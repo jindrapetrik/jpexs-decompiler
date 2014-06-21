@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -110,8 +110,8 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((int) c);
     }
 
-    public DefineFont3Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineFont3", pos, length);
+    public DefineFont3Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineFont3", pos, length);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -68,8 +68,8 @@ public class EnableDebugger2Tag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public EnableDebugger2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "EnableDebugger2", pos, length);
+    public EnableDebugger2Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "EnableDebugger2", pos, length);
         reserved = sis.readUI16();
         passwordHash = sis.readString();
     }

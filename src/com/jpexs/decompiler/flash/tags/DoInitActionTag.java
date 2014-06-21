@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -60,8 +59,8 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * @param pos
      * @throws IOException
      */
-    public DoInitActionTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DoInitAction", pos, length);
+    public DoInitActionTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DoInitAction", pos, length);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();
         actionBytes = sis.readBytesEx(sis.available());

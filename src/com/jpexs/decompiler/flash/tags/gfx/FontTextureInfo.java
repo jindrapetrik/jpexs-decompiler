@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
@@ -89,8 +89,8 @@ public class FontTextureInfo extends Tag {
      * @param pos
      * @throws IOException
      */
-    public FontTextureInfo(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "FontTextureInfo", pos, length);
+    public FontTextureInfo(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "FontTextureInfo", pos, length);
         textureID = sis.readUI32();
         textureFormat = sis.readUI16();
         int fileNameLen = sis.readUI8();

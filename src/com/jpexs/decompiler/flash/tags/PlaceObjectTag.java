@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -104,8 +104,8 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "PlaceObject", pos, length);
+    public PlaceObjectTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "PlaceObject", pos, length);
         characterId = sis.readUI16();
         depth = sis.readUI16();
         matrix = sis.readMatrix();

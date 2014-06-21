@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
@@ -221,14 +222,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public TagTree tagTree;
+    public DumpTree dumpTree;
     private final FlashPlayerPanel flashPanel;
     private final JPanel contentPanel;
     private final JPanel displayPanel;
     private JPanel folderPreviewPanel;
+    private JPanel dumpViewPanel;
+    private JLabel dumpViewLabel; // very very simple dump view, todo: hexview with virtual scrolling
     private boolean isWelcomeScreen = true;
     private static final String CARDPREVIEWPANEL = "Preview card";
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
     private static final String CARDEMPTYPANEL = "Empty card";
+    private static final String CARDDUMPVIEW = "Dump view";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
@@ -242,6 +247,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
     private PreviewPanel previewPanel;
+    private JPanel treePanel;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
@@ -494,6 +500,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return folderPreviewCard;
     }
 
+    private JPanel createDumpPreviewCard() {
+        JPanel dumpViewCard = new JPanel(new BorderLayout());
+        dumpViewPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        dumpViewLabel = new JLabel();
+        dumpViewPanel.add(dumpViewLabel);
+        dumpViewCard.add(new JScrollPane(dumpViewPanel), BorderLayout.CENTER);
+
+        return dumpViewCard;
+    }
+
     public String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -603,6 +619,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         createContextMenu();
 
+        dumpTree = new DumpTree((DumpTreeModel) null);
+        dumpTree.addTreeSelectionListener(this);
+
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
 
@@ -611,6 +630,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel = new PreviewPanel(this, flashPanel);
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
+        displayPanel.add(createDumpPreviewCard(), CARDDUMPVIEW);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
@@ -629,9 +649,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         });
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
-        JPanel pan1 = new JPanel(new BorderLayout());
-        pan1.add(new JScrollPane(tagTree), BorderLayout.CENTER);
-        pan1.add(searchPanel, BorderLayout.SOUTH);
+        treePanel = new JPanel(new BorderLayout());
+        showDumpView(Configuration.dumpView.get());
+        treePanel.add(searchPanel, BorderLayout.SOUTH);
 
         filterField.addActionListener(this);
 
@@ -659,7 +679,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
 
         //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pan1, detailPanel);
+        splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, detailPanel);
         splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
 
         welcomePanel = createWelcomePanel();
@@ -719,6 +739,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             swf.isAS3 = hasAbc;
 
             tagTree.setModel(new TagTreeModel(mainFrame, swfs));
+            dumpTree.setModel(new DumpTreeModel(swfs));
 
             if (hasAbc) {
                 if (abcPanel == null) {
@@ -2363,8 +2384,25 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         cl.show(displayPanel, card);
     }
 
+    private void dumpTreeValueChanged(TreeSelectionEvent e) {
+        showCard(CARDDUMPVIEW);
+        DumpInfo dumpInfo = (DumpInfo) e.getPath().getLastPathComponent();
+        if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
+            // todo
+            dumpViewLabel.setText("startByte: " + dumpInfo.startByte + 
+                    " startBit: " + dumpInfo.startBit +
+                    " lengthBytes: " + dumpInfo.lengthBytes +
+                    " lengthBits: " + dumpInfo.lengthBits);
+        }
+    }
+    
     @Override
     public void valueChanged(TreeSelectionEvent e) {
+        Object source = e.getSource();
+        if (source == dumpTree) {
+            dumpTreeValueChanged(e);
+            return;
+        }
         TreeNode treeNode = (TreeNode) e.getPath().getLastPathComponent();
         TreeItem treeItem = treeNode.getItem();
         if (!(treeItem instanceof SWFList)) {
@@ -2402,6 +2440,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public boolean isInternalFlashViewerSelected() {
         return mainMenu.isInternalFlashViewerSelected();
+    }
+
+    public void showDumpView(boolean show) {
+        treePanel.removeAll();
+        if (show) {
+            treePanel.add(new JScrollPane(dumpTree), BorderLayout.CENTER);
+        } else {
+            treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
+        }
+        treePanel.revalidate();
     }
 
     public void reload(boolean forceReload) {

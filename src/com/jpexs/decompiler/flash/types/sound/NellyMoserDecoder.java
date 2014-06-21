@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import lt.dkd.nellymoser.CodecImpl;
@@ -35,16 +36,15 @@ public class NellyMoserDecoder extends SoundDecoder {
     }
 
     @Override
-    public void decode(byte[] data, OutputStream os) throws IOException {
+    public void decode(SWFInputStream sis, OutputStream os) throws IOException {
         soundFormat.stereo = false;
         float audioD[] = new float[NELLY_SAMPLES];
 
         final float[] state = new float[64];
 
-        byte[] block = new byte[NELLY_BLOCK_LEN];
-        int blockCount = data.length / NELLY_BLOCK_LEN;
+        int blockCount = sis.available() / NELLY_BLOCK_LEN;
         for (int j = 0; j < blockCount; j++) {
-            System.arraycopy(data, j * NELLY_BLOCK_LEN, block, 0, NELLY_BLOCK_LEN);
+            byte[] block = sis.readBytesEx(NELLY_BLOCK_LEN);
             CodecImpl.decode(state, block, audioD);
             short audio[] = new short[NELLY_SAMPLES];
             for (int i = 0; i < audioD.length; i++) {

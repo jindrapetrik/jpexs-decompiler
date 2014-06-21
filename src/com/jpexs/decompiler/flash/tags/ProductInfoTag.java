@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -44,8 +44,8 @@ public class ProductInfoTag extends Tag {
     public long compilationDateHigh;
     public static final int ID = 41;
 
-    public ProductInfoTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "ProductInfo", pos, length);
+    public ProductInfoTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "ProductInfo", pos, length);
         /*
          * 0: Unknown
          * 1: Macromedia Flex for J2EE

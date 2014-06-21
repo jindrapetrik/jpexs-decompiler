@@ -661,7 +661,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         this.tag = tag;
         SWF swf = tag.getSwf();
         try {
-            this.editedTag = SWFInputStream.resolveTag(swf, tag, 0, false, true, swf.gfx);
+            this.editedTag = SWFInputStream.resolveTag(tag, 0, false, true, swf.gfx);
         } catch (InterruptedException ex) {
         }
         tree.setEditable(edit);

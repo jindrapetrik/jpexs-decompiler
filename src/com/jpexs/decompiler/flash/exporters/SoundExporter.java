@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
@@ -139,7 +141,9 @@ public class SoundExporter {
                 }
             }
         } else {
-            fmt.createWav(st.getRawSoundData(), fos);
+            byte[] soundData = st.getRawSoundData();
+            SWF swf = ((Tag) st).getSwf();
+            fmt.createWav(new SWFInputStream(swf, soundData), fos);
         }
     }
 

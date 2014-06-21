@@ -427,6 +427,8 @@ public class SWFOutputStream extends OutputStream {
             tagPositions.put(tag, pos);
             tagLengths.put(tag, length);
         }
+        
+        // todo: honfika: update tag position and lengths. Currently the 2nd save fails
     }
 
     /**

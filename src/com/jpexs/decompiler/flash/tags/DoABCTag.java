@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -57,9 +57,9 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @param pos
      * @throws IOException
      */
-    public DoABCTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DoABC", pos, length);
-        abc = new ABC(sis.getBaseStream(), swf, this);
+    public DoABCTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DoABC", pos, length);
+        abc = new ABC(sis, swf, this);
     }
 
     /**

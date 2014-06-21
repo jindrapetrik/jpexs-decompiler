@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -103,8 +103,8 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      * @param pos
      * @throws IOException
      */
-    public DefineVideoStreamTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineVideoStream", pos, length);
+    public DefineVideoStreamTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineVideoStream", pos, length);
         characterID = sis.readUI16();
         numFrames = sis.readUI16();
         width = sis.readUI16();

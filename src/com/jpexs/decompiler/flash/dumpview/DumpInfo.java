@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.dumpview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -23,28 +26,45 @@ package com.jpexs.decompiler.flash.dumpview;
 public class DumpInfo {
 
     public String name;
+    public String type;
 
     public Object previewValue;
 
-    public int startByte;
+    public long startByte;
 
     public int startBit;
     
-    public int lengthBytes;
+    public long lengthBytes;
 
     public int lengthBits;
     
-    public DumpInfo(int startByte, int lengthBytes) {
+    public DumpInfo parent;
+    
+    public List<DumpInfo> childInfos = new ArrayList<>();
+    
+    public DumpInfo(String name, String type, Object value, long startByte, int lengthBytes) {
         
+        this.name = name;
+        this.type = type;
+        this.previewValue = value;
         this.startByte = startByte;
         this.lengthBytes = lengthBytes;
     }
 
-    public DumpInfo(int startByte, int startBit, int lengthBytes, int lengthBits) {
+    public DumpInfo(String name, String type, Object value, long startByte, int startBit, long lengthBytes, int lengthBits) {
         
+        this.name = name;
+        this.type = type;
+        this.previewValue = value;
         this.startByte = startByte;
         this.lengthBytes = lengthBytes;
         this.startBit = startBit;
         this.lengthBits = lengthBits;
+    }
+
+    @Override
+    public String toString() {
+        String value = previewValue == null ? "" : previewValue.toString();
+        return name + "(" + type + ")" + (value.isEmpty() ? "" : " = " + value);
     }
 }

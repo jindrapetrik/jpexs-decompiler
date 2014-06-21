@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
@@ -42,8 +42,8 @@ public class DefineFontAlignZonesTag extends Tag {
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 
-    public DefineFontAlignZonesTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineFontAlignZones", pos, length);
+    public DefineFontAlignZonesTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineFontAlignZones", pos, length);
         fontID = sis.readUI16();
         CSMTableHint = (int) sis.readUB(2);
         reserved = (int) sis.readUB(6);

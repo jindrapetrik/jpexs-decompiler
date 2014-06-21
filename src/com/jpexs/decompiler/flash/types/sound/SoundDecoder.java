@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,11 +33,11 @@ public abstract class SoundDecoder {
         this.soundFormat = soundFormat;
     }
 
-    public byte[] decode(byte[] data) throws IOException {
+    public byte[] decode(SWFInputStream sis) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(data, baos);
+        decode(sis, baos);
         return baos.toByteArray();
     }
 
-    public abstract void decode(byte[] data, OutputStream os) throws IOException;
+    public abstract void decode(SWFInputStream sis, OutputStream os) throws IOException;
 }

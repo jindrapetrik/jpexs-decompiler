@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -699,8 +699,8 @@ public class DefineEditTextTag extends TextTag {
      * @param pos
      * @throws IOException
      */
-    public DefineEditTextTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineEditText", pos, length);
+    public DefineEditTextTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineEditText", pos, length);
         characterID = sis.readUI16();
         bounds = sis.readRECT();
         hasText = sis.readUB(1) == 1;

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
@@ -60,8 +60,8 @@ public class ExportAssetsTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public ExportAssetsTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "ExportAssets", pos, length);
+    public ExportAssetsTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "ExportAssets", pos, length);
         int count = sis.readUI16();
         tags = new ArrayList<>();
         names = new ArrayList<>();

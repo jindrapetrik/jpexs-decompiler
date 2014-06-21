@@ -91,6 +91,10 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> internalFlashViewer = null;
 
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static final ConfigurationItem<Boolean> dumpView = null;
+
+    @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
 

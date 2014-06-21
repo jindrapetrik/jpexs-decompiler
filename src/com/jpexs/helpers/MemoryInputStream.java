@@ -26,21 +26,17 @@ import java.io.IOException;
 public class MemoryInputStream extends SeekableInputStream {
 
     private final byte[] buffer;
-    private long pos = 0;
-    private int count = 0;
-    private int startPos = 0;
-    private int maxLength = -1;
+    private long pos;
+    private int count;
+    private int startPos;
+    private int maxLength;
 
-    public MemoryInputStream(byte[] buffer) {
-        this.buffer = buffer;
+    public MemoryInputStream(byte[] buffer) throws IOException {
+        this(buffer, 0, buffer.length);
     }
 
     public MemoryInputStream(byte[] buffer, int startPos) throws IOException {
-        this.buffer = buffer;
-        if (startPos >= buffer.length) {
-            throw new IOException("Invalid startPos");
-        }
-        this.startPos = startPos;
+        this(buffer, startPos, buffer.length - startPos);
     }
 
     public MemoryInputStream(byte[] buffer, int startPos, int maxLength) throws IOException {
@@ -51,7 +47,7 @@ public class MemoryInputStream extends SeekableInputStream {
         }
         this.maxLength = maxLength;
         if (startPos + maxLength >= buffer.length) {
-            this.maxLength = buffer.length - startPos - 1;
+            this.maxLength = buffer.length - startPos;
         }
     }
 
@@ -83,7 +79,7 @@ public class MemoryInputStream extends SeekableInputStream {
             count = (int) pos;
         }
 
-        if (pos < getLength()) {
+        if (pos < length()) {
             int ret = buffer[(int) pos + startPos] & 0xff;
             pos++;
             return ret;
@@ -92,19 +88,12 @@ public class MemoryInputStream extends SeekableInputStream {
         return -1;
     }
 
-    private int getLength() {
-        if (maxLength == -1) {
-            return buffer.length - startPos;
-        }
+    private int length() {
         return maxLength;
     }
 
     @Override
     public int available() throws IOException {
-        return buffer.length - (int) pos;
-    }
-
-    public long length() throws IOException {
-        return buffer.length;
+        return maxLength - (int) pos;
     }
 }

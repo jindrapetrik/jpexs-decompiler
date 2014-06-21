@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -103,8 +103,8 @@ public class DefineButtonSoundTag extends CharacterIdTag {
      * @param pos
      * @throws IOException
      */
-    public DefineButtonSoundTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineButtonSound", pos, length);
+    public DefineButtonSoundTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineButtonSound", pos, length);
         buttonId = sis.readUI16();
         buttonSoundChar0 = sis.readUI16();
         if (buttonSoundChar0 != 0) {

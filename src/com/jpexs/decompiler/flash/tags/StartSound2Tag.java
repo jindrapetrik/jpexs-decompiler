@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import java.io.ByteArrayOutputStream;
@@ -59,8 +59,8 @@ public class StartSound2Tag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public StartSound2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "StartSound2", pos, length);
+    public StartSound2Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "StartSound2", pos, length);
         soundClassName = sis.readString();
         soundInfo = sis.readSOUNDINFO();
     }

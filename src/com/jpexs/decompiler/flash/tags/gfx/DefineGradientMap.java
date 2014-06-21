@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayOutputStream;
@@ -61,8 +61,8 @@ public class DefineGradientMap extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineGradientMap(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineGradientMap", pos, length);
+    public DefineGradientMap(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineGradientMap", pos, length);
         int numGradients = sis.readUI16();
         indices = new int[numGradients];
         for (int i = 0; i < numGradients; i++) {

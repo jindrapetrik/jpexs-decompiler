@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
@@ -34,8 +34,8 @@ public class SymbolClassTag extends Tag {
     public String[] names;
     public static final int ID = 76;
 
-    public SymbolClassTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "SymbolClass", pos, length);
+    public SymbolClassTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "SymbolClass", pos, length);
         int numSymbols = sis.readUI16();
         tags = new int[numSymbols];
         names = new String[numSymbols];

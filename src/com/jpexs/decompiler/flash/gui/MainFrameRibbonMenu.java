@@ -86,6 +86,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
     static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
     static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
+    static final String ACTION_DUMP_VIEW_SWITCH = "DUMPVIEWSWITCH";
     static final String ACTION_SEARCH = "SEARCH";
     static final String ACTION_TIMELINE = "TIMELINE";
     static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
@@ -122,6 +123,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
     private JCheckBox miAutoDeobfuscation;
     private JCheckBox miInternalViewer;
+    private JCheckBox miDumpView;
     private JCheckBox miParallelSpeedUp;
     private JCheckBox miAssociate;
     private JCheckBox miDecompile;
@@ -425,6 +427,11 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         miAutoRenameIdentifiers.setActionCommand(ACTION_AUTO_RENAME_IDENTIFIERS);
         miAutoRenameIdentifiers.addActionListener(this);
 
+        miDumpView = new JCheckBox(translate("menu.settings.dumpView"));
+        miDumpView.setSelected(Configuration.dumpView.get());
+        miDumpView.setActionCommand(ACTION_DUMP_VIEW_SWITCH);
+        miDumpView.addActionListener(this);
+
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
@@ -435,6 +442,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
         settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoRenameIdentifiers));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miDumpView));
 
         JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
         List<RibbonBandResizePolicy> languageBandResizePolicies = getIconBandResizePolicies(languageBand);
@@ -609,6 +617,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             case ACTION_INTERNAL_VIEWER_SWITCH:
                 Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
                 mainFrame.panel.reload(true);
+                break;
+            case ACTION_DUMP_VIEW_SWITCH:
+                Configuration.internalFlashViewer.set(miDumpView.isSelected());
+                mainFrame.panel.showDumpView(miDumpView.isSelected());
                 break;
             case ACTION_SEARCH:
                 mainFrame.panel.searchAs();

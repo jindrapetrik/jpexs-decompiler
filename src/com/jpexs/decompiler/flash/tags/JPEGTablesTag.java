@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.IOException;
 
@@ -26,8 +26,8 @@ public class JPEGTablesTag extends Tag {
     @Internal
     public byte[] jpegData;
 
-    public JPEGTablesTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "JPEGTables", pos, length);
+    public JPEGTablesTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "JPEGTables", pos, length);
         jpegData = sis.readBytesEx(sis.available());
     }
 }

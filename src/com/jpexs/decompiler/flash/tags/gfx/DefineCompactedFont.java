@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -88,8 +88,8 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
      * @param pos
      * @throws IOException
      */
-    public DefineCompactedFont(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineCompactedFont", pos, length);
+    public DefineCompactedFont(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineCompactedFont", pos, length);
 
         fontId = sis.readUI16();
         fonts = new ArrayList<>();

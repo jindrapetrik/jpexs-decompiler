@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CXFORM;
@@ -63,8 +63,8 @@ public class DefineButtonCxformTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineButtonCxformTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineButtonCxform", pos, length);
+    public DefineButtonCxformTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineButtonCxform", pos, length);
         buttonId = sis.readUI16();
         buttonColorTransform = sis.readCXFORM();
     }

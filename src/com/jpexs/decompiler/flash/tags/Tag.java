@@ -44,7 +44,7 @@ import java.util.Set;
 /**
  * Represents Tag inside SWF file
  */
-public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializable {
+public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializable {
 
     /**
      * Identifier of tag type
@@ -213,7 +213,6 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
                             StartSound2Tag.ID,
                             StartSoundTag.ID,
                             SymbolClassTag.ID,
-                            TagStub.ID,
                             VideoFrameTag.ID,
                             DefineCompactedFont.ID,
                             DefineExternalGradient.ID,
@@ -339,8 +338,6 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         } else {
             sos.write(swf.uncompressedData, (int) pos, length);
         }
-        
-        //todo: honfika: update pos and length during save
     }
 
     /**

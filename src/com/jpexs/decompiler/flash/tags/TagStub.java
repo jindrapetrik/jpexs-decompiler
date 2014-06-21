@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import java.io.IOException;
+import com.jpexs.decompiler.flash.SWFInputStream;
 
 /**
  *
@@ -26,28 +26,24 @@ import java.io.IOException;
  */
 public class TagStub extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        return getOriginalData();
-    }
-
+    private SWFInputStream dataStream;
+    
     /**
      * Constructor
      *
      * @param swf
+     * @param id
      * @param length
+     * @param name
      * @param pos
-     * @throws IOException
+     * @param sis
      */
-    public TagStub(SWF swf, long pos, int length) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, pos, length);
+    public TagStub(SWF swf, int id, String name, long pos, int length, SWFInputStream sis) {
+        super(swf, id, name, pos, length);
+        dataStream = sis;
+    }
 
+    public SWFInputStream getDataStream() {
+        return dataStream;
     }
 }

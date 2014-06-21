@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -56,8 +56,8 @@ public class ImportAssetsTag extends Tag implements ImportTag {
      * @param pos
      * @throws IOException
      */
-    public ImportAssetsTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "ImportAssets", pos, length);
+    public ImportAssetsTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "ImportAssets", pos, length);
         tags = new ArrayList<>();
         names = new ArrayList<>();
         url = sis.readString();

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -48,8 +48,8 @@ public class FileAttributesTag extends Tag {
         super(swf, ID, "FileAttributes", 0, 0);
     }
 
-    public FileAttributesTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "FileAttributes", pos, length);
+    public FileAttributesTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "FileAttributes", pos, length);
         reserved1 = sis.readUB(1) == 1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1) != 0;

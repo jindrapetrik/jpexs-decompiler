@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayOutputStream;
@@ -71,8 +71,8 @@ public class DefineExternalImage extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineExternalImage(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineExternalImage", pos, length);
+    public DefineExternalImage(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineExternalImage", pos, length);
         characterId = sis.readUI16();
         bitmapFormat = sis.readUI16();
         targetWidth = sis.readUI16();

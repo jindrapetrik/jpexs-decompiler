@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -130,8 +130,8 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
      * @param pos
      * @throws IOException
      */
-    public DefineMorphShapeTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineMorphShape", pos, length);
+    public DefineMorphShapeTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineMorphShape", pos, length);
         characterId = sis.readUI16();
         startBounds = sis.readRECT();
         endBounds = sis.readRECT();

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayOutputStream;
@@ -68,8 +68,8 @@ public class DefineSubImage extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineSubImage(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineSubImage", pos, length);
+    public DefineSubImage(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineSubImage", pos, length);
         characterId = sis.readUI16();
         imageCharacterId = sis.readUI16();
         x1 = sis.readUI16();

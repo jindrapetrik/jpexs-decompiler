@@ -17,6 +17,7 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -31,8 +32,8 @@ public class NoDecoder extends SoundDecoder {
     }
 
     @Override
-    public void decode(byte[] data, OutputStream os) throws IOException {
-        os.write(data);
+    public void decode(SWFInputStream sis, OutputStream os) throws IOException {
+        os.write(sis.readBytesEx(sis.available()));
     }
 
 }

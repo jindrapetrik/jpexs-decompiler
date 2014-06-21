@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
@@ -82,8 +82,8 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineSceneAndFrameLabelDataTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineSceneAndFrameLabelData", pos, length);
+    public DefineSceneAndFrameLabelDataTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineSceneAndFrameLabelData", pos, length);
         int sceneCount = (int) sis.readEncodedU32();
         sceneOffsets = new long[sceneCount];
         sceneNames = new String[sceneCount];

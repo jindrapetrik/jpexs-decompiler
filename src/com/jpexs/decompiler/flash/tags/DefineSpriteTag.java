@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -201,11 +201,11 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public DefineSpriteTag(SWFLimitedInputStream sis, int level, long pos, int length, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(sis.swf, ID, "DefineSprite", pos, length);
+    public DefineSpriteTag(SWFInputStream sis, int level, long pos, int length, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+        super(sis.getSwf(), ID, "DefineSprite", pos, length);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        List<Tag> subTags = sis.readTagList(swf, this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
+        List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
         if (subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
             subTags.remove(subTags.size() - 1);

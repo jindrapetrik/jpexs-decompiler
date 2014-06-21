@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -79,26 +80,26 @@ public class SoundFormat {
         ensureFormat();
     }
 
-    public byte[] decode(byte data[]) {
+    public byte[] decode(SWFInputStream sis) {
         try {
-            return getDecoder().decode(data);
+            return getDecoder().decode(sis);
         } catch (IOException ex) {
             return null;
         }
     }
 
-    public boolean decode(byte[] data, OutputStream os) {
+    public boolean decode(SWFInputStream sis, OutputStream os) {
         try {
-            getDecoder().decode(data, os);
+            getDecoder().decode(sis, os);
             return true;
         } catch (IOException ex) {
             return false;
         }
     }
 
-    public boolean play(byte[] data) {
+    public boolean play(SWFInputStream sis) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (!decode(data, baos)) {
+        if (!decode(sis, baos)) {
             return false;
         }
 
@@ -161,10 +162,10 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(byte[] data, OutputStream os) {
+    public boolean createWav(SWFInputStream sis, OutputStream os) {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(data, baos);
+        decode(sis, baos);
         try {
             createWavFromPcmData(os, samplingRate, true, stereo, baos.toByteArray());
             return true;

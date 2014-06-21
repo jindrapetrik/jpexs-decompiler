@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -100,8 +100,8 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      * @param pos
      * @throws IOException
      */
-    public DefineSoundTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineSound", pos, length);
+    public DefineSoundTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineSound", pos, length);
         soundId = sis.readUI16();
         soundFormat = (int) sis.readUB(4);
         soundRate = (int) sis.readUB(2);
@@ -235,7 +235,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     }
                 }
                 try {
-                    MP3SOUNDDATA snd = new MP3SOUNDDATA(swf, mp3data, true);
+                    MP3SOUNDDATA snd = new MP3SOUNDDATA(new SWFInputStream(swf, mp3data), true);
                     if (!snd.frames.isEmpty()) {
                         MP3FRAME fr = snd.frames.get(0);
                         newSoundRate = fr.getSamplingRate();

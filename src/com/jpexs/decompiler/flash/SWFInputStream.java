@@ -120,6 +120,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -189,6 +190,7 @@ import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -263,7 +265,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -289,12 +290,13 @@ import java.util.zip.InflaterInputStream;
  */
 public class SWFInputStream implements AutoCloseable {
 
-    private SeekableInputStream is;
-    private long pos;
+    private MemoryInputStream is;
+    private long startingPos;
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
     private final List<ProgressListener> listeners = new ArrayList<>();
     private long percentMax;
-    public SWF swf;
+    private SWF swf;
+    public DumpInfo dumpInfo;
 
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
@@ -317,11 +319,13 @@ public class SWFInputStream implements AutoCloseable {
      * @param swf SWF to read
      * @param data SWF data
      * @param startingPos
+     * @param limit
+     * @throws java.io.IOException
      */
-    public SWFInputStream(SWF swf, byte[] data, long startingPos) {
+    public SWFInputStream(SWF swf, byte[] data, long startingPos, int limit) throws IOException {
         this.swf = swf;
-        this.is = new MemoryInputStream(data);
-        pos = startingPos;
+        this.startingPos = startingPos;
+        is = new MemoryInputStream(data, 0, limit);
     }
 
     /**
@@ -329,9 +333,14 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param swf SWF to read
      * @param data SWF data
+     * @throws java.io.IOException
      */
-    public SWFInputStream(SWF swf, byte[] data) {
-        this(swf, data, 0L);
+    public SWFInputStream(SWF swf, byte[] data) throws IOException {
+        this(swf, data, 0L, data.length);
+    }
+
+    public SWF getSwf() {
+        return swf;
     }
 
     /**
@@ -340,7 +349,7 @@ public class SWFInputStream implements AutoCloseable {
      * @return Number of bytes
      */
     public long getPos() {
-        return pos;
+        return startingPos + is.getPos();
     }
 
     /**
@@ -350,51 +359,48 @@ public class SWFInputStream implements AutoCloseable {
      * @throws java.io.IOException
      */
     public void seek(long pos) throws IOException {
-        if (is instanceof SeekableInputStream) {
-            SeekableInputStream sis = (SeekableInputStream) is;
-            sis.seek(pos);
-        } else {
-            throw new IOException("Underlying stream is not a SeekableInputStream");
-        }
+        is.seek(pos - startingPos);
     }
 
+    private void newDumpLevel(String name) {
+        String type = name;
+        if (dumpInfo != null) {
+            DumpInfo di = new DumpInfo(name, type, null, is.getPos(), 0);
+            di.parent = dumpInfo;
+            dumpInfo.childInfos.add(di);
+            dumpInfo = di;
+        }
+    }
+    
+    private void endDumpLevel() {
+        if (dumpInfo != null) {
+            if (dumpInfo.lengthBits == 0) {
+                dumpInfo.lengthBytes = is.getPos() - dumpInfo.startByte;
+            }
+            dumpInfo = dumpInfo.parent;
+        }
+    }
+    
     /**
      * Reads one byte from the stream
      *
-     * @return byte or -1 on error
+     * @return byte
      * @throws IOException
      */
-    public int read() throws IOException {
-        bitPos = 0;
-        try {
-            return readNoBitReset();
-        } catch (EOFException | EndOfStreamException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        return -1;
-    }
-
-    public int readEx() throws IOException {
+    private int readEx() throws IOException {
         bitPos = 0;
         return readNoBitReset();
     }
 
-    public int read(byte[] b, int off, int len) throws IOException {
-        int bytesRead = is.read(b, off, len);
-        bitPos = 0;
-        pos += bytesRead;
-        return bytesRead;
-    }
-
-    public void alignByte() {
+    private void alignByte() {
         bitPos = 0;
     }
+    
     private int lastPercent = -1;
 
     private int readNoBitReset() throws IOException, EndOfStreamException {
-        pos++;
-        if (percentMax > 0) {
-            int percent = (int) (pos * 100 / percentMax);
+        if (listeners.size() > 0 && percentMax > 0) {
+            int percent = (int) (getPos() * 100 / percentMax);
             if (lastPercent != percent) {
                 for (ProgressListener pl : listeners) {
                     pl.progress(percent);
@@ -416,7 +422,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public int readUI8() throws IOException {
-        return readEx();
+        newDumpLevel("UI8");
+        int ret = readEx();
+        endDumpLevel();
+        return ret;
     }
 
     /**
@@ -426,11 +435,13 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public String readString() throws IOException {
+        newDumpLevel("string");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int r;
         while (true) {
             r = readEx();
             if (r == 0) {
+                endDumpLevel();
                 return new String(baos.toByteArray(), Utf8Helper.charset);
             }
             baos.write(r);
@@ -444,7 +455,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public long readUI32() throws IOException {
-        return (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffff;
+        newDumpLevel("UI8");
+        long ret = (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffff;
+        endDumpLevel();
+        return ret;
     }
 
     /**
@@ -454,11 +468,17 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public int readUI16() throws IOException {
-        return readEx() + (readEx() << 8);
+        newDumpLevel("UI16");
+        int ret = readEx() + (readEx() << 8);
+        endDumpLevel();
+        return ret;
     }
 
     public int readUI24() throws IOException {
-        return readEx() + (readEx() << 8) + (readEx() << 16);
+        newDumpLevel("UI24");
+        int ret = readEx() + (readEx() << 8) + (readEx() << 16);
+        endDumpLevel();
+        return ret;
     }
 
     /**
@@ -468,7 +488,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public long readSI32() throws IOException {
+        newDumpLevel("SI32");
         long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
+        endDumpLevel();
         if (uval >= 0x80000000) {
             return -(((~uval) & 0xffffffff) + 1);
         } else {
@@ -483,7 +505,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public int readSI16() throws IOException {
+        newDumpLevel("SI16");
         int uval = readEx() + (readEx() << 8);
+        endDumpLevel();
         if (uval >= 0x8000) {
             return -(((~uval) & 0xffff) + 1);
         } else {
@@ -498,7 +522,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public int readSI8() throws IOException {
+        newDumpLevel("SI8");
         int uval = readEx();
+        endDumpLevel();
         if (uval >= 0x80) {
             return -(((~uval) & 0xff) + 1);
         } else {
@@ -513,8 +539,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public double readFIXED() throws IOException {
+        newDumpLevel("FIXED");
         int afterPoint = readUI16();
         int beforePoint = readUI16();
+        endDumpLevel();
         return ((double) ((beforePoint << 16) + afterPoint)) / 65536;
     }
 
@@ -525,8 +553,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public float readFIXED8() throws IOException {
+        newDumpLevel("FIXED8");
         int afterPoint = readEx();
         int beforePoint = readEx();
+        endDumpLevel();
         return beforePoint + (((float) afterPoint) / 256);
     }
 
@@ -550,7 +580,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public double readDOUBLE() throws IOException {
+        newDumpLevel("DOUBLE");
         long el = readLong();
+        endDumpLevel();
         double ret = Double.longBitsToDouble(el);
         return ret;
     }
@@ -598,10 +630,12 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return new byte[0];
         }
+        newDumpLevel("bytes");
         byte[] ret = new byte[(int) count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) readEx();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -633,6 +667,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return new byte[0];
         }
+        newDumpLevel("bytes");
         byte[] ret = new byte[count];
         int i = 0;
         try {
@@ -643,6 +678,7 @@ public class SWFInputStream implements AutoCloseable {
             ret = Arrays.copyOf(ret, i); // truncate array
             logger.log(Level.SEVERE, null, ex);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -665,23 +701,29 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public long readEncodedU32() throws IOException {
+        newDumpLevel("encodedU32");
         int result = readEx();
         if ((result & 0x00000080) == 0) {
+            endDumpLevel();
             return result;
         }
         result = (result & 0x0000007f) | (readEx()) << 7;
         if ((result & 0x00004000) == 0) {
+            endDumpLevel();
             return result;
         }
         result = (result & 0x00003fff) | (readEx()) << 14;
         if ((result & 0x00200000) == 0) {
+            endDumpLevel();
             return result;
         }
         result = (result & 0x001fffff) | (readEx()) << 21;
         if ((result & 0x10000000) == 0) {
+            endDumpLevel();
             return result;
         }
         result = (result & 0x0fffffff) | (readEx()) << 28;
+        endDumpLevel();
         return result;
     }
     private int bitPos = 0;
@@ -702,6 +744,7 @@ public class SWFInputStream implements AutoCloseable {
         if (bitPos == 0) {
             tempByte = readNoBitReset();
         }
+        newDumpLevel("UB");
         for (int bit = 0; bit < nBits; bit++) {
             int nb = (tempByte >> (7 - bitPos)) & 1;
             ret += (nb << (nBits - 1 - bit));
@@ -713,6 +756,7 @@ public class SWFInputStream implements AutoCloseable {
                 }
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -756,6 +800,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public RECT readRECT() throws IOException {
         RECT ret = new RECT();
+        newDumpLevel("RECT");
         int NBits = (int) readUB(5);
         ret.Xmin = (int) readSB(NBits);
         ret.Xmax = (int) readSB(NBits);
@@ -763,6 +808,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.Ymax = (int) readSB(NBits);
         ret.nbits = NBits;
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -797,22 +843,20 @@ public class SWFInputStream implements AutoCloseable {
         private final int level;
         private final boolean parallel;
         private final boolean skipUnusualTags;
-        private final SWF swf;
         private final boolean gfx;
 
-        public TagResolutionTask(SWF swf, Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
+        public TagResolutionTask(Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
             this.tag = tag;
             this.level = level;
             this.parallel = parallel;
             this.skipUnusualTags = skipUnusualTags;
-            this.swf = swf;
             this.gfx = gfx;
         }
 
         @Override
         public Tag call() throws Exception {
             try {
-                return resolveTag(swf, tag, level, parallel, skipUnusualTags, gfx);
+                return resolveTag(tag, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 return tag;
@@ -824,7 +868,6 @@ public class SWFInputStream implements AutoCloseable {
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
      * of the stream. Optionally can skip AS1/2 tags when file is AS3
      *
-     * @param swf
      * @param timelined
      * @param level
      * @param parallel
@@ -835,7 +878,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public List<Tag> readTagList(SWF swf, Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean gfx) throws IOException, InterruptedException {
+    public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean gfx) throws IOException, InterruptedException {
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
@@ -847,11 +890,13 @@ public class SWFInputStream implements AutoCloseable {
         boolean isAS3 = false;
         while (true) {
             long pos = getPos();
+            newDumpLevel("TAG");
             try {
-                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
+                tag = readTag(level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
+            endDumpLevel();
             if (tag == null) {
                 break;
             }
@@ -870,7 +915,7 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(swf, tag, level, parallel, skipUnusualTags, gfx);
+                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(tag, level, parallel, skipUnusualTags, gfx);
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -911,7 +956,7 @@ public class SWFInputStream implements AutoCloseable {
             }
             if (parseTags && doParse) {
                 if (parallel) {
-                    Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, level, parallel, skipUnusualTags, gfx));
+                    Future<Tag> future = executor.submit(new TagResolutionTask(tag, level, parallel, skipUnusualTags, gfx));
                     futureResults.add(future);
                 }
             }
@@ -937,13 +982,18 @@ public class SWFInputStream implements AutoCloseable {
         return tags;
     }
 
-    public static Tag resolveTag(SWF swf, Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
+    public static Tag resolveTag(Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
         Tag ret;
 
-        byte[] data = tag.getData();
+        if (!(tag instanceof TagStub)) {
+            return tag;
+        }
+        
         long pos = tag.getPos();
         int length = tag.getOriginalLength();
-        SWFLimitedInputStream sis = new SWFLimitedInputStream(swf, new SWFInputStream(swf, data, tag.getDataPos()), length);
+        SWF swf = tag.getSwf();
+        TagStub tagStub = (TagStub) tag;
+        SWFInputStream sis = tagStub.getDataStream();
         
         try {
             switch (tag.getId()) {
@@ -1217,7 +1267,7 @@ public class SWFInputStream implements AutoCloseable {
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Error during tag reading", ex);
-            ret = new Tag(swf, tag.getId(), "ErrorTag", pos, length);
+            ret = new TagStub(swf, tag.getId(), "ErrorTag", pos, length, null);
         }
         ret.forceWriteAsLong = tag.forceWriteAsLong;
         ret.setTimelined(tag.getTimelined());
@@ -1228,7 +1278,6 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one Tag from the stream with optional resolving (= reading tag
      * content)
      *
-     * @param swf
      * @param level
      * @param pos
      * @param resolve
@@ -1239,7 +1288,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
+    public Tag readTag(int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
 
@@ -1251,13 +1300,16 @@ public class SWFInputStream implements AutoCloseable {
             tagLength = readSI32();
             readLong = true;
         }
-        skipBytes((int) tagLength);
-        Tag ret = new Tag(swf, tagID, "Unresolved", pos, (int) (tagLength + (readLong ? 6 : 2)));
+        int headerLength = readLong ? 6 : 2;
+        SWFInputStream tagDataStream = getLimitedStream((int) tagLength);
+        TagStub tagStub = new TagStub(swf, tagID, "Unresolved", pos, (int) (tagLength + headerLength), tagDataStream);
+        Tag ret = tagStub;
         ret.forceWriteAsLong = readLong;
+        skipBytes((int) tagLength);
 
         if (resolve) {
             try {
-                ret = resolveTag(swf, ret, level, parallel, skipUnusualTags, gfx);
+                ret = resolveTag(ret, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -1550,6 +1602,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MATRIX readMatrix() throws IOException {
         MATRIX ret = new MATRIX();
+        newDumpLevel("MATRIX");
         ret.hasScale = readUB(1) == 1;
         if (ret.hasScale) {
             int NScaleBits = (int) readUB(5);
@@ -1569,6 +1622,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.translateY = (int) readSB(NTranslateBits);
         ret.nTranslateBits = NTranslateBits;
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -1580,6 +1634,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CXFORMWITHALPHA readCXFORMWITHALPHA() throws IOException {
         CXFORMWITHALPHA ret = new CXFORMWITHALPHA();
+        newDumpLevel("CXFORMWITHALPHA");
         ret.hasAddTerms = readUB(1) == 1;
         ret.hasMultTerms = readUB(1) == 1;
         int Nbits = (int) readUB(4);
@@ -1597,6 +1652,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.alphaAddTerm = (int) readSB(Nbits);
         }
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -1608,6 +1664,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CXFORM readCXFORM() throws IOException {
         CXFORM ret = new CXFORM();
+        newDumpLevel("CXFORM");
         ret.hasAddTerms = readUB(1) == 1;
         ret.hasMultTerms = readUB(1) == 1;
         int Nbits = (int) readUB(4);
@@ -1623,6 +1680,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.blueAddTerm = (int) readSB(Nbits);
         }
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -1634,6 +1692,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CLIPEVENTFLAGS readCLIPEVENTFLAGS() throws IOException {
         CLIPEVENTFLAGS ret = new CLIPEVENTFLAGS();
+        newDumpLevel("CLIPEVENTFLAGS");
         ret.clipEventKeyUp = readUB(1) == 1;
         ret.clipEventKeyDown = readUB(1) == 1;
         ret.clipEventMouseUp = readUB(1) == 1;
@@ -1657,6 +1716,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.clipEventDragOut = readUB(1) == 1;
             ret.reserved2 = (int) readUB(8);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -1669,7 +1729,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag) throws IOException {
+        newDumpLevel("CLIPACTIONRECORD");
         CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, getPos(), tag);
+        endDumpLevel();
         if (ret.eventFlags.isClear()) {
             return null;
         }
@@ -1686,6 +1748,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CLIPACTIONS readCLIPACTIONS(SWF swf, Tag tag) throws IOException {
         CLIPACTIONS ret = new CLIPACTIONS();
+        newDumpLevel("CLIPACTIONS");
         ret.reserved = readUI16();
         ret.allEventFlags = readCLIPEVENTFLAGS();
         CLIPACTIONRECORD cr;
@@ -1693,6 +1756,7 @@ public class SWFInputStream implements AutoCloseable {
         while ((cr = readCLIPACTIONRECORD(swf, tag)) != null) {
             ret.clipActionRecords.add(cr);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -1704,10 +1768,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public COLORMATRIXFILTER readCOLORMATRIXFILTER() throws IOException {
         COLORMATRIXFILTER ret = new COLORMATRIXFILTER();
+        newDumpLevel("COLORMATRIXFILTER");
         ret.matrix = new float[20];
         for (int i = 0; i < 20; i++) {
             ret.matrix[i] = readFLOAT();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -1719,10 +1785,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public RGBA readRGBA() throws IOException {
         RGBA ret = new RGBA();
+        newDumpLevel("RGBA");
         ret.red = readUI8();
         ret.green = readUI8();
         ret.blue = readUI8();
         ret.alpha = readUI8();
+        endDumpLevel();
         return ret;
     }
 
@@ -1734,10 +1802,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public ARGB readARGB() throws IOException {
         ARGB ret = new ARGB();
+        newDumpLevel("ARGB");
         ret.alpha = readUI8();
         ret.red = readUI8();
         ret.green = readUI8();
         ret.blue = readUI8();
+        endDumpLevel();
         return ret;
     }
 
@@ -1749,9 +1819,11 @@ public class SWFInputStream implements AutoCloseable {
      */
     public RGB readRGB() throws IOException {
         RGB ret = new RGB();
+        newDumpLevel("RGB");
         ret.red = readUI8();
         ret.green = readUI8();
         ret.blue = readUI8();
+        endDumpLevel();
         return ret;
     }
 
@@ -1763,6 +1835,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CONVOLUTIONFILTER readCONVOLUTIONFILTER() throws IOException {
         CONVOLUTIONFILTER ret = new CONVOLUTIONFILTER();
+        newDumpLevel("CONVOLUTIONFILTER");
         ret.matrixX = readUI8();
         ret.matrixY = readUI8();
         ret.divisor = readFLOAT();
@@ -1777,6 +1850,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.reserved = (int) readUB(6);
         ret.clamp = readUB(1) == 1;
         ret.preserveAlpha = readUB(1) == 1;
+        endDumpLevel();
         return ret;
     }
 
@@ -1788,10 +1862,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public BLURFILTER readBLURFILTER() throws IOException {
         BLURFILTER ret = new BLURFILTER();
+        newDumpLevel("BLURFILTER");
         ret.blurX = readFIXED();
         ret.blurY = readFIXED();
         ret.passes = (int) readUB(5);
         ret.reserved = (int) readUB(3);
+        endDumpLevel();
         return ret;
     }
 
@@ -1803,6 +1879,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public DROPSHADOWFILTER readDROPSHADOWFILTER() throws IOException {
         DROPSHADOWFILTER ret = new DROPSHADOWFILTER();
+        newDumpLevel("DROPSHADOWFILTER");
         ret.dropShadowColor = readRGBA();
         ret.blurX = readFIXED();
         ret.blurY = readFIXED();
@@ -1813,6 +1890,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.knockout = readUB(1) == 1;
         ret.compositeSource = readUB(1) == 1;
         ret.passes = (int) readUB(5);
+        endDumpLevel();
         return ret;
     }
 
@@ -1824,6 +1902,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GLOWFILTER readGLOWFILTER() throws IOException {
         GLOWFILTER ret = new GLOWFILTER();
+        newDumpLevel("GLOWFILTER");
         ret.glowColor = readRGBA();
         ret.blurX = readFIXED();
         ret.blurY = readFIXED();
@@ -1832,6 +1911,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.knockout = readUB(1) == 1;
         ret.compositeSource = readUB(1) == 1;
         ret.passes = (int) readUB(5);
+        endDumpLevel();
         return ret;
     }
 
@@ -1843,6 +1923,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public BEVELFILTER readBEVELFILTER() throws IOException {
         BEVELFILTER ret = new BEVELFILTER();
+        newDumpLevel("BEVELFILTER");
         ret.highlightColor = readRGBA(); //Highlight color first. It it opposite of the documentation
         ret.shadowColor = readRGBA();
         ret.blurX = readFIXED();
@@ -1855,6 +1936,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.compositeSource = readUB(1) == 1;
         ret.onTop = readUB(1) == 1;
         ret.passes = (int) readUB(4);
+        endDumpLevel();
         return ret;
     }
 
@@ -1866,6 +1948,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GRADIENTGLOWFILTER readGRADIENTGLOWFILTER() throws IOException {
         GRADIENTGLOWFILTER ret = new GRADIENTGLOWFILTER();
+        newDumpLevel("GRADIENTGLOWFILTER");
         int numColors = readUI8();
         ret.gradientColors = new RGBA[numColors];
         ret.gradientRatio = new int[numColors];
@@ -1885,6 +1968,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.compositeSource = readUB(1) == 1;
         ret.onTop = readUB(1) == 1;
         ret.passes = (int) readUB(4);
+        endDumpLevel();
         return ret;
     }
 
@@ -1896,6 +1980,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GRADIENTBEVELFILTER readGRADIENTBEVELFILTER() throws IOException {
         GRADIENTBEVELFILTER ret = new GRADIENTBEVELFILTER();
+        newDumpLevel("GRADIENTBEVELFILTER");
         int numColors = readUI8();
         ret.gradientColors = new RGBA[numColors];
         ret.gradientRatio = new int[numColors];
@@ -1915,6 +2000,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.compositeSource = readUB(1) == 1;
         ret.onTop = readUB(1) == 1;
         ret.passes = (int) readUB(4);
+        endDumpLevel();
         return ret;
     }
 
@@ -1926,10 +2012,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public List<FILTER> readFILTERLIST() throws IOException {
         List<FILTER> ret = new ArrayList<>();
+        newDumpLevel("FILTERLIST");
         int numberOfFilters = readUI8();
         for (int i = 0; i < numberOfFilters; i++) {
             ret.add(readFILTER());
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -1940,27 +2028,37 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public FILTER readFILTER() throws IOException {
+        newDumpLevel("FILTER");
         int filterId = readUI8();
+        FILTER ret = null;
         switch (filterId) {
             case 0:
-                return readDROPSHADOWFILTER();
+                ret = readDROPSHADOWFILTER();
+                break;
             case 1:
-                return readBLURFILTER();
+                ret = readBLURFILTER();
+                break;
             case 2:
-                return readGLOWFILTER();
+                ret = readGLOWFILTER();
+                break;
             case 3:
-                return readBEVELFILTER();
+                ret = readBEVELFILTER();
+                break;
             case 4:
-                return readGRADIENTGLOWFILTER();
+                ret = readGRADIENTGLOWFILTER();
+                break;
             case 5:
-                return readCONVOLUTIONFILTER();
+                ret = readCONVOLUTIONFILTER();
+                break;
             case 6:
-                return readCOLORMATRIXFILTER();
+                ret = readCOLORMATRIXFILTER();
+                break;
             case 7:
-                return readGRADIENTBEVELFILTER();
-            default:
-                return null;
+                ret = readGRADIENTBEVELFILTER();
+                break;
         }
+        endDumpLevel();
+        return ret;
     }
 
     /**
@@ -1973,10 +2071,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public List<BUTTONRECORD> readBUTTONRECORDList(boolean inDefineButton2) throws IOException {
         List<BUTTONRECORD> ret = new ArrayList<>();
+        newDumpLevel("BUTTONRECORDList");
         BUTTONRECORD br;
         while ((br = readBUTTONRECORD(inDefineButton2)) != null) {
             ret.add(br);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -1989,6 +2089,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public BUTTONRECORD readBUTTONRECORD(boolean inDefineButton2) throws IOException {
         BUTTONRECORD ret = new BUTTONRECORD();
+        newDumpLevel("BUTTONRECORD");
         ret.reserved = (int) readUB(2);
         ret.buttonHasBlendMode = readUB(1) == 1;
         ret.buttonHasFilterList = readUB(1) == 1;
@@ -2015,6 +2116,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret.blendMode = readUI8();
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2028,11 +2130,13 @@ public class SWFInputStream implements AutoCloseable {
      */
     public List<BUTTONCONDACTION> readBUTTONCONDACTIONList(SWF swf, Tag tag) throws IOException {
         List<BUTTONCONDACTION> ret = new ArrayList<>();
+        newDumpLevel("BUTTONCONDACTIONList");
         BUTTONCONDACTION bc;
         while (!(bc = readBUTTONCONDACTION(swf, tag)).isLast) {
             ret.add(bc);
         }
         ret.add(bc);
+        endDumpLevel();
         return ret;
     }
 
@@ -2045,8 +2149,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public BUTTONCONDACTION readBUTTONCONDACTION(SWF swf, Tag tag) throws IOException {
+        newDumpLevel("BUTTONCONDACTION");
         BUTTONCONDACTION ret = new BUTTONCONDACTION(swf, this, getPos(), tag);
         //ret.actions = readActionList();
+        endDumpLevel();
         return ret;
     }
 
@@ -2059,12 +2165,14 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GRADRECORD readGRADRECORD(int shapeNum) throws IOException {
         GRADRECORD ret = new GRADRECORD();
+        newDumpLevel("GRADRECORD");
         ret.ratio = readUI8();
         if (shapeNum >= 3) {
             ret.color = readRGBA();
         } else {
             ret.color = readRGB();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2077,6 +2185,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GRADIENT readGRADIENT(int shapeNum) throws IOException {
         GRADIENT ret = new GRADIENT();
+        newDumpLevel("GRADIENT");
         ret.spreadMode = (int) readUB(2);
         ret.interpolationMode = (int) readUB(2);
         int numGradients = (int) readUB(4);
@@ -2085,6 +2194,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.gradientRecords[i] = readGRADRECORD(shapeNum);
 
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2097,6 +2207,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public FOCALGRADIENT readFOCALGRADIENT(int shapeNum) throws IOException {
         FOCALGRADIENT ret = new FOCALGRADIENT();
+        newDumpLevel("FOCALGRADIENT");
         ret.spreadMode = (int) readUB(2);
         ret.interpolationMode = (int) readUB(2);
         int numGradients = (int) readUB(4);
@@ -2105,6 +2216,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.gradientRecords[i] = readGRADRECORD(shapeNum);
         }
         ret.focalPoint = readFIXED8();
+        endDumpLevel();
         return ret;
     }
 
@@ -2117,6 +2229,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public FILLSTYLE readFILLSTYLE(int shapeNum) throws IOException {
         FILLSTYLE ret = new FILLSTYLE();
+        newDumpLevel("FILLSTYLE");
         ret.fillStyleType = readUI8();
         if (ret.fillStyleType == FILLSTYLE.SOLID) {
             if (shapeNum >= 3) {
@@ -2145,6 +2258,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.bitmapId = readUI16();
             ret.bitmapMatrix = readMatrix();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2158,6 +2272,7 @@ public class SWFInputStream implements AutoCloseable {
     public FILLSTYLEARRAY readFILLSTYLEARRAY(int shapeNum) throws IOException {
 
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
+        newDumpLevel("FILLSTYLEARRAY");
         int fillStyleCount = readUI8();
         if (((shapeNum == 2) || (shapeNum == 3) || (shapeNum == 4/*?*/)) && (fillStyleCount == 0xff)) {
             fillStyleCount = readUI16();
@@ -2166,6 +2281,7 @@ public class SWFInputStream implements AutoCloseable {
         for (int i = 0; i < fillStyleCount; i++) {
             ret.fillStyles[i] = readFILLSTYLE(shapeNum);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2178,6 +2294,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public LINESTYLE readLINESTYLE(int shapeNum) throws IOException {
         LINESTYLE ret = new LINESTYLE();
+        newDumpLevel("LINESTYLE");
         ret.width = readUI16();
         if ((shapeNum == 1) || (shapeNum == 2)) {
             ret.color = readRGB();
@@ -2185,6 +2302,7 @@ public class SWFInputStream implements AutoCloseable {
         if (shapeNum == 3) {
             ret.color = readRGBA();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2197,6 +2315,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public LINESTYLE2 readLINESTYLE2(int shapeNum) throws IOException {
         LINESTYLE2 ret = new LINESTYLE2();
+        newDumpLevel("LINESTYLE2");
         ret.width = readUI16();
         ret.startCapStyle = (int) readUB(2);
         ret.joinStyle = (int) readUB(2);
@@ -2215,6 +2334,7 @@ public class SWFInputStream implements AutoCloseable {
         } else {
             ret.fillType = readFILLSTYLE(shapeNum);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2227,6 +2347,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public LINESTYLEARRAY readLINESTYLEARRAY(int shapeNum) throws IOException {
         LINESTYLEARRAY ret = new LINESTYLEARRAY();
+        newDumpLevel("LINESTYLEARRAY");
         int lineStyleCount = readUI8();
         if (lineStyleCount == 0xff) {
             lineStyleCount = readUI16();
@@ -2242,6 +2363,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret.lineStyles[i] = readLINESTYLE2(shapeNum);
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2256,6 +2378,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     private SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum, boolean morphShape) throws IOException {
         SHAPERECORD ret;
+        newDumpLevel("SHAPERECORD");
         int typeFlag = (int) readUB(1);
         if (typeFlag == 0) {
             boolean stateNewStyles = readUB(1) == 1;
@@ -2324,6 +2447,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret = cer;
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2337,9 +2461,11 @@ public class SWFInputStream implements AutoCloseable {
      */
     public SHAPE readSHAPE(int shapeNum, boolean morphShape) throws IOException {
         SHAPE ret = new SHAPE();
+        newDumpLevel("SHAPE");
         ret.numFillBits = (int) readUB(4);
         ret.numLineBits = (int) readUB(4);
         ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits, morphShape);
+        endDumpLevel();
         return ret;
     }
 
@@ -2353,11 +2479,13 @@ public class SWFInputStream implements AutoCloseable {
      */
     public SHAPEWITHSTYLE readSHAPEWITHSTYLE(int shapeNum, boolean morphShape) throws IOException {
         SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
+        newDumpLevel("SHAPEWITHSTYLE");
         ret.fillStyles = readFILLSTYLEARRAY(shapeNum);
         ret.lineStyles = readLINESTYLEARRAY(shapeNum);
         ret.numFillBits = (int) readUB(4);
         ret.numLineBits = (int) readUB(4);
         ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits, morphShape);
+        endDumpLevel();
         return ret;
     }
 
@@ -2372,6 +2500,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     private List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits, boolean morphShape) throws IOException {
         List<SHAPERECORD> ret = new ArrayList<>();
+        newDumpLevel("SHAPERECORDS");
         SHAPERECORD rec;
         do {
             rec = readSHAPERECORD(fillBits, lineBits, shapeNum, morphShape);
@@ -2385,6 +2514,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.add(rec);
         } while (!(rec instanceof EndShapeRecord));
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -2396,6 +2526,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public SOUNDINFO readSOUNDINFO() throws IOException {
         SOUNDINFO ret = new SOUNDINFO();
+        newDumpLevel("SOUNDINFO");
         ret.reserved = (int) readUB(2);
         ret.syncStop = readUB(1) == 1;
         ret.syncNoMultiple = readUB(1) == 1;
@@ -2419,6 +2550,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret.envelopeRecords[i] = readSOUNDENVELOPE();
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2430,9 +2562,11 @@ public class SWFInputStream implements AutoCloseable {
      */
     public SOUNDENVELOPE readSOUNDENVELOPE() throws IOException {
         SOUNDENVELOPE ret = new SOUNDENVELOPE();
+        newDumpLevel("SOUNDENVELOPE");
         ret.pos44 = readUI32();
         ret.leftLevel = readUI16();
         ret.rightLevel = readUI16();
+        endDumpLevel();
         return ret;
     }
 
@@ -2446,8 +2580,10 @@ public class SWFInputStream implements AutoCloseable {
      */
     public GLYPHENTRY readGLYPHENTRY(int glyphBits, int advanceBits) throws IOException {
         GLYPHENTRY ret = new GLYPHENTRY();
+        newDumpLevel("GLYPHENTRY");
         ret.glyphIndex = (int) readUB(glyphBits);
         ret.glyphAdvance = (int) readUB(advanceBits);
+        endDumpLevel();
         return ret;
     }
 
@@ -2462,6 +2598,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public TEXTRECORD readTEXTRECORD(boolean inDefineText2, int glyphBits, int advanceBits) throws IOException {
         TEXTRECORD ret = new TEXTRECORD();
+        newDumpLevel("TEXTRECORD");
         int first = (int) readUB(1); //always 1
         readUB(3); //always 0
         ret.styleFlagsHasFont = readUB(1) == 1;
@@ -2469,6 +2606,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.styleFlagsHasYOffset = readUB(1) == 1;
         ret.styleFlagsHasXOffset = readUB(1) == 1;
         if ((!ret.styleFlagsHasFont) && (!ret.styleFlagsHasColor) && (!ret.styleFlagsHasYOffset) && (!ret.styleFlagsHasXOffset) && (first == 0)) { //final text record
+            endDumpLevel();
             return null;
         }
         if (ret.styleFlagsHasFont) {
@@ -2496,6 +2634,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);
         }
         alignByte();
+        endDumpLevel();
         return ret;
     }
 
@@ -2507,10 +2646,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHGRADRECORD readMORPHGRADRECORD() throws IOException {
         MORPHGRADRECORD ret = new MORPHGRADRECORD();
+        newDumpLevel("MORPHGRADRECORD");
         ret.startRatio = readUI8();
         ret.startColor = readRGBA();
         ret.endRatio = readUI8();
         ret.endColor = readRGBA();
+        endDumpLevel();
         return ret;
     }
 
@@ -2522,6 +2663,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
+        newDumpLevel("MORPHGRADIENT");
         //Despite of documentation (UI8 1-8), there are two fields 
         // spreadMode and interPolationMode which are same as in GRADIENT
         ret.spreadMode = (int) readUB(2);
@@ -2531,6 +2673,7 @@ public class SWFInputStream implements AutoCloseable {
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2544,6 +2687,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHFOCALGRADIENT readMORPHFOCALGRADIENT() throws IOException {
         MORPHFOCALGRADIENT ret = new MORPHFOCALGRADIENT();
+        newDumpLevel("MORPHFOCALGRADIENT");
         ret.spreadMode = (int) readUB(2);
         ret.interPolationMode = (int) readUB(2);
         int numGradients = (int) readUB(4);
@@ -2553,6 +2697,7 @@ public class SWFInputStream implements AutoCloseable {
         }
         ret.startFocalPoint = readFIXED8();
         ret.endFocalPoint = readFIXED8();
+        endDumpLevel();
         return ret;
     }
 
@@ -2564,6 +2709,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHFILLSTYLE readMORPHFILLSTYLE() throws IOException {
         MORPHFILLSTYLE ret = new MORPHFILLSTYLE();
+        newDumpLevel("MORPHFILLSTYLE");
         ret.fillStyleType = readUI8();
         if (ret.fillStyleType == MORPHFILLSTYLE.SOLID) {
             ret.startColor = readRGBA();
@@ -2591,6 +2737,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.startBitmapMatrix = readMatrix();
             ret.endBitmapMatrix = readMatrix();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2603,6 +2750,7 @@ public class SWFInputStream implements AutoCloseable {
     public MORPHFILLSTYLEARRAY readMORPHFILLSTYLEARRAY() throws IOException {
 
         MORPHFILLSTYLEARRAY ret = new MORPHFILLSTYLEARRAY();
+        newDumpLevel("MORPHFILLSTYLEARRAY");
         int fillStyleCount = readUI8();
         if (fillStyleCount == 0xff) {
             fillStyleCount = readUI16();
@@ -2611,6 +2759,7 @@ public class SWFInputStream implements AutoCloseable {
         for (int i = 0; i < fillStyleCount; i++) {
             ret.fillStyles[i] = readMORPHFILLSTYLE();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2622,10 +2771,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHLINESTYLE readMORPHLINESTYLE() throws IOException {
         MORPHLINESTYLE ret = new MORPHLINESTYLE();
+        newDumpLevel("MORPHLINESTYLE");
         ret.startWidth = readUI16();
         ret.endWidth = readUI16();
         ret.startColor = readRGBA();
         ret.endColor = readRGBA();
+        endDumpLevel();
         return ret;
     }
 
@@ -2637,6 +2788,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHLINESTYLE2 readMORPHLINESTYLE2() throws IOException {
         MORPHLINESTYLE2 ret = new MORPHLINESTYLE2();
+        newDumpLevel("MORPHLINESTYLE2");
         ret.startWidth = readUI16();
         ret.endWidth = readUI16();
         ret.startCapStyle = (int) readUB(2);
@@ -2657,6 +2809,7 @@ public class SWFInputStream implements AutoCloseable {
         } else {
             ret.fillType = readMORPHFILLSTYLE();
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2669,6 +2822,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public MORPHLINESTYLEARRAY readMORPHLINESTYLEARRAY(int morphShapeNum) throws IOException {
         MORPHLINESTYLEARRAY ret = new MORPHLINESTYLEARRAY();
+        newDumpLevel("MORPHLINESTYLEARRAY");
         int lineStyleCount = readUI8();
         if (lineStyleCount == 0xff) {
             lineStyleCount = readUI16();
@@ -2684,6 +2838,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret.lineStyles2[i] = readMORPHLINESTYLE2();
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2696,6 +2851,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public KERNINGRECORD readKERNINGRECORD(boolean fontFlagsWideCodes) throws IOException {
         KERNINGRECORD ret = new KERNINGRECORD();
+        newDumpLevel("KERNINGRECORD");
         if (fontFlagsWideCodes) {
             ret.fontKerningCode1 = readUI16();
             ret.fontKerningCode2 = readUI16();
@@ -2704,6 +2860,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.fontKerningCode2 = readUI8();
         }
         ret.fontKerningAdjustment = readSI16();
+        endDumpLevel();
         return ret;
     }
 
@@ -2715,7 +2872,9 @@ public class SWFInputStream implements AutoCloseable {
      */
     public LANGCODE readLANGCODE() throws IOException {
         LANGCODE ret = new LANGCODE();
+        newDumpLevel("LANGCODE");
         ret.languageCode = readUI8();
+        endDumpLevel();
         return ret;
     }
 
@@ -2727,6 +2886,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public ZONERECORD readZONERECORD() throws IOException {
         ZONERECORD ret = new ZONERECORD();
+        newDumpLevel("ZONERECORD");
         int numZoneData = readUI8();
         ret.zonedata = new ZONEDATA[numZoneData];
         for (int i = 0; i < numZoneData; i++) {
@@ -2735,6 +2895,7 @@ public class SWFInputStream implements AutoCloseable {
         readUB(6);
         ret.zoneMaskY = readUB(1) == 1;
         ret.zoneMaskX = readUB(1) == 1;
+        endDumpLevel();
         return ret;
     }
 
@@ -2746,8 +2907,10 @@ public class SWFInputStream implements AutoCloseable {
      */
     public ZONEDATA readZONEDATA() throws IOException {
         ZONEDATA ret = new ZONEDATA();
+        newDumpLevel("ZONEDATA");
         ret.alignmentCoordinate = readUI16();
         ret.range = readUI16();
+        endDumpLevel();
         return ret;
     }
 
@@ -2759,10 +2922,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public PIX15 readPIX15() throws IOException {
         PIX15 ret = new PIX15();
+        newDumpLevel("PIX15");
         readUB(1);
         ret.red = (int) readUB(5);
         ret.green = (int) readUB(5);
         ret.blue = (int) readUB(5);
+        endDumpLevel();
         return ret;
     }
 
@@ -2774,10 +2939,12 @@ public class SWFInputStream implements AutoCloseable {
      */
     public PIX24 readPIX24() throws IOException {
         PIX24 ret = new PIX24();
+        newDumpLevel("PIX24");
         ret.reserved = readUI8();
         ret.red = readUI8();
         ret.green = readUI8();
         ret.blue = readUI8();
+        endDumpLevel();
         return ret;
     }
 
@@ -2792,6 +2959,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public COLORMAPDATA readCOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight) throws IOException {
         COLORMAPDATA ret = new COLORMAPDATA();
+        newDumpLevel("COLORMAPDATA");
         ret.colorTableRGB = new RGB[colorTableSize + 1];
         for (int i = 0; i < colorTableSize + 1; i++) {
             ret.colorTableRGB[i] = readRGB();
@@ -2808,6 +2976,7 @@ public class SWFInputStream implements AutoCloseable {
             }
         }
         ret.colorMapPixelData = readBytesEx(dataLen);
+        endDumpLevel();
         return ret;
     }
 
@@ -2822,6 +2991,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public BITMAPDATA readBITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
         BITMAPDATA ret = new BITMAPDATA();
+        newDumpLevel("BITMAPDATA");
         List<PIX15> pix15 = new ArrayList<>();
         List<PIX24> pix24 = new ArrayList<>();
         int dataLen = 0;
@@ -2847,6 +3017,7 @@ public class SWFInputStream implements AutoCloseable {
         } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
             ret.bitmapPixelDataPix24 = pix24.toArray(new PIX24[pix24.size()]);
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2861,12 +3032,14 @@ public class SWFInputStream implements AutoCloseable {
      */
     public ALPHABITMAPDATA readALPHABITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
         ALPHABITMAPDATA ret = new ALPHABITMAPDATA();
+        newDumpLevel("ALPHABITMAPDATA");
         ret.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
                 ret.bitmapPixelData[y * bitmapWidth + x] = readARGB();
             }
         }
+        endDumpLevel();
         return ret;
     }
 
@@ -2881,6 +3054,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public ALPHACOLORMAPDATA readALPHACOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight) throws IOException {
         ALPHACOLORMAPDATA ret = new ALPHACOLORMAPDATA();
+        newDumpLevel("ALPHACOLORMAPDATA");
         ret.colorTableRGB = new RGBA[colorTableSize + 1];
         for (int i = 0; i < colorTableSize + 1; i++) {
             ret.colorTableRGB[i] = readRGBA();
@@ -2897,6 +3071,7 @@ public class SWFInputStream implements AutoCloseable {
             }
         }
         ret.colorMapPixelData = readBytesEx(dataLen);
+        endDumpLevel();
         return ret;
     }
 
@@ -2911,7 +3086,15 @@ public class SWFInputStream implements AutoCloseable {
         return available() * 8;
     }
     
-    public SeekableInputStream getBaseStream() {
-        return is;
+    public MemoryInputStream getBaseStream() throws IOException {
+        int pos = (int) is.getPos();
+        return new MemoryInputStream(is.getAllRead(), pos, pos + is.available());
+    }
+
+    public SWFInputStream getLimitedStream(int limit) throws IOException {
+        SWFInputStream sis = new SWFInputStream(swf, is.getAllRead(), startingPos, (int) (is.getPos() + limit));
+        sis.dumpInfo = dumpInfo;
+        sis.seek(is.getPos() + startingPos);
+        return sis;
     }
 }

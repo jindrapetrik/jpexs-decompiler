@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -101,8 +101,8 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      * @param pos
      * @throws IOException
      */
-    public DefineButton2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineButton2", pos, length);
+    public DefineButton2Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineButton2", pos, length);
         buttonId = sis.readUI16();
         reserved = (int) sis.readUB(7);
         trackAsMenu = sis.readUB(1) == 1;

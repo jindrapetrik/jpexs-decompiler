@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,9 +38,9 @@ public class MP3Decoder extends SoundDecoder {
     }
 
     @Override
-    public void decode(byte[] data, OutputStream os) throws IOException {
+    public void decode(SWFInputStream sis, OutputStream os) throws IOException {
         Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(data));
+        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available())));
         SampleBuffer buf;
         while ((buf = readFrame(decoder, bitstream)) != null) {
             short audio[] = buf.getBuffer();

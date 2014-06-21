@@ -16,9 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
@@ -26,11 +25,11 @@ import java.io.InputStream;
  */
 public class GFxInputStream {
 
-    private final ReReadableInputStream is;
+    private final MemoryInputStream is;
     private static final int MaxUInt7 = (1 << 7) - 1;
 
-    public GFxInputStream(InputStream is) {
-        this.is = new ReReadableInputStream(is);
+    public GFxInputStream(MemoryInputStream is) {
+        this.is = is;
     }
 
     public int available() throws IOException {

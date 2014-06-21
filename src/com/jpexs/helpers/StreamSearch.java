@@ -31,7 +31,7 @@ public class StreamSearch implements Searchable {
 
     private final MemoryInputStream is;
 
-    public StreamSearch(InputStream is) {
+    public StreamSearch(InputStream is) throws IOException {
         this.is = new MemoryInputStream(Helper.readStream(is));
     }
 

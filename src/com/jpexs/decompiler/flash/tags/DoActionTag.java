@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -55,8 +54,8 @@ public class DoActionTag extends Tag implements ASMSource {
      * @param pos
      * @throws java.io.IOException
      */
-    public DoActionTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DoAction", pos, length);
+    public DoActionTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DoAction", pos, length);
         //do not load actionBytes. Disassebler will use the original SWF stream in this case
         //actionBytes = sis.readBytesEx(sis.available());
     }

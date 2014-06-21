@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -88,8 +88,8 @@ public class CSMTextSettingsTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public CSMTextSettingsTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "CSMTextSettings", pos, length);
+    public CSMTextSettingsTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "CSMTextSettings", pos, length);
         textID = sis.readUI16();
         useFlashType = (int) sis.readUB(2);
         gridFit = (int) sis.readUB(3);

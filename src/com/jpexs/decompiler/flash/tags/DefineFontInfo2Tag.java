@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.LANGCODE;
@@ -92,8 +92,8 @@ public class DefineFontInfo2Tag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineFontInfo2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineFontInfo2", pos, length);
+    public DefineFontInfo2Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineFontInfo2", pos, length);
         fontID = sis.readUI16();
         int fontNameLen = sis.readUI8();
         if (swf.version >= 6) {

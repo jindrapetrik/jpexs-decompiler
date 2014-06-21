@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayOutputStream;
@@ -69,8 +69,8 @@ public class DefineExternalGradient extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineExternalGradient(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineExternalGradient", pos, length);
+    public DefineExternalGradient(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineExternalGradient", pos, length);
         gradientId = sis.readUI16();
         bitmapsFormat = sis.readUI16();
         gradientSize = sis.readUI16();

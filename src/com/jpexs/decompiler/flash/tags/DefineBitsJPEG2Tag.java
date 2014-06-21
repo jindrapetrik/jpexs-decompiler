@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -68,8 +68,8 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         return null;
     }
 
-    public DefineBitsJPEG2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineBitsJPEG2", pos, length);
+    public DefineBitsJPEG2Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineBitsJPEG2", pos, length);
         characterID = sis.readUI16();
         imageData = sis.readBytesEx(sis.available());
     }

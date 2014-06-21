@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.helpers.SoundPlayer;
 import java.awt.Color;
@@ -67,7 +70,9 @@ public class SoundTagPlayer implements MediaDisplay {
         this.tag = tag;
         this.loops = loops;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        tag.getSoundFormat().createWav(tag.getRawSoundData(), baos);
+        byte[] soundData = tag.getRawSoundData();
+        SWF swf = ((Tag) tag).getSwf();
+        tag.getSoundFormat().createWav(new SWFInputStream(swf, soundData), baos);
         player = new SoundPlayer(new ByteArrayInputStream(baos.toByteArray()));
     }
 

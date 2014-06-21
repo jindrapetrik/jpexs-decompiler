@@ -31,7 +31,7 @@ public class SwfHeaderStreamSearch implements Searchable {
 
     private final MemoryInputStream is;
 
-    public SwfHeaderStreamSearch(InputStream is) {
+    public SwfHeaderStreamSearch(InputStream is) throws IOException {
         this.is = new MemoryInputStream(Helper.readStream(is));
     }
 

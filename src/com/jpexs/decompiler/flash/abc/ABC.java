@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
@@ -58,7 +59,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -336,10 +336,10 @@ public class ABC {
         }
     }
 
-    public ABC(InputStream is, SWF swf, ABCContainerTag tag) throws IOException {
+    public ABC(SWFInputStream is, SWF swf, ABCContainerTag tag) throws IOException {
         this.swf = swf;
         this.parentTag = tag;
-        ABCInputStream ais = new ABCInputStream(is);
+        ABCInputStream ais = new ABCInputStream(is.getBaseStream());
         minor_version = ais.readU16();
         major_version = ais.readU16();
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});

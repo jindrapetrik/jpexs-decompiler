@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
@@ -90,6 +91,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -268,6 +270,8 @@ public final class SWF implements TreeItem, Timelined {
     public static final double unitDivisor = 20;
 
     private Timeline timeline;
+    
+    public DumpInfo dumpInfo;
 
     public void updateCharacters() {
         characters.clear();
@@ -304,7 +308,7 @@ public final class SWF implements TreeItem, Timelined {
             Tag t = tags.get(i);
             if (t instanceof DefineSpriteTag) {
                 if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
-                    tags.set(i, new Tag(this, t.getId(), "InvalidSprite", t.getPos(), t.getOriginalLength()));
+                    tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getPos(), t.getOriginalLength(), null));
                 }
             }
         }
@@ -503,14 +507,17 @@ public final class SWF implements TreeItem, Timelined {
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
-        version = header.version;
-        fileSize = header.fileSize;
         gfx = header.gfx;
         compression = header.compression;
         uncompressedData = baos.toByteArray();
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
-        sis.read(new byte[8], 0, 8); // skip the header
+        dumpInfo = new DumpInfo("rootswf", "", null, 0, 0);
+        sis.dumpInfo = dumpInfo;
+        sis.readBytesEx(3); // skip siganture
+        version = sis.readUI8();
+        fileSize = sis.readUI32();
+        sis.dumpInfo.lengthBytes = fileSize;
         if (listener != null) {
             sis.addPercentListener(listener);
         }
@@ -520,7 +527,7 @@ public final class SWF implements TreeItem, Timelined {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        List<Tag> tags = sis.readTagList(this, this, 0, parallelRead, true, !checkOnly, gfx);
+        List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
         if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
             tags.remove(tags.size() - 1);
@@ -705,7 +712,7 @@ public final class SWF implements TreeItem, Timelined {
         }
 
         int version = hdr[3];
-        SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4);
+        SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4);
         long fileSize = sis.readUI32();
         SWFHeader header = new SWFHeader();
         header.version = version;
@@ -730,8 +737,8 @@ public final class SWF implements TreeItem, Timelined {
                     sis.readUI32(); // compressed LZMA data size = compressed SWF - 17 byte,
                                      // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
                     int propertiesSize = 5;
-                    byte[] lzmaProperties = new byte[propertiesSize];
-                    if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
+                    byte[] lzmaProperties = sis.readBytes(propertiesSize);
+                    if (lzmaProperties.length != propertiesSize) {
                         throw new IOException("LZMA:input .lzma file is too short");
                     }
                     SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();

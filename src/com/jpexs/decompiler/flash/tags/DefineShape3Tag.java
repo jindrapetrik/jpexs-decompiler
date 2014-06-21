@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -67,8 +67,8 @@ public class DefineShape3Tag extends ShapeTag {
         return shapeId;
     }
 
-    public DefineShape3Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineShape3", pos, length);
+    public DefineShape3Tag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineShape3", pos, length);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         shapes = sis.readSHAPEWITHSTYLE(3, false);

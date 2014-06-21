@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -134,8 +134,8 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
      * @param pos
      * @throws IOException
      */
-    public SoundStreamHeadTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "SoundStreamHead", pos, length);
+    public SoundStreamHeadTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "SoundStreamHead", pos, length);
         reserved = (int) sis.readUB(4);
         playBackSoundRate = (int) sis.readUB(2);
         playBackSoundSize = sis.readUB(1) == 1;

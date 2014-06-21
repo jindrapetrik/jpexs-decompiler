@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -100,8 +99,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * @param pos
      * @throws IOException
      */
-    public DefineButtonTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
-        super(sis.swf, ID, "DefineButton", pos, length);
+    public DefineButtonTag(SWFInputStream sis, long pos, int length) throws IOException {
+        super(sis.getSwf(), ID, "DefineButton", pos, length);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);
         hdrSize = sis.getPos();
