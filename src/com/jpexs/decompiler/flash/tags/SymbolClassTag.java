@@ -36,12 +36,12 @@ public class SymbolClassTag extends Tag {
 
     public SymbolClassTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "SymbolClass", pos, length);
-        int numSymbols = sis.readUI16();
+        int numSymbols = sis.readUI16("numSymbols");
         tags = new int[numSymbols];
         names = new String[numSymbols];
         for (int ii = 0; ii < numSymbols; ii++) {
-            int tagID = sis.readUI16();
-            String className = sis.readString();
+            int tagID = sis.readUI16("tagID");
+            String className = sis.readString("className");
             tags[ii] = tagID;
             names[ii] = className;
         }

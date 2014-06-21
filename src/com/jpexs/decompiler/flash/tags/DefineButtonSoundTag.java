@@ -105,22 +105,22 @@ public class DefineButtonSoundTag extends CharacterIdTag {
      */
     public DefineButtonSoundTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineButtonSound", pos, length);
-        buttonId = sis.readUI16();
-        buttonSoundChar0 = sis.readUI16();
+        buttonId = sis.readUI16("buttonId");
+        buttonSoundChar0 = sis.readUI16("buttonSoundChar0");
         if (buttonSoundChar0 != 0) {
-            buttonSoundInfo0 = sis.readSOUNDINFO();
+            buttonSoundInfo0 = sis.readSOUNDINFO("buttonSoundInfo0");
         }
-        buttonSoundChar1 = sis.readUI16();
+        buttonSoundChar1 = sis.readUI16("buttonSoundChar1");
         if (buttonSoundChar1 != 0) {
-            buttonSoundInfo1 = sis.readSOUNDINFO();
+            buttonSoundInfo1 = sis.readSOUNDINFO("buttonSoundInfo1");
         }
-        buttonSoundChar2 = sis.readUI16();
+        buttonSoundChar2 = sis.readUI16("buttonSoundChar2");
         if (buttonSoundChar2 != 0) {
-            buttonSoundInfo2 = sis.readSOUNDINFO();
+            buttonSoundInfo2 = sis.readSOUNDINFO("buttonSoundInfo2");
         }
-        buttonSoundChar3 = sis.readUI16();
+        buttonSoundChar3 = sis.readUI16("buttonSoundChar3");
         if (buttonSoundChar3 != 0) {
-            buttonSoundInfo3 = sis.readSOUNDINFO();
+            buttonSoundInfo3 = sis.readSOUNDINFO("buttonSoundInfo3");
         }
     }
 }

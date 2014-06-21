@@ -31,8 +31,8 @@ public class DefineFontNameTag extends Tag {
 
     public DefineFontNameTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineFontName", pos, length);
-        fontId = sis.readUI16();
-        fontName = sis.readString();
-        fontCopyright = sis.readString();
+        fontId = sis.readUI16("fontId");
+        fontName = sis.readString("fontName");
+        fontCopyright = sis.readString("fontCopyright");
     }
 }

@@ -220,35 +220,35 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      */
     public PlaceObject2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "PlaceObject2", pos, length);
-        placeFlagHasClipActions = sis.readUB(1) == 1;
-        placeFlagHasClipDepth = sis.readUB(1) == 1;
-        placeFlagHasName = sis.readUB(1) == 1;
-        placeFlagHasRatio = sis.readUB(1) == 1;
-        placeFlagHasColorTransform = sis.readUB(1) == 1;
-        placeFlagHasMatrix = sis.readUB(1) == 1;
-        placeFlagHasCharacter = sis.readUB(1) == 1;
-        placeFlagMove = sis.readUB(1) == 1;
-        depth = sis.readUI16();
+        placeFlagHasClipActions = sis.readUB(1, "placeFlagHasClipActions") == 1;
+        placeFlagHasClipDepth = sis.readUB(1, "placeFlagHasClipDepth") == 1;
+        placeFlagHasName = sis.readUB(1, "placeFlagHasName") == 1;
+        placeFlagHasRatio = sis.readUB(1, "placeFlagHasRatio") == 1;
+        placeFlagHasColorTransform = sis.readUB(1, "placeFlagHasColorTransform") == 1;
+        placeFlagHasMatrix = sis.readUB(1, "placeFlagHasMatrix") == 1;
+        placeFlagHasCharacter = sis.readUB(1, "placeFlagHasCharacter") == 1;
+        placeFlagMove = sis.readUB(1, "placeFlagMove") == 1;
+        depth = sis.readUI16("depth");
         if (placeFlagHasCharacter) {
-            characterId = sis.readUI16();
+            characterId = sis.readUI16("characterId");
         }
         if (placeFlagHasMatrix) {
-            matrix = sis.readMatrix();
+            matrix = sis.readMatrix("matrix");
         }
         if (placeFlagHasColorTransform) {
-            colorTransform = sis.readCXFORMWITHALPHA();
+            colorTransform = sis.readCXFORMWITHALPHA("colorTransform");
         }
         if (placeFlagHasRatio) {
-            ratio = sis.readUI16();
+            ratio = sis.readUI16("ratio");
         }
         if (placeFlagHasName) {
-            name = sis.readString();
+            name = sis.readString("name");
         }
         if (placeFlagHasClipDepth) {
-            clipDepth = sis.readUI16();
+            clipDepth = sis.readUI16("clipDepth");
         }
         if (placeFlagHasClipActions) {
-            clipActions = sis.readCLIPACTIONS(swf, this);
+            clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
     }
 

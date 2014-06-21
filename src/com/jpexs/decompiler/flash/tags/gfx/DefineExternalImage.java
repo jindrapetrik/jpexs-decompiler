@@ -73,12 +73,12 @@ public class DefineExternalImage extends Tag {
      */
     public DefineExternalImage(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineExternalImage", pos, length);
-        characterId = sis.readUI16();
-        bitmapFormat = sis.readUI16();
-        targetWidth = sis.readUI16();
-        targetHeight = sis.readUI16();
-        int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytesEx(fileNameLen));
+        characterId = sis.readUI16("characterId");
+        bitmapFormat = sis.readUI16("bitmapFormat");
+        targetWidth = sis.readUI16("targetWidth");
+        targetHeight = sis.readUI16("targetHeight");
+        int fileNameLen = sis.readUI8("fileNameLen");
+        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
 
     }
 }

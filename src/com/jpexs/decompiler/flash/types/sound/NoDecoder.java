@@ -33,7 +33,7 @@ public class NoDecoder extends SoundDecoder {
 
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
-        os.write(sis.readBytesEx(sis.available()));
+        os.write(sis.readBytesEx(sis.available(), "soundStream"));
     }
 
 }

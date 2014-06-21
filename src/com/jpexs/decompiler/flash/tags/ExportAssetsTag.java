@@ -62,13 +62,13 @@ public class ExportAssetsTag extends Tag {
      */
     public ExportAssetsTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "ExportAssets", pos, length);
-        int count = sis.readUI16();
+        int count = sis.readUI16("count");
         tags = new ArrayList<>();
         names = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            int characterId = sis.readUI16();
+            int characterId = sis.readUI16("characterId");
             tags.add(characterId);
-            String name = sis.readString();
+            String name = sis.readString("name");
             names.add(name);
         }
     }

@@ -90,13 +90,13 @@ public class CSMTextSettingsTag extends Tag {
      */
     public CSMTextSettingsTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "CSMTextSettings", pos, length);
-        textID = sis.readUI16();
-        useFlashType = (int) sis.readUB(2);
-        gridFit = (int) sis.readUB(3);
-        reserved = (int) sis.readUB(3);
-        thickness = sis.readFLOAT(); //F32 = FLOAT
-        sharpness = sis.readFLOAT(); //F32 = FLOAT
-        reserved2 = sis.readUI8(); //reserved
+        textID = sis.readUI16("textID");
+        useFlashType = (int) sis.readUB(2, "useFlashType");
+        gridFit = (int) sis.readUB(3, "gridFit");
+        reserved = (int) sis.readUB(3, "reserved");
+        thickness = sis.readFLOAT("thickness"); //F32 = FLOAT
+        sharpness = sis.readFLOAT("sharpness"); //F32 = FLOAT
+        reserved2 = sis.readUI8("reserved2"); //reserved
     }
 
     /**

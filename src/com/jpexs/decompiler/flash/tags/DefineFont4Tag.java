@@ -48,13 +48,13 @@ public class DefineFont4Tag extends CharacterTag {
 
     public DefineFont4Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineFont4", pos, length);
-        fontID = sis.readUI16();
-        reserved = (int) sis.readUB(5);
-        fontFlagsHasFontData = sis.readUB(1) == 1;
-        fontFlagsItalic = sis.readUB(1) == 1;
-        fontFlagsBold = sis.readUB(1) == 1;
-        fontName = sis.readString();
-        fontData = sis.readBytesEx(sis.available());
+        fontID = sis.readUI16("fontID");
+        reserved = (int) sis.readUB(5, "reserved");
+        fontFlagsHasFontData = sis.readUB(1, "fontFlagsHasFontData") == 1;
+        fontFlagsItalic = sis.readUB(1, "fontFlagsItalic") == 1;
+        fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
+        fontName = sis.readString("fontName");
+        fontData = sis.readBytesEx(sis.available(), "fontData");
     }
 
     /**

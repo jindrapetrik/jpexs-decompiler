@@ -32,7 +32,7 @@ public class MetadataTag extends Tag {
     public MetadataTag(SWFInputStream sis, long pos, int length) {
         super(sis.getSwf(), ID, "Metadata", pos, length);
         try {
-            xmlMetadata = sis.readString();
+            xmlMetadata = sis.readString("xmlMetadata");
         } catch (IOException ex) {
         }
     }

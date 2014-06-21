@@ -203,8 +203,8 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      */
     public DefineSpriteTag(SWFInputStream sis, int level, long pos, int length, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         super(sis.getSwf(), ID, "DefineSprite", pos, length);
-        spriteId = sis.readUI16();
-        frameCount = sis.readUI16();
+        spriteId = sis.readUI16("spriteId");
+        frameCount = sis.readUI16("frameCount");
         List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
         if (subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;

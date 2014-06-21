@@ -112,65 +112,65 @@ public class DefineFont3Tag extends FontTag {
 
     public DefineFont3Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineFont3", pos, length);
-        fontId = sis.readUI16();
-        fontFlagsHasLayout = sis.readUB(1) == 1;
-        fontFlagsShiftJIS = sis.readUB(1) == 1;
-        fontFlagsSmallText = sis.readUB(1) == 1;
-        fontFlagsANSI = sis.readUB(1) == 1;
-        fontFlagsWideOffsets = sis.readUB(1) == 1;
-        fontFlagsWideCodes = sis.readUB(1) == 1;
-        fontFlagsItalic = sis.readUB(1) == 1;
-        fontFlagsBold = sis.readUB(1) == 1;
-        languageCode = sis.readLANGCODE();
-        int fontNameLen = sis.readUI8();
+        fontId = sis.readUI16("fontId");
+        fontFlagsHasLayout = sis.readUB(1, "fontFlagsHasLayout") == 1;
+        fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;
+        fontFlagsSmallText = sis.readUB(1, "fontFlagsSmallText") == 1;
+        fontFlagsANSI = sis.readUB(1, "fontFlagsANSI") == 1;
+        fontFlagsWideOffsets = sis.readUB(1, "fontFlagsWideOffsets") == 1;
+        fontFlagsWideCodes = sis.readUB(1, "fontFlagsWideCodes") == 1;
+        fontFlagsItalic = sis.readUB(1, "fontFlagsItalic") == 1;
+        fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
+        languageCode = sis.readLANGCODE("languageCode");
+        int fontNameLen = sis.readUI8("fontNameLen");
         if (swf.version >= 6) {
-            fontName = new String(sis.readBytesEx(fontNameLen), Utf8Helper.charset);
+            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"), Utf8Helper.charset);
         } else {
-            fontName = new String(sis.readBytesEx(fontNameLen));
+            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
         }
-        numGlyphs = sis.readUI16();
+        numGlyphs = sis.readUI16("numGlyphs");
         for (int i = 0; i < numGlyphs; i++) { //offsetTable
             if (fontFlagsWideOffsets) {
-                sis.readUI32();
+                sis.readUI32("offset");
             } else {
-                sis.readUI16();
+                sis.readUI16("offset");
             }
         }
         if (numGlyphs > 0) {
             if (fontFlagsWideOffsets) {
-                sis.readUI32(); //codeTableOffset
+                sis.readUI32("offset"); //codeTableOffset
             } else {
-                sis.readUI16(); //codeTableOffset
+                sis.readUI16("offset"); //codeTableOffset
             }
         }
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
-            glyphShapeTable.add(sis.readSHAPE(1, false));
+            glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
         }
         codeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
             if (fontFlagsWideCodes) {
-                codeTable.add(sis.readUI16());
+                codeTable.add(sis.readUI16("code"));
             } else {
-                codeTable.add(sis.readUI8());
+                codeTable.add(sis.readUI8("code"));
             }
         }
         if (fontFlagsHasLayout) {
-            fontAscent = sis.readSI16();
-            fontDescent = sis.readSI16();
-            fontLeading = sis.readSI16();
+            fontAscent = sis.readSI16("fontAscent");
+            fontDescent = sis.readSI16("fontDescent");
+            fontLeading = sis.readSI16("fontLeading");
             fontAdvanceTable = new ArrayList<>();
             for (int i = 0; i < numGlyphs; i++) {
-                fontAdvanceTable.add(sis.readSI16());
+                fontAdvanceTable.add(sis.readSI16("fontAdvance"));
             }
             fontBoundsTable = new ArrayList<>();
             for (int i = 0; i < numGlyphs; i++) {
-                fontBoundsTable.add(sis.readRECT());
+                fontBoundsTable.add(sis.readRECT("rect"));
             }
-            int kerningCount = sis.readUI16();
+            int kerningCount = sis.readUI16("kerningCount");
             fontKerningTable = new KERNINGRECORD[kerningCount];
             for (int i = 0; i < kerningCount; i++) {
-                fontKerningTable[i] = sis.readKERNINGRECORD(fontFlagsWideCodes);
+                fontKerningTable[i] = sis.readKERNINGRECORD(fontFlagsWideCodes, "record");
             }
         }
     }

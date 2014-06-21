@@ -38,9 +38,9 @@ public class FrameLabelTag extends Tag {
 
     public FrameLabelTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "FrameLabel", pos, length);
-        name = sis.readString();
+        name = sis.readString("name");
         if (sis.available() > 0) {
-            if (sis.readUI8() == 1) {
+            if (sis.readUI8("namedAnchor") == 1) {
                 namedAnchor = true;
             }
         }

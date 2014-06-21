@@ -1440,7 +1440,7 @@ public class XFLConverter {
                     exportFormat = "wav";
                     try {
                         SWFInputStream sis = new SWFInputStream(swf, soundData);
-                        int adpcmCodeSize = (int) sis.readUB(2);
+                        int adpcmCodeSize = (int) sis.readUB(2, "adpcmCodeSize");
                         bits = 2 + adpcmCodeSize;
                     } catch (IOException ex) {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);

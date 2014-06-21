@@ -514,19 +514,19 @@ public final class SWF implements TreeItem, Timelined {
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfo("rootswf", "", null, 0, 0);
         sis.dumpInfo = dumpInfo;
-        sis.readBytesEx(3); // skip siganture
-        version = sis.readUI8();
-        fileSize = sis.readUI32();
+        sis.readBytesEx(3, "signature"); // skip siganture
+        version = sis.readUI8("version");
+        fileSize = sis.readUI32("fileSize");
         sis.dumpInfo.lengthBytes = fileSize;
         if (listener != null) {
             sis.addPercentListener(listener);
         }
         sis.setPercentMax(fileSize);
-        displayRect = sis.readRECT();
+        displayRect = sis.readRECT("displayRect");
         // FIXED8 (16 bit fixed point) frameRate
-        sis.readUI8(); //tmpFirstByetOfFrameRate
-        frameRate = sis.readUI8();
-        frameCount = sis.readUI16();
+        sis.readUI8("tmpFirstByetOfFrameRate"); //tmpFirstByetOfFrameRate
+        frameRate = sis.readUI8("frameRate");
+        frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
         if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
@@ -713,7 +713,7 @@ public final class SWF implements TreeItem, Timelined {
 
         int version = hdr[3];
         SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4);
-        long fileSize = sis.readUI32();
+        long fileSize = sis.readUI32("fileSize");
         SWFHeader header = new SWFHeader();
         header.version = version;
         header.fileSize = fileSize;
@@ -734,10 +734,10 @@ public final class SWF implements TreeItem, Timelined {
                     break;
                 }
                 case 'Z': { // ZWS
-                    sis.readUI32(); // compressed LZMA data size = compressed SWF - 17 byte,
+                    sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,
                                      // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
                     int propertiesSize = 5;
-                    byte[] lzmaProperties = sis.readBytes(propertiesSize);
+                    byte[] lzmaProperties = sis.readBytes(propertiesSize, "lzmaproperties");
                     if (lzmaProperties.length != propertiesSize) {
                         throw new IOException("LZMA:input .lzma file is too short");
                     }

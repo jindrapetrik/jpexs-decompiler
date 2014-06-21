@@ -84,19 +84,19 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      */
     public DefineSceneAndFrameLabelDataTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineSceneAndFrameLabelData", pos, length);
-        int sceneCount = (int) sis.readEncodedU32();
+        int sceneCount = (int) sis.readEncodedU32("sceneCount");
         sceneOffsets = new long[sceneCount];
         sceneNames = new String[sceneCount];
         for (int i = 0; i < sceneCount; i++) {
-            sceneOffsets[i] = sis.readEncodedU32();
-            sceneNames[i] = sis.readString();
+            sceneOffsets[i] = sis.readEncodedU32("sceneOffset");
+            sceneNames[i] = sis.readString("sceneName");
         }
-        int frameLabelCount = (int) sis.readEncodedU32();
+        int frameLabelCount = (int) sis.readEncodedU32("frameLabelCount");
         frameNums = new long[frameLabelCount];
         frameNames = new String[frameLabelCount];
         for (int i = 0; i < frameLabelCount; i++) {
-            frameNums[i] = sis.readEncodedU32();
-            frameNames[i] = sis.readString();
+            frameNums[i] = sis.readEncodedU32("frameNum");
+            frameNames[i] = sis.readString("frameName");
         }
 
     }

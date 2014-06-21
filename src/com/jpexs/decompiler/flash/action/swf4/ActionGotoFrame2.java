@@ -45,11 +45,11 @@ public class ActionGotoFrame2 extends Action {
 
     public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9F, actionLength);
-        reserved = (int) sis.readUB(6);
-        sceneBiasFlag = sis.readUB(1) == 1;
-        playFlag = sis.readUB(1) == 1;
+        reserved = (int) sis.readUB(6, "reserved");
+        sceneBiasFlag = sis.readUB(1, "sceneBiasFlag") == 1;
+        playFlag = sis.readUB(1, "playFlag") == 1;
         if (sceneBiasFlag) {
-            sceneBias = sis.readUI16();
+            sceneBias = sis.readUI16("sceneBias");
         }
     }
 

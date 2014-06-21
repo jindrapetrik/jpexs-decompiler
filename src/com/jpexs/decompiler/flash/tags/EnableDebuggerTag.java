@@ -64,6 +64,6 @@ public class EnableDebuggerTag extends Tag {
      */
     public EnableDebuggerTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "EnableDebugger", pos, length);
-        passwordHash = sis.readString();
+        passwordHash = sis.readString("passwordHash");
     }
 }

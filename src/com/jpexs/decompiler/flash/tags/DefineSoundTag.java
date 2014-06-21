@@ -102,13 +102,13 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      */
     public DefineSoundTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineSound", pos, length);
-        soundId = sis.readUI16();
-        soundFormat = (int) sis.readUB(4);
-        soundRate = (int) sis.readUB(2);
-        soundSize = sis.readUB(1) == 1;
-        soundType = sis.readUB(1) == 1;
-        soundSampleCount = sis.readUI32();
-        soundData = sis.readBytesEx(sis.available());
+        soundId = sis.readUI16("soundId");
+        soundFormat = (int) sis.readUB(4, "soundFormat");
+        soundRate = (int) sis.readUB(2, "soundRate");
+        soundSize = sis.readUB(1, "soundSize") == 1;
+        soundType = sis.readUB(1, "soundType") == 1;
+        soundSampleCount = sis.readUI32("soundSampleCount");
+        soundData = sis.readBytesEx(sis.available(), "soundData");
     }
 
     @Override

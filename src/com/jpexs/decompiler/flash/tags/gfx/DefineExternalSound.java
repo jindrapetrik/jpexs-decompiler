@@ -81,17 +81,17 @@ public class DefineExternalSound extends Tag {
      */
     public DefineExternalSound(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineExternalSound", pos, length);
-        characterId = sis.readUI16();
-        soundFormat = sis.readUI16();
-        bits = sis.readUI16();
-        channels = sis.readUI16();
-        sampleRate = sis.readUI32();
-        sampleCount = sis.readUI32();
-        seekSample = sis.readUI32();
-        int exportNameLen = sis.readUI8();
-        exportName = new String(sis.readBytesEx(exportNameLen));
-        int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytesEx(fileNameLen));
+        characterId = sis.readUI16("characterId");
+        soundFormat = sis.readUI16("soundFormat");
+        bits = sis.readUI16("bits");
+        channels = sis.readUI16("channels");
+        sampleRate = sis.readUI32("sampleRate");
+        sampleCount = sis.readUI32("sampleCount");
+        seekSample = sis.readUI32("seekSample");
+        int exportNameLen = sis.readUI8("exportNameLen");
+        exportName = new String(sis.readBytesEx(exportNameLen, "exportName"));
+        int fileNameLen = sis.readUI8("fileNameLen");
+        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
 
     }
 }

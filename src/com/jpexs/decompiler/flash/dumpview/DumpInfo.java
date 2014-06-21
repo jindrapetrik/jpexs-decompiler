@@ -65,6 +65,6 @@ public class DumpInfo {
     @Override
     public String toString() {
         String value = previewValue == null ? "" : previewValue.toString();
-        return name + "(" + type + ")" + (value.isEmpty() ? "" : " = " + value);
+        return name + " (" + type + ")" + (value.isEmpty() ? "" : " = " + value);
     }
 }

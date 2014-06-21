@@ -60,9 +60,9 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     public DefineBinaryDataTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineBinaryData", pos, length);
-        tag = sis.readUI16();
-        reserved = sis.readUI32();
-        binaryData = sis.readBytesEx(sis.available());
+        tag = sis.readUI16("tag");
+        reserved = sis.readUI32("reserved");
+        binaryData = sis.readBytesEx(sis.available(),"binaryData");
     }
 
     @Override

@@ -51,8 +51,8 @@ public class ActionGetURL extends Action {
         super(0x83, actionLength);
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        urlString = sis.readString();
-        targetString = sis.readString();
+        urlString = sis.readString("urlString");
+        targetString = sis.readString("targetString");
     }
 
     public ActionGetURL(FlasmLexer lexer) throws IOException, ParseException {

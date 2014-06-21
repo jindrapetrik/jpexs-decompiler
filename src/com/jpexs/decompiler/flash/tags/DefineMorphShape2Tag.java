@@ -154,19 +154,19 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
      */
     public DefineMorphShape2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineMorphShape2", pos, length);
-        characterId = sis.readUI16();
-        startBounds = sis.readRECT();
-        endBounds = sis.readRECT();
-        startEdgeBounds = sis.readRECT();
-        endEdgeBounds = sis.readRECT();
-        reserved = (int) sis.readUB(6);
-        usesNonScalingStrokes = sis.readUB(1) == 1;
-        usesScalingStrokes = sis.readUB(1) == 1;
-        long offset = sis.readUI32();
-        morphFillStyles = sis.readMORPHFILLSTYLEARRAY();
-        morphLineStyles = sis.readMORPHLINESTYLEARRAY(2);
-        startEdges = sis.readSHAPE(2, true);
-        endEdges = sis.readSHAPE(2, true);
+        characterId = sis.readUI16("characterId");
+        startBounds = sis.readRECT("startBounds");
+        endBounds = sis.readRECT("endBounds");
+        startEdgeBounds = sis.readRECT("startEdgeBounds");
+        endEdgeBounds = sis.readRECT("endEdgeBounds");
+        reserved = (int) sis.readUB(6, "reserved");
+        usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
+        usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
+        long offset = sis.readUI32("offset");
+        morphFillStyles = sis.readMORPHFILLSTYLEARRAY("morphFillStyles");
+        morphLineStyles = sis.readMORPHLINESTYLEARRAY(2, "morphLineStyles");
+        startEdges = sis.readSHAPE(2, true, "startEdges");
+        endEdges = sis.readSHAPE(2, true, "endEdges");
     }
 
     @Override

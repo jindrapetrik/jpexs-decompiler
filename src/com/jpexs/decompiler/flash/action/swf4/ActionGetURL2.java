@@ -59,10 +59,10 @@ public class ActionGetURL2 extends Action {
 
     public ActionGetURL2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9A, actionLength);
-        loadVariablesFlag = sis.readUB(1) == 1;
-        loadTargetFlag = sis.readUB(1) == 1;
-        reserved = (int) sis.readUB(4);
-        sendVarsMethod = (int) sis.readUB(2); //This is first in documentation, which is WRONG!
+        loadVariablesFlag = sis.readUB(1, "loadVariablesFlag") == 1;
+        loadTargetFlag = sis.readUB(1, "loadTargetFlag") == 1;
+        reserved = (int) sis.readUB(4, "reserved");
+        sendVarsMethod = (int) sis.readUB(2, "sendVarsMethod"); //This is first in documentation, which is WRONG!
     }
 
     @Override

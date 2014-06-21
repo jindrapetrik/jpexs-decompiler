@@ -73,9 +73,9 @@ public class EnableTelemetryTag extends Tag {
      */
     public EnableTelemetryTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "", pos, length);
-        reserved = (int) sis.readUB(16);
+        reserved = (int) sis.readUB(16, "reserved");
         if (sis.available() > 0) {
-            passwordHash = sis.readBytesEx(32);
+            passwordHash = sis.readBytesEx(32, "passwordHash");
         }
     }
 }

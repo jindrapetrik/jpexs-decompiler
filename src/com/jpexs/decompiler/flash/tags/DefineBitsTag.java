@@ -56,8 +56,8 @@ public class DefineBitsTag extends ImageTag {
 
     public DefineBitsTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineBits", pos, length);
-        characterID = sis.readUI16();
-        jpegData = sis.readBytesEx(sis.available());
+        characterID = sis.readUI16("characterID");
+        jpegData = sis.readBytesEx(sis.available(), "jpegData");
     }
 
     private void getJPEGTables() {

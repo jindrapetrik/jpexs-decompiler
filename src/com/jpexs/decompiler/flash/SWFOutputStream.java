@@ -1038,7 +1038,7 @@ public class SWFOutputStream extends OutputStream {
             sos.writeUB(1, value.condOverUpToIddle ? 1 : 0);
             sos.writeUB(1, value.condIdleToOverUp ? 1 : 0);
             sos.writeUB(7, value.condKeyPress);
-            sos.writeUB(1, value.condOverDownToIddle ? 1 : 0);
+            sos.writeUB(1, value.condOverDownToIdle ? 1 : 0);
             sos.write(value.actionBytes);
         }
         byte[] data = baos.toByteArray();

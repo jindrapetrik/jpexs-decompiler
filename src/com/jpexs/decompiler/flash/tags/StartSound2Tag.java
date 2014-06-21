@@ -61,7 +61,7 @@ public class StartSound2Tag extends Tag {
      */
     public StartSound2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "StartSound2", pos, length);
-        soundClassName = sis.readString();
-        soundInfo = sis.readSOUNDINFO();
+        soundClassName = sis.readString("soundClassName");
+        soundInfo = sis.readSOUNDINFO("soundInfo");
     }
 }

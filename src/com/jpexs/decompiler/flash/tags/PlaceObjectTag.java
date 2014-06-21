@@ -106,11 +106,11 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      */
     public PlaceObjectTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "PlaceObject", pos, length);
-        characterId = sis.readUI16();
-        depth = sis.readUI16();
-        matrix = sis.readMatrix();
+        characterId = sis.readUI16("characterId");
+        depth = sis.readUI16("depth");
+        matrix = sis.readMatrix("matrix");
         if (sis.available() > 0) {
-            colorTransform = sis.readCXFORM();
+            colorTransform = sis.readCXFORM("colorTransform");
         }
     }
 

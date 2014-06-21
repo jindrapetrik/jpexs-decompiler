@@ -35,12 +35,12 @@ public class MP3SOUNDDATA {
 
     public MP3SOUNDDATA(SWFInputStream sis, boolean raw) throws IOException {
         if (!raw) {
-            seekSamples = sis.readSI16();
+            seekSamples = sis.readSI16("seekSamples");
         }
         frames = new ArrayList<>();
         MP3FRAME f;
         Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available())));
+        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
         while ((f = MP3FRAME.readFrame(bitstream, decoder)) != null) {
             frames.add(f);
         }

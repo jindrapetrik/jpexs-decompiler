@@ -70,8 +70,8 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     public DefineBitsJPEG2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineBitsJPEG2", pos, length);
-        characterID = sis.readUI16();
-        imageData = sis.readBytesEx(sis.available());
+        characterID = sis.readUI16("characterID");
+        imageData = sis.readBytesEx(sis.available(), "imageData");
     }
 
     public DefineBitsJPEG2Tag(SWF swf, long pos, int length, int characterID, byte[] imageData) throws IOException {

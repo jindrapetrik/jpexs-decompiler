@@ -205,15 +205,15 @@ public class AdpcmDecoder extends SoundDecoder {
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
         int adpcm_code_size;
         SWFOutputStream sos = new SWFOutputStream(os, SWF.DEFAULT_VERSION);
-        adpcm_code_size = (int) sis.readUB(2);
+        adpcm_code_size = (int) sis.readUB(2, "adpcm_code_size");
         int bits_per_code = adpcm_code_size + 2;
         try {
             do {
                 if (soundFormat.stereo) {
-                    int initialSampleLeft = (int) sis.readSB(16);
-                    int initialIndexLeft = (int) sis.readUB(6);
-                    int initialSampleRight = (int) sis.readSB(16);
-                    int initialIndexRight = (int) sis.readUB(6);
+                    int initialSampleLeft = (int) sis.readSB(16, "initialSampleLeft");
+                    int initialIndexLeft = (int) sis.readUB(6, "initialIndexLeft");
+                    int initialSampleRight = (int) sis.readSB(16, "initialSampleRight");
+                    int initialIndexRight = (int) sis.readUB(6, "initialIndexRight");
                     AdpcmState stateLeft = new AdpcmState();
                     stateLeft.index = initialIndexLeft;
                     stateLeft.sample = initialSampleLeft;
@@ -221,8 +221,8 @@ public class AdpcmDecoder extends SoundDecoder {
                     stateRight.index = initialIndexRight;
                     stateRight.sample = initialSampleRight;
                     for (int i = 1; (i <= 4095) && (sis.availableBits() >= bits_per_code * 2); i++) {
-                        int codeLeft = (int) sis.readUB(bits_per_code);
-                        int codeRight = (int) sis.readUB(bits_per_code);
+                        int codeLeft = (int) sis.readUB(bits_per_code, "codeLeft");
+                        int codeRight = (int) sis.readUB(bits_per_code, "codeRight");
                         int valLeft = 0;
                         int valRight = 0;
                         switch (bits_per_code) {
@@ -247,13 +247,13 @@ public class AdpcmDecoder extends SoundDecoder {
                         sos.writeSI16(valRight);
                     }
                 } else {
-                    int initialSample = (int) sis.readSB(16);
-                    int initialIndex = (int) sis.readUB(6);
+                    int initialSample = (int) sis.readSB(16, "initialSample");
+                    int initialIndex = (int) sis.readUB(6, "initialIndex");
                     AdpcmState state = new AdpcmState();
                     state.index = initialIndex;
                     state.sample = initialSample;
                     for (int i = 1; (i <= 4095) && (sis.availableBits() >= bits_per_code); i++) {
-                        int code = (int) sis.readUB(bits_per_code);
+                        int code = (int) sis.readUB(bits_per_code, "code");
                         int val = 0;
                         switch (bits_per_code) {
                             case 2:

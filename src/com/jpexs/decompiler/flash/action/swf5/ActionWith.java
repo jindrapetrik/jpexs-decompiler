@@ -51,7 +51,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     public ActionWith(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x94, actionLength);
-        codeSize = sis.readUI16();
+        codeSize = sis.readUI16("codeSize");
         this.version = version;
     }
 

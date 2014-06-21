@@ -50,7 +50,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
 
     public ActionStoreRegister(int actionLength, SWFInputStream sis) throws IOException {
         super(0x87, actionLength);
-        registerNumber = sis.readUI8();
+        registerNumber = sis.readUI8("registerNumber");
     }
 
     public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {

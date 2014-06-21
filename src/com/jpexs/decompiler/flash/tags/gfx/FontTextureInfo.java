@@ -91,20 +91,20 @@ public class FontTextureInfo extends Tag {
      */
     public FontTextureInfo(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "FontTextureInfo", pos, length);
-        textureID = sis.readUI32();
-        textureFormat = sis.readUI16();
-        int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytesEx(fileNameLen));
-        textureWidth = sis.readUI16();
-        textureHeight = sis.readUI16();
-        padPixels = sis.readUI8();
-        nominalGlyphSz = sis.readUI16();
-        int numTexGlyphs = sis.readUI16();
+        textureID = sis.readUI32("textureID");
+        textureFormat = sis.readUI16("textureFormat");
+        int fileNameLen = sis.readUI8("fileNameLen");
+        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
+        textureWidth = sis.readUI16("textureWidth");
+        textureHeight = sis.readUI16("textureHeight");
+        padPixels = sis.readUI8("padPixels");
+        nominalGlyphSz = sis.readUI16("nominalGlyphSz");
+        int numTexGlyphs = sis.readUI16("numTexGlyphs");
         texGlyphs = new TEXGLYPH[numTexGlyphs];
         for (int i = 0; i < numTexGlyphs; i++) {
             texGlyphs[i] = new TEXGLYPH(new GFxInputStream(sis.getBaseStream()));
         }
-        int numFonts = sis.readUI16();
+        int numFonts = sis.readUI16("numFonts");
         fonts = new FONTINFO[numFonts];
         for (int i = 0; i < numFonts; i++) {
             fonts[i] = new FONTINFO(new GFxInputStream(sis.getBaseStream()));

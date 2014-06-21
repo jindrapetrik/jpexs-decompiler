@@ -103,13 +103,13 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      */
     public DefineButton2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineButton2", pos, length);
-        buttonId = sis.readUI16();
-        reserved = (int) sis.readUB(7);
-        trackAsMenu = sis.readUB(1) == 1;
-        int actionOffset = sis.readUI16();
-        characters = sis.readBUTTONRECORDList(true);
+        buttonId = sis.readUI16("buttonId");
+        reserved = (int) sis.readUB(7, "reserved");
+        trackAsMenu = sis.readUB(1, "trackAsMenu") == 1;
+        int actionOffset = sis.readUI16("actionOffset");
+        characters = sis.readBUTTONRECORDList(true, "characters");
         if (actionOffset > 0) {
-            actions = sis.readBUTTONCONDACTIONList(swf, this);
+            actions = sis.readBUTTONCONDACTIONList(swf, this, "actions");
         }
     }
 

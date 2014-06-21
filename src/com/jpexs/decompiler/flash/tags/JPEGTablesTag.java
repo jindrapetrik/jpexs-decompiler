@@ -28,6 +28,6 @@ public class JPEGTablesTag extends Tag {
 
     public JPEGTablesTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "JPEGTables", pos, length);
-        jpegData = sis.readBytesEx(sis.available());
+        jpegData = sis.readBytesEx(sis.available(), "jpegData");
     }
 }

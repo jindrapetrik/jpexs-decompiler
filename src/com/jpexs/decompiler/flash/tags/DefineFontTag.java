@@ -142,16 +142,16 @@ public class DefineFontTag extends FontTag {
      */
     public DefineFontTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineFont", pos, length);
-        fontId = sis.readUI16();
-        int firstOffset = sis.readUI16();
+        fontId = sis.readUI16("fontId");
+        int firstOffset = sis.readUI16("firstOffset");
         int nGlyphs = firstOffset / 2;
         glyphShapeTable = new ArrayList<>();
 
         for (int i = 1; i < nGlyphs; i++) {
-            sis.readUI16(); //offset
+            sis.readUI16("offset"); //offset
         }
         for (int i = 0; i < nGlyphs; i++) {
-            glyphShapeTable.add(sis.readSHAPE(1, false));
+            glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
         }
     }
 

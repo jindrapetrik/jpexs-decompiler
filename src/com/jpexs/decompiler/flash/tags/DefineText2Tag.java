@@ -466,14 +466,14 @@ public class DefineText2Tag extends TextTag {
      */
     public DefineText2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineText2", pos, length);
-        characterID = sis.readUI16();
-        textBounds = sis.readRECT();
-        textMatrix = sis.readMatrix();
-        int glyphBits = sis.readUI8();
-        int advanceBits = sis.readUI8();
+        characterID = sis.readUI16("characterID");
+        textBounds = sis.readRECT("textBounds");
+        textMatrix = sis.readMatrix("textMatrix");
+        int glyphBits = sis.readUI8("glyphBits");
+        int advanceBits = sis.readUI8("advanceBits");
         textRecords = new ArrayList<>();
         TEXTRECORD tr;
-        while ((tr = sis.readTEXTRECORD(true, glyphBits, advanceBits)) != null) {
+        while ((tr = sis.readTEXTRECORD(true, glyphBits, advanceBits, "record")) != null) {
             textRecords.add(tr);
         }
     }

@@ -171,10 +171,10 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         try {
             SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))));
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-                colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
+                colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
             }
             if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
-                bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight);
+                bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
             }
         } catch (IOException ex) {
         }
@@ -183,14 +183,14 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     public DefineBitsLosslessTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineBitsLossless", pos, length);
-        characterID = sis.readUI16();
-        bitmapFormat = sis.readUI8();
-        bitmapWidth = sis.readUI16();
-        bitmapHeight = sis.readUI16();
+        characterID = sis.readUI16("characterID");
+        bitmapFormat = sis.readUI8("bitmapFormat");
+        bitmapWidth = sis.readUI16("bitmapWidth");
+        bitmapHeight = sis.readUI16("bitmapHeight");
         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-            bitmapColorTableSize = sis.readUI8();
+            bitmapColorTableSize = sis.readUI8("bitmapColorTableSize");
         }
-        zlibBitmapData = sis.readBytesEx(sis.available());
+        zlibBitmapData = sis.readBytesEx(sis.available(), "zlibBitmapData");
     }
 
     /**

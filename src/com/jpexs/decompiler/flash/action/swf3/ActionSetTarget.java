@@ -43,7 +43,7 @@ public class ActionSetTarget extends Action {
         super(0x8B, actionLength);
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        targetName = sis.readString();
+        targetName = sis.readString("targetName");
     }
 
     @Override

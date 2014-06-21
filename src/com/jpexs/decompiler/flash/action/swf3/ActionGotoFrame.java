@@ -40,7 +40,7 @@ public class ActionGotoFrame extends Action {
 
     public ActionGotoFrame(int actionLength, SWFInputStream sis) throws IOException {
         super(0x81, actionLength);
-        frame = sis.readUI16();
+        frame = sis.readUI16("frame");
     }
 
     @Override

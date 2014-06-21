@@ -132,14 +132,14 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
      */
     public DefineMorphShapeTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineMorphShape", pos, length);
-        characterId = sis.readUI16();
-        startBounds = sis.readRECT();
-        endBounds = sis.readRECT();
-        long offset = sis.readUI32(); //ignore
-        morphFillStyles = sis.readMORPHFILLSTYLEARRAY();
-        morphLineStyles = sis.readMORPHLINESTYLEARRAY(1);
-        startEdges = sis.readSHAPE(1, true);
-        endEdges = sis.readSHAPE(1, true);
+        characterId = sis.readUI16("characterId");
+        startBounds = sis.readRECT("startBounds");
+        endBounds = sis.readRECT("endBounds");
+        long offset = sis.readUI32("offset"); //ignore
+        morphFillStyles = sis.readMORPHFILLSTYLEARRAY("morphFillStyles");
+        morphLineStyles = sis.readMORPHLINESTYLEARRAY(1, "morphLineStyles");
+        startEdges = sis.readSHAPE(1, true, "startEdges");
+        endEdges = sis.readSHAPE(1, true, "endEdges");
     }
 
     @Override

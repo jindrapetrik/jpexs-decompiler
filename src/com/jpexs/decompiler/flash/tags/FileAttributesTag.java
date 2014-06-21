@@ -50,17 +50,17 @@ public class FileAttributesTag extends Tag {
 
     public FileAttributesTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "FileAttributes", pos, length);
-        reserved1 = sis.readUB(1) == 1; // reserved
+        reserved1 = sis.readUB(1, "reserved1") == 1; // reserved
         // UB[1] == 0  (reserved)
-        useDirectBlit = sis.readUB(1) != 0;
-        useGPU = sis.readUB(1) != 0;
-        hasMetadata = sis.readUB(1) != 0;
-        actionScript3 = sis.readUB(1) != 0;
-        noCrossDomainCache = sis.readUB(1) != 0;
-        reserved2 = sis.readUB(1) == 1; // reserved
-        useNetwork = sis.readUB(1) != 0;
+        useDirectBlit = sis.readUB(1, "useDirectBlit") != 0;
+        useGPU = sis.readUB(1, "useGPU") != 0;
+        hasMetadata = sis.readUB(1, "hasMetadata") != 0;
+        actionScript3 = sis.readUB(1, "actionScript3") != 0;
+        noCrossDomainCache = sis.readUB(1, "noCrossDomainCache") != 0;
+        reserved2 = sis.readUB(1, "reserved2") == 1; // reserved
+        useNetwork = sis.readUB(1, "useNetwork") != 0;
         // UB[24] == 0 (reserved)
-        reserved3 = (int) sis.readUB(24); //reserved
+        reserved3 = (int) sis.readUB(24, "reserved3"); //reserved
     }
 
     /**

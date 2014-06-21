@@ -68,17 +68,17 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         super(0x8F, actionLength);
         long startPos = sis.getPos();
         this.version = version;
-        reserved = (int) sis.readUB(5);
-        catchInRegisterFlag = sis.readUB(1) == 1;
-        finallyBlockFlag = sis.readUB(1) == 1;
-        catchBlockFlag = sis.readUB(1) == 1;
-        trySize = sis.readUI16();
-        catchSize = sis.readUI16();
-        finallySize = sis.readUI16();
+        reserved = (int) sis.readUB(5, "reserved");
+        catchInRegisterFlag = sis.readUB(1, "catchInRegisterFlag") == 1;
+        finallyBlockFlag = sis.readUB(1, "finallyBlockFlag") == 1;
+        catchBlockFlag = sis.readUB(1, "catchBlockFlag") == 1;
+        trySize = sis.readUI16("trySize");
+        catchSize = sis.readUI16("catchSize");
+        finallySize = sis.readUI16("finallySize");
         if (catchInRegisterFlag) {
-            catchRegister = sis.readUI8();
+            catchRegister = sis.readUI8("catchRegister");
         } else {
-            catchName = sis.readString();
+            catchName = sis.readString("catchName");
         }
     }
 

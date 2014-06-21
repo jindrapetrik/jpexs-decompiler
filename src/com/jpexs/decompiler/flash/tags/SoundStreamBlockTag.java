@@ -43,6 +43,6 @@ public class SoundStreamBlockTag extends Tag {
     public SoundStreamBlockTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "SoundStreamBlock", pos, length);
         //all data is streamSoundData
-        streamSoundData = sis.readBytesEx(sis.available());
+        streamSoundData = sis.readBytesEx(sis.available(), "streamSoundData");
     }
 }

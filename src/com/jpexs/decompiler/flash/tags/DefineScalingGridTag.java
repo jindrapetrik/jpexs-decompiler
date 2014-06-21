@@ -37,8 +37,8 @@ public class DefineScalingGridTag extends Tag {
 
     public DefineScalingGridTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineScalingGrid", pos, length);
-        characterId = sis.readUI16();
-        splitter = sis.readRECT();
+        characterId = sis.readUI16("characterId");
+        splitter = sis.readRECT("splitter");
     }
 
     /**

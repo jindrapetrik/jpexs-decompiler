@@ -108,17 +108,17 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, long pos, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
-        eventFlags = sis.readCLIPEVENTFLAGS();
+        eventFlags = sis.readCLIPEVENTFLAGS("eventFlags");
         if (eventFlags.isClear()) {
             return;
         }
-        long actionRecordSize = sis.readUI32();
+        long actionRecordSize = sis.readUI32("actionRecordSize");
         if (eventFlags.clipEventKeyPress) {
-            keyCode = sis.readUI8();
+            keyCode = sis.readUI8("keyCode");
             actionRecordSize--;
         }
         hdrPos = sis.getPos();
-        actionBytes = sis.readBytesEx(actionRecordSize);
+        actionBytes = sis.readBytesEx(actionRecordSize, "actionBytes");
         this.pos = pos;
     }
 

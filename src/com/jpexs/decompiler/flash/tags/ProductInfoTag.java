@@ -52,7 +52,7 @@ public class ProductInfoTag extends Tag {
          * 2: Macromedia Flex for .NET
          * 3: Adobe Flex
          */
-        productID = sis.readUI32();
+        productID = sis.readUI32("productID");
 
         /*
          * 0: Developer Edition
@@ -63,13 +63,13 @@ public class ProductInfoTag extends Tag {
          * 5: Trial Edition
          * 6: None
          */
-        edition = sis.readUI32();
-        majorVersion = sis.readUI8();
-        minorVersion = sis.readUI8();
-        buildLow = sis.readUI32();
-        buildHigh = sis.readUI32();
-        compilationDateLow = sis.readUI32();
-        compilationDateHigh = sis.readUI32();
+        edition = sis.readUI32("edition");
+        majorVersion = sis.readUI8("majorVersion");
+        minorVersion = sis.readUI8("minorVersion");
+        buildLow = sis.readUI32("buildLow");
+        buildHigh = sis.readUI32("buildHigh");
+        compilationDateLow = sis.readUI32("compilationDateLow");
+        compilationDateHigh = sis.readUI32("compilationDateHigh");
     }
 
     @Override

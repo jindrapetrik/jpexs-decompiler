@@ -35,7 +35,7 @@ public class ActionStrictMode extends Action {
 
     public ActionStrictMode(SWFInputStream sis) throws IOException {
         super(0x89, 1);
-        mode = sis.readUI8();
+        mode = sis.readUI8("mode");
     }
 
     public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {

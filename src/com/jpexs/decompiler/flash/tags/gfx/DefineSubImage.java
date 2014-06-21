@@ -70,11 +70,11 @@ public class DefineSubImage extends Tag {
      */
     public DefineSubImage(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineSubImage", pos, length);
-        characterId = sis.readUI16();
-        imageCharacterId = sis.readUI16();
-        x1 = sis.readUI16();
-        y1 = sis.readUI16();
-        x2 = sis.readUI16();
-        y2 = sis.readUI16();
+        characterId = sis.readUI16("characterId");
+        imageCharacterId = sis.readUI16("imageCharacterId");
+        x1 = sis.readUI16("x1");
+        y1 = sis.readUI16("y1");
+        x2 = sis.readUI16("x2");
+        y2 = sis.readUI16("y2");
     }
 }

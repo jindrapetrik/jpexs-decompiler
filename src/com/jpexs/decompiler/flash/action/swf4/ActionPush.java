@@ -77,16 +77,16 @@ public class ActionPush extends Action {
         super(0x96, actionLength);
         int type;
         values = new ArrayList<>();
-        sis = new SWFInputStream(sis.getSwf(), sis.readBytesEx(actionLength));
+        sis = new SWFInputStream(sis.getSwf(), sis.readBytesEx(actionLength, "actionPush"));
         try {
             while (sis.available() > 0) {
-                type = sis.readUI8();
+                type = sis.readUI8("type");
                 switch (type) {
                     case 0:
-                        values.add(sis.readString());
+                        values.add(sis.readString("string"));
                         break;
                     case 1:
-                        values.add(sis.readFLOAT());
+                        values.add(sis.readFLOAT("float"));
                         break;
                     case 2:
                         values.add(new Null());
@@ -95,10 +95,10 @@ public class ActionPush extends Action {
                         values.add(new Undefined());
                         break;
                     case 4:
-                        values.add(new RegisterNumber(sis.readUI8()));
+                        values.add(new RegisterNumber(sis.readUI8("registerNumber")));
                         break;
                     case 5:
-                        int b = sis.readUI8();
+                        int b = sis.readUI8("boolean");
                         if (b == 0) {
                             values.add((Boolean) false);
                         } else {
@@ -107,17 +107,17 @@ public class ActionPush extends Action {
 
                         break;
                     case 6:
-                        values.add(sis.readDOUBLE());
+                        values.add(sis.readDOUBLE("double"));
                         break;
                     case 7:
-                        long el = sis.readSI32();
+                        long el = sis.readSI32("el");
                         values.add((Long) el);
                         break;
                     case 8:
-                        values.add(new ConstantIndex(sis.readUI8()));
+                        values.add(new ConstantIndex(sis.readUI8("constantIndex")));
                         break;
                     case 9:
-                        values.add(new ConstantIndex(sis.readUI16()));
+                        values.add(new ConstantIndex(sis.readUI16("constantIndex")));
                         break;
                 }
             }

@@ -43,7 +43,7 @@ public class ActionGoToLabel extends Action {
         super(0x8C, actionLength);
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        label = sis.readString();
+        label = sis.readString("label");
     }
 
     @Override

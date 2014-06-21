@@ -63,6 +63,6 @@ public class DebugIDTag extends Tag {
      */
     public DebugIDTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DebugID", pos, length);
-        debugId = sis.readBytesEx(16);
+        debugId = sis.readBytesEx(16, "debugId");
     }
 }

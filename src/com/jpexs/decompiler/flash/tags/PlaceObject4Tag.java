@@ -305,55 +305,55 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      */
     public PlaceObject4Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "PlaceObject4", pos, length);
-        placeFlagHasClipActions = sis.readUB(1) == 1;
-        placeFlagHasClipDepth = sis.readUB(1) == 1;
-        placeFlagHasName = sis.readUB(1) == 1;
-        placeFlagHasRatio = sis.readUB(1) == 1;
-        placeFlagHasColorTransform = sis.readUB(1) == 1;
-        placeFlagHasMatrix = sis.readUB(1) == 1;
-        placeFlagHasCharacter = sis.readUB(1) == 1;
-        placeFlagMove = sis.readUB(1) == 1;
-        reserved = sis.readUB(1) == 1;
-        placeFlagOpaqueBackground = sis.readUB(1) == 1; //SWF11
-        placeFlagHasVisible = sis.readUB(1) == 1;       //SWF11
-        placeFlagHasImage = sis.readUB(1) == 1;
-        placeFlagHasClassName = sis.readUB(1) == 1;
-        placeFlagHasCacheAsBitmap = sis.readUB(1) == 1;
-        placeFlagHasBlendMode = sis.readUB(1) == 1;
-        placeFlagHasFilterList = sis.readUB(1) == 1;
+        placeFlagHasClipActions = sis.readUB(1, "placeFlagHasClipActions") == 1;
+        placeFlagHasClipDepth = sis.readUB(1, "placeFlagHasClipDepth") == 1;
+        placeFlagHasName = sis.readUB(1, "placeFlagHasName") == 1;
+        placeFlagHasRatio = sis.readUB(1, "placeFlagHasRatio") == 1;
+        placeFlagHasColorTransform = sis.readUB(1, "placeFlagHasColorTransform") == 1;
+        placeFlagHasMatrix = sis.readUB(1, "placeFlagHasMatrix") == 1;
+        placeFlagHasCharacter = sis.readUB(1, "placeFlagHasCharacter") == 1;
+        placeFlagMove = sis.readUB(1, "placeFlagMove") == 1;
+        reserved = sis.readUB(1, "reserved") == 1;
+        placeFlagOpaqueBackground = sis.readUB(1, "placeFlagOpaqueBackground") == 1; //SWF11
+        placeFlagHasVisible = sis.readUB(1, "placeFlagHasVisible") == 1;       //SWF11
+        placeFlagHasImage = sis.readUB(1, "placeFlagHasImage") == 1;
+        placeFlagHasClassName = sis.readUB(1, "placeFlagHasClassName") == 1;
+        placeFlagHasCacheAsBitmap = sis.readUB(1, "placeFlagHasCacheAsBitmap") == 1;
+        placeFlagHasBlendMode = sis.readUB(1, "placeFlagHasBlendMode") == 1;
+        placeFlagHasFilterList = sis.readUB(1, "placeFlagHasFilterList") == 1;
 
-        depth = sis.readUI16();
+        depth = sis.readUI16("depth");
         if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
-            className = sis.readString();
+            className = sis.readString("className");
         }
         if (placeFlagHasCharacter) {
-            characterId = sis.readUI16();
+            characterId = sis.readUI16("characterId");
         }
         if (placeFlagHasMatrix) {
-            matrix = sis.readMatrix();
+            matrix = sis.readMatrix("matrix");
         }
         if (placeFlagHasColorTransform) {
-            colorTransform = sis.readCXFORMWITHALPHA();
+            colorTransform = sis.readCXFORMWITHALPHA("colorTransform");
         }
         if (placeFlagHasRatio) {
-            ratio = sis.readUI16();
+            ratio = sis.readUI16("ratio");
         }
         if (placeFlagHasName) {
-            name = sis.readString();
+            name = sis.readString("name");
         }
         if (placeFlagHasClipDepth) {
-            clipDepth = sis.readUI16();
+            clipDepth = sis.readUI16("clipDepth");
         }
         if (placeFlagHasFilterList) {
-            surfaceFilterList = sis.readFILTERLIST();
+            surfaceFilterList = sis.readFILTERLIST("surfaceFilterList");
         }
         if (placeFlagHasBlendMode) {
-            blendMode = sis.readUI8();
+            blendMode = sis.readUI8("blendMode");
         }
         bitmapCacheBug = false;
         if (placeFlagHasCacheAsBitmap) {
             try {
-                bitmapCache = sis.readUI8();
+                bitmapCache = sis.readUI8("bitmapCache");
             } catch (EndOfStreamException eex) {
                 bitmapCacheBug = true;
                 bitmapCache = 1;
@@ -361,16 +361,16 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         }
 
         if (placeFlagHasVisible) {
-            visible = sis.readUI8();
+            visible = sis.readUI8("visible");
         }
         if (placeFlagOpaqueBackground) {
-            backgroundColor = sis.readRGBA();
+            backgroundColor = sis.readRGBA("backgroundColor");
         }
 
         if (placeFlagHasClipActions) {
-            clipActions = sis.readCLIPACTIONS(swf, this);
+            clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
-        amfData = sis.readBytesEx(sis.available());
+        amfData = sis.readBytesEx(sis.available(), "amfData");
     }
 
     /**

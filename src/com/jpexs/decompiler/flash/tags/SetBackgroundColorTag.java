@@ -30,7 +30,7 @@ public class SetBackgroundColorTag extends Tag {
 
     public SetBackgroundColorTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "SetBackgroundColor", pos, length);
-        backgroundColor = sis.readRGB();
+        backgroundColor = sis.readRGB("backgroundColor");
     }
 
     public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {

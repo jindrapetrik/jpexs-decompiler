@@ -60,7 +60,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
 
     public ActionWaitForFrame2(int actionLength, SWFInputStream sis, ConstantPool cpool) throws IOException {
         super(0x8D, actionLength);
-        skipCount = sis.readUI8();
+        skipCount = sis.readUI8("skipCount");
         skipped = new ArrayList<>();
         /*for (int i = 0; i < skipCount; i++) {
          Action a = sis.readAction(cpool);

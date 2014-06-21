@@ -69,9 +69,9 @@ public class DefineShape2Tag extends ShapeTag {
 
     public DefineShape2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineShape2", pos, length);
-        shapeId = sis.readUI16();
-        shapeBounds = sis.readRECT();
-        shapes = sis.readSHAPEWITHSTYLE(2, false);
+        shapeId = sis.readUI16("shapeId");
+        shapeBounds = sis.readRECT("shapeBounds");
+        shapes = sis.readSHAPEWITHSTYLE(2, false, "shapes");
     }
 
     @Override

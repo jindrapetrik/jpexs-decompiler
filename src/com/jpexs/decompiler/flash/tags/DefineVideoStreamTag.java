@@ -105,14 +105,14 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      */
     public DefineVideoStreamTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineVideoStream", pos, length);
-        characterID = sis.readUI16();
-        numFrames = sis.readUI16();
-        width = sis.readUI16();
-        height = sis.readUI16();
-        reserved = (int) sis.readUB(4);
-        videoFlagsDeblocking = (int) sis.readUB(3);
-        videoFlagsSmoothing = sis.readUB(1) == 1;
-        codecID = sis.readUI8();
+        characterID = sis.readUI16("characterID");
+        numFrames = sis.readUI16("numFrames");
+        width = sis.readUI16("width");
+        height = sis.readUI16("height");
+        reserved = (int) sis.readUB(4, "reserved");
+        videoFlagsDeblocking = (int) sis.readUB(3, "videoFlagsDeblocking");
+        videoFlagsSmoothing = sis.readUB(1, "videoFlagsSmoothing") == 1;
+        codecID = sis.readUI8("codecID");
     }
 
     @Override

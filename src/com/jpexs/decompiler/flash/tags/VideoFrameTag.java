@@ -67,8 +67,8 @@ public class VideoFrameTag extends Tag {
      */
     public VideoFrameTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "VideoFrame", pos, length);
-        streamID = sis.readUI16();
-        frameNum = sis.readUI16();
-        videoData = sis.readBytesEx(sis.available()); //TODO: Parse video packets
+        streamID = sis.readUI16("streamID");
+        frameNum = sis.readUI16("frameNum");
+        videoData = sis.readBytesEx(sis.available(), "videoData"); //TODO: Parse video packets
     }
 }

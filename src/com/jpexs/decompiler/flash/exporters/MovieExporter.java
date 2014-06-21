@@ -103,28 +103,28 @@ public class MovieExporter {
                     || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
                 SWFInputStream sis = new SWFInputStream(swf, tag.videoData);
                 if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
-                    sis.readUI24(); //offsetToAlpha
+                    sis.readUI24("offsetToAlpha"); //offsetToAlpha
                 }
-                int frameMode = (int) sis.readUB(1);
+                int frameMode = (int) sis.readUB(1, "frameMode");
 
                 if (frameMode == 0) {
                     frameType = 1; //intra
                 } else {
                     frameType = 2; //inter
                 }
-                sis.readUB(6); //qp
-                int marker = (int) sis.readUB(1);
+                sis.readUB(6, "qp"); //qp
+                int marker = (int) sis.readUB(1, "marker");
                 if (frameMode == 0) {
-                    int version = (int) sis.readUB(5);
-                    int version2 = (int) sis.readUB(2);
-                    sis.readUB(1);//interlace
+                    int version = (int) sis.readUB(5, "version");
+                    int version2 = (int) sis.readUB(2, "version2");
+                    sis.readUB(1, "interlace"); //interlace
                     if (marker == 1 || version2 == 0) {
-                        sis.readUI16();//offset
+                        sis.readUI16("offset"); //offset
                     }
-                    int dim_y = sis.readUI8();
-                    int dim_x = sis.readUI8();
-                    sis.readUI8(); //render_y
-                    sis.readUI8(); //render_x
+                    int dim_y = sis.readUI8("dim_y");
+                    int dim_x = sis.readUI8("dim_x");
+                    sis.readUI8("render_y"); //render_y
+                    sis.readUI8("render_x"); //render_x
                     horizontalAdjustment = (int) (dim_x * Math.ceil(((double) videoStream.width) / (double) dim_x)) - videoStream.width;
                     verticalAdjustment = (int) (dim_y * Math.ceil(((double) videoStream.height) / (double) dim_y)) - videoStream.height;
 
@@ -136,19 +136,19 @@ public class MovieExporter {
             }
             if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
                 SWFInputStream sis = new SWFInputStream(swf, tag.videoData);
-                sis.readUB(17);//pictureStartCode
-                sis.readUB(5); //version
-                sis.readUB(8); //temporalReference
-                int pictureSize = (int) sis.readUB(3); //pictureSize
+                sis.readUB(17, "pictureStartCode");//pictureStartCode
+                sis.readUB(5, "version"); //version
+                sis.readUB(8, "temporalReference"); //temporalReference
+                int pictureSize = (int) sis.readUB(3, "pictureSize"); //pictureSize
                 if (pictureSize == 0) {
-                    sis.readUB(8); //customWidth
-                    sis.readUB(8); //customHeight
+                    sis.readUB(8, "customWidth"); //customWidth
+                    sis.readUB(8, "customHeight"); //customHeight
                 }
                 if (pictureSize == 1) {
-                    sis.readUB(16); //customWidth
-                    sis.readUB(16); //customHeight
+                    sis.readUB(16, "customWidth"); //customWidth
+                    sis.readUB(16, "customHeight"); //customHeight
                 }
-                int pictureType = (int) sis.readUB(2);
+                int pictureType = (int) sis.readUB(2, "pictureType");
                 switch (pictureType) {
                     case 0: //intra
                         frameType = 1; //keyframe

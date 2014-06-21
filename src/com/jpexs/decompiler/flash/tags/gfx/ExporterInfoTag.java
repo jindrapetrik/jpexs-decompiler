@@ -89,21 +89,21 @@ public class ExporterInfoTag extends Tag {
      */
     public ExporterInfoTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "ExporterInfo", pos, length);
-        this.version = sis.readUI16();
+        this.version = sis.readUI16("version");
         if (this.version >= 0x10a) {
-            flags = sis.readUI32();
+            flags = sis.readUI32("flags");
         }
-        bitmapFormat = sis.readUI16();
-        int prefixLen = sis.readUI8();
-        prefix = sis.readBytesEx(prefixLen);
-        int swfNameLen = sis.readUI8();
-        swfName = new String(sis.readBytesEx(swfNameLen));
+        bitmapFormat = sis.readUI16("bitmapFormat");
+        int prefixLen = sis.readUI8("prefixLen");
+        prefix = sis.readBytesEx(prefixLen, "prefix");
+        int swfNameLen = sis.readUI8("swfNameLen");
+        swfName = new String(sis.readBytesEx(swfNameLen, "swfName"));
         if (sis.available() > 0) // (version >= 0x401) //?                
         {
             codeOffsets = new ArrayList<>();
-            int numCodeOffsets = sis.readUI16();
+            int numCodeOffsets = sis.readUI16("numCodeOffsets");
             for (int i = 0; i < numCodeOffsets; i++) {
-                codeOffsets.add(sis.readUI32());
+                codeOffsets.add(sis.readUI32("codeOffset"));
             }
         }
     }

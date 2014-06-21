@@ -81,16 +81,16 @@ public class DefineExternalImage2 extends Tag {
      */
     public DefineExternalImage2(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineExternalImage2", pos, length);
-        characterId = sis.readUI32();
-        bitmapFormat = sis.readUI16();
-        targetWidth = sis.readUI16();
-        targetHeight = sis.readUI16();
-        int exportNameLen = sis.readUI8();
-        exportName = new String(sis.readBytesEx(exportNameLen));
-        int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytesEx(fileNameLen));
+        characterId = sis.readUI32("characterId");
+        bitmapFormat = sis.readUI16("bitmapFormat");
+        targetWidth = sis.readUI16("targetWidth");
+        targetHeight = sis.readUI16("targetHeight");
+        int exportNameLen = sis.readUI8("exportNameLen");
+        exportName = new String(sis.readBytesEx(exportNameLen, "exportName"));
+        int fileNameLen = sis.readUI8("fileNameLen");
+        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
         if (sis.available() > 0) { //there is usually one zero byte, bod knows why
-            extraData = sis.readBytesEx(sis.available());
+            extraData = sis.readBytesEx(sis.available(), "extraData");
         }
     }
 }

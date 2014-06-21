@@ -40,7 +40,7 @@ public class MP3Decoder extends SoundDecoder {
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
         Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available())));
+        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
         SampleBuffer buf;
         while ((buf = readFrame(decoder, bitstream)) != null) {
             short audio[] = buf.getBuffer();

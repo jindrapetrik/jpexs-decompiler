@@ -65,7 +65,7 @@ public class DefineButtonCxformTag extends Tag {
      */
     public DefineButtonCxformTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineButtonCxform", pos, length);
-        buttonId = sis.readUI16();
-        buttonColorTransform = sis.readCXFORM();
+        buttonId = sis.readUI16("buttonId");
+        buttonColorTransform = sis.readCXFORM("buttonColorTransform");
     }
 }

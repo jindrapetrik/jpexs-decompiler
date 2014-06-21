@@ -70,7 +70,7 @@ public class EnableDebugger2Tag extends Tag {
      */
     public EnableDebugger2Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "EnableDebugger2", pos, length);
-        reserved = sis.readUI16();
-        passwordHash = sis.readString();
+        reserved = sis.readUI16("reserved");
+        passwordHash = sis.readString("passwordHash");
     }
 }

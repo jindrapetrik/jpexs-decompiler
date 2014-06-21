@@ -44,7 +44,7 @@ public class NellyMoserDecoder extends SoundDecoder {
 
         int blockCount = sis.available() / NELLY_BLOCK_LEN;
         for (int j = 0; j < blockCount; j++) {
-            byte[] block = sis.readBytesEx(NELLY_BLOCK_LEN);
+            byte[] block = sis.readBytesEx(NELLY_BLOCK_LEN, "block");
             CodecImpl.decode(state, block, audioD);
             short audio[] = new short[NELLY_SAMPLES];
             for (int i = 0; i < audioD.length; i++) {

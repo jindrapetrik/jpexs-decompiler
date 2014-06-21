@@ -71,7 +71,7 @@ public class SetTabIndexTag extends Tag {
      */
     public SetTabIndexTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "SetTabIndex", pos, length);
-        depth = sis.readUI16();
-        tabIndex = sis.readUI16();
+        depth = sis.readUI16("depth");
+        tabIndex = sis.readUI16("tabIndex");
     }
 }

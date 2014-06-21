@@ -63,22 +63,22 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         this.swf = swf;
         this.tag = tag;
         pos = containerOffset;
-        int condActionSize = sis.readUI16();
+        int condActionSize = sis.readUI16("condActionSize");
         isLast = condActionSize <= 0;
-        condIdleToOverDown = sis.readUB(1) == 1;
-        condOutDownToIdle = sis.readUB(1) == 1;
-        condOutDownToOverDown = sis.readUB(1) == 1;
-        condOverDownToOutDown = sis.readUB(1) == 1;
-        condOverDownToOverUp = sis.readUB(1) == 1;
-        condOverUpToOverDown = sis.readUB(1) == 1;
-        condOverUpToIddle = sis.readUB(1) == 1;
-        condIdleToOverUp = sis.readUB(1) == 1;
-        condKeyPress = (int) sis.readUB(7);
-        condOverDownToIddle = sis.readUB(1) == 1;
+        condIdleToOverDown = sis.readUB(1, "condIdleToOverDown") == 1;
+        condOutDownToIdle = sis.readUB(1, "condOutDownToIdle") == 1;
+        condOutDownToOverDown = sis.readUB(1, "condOutDownToOverDown") == 1;
+        condOverDownToOutDown = sis.readUB(1, "condOverDownToOutDown") == 1;
+        condOverDownToOverUp = sis.readUB(1, "condOverDownToOverUp") == 1;
+        condOverUpToOverDown = sis.readUB(1, "condOverUpToOverDown") == 1;
+        condOverUpToIddle = sis.readUB(1, "condOverUpToIddle") == 1;
+        condIdleToOverUp = sis.readUB(1, "condIdleToOverUp") == 1;
+        condKeyPress = (int) sis.readUB(7, "condKeyPress");
+        condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
         if (condActionSize <= 0) {
-            actionBytes = sis.readBytesEx(sis.available());
+            actionBytes = sis.readBytesEx(sis.available(), "actionBytes");
         } else {
-            actionBytes = sis.readBytesEx(condActionSize - 4);
+            actionBytes = sis.readBytesEx(condActionSize - 4, "actionBytes");
         }
     }
     /**
@@ -127,7 +127,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     /**
      * OverDown to Idle
      */
-    public boolean condOverDownToIddle;
+    public boolean condOverDownToIdle;
     /**
      * Actions to perform
      */

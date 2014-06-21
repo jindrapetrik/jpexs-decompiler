@@ -44,12 +44,12 @@ public class DefineFontAlignZonesTag extends Tag {
 
     public DefineFontAlignZonesTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineFontAlignZones", pos, length);
-        fontID = sis.readUI16();
-        CSMTableHint = (int) sis.readUB(2);
-        reserved = (int) sis.readUB(6);
+        fontID = sis.readUI16("fontID");
+        CSMTableHint = (int) sis.readUB(2, "CSMTableHint");
+        reserved = (int) sis.readUB(6, "reserved");
         zoneTable = new ArrayList<>();
         while (sis.available() > 0) {
-            ZONERECORD zr = sis.readZONERECORD();
+            ZONERECORD zr = sis.readZONERECORD("record");
             zoneTable.add(zr);
         }
     }

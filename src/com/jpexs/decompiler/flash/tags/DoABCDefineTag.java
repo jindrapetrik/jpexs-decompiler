@@ -72,8 +72,8 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      */
     public DoABCDefineTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DoABCDefine", pos, length);
-        flags = sis.readUI32();
-        name = sis.readString();
+        flags = sis.readUI32("flags");
+        name = sis.readString("name");
         abc = new ABC(sis, swf, this);
     }
 

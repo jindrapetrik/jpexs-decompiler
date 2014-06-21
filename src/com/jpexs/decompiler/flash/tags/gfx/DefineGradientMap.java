@@ -63,10 +63,10 @@ public class DefineGradientMap extends Tag {
      */
     public DefineGradientMap(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineGradientMap", pos, length);
-        int numGradients = sis.readUI16();
+        int numGradients = sis.readUI16("numGradients");
         indices = new int[numGradients];
         for (int i = 0; i < numGradients; i++) {
-            indices[i] = sis.readUI16();
+            indices[i] = sis.readUI16("index");
         }
     }
 }

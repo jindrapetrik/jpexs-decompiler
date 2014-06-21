@@ -65,7 +65,7 @@ public class ProtectTag extends Tag {
     public ProtectTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "Protect", pos, length);
         if (sis.available() > 0) {
-            passwordHash = sis.readString();
+            passwordHash = sis.readString("passwordHash");
         } else {
             passwordHash = "";
         }

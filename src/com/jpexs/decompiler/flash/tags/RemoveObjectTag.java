@@ -73,8 +73,8 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
      */
     public RemoveObjectTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "RemoveObject", pos, length);
-        characterId = sis.readUI16();
-        depth = sis.readUI16();
+        characterId = sis.readUI16("characterId");
+        depth = sis.readUI16("depth");
     }
 
     @Override

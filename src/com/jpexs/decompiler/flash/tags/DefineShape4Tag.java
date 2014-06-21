@@ -77,14 +77,14 @@ public class DefineShape4Tag extends ShapeTag {
 
     public DefineShape4Tag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DefineShape4", pos, length);
-        shapeId = sis.readUI16();
-        shapeBounds = sis.readRECT();
-        edgeBounds = sis.readRECT();
-        reserved = (int) sis.readUB(5);
-        usesFillWindingRule = sis.readUB(1) == 1;
-        usesNonScalingStrokes = sis.readUB(1) == 1;
-        usesScalingStrokes = sis.readUB(1) == 1;
-        shapes = sis.readSHAPEWITHSTYLE(4, false);
+        shapeId = sis.readUI16("shapeId");
+        shapeBounds = sis.readRECT("shapeBounds");
+        edgeBounds = sis.readRECT("edgeBounds");
+        reserved = (int) sis.readUB(5, "reserved");
+        usesFillWindingRule = sis.readUB(1, "usesFillWindingRule") == 1;
+        usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
+        usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
+        shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
     }
 
     @Override

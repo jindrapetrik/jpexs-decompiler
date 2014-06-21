@@ -62,12 +62,12 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         //byte[] data=sis.readBytes(actionLength);
         //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
         long startPos = sis.getPos();
-        functionName = sis.readString();
-        int numParams = sis.readUI16();
+        functionName = sis.readString("functionName");
+        int numParams = sis.readUI16("numParams");
         for (int i = 0; i < numParams; i++) {
-            paramNames.add(sis.readString());
+            paramNames.add(sis.readString("paramName"));
         }
-        codeSize = sis.readUI16();
+        codeSize = sis.readUI16("codeSize");
         long endPos = sis.getPos();
         //code = new ArrayList<Action>();
         hdrSize = endPos - startPos;

@@ -136,17 +136,17 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
      */
     public SoundStreamHeadTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "SoundStreamHead", pos, length);
-        reserved = (int) sis.readUB(4);
-        playBackSoundRate = (int) sis.readUB(2);
-        playBackSoundSize = sis.readUB(1) == 1;
-        playBackSoundType = sis.readUB(1) == 1;
-        streamSoundCompression = (int) sis.readUB(4);
-        streamSoundRate = (int) sis.readUB(2);
-        streamSoundSize = sis.readUB(1) == 1;
-        streamSoundType = sis.readUB(1) == 1;
-        streamSoundSampleCount = sis.readUI16();
+        reserved = (int) sis.readUB(4, "reserved");
+        playBackSoundRate = (int) sis.readUB(2, "playBackSoundRate");
+        playBackSoundSize = sis.readUB(1, "playBackSoundSize") == 1;
+        playBackSoundType = sis.readUB(1, "playBackSoundType") == 1;
+        streamSoundCompression = (int) sis.readUB(4, "streamSoundCompression");
+        streamSoundRate = (int) sis.readUB(2, "streamSoundRate");
+        streamSoundSize = sis.readUB(1, "streamSoundSize") == 1;
+        streamSoundType = sis.readUB(1, "streamSoundType") == 1;
+        streamSoundSampleCount = sis.readUI16("streamSoundSampleCount");
         if (streamSoundCompression == 2) {
-            latencySeek = sis.readSI16();
+            latencySeek = sis.readSI16("latencySeek");
         }
     }
 

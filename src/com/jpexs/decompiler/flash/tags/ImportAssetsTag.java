@@ -60,11 +60,11 @@ public class ImportAssetsTag extends Tag implements ImportTag {
         super(sis.getSwf(), ID, "ImportAssets", pos, length);
         tags = new ArrayList<>();
         names = new ArrayList<>();
-        url = sis.readString();
-        int count = sis.readUI16();
+        url = sis.readString("url");
+        int count = sis.readUI16("count");
         for (int i = 0; i < count; i++) {
-            int charId = sis.readUI16();
-            String tagName = sis.readString();
+            int charId = sis.readUI16("charId");
+            String tagName = sis.readString("tagName");
             tags.add(charId);
             names.add(tagName);
         }
