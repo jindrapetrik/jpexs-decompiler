@@ -116,8 +116,7 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
         });
 
         View.centerScreen(this);
-        
-        
+
     }
 
     private static void getApplicationMenuButtons(Component comp, List<JRibbonApplicationMenuButton> ret) {
@@ -220,9 +219,8 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
     }
 
     @Override
-    public Window getWindow() {        
+    public Window getWindow() {
         return this;
     }
-    
-    
+
 }

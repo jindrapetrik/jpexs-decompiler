@@ -32,6 +32,5 @@ public class ABCPanelSearchResult {
     public String toString() {
         return classPath.toString();
     }
-    
-    
+
 }

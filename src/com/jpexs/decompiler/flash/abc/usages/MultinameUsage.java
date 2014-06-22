@@ -25,6 +25,7 @@ import java.util.List;
  * @author JPEXS
  */
 public abstract class MultinameUsage {
+
     public List<ABCContainerTag> abcTags;
     public ABC abc;
 
@@ -32,5 +33,5 @@ public abstract class MultinameUsage {
         this.abcTags = abcTags;
         this.abc = abc;
     }
-    
+
 }

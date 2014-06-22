@@ -384,16 +384,16 @@ public class Configuration {
                     String path = "." + applicationId + "/";
                     directory = new File(userHome, path);
                 }
-            }else{
+            } else {
                 //no home, then use application directory
                 directory = new File(".");
             }
         }
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
-                 if (!directory.exists()) {
-                     directory = new File("."); //fallback to current directory
-                 }
+                if (!directory.exists()) {
+                    directory = new File("."); //fallback to current directory
+                }
             }
         }
         String ret = directory.getAbsolutePath();
@@ -520,7 +520,7 @@ public class Configuration {
 
             @SuppressWarnings("unchecked")
             HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
-            config = cfg;        
+            config = cfg;
         } catch (ClassNotFoundException | IOException ex) {
             //ignore
         }

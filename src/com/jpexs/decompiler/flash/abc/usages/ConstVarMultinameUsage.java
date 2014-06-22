@@ -35,7 +35,7 @@ import java.util.List;
 public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
     public ConstVarMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         try {
             ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         } catch (InterruptedException ex) {
-           //ignore
+            //ignore
         }
         return writer.toString();
     }

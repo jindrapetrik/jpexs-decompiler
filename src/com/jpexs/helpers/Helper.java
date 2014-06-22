@@ -462,7 +462,7 @@ public class Helper {
             while ((cnt = is.read(buf)) > 0) {
                 os.write(buf, 0, cnt);
                 maxLength -= cnt;
-                
+
                 // last chunk is smaller
                 if (maxLength < bufSize) {
                     buf = new byte[(int) maxLength];
@@ -472,7 +472,7 @@ public class Helper {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static void writeFile(String file, byte[]  
         ... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {

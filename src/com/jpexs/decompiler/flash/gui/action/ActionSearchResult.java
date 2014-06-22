@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui.action;
 
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -24,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
  * @author JPEXS
  */
 public class ActionSearchResult {
+
     public ASMSource src;
     public String path;
 
@@ -36,6 +36,5 @@ public class ActionSearchResult {
     public String toString() {
         return path;
     }
-    
-    
+
 }

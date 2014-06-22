@@ -61,29 +61,27 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private boolean isStatic = false;
     private final Cache<CachedDecompilation> cache = Cache.getInstance(true);
     private Trait currentTrait = null;
-    
+
     private final List<Runnable> scriptListeners = new ArrayList<Runnable>();
-    
-    public void addScriptListener(Runnable l){
+
+    public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
     }
 
     public ABCPanel getAbcPanel() {
         return abcPanel;
     }
-    
-    
-    
-    public void removeScriptListener(Runnable l){
+
+    public void removeScriptListener(Runnable l) {
         scriptListeners.remove(l);
     }
 
-    public void fireScript(){
-        for(int i=0;i<scriptListeners.size();i++){
+    public void fireScript() {
+        for (int i = 0; i < scriptListeners.size(); i++) {
             scriptListeners.get(i).run();
         }
     }
-    
+
     public Trait getCurrentTrait() {
         return currentTrait;
     }
@@ -96,7 +94,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return isStatic;
     }
 
-    public void setNoTrait() {                
+    public void setNoTrait() {
         abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
     }
 
@@ -450,7 +448,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         setEditable(false);
         getCaret().setVisible(true);
         addCaretListener(this);
-        this.abcPanel = abcPanel;                 
+        this.abcPanel = abcPanel;
     }
     private List<ABCContainerTag> abcList;
 
@@ -537,7 +535,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     @Override
-    public void setText(String t) {        
+    public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
     }

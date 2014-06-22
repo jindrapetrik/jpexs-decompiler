@@ -370,11 +370,11 @@ public class SWFInputStream implements AutoCloseable {
             dumpInfo = di;
         }
     }
-    
+
     private void endDumpLevel() {
         endDumpLevel(null);
     }
-    
+
     private void endDumpLevel(Object value) {
         if (dumpInfo != null) {
             if (dumpInfo.startBit == 0 && bitPos == 0) {
@@ -386,7 +386,7 @@ public class SWFInputStream implements AutoCloseable {
             dumpInfo = dumpInfo.parent;
         }
     }
-    
+
     /**
      * Reads one byte from the stream
      *
@@ -401,7 +401,7 @@ public class SWFInputStream implements AutoCloseable {
     private void alignByte() {
         bitPos = 0;
     }
-    
+
     private int lastPercent = -1;
 
     private int readNoBitReset() throws IOException, EndOfStreamException {
@@ -695,6 +695,7 @@ public class SWFInputStream implements AutoCloseable {
         }
         return ret;
     }
+
     /**
      * Skip bytes from the stream
      *
@@ -806,7 +807,7 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(ret);
         return ret;
     }
-    
+
     /**
      * Reads UB[nBits] (Unsigned-bit value) value from the stream
      *
@@ -850,7 +851,7 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(ret);
         return ret;
     }
-    
+
     /**
      * Reads SB[nBits] (Signed-bit value) value from the stream
      *
@@ -1086,13 +1087,13 @@ public class SWFInputStream implements AutoCloseable {
         if (!(tag instanceof TagStub)) {
             return tag;
         }
-        
+
         long pos = tag.getPos();
         int length = tag.getOriginalLength();
         SWF swf = tag.getSwf();
         TagStub tagStub = (TagStub) tag;
         SWFInputStream sis = tagStub.getDataStream();
-        
+
         try {
             switch (tag.getId()) {
                 case 0:
@@ -3238,7 +3239,7 @@ public class SWFInputStream implements AutoCloseable {
         }
         return available() * 8;
     }
-    
+
     public MemoryInputStream getBaseStream() throws IOException {
         int pos = (int) is.getPos();
         return new MemoryInputStream(is.getAllRead(), pos, pos + is.available());

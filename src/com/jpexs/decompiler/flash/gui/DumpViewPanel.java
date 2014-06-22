@@ -34,19 +34,19 @@ import javax.swing.table.TableColumnModel;
  * @author JPEXS
  */
 public class DumpViewPanel extends JPanel {
-    
+
     private final int bytesInRow = 16;
     private final JLabel dumpViewLabel;
     private final JTable dumpViewHexTable;
     private byte[] data;
-    
+
     public DumpViewPanel() {
         super(new BorderLayout());
 
         dumpViewLabel = new JLabel();
         dumpViewLabel.setMinimumSize(new Dimension(100, 20));
         add(dumpViewLabel, BorderLayout.SOUTH);
-        
+
         dumpViewHexTable = new JTable();
         dumpViewHexTable.setBackground(Color.white);
         dumpViewHexTable.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -81,7 +81,7 @@ public class DumpViewPanel extends JPanel {
 
             @Override
             public int getColumnCount() {
-                return 2*bytesInRow + 1;
+                return 2 * bytesInRow + 1;
             }
 
             @Override
@@ -93,7 +93,7 @@ public class DumpViewPanel extends JPanel {
                 }
                 return "";
             }
-            
+
             @Override
             public Object getValueAt(int row, int column) {
                 if (column == 0) {
@@ -107,7 +107,7 @@ public class DumpViewPanel extends JPanel {
                 } else {
                     int pos = row * bytesInRow + column - bytesInRow - 1;
                     if (pos < data.length) {
-                        return (char)data[pos];
+                        return (char) data[pos];
                     }
                     return null;
                 }
@@ -115,11 +115,11 @@ public class DumpViewPanel extends JPanel {
         });
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
-    
+
     public void setData(byte[] data) {
         this.data = data;
     }
-    
+
     public void setLabelText(String text) {
         dumpViewLabel.setText(text);
     }

@@ -283,8 +283,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public MainFrame getMainFrame() {
         return mainFrame;
     }
-    
-    
 
     static {
         try {
@@ -441,7 +439,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
 
                         jumpToCharacterMenuItem.setVisible(item instanceof CharacterIdTag && !(item instanceof CharacterTag));
-                        
+
                         rawEditMenuItem.setVisible(item instanceof Tag);
                     }
 
@@ -2281,7 +2279,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (item == null) {
                     return;
                 }
-                
+
                 showCard(CARDPREVIEWPANEL);
                 previewPanel.showGenericTagPanel((Tag) item);
             }
@@ -2291,7 +2289,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (item == null || !(item instanceof CharacterIdTag)) {
                     return;
                 }
-                
+
                 CharacterIdTag characterIdTag = (CharacterIdTag) item;
                 setTreeItem(item.getSwf().characters.get(characterIdTag.getCharacterId()));
             }
@@ -2385,10 +2383,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         DumpInfo dumpInfo = (DumpInfo) e.getPath().getLastPathComponent();
         if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
             // todo
-            dumpViewPanel.setLabelText("startByte: " + dumpInfo.startByte + 
-                    " startBit: " + dumpInfo.startBit +
-                    " lengthBytes: " + dumpInfo.lengthBytes +
-                    " lengthBits: " + dumpInfo.lengthBits);
+            dumpViewPanel.setLabelText("startByte: " + dumpInfo.startByte
+                    + " startBit: " + dumpInfo.startBit
+                    + " lengthBytes: " + dumpInfo.lengthBytes
+                    + " lengthBits: " + dumpInfo.lengthBits);
         }
 
         // todo honfika: support multiple swf
@@ -2396,7 +2394,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         dumpViewPanel.revalidate();
         showCard(CARDDUMPVIEW);
     }
-    
+
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object source = e.getSource();

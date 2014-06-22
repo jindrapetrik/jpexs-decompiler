@@ -124,6 +124,5 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     public Window getWindow() {
         return this;
     }
-    
-    
+
 }

@@ -33,6 +33,6 @@ public interface MainFrame {
     public boolean isVisible();
 
     public void setVisible(boolean b);
-    
+
     public Window getWindow();
 }

@@ -58,18 +58,17 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
     public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel, boolean definitions) {
         super(abcPanel.getMainPanel().getMainFrame().getWindow());
         this.abcPanel = abcPanel;
-        List<MultinameUsage> usages = definitions?abc.findMultinameDefinition(abcTags,multinameIndex):abc.findMultinameUsage(abcTags,multinameIndex);
+        List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(abcTags, multinameIndex) : abc.findMultinameUsage(abcTags, multinameIndex);
         Multiname m = abc.constants.constant_multiname.get(multinameIndex);
-        if(m.namespace_index>0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE)
-        {
-            for(ABCContainerTag at:abcTags){
+        if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+            for (ABCContainerTag at : abcTags) {
                 ABC a = at.getABC();
-                if(a == abc){
+                if (a == abc) {
                     continue;
-                }            
-                int mid=a.constants.getMultinameId(m,false);            
-                if(mid>0){
-                    usages.addAll(definitions?a.findMultinameDefinition(abcTags, mid):a.findMultinameUsage(abcTags, mid));
+                }
+                int mid = a.constants.getMultinameId(m, false);
+                if (mid > 0) {
+                    usages.addAll(definitions ? a.findMultinameDefinition(abcTags, mid) : a.findMultinameUsage(abcTags, mid));
                 }
             }
         }
@@ -94,57 +93,56 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
         cont.add(new JScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle((definitions?translate("dialog.title.declaration"):translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants));
+        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
 
-    public static void gotoUsage(final ABCPanel abcPanel,final MultinameUsage usage){
+    public static void gotoUsage(final ABCPanel abcPanel, final MultinameUsage usage) {
         if (usage instanceof InsideClassMultinameUsage) {
-                final InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
-                
-                Runnable settrait = new Runnable() {
+            final InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
 
-                    @Override
-                    public void run() {
-                        abcPanel.decompiledTextArea.removeScriptListener(this);
-                        abcPanel.decompiledTextArea.setClassIndex(icu.classIndex);
-                        if (usage instanceof TraitMultinameUsage) {
-                            TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
-                            int traitIndex;
-                            if (tmu.parentTraitIndex > -1) {
-                                traitIndex = tmu.parentTraitIndex;
-                            } else {
-                                traitIndex = tmu.traitIndex;
-                            }
-                            if (!tmu.isStatic) {
-                                traitIndex += abcPanel.abc.class_info.get(tmu.classIndex).static_traits.traits.size();
-                            }
-                            if (tmu instanceof MethodMultinameUsage) {
-                                MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
-                                if (mmu.isInitializer == true) {
-                                    traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.isStatic ? 1 : 0);
-                                }
-                            }                   
-                            abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+            Runnable settrait = new Runnable() {
+
+                @Override
+                public void run() {
+                    abcPanel.decompiledTextArea.removeScriptListener(this);
+                    abcPanel.decompiledTextArea.setClassIndex(icu.classIndex);
+                    if (usage instanceof TraitMultinameUsage) {
+                        TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
+                        int traitIndex;
+                        if (tmu.parentTraitIndex > -1) {
+                            traitIndex = tmu.parentTraitIndex;
+                        } else {
+                            traitIndex = tmu.traitIndex;
                         }
+                        if (!tmu.isStatic) {
+                            traitIndex += abcPanel.abc.class_info.get(tmu.classIndex).static_traits.traits.size();
+                        }
+                        if (tmu instanceof MethodMultinameUsage) {
+                            MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
+                            if (mmu.isInitializer == true) {
+                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.isStatic ? 1 : 0);
+                            }
+                        }
+                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
                     }
-                };
-                               
-                
-                if(abcPanel.decompiledTextArea.getClassIndex() == icu.classIndex && abcPanel.abc == icu.abc){
-                    settrait.run();
-                }else{
-                    abcPanel.decompiledTextArea.addScriptListener(settrait);
-                    abcPanel.hilightScript(abcPanel.swf, abcPanel.abc.instance_info.get(icu.classIndex).getName(abcPanel.abc.constants).getNameWithNamespace(abcPanel.abc.constants));
-                }                                                
+                }
+            };
+
+            if (abcPanel.decompiledTextArea.getClassIndex() == icu.classIndex && abcPanel.abc == icu.abc) {
+                settrait.run();
+            } else {
+                abcPanel.decompiledTextArea.addScriptListener(settrait);
+                abcPanel.hilightScript(abcPanel.swf, abcPanel.abc.instance_info.get(icu.classIndex).getName(abcPanel.abc.constants).getNameWithNamespace(abcPanel.abc.constants));
             }
+        }
     }
-    
+
     private void gotoUsage() {
         if (usageList.getSelectedIndex() != -1) {
             MultinameUsage usage = usageListModel.getUsage(usageList.getSelectedIndex());
-            gotoUsage(abcPanel,usage);
+            gotoUsage(abcPanel, usage);
         }
     }
 

@@ -765,7 +765,7 @@ public class DefineEditTextTag extends TextTag {
         }
         return false;
     }
-    
+
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         render(false, image, transformation, colorTransform);

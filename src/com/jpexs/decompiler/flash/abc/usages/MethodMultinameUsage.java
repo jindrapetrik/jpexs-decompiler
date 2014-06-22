@@ -35,8 +35,8 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     public boolean isInitializer;
 
-    public MethodMultinameUsage(List<ABCContainerTag> abcTags, ABC abc,int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public MethodMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
         this.isInitializer = isInitializer;
     }
 

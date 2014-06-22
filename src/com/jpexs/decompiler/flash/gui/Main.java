@@ -1051,7 +1051,7 @@ public class Main {
             // sometimes during development the version information is not available
             return false;
         }
-        
+
         List<String> accepted = new ArrayList<>();
         if (Configuration.checkForUpdatesStable.get()) {
             accepted.add("stable");

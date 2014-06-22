@@ -136,7 +136,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public DetailPanel detailPanel;
     public JPanel navPanel;
     public JTabbedPane tabbedPane;
-    public SearchPanel<ABCPanelSearchResult> searchPanel;    
+    public SearchPanel<ABCPanelSearchResult> searchPanel;
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
@@ -155,9 +155,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         return mainPanel;
     }
 
-    
-    
-    
     public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
@@ -207,23 +204,21 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
             System.gc();
             Main.stopWork();
-            
+
             searchPanel.setSearchText(txt);
-            
+
             View.execInEventDispatch(new Runnable() {
 
                 @Override
                 public void run() {
-                    SearchResultsDialog<ABCPanelSearchResult> sr=new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(),txt,ABCPanel.this);
+                    SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(), txt, ABCPanel.this);
                     sr.setResults(found);
-                    sr.setVisible(true);     
+                    sr.setVisible(true);
                 }
             });
-             
-            
-            
+
             return true;
-            
+
             //return searchPanel.setResults(found);
         }
         return false;
@@ -410,7 +405,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         iconDecPanel.add(scriptNameLabel);
         iconDecPanel.add(iconsPanel);
         iconDecPanel.add(decompiledScrollPane);
-        
+
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
@@ -459,32 +454,30 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         });
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
-        
-        
-              
+
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                 int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
-                if(multinameIndex>-1){
-                    UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this,false);
+                int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
+                if (multinameIndex > -1) {
+                    UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, false);
                     usageFrame.setVisible(true);
                 }
             }
         }, "find-usages", AppStrings.translate("abc.action.find-usages"), "control U");
-        
+
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                 gotoDeclaration();
+                gotoDeclaration();
             }
-        }, "find-declaration",  AppStrings.translate("abc.action.find-declaration"), "control B");
-        
+        }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
+
         CtrlClickHandler cch = new CtrlClickHandler();
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
         decompiledTextArea.addMouseMotionListener(cch);
-        
+
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
         pan2.add((abcComboBox = new JComboBox<>(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
@@ -508,7 +501,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         });
 
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
-      
+
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
         abcComboBox.addItemListener(this);
@@ -548,45 +541,44 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
-    
-    private void gotoDeclaration(){
+
+    private void gotoDeclaration() {
         int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
-        if(multinameIndex>-1){
-            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList,multinameIndex);
-            
+        if (multinameIndex > -1) {
+            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
+
             Multiname m = abc.constants.constant_multiname.get(multinameIndex);
             //search other ABC tags if this is not private multiname
-            if(m.namespace_index>0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE)
-            {
-                for(ABCContainerTag at:swf.abcList){
+            if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+                for (ABCContainerTag at : swf.abcList) {
                     ABC a = at.getABC();
-                    if(a == abc){
+                    if (a == abc) {
                         continue;
-                    }            
-                    int mid=a.constants.getMultinameId(m,false);            
-                    if(mid>0){
+                    }
+                    int mid = a.constants.getMultinameId(m, false);
+                    if (mid > 0) {
                         usages.addAll(a.findMultinameDefinition(swf.abcList, mid));
                     }
                 }
             }
-            
+
             //more than one? display list
-            if(usages.size()>1){
-                UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this,true);
+            if (usages.size() > 1) {
+                UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, true);
                 usageFrame.setVisible(true);
-            }else if(!usages.isEmpty()){ //one
+            } else if (!usages.isEmpty()) { //one
                 UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
             }
         }
     }
-    
+
     private class CtrlClickHandler extends KeyAdapter implements MouseListener, MouseMotionListener {
 
         private boolean ctrlDown = false;
-            
+
         @Override
-        public void keyPressed(KeyEvent e) {                
-            if(e.getKeyCode() == 17 && !decompiledTextArea.isEditable()){
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == 17 && !decompiledTextArea.isEditable()) {
                 ctrlDown = true;
                 decompiledTextArea.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
@@ -594,24 +586,24 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
         @Override
         public void keyReleased(KeyEvent e) {
-            if(e.getKeyCode() == 17){
+            if (e.getKeyCode() == 17) {
                 ctrlDown = false;
                 decompiledTextArea.setCursor(Cursor.getDefaultCursor());
             }
         }
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
-           if(ctrlDown && e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !decompiledTextArea.isEditable()){
+            if (ctrlDown && e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !decompiledTextArea.isEditable()) {
                 ctrlDown = false;
                 decompiledTextArea.setCursor(Cursor.getDefaultCursor());
-                gotoDeclaration();                
-           } 
+                gotoDeclaration();
+            }
         }
 
         @Override
-        public void mousePressed(MouseEvent e) {            
-            
+        public void mousePressed(MouseEvent e) {
+
         }
 
         @Override
@@ -634,12 +626,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            if(ctrlDown && decompiledTextArea.isEditable()){
+            if (ctrlDown && decompiledTextArea.isEditable()) {
                 ctrlDown = false;
                 decompiledTextArea.setCursor(Cursor.getDefaultCursor());
             }
         }
-        
+
     }
 
     public void reload() {
@@ -713,11 +705,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         View.execInEventDispatchLater(new Runnable() {
 
             @Override
-            public void run() {                
+            public void run() {
                 searchPanel.showQuickFindDialog(decompiledTextArea);
             }
         });
-        
+
     }
 
     public String lastDecompiled = null;
@@ -951,6 +943,5 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 break;
         }
     }
-    
-    
+
 }

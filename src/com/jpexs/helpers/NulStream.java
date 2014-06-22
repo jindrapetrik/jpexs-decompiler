@@ -27,5 +27,5 @@ public class NulStream extends OutputStream {
     @Override
     public void write(int i) {
     }
-    
+
 }

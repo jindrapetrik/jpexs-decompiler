@@ -21,12 +21,12 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public class SWFHeader {
-    
+
     /**
      * Version of SWF
      */
     public int version;
-    
+
     /**
      * Uncompressed size of the file
      */

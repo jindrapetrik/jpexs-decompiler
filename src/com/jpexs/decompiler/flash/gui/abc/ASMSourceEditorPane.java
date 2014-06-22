@@ -63,10 +63,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private ScriptExportMode exportMode = ScriptExportMode.PCODE;
     private Trait trait;
 
-    public ABCPanel getAbcPanel(){
+    public ABCPanel getAbcPanel() {
         return decompiledEditor.getAbcPanel();
     }
-    
+
     public ScriptExportMode getExportMode() {
         return exportMode;
     }
@@ -172,7 +172,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public void graph() {
         try {
             AVM2Graph gr = new AVM2Graph(abc.bodies.get(bodyIndex).code, abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies.get(bodyIndex).code.visitCode(abc.bodies.get(bodyIndex)));
-            (new GraphDialog(getAbcPanel().getMainPanel().getMainFrame().getWindow(),gr, name)).setVisible(true);
+            (new GraphDialog(getAbcPanel().getMainPanel().getMainFrame().getWindow(), gr, name)).setVisible(true);
         } catch (InterruptedException ex) {
             Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
         }

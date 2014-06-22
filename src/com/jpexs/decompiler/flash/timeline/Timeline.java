@@ -194,13 +194,13 @@ public class Timeline {
             getNeededCharacters(i, usedCharacters);
         }
     }
-    
+
     public void getNeededCharacters(List<Integer> frames, Set<Integer> usedCharacters) {
         for (int frame = 0; frame < frames.size(); frame++) {
             getNeededCharacters(frame, usedCharacters);
         }
     }
-    
+
     public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
         Frame frameObj = frames.get(frame);
         for (int depth : frameObj.layers.keySet()) {
@@ -214,7 +214,7 @@ public class Timeline {
             }
         }
     }
-    
+
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         for (int i = 0; i < tags.size(); i++) {

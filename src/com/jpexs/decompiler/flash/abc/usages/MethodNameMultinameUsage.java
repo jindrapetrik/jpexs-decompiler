@@ -28,11 +28,11 @@ import java.util.List;
 public class MethodNameMultinameUsage extends MethodMultinameUsage implements DefinitionUsage {
 
     public MethodNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
     }
 
     @Override
-    public String toString()  {
+    public String toString() {
         return super.toString() + " name";
     }
 }

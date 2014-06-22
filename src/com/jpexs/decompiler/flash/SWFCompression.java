@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public enum SWFCompression {
-    
+
     NONE, ZLIB, LZMA
 }

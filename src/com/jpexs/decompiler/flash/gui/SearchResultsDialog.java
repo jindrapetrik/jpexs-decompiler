@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.BorderLayout;
@@ -39,25 +38,26 @@ import javax.swing.SwingUtilities;
  * @author JPEXS
  * @param <E>
  */
-public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
+public class SearchResultsDialog<E> extends AppDialog implements ActionListener {
+
     private final JList<E> resultsList;
     private final DefaultListModel<E> model;
     private final SearchListener<E> listener;
-    
+
     static final String ACTION_GOTO = "GOTO";
     static final String ACTION_CANCEL = "CLOSE";
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
     private final JButton closeButton = new JButton(translate("button.close"));
-    
-    public SearchResultsDialog(Window owner,String text,SearchListener<E> listener) {
+
+    public SearchResultsDialog(Window owner, String text, SearchListener<E> listener) {
         super(owner);
         setTitle(translate("dialog.title").replace("%text%", text));
-        Container cnt=getContentPane();       
+        Container cnt = getContentPane();
         model = new DefaultListModel<>();
-        resultsList = new JList<>(model);        
+        resultsList = new JList<>(model);
         this.listener = listener;
-        
+
         gotoButton.setActionCommand(ACTION_GOTO);
         gotoButton.addActionListener(this);
         closeButton.setActionCommand(ACTION_CANCEL);
@@ -74,24 +74,24 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
                     gotoElement();
                 }
             }
-            
-       });
-        
+
+        });
+
         cnt.setLayout(new BorderLayout());
         JScrollPane sp = new JScrollPane(resultsList);
-        sp.setPreferredSize(new Dimension(300,300));
-        cnt.add(sp,BorderLayout.CENTER);        
-        cnt.add(buttonsPanel,BorderLayout.SOUTH);
+        sp.setPreferredSize(new Dimension(300, 300));
+        cnt.add(sp, BorderLayout.CENTER);
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
-    
-    public void setResults(List<E> results){
+
+    public void setResults(List<E> results) {
         model.clear();
-        for(E e:results){
+        for (E e : results) {
             model.addElement(e);
-        }              
+        }
     }
 
     @Override
@@ -106,18 +106,18 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
                 break;
         }
     }
-    
-    private void gotoElement(){
+
+    private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
-                public void run() {                    
+                public void run() {
                     listener.updateSearchPos(resultsList.getSelectedValue());
                 }
-                
+
             });
         }
     }
-    
+
 }

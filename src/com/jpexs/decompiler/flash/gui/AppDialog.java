@@ -37,7 +37,7 @@ public abstract class AppDialog extends JDialog {
             getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
         }
     }
-    
+
     public AppDialog(Window owner) {
         super(owner);
         View.installEscapeCloseOperation(this);
@@ -45,7 +45,6 @@ public abstract class AppDialog extends JDialog {
             getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
         }
     }
-    
 
     public String translate(String key) {
         return resourceBundle.getString(key);

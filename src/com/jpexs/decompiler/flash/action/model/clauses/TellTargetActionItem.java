@@ -84,7 +84,7 @@ public class TellTargetActionItem extends ActionItem {
     public boolean needsSemicolon() {
         return false;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return false;

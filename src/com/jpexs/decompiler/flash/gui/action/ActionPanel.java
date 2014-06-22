@@ -245,7 +245,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     break;
                 }
                 if (pat.matcher(getCached(item.getValue()).text).find()) {
-                    found.add(new ActionSearchResult(item.getValue(),item.getKey()));
+                    found.add(new ActionSearchResult(item.getValue(), item.getKey()));
                 }
             }
 
@@ -255,9 +255,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
                 @Override
                 public void run() {
-                    SearchResultsDialog<ActionSearchResult> sr=new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(),txt,ActionPanel.this);
+                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(), txt, ActionPanel.this);
                     sr.setResults(found);
-                    sr.setVisible(true);     
+                    sr.setVisible(true);
                 }
             });
             return true;
@@ -704,7 +704,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             case ACTION_GRAPH:
                 if (lastCode != null) {
                     try {
-                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(),new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
                         gf.setVisible(true);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -794,7 +794,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         View.execInEventDispatchLater(new Runnable() {
 
             @Override
-            public void run() {                
+            public void run() {
                 searchPanel.showQuickFindDialog(decompiledEditor);
             }
         });

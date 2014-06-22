@@ -28,7 +28,7 @@ import java.util.List;
 public class MethodParamsMultinameUsage extends MethodMultinameUsage {
 
     public MethodParamsMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
     }
 
     @Override

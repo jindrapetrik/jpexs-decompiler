@@ -504,18 +504,18 @@ public class View {
             tree.collapsePath(parent);
         }
     }
-    
-    public static void addEditorAction(JEditorPane editor,AbstractAction a,String key, String name, String keyStroke){        
+
+    public static void addEditorAction(JEditorPane editor, AbstractAction a, String key, String name, String keyStroke) {
         KeyStroke ks = KeyStroke.getKeyStroke(keyStroke);
         a.putValue(Action.ACCELERATOR_KEY, ks);
         a.putValue(Action.NAME, name);
-        
+
         String actionName = key;
         ActionMap amap = editor.getActionMap();
         InputMap imap = editor.getInputMap(JTextComponent.WHEN_FOCUSED);
         imap.put(ks, actionName);
         amap.put(actionName, a);
-        
+
         JPopupMenu pmenu = editor.getComponentPopupMenu();
         JMenuItem findUsagesMenu = new JMenuItem(a);
         pmenu.add(findUsagesMenu);

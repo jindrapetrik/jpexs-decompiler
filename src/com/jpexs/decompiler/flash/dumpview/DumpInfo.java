@@ -33,17 +33,17 @@ public class DumpInfo {
     public long startByte;
 
     public int startBit;
-    
+
     public long lengthBytes;
 
     public int lengthBits;
-    
+
     public DumpInfo parent;
-    
+
     public List<DumpInfo> childInfos = new ArrayList<>();
-    
+
     public DumpInfo(String name, String type, Object value, long startByte, int lengthBytes) {
-        
+
         this.name = name;
         this.type = type;
         this.previewValue = value;
@@ -52,7 +52,7 @@ public class DumpInfo {
     }
 
     public DumpInfo(String name, String type, Object value, long startByte, int startBit, long lengthBytes, int lengthBits) {
-        
+
         this.name = name;
         this.type = type;
         this.previewValue = value;

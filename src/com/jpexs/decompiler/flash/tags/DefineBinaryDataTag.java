@@ -62,7 +62,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         super(sis.getSwf(), ID, "DefineBinaryData", pos, length);
         tag = sis.readUI16("tag");
         reserved = sis.readUI32("reserved");
-        binaryData = sis.readBytesEx(sis.available(),"binaryData");
+        binaryData = sis.readBytesEx(sis.available(), "binaryData");
     }
 
     @Override

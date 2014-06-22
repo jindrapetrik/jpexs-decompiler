@@ -283,7 +283,7 @@ public class Filtering {
             hc.drawImage(hilightIm, 0, 0, null);
             hc.setComposite(AlphaComposite.DstOut);
             hc.drawImage(shadowIm, 0, 0, null);
-            
+
             sc.drawImage(shadowIm, 0, 0, null);
             sc.setComposite(AlphaComposite.DstOut);
             sc.drawImage(hilightIm, 0, 0, null);

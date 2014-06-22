@@ -93,7 +93,7 @@ public class PreviewImage extends JPanel {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Tag tag = (Tag) treeItem; 
+                    Tag tag = (Tag) treeItem;
                     tag.getSwf().removeTag(tag, false);
                     mainPanel.refreshTree();
                 }
@@ -104,7 +104,7 @@ public class PreviewImage extends JPanel {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Tag tag = (Tag) treeItem; 
+                    Tag tag = (Tag) treeItem;
                     tag.getSwf().removeTag(tag, true);
                     mainPanel.refreshTree();
                 }

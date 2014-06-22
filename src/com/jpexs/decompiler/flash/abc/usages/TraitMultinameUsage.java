@@ -33,7 +33,7 @@ public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
     public int parentTraitIndex;
 
     public TraitMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc,multinameIndex, classIndex);
+        super(abcTags, abc, multinameIndex, classIndex);
         this.traitIndex = traitIndex;
         this.isStatic = isStatic;
         this.traits = traits;

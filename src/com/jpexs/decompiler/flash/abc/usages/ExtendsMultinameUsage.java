@@ -27,7 +27,7 @@ import java.util.List;
 public class ExtendsMultinameUsage extends InsideClassMultinameUsage {
 
     public ExtendsMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex) {
-        super(abcTags,abc,multinameIndex, classIndex);
+        super(abcTags, abc, multinameIndex, classIndex);
     }
 
     @Override

@@ -247,7 +247,7 @@ public class GraphDialog extends AppDialog {
     int frameWidthDiff;
     int frameHeightDiff;
 
-    public GraphDialog(Window owner,Graph graph, String name) throws InterruptedException {
+    public GraphDialog(Window owner, Graph graph, String name) throws InterruptedException {
         super(owner);
         setSize(500, 500);
         Container cnt = getContentPane();

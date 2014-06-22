@@ -73,9 +73,9 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
     public boolean removeCharacter(int characterId) {
         if (bitmapId == characterId) {
             if ((fillStyleType == REPEATING_BITMAP)
-                || (fillStyleType == CLIPPED_BITMAP)
-                || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
-                || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
+                    || (fillStyleType == CLIPPED_BITMAP)
+                    || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
+                    || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
                 fillStyleType = SOLID;
                 if (color == null) {
                     color = inShape3 ? new RGBA(0, 0, 0, 0) : new RGB(0, 0, 0);

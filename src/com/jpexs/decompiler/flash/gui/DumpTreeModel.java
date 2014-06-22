@@ -31,7 +31,7 @@ import javax.swing.tree.TreePath;
 public class DumpTreeModel implements TreeModel {
 
     private final DumpInfo root;
-            
+
     public DumpTreeModel(List<SWFList> swfs) {
         DumpInfo root = new DumpInfo("root", "", null, 0, 0);
         for (SWFList swfList : swfs) {
@@ -42,7 +42,7 @@ public class DumpTreeModel implements TreeModel {
         }
         this.root = root;
     }
-    
+
     @Override
     public Object getRoot() {
         return root;
@@ -80,5 +80,5 @@ public class DumpTreeModel implements TreeModel {
     @Override
     public void removeTreeModelListener(TreeModelListener tl) {
     }
-    
+
 }

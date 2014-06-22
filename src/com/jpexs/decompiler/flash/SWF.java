@@ -236,8 +236,8 @@ public final class SWF implements TreeItem, Timelined {
      */
     public int version;
     /**
-      * Uncompressed size of the file
-      */
+     * Uncompressed size of the file
+     */
     public long fileSize;
     /**
      * Used compression mode
@@ -270,7 +270,7 @@ public final class SWF implements TreeItem, Timelined {
     public static final double unitDivisor = 20;
 
     private Timeline timeline;
-    
+
     public DumpInfo dumpInfo;
 
     public void updateCharacters() {
@@ -368,7 +368,7 @@ public final class SWF implements TreeItem, Timelined {
     public void saveTo(OutputStream os) throws IOException {
         saveTo(os, compression);
     }
-    
+
     /**
      * Saves this SWF into new file
      *
@@ -691,7 +691,7 @@ public final class SWF implements TreeItem, Timelined {
             return false;
         }
     }
-    
+
     private static SWFHeader decompress(InputStream is, OutputStream os, boolean allowUncompressed) throws IOException {
         byte[] hdr = new byte[8];
 
@@ -735,7 +735,7 @@ public final class SWF implements TreeItem, Timelined {
                 }
                 case 'Z': { // ZWS
                     sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,
-                                     // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
+                    // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
                     int propertiesSize = 5;
                     byte[] lzmaProperties = sis.readBytes(propertiesSize, "lzmaproperties");
                     if (lzmaProperties.length != propertiesSize) {
@@ -760,7 +760,7 @@ public final class SWF implements TreeItem, Timelined {
                     }
                 }
             }
-            
+
             return header;
         }
     }
@@ -789,13 +789,13 @@ public final class SWF implements TreeItem, Timelined {
                 abcTags.add(cnt);
             }
         }
-        
+
         boolean exported = false;
-        
+
         for (int i = 0; i < abcTags.size(); i++) {
             ABC abc = abcTags.get(i).getABC();
             List<ScriptPack> scrs = abc.findScriptPacksByPath(className);
-            for(ScriptPack scr:scrs) {
+            for (ScriptPack scr : scrs) {
                 String cnt = "";
                 if (abc.script_info.size() > 1) {
                     cnt = "script " + (i + 1) + "/" + abc.script_info.size() + " ";
@@ -804,11 +804,11 @@ public final class SWF implements TreeItem, Timelined {
                 informListeners("exporting", exStr);
                 scr.export(outdir, abcTags, exportMode, parallel);
                 exStr = "Exported " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
-                informListeners("exported", exStr);      
+                informListeners("exported", exStr);
                 exported = true;
-            }            
+            }
         }
-        return exported;       
+        return exported;
     }
 
     private List<MyEntry<ClassPath, ScriptPack>> uniqueAS3Packs(List<MyEntry<ClassPath, ScriptPack>> packs) {
@@ -1281,10 +1281,10 @@ public final class SWF implements TreeItem, Timelined {
             return;
         }
         try (ImageOutputStream output = new FileImageOutputStream(file)) {
-            BufferedImage img0=images.next();
+            BufferedImage img0 = images.next();
             GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
             writer.writeToSequence(img0);
-            
+
             while (images.hasNext()) {
                 writer.writeToSequence(images.next());
             }
@@ -1521,24 +1521,24 @@ public final class SWF implements TreeItem, Timelined {
 
             return ret;
         }
-        
-        final Timeline ftim=tim;
-        final Color fbackgroundColor=backgroundColor;
+
+        final Timeline ftim = tim;
+        final Color fbackgroundColor = backgroundColor;
         final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
 
-            private final int pos=0;
-            
+            private final int pos = 0;
+
             @Override
             public boolean hasNext() {
-                return fframes.size()>pos;
+                return fframes.size() > pos;
             }
 
             @Override
             public BufferedImage next() {
-                if(!hasNext()){
+                if (!hasNext()) {
                     return null;
                 }
-                return frameToImageGet(ftim, fframes.get(pos), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor,false).getBufferedImage();
+                return frameToImageGet(ftim, fframes.get(pos), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false).getBufferedImage();
             }
         };
 
@@ -2519,7 +2519,7 @@ public final class SWF implements TreeItem, Timelined {
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image;
-        if(useCache){
+        if (useCache) {
             image = getFromCache(key);
             if (image != null) {
                 return image;
@@ -2882,8 +2882,8 @@ public final class SWF implements TreeItem, Timelined {
                 i--;
                 continue;
             }
-            
-            if (toRemove instanceof CharacterTag){
+
+            if (toRemove instanceof CharacterTag) {
                 if (t.removeCharacter(characterId)) {
                     modified = true;
                     i = -1;
@@ -2902,7 +2902,7 @@ public final class SWF implements TreeItem, Timelined {
         }
         return modified;
     }
-    
+
     public void removeTag(Tag t, boolean removeDependencies) {
         Timelined timelined = t.getTimelined();
         if (t instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(t.getId())) {

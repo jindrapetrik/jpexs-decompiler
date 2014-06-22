@@ -31,7 +31,7 @@ import javax.swing.tree.TreeModel;
  * @author JPEXS
  */
 public class DumpTree extends JTree {
-    
+
     public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
@@ -50,7 +50,6 @@ public class DumpTree extends JTree {
                     hasFocus);
 
             //DumpInfo dumpInfo = (DumpInfo) value;
-
             setUI(new BasicLabelUI());
             setOpaque(false);
             setBackgroundNonSelectionColor(Color.white);
@@ -83,7 +82,5 @@ public class DumpTree extends JTree {
             }
         }
     }
-    
-    
 
 }

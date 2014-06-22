@@ -1604,7 +1604,7 @@ public class XFLConverter {
                         linkageExportForAS = true;
                         mediaLinkStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
                     }
-                    if(linkageExportForAS){
+                    if (linkageExportForAS) {
                         mediaLinkStr += " linkageExportForAS=\"true\"";
                     }
                     mediaLinkStr += "/>\n";

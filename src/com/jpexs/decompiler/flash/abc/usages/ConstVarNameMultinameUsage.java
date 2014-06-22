@@ -28,7 +28,7 @@ import java.util.List;
 public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implements DefinitionUsage {
 
     public ConstVarNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
     }
 
     @Override
