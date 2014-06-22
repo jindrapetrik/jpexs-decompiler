@@ -98,7 +98,7 @@ public class DumpViewPanel extends JPanel {
                 }
                 int byteCount = data.length;
                 int rowCount = byteCount / bytesInRow;
-                if (byteCount + bytesInRow != 0) {
+                if (byteCount % bytesInRow != 0) {
                     rowCount++;
                 }
                 return rowCount;
@@ -163,30 +163,6 @@ public class DumpViewPanel extends JPanel {
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
-    public static void scrollToVisible(JTable table, int rowIndex, int vColIndex) {
-        if (!(table.getParent() instanceof JViewport)) {
-            return;
-        }
-        JViewport viewport = (JViewport)table.getParent();
-
-        // This rectangle is relative to the table where the
-        // northwest corner of cell (0,0) is always (0,0).
-        Rectangle rect = table.getCellRect(rowIndex, vColIndex, true);
-
-        // The location of the viewport relative to the table
-        Point pt = viewport.getViewPosition();
-
-        // Translate the cell location so that it is relative
-        // to the view, assuming the northwest corner of the
-        // view is (0,0)
-        rect.setLocation(rect.x-pt.x, rect.y-pt.y);
-
-        table.scrollRectToVisible(rect);
-
-        // Scroll the area into view
-        //viewport.scrollRectToVisible(rect);
-    }
-    
     private int getEndIndex(DumpInfo dumpInfo) {
         int end = (int) dumpInfo.startByte;
         if (dumpInfo.lengthBytes != 0) {
@@ -218,7 +194,26 @@ public class DumpViewPanel extends JPanel {
         if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
             int selectionStart = (int) dumpInfo.startByte;
             int selectionEnd = getEndIndex(dumpInfo);
-            //setSelectedRange(selectionStart, end - 1);
+
+            // HACK to scroll current selection to visible
+            int row = (int) (dumpInfo.startByte / bytesInRow);
+            
+            final int pageSize = (int) (dumpViewHexTable.getParent().getSize().getHeight() / dumpViewHexTable.getRowHeight());
+
+            int byteCount = data.length;
+            int rowCount = byteCount / bytesInRow;
+            if (byteCount % bytesInRow != 0) {
+                rowCount++;
+            }
+
+            int row2 = Math.min(row + pageSize - 2, rowCount - 1); 
+            dumpViewHexTable.getSelectionModel().setSelectionInterval(row2, row2);
+            dumpViewHexTable.scrollRectToVisible(new Rectangle(dumpViewHexTable.getCellRect(row2, 0, true)));            
+
+            dumpViewHexTable.getSelectionModel().setSelectionInterval(row, row);
+            dumpViewHexTable.scrollRectToVisible(new Rectangle(dumpViewHexTable.getCellRect(row, 0, true)));            
+            // END HACK
+
             setLabelText("startByte: " + dumpInfo.startByte
                     + " startBit: " + dumpInfo.startBit
                     + " lengthBytes: " + dumpInfo.lengthBytes
@@ -226,8 +221,6 @@ public class DumpViewPanel extends JPanel {
                     + " selectionStart: " + selectionStart
                     + " selectionEnd: " + selectionEnd);
         }
-        
-        scrollToVisible(dumpViewHexTable, (int) (dumpInfo.startByte / bytesInRow), 0);
         
         repaint();
     }
