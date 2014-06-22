@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -116,8 +117,27 @@ public class DumpViewPanel extends JPanel {
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
-    public void setData(byte[] data) {
+    public void setData(byte[] data, DumpInfo dumpInfo) {
         this.data = data;
+
+        if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
+            // todo
+            int end = (int) dumpInfo.startByte;
+            if (dumpInfo.lengthBytes != 0) {
+                end += dumpInfo.lengthBytes;
+            } else {
+                int bits = dumpInfo.startBit + dumpInfo.lengthBits;
+                end += bits / 8;
+                if (bits % 8 != 0) {
+                    end++;
+                }
+            }
+            //setSelectedRange((int) dumpInfo.startByte, end - 1);
+            setLabelText("startByte: " + dumpInfo.startByte
+                    + " startBit: " + dumpInfo.startBit
+                    + " lengthBytes: " + dumpInfo.lengthBytes
+                    + " lengthBits: " + dumpInfo.lengthBits);
+        }
     }
 
     public void setLabelText(String text) {

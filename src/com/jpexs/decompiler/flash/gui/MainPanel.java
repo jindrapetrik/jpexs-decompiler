@@ -2381,16 +2381,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void dumpTreeValueChanged(TreeSelectionEvent e) {
         DumpInfo dumpInfo = (DumpInfo) e.getPath().getLastPathComponent();
-        if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
-            // todo
-            dumpViewPanel.setLabelText("startByte: " + dumpInfo.startByte
-                    + " startBit: " + dumpInfo.startBit
-                    + " lengthBytes: " + dumpInfo.lengthBytes
-                    + " lengthBits: " + dumpInfo.lengthBits);
-        }
 
         // todo honfika: support multiple swf
-        dumpViewPanel.setData(swfs.get(0).swfs.get(0).uncompressedData);
+        dumpViewPanel.setData(swfs.get(0).swfs.get(0).uncompressedData, dumpInfo);
         dumpViewPanel.revalidate();
         showCard(CARDDUMPVIEW);
     }
