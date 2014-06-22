@@ -364,7 +364,11 @@ public class SWFInputStream implements AutoCloseable {
 
     private void newDumpLevel(String name, String type) {
         if (dumpInfo != null) {
-            DumpInfo di = new DumpInfo(name, type, null, is.getPos(), bitPos, 0, 0);
+            long startByte = is.getPos();
+            if (bitPos > 0) {
+                startByte--;
+            }
+            DumpInfo di = new DumpInfo(name, type, null, startByte, bitPos, 0, 0);
             di.parent = dumpInfo;
             dumpInfo.childInfos.add(di);
             dumpInfo = di;
@@ -380,7 +384,7 @@ public class SWFInputStream implements AutoCloseable {
             if (dumpInfo.startBit == 0 && bitPos == 0) {
                 dumpInfo.lengthBytes = is.getPos() - dumpInfo.startByte;
             } else {
-                dumpInfo.lengthBits = (int) ((is.getPos() - dumpInfo.startByte - (dumpInfo.startBit == 0 ? 1 : 0)) * 8 - dumpInfo.startBit + bitPos);
+                dumpInfo.lengthBits = (int) ((is.getPos() - dumpInfo.startByte - 1) * 8 - dumpInfo.startBit + (bitPos == 0 ? 8 : bitPos));
             }
             dumpInfo.previewValue = value;
             dumpInfo = dumpInfo.parent;
