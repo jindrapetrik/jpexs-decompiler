@@ -41,7 +41,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationM
 public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
 
     public MainPanel panel;
-    private MainFrameMenu mainMenu;
+    private final MainFrameMenu mainMenu;
 
     public MainFrameRibbon() {
         super();

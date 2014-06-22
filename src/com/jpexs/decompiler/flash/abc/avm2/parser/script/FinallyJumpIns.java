@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
  */
 public class FinallyJumpIns extends JumpIns {
 
-    private long finallyClauseId;
+    private final long finallyClauseId;
 
     public FinallyJumpIns(long finallyClauseId) {
         this.finallyClauseId = finallyClauseId;

@@ -619,7 +619,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 mainFrame.panel.reload(true);
                 break;
             case ACTION_DUMP_VIEW_SWITCH:
-                Configuration.internalFlashViewer.set(miDumpView.isSelected());
+                Configuration.dumpView.set(miDumpView.isSelected());
                 mainFrame.panel.showDumpView(miDumpView.isSelected());
                 break;
             case ACTION_SEARCH:

@@ -227,8 +227,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final JPanel contentPanel;
     private final JPanel displayPanel;
     private JPanel folderPreviewPanel;
-    private JPanel dumpViewPanel;
-    private JLabel dumpViewLabel; // very very simple dump view, todo: hexview with virtual scrolling
     private boolean isWelcomeScreen = true;
     private static final String CARDPREVIEWPANEL = "Preview card";
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
@@ -246,8 +244,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private JPanel detailPanel;
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private PreviewPanel previewPanel;
-    private JPanel treePanel;
+    private final PreviewPanel previewPanel;
+    private DumpViewPanel dumpViewPanel;
+    private final JPanel treePanel;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
@@ -502,9 +501,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createDumpPreviewCard() {
         JPanel dumpViewCard = new JPanel(new BorderLayout());
-        dumpViewPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        dumpViewLabel = new JLabel();
-        dumpViewPanel.add(dumpViewLabel);
+        dumpViewPanel = new DumpViewPanel();
         dumpViewCard.add(new JScrollPane(dumpViewPanel), BorderLayout.CENTER);
 
         return dumpViewCard;
@@ -1761,7 +1758,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         File textsFolder = new File(Path.combine(folder, TextExporter.TEXT_EXPORT_FOLDER));
         String[] files = textsFolder.list(new FilenameFilter() {
 
-            private Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
+            private final Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
 
             @Override
             public boolean accept(File dir, String name) {
@@ -2385,15 +2382,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private void dumpTreeValueChanged(TreeSelectionEvent e) {
-        showCard(CARDDUMPVIEW);
         DumpInfo dumpInfo = (DumpInfo) e.getPath().getLastPathComponent();
         if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
             // todo
-            dumpViewLabel.setText("startByte: " + dumpInfo.startByte + 
+            dumpViewPanel.setLabelText("startByte: " + dumpInfo.startByte + 
                     " startBit: " + dumpInfo.startBit +
                     " lengthBytes: " + dumpInfo.lengthBytes +
                     " lengthBits: " + dumpInfo.lengthBits);
         }
+
+        // todo honfika: support multiple swf
+        dumpViewPanel.setData(swfs.get(0).swfs.get(0).uncompressedData);
+        dumpViewPanel.revalidate();
+        showCard(CARDDUMPVIEW);
     }
     
     @Override

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
  */
 public class ContinueJumpIns extends JumpIns {
 
-    private long loopId;
+    private final long loopId;
 
     public ContinueJumpIns(long loopId) {
         this.loopId = loopId;

@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
  */
 public class TagStub extends Tag {
 
-    private SWFInputStream dataStream;
+    private final SWFInputStream dataStream;
     
     /**
      * Constructor

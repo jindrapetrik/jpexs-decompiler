@@ -1526,7 +1526,7 @@ public final class SWF implements TreeItem, Timelined {
         final Color fbackgroundColor=backgroundColor;
         final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
 
-            private int pos=0;
+            private final int pos=0;
             
             @Override
             public boolean hasNext() {

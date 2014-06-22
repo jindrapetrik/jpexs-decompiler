@@ -62,7 +62,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private final Cache<CachedDecompilation> cache = Cache.getInstance(true);
     private Trait currentTrait = null;
     
-    private List<Runnable> scriptListeners = new ArrayList<Runnable>();
+    private final List<Runnable> scriptListeners = new ArrayList<Runnable>();
     
     public void addScriptListener(Runnable l){
         scriptListeners.add(l);

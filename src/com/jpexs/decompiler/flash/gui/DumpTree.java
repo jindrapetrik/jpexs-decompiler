@@ -24,6 +24,7 @@ import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 
 /**
  *
@@ -71,5 +72,18 @@ public class DumpTree extends JTree {
             }
         });
     }
+
+    @Override
+    public void setModel(TreeModel tm) {
+        super.setModel(tm);
+        if (tm != null) {
+            int rowCount = tm.getChildCount(tm.getRoot());
+            for (int i = rowCount - 1; i >= 0; i--) {
+                expandRow(i);
+            }
+        }
+    }
+    
+    
 
 }

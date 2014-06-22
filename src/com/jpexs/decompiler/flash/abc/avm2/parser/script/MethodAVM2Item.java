@@ -27,9 +27,9 @@ import java.util.List;
  */
 public class MethodAVM2Item extends FunctionAVM2Item {
 
-    private boolean isStatic;
-    private boolean isFinal;
-    private boolean override;
+    private final boolean isStatic;
+    private final boolean isFinal;
+    private final boolean override;
     public String customNamespace;
     public boolean isInterface;
 

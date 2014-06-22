@@ -153,7 +153,7 @@ import java.util.List;
  */
 public class ActionScriptParser {
 
-    private int swfVersion;
+    private final int swfVersion;
 
     public ActionScriptParser(int swfVersion) {
         this.swfVersion = swfVersion;

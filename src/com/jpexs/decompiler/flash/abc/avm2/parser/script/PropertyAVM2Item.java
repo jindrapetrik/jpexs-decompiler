@@ -64,8 +64,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem object;
     public ABC abc;
     public List<ABC> otherABCs;
-    private List<Integer> openedNamespaces;
-    private List<MethodBody> callStack;
+    private final List<Integer> openedNamespaces;
+    private final List<MethodBody> callStack;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
 
     @Override

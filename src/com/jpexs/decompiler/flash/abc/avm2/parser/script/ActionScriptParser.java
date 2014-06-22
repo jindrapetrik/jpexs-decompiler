@@ -129,10 +129,10 @@ public class ActionScriptParser {
     private final boolean debugMode = false;
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
-    private ABC abc;
-    private List<ABC> otherABCs;
+    private final ABC abc;
+    private final List<ABC> otherABCs;
 
-    private static List<ABC> playerABCs = new ArrayList<>();
+    private static final List<ABC> playerABCs = new ArrayList<>();
 
     private long uniqId() {
         uniqLast++;

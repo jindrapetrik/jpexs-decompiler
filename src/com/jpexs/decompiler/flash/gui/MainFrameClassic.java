@@ -35,7 +35,7 @@ import javax.swing.JFrame;
 public final class MainFrameClassic extends AppFrame implements MainFrame {
 
     public MainPanel panel;
-    private MainFrameMenu mainMenu;
+    private final MainFrameMenu mainMenu;
 
     public MainFrameClassic() {
         super();

@@ -596,7 +596,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
     }
     private final List<String> constantPool;
-    private int swfVersion;
+    private final int swfVersion;
 
     public int getSwfVersion() {
         return swfVersion;

@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class SlotAVM2Item extends AVM2Item {
 
     private final int namespace;
-    private boolean isStatic;
+    private final boolean isStatic;
     public String var;
     public GraphTargetItem type;
     public String customNamespace;

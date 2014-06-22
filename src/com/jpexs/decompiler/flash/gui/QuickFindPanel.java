@@ -51,7 +51,7 @@ public class QuickFindPanel extends JPanel implements ActionListener, jsyntaxpan
     public JCheckBox ignoreCaseCheckbox,regExpCheckbox,wrapCheckbox;
     public JLabel statusLabel;
     
-    private Markers.SimpleMarker marker = new Markers.SimpleMarker(Color.PINK);
+    private final Markers.SimpleMarker marker = new Markers.SimpleMarker(Color.PINK);
 	private WeakReference<JTextComponent> target;
 	private WeakReference<DocumentSearchData> dsd;
 	private int oldCaretPosition;

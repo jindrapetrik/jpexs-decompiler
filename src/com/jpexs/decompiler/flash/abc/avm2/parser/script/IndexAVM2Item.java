@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class IndexAVM2Item extends AssignableAVM2Item {
 
-    private List<Integer> openedNamespaces;
+    private final List<Integer> openedNamespaces;
     public GraphTargetItem object;
     public GraphTargetItem index;
     public boolean attr;

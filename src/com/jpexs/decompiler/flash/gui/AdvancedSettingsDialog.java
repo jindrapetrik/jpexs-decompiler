@@ -56,7 +56,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class AdvancedSettingsDialog extends AppDialog implements ActionListener {
 
-    private Map<String, Component> componentsMap = new HashMap<>();
+    private final Map<String, Component> componentsMap = new HashMap<>();
 
     /**
      * Creates new form AdvancedSettingsDialog
