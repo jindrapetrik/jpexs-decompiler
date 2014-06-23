@@ -940,13 +940,15 @@ public class SWFInputStream implements AutoCloseable {
     private class TagResolutionTask implements Callable<Tag> {
 
         private final Tag tag;
+        private final DumpInfo dumpInfo;
         private final int level;
         private final boolean parallel;
         private final boolean skipUnusualTags;
         private final boolean gfx;
 
-        public TagResolutionTask(Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
+        public TagResolutionTask(Tag tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
             this.tag = tag;
+            this.dumpInfo = dumpInfo;
             this.level = level;
             this.parallel = parallel;
             this.skipUnusualTags = skipUnusualTags;
@@ -956,7 +958,11 @@ public class SWFInputStream implements AutoCloseable {
         @Override
         public Tag call() throws Exception {
             try {
-                return resolveTag(tag, level, parallel, skipUnusualTags, gfx);
+                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
+                if (t != null) {
+                    dumpInfo.name = t.getName();
+                }
+                return t;
             } catch (EndOfStreamException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 return tag;
@@ -996,8 +1002,9 @@ public class SWFInputStream implements AutoCloseable {
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
+            DumpInfo di = dumpInfo;
             if (tag != null) {
-                dumpInfo.name = tag.getName();
+                di.name = tag.getName();
             }
             endDumpLevel(tag == null ? null : tag.getId());
             if (tag == null) {
@@ -1018,7 +1025,8 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(tag, level, parallel, skipUnusualTags, gfx);
+                        tag = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
+                        FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -1059,7 +1067,7 @@ public class SWFInputStream implements AutoCloseable {
             }
             if (parseTags && doParse) {
                 if (parallel) {
-                    Future<Tag> future = executor.submit(new TagResolutionTask(tag, level, parallel, skipUnusualTags, gfx));
+                    Future<Tag> future = executor.submit(new TagResolutionTask(tag, di, level, parallel, skipUnusualTags, gfx));
                     futureResults.add(future);
                 }
             }
