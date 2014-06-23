@@ -129,10 +129,6 @@ public class Configuration {
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
-    @ConfigurationDefaultInt(65536)
-    @ConfigurationCategory("display")
-    public static final ConfigurationItem<Integer> binaryDataDisplayLimit = null;
-
     /**
      * Debug mode = throwing an error when comparing original file and
      * recompiled

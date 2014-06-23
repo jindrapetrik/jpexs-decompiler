@@ -16,12 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JPanel;
@@ -33,7 +29,7 @@ import javax.swing.JScrollPane;
  */
 public final class BinaryPanel extends JPanel implements ComponentListener {
 
-    public LineMarkedEditorPane hexEditor = new LineMarkedEditorPane();
+    public HexView hexEditor = new HexView();
     private byte[] data;
 
     public BinaryPanel() {
@@ -50,17 +46,12 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
 
     public void setBinaryData(byte[] data) {
         this.data = data;
-        hexEditor.setEditable(false);
         if (data != null) {
             int widthInChars = getWidth() / 7 - 3 - 11; // -3: scrollbar, -11: address in hex format
-            int blockCount = widthInChars / 34;
-            hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
-            hexEditor.setContentType("text/plain");
-            int limit = Configuration.binaryDataDisplayLimit.get();
-            hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8, limit));
-            hexEditor.setCaretPosition(0);
+            //int blockCount = widthInChars / 34;
+            hexEditor.setData(data, null, null);
         } else {
-            hexEditor.setText("");
+            hexEditor.setData(new byte[0], null, null);
         }
     }
 
