@@ -1758,7 +1758,7 @@ public class ActionScriptParser {
             }
         }
         if (lexer.lex().type != SymbolType.EOF) {
-            throw new ParseException("Parsing finisned before end of the file", lexer.yyline());
+            throw new ParseException("Parsing finished before end of the file", lexer.yyline());
         }
         return retTree;
     }
