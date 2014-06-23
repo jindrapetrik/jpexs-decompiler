@@ -57,7 +57,7 @@ public class SWFStreamTest {
             sos.writeFB(20, f);
         }
         try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
-            assertTrue(Double.compare(f, sis.readFB(20)) == 0);
+            assertTrue(Double.compare(f, sis.readFB(20, "test")) == 0);
         }
     }
 
@@ -72,11 +72,11 @@ public class SWFStreamTest {
             sos.writeUB(9, 5);
         }
         try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
-            assertEquals(1, sis.readUB(5));
-            assertEquals(2, sis.readUB(6));
-            assertEquals(3, sis.readUB(7));
-            assertEquals(4, sis.readUB(8));
-            assertEquals(5, sis.readUB(9));
+            assertEquals(1, sis.readUB(5, "test"));
+            assertEquals(2, sis.readUB(6, "test"));
+            assertEquals(3, sis.readUB(7, "test"));
+            assertEquals(4, sis.readUB(8, "test"));
+            assertEquals(5, sis.readUB(9, "test"));
         }
     }
 
@@ -91,11 +91,11 @@ public class SWFStreamTest {
             sos.writeSB(9, -5);
         }
         try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
-            assertEquals(-1, sis.readSB(5));
-            assertEquals(2, sis.readSB(6));
-            assertEquals(-3, sis.readSB(7));
-            assertEquals(4, sis.readSB(8));
-            assertEquals(-5, sis.readSB(9));
+            assertEquals(-1, sis.readSB(5, "test"));
+            assertEquals(2, sis.readSB(6, "test"));
+            assertEquals(-3, sis.readSB(7, "test"));
+            assertEquals(4, sis.readSB(8, "test"));
+            assertEquals(-5, sis.readSB(9, "test"));
         }
     }
 
@@ -107,7 +107,7 @@ public class SWFStreamTest {
         sos.writeFLOAT(f);
         sos.close();
         SWFInputStream sis = new SWFInputStream(null, baos.toByteArray());
-        assertEquals(f, sis.readFLOAT());
+        assertEquals(f, sis.readFLOAT("test"));
         sis.close();
 
         baos = new ByteArrayOutputStream();
@@ -116,7 +116,7 @@ public class SWFStreamTest {
         sos.writeFLOAT16(f);
         sos.close();
         sis = new SWFInputStream(null, baos.toByteArray());
-        assertEquals(f, sis.readFLOAT16());
+        assertEquals(f, sis.readFLOAT16("test"));
         sis.close();
 
         baos = new ByteArrayOutputStream();
@@ -125,7 +125,7 @@ public class SWFStreamTest {
         sos.writeDOUBLE(d);
         sos.close();
         sis = new SWFInputStream(null, baos.toByteArray());
-        assertEquals(d, sis.readDOUBLE());
+        assertEquals(d, sis.readDOUBLE("test"));
         sis.close();
     }
 
@@ -134,7 +134,7 @@ public class SWFStreamTest {
         //example from specification
         byte[] data = new byte[]{(byte) 0x00, (byte) 0x80, (byte) 0x07, (byte) 0x00};
         SWFInputStream sis = new SWFInputStream(null, data);
-        assertTrue(Double.compare(7.5, sis.readFIXED()) == 0);
+        assertTrue(Double.compare(7.5, sis.readFIXED("test")) == 0);
         sis.close();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -143,7 +143,7 @@ public class SWFStreamTest {
         sos.writeFIXED(dd);
         sos.close();
         sis = new SWFInputStream(null, baos.toByteArray());
-        assertTrue(Double.compare(dd, sis.readFIXED()) == 0);
+        assertTrue(Double.compare(dd, sis.readFIXED("test")) == 0);
         sis.close();
 
         baos = new ByteArrayOutputStream();
@@ -152,7 +152,7 @@ public class SWFStreamTest {
         sos.writeFIXED8(ff);
         sos.close();
         sis = new SWFInputStream(null, baos.toByteArray());
-        assertEquals(ff, sis.readFIXED8());
+        assertEquals(ff, sis.readFIXED8("test"));
         sis.close();
     }
 
@@ -165,7 +165,7 @@ public class SWFStreamTest {
             sos.writeRECT(rect);
         }
         try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
-            RECT readRECT = sis.readRECT();
+            RECT readRECT = sis.readRECT("test");
             assertEquals(readRECT.Xmin, -0x3FFFFFFF);
             assertEquals(readRECT.Xmax, 0x3FFFFFFF);
             assertEquals(readRECT.Ymin, -0x3FFFFFFF);
