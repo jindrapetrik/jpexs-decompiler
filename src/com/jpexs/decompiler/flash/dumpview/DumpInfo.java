@@ -42,7 +42,7 @@ public class DumpInfo {
 
     public List<DumpInfo> childInfos = new ArrayList<>();
 
-    public DumpInfo(String name, String type, Object value, long startByte, int lengthBytes) {
+    public DumpInfo(String name, String type, Object value, long startByte, long lengthBytes) {
 
         this.name = name;
         this.type = type;
