@@ -56,8 +56,8 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DoAction", pos, length);
-        //do not load actionBytes. Disassebler will use the original SWF stream in this case
-        //actionBytes = sis.readBytesEx(sis.available());
+        //do not store actionBytes. Disassebler will use the original SWF stream in this case
+        sis.readBytesEx(sis.available(), "actionBytes");
     }
 
     /**

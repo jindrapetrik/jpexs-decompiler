@@ -27,7 +27,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -41,6 +40,8 @@ public class HexView extends JTable {
     private byte[] data;
     private final String[] highlightColorsStr = new String[]{/*"EEEEEE", */"29AEC2", "9AC88C", "DF5F80", "EEA32E", "FFD200", "5E9B4C", "D3E976", "A3AEC2"};
     private final Color[] highlightColors;
+    private Color bgColor = Color.decode("#F7F7F7");
+    private Color bgColorAlternate = Color.decode("#EDEDED");
 
     public class HighlightCellRenderer extends DefaultTableCellRenderer {
 
@@ -48,9 +49,9 @@ public class HexView extends JTable {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
             JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-            if (highlightStarts != null) {
+            int level = -1;
+            if (col > 0 && highlightStarts != null) {
                 int idx = row * bytesInRow + ((col > bytesInRow) ? (col - bytesInRow - 1) : (col - 1));
-                int level = -1;
                 for (int i = 0; i < highlightStarts.length; i++) {
                     if (highlightStarts[i] <= idx && highlightEnds[i] >= idx) {
                         level++;
@@ -58,12 +59,14 @@ public class HexView extends JTable {
                         break;
                     }
                 }
-                if (level > -1) {
-                    l.setBackground(highlightColors[level % highlightColors.length]);
-                } else {
-                    l.setBackground(Color.white);
-                }
             }
+
+            if (level > -1) {
+                l.setBackground(highlightColors[level % highlightColors.length]);
+            } else {
+                l.setBackground(row % 2 == 0 ? bgColor : bgColorAlternate);
+            }
+
             return l;
         }
     }    
@@ -131,17 +134,20 @@ public class HexView extends JTable {
         
         setShowHorizontalLines(false);
         setShowVerticalLines(false);
+        setRowSelectionAllowed(false);
+        setColumnSelectionAllowed(false);
 
         HighlightCellRenderer cellRenderer = new HighlightCellRenderer();
-        TableColumnModel columnModel = getColumnModel();
-        columnModel.getColumn(0).setMaxWidth(80);
+        TableColumn column = columnModel.getColumn(0);
+        column.setMaxWidth(80);
+        //column.setCellRenderer(cellRenderer);
         for (int i = 0; i < bytesInRow; i++) {
-            TableColumn column = columnModel.getColumn(i + 1);
+            column = columnModel.getColumn(i + 1);
             column.setMaxWidth(25);
             column.setCellRenderer(cellRenderer);
         }
         for (int i = 0; i < bytesInRow; i++) {
-            TableColumn column = columnModel.getColumn(i + bytesInRow + 1);
+            column = columnModel.getColumn(i + bytesInRow + 1);
             column.setMaxWidth(10);
             column.setCellRenderer(cellRenderer);
         }

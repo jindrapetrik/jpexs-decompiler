@@ -62,8 +62,8 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public DoInitActionTag(SWFInputStream sis, long pos, int length) throws IOException {
         super(sis.getSwf(), ID, "DoInitAction", pos, length);
         spriteId = sis.readUI16("spriteId");
-        //actions = sis.readActionList();
-        actionBytes = sis.readBytesEx(sis.available(), "actionBytes");
+        //do not store actionBytes. Disassebler will use the original SWF stream in this case
+        sis.readBytesEx(sis.available(), "actionBytes");
     }
 
     /**
