@@ -80,7 +80,7 @@ public class DumpViewPanel extends JPanel {
             int selectionStart = (int) dumpInfo.startByte;
             int selectionEnd = getEndIndex(dumpInfo);
 
-            dumpViewHexTable.scrollToByte(dumpInfo.startByte);
+            dumpViewHexTable.scrollToByte(highlightStarts, highlightEnds);
             
             setLabelText("startByte: " + dumpInfo.startByte
                     + " startBit: " + dumpInfo.startBit

@@ -169,24 +169,18 @@ public class HexView extends JTable {
     }
     
     public void scrollToByte(long byteNum) {
-        // HACK to scroll current selection to visible
         int row = (int) (byteNum / bytesInRow);
 
-        final int pageSize = (int) (getParent().getSize().getHeight() / getRowHeight());
-
-        int byteCount = data.length;
-        int rowCount = byteCount / bytesInRow;
-        if (byteCount % bytesInRow != 0) {
-            rowCount++;
-        }
-
-        int row2 = Math.min(row + pageSize - 2, rowCount - 1); 
-        getSelectionModel().setSelectionInterval(row2, row2);
-        scrollRectToVisible(new Rectangle(getCellRect(row2, 0, true)));            
-
+        //final int pageSize = (int) (getParent().getSize().getHeight() / getRowHeight());
         getSelectionModel().setSelectionInterval(row, row);
         scrollRectToVisible(new Rectangle(getCellRect(row, 0, true)));            
-        // END HACK
     }
     
+    public void scrollToByte(long[] byteNumStarts, long[] byteNumEnds) {
+        for (int i = 0; i < byteNumStarts.length; i++) {
+            scrollToByte(byteNumStarts[i]);
+            scrollToByte(byteNumEnds[i]);
+            scrollToByte(byteNumStarts[i]);
+        }
+    }
 }
