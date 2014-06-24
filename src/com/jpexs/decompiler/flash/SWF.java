@@ -1534,6 +1534,11 @@ public final class SWF implements TreeItem, Timelined {
             }
 
             @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
             public BufferedImage next() {
                 if (!hasNext()) {
                     return null;
