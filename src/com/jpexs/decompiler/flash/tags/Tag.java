@@ -68,7 +68,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      * Original tag data
      */
     @Internal
-    private final ByteArrayRange originalData;
+    private ByteArrayRange originalData;
 
     public String getTagName() {
         return tagName;
@@ -392,6 +392,15 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
 
     public void setModified(boolean value) {
         modified = value;
+    }
+
+    public void createOriginalData() {
+        byte[] data = getData();
+        byte[] headerData = getHeader(data);
+        byte[] tagData = new byte[data.length + headerData.length];
+        System.arraycopy(headerData, 0, tagData, 0, headerData.length);
+        System.arraycopy(data, 0, tagData, headerData.length, data.length);
+        originalData = new ByteArrayRange(tagData, 0, tagData.length);
     }
 
     public boolean isModified() {

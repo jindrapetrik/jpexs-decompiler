@@ -451,6 +451,7 @@ public final class SWF implements TreeItem, Timelined {
     public void clearModified() {
         for (Tag tag : tags) {
             if (tag.isModified()) {
+                tag.createOriginalData();
                 tag.setModified(false);
             }
         }
