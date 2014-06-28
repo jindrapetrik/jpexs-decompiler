@@ -340,6 +340,8 @@ public class ABC {
         this.swf = swf;
         this.parentTag = tag;
         ABCInputStream ais = new ABCInputStream(is.getBaseStream());
+        // put it to the dumpview:
+        is.readBytesEx(is.available(), "abcBytes");
         minor_version = ais.readU16();
         major_version = ais.readU16();
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
