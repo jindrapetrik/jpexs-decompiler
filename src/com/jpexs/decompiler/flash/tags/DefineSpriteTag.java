@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
@@ -50,7 +51,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -193,16 +193,15 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * Constructor
      *
      * @param sis
-     * @param length
+     * @param data
      * @param level
-     * @param pos
      * @param parallel
      * @param skipUnusualTags
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public DefineSpriteTag(SWFInputStream sis, int level, long pos, int length, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(sis.getSwf(), ID, "DefineSprite", pos, length);
+    public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+        super(sis.getSwf(), ID, "DefineSprite", data);
         spriteId = sis.readUI16("spriteId");
         frameCount = sis.readUI16("frameCount");
         List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
@@ -230,9 +229,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         try {
             sos.writeUI16(spriteId);
             sos.writeUI16(frameCount);
-            Map<Tag, Long> tagPositions = new HashMap<>();
-            Map<Tag, Integer> tagLengths = new HashMap<>();
-            sos.writeTags(subTags, tagPositions, tagLengths);
+            sos.writeTags(subTags);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }

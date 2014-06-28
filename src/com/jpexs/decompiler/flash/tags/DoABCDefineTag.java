@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,12 +67,11 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DoABCDefineTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DoABCDefine", pos, length);
+    public DoABCDefineTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DoABCDefine", data);
         flags = sis.readUI32("flags");
         name = sis.readString("name");
         abc = new ABC(sis, swf, this);

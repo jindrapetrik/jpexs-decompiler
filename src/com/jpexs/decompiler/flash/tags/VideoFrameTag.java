@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -61,12 +62,11 @@ public class VideoFrameTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public VideoFrameTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "VideoFrame", pos, length);
+    public VideoFrameTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "VideoFrame", data);
         streamID = sis.readUI16("streamID");
         frameNum = sis.readUI16("frameNum");
         videoData = sis.readBytesEx(sis.available(), "videoData"); //TODO: Parse video packets

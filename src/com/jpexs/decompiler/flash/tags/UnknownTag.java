@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.helpers.ByteArrayRange;
 
 /**
  *
@@ -24,8 +25,8 @@ import com.jpexs.decompiler.flash.SWF;
  */
 public class UnknownTag extends Tag {
 
-    public UnknownTag(SWF swf, int id, long pos, int length) {
-        super(swf, id, "Unknown", pos, length);
+    public UnknownTag(SWF swf, int id, ByteArrayRange data) {
+        super(swf, id, "Unknown", data);
     }
 
     @Override

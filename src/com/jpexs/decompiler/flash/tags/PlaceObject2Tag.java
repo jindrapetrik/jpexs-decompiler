@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -191,7 +192,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
     }
 
     public PlaceObject2Tag(SWF swf, boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
-        super(swf, ID, "PlaceObject2", 0, 0);
+        super(swf, ID, "PlaceObject2", null);
         this.placeFlagHasClipActions = placeFlagHasClipActions;
         this.placeFlagHasClipDepth = placeFlagHasClipDepth;
         this.placeFlagHasName = placeFlagHasName;
@@ -214,12 +215,11 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public PlaceObject2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject2", pos, length);
+    public PlaceObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "PlaceObject2", data);
         placeFlagHasClipActions = sis.readUB(1, "placeFlagHasClipActions") == 1;
         placeFlagHasClipDepth = sis.readUB(1, "placeFlagHasClipDepth") == 1;
         placeFlagHasName = sis.readUB(1, "placeFlagHasName") == 1;

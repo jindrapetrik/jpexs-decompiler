@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
@@ -185,19 +186,18 @@ public class DefineFont2Tag extends FontTag {
     }
 
     public DefineFont2Tag(SWF swf) throws IOException {
-        super(swf, ID, "DefineFont2", 0, 0);
+        super(swf, ID, "DefineFont2", null);
     }
 
     /**
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineFont2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont2", pos, length);
+    public DefineFont2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineFont2", data);
         fontId = sis.readUI16("fontId");
         fontFlagsHasLayout = sis.readUB(1, "fontFlagsHasLayout") == 1;
         fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;

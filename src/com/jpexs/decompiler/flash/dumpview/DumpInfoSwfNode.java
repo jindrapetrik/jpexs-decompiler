@@ -14,21 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.dumpview;
 
-import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.helpers.ByteArrayRange;
-import java.io.IOException;
+import com.jpexs.decompiler.flash.SWF;
 
-public class JPEGTablesTag extends Tag {
+/**
+ *
+ * @author JPEXS
+ */
+public class DumpInfoSwfNode extends DumpInfo {
 
-    public static final int ID = 8;
-    @Internal
-    public byte[] jpegData;
-
-    public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "JPEGTables", data);
-        jpegData = sis.readBytesEx(sis.available(), "jpegData");
+    private final SWF swf;
+    
+    public DumpInfoSwfNode(SWF swf, String name, String type, Object value, long startByte, long lengthBytes) {
+        super(name, type, value, startByte, lengthBytes);
+        this.swf = swf;
+    }
+    
+    public SWF getSwf() {
+        return swf;
+    }
+    
+    public static DumpInfoSwfNode getSwfNode(DumpInfo dumpInfo) {
+        while (!(dumpInfo instanceof DumpInfoSwfNode)) {
+            dumpInfo = dumpInfo.parent;
+        }
+        return (DumpInfoSwfNode) dumpInfo;
     }
 }

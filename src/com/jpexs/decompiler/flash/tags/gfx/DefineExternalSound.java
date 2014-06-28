@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -75,12 +76,11 @@ public class DefineExternalSound extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineExternalSound(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineExternalSound", pos, length);
+    public DefineExternalSound(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineExternalSound", data);
         characterId = sis.readUI16("characterId");
         soundFormat = sis.readUI16("soundFormat");
         bits = sis.readUI16("bits");

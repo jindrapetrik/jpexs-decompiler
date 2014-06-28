@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.helpers.ByteArrayRange;
 
 /**
  *
@@ -33,13 +34,12 @@ public class TagStub extends Tag {
      *
      * @param swf
      * @param id
-     * @param length
+     * @param data
      * @param name
-     * @param pos
      * @param sis
      */
-    public TagStub(SWF swf, int id, String name, long pos, int length, SWFInputStream sis) {
-        super(swf, id, name, pos, length);
+    public TagStub(SWF swf, int id, String name, ByteArrayRange data, SWFInputStream sis) {
+        super(swf, id, name, data);
         dataStream = sis;
     }
 

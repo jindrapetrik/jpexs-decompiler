@@ -72,8 +72,6 @@ public interface ASMSource extends TreeItem {
 
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer);
 
-    public long getPos();
-
     public void addDisassemblyListener(DisassemblyListener listener);
 
     public void removeDisassemblyListener(DisassemblyListener listener);

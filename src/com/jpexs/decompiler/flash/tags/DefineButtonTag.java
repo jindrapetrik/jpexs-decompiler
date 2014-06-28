@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -95,12 +96,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineButtonTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineButton", pos, length);
+    public DefineButtonTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineButton", data);
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
         hdrSize = sis.getPos();
@@ -144,7 +144,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getDataPos() + hdrSize, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     /**
@@ -170,13 +170,13 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             SWFInputStream rri;
             if (actionBytes == null) {
                 prevLength = (int) (getDataPos() + hdrSize);
-                rri = new SWFInputStream(swf, swf.uncompressedData);
+                rri = new SWFInputStream(swf, getOriginalRange().array);
                 rri.seek(prevLength);
             } else {
                 prevLength = 0;
                 rri = new SWFInputStream(swf, actionBytes);
             }
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getDataPos() + hdrSize - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

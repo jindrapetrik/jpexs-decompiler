@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -55,8 +56,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     protected final int previewSize = 500;
 
-    public FontTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public FontTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract int getFontId();

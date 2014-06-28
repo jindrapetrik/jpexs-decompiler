@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayOutputStream;
@@ -425,7 +426,7 @@ public class DefineTextTag extends TextTag {
     }
 
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
-        super(swf, ID, "DefineText", 0, 0);
+        super(swf, ID, "DefineText", null);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -471,12 +472,11 @@ public class DefineTextTag extends TextTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineTextTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineText", pos, length);
+    public DefineTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineText", data);
         characterID = sis.readUI16("characterID");
         textBounds = sis.readRECT("textBounds");
         textMatrix = sis.readMatrix("textMatrix");

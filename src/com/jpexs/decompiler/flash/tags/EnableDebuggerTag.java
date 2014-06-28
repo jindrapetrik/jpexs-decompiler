@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -58,12 +59,11 @@ public class EnableDebuggerTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public EnableDebuggerTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "EnableDebugger", pos, length);
+    public EnableDebuggerTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "EnableDebugger", data);
         passwordHash = sis.readString("passwordHash");
     }
 }

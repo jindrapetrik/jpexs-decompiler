@@ -52,7 +52,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
@@ -271,7 +271,7 @@ public final class SWF implements TreeItem, Timelined {
 
     private Timeline timeline;
 
-    public DumpInfo dumpInfo;
+    public DumpInfoSwfNode dumpInfo;
 
     public void updateCharacters() {
         characters.clear();
@@ -308,7 +308,7 @@ public final class SWF implements TreeItem, Timelined {
             Tag t = tags.get(i);
             if (t instanceof DefineSpriteTag) {
                 if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
-                    tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getPos(), t.getOriginalLength(), null));
+                    tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getOriginalRange(), null));
                 }
             }
         }
@@ -385,9 +385,7 @@ public final class SWF implements TreeItem, Timelined {
             sos.writeUI8(frameRate);
             sos.writeUI16(frameCount);
 
-            Map<Tag, Long> tagPositions = new HashMap<>();
-            Map<Tag, Integer> tagLengths = new HashMap<>();
-            sos.writeTags(tags, tagPositions, tagLengths);
+            sos.writeTags(tags);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -512,7 +510,7 @@ public final class SWF implements TreeItem, Timelined {
         uncompressedData = baos.toByteArray();
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
-        dumpInfo = new DumpInfo("rootswf", "", null, 0, 0);
+        dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
         sis.dumpInfo = dumpInfo;
         sis.readBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
@@ -543,7 +541,7 @@ public final class SWF implements TreeItem, Timelined {
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
-                if (tag.getOriginalLength() > 2 && Tag.getRequiredTags().contains(tag.getId())) {
+                if (tag.getOriginalDataLength() > 0 && Tag.getRequiredTags().contains(tag.getId())) {
                     hasNonUnknownTag = true;
                 }
             }
@@ -2120,7 +2118,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
         for (ASMSource src : actionsMap.keySet()) {
-            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
+            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, ""/*FIXME path*/));
             src.setActions(actionsMap.get(src));
             src.setModified();
         }

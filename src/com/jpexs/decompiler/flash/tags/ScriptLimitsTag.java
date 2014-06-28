@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,8 +35,8 @@ public class ScriptLimitsTag extends Tag {
 
     public static final int ID = 65;
 
-    public ScriptLimitsTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "ScriptLimits", pos, length);
+    public ScriptLimitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "ScriptLimits", data);
         maxRecursionDepth = sis.readUI16("maxRecursionDepth");
         scriptTimeoutSeconds = sis.readUI16("scriptTimeoutSeconds");
     }

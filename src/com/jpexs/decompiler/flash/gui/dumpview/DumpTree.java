@@ -1,0 +1,171 @@
+/*
+ *  Copyright (C) 2010-2014 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jpexs.decompiler.flash.gui.dumpview;
+
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.helpers.Helper;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class DumpTree extends JTree implements ActionListener {
+
+    private static final String ACTION_CLOSE_SWF = "CLOSESWF";
+    private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
+
+    private final MainPanel mainPanel;
+
+    public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(
+                JTree tree,
+                Object value,
+                boolean sel,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
+
+            super.getTreeCellRendererComponent(
+                    tree, value, sel,
+                    expanded, leaf, row,
+                    hasFocus);
+
+            //DumpInfo dumpInfo = (DumpInfo) value;
+            setUI(new BasicLabelUI());
+            setOpaque(false);
+            setBackgroundNonSelectionColor(Color.white);
+
+            return this;
+        }
+    }
+
+    public DumpTree(DumpTreeModel treeModel, MainPanel mainPanel) {
+        super(treeModel);
+        this.mainPanel = mainPanel;
+        setCellRenderer(new DumpTreeCellRenderer());
+        setRootVisible(false);
+        setBackground(Color.white);
+        setUI(new BasicTreeUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                setHashColor(Color.gray);
+                super.paint(g, c);
+            }
+        });
+    }
+
+    public void createContextMenu() {
+        final JPopupMenu contextPopupMenu = new JPopupMenu();
+
+        final JMenuItem expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
+        expandRecursiveMenuItem.addActionListener(this);
+        expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
+        contextPopupMenu.add(expandRecursiveMenuItem);
+
+        final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
+        closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
+        closeSelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(closeSelectionMenuItem);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+
+                    int row = getClosestRowForLocation(e.getX(), e.getY());
+                    int[] selectionRows = getSelectionRows();
+                    if (!Helper.contains(selectionRows, row)) {
+                        setSelectionRow(row);
+                    }
+
+                    TreePath[] paths = getSelectionPaths();
+                    if (paths == null || paths.length == 0) {
+                        return;
+                    }
+                    closeSelectionMenuItem.setVisible(false);
+                    expandRecursiveMenuItem.setVisible(false);
+
+                    if (paths.length == 1) {
+                        DumpInfo treeNode = (DumpInfo) paths[0].getLastPathComponent();
+
+                        if (treeNode instanceof DumpInfoSwfNode) {
+                            closeSelectionMenuItem.setVisible(true);
+                        }
+
+                        TreeModel model = getModel();
+                        expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
+                    }
+
+                    contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getActionCommand()) {
+            case ACTION_EXPAND_RECURSIVE: {
+                TreePath path = getSelectionPath();
+                if (path == null) {
+                    return;
+                }
+                View.expandTreeNodesRecursive(this, path, true);
+            }
+            break;
+            case ACTION_CLOSE_SWF: {
+                Main.closeFile(mainPanel.getCurrentSwfList());
+            }
+        }
+    }
+    
+    @Override
+    public void setModel(TreeModel tm) {
+        super.setModel(tm);
+        if (tm != null) {
+            int rowCount = tm.getChildCount(tm.getRoot());
+            for (int i = rowCount - 1; i >= 0; i--) {
+                expandRow(i);
+            }
+        }
+    }
+
+}

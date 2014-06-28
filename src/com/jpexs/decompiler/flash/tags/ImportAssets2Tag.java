@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,12 +60,11 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public ImportAssets2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "ImportAssets2", pos, length);
+    public ImportAssets2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "ImportAssets2", data);
         tags = new ArrayList<>();
         names = new ArrayList<>();
         url = sis.readString("url");

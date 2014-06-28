@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,12 +138,11 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public SoundStreamHead2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "SoundStreamHead2", pos, length);
+    public SoundStreamHead2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "SoundStreamHead2", data);
         reserved = (int) sis.readUB(4, "reserved");
         playBackSoundRate = (int) sis.readUB(2, "playBackSoundRate");
         playBackSoundSize = sis.readUB(1, "playBackSoundSize") == 1;

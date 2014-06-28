@@ -76,7 +76,6 @@ public class ActionListReader {
      * ActionEndFlag(=0) or end of the stream.
      *
      * @param listeners
-     * @param containerSWFOffset
      * @param sis
      * @param version
      * @param ip
@@ -87,13 +86,13 @@ public class ActionListReader {
      * @throws java.lang.InterruptedException
      * @throws java.util.concurrent.TimeoutException
      */
-    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
+    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
             return CancellableWorker.call(new Callable<List<Action>>() {
 
                 @Override
                 public List<Action> call() throws IOException, InterruptedException {
-                    return readActionList(listeners, containerSWFOffset, sis, version, ip, endIp, path);
+                    return readActionList(listeners, sis, version, ip, endIp, path);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
         } catch (ExecutionException ex) {
@@ -114,7 +113,6 @@ public class ActionListReader {
      * ActionEndFlag(=0) or end of the stream.
      *
      * @param listeners
-     * @param containerSWFOffset
      * @param sis
      * @param version
      * @param ip
@@ -124,7 +122,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
+    public static List<Action> readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         boolean deobfuscate = Configuration.autoDeobfuscate.get();
 
         ConstantPool cpool = new ConstantPool();
@@ -132,7 +130,7 @@ public class ActionListReader {
         // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();
         List<Long> nextOffsets = new ArrayList<>();
-        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool,
+        Action entryAction = readActionListAtPos(listeners, cpool,
                 sis, actionMap, nextOffsets,
                 ip, ip, endIp, version, path, false, new ArrayList<Long>());
 
@@ -193,7 +191,7 @@ public class ActionListReader {
 
         if (deobfuscate) {
             try {
-                actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
+                actions = deobfuscateActionList(listeners, actions, version, ip, path);
                 updateActionLengths(actions, version);
                 removeZeroJumps(actions, version);
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
@@ -210,7 +208,6 @@ public class ActionListReader {
      * ActionEndFlag(=0) or end of the stream.
      *
      * @param listeners
-     * @param containerSWFOffset
      * @param actions
      * @param version
      * @param ip
@@ -219,7 +216,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, long containerSWFOffset, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
+    public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
             return actions;
         }
@@ -260,7 +257,7 @@ public class ActionListReader {
             }
         }
 
-        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
+        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
         if (!retdups.isEmpty()) {
             for (int i = 0; i < ip; i++) {
@@ -286,7 +283,7 @@ public class ActionListReader {
             }
         }
 
-        ret = Action.removeNops(0, ret, version, 0, path);
+        ret = Action.removeNops(0, ret, version, path);
         List<Action> reta = new ArrayList<>();
         for (Object o : ret) {
             if (o instanceof Action) {
@@ -591,7 +588,7 @@ public class ActionListReader {
         return true;
     }
 
-    private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
+    private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
             SWFInputStream sis, List<Action> actions, List<Long> nextOffsets,
             long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
 
@@ -646,7 +643,6 @@ public class ActionListReader {
                     listeners.get(i).progress(AppStrings.translate("disassemblingProgress.reading"), pos, length);
                 }
 
-                a.containerSWFOffset = containerSWFOffset;
                 a.setAddress(ip, version, false);
 
                 if (a instanceof ActionPush && cpool != null) {
@@ -677,7 +673,7 @@ public class ActionListReader {
                         if (size != 0) {
                             long ip2 = ip + actionLengthWithHeader;
                             //long endIp2 = ip + actionLengthWithHeader + size;
-                            readActionListAtPos(listeners, containerSWFOffset, cpool,
+                            readActionListAtPos(listeners, cpool,
                                     sis, actions, nextOffsets,
                                     ip2, startIp, endIp, version, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
@@ -706,7 +702,7 @@ public class ActionListReader {
         }
     }
 
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, ActionLocalData localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -879,7 +875,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new Stack<GraphTargetItem>(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -939,7 +935,7 @@ public class ActionListReader {
 
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, prepareLocalBranch(localData), substack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
             }
 
             if (newip > -1) {

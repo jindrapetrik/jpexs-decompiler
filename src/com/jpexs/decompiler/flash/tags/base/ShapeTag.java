@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
@@ -36,8 +37,8 @@ import java.util.Set;
  */
 public abstract class ShapeTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public ShapeTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract SHAPEWITHSTYLE getShapes();

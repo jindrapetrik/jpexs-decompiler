@@ -14,21 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.helpers.ByteArrayRange;
-import java.io.IOException;
+/**
+ *
+ * @author JPEXS
+ */
+public enum TreePanelMode {
 
-public class JPEGTablesTag extends Tag {
-
-    public static final int ID = 8;
-    @Internal
-    public byte[] jpegData;
-
-    public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "JPEGTables", data);
-        jpegData = sis.readBytesEx(sis.available(), "jpegData");
-    }
+    TAG_TREE, DUMP_TREE
 }

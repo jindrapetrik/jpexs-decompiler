@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -84,12 +85,11 @@ public class CSMTextSettingsTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public CSMTextSettingsTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "CSMTextSettings", pos, length);
+    public CSMTextSettingsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "CSMTextSettings", data);
         textID = sis.readUI16("textID");
         useFlashType = (int) sis.readUB(2, "useFlashType");
         gridFit = (int) sis.readUB(3, "gridFit");

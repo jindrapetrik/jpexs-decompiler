@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.helpers.ByteArrayRange;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,8 @@ import java.util.List;
  */
 public abstract class CharacterIdTag extends Tag {
 
-    public CharacterIdTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public CharacterIdTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract int getCharacterId();

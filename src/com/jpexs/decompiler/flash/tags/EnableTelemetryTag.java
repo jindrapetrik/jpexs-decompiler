@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -67,12 +68,11 @@ public class EnableTelemetryTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public EnableTelemetryTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "", pos, length);
+    public EnableTelemetryTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "", data);
         reserved = (int) sis.readUB(16, "reserved");
         if (sis.available() > 0) {
             passwordHash = sis.readBytesEx(32, "passwordHash");

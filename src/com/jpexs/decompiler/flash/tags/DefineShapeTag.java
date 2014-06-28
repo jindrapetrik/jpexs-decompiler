@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;
@@ -64,8 +65,8 @@ public class DefineShapeTag extends ShapeTag {
         return shapeBounds;
     }
 
-    public DefineShapeTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineShape", pos, length);
+    public DefineShapeTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineShape", data);
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
         shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");

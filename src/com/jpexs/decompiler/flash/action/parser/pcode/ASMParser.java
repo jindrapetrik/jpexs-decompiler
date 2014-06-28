@@ -133,12 +133,11 @@ import java.util.logging.Logger;
 
 public class ASMParser {
 
-    public static List<Action> parse(long containerSWFOffset, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public static List<Action> parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
-        cpool.containerSWFOffset = containerSWFOffset;
         cpool.setAddress(address, version, false);
         address += cpool.getBytes(version).length;
         list.add(cpool);
@@ -180,11 +179,9 @@ public class ASMParser {
                     a = null;
                 }
                 if (a instanceof ActionNop) {
-                    a.containerSWFOffset = containerSWFOffset;
                     a.setAddress(address, version, false);
                     address += 1;
                 } else if (a != null) {
-                    a.containerSWFOffset = containerSWFOffset;
                     a.setAddress(address, version, false);
                     address += a.getBytes(version).length;
                 }
@@ -446,7 +443,7 @@ public class ASMParser {
         }
     }
 
-    public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
+    public static List<Action> parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version);
 
@@ -459,7 +456,7 @@ public class ASMParser {
 
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
-        List<Action> ret = parse(containerSWFOffset, ignoreNops, labels, address, lexer, constantPool, version);
+        List<Action> ret = parse(ignoreNops, labels, address, lexer, constantPool, version);
         List<Action> links = Action.getActionsAllIfsOrJumps(ret);
         //Action.setActionsAddresses(ret, address, version);
         for (Action link : links) {

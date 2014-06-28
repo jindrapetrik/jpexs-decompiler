@@ -54,11 +54,6 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         return swf;
     }
 
-    @Override
-    public long getPos() {
-        return pos;
-    }
-
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, long containerOffset, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
@@ -169,7 +164,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getPos() + 4, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     /**
@@ -191,7 +186,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + 4, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
             return list;
 
         } catch (InterruptedException ex) {
