@@ -512,11 +512,13 @@ public final class SWF implements TreeItem, Timelined {
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
-        sis.dumpInfo = dumpInfo;
+        if (Configuration.dumpInfoCollecting.get()) {
+            sis.dumpInfo = dumpInfo;
+        }
         sis.readBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
         fileSize = sis.readUI32("fileSize");
-        sis.dumpInfo.lengthBytes = fileSize;
+        dumpInfo.lengthBytes = fileSize;
         if (listener != null) {
             sis.addPercentListener(listener);
         }

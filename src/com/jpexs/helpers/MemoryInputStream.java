@@ -27,7 +27,6 @@ public class MemoryInputStream extends SeekableInputStream {
 
     private final byte[] buffer;
     private long pos;
-    private int count;
     private int startPos;
     private int maxLength;
 
@@ -51,10 +50,6 @@ public class MemoryInputStream extends SeekableInputStream {
         }
     }
 
-    public int getCount() {
-        return count;
-    }
-
     public byte[] getAllRead() {
         return buffer;
     }
@@ -75,11 +70,7 @@ public class MemoryInputStream extends SeekableInputStream {
 
     @Override
     public int read() throws IOException {
-        if (pos > count) {
-            count = (int) pos;
-        }
-
-        if (pos < length()) {
+        if (pos < maxLength) {
             int ret = buffer[(int) pos + startPos] & 0xff;
             pos++;
             return ret;
@@ -88,10 +79,18 @@ public class MemoryInputStream extends SeekableInputStream {
         return -1;
     }
 
-    private int length() {
-        return maxLength;
+    @Override
+    public int read(byte[] bytes) throws IOException {
+        if (pos < maxLength) {
+            int toRead = Math.min(available(), bytes.length);
+            System.arraycopy(buffer, (int) pos + startPos, bytes, 0, toRead);
+            pos += toRead;
+            return toRead;
+        }
+        
+        return -1;
     }
-
+    
     @Override
     public int available() throws IOException {
         return maxLength - (int) pos;

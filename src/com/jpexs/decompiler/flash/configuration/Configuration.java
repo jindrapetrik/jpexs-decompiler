@@ -94,6 +94,10 @@ public class Configuration {
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> dumpView = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static final ConfigurationItem<Boolean> dumpInfoCollecting = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;

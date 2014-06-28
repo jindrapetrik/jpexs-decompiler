@@ -127,12 +127,13 @@ public class PlayerControls extends JPanel implements ActionListener {
     }
 
     private void update() {
+        if (!display.isLoaded()) {
+            return;
+        }
+
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                if (!display.isLoaded()) {
-                    return;
-                }
                 int totalFrames = display.getTotalFrames();
                 int currentFrame = display.getCurrentFrame();
                 int frameRate = display.getFrameRate();

@@ -310,6 +310,18 @@ public class SWFInputStream implements AutoCloseable {
         }
     }
 
+    private void informListeners() {
+        if (listeners.size() > 0 && percentMax > 0) {
+            int percent = (int) (getPos() * 100 / percentMax);
+            if (lastPercent != percent) {
+                for (ProgressListener pl : listeners) {
+                    pl.progress(percent);
+                }
+                lastPercent = percent;
+            }
+        }
+    }
+    
     public void setPercentMax(long percentMax) {
         this.percentMax = percentMax;
     }
@@ -410,15 +422,7 @@ public class SWFInputStream implements AutoCloseable {
     private int lastPercent = -1;
 
     private int readNoBitReset() throws IOException, EndOfStreamException {
-        if (listeners.size() > 0 && percentMax > 0) {
-            int percent = (int) (getPos() * 100 / percentMax);
-            if (lastPercent != percent) {
-                for (ProgressListener pl : listeners) {
-                    pl.progress(percent);
-                }
-                lastPercent = percent;
-            }
-        }
+        informListeners();
         int r = is.read();
         if (r == -1) {
             throw new EndOfStreamException();
@@ -694,10 +698,14 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return new byte[0];
         }
+        
+        informListeners();
+        bitPos = 0;
         byte[] ret = new byte[(int) count];
-        for (int i = 0; i < count; i++) {
-            ret[i] = (byte) readEx();
+        if (is.read(ret) != count) {
+            throw new EndOfStreamException();
         }
+
         return ret;
     }
 
@@ -960,7 +968,7 @@ public class SWFInputStream implements AutoCloseable {
         public Tag call() throws Exception {
             try {
                 Tag t = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
-                if (t != null) {
+                if (dumpInfo!= null && t != null) {
                     dumpInfo.name = t.getName();
                 }
                 return t;
@@ -1004,7 +1012,7 @@ public class SWFInputStream implements AutoCloseable {
                 tag = null;
             }
             DumpInfo di = dumpInfo;
-            if (tag != null) {
+            if (di != null && tag != null) {
                 di.name = tag.getName();
             }
             endDumpLevel(tag == null ? null : tag.getId());

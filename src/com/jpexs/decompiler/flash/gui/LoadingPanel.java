@@ -61,7 +61,7 @@ public class LoadingPanel extends JPanel {
 
     private synchronized void redrawImage(int size) {
         if (drawTimer != null) {
-            drawTimer.cancel();;
+            drawTimer.cancel();
             drawTimer = null;
         }
         BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
@@ -105,12 +105,14 @@ public class LoadingPanel extends JPanel {
 
             @Override
             public void run() {
-                double rot2 = rotation - Math.PI * 2 / segments;
-                if (rot2 < 0) {
-                    rot2 += Math.PI * 2;
+                if (isVisible()) {
+                    double rot2 = rotation - Math.PI * 2 / segments;
+                    if (rot2 < 0) {
+                        rot2 += Math.PI * 2;
+                    }
+                    setRotation(rot2);
+                    repaint();
                 }
-                setRotation(rot2);
-                repaint();
             }
         }, idelay, idelay);
     }
