@@ -383,7 +383,7 @@ public class SWFInputStream implements AutoCloseable {
             }
             DumpInfo di = new DumpInfo(name, type, null, startByte, bitPos, 0, 0);
             di.parent = dumpInfo;
-            dumpInfo.childInfos.add(di);
+            dumpInfo.getChildInfos().add(di);
             dumpInfo = di;
         }
     }

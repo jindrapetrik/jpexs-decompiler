@@ -37,7 +37,7 @@ public class DumpTreeModel implements TreeModel {
         for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
                 swf.dumpInfo.name = swf.getFileTitle();
-                root.childInfos.add(swf.dumpInfo);
+                root.getChildInfos().add(swf.dumpInfo);
             }
         }
         this.root = root;
@@ -50,17 +50,17 @@ public class DumpTreeModel implements TreeModel {
 
     @Override
     public Object getChild(Object o, int i) {
-        return ((DumpInfo) o).childInfos.get(i);
+        return ((DumpInfo) o).getChildInfos().get(i);
     }
 
     @Override
     public int getChildCount(Object o) {
-        return ((DumpInfo) o).childInfos.size();
+        return ((DumpInfo) o).getChildInfos().size();
     }
 
     @Override
     public boolean isLeaf(Object o) {
-        return ((DumpInfo) o).childInfos.isEmpty();
+        return ((DumpInfo) o).getChildInfos().isEmpty();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DumpTreeModel implements TreeModel {
 
     @Override
     public int getIndexOfChild(Object o, Object o1) {
-        return ((DumpInfo) o).childInfos.indexOf(o1);
+        return ((DumpInfo) o).getChildInfos().indexOf(o1);
     }
 
     @Override

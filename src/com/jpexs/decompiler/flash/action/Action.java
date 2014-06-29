@@ -900,7 +900,7 @@ public class Action implements GraphSourceItem {
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
-                            System.gc();
+                            Helper.freeMem();
                         }
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[]{
