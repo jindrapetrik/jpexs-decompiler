@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
 import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
 import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -85,12 +86,11 @@ public class FontTextureInfo extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public FontTextureInfo(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "FontTextureInfo", pos, length);
+    public FontTextureInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "FontTextureInfo", data);
         textureID = sis.readUI32("textureID");
         textureFormat = sis.readUI16("textureFormat");
         int fileNameLen = sis.readUI8("fileNameLen");

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -67,12 +68,11 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public RemoveObjectTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "RemoveObject", pos, length);
+    public RemoveObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "RemoveObject", data);
         characterId = sis.readUI16("characterId");
         depth = sis.readUI16("depth");
     }

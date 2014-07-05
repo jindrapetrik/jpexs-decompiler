@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -58,12 +59,11 @@ public class ProtectTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public ProtectTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "Protect", pos, length);
+    public ProtectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "Protect", data);
         if (sis.available() > 0) {
             passwordHash = sis.readString("passwordHash");
         } else {

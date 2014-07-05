@@ -107,7 +107,6 @@ public class Action implements GraphSourceItem {
      * Length of action data
      */
     public int actionLength;
-    public long containerSWFOffset;
     private long address;
 
     public static final String[] reservedWords = {
@@ -129,9 +128,7 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-    public long getFileAddress() {
-        return containerSWFOffset + getAddress();
-    }
+
     /**
      * Names of ActionScript properties
      */
@@ -425,12 +422,11 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @param writer
-     * @param swfPos
      * @param path
      * @return HilightedTextWriter
      */
-    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ScriptExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
-        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, exportMode, writer, swfPos, path);
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
+        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, exportMode, writer, path);
     }
 
     /**
@@ -443,11 +439,10 @@ public class Action implements GraphSourceItem {
      * @param constantPool Constant pool
      * @param version SWF version
      * @param hex Add hexadecimal?
-     * @param swfPos
      * @param path
      * @return HilightedTextWriter
      */
-    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
+    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -905,7 +900,7 @@ public class Action implements GraphSourceItem {
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
-                            System.gc();
+                            Helper.freeMem();
                         }
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[]{
@@ -1231,7 +1226,7 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-    public static List<Action> removeNops(long address, List<Action> actions, int version, long swfPos, String path) {
+    public static List<Action> removeNops(long address, List<Action> actions, int version, String path) {
         List<Action> ret = actions;
         if (true) {
             //return ret;
@@ -1239,9 +1234,9 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ScriptExportMode.PCODE, writer, swfPos, path);
+            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ScriptExportMode.PCODE, writer, path);
             s = writer.toString();
-            ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);
+            ret = ASMParser.parse(address, true, s, SWF.DEFAULT_VERSION, false);
         } catch (IOException | ParseException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error. path: " + path, ex);
         }

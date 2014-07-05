@@ -202,7 +202,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 }
             }
 
-            System.gc();
             Main.stopWork();
 
             searchPanel.setSearchText(txt);

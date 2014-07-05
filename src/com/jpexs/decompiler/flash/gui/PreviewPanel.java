@@ -683,8 +683,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(swf, 0, 0);
-                        actions = ASMParser.parse(0, 0, false,
+                        doa = new DoActionTag(swf, null);
+                        actions = ASMParser.parse(0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
@@ -703,7 +703,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         doa.writeTag(sos2);
                         new ShowFrameTag(swf).writeTag(sos2);
 
-                        actions = ASMParser.parse(0, 0, false,
+                        actions = ASMParser.parse(0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
@@ -730,7 +730,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         doa.writeTag(sos2);
                         new ShowFrameTag(swf).writeTag(sos2);
 
-                        actions = ASMParser.parse(0, 0, false,
+                        actions = ASMParser.parse(0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
@@ -774,7 +774,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         doa.writeTag(sos2);
                         new ShowFrameTag(swf).writeTag(sos2);
 
-                        actions = ASMParser.parse(0, 0, false,
+                        actions = ASMParser.parse(0, false,
                                 "StopSounds\n"
                                 + "Stop", swf.version, false);
                         doa.setActions(actions);

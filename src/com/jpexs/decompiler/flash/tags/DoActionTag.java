@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,12 +51,11 @@ public class DoActionTag extends Tag implements ASMSource {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws java.io.IOException
      */
-    public DoActionTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DoAction", pos, length);
+    public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DoAction", data);
         //do not store actionBytes. Disassebler will use the original SWF stream in this case
         sis.readBytesEx(sis.available(), "actionBytes");
     }
@@ -64,11 +64,10 @@ public class DoActionTag extends Tag implements ASMSource {
      * Constructor
      *
      * @param swf
-     * @param length
-     * @param pos
+     * @param data
      */
-    public DoActionTag(SWF swf, long pos, int length) {
-        super(swf, ID, "DoAction", pos, length);
+    public DoActionTag(SWF swf, ByteArrayRange data) {
+        super(swf, ID, "DoAction", data);
         actionBytes = new byte[0];
     }
 
@@ -95,7 +94,7 @@ public class DoActionTag extends Tag implements ASMSource {
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getDataPos(), toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     /**
@@ -125,13 +124,13 @@ public class DoActionTag extends Tag implements ASMSource {
             SWFInputStream rri;
             if (actionBytes == null) {
                 prevLength = (int) getDataPos();
-                rri = new SWFInputStream(swf, swf.uncompressedData);
+                rri = new SWFInputStream(swf, getOriginalRange().array);
                 rri.seek(prevLength);
             } else {
                 prevLength = 0;
                 rri = new SWFInputStream(swf, actionBytes);
             }
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getDataPos() - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

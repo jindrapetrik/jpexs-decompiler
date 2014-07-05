@@ -434,8 +434,7 @@ public class Main {
             mainFrame.getPanel().closeAll();
         }
         if (Main.sourceInfos.isEmpty()) {
-            Cache.clearAll();
-            System.gc();
+            Helper.freeMem();
             showModeFrame();
             return true;
         } else {
@@ -501,8 +500,7 @@ public class Main {
             sourceInfos.clear();
             mainFrame.getPanel().closeAll();
             mainFrame.setVisible(false);
-            Cache.clearAll();
-            System.gc();
+            Helper.freeMem();
         }
 
         View.execInEventDispatch(new Runnable() {
@@ -870,31 +868,11 @@ public class Main {
     }
 
     /**
-     * This may help to free some memory when not needed (maybe?)
-     */
-    private static void startFreeMemThread() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        Thread.sleep(5000);
-                        System.gc();
-                    }
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            }
-        }.start();
-    }
-
-    /**
      * @param args the command line arguments
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
         AppStrings.setResourceClass(MainFrame.class);
-        startFreeMemThread();
         initLogging(Configuration.debugMode.get());
         initLang();
 

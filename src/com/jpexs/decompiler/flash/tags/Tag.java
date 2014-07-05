@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -56,16 +57,6 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      */
     @Internal
     public boolean forceWriteAsLong = false;
-    /**
-     * Original position in the SWF file
-     */
-    @Internal
-    private final long pos;
-    /**
-     * Original tag length
-     */
-    @Internal
-    private final int length;
     protected String tagName;
     @Internal
     protected transient SWF swf;
@@ -73,6 +64,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     protected transient Timelined timelined;
     @Internal
     private boolean modified;
+    /**
+     * Original tag data
+     */
+    @Internal
+    private ByteArrayRange originalData;
 
     public String getTagName() {
         return tagName;
@@ -119,19 +115,17 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      * @param swf The SWF
      * @param id Tag type identifier
      * @param name Tag name
-     * @param pos Original position in the SWF file
-     * @param length Original tag length
+     * @param data Original tag data
      */
-    public Tag(SWF swf, int id, String name, long pos, int length) {
+    public Tag(SWF swf, int id, String name, ByteArrayRange data) {
         this.id = id;
         this.tagName = name;
-        this.pos = pos;
-        this.length = length;
+        this.originalData = data;
         this.swf = swf;
         if (swf == null) {
             throw new Error("swf parameter cannot be null.");
         }
-        if (pos == 0) { // it is tag build by constructor        
+        if (data == null) { // it is tag build by constructor        
             modified = true;
         }
     }
@@ -336,7 +330,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
             sos.write(newHeaderData);
             sos.write(newData);
         } else {
-            sos.write(swf.uncompressedData, (int) pos, length);
+            sos.write(originalData.array, originalData.pos, originalData.length);
         }
     }
 
@@ -359,24 +353,24 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
         return getOriginalData();
     }
 
-    public final int getOriginalLength() {
-        return length;
+    public final ByteArrayRange getOriginalRange() {
+        return originalData;
     }
 
     public final byte[] getOriginalData() {
         // todo honfika: do not copy data
         int dataLength = getOriginalDataLength();
         byte[] data = new byte[dataLength];
-        System.arraycopy(swf.uncompressedData, (int) (pos + length - dataLength), data, 0, dataLength);
+        System.arraycopy(originalData.array, (int) (originalData.pos + originalData.length - dataLength), data, 0, dataLength);
         return data;
     }
 
     public final int getOriginalDataLength() {
-        return length - (isLongOriginal() ? 6 : 2);
+        return originalData.length - (isLongOriginal() ? 6 : 2);
     }
 
-    public final boolean isLongOriginal() {
-        int shortLength = swf.uncompressedData[(int) pos] & 0x003F;
+    private final boolean isLongOriginal() {
+        int shortLength = originalData.array[(int) originalData.pos] & 0x003F;
         return shortLength == 0x3f;
     }
 
@@ -389,15 +383,24 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     public long getPos() {
-        return pos;
+        return originalData.pos;
     }
 
     public long getDataPos() {
-        return pos + (isLongOriginal() ? 6 : 2);
+        return originalData.pos + (isLongOriginal() ? 6 : 2);
     }
 
     public void setModified(boolean value) {
         modified = value;
+    }
+
+    public void createOriginalData() {
+        byte[] data = getData();
+        byte[] headerData = getHeader(data);
+        byte[] tagData = new byte[data.length + headerData.length];
+        System.arraycopy(headerData, 0, tagData, 0, headerData.length);
+        System.arraycopy(data, 0, tagData, headerData.length, data.length);
+        originalData = new ByteArrayRange(tagData, 0, tagData.length);
     }
 
     public boolean isModified() {

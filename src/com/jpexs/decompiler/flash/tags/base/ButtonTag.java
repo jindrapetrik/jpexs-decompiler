@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
@@ -42,8 +43,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     public static int FRAME_DOWN = 2;
     public static int FRAME_HITTEST = 3;
 
-    public ButtonTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public ButtonTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract List<BUTTONRECORD> getRecords();

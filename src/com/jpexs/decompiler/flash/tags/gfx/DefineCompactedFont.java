@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
@@ -84,12 +85,11 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineCompactedFont(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineCompactedFont", pos, length);
+    public DefineCompactedFont(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineCompactedFont", data);
 
         fontId = sis.readUI16("fontId");
         fonts = new ArrayList<>();

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
@@ -120,7 +121,7 @@ public class SWFSearch {
                     }
                 }
             } catch (OutOfMemoryError ome) {
-                System.gc();
+                Helper.freeMem();
             } catch (Exception | Error ex) {
             }
         }

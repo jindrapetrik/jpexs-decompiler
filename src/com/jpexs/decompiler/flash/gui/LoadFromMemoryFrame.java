@@ -148,7 +148,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                         }
 
                     } catch (OutOfMemoryError ome) {
-                        System.gc();
+                        Helper.freeMem();
                     } catch (Exception | Error ex) {
                     }
 

@@ -733,7 +733,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     if (text.trim().startsWith("#hexdata")) {
                         src.setActionBytes(Helper.getBytesFromHexaText(text));
                     } else {
-                        src.setActions(ASMParser.parse(0, src.getPos(), true, text, src.getSwf().version, false));
+                        src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
                     }
                     src.setModified();
                     setSource(this.src, false);

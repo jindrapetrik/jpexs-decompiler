@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.ByteArrayOutputStream;
@@ -126,12 +127,11 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineMorphShapeTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineMorphShape", pos, length);
+    public DefineMorphShapeTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineMorphShape", data);
         characterId = sis.readUI16("characterId");
         startBounds = sis.readRECT("startBounds");
         endBounds = sis.readRECT("endBounds");

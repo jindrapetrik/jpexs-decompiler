@@ -357,12 +357,14 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
          deobfuscationCommandButton.setEnabled(hasAbc);*/
     }
 
-    private void saveAs(SWF swf, SaveFileMode mode) {
+    private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
             swf.fileTitle = null;
             mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
             saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -481,17 +483,19 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
+                boolean saved = false;
                 if (snode.binaryData != null) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
                         swf.saveTo(baos);
                         snode.binaryData.binaryData = baos.toByteArray();
                         snode.binaryData.setModified(true);
+                        saved = true;
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
                 } else if (swf.file == null) {
-                    saveAs(swf, SaveFileMode.SAVEAS);
+                    saved = saveAs(swf, SaveFileMode.SAVEAS);
                 } else {
                     try {
                         Main.saveFile(swf, swf.file);
@@ -500,13 +504,16 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                         View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                swf.clearModified();
+                if (saved) {
+                    swf.clearModified();
+                }
             }
             break;
             case ACTION_SAVE_AS: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                saveAs(swf, SaveFileMode.SAVEAS);
-                swf.clearModified();
+                if (saveAs(swf, SaveFileMode.SAVEAS)) {
+                    swf.clearModified();
+                }
             }
             break;
             case ACTION_SAVE_AS_EXE: {

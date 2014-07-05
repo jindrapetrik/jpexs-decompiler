@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,12 +56,11 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DoInitActionTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DoInitAction", pos, length);
+    public DoInitActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DoInitAction", data);
         spriteId = sis.readUI16("spriteId");
         //do not store actionBytes. Disassebler will use the original SWF stream in this case
         sis.readBytesEx(sis.available(), "actionBytes");
@@ -108,7 +108,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getDataPos() + 2, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     @Override
@@ -118,13 +118,13 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
             SWFInputStream rri;
             if (actionBytes == null) {
                 prevLength = (int) (getDataPos() + 2);
-                rri = new SWFInputStream(swf, swf.uncompressedData);
+                rri = new SWFInputStream(swf, getOriginalRange().array);
                 rri.seek(prevLength);
             } else {
                 prevLength = 0;
                 rri = new SWFInputStream(swf, actionBytes);
             }
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getDataPos() + 2 - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

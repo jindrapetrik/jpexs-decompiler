@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -67,8 +68,8 @@ import org.w3c.dom.Element;
  */
 public abstract class TextTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public TextTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public TextTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract MATRIX getTextMatrix();

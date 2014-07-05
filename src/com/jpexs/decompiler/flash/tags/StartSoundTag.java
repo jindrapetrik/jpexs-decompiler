@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,12 +60,11 @@ public class StartSoundTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public StartSoundTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "StartSound", pos, length);
+    public StartSoundTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "StartSound", data);
         soundId = sis.readUI16("soundId");
         soundInfo = sis.readSOUNDINFO("soundInfo");
     }

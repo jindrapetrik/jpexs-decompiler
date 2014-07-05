@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,11 +46,11 @@ public class FileAttributesTag extends Tag {
     public static final int ID = 69;
 
     public FileAttributesTag(SWF swf) {
-        super(swf, ID, "FileAttributes", 0, 0);
+        super(swf, ID, "FileAttributes", null);
     }
 
-    public FileAttributesTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "FileAttributes", pos, length);
+    public FileAttributesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "FileAttributes", data);
         reserved1 = sis.readUB(1, "reserved1") == 1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1, "useDirectBlit") != 0;

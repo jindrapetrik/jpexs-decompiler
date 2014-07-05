@@ -76,7 +76,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
                 + "Jump loc0084\n"
                 + "loc0084:";
         try {
-            List<Action> actions = ASMParser.parse(0, 0, true, actionsString, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));

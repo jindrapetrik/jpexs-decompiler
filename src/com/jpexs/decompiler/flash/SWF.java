@@ -308,7 +308,7 @@ public final class SWF implements TreeItem, Timelined {
             Tag t = tags.get(i);
             if (t instanceof DefineSpriteTag) {
                 if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
-                    tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getPos(), t.getOriginalLength(), null));
+                    tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getOriginalRange(), null));
                 }
             }
         }
@@ -385,9 +385,7 @@ public final class SWF implements TreeItem, Timelined {
             sos.writeUI8(frameRate);
             sos.writeUI16(frameCount);
 
-            Map<Tag, Long> tagPositions = new HashMap<>();
-            Map<Tag, Integer> tagLengths = new HashMap<>();
-            sos.writeTags(tags, tagPositions, tagLengths);
+            sos.writeTags(tags);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -453,6 +451,7 @@ public final class SWF implements TreeItem, Timelined {
     public void clearModified() {
         for (Tag tag : tags) {
             if (tag.isModified()) {
+                tag.createOriginalData();
                 tag.setModified(false);
             }
         }
@@ -513,11 +512,13 @@ public final class SWF implements TreeItem, Timelined {
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
-        sis.dumpInfo = dumpInfo;
+        if (Configuration.dumpInfoCollecting.get()) {
+            sis.dumpInfo = dumpInfo;
+        }
         sis.readBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
         fileSize = sis.readUI32("fileSize");
-        sis.dumpInfo.lengthBytes = fileSize;
+        dumpInfo.lengthBytes = fileSize;
         if (listener != null) {
             sis.addPercentListener(listener);
         }
@@ -543,7 +544,7 @@ public final class SWF implements TreeItem, Timelined {
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
-                if (tag.getOriginalLength() > 2 && Tag.getRequiredTags().contains(tag.getId())) {
+                if (tag.getOriginalDataLength() > 0 && Tag.getRequiredTags().contains(tag.getId())) {
                     hasNonUnknownTag = true;
                 }
             }
@@ -2120,7 +2121,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
         for (ASMSource src : actionsMap.keySet()) {
-            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
+            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, ""/*FIXME path*/));
             src.setActions(actionsMap.get(src));
             src.setModified();
         }

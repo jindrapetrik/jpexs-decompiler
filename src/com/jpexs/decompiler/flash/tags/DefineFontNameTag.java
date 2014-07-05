@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 public class DefineFontNameTag extends Tag {
@@ -29,8 +30,8 @@ public class DefineFontNameTag extends Tag {
     public String fontCopyright;
     public static final int ID = 88;
 
-    public DefineFontNameTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineFontName", pos, length);
+    public DefineFontNameTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineFontName", data);
         fontId = sis.readUI16("fontId");
         fontName = sis.readString("fontName");
         fontCopyright = sis.readString("fontCopyright");

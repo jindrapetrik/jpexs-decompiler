@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.IOException;
@@ -28,8 +29,8 @@ import java.io.InputStream;
  */
 public abstract class ImageTag extends CharacterTag {
 
-    public ImageTag(SWF swf, int id, String name, long pos, int length) {
-        super(swf, id, name, pos, length);
+    public ImageTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
     }
 
     public abstract InputStream getImageData();

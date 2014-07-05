@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -83,12 +84,11 @@ public class ExporterInfoTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public ExporterInfoTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "ExporterInfo", pos, length);
+    public ExporterInfoTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "ExporterInfo", data);
         this.version = sis.readUI16("version");
         if (this.version >= 0x10a) {
             flags = sis.readUI32("flags");

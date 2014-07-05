@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,7 +48,7 @@ public class ExportAssetsTag extends Tag {
     public static final int ID = 56;
 
     public ExportAssetsTag(SWF swf) {
-        super(swf, ID, "ExportAssets", 0, 0);
+        super(swf, ID, "ExportAssets", null);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }
@@ -56,12 +57,11 @@ public class ExportAssetsTag extends Tag {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public ExportAssetsTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "ExportAssets", pos, length);
+    public ExportAssetsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "ExportAssets", data);
         int count = sis.readUI16("count");
         tags = new ArrayList<>();
         names = new ArrayList<>();

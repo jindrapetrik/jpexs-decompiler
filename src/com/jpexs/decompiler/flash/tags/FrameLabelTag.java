@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,8 +37,8 @@ public class FrameLabelTag extends Tag {
         return namedAnchor;
     }
 
-    public FrameLabelTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "FrameLabel", pos, length);
+    public FrameLabelTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "FrameLabel", data);
         name = sis.readString("name");
         if (sis.available() > 0) {
             if (sis.readUI8("namedAnchor") == 1) {

@@ -40,7 +40,7 @@ public class DumpInfo {
 
     public DumpInfo parent;
 
-    public List<DumpInfo> childInfos = new ArrayList<>();
+    private List<DumpInfo> childInfos;
 
     public DumpInfo(String name, String type, Object value, long startByte, long lengthBytes) {
 
@@ -62,6 +62,13 @@ public class DumpInfo {
         this.lengthBits = lengthBits;
     }
 
+    public List<DumpInfo> getChildInfos() {
+        if (childInfos == null) {
+            childInfos = new ArrayList<>();
+        }
+        return childInfos;
+    }
+    
     @Override
     public String toString() {
         String value = previewValue == null ? "" : previewValue.toString();

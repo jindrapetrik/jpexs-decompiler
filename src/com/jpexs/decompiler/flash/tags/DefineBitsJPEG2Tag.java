@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,14 +69,14 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         return null;
     }
 
-    public DefineBitsJPEG2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsJPEG2", pos, length);
+    public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineBitsJPEG2", data);
         characterID = sis.readUI16("characterID");
         imageData = sis.readBytesEx(sis.available(), "imageData");
     }
 
-    public DefineBitsJPEG2Tag(SWF swf, long pos, int length, int characterID, byte[] imageData) throws IOException {
-        super(swf, ID, "DefineBitsJPEG2", pos, length);
+    public DefineBitsJPEG2Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
+        super(swf, ID, "DefineBitsJPEG2", data);
         this.characterID = characterID;
         this.imageData = imageData;
     }

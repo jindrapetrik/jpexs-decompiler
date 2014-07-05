@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.helpers.ByteArrayRange;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,15 +52,14 @@ public class ShowFrameTag extends Tag {
      * Constructor
      *
      * @param swf
-     * @param length
-     * @param pos
+     * @param data
      */
-    public ShowFrameTag(SWF swf, long pos, int length) {
-        super(swf, ID, "ShowFrame", pos, length);
+    public ShowFrameTag(SWF swf, ByteArrayRange data) {
+        super(swf, ID, "ShowFrame", data);
     }
 
     public ShowFrameTag(SWF swf) {
-        super(swf, ID, "ShowFrame", 0, 0);
+        super(swf, ID, "ShowFrame", null);
     }
 
     public static boolean isNestedTagType(int tagTypeId) {

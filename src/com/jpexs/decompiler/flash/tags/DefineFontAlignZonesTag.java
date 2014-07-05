@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,8 +43,8 @@ public class DefineFontAlignZonesTag extends Tag {
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 
-    public DefineFontAlignZonesTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineFontAlignZones", pos, length);
+    public DefineFontAlignZonesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineFontAlignZones", data);
         fontID = sis.readUI16("fontID");
         CSMTableHint = (int) sis.readUB(2, "CSMTableHint");
         reserved = (int) sis.readUB(6, "reserved");

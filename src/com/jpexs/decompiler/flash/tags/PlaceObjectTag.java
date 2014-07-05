@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -100,12 +101,11 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public PlaceObjectTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject", pos, length);
+    public PlaceObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "PlaceObject", data);
         characterId = sis.readUI16("characterId");
         depth = sis.readUI16("depth");
         matrix = sis.readMatrix("matrix");
@@ -115,7 +115,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, "PlaceObject", 0, 0);
+        super(swf, ID, "PlaceObject", null);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

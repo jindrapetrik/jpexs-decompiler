@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.io.ByteArrayInputStream;
@@ -110,8 +111,8 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((int) c);
     }
 
-    public DefineFont3Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont3", pos, length);
+    public DefineFont3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineFont3", data);
         fontId = sis.readUI16("fontId");
         fontFlagsHasLayout = sis.readUB(1, "fontFlagsHasLayout") == 1;
         fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;

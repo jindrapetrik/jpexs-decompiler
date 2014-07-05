@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -107,8 +108,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
-    public DefineBitsLossless2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsLossless2", pos, length);
+    public DefineBitsLossless2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineBitsLossless2", data);
         characterID = sis.readUI16("characterID");
         bitmapFormat = sis.readUI8("bitmapFormat");
         bitmapWidth = sis.readUI16("bitmapWidth");

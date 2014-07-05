@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -97,12 +98,11 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public DefineButton2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineButton2", pos, length);
+    public DefineButton2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineButton2", data);
         buttonId = sis.readUI16("buttonId");
         reserved = (int) sis.readUB(7, "reserved");
         trackAsMenu = sis.readUB(1, "trackAsMenu") == 1;

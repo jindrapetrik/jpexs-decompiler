@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 public class RemoveObject2Tag extends Tag implements RemoveTag {
@@ -28,8 +29,8 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
     public int depth;
     public static final int ID = 28;
 
-    public RemoveObject2Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "RemoveObject2", pos, length);
+    public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "RemoveObject2", data);
         depth = sis.readUI16("depth");
     }
 

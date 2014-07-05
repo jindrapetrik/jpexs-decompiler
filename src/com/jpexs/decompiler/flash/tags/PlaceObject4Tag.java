@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -299,12 +300,11 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      * Constructor
      *
      * @param sis
-     * @param length
-     * @param pos
+     * @param data
      * @throws IOException
      */
-    public PlaceObject4Tag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject4", pos, length);
+    public PlaceObject4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "PlaceObject4", data);
         placeFlagHasClipActions = sis.readUB(1, "placeFlagHasClipActions") == 1;
         placeFlagHasClipDepth = sis.readUB(1, "placeFlagHasClipDepth") == 1;
         placeFlagHasName = sis.readUB(1, "placeFlagHasName") == 1;

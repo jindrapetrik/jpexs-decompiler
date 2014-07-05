@@ -127,10 +127,6 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         return swf;
     }
 
-    @Override
-    public long getPos() {
-        return pos;
-    }
     /**
      * Events to which this handler applies
      */
@@ -184,7 +180,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getPos() + hdrPos, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     /**
@@ -200,7 +196,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrPos, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

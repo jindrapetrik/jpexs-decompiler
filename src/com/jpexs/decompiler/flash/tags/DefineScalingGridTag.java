@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,8 +36,8 @@ public class DefineScalingGridTag extends Tag {
     public RECT splitter;
     public static final int ID = 78;
 
-    public DefineScalingGridTag(SWFInputStream sis, long pos, int length) throws IOException {
-        super(sis.getSwf(), ID, "DefineScalingGrid", pos, length);
+    public DefineScalingGridTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "DefineScalingGrid", data);
         characterId = sis.readUI16("characterId");
         splitter = sis.readRECT("splitter");
     }
