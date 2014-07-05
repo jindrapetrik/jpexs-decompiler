@@ -51,19 +51,23 @@ public class HexView extends JTable {
             JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
             int level = -1;
             if (col > 0 && highlightStarts != null) {
-                int idx = row * bytesInRow + ((col > bytesInRow) ? (col - bytesInRow - 1) : (col - 1));
-                for (int i = 0; i < highlightStarts.length; i++) {
-                    if (highlightStarts[i] <= idx && highlightEnds[i] >= idx) {
-                        level++;
-                    } else {
-                        break;
+                if(col!=bytesInRow+1){
+                    int idx = row * bytesInRow + ((col > bytesInRow + 1) ? (col - bytesInRow - 2) : (col - 1));
+                    for (int i = 0; i < highlightStarts.length; i++) {
+                        if (highlightStarts[i] <= idx && highlightEnds[i] >= idx) {
+                            level++;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
 
             if (level > -1) {
+                l.setForeground(Color.white);
                 l.setBackground(highlightColors[level % highlightColors.length]);
             } else {
+                l.setForeground(Color.black);
                 l.setBackground(row % 2 == 0 ? bgColor : bgColorAlternate);
             }
 
@@ -94,7 +98,7 @@ public class HexView extends JTable {
 
             @Override
             public int getColumnCount() {
-                return 2 * bytesInRow + 1;
+                return 2 * bytesInRow + 1 + 1;
             }
 
             @Override
@@ -117,8 +121,10 @@ public class HexView extends JTable {
                         return String.format("%02X", data[pos]);
                     }
                     return null;
+                } else if (column == 1 + bytesInRow) {
+                    return null;
                 } else {
-                    int pos = row * bytesInRow + column - bytesInRow - 1;
+                    int pos = row * bytesInRow + column - bytesInRow - 1 - 1;
                     if (pos < data.length) {
                         return (char) data[pos];
                     }
@@ -146,8 +152,12 @@ public class HexView extends JTable {
             column.setMaxWidth(25);
             column.setCellRenderer(cellRenderer);
         }
+        
+        column = columnModel.getColumn(bytesInRow + 1);
+        column.setMaxWidth(10);
+        
         for (int i = 0; i < bytesInRow; i++) {
-            column = columnModel.getColumn(i + bytesInRow + 1);
+            column = columnModel.getColumn(i + bytesInRow + 1 + 1);
             column.setMaxWidth(10);
             column.setCellRenderer(cellRenderer);
         }
