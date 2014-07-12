@@ -1527,7 +1527,7 @@ public final class SWF implements TreeItem, Timelined {
         final Color fbackgroundColor = backgroundColor;
         final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
 
-            private final int pos = 0;
+            private int pos = 0;
 
             @Override
             public boolean hasNext() {
@@ -1544,7 +1544,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (!hasNext()) {
                     return null;
                 }
-                return frameToImageGet(ftim, fframes.get(pos), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false).getBufferedImage();
+                return frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false).getBufferedImage();
             }
         };
 
@@ -1565,7 +1565,7 @@ public final class SWF implements TreeItem, Timelined {
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            File f = new File(foutdir + File.separator + fframes.get(fi) + ".png");
+                            File f = new File(foutdir + File.separator + (fframes.get(fi)+1) + ".png");
                             ImageIO.write(frameImages.next(), "PNG", f);
                             ret.add(f);
                         }
