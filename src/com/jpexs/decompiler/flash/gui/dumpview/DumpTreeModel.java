@@ -55,12 +55,12 @@ public class DumpTreeModel implements TreeModel {
 
     @Override
     public int getChildCount(Object o) {
-        return ((DumpInfo) o).getChildInfos().size();
+        return ((DumpInfo) o).getChildCount();
     }
 
     @Override
     public boolean isLeaf(Object o) {
-        return ((DumpInfo) o).getChildInfos().isEmpty();
+        return ((DumpInfo) o).getChildCount() == 0;
     }
 
     @Override

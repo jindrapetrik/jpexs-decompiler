@@ -62,6 +62,10 @@ public class DumpInfo {
         this.lengthBits = lengthBits;
     }
 
+    public int getChildCount() {
+        return childInfos == null ? 0 : childInfos.size();
+    }
+    
     public List<DumpInfo> getChildInfos() {
         if (childInfos == null) {
             childInfos = new ArrayList<>();
