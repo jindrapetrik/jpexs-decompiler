@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -379,6 +380,7 @@ public class BitmapExporter extends ShapeExporterBase {
                         ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
                         double minX = rect.xMin;
                         double minY = rect.yMin;
+                        graphics.setComposite(AlphaComposite.SrcOver);
                         graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
 
