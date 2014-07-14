@@ -337,6 +337,7 @@ public class BitmapExporter extends ShapeExporterBase {
     protected void finalizePath() {
         if (path != null) {
             if (fillPaint != null) {
+                graphics.setComposite(AlphaComposite.SrcOver);
                 if (fillPaint instanceof MultipleGradientPaint) {
                     AffineTransform oldAf = graphics.getTransform();
                     if (fillPathPaint != null) {
@@ -380,7 +381,6 @@ public class BitmapExporter extends ShapeExporterBase {
                         ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
                         double minX = rect.xMin;
                         double minY = rect.yMin;
-                        graphics.setComposite(AlphaComposite.SrcOver);
                         graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
 
