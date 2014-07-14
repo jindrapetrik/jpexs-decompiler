@@ -358,6 +358,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     public final byte[] getOriginalData() {
+        if (originalData == null) {
+            return new byte[0];
+        }
         // todo honfika: do not copy data
         int dataLength = getOriginalDataLength();
         byte[] data = new byte[dataLength];
@@ -366,6 +369,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     public final int getOriginalDataLength() {
+        if (originalData == null) {
+            return 0;
+        }
+        
         return originalData.length - (isLongOriginal() ? 6 : 2);
     }
 

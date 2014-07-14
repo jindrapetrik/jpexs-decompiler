@@ -300,7 +300,7 @@ public class TagTree extends JTree implements ActionListener {
 
         final JMenuItem exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
-        exportSelectionMenuItem.addActionListener(this);
+        exportSelectionMenuItem.addActionListener(mainPanel);
         contextPopupMenu.add(exportSelectionMenuItem);
 
         final JMenuItem replaceSelectionMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
