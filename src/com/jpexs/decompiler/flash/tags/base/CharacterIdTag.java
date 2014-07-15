@@ -40,19 +40,10 @@ public abstract class CharacterIdTag extends Tag {
      */
     @Internal
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-    protected String className;
     protected String exportName;
 
     public void setExportName(String exportName) {
         this.exportName = exportName;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getClassName() {
-        return className;
     }
 
     @Override
@@ -60,9 +51,6 @@ public abstract class CharacterIdTag extends Tag {
         String nameAppend = "";
         if (exportName != null) {
             nameAppend = ": " + exportName;
-        }
-        if (className != null) {
-            nameAppend = ": " + className;
         }
         if (getCharacterId() != -1) {
             return super.getName() + " (" + getCharacterId() + nameAppend + ")";

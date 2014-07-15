@@ -123,7 +123,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      * If PlaceFlagHasClassName or (PlaceFlagHasImage and
      * PlaceFlagHasCharacter), Name of the class to place
      */
-    @Conditional("placeFlagHasClassName|(placeFlagHasImage,placeFlagHasCharacter)")
+    @Conditional("placeFlagHasClassName")
     public String className;
     /**
      * If PlaceFlagHasCharacter, ID of character to place
@@ -249,7 +249,8 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
             sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
             sos.writeUI16(depth);
-            if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+            
+            if (placeFlagHasClassName) {
                 sos.writeString(className);
             }
             if (placeFlagHasCharacter) {
@@ -323,7 +324,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasFilterList = sis.readUB(1, "placeFlagHasFilterList") == 1;
 
         depth = sis.readUI16("depth");
-        if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+        if (placeFlagHasClassName) {
             className = sis.readString("className");
         }
         if (placeFlagHasCharacter) {

@@ -228,6 +228,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasMatrix = sis.readUB(1, "placeFlagHasMatrix") == 1;
         placeFlagHasCharacter = sis.readUB(1, "placeFlagHasCharacter") == 1;
         placeFlagMove = sis.readUB(1, "placeFlagMove") == 1;
+        
         depth = sis.readUI16("depth");
         if (placeFlagHasCharacter) {
             characterId = sis.readUI16("characterId");

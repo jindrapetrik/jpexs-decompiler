@@ -643,8 +643,8 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
         for (Tag t : tags) {
-            if (t instanceof CharacterIdTag) {
-                CharacterIdTag ct = (CharacterIdTag) t;
+            if (t instanceof CharacterTag) {
+                CharacterTag ct = (CharacterTag) t;
                 if (classes.containsKey(ct.getCharacterId())) {
                     ct.setClassName(classes.get(ct.getCharacterId()));
                 }

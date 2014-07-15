@@ -25,7 +25,35 @@ import com.jpexs.helpers.ByteArrayRange;
  */
 public abstract class CharacterTag extends CharacterIdTag {
 
+    protected String className;
+
     public CharacterTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    @Override
+    public String getName() {
+        String nameAppend = "";
+        if (exportName != null) {
+            nameAppend = ": " + exportName;
+        }
+        if (className != null) {
+            nameAppend = ": " + className;
+        }
+        if (getCharacterId() != -1) {
+            return tagName + " (" + getCharacterId() + nameAppend + ")";
+        }
+        if (!nameAppend.isEmpty()) {
+            return tagName + " (" + nameAppend + ")";
+        }
+        return tagName;
     }
 }
