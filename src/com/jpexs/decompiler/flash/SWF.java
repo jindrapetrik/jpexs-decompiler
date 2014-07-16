@@ -1326,25 +1326,26 @@ public final class SWF implements TreeItem, Timelined {
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
                 fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-            } else if (ch instanceof ImageTag) {
-                ImageTag image = (ImageTag) ch;
-                String format = image.getImageFormat();
-                InputStream imageStream = image.getImageData();
-                byte[] imageData;
-                if (imageStream != null) {
-                    imageData = Helper.readStream(image.getImageData());
-                } else {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        ImageIO.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                    } catch (IOException ex) {
-                    }
-                    imageData = baos.toByteArray();
-                }
-                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                fos.write(Utf8Helper.getBytes("var image" + c + " = document.createElement(\"img\");\r\nimage" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
             } else {
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
+                if (ch instanceof ImageTag) {
+                    ImageTag image = (ImageTag) ch;
+                    String format = image.getImageFormat();
+                    InputStream imageStream = image.getImageData();
+                    byte[] imageData;
+                    if (imageStream != null) {
+                        imageData = Helper.readStream(image.getImageData());
+                    } else {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        try {
+                            ImageIO.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
+                        } catch (IOException ex) {
+                        }
+                        imageData = baos.toByteArray();
+                    }
+                    String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                    fos.write(Utf8Helper.getBytes("var imageObj" + c + " = document.createElement(\"img\");\r\nimageObj" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
+                }
                 if (ch instanceof DrawableTag) {
                     fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
                 }

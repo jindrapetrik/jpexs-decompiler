@@ -17,17 +17,36 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.awt.Shape;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class ImageTag extends CharacterTag {
+public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public ImageTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
@@ -81,5 +100,89 @@ public abstract class ImageTag extends CharacterTag {
     protected static Color multiplyAlpha(Color c) {
         float multiplier = c.getAlpha() == 0 ? 0 : 255.0f / c.getAlpha();
         return new Color(max255(c.getRed() * multiplier), max255(c.getGreen() * multiplier), max255(c.getBlue() * multiplier), c.getAlpha());
+    }
+
+    private SHAPEWITHSTYLE getShape() {
+        SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
+        shape.fillStyles = new FILLSTYLEARRAY();
+        shape.fillStyles.fillStyles = new FILLSTYLE[1];
+        FILLSTYLE fillStyle = new FILLSTYLE();
+        fillStyle.fillStyleType = FILLSTYLE.REPEATING_BITMAP;
+        fillStyle.bitmapId = getCharacterId();
+        MATRIX matrix = new MATRIX();
+        matrix.hasScale = true;
+        matrix.scaleX = ((int) SWF.unitDivisor) << 16;
+        matrix.scaleY = matrix.scaleX;
+        fillStyle.bitmapMatrix = matrix;
+        shape.fillStyles.fillStyles[0] = fillStyle;
+
+        shape.lineStyles = new LINESTYLEARRAY();
+        shape.lineStyles.lineStyles = new LINESTYLE[0];
+        shape.shapeRecords = new ArrayList<>();
+        StyleChangeRecord style = new StyleChangeRecord();
+        style.stateFillStyle0 = true;
+        style.fillStyle0 = 1;
+        style.stateMoveTo = true;
+        shape.shapeRecords.add(style);
+        RECT rect = getRect();
+        StraightEdgeRecord top = new StraightEdgeRecord();
+        top.generalLineFlag = true;
+        top.deltaX = rect.getWidth();
+        StraightEdgeRecord right = new StraightEdgeRecord();
+        right.generalLineFlag = true;
+        right.deltaY = rect.getHeight();
+        StraightEdgeRecord bottom = new StraightEdgeRecord();
+        bottom.generalLineFlag = true;
+        bottom.deltaX = -rect.getWidth();
+        StraightEdgeRecord left = new StraightEdgeRecord();
+        left.generalLineFlag = true;
+        left.deltaY = -rect.getHeight();
+        shape.shapeRecords.add(top);
+        shape.shapeRecords.add(right);
+        shape.shapeRecords.add(bottom);
+        shape.shapeRecords.add(left);
+        shape.shapeRecords.add(new EndShapeRecord());
+        return shape;
+    }
+    
+    @Override
+    public RECT getRect() {
+        SerializableImage image = getImage();
+        int widthInTwips = (int) (image.getWidth() * SWF.unitDivisor);
+        int heightInTwips = (int) (image.getHeight() * SWF.unitDivisor);
+        return new RECT(0, widthInTwips, 0, heightInTwips);
+    }
+
+    @Override
+    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        BitmapExporter.export(swf, getShape(), null, image, transformation, colorTransform);
+    }
+
+    @Override
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), exporter, null, colorTransform);
+        shapeExporter.export();
+    }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShape(), new ColorTransform(), 0, 0);
+        cse.export();
+        return cse.getShapeData();
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        return true;
+    }
+
+    @Override
+    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        return transformation.toTransform().createTransformedShape(getShape().getOutline());
     }
 }

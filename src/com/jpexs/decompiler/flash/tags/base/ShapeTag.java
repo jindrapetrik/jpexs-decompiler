@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class ShapeTag extends CharacterTag implements BoundedTag, DrawableTag {
+public abstract class ShapeTag extends CharacterTag implements DrawableTag {
 
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);

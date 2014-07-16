@@ -271,7 +271,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     fillMatrix = matrix;
                 }
 
-                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");\r\n";
+                fillData += "\tvar fimg = ctrans.applyToImage(imageObj" + bitmapId + ");\r\n";
                 fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
