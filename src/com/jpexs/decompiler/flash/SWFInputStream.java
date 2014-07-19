@@ -1007,7 +1007,7 @@ public class SWFInputStream implements AutoCloseable {
             long pos = getPos();
             newDumpLevel(null, "TAG");
             try {
-                tag = readTag(level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
+                tag = readTag(timelined, level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
@@ -1397,6 +1397,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one Tag from the stream with optional resolving (= reading tag
      * content)
      *
+     * @param timelined
      * @param level
      * @param pos
      * @param resolve
@@ -1407,7 +1408,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public Tag readTag(int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
+    public Tag readTag(Timelined timelined, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16("tagIDTagLength");
         int tagID = (tagIDTagLength) >> 6;
 
@@ -1431,7 +1432,7 @@ public class SWFInputStream implements AutoCloseable {
             try {
                 ret = resolveTag(ret, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);
             }
 
             if (Configuration.debugMode.get()) {
