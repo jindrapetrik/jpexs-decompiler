@@ -157,15 +157,17 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     @Override
     public HilightedTextWriter append(String str) {
-        GraphSourceItemPosition itemPos = offsets.peek();
-        GraphSourceItem src = itemPos.graphSourceItem;
-        int pos = itemPos.position;
         Highlighting h = null;
-        if (src != null && hilight) {
-            Map<String, String> data = new HashMap<>();
-            data.put("offset", Long.toString(src.getOffset() + pos + 1));
-            h = new Highlighting(sb.length() - newLineCount, data, HilightType.OFFSET, str);
-            instructionHilights.add(h);
+        if (!offsets.empty()) {
+            GraphSourceItemPosition itemPos = offsets.peek();
+            GraphSourceItem src = itemPos.graphSourceItem;
+            int pos = itemPos.position;
+            if (src != null && hilight) {
+                Map<String, String> data = new HashMap<>();
+                data.put("offset", Long.toString(src.getOffset() + pos + 1));
+                h = new Highlighting(sb.length() - newLineCount, data, HilightType.OFFSET, str);
+                instructionHilights.add(h);
+            }
         }
         appendToSb(str);
         if (h != null) {

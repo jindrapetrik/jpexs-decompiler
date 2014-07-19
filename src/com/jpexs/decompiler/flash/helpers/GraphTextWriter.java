@@ -153,7 +153,7 @@ public abstract class GraphTextWriter {
         return "";
     }
 
-    public GraphTextWriter startBlock(String opening) {
+    private GraphTextWriter startBlock(String opening) {
         if (formatting.beginBlockOnNewLine) {
             newLine();
         } else {
@@ -166,7 +166,7 @@ public abstract class GraphTextWriter {
         return startBlock("{");
     }
 
-    public GraphTextWriter endBlock(String closing) {
+    private GraphTextWriter endBlock(String closing) {
         return unindent().append(closing);
     }
 
