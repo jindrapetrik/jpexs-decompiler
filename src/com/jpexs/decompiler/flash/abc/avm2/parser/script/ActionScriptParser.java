@@ -490,7 +490,7 @@ public class ActionScriptParser {
                     paramTypes.add(new UnboundedTypeItem());
                 }
                 if (s.type == SymbolType.ASSIGN) {
-                    paramValues.add(expression(pkg, new Reference<Boolean>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
+                    paramValues.add(expression(pkg, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
                     s = lex();
                 } else {
                     if (!paramValues.isEmpty()) {
@@ -671,13 +671,13 @@ public class ActionScriptParser {
                     GraphTargetItem extendsTypeStr = null;
                     s = lex();
                     if (s.type == SymbolType.EXTENDS) {
-                        extendsTypeStr = type(pkg, new Reference<Boolean>(false), importedClasses, subNamespaces, new ArrayList<AssignableAVM2Item>());
+                        extendsTypeStr = type(pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<AssignableAVM2Item>());
                         s = lex();
                     }
                     List<GraphTargetItem> implementsTypeStrs = new ArrayList<>();
                     if (s.type == SymbolType.IMPLEMENTS) {
                         do {
-                            GraphTargetItem implementsTypeStr = type(pkg, new Reference<Boolean>(false), importedClasses, subNamespaces, new ArrayList<AssignableAVM2Item>());
+                            GraphTargetItem implementsTypeStr = type(pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<AssignableAVM2Item>());
                             implementsTypeStrs.add(implementsTypeStr);
                             s = lex();
                         } while (s.type == SymbolType.COMMA);
@@ -711,7 +711,7 @@ public class ActionScriptParser {
 
                     if (s.type == SymbolType.EXTENDS) {
                         do {
-                            GraphTargetItem intExtendsTypeStr = type(pkg, new Reference<Boolean>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
+                            GraphTargetItem intExtendsTypeStr = type(pkg, new Reference<>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
                             intExtendsTypeStrs.add(intExtendsTypeStr);
                             s = lex();
                         } while (s.type == SymbolType.COMMA);
@@ -762,9 +762,9 @@ public class ActionScriptParser {
                         if (isInterface) {
                             throw new ParseException("Interface cannot have constructor", lexer.yyline());
                         }
-                        constr = (method(pkg, false, customAccess, new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
+                        constr = (method(pkg, false, customAccess, new Reference<>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
                     } else {
-                        MethodAVM2Item ft = method(pkg, isInterface, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
+                        MethodAVM2Item ft = method(pkg, isInterface, customAccess, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
 
                         if (isGetter) {
                             if (!ft.paramTypes.isEmpty()) {
@@ -845,7 +845,7 @@ public class ActionScriptParser {
                     s = lex();
                     GraphTargetItem type = null;
                     if (s.type == SymbolType.COLON) {
-                        type = type(pkg, new Reference<Boolean>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
+                        type = type(pkg, new Reference<>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
                         s = lex();
                     } else {
                         type = TypeItem.UNBOUNDED;
@@ -854,7 +854,7 @@ public class ActionScriptParser {
                     GraphTargetItem value = null;
 
                     if (s.type == SymbolType.ASSIGN) {
-                        value = expression(pkg, new Reference<Boolean>(false), importedClasses, openedNamespaces, new HashMap<String, Integer>(), false, false, true, isStatic || isConst ? sinitVariables : constrVariables);
+                        value = expression(pkg, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<String, Integer>(), false, false, true, isStatic || isConst ? sinitVariables : constrVariables);
                         s = lex();
                     }
                     GraphTargetItem tar;
@@ -1174,7 +1174,7 @@ public class ActionScriptParser {
         List<String> openedTags = new ArrayList<>();
         int closedVarTags = 0;
 
-        GraphTargetItem ret = add(xmltag(pkg, new Reference<Boolean>(false), openedTags, new Reference<Integer>(closedVarTags), needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+        GraphTargetItem ret = add(xmltag(pkg, new Reference<>(false), openedTags, new Reference<>(closedVarTags), needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
         ret = new XMLAVM2Item(ret);
         lexer.yybegin(ActionScriptLexer.YYINITIAL);
         //TODO: Order of additions as in official compiler

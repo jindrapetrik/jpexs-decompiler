@@ -39,7 +39,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     //TODO: handle AVM2 separately
     public List<ABCException> exceptions = new ArrayList<>();
-    public List<Integer> finallyCatches = new ArrayList<Integer>();
+    public List<Integer> finallyCatches = new ArrayList<>();
     public Map<Integer, Integer> finallyCounter = new HashMap<>();
     public int finallyRegister = -1;
     public String currentClass;
@@ -47,7 +47,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public List<MethodBody> callStack = new ArrayList<>();
     public Map<MethodBody, List<Integer>> traitUsages = new HashMap<>();
     public String pkg = "";
-    public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
+    public List<GraphTargetItem> scopeStack = new ArrayList<>();
     public boolean documentClass;
     public ScriptInfo currentScript;
 

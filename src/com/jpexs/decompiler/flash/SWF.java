@@ -2148,7 +2148,7 @@ public final class SWF implements TreeItem, Timelined {
 
     public static SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {
-            return (SerializableImage) SWF.frameCache.get(key);
+            return SWF.frameCache.get(key);
         }
         return null;
     }

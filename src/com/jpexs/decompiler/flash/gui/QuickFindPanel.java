@@ -165,7 +165,7 @@ public class QuickFindPanel extends JPanel implements ActionListener, jsyntaxpan
 
     @Override
     public void showQuickFind(final JTextComponent t, DocumentSearchData ds) {
-        dsd = new WeakReference<DocumentSearchData>(ds);
+        dsd = new WeakReference<>(ds);
         oldCaretPosition = t.getCaretPosition();
         Container view = t.getParent();
         Dimension wd = getSize();

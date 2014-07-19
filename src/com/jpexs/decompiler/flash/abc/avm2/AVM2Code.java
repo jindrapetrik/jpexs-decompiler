@@ -1249,7 +1249,7 @@ public class AVM2Code implements Serializable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
+    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -2699,7 +2699,7 @@ public class AVM2Code implements Serializable {
                  }*/
             }
 
-            if (((AVM2Instruction) ins).definition instanceof NewFunctionIns) {
+            if (ins.definition instanceof NewFunctionIns) {
                 stack.push(new BooleanAVM2Item(null, true));
             } else {
                 localData.ip = ip;
@@ -2724,8 +2724,8 @@ public class AVM2Code implements Serializable {
 
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
-                if (((AVM2Instruction) ins).definition instanceof IfTypeIns
-                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns))
+                if (ins.definition instanceof IfTypeIns
+                        && (!(ins.definition instanceof JumpIns))
                         && (!stack.isEmpty())
                         && (stack.peek().isCompileTime())
                         && (!stack.peek().hasSideEffect())) {
@@ -2858,11 +2858,10 @@ public class AVM2Code implements Serializable {
         for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);
             if (dec != null) {
-                if (((AVM2Instruction) src).definition instanceof LookupSwitchIns) {
-                    AVM2Instruction asrc = (AVM2Instruction) src;
+                if (src.definition instanceof LookupSwitchIns) {
                     if (dec.casesUsed.size() == 1) {
                         for (int c : dec.casesUsed) {
-                            asrc.setFixBranch(c);
+                            src.setFixBranch(c);
                             cnt++;
                         }
                     }

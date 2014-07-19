@@ -190,7 +190,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
     private void open() {
         if (swfList.getSelectedIndex() > -1) {
-            Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
+            Replacement r = listModel.getElementAt(swfList.getSelectedIndex());
             Main.openFile(r.targetFile, r.urlPattern);
         }
     }
@@ -208,7 +208,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 break;
             case ACTION_RENAME:
                 if (swfList.getSelectedIndex() > -1) {
-                    Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
+                    Replacement r = listModel.getElementAt(swfList.getSelectedIndex());
                     String s = View.showInputDialog("URL", r.urlPattern);
                     r.urlPattern = s;
                     listModel.dataChanged(swfList.getSelectedIndex());
@@ -216,7 +216,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 break;
             case ACTION_CLEAR:
                 for (int i = 0; i < listModel.getSize(); i++) {
-                    Replacement r = (Replacement) listModel.getElementAt(i);
+                    Replacement r = listModel.getElementAt(i);
                     File f;
                     try {
                         f = (new File(Main.tempFile(r.targetFile)));

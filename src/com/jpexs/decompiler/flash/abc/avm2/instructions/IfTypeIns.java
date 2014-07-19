@@ -17,9 +17,10 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.HashMap;
 import java.util.Stack;
 
 public interface IfTypeIns {
 
-    public abstract void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins);
+    public abstract void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins);
 }

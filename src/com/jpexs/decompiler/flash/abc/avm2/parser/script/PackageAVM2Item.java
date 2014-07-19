@@ -32,7 +32,7 @@ public class PackageAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> items;
     public String packageName;
-    public List<String> importedClasses = new ArrayList<String>();
+    public List<String> importedClasses = new ArrayList<>();
     public int publicNs = 0;
 
     public PackageAVM2Item(int publicNs, List<String> importedClasses, String packageName, List<GraphTargetItem> items) {

@@ -34,7 +34,7 @@ public class WithAVM2Item extends AVM2Item {
 
     public GraphTargetItem scope;
     public List<GraphTargetItem> items;
-    public List<AssignableAVM2Item> subvariables = new ArrayList<AssignableAVM2Item>();
+    public List<AssignableAVM2Item> subvariables = new ArrayList<>();
 
     public WithAVM2Item(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
         super(instruction, NOPRECEDENCE);

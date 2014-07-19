@@ -1795,7 +1795,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (custom != null) {
             PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abc, allABCs, openedNamespaces, new ArrayList<MethodBody>());
             Reference<ValueKind> value = new Reference<>(null);
-            prop.resolve(localData, new Reference<GraphTargetItem>(null), new Reference<GraphTargetItem>(null), new Reference<Integer>(0), value);
+            prop.resolve(localData, new Reference<GraphTargetItem>(null), new Reference<GraphTargetItem>(null), new Reference<>(0), value);
             boolean resolved = true;
             if (value.getVal() == null) {
                 resolved = false;

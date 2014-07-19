@@ -38,16 +38,16 @@ public class IfNeIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-        GraphTargetItem v2 = (GraphTargetItem) stack.pop();
-        GraphTargetItem v1 = (GraphTargetItem) stack.pop();
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+        GraphTargetItem v2 = stack.pop();
+        GraphTargetItem v1 = stack.pop();
         stack.push(new NeqAVM2Item(ins, v1, v2));
     }
 
     @Override
-    public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
-        GraphTargetItem v2 = (GraphTargetItem) stack.pop();
-        GraphTargetItem v1 = (GraphTargetItem) stack.pop();
+    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
+        GraphTargetItem v2 = stack.pop();
+        GraphTargetItem v1 = stack.pop();
         stack.push(new EqAVM2Item(ins, v1, v2));
     }
 

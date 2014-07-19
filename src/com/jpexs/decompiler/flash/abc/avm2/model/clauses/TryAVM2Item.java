@@ -41,7 +41,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public List<NameAVM2Item> catchExceptions2;
     public List<List<GraphTargetItem>> catchCommands;
     public List<GraphTargetItem> finallyCommands;
-    public List<List<AssignableAVM2Item>> catchVariables = new ArrayList<List<AssignableAVM2Item>>();
+    public List<List<AssignableAVM2Item>> catchVariables = new ArrayList<>();
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {

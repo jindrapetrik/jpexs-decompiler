@@ -92,8 +92,12 @@ public class SoundPlayer {
 
     @Override
     protected void finalize() throws Throwable {
-        if (clip != null) {
-            clip.close();
+        try {
+            if (clip != null) {
+                clip.close();
+            }
+        } finally {
+            super.finalize();
         }
     }
 

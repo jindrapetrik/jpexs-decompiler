@@ -201,7 +201,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     @Override
     public RECT getRect() {
         if (rectCache.contains(this)) {
-            return (RECT) rectCache.get(this);
+            return rectCache.get(this);
         }
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {

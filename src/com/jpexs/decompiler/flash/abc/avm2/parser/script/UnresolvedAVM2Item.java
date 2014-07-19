@@ -60,7 +60,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem resolvedRoot;
     private final boolean mustBeType;
     public List<String> importedClasses;
-    public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
+    public List<GraphTargetItem> scopeStack = new ArrayList<>();
     public List<GraphTargetItem> subtypes;
 
     @Override

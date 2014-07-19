@@ -80,17 +80,17 @@ public class InstructionDefinition implements Serializable {
         throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
     }
 
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
     }
 
     protected FullMultinameAVM2Item resolveMultiname(Stack<GraphTargetItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (constants.getMultiname(multinameIndex).needsName()) {
-            name = (GraphTargetItem) stack.pop();
+            name = stack.pop();
         }
         if (constants.getMultiname(multinameIndex).needsNs()) {
-            ns = (GraphTargetItem) stack.pop();
+            ns = stack.pop();
         }
         return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
     }

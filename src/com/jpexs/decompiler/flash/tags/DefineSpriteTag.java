@@ -126,7 +126,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     @Override
     public RECT getRect() {
         if (rectCache.contains(this)) {
-            return (RECT) rectCache.get(this);
+            return rectCache.get(this);
         }
         RECT emptyRet = new RECT();
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);

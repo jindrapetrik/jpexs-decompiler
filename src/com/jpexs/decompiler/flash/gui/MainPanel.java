@@ -383,7 +383,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
-        tagTree = new TagTree((TagTreeModel) null, this);
+        tagTree = new TagTree(null, this);
         tagTree.addTreeSelectionListener(this);
 
         DragSource dragSource = DragSource.getDefaultDragSource();
@@ -467,7 +467,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         tagTree.createContextMenu(swfs);
 
-        dumpTree = new DumpTree((DumpTreeModel) null, this);
+        dumpTree = new DumpTree(null, this);
         dumpTree.addTreeSelectionListener(this);
         dumpTree.createContextMenu();
 

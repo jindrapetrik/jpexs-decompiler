@@ -336,21 +336,20 @@ public class TagTreeModel implements TreeModel {
                     return newPath;
                 }
             }
-            if (n instanceof TreeNode) {
-                TreeNode nd = (TreeNode) n;
-                if (obj instanceof StringItem && nd.getItem() instanceof StringItem) {
-                    // StringItems are always recreated, so compare them by name
-                    StringItem nds = (StringItem) nd.getItem();
-                    StringItem objs = (StringItem) obj;
-                    if (objs.getName().equals(nds.getName())) {
-                        return newPath;
-                    }
-                } else {
-                    if (nd.getItem() == obj) {
-                        return newPath;
-                    }
+            
+            if (obj instanceof StringItem && n.getItem() instanceof StringItem) {
+                // StringItems are always recreated, so compare them by name
+                StringItem nds = (StringItem) n.getItem();
+                StringItem objs = (StringItem) obj;
+                if (objs.getName().equals(nds.getName())) {
+                    return newPath;
+                }
+            } else {
+                if (n.getItem() == obj) {
+                    return newPath;
                 }
             }
+
             ret = searchTag(obj, n, newPath);
             if (ret != null) {
                 return ret;

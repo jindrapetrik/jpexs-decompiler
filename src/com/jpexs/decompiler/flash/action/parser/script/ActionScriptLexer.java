@@ -1203,7 +1203,7 @@ public final class ActionScriptLexer {
         return yychar;
     }
 
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
