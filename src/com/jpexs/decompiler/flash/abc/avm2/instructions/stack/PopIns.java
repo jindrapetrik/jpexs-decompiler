@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -49,21 +50,11 @@ public class PopIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         if (stack.size() > 0) {
-            GraphTargetItem top = stack.pop();
-            //TODO: handle all values (#585) - beware collision with return inside finally block
-            if (top instanceof CallPropertyAVM2Item) {
+            GraphTargetItem top = stack.pop();            
+            //Note: Commands like "5;" - numbers are unsupported as it collide with try..finally block decompilation. TODO: allow this somehow
+            if(!(top instanceof IntegerValueAVM2Item)){
                 output.add(top);
-            } else if (top instanceof CallSuperAVM2Item) {
-                output.add(top);
-            } else if (top instanceof CallStaticAVM2Item) {
-                output.add(top);
-            } else if (top instanceof CallMethodAVM2Item) {
-                output.add(top);
-            } else if (top instanceof CallAVM2Item) {
-                output.add(top);
-            } else if (top instanceof AssignmentAVM2Item) {
-                output.add(top);
-            }
+            }            
         }
     }
 
