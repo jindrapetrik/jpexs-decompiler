@@ -2091,12 +2091,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         TreeItem treeItem = treeNode.getItem();
         if (!(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
-            /*if (swfs.contains(swf.swfList)) { //why?
-             updateUi(swf);
-             } else {
-             updateUi();
-             }*/
-            updateUi(swf);
+            if (swfs.isEmpty()) {
+                // show welcome panel after closing swfs
+                updateUi();
+            } else {
+                updateUi(swf);
+            }
         } else {
             updateUi();
         }
