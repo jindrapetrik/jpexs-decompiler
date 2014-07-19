@@ -449,9 +449,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (classHeader.startsWith("private ")) {
             classHeader = classHeader.substring("private ".length());
         }
-        writer.appendNoHilight(classHeader).newLine();
-        writer.appendNoHilight("{").newLine();
-        writer.indent();
+        writer.appendNoHilight(classHeader).startBlock();
 
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {
@@ -496,11 +494,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
             } else {
                 abc.method_info.get(abc.instance_info.get(class_info).iinit_index).getParamStr(writer, abc.constants, null, abc, fullyQualifiedNames);
             }
-            writer.appendNoHilight(") {").newLine();
+            writer.appendNoHilight(")").startBlock();
             if (bodyIndex != -1) {
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits);
             }
-            writer.appendNoHilight("}").newLine();
+            writer.endBlock().newLine();
             writer.endTrait();
         }
 
@@ -509,8 +507,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        writer.unindent();
-        writer.appendNoHilight("}"); // class
+        writer.endBlock(); // class
         writer.endClass();
         writer.newLine();
         return writer;

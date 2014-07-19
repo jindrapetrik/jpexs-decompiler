@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -582,6 +584,12 @@ public class Configuration {
         int processorCount = Runtime.getRuntime().availableProcessors();
         if (parallelThreadCount.get() > processorCount) {
             parallelThreadCount.set(processorCount);
+        }
+        
+        if (lastUpdatesCheckDate.get() == null) {
+            GregorianCalendar mingc = new GregorianCalendar();
+            mingc.setTime(new Date(Long.MIN_VALUE));
+            lastUpdatesCheckDate.set(mingc);
         }
     }
 
