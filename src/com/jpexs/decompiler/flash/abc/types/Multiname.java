@@ -36,10 +36,10 @@ public class Multiname {
     private static final int[] multinameKinds = new int[]{QNAME, QNAMEA, MULTINAME, MULTINAMEA, RTQNAME, RTQNAMEA, MULTINAMEL, RTQNAMEL, RTQNAMELA, MULTINAMELA, TYPENAME};
     private static final String[] multinameKindNames = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA", "MultinameLA", "TypeName"};
     public int kind = -1;
-    public int name_index = -1;
-    public int namespace_index = -1;
-    public int namespace_set_index = -1;
-    public int qname_index = -1; //for TypeName
+    public int name_index = 0;
+    public int namespace_index = 0;
+    public int namespace_set_index = 0;
+    public int qname_index = 0; //for TypeName
     public List<Integer> params; //for TypeName
     public boolean deleted;
 
@@ -159,7 +159,7 @@ public class Multiname {
         String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants);
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
-            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).hasName(constants.getNamespace(index).getName(constants), constants)) {
+            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).name_index == name_index) {
                 sub++;
             }
             if (n == index) {

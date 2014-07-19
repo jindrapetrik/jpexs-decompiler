@@ -254,10 +254,10 @@ public class ASM3Parser {
     private static int parseMultiName(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
         ParsedSymbol s = lexer.lex();
         int kind = 0;
-        int name_index = -1;
-        int namespace_index = -1;
-        int namespace_set_index = -1;
-        int qname_index = -1;
+        int name_index = 0;
+        int namespace_index = 0;
+        int namespace_set_index = 0;
+        int qname_index = 0;
         List<Integer> params = new ArrayList<>();
 
         switch (s.type) {
