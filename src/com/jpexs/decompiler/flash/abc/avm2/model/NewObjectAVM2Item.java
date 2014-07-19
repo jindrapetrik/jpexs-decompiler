@@ -41,10 +41,7 @@ public class NewObjectAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean singleLine = pairs.size() < 2;
-        if (!singleLine) {
-            writer.newLine();
-            writer.indent();
-        }
+        //no new line before as it may break return clause (#593)
         writer.append("{");
         if (!singleLine) {
             writer.newLine();
@@ -60,10 +57,7 @@ public class NewObjectAVM2Item extends AVM2Item {
             writer.newLine();
             writer.unindent();
         }
-        writer.append("}");
-        if (!singleLine) {
-            writer.unindent();
-        }
+        writer.append("}");        
         return writer;
     }
 
