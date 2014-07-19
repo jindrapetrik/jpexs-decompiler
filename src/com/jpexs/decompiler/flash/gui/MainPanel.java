@@ -499,7 +499,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
         treePanel = new JPanel(new BorderLayout());
-        showDumpView(Configuration.dumpView.get());
         treePanel.add(searchPanel, BorderLayout.SOUTH);
 
         filterField.addActionListener(this);
@@ -570,6 +569,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
         detailPanel.setVisible(false);
 
+        showDumpView(Configuration.dumpView.get());
         updateUi();
 
         //Opening files with drag&drop to main window
@@ -1158,7 +1158,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
         }
-        if (documentClass != null) {
+        if (documentClass != null && !Configuration.dumpView.get()) {
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
             abcPanel.setSwf(swf);
@@ -1256,11 +1256,22 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     @Override
     public void updateSearchPos(TextTag item) {
-        setTreeItem(item);
+        setTagTreeSelectedNode(item);
         previewPanel.getTextPanel().updateSearchPos();
     }
 
-    public void setTreeItem(TreeItem treeItem) {
+    private void setDumpTreeSelectedNode(DumpInfo dumpInfo) {
+        DumpTreeModel dtm = (DumpTreeModel) dumpTree.getModel();
+        TreePath tp = dtm.getDumpInfoPath(dumpInfo);
+        if (tp != null) {
+            dumpTree.setSelectionPath(tp);
+            dumpTree.scrollPathToVisible(tp);
+        } else {
+            showCard(CARDEMPTYPANEL);
+        }
+    }
+
+    public void setTagTreeSelectedNode(TreeItem treeItem) {
         TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
         TreePath tp = ttm.getTagPath(treeItem);
         if (tp != null) {
@@ -1833,13 +1844,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
+        DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
         View.refreshTree(dumpTree, new DumpTreeModel(swfs));
         if (treeItem != null) {
-            setTreeItem(treeItem);
+            setTagTreeSelectedNode(treeItem);
+        }
+        if (dumpInfo != null) {
+            setDumpTreeSelectedNode(dumpInfo);
         }
     }
-
+    
     public void refreshDecompiled() {
         clearCache();
         if (abcPanel != null) {
@@ -1993,7 +2008,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
                                     swf.updateCharacters();
                                     refreshTree();
-                                    setTreeItem(jpeg2Tag);
+                                    setTagTreeSelectedNode(jpeg2Tag);
                                 } else {
                                     it.setImage(data);
                                 }
@@ -2062,19 +2077,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private void dumpTreeValueChanged(TreeSelectionEvent e) {
-        DumpInfo dumpInfo = (DumpInfo) e.getPath().getLastPathComponent();
-
-        
-        dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData, dumpInfo);
-        dumpViewPanel.revalidate();
-        showCard(CARDDUMPVIEW);
+        dumpViewReload(false);
     }
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object source = e.getSource();
         if (source == dumpTree) {
-            dumpTreeValueChanged(e);
+            reload(false);
             return;
         }
         TreeNode treeNode = (TreeNode) e.getPath().getLastPathComponent();
@@ -2121,14 +2131,35 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (show) {
             treePanel.add(new JScrollPane(dumpTree), BorderLayout.CENTER);
             treePanelMode = TreePanelMode.DUMP_TREE;
+            showDetail(DETAILCARDEMPTYPANEL);
         } else {
             treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
             treePanelMode = TreePanelMode.TAG_TREE;
         }
+        reload(true);
         treePanel.revalidate();
     }
 
+    private void dumpViewReload(boolean forceReload) {
+        showDetail(DETAILCARDEMPTYPANEL);
+
+        DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
+        if (dumpInfo == null) {
+            showCard(CARDEMPTYPANEL);
+            return;
+        }
+        
+        dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData, dumpInfo);
+        dumpViewPanel.revalidate();
+        showCard(CARDDUMPVIEW);
+    }
+    
     public void reload(boolean forceReload) {
+        if (Configuration.dumpView.get()) {
+            dumpViewReload(forceReload);
+            return;
+        }
+        
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
             return;

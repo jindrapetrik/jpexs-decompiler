@@ -882,7 +882,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 tag.getSwf().updateCharacters();
                 tag.getTimelined().resetTimeline();
                 mainPanel.refreshTree();
-                mainPanel.setTreeItem(tag);
+                mainPanel.setTagTreeSelectedNode(tag);
                 editButton.setVisible(true);
                 saveButton.setVisible(false);
                 cancelButton.setVisible(false);

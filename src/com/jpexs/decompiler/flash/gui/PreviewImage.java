@@ -119,7 +119,7 @@ public class PreviewImage extends JPanel {
             public void mouseClicked(MouseEvent e) {
 
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
-                    mainPanel.setTreeItem(treeItem);
+                    mainPanel.setTagTreeSelectedNode(treeItem);
                 }
             }
 

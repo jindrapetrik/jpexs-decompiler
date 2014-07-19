@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -43,13 +44,45 @@ public class DumpTreeModel implements TreeModel {
         this.root = root;
     }
 
+    private List<DumpInfo> searchDumpInfo(DumpInfo dumpInfo, DumpInfo parent, List<DumpInfo> path) {
+        List<DumpInfo> ret = null;
+        int cnt = getChildCount(parent);
+        for (int i = 0; i < cnt; i++) {
+            DumpInfo n = getChild(parent, i);
+            List<DumpInfo> newPath = new ArrayList<>();
+            newPath.addAll(path);
+            newPath.add(n);
+
+            if (dumpInfo == n) {
+                return newPath;
+            }
+
+            ret = searchDumpInfo(dumpInfo, n, newPath);
+            if (ret != null) {
+                return ret;
+            }
+        }
+        return ret;
+    }
+
+    public TreePath getDumpInfoPath(DumpInfo dumpInfo) {
+        List<DumpInfo> path = new ArrayList<>();
+        path.add(getRoot());
+        path = searchDumpInfo(dumpInfo, getRoot(), path);
+        if (path == null) {
+            return null;
+        }
+        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
+        return tp;
+    }
+
     @Override
-    public Object getRoot() {
+    public DumpInfo getRoot() {
         return root;
     }
 
     @Override
-    public Object getChild(Object o, int i) {
+    public DumpInfo getChild(Object o, int i) {
         return ((DumpInfo) o).getChildInfos().get(i);
     }
 

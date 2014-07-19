@@ -439,7 +439,7 @@ public class TagTree extends JTree implements ActionListener {
                 }
 
                 CharacterIdTag characterIdTag = (CharacterIdTag) item;
-                mainPanel.setTreeItem(item.getSwf().characters.get(characterIdTag.getCharacterId()));
+                mainPanel.setTagTreeSelectedNode(item.getSwf().characters.get(characterIdTag.getCharacterId()));
             }
             break;
             case ACTION_EXPAND_RECURSIVE: {
