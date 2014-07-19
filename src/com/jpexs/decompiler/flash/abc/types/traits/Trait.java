@@ -133,12 +133,10 @@ public abstract class Trait implements Serializable {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
-            writer.appendNoHilight("package " + nsname).newLine(); //assume not null name
-            writer.appendNoHilight("{").newLine();
-            writer.indent();
+            writer.appendNoHilight("package " + nsname); //assume not null name
+            writer.startBlock();
             toString(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-            writer.unindent();
-            writer.appendNoHilight("}");
+            writer.endBlock();
             writer.newLine();
         }
         return writer;

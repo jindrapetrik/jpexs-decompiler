@@ -165,19 +165,14 @@ public class MethodBody implements Cloneable, Serializable {
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
-            writer.indent();
             code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
-            writer.unindent();
         } else {
             if (!Configuration.decompile.get()) {
-                writer.indent();
                 writer.startMethod(this.method_info);
                 writer.appendNoHilight("//" + AppStrings.translate("decompilation.skipped")).newLine();
                 writer.endMethod();
-                writer.unindent();
                 return writer;
             }
-            writer.indent();
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
 
             if (convertException == null) {
@@ -192,7 +187,6 @@ public class MethodBody implements Cloneable, Serializable {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
                 Helper.appendErrorComment(writer, convertException);
             }
-            writer.unindent();
         }
         return writer;
     }
