@@ -35,11 +35,13 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
+import com.jpexs.decompiler.flash.treenodes.HeaderNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.io.ByteArrayInputStream;
@@ -242,6 +244,9 @@ public class TagTreeModel implements TreeModel {
         }
         swfNode.scriptsNode = actionScriptNode;
 
+        
+        ret.add(new HeaderNode(new HeaderItem(swf)));
+        
         if (!shapesNode.subNodes.isEmpty()) {
             ret.add(shapesNode);
         }

@@ -123,6 +123,7 @@ import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
+import com.jpexs.decompiler.flash.treenodes.HeaderNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -232,6 +233,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String CARDDUMPVIEW = "Dump view";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
+    private static final String CARDHEADER = "Header card";
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
@@ -243,6 +245,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
     private final PreviewPanel previewPanel;
+    private HeaderInfoPanel headerPanel;
     private DumpViewPanel dumpViewPanel;
     private final JPanel treePanel;
     private TreePanelMode treePanelMode;
@@ -480,7 +483,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
         displayPanel.add(createDumpPreviewCard(), CARDDUMPVIEW);
-
+        
+        headerPanel  = new HeaderInfoPanel();
+        displayPanel.add(headerPanel,CARDHEADER);
+        
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
 
@@ -2244,7 +2250,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         previewPanel.setImageReplaceButtonVisible(false);
 
-        if (treeNode instanceof StringNode) {
+        if(treeNode instanceof HeaderNode) {
+            showCard(CARDHEADER);
+            headerPanel.load(((HeaderNode)treeNode).getItem().getSwf());
+        } else if (treeNode instanceof StringNode) {
             showCard(CARDFOLDERPREVIEWPANEL);
             showFolderPreview(treeNode);
         } else if (treeNode instanceof SWFNode) {

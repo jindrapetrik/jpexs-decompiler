@@ -42,5 +42,6 @@ public enum TreeNodeType {
     FOLDER_OPEN,
     BUNDLE_ZIP,
     BUNDLE_SWC,
-    BUNDLE_BINARY
+    BUNDLE_BINARY,
+    HEADER
 }

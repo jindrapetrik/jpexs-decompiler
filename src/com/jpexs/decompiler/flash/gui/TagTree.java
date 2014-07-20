@@ -59,6 +59,7 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
@@ -186,6 +187,11 @@ public class TagTree extends JTree implements ActionListener {
     }
 
     public static TreeNodeType getTreeNodeType(TreeItem t) {
+        
+        if(t instanceof HeaderItem){
+            return TreeNodeType.HEADER;
+        }
+        
         if ((t instanceof DefineFontTag)
                 || (t instanceof DefineFont2Tag)
                 || (t instanceof DefineFont3Tag)

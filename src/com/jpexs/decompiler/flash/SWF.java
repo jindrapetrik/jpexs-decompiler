@@ -369,6 +369,29 @@ public final class SWF implements TreeItem, Timelined {
         saveTo(os, compression);
     }
 
+    public String getHeaderBytes() {
+        String ret = "";
+        if (compression == SWFCompression.LZMA) {
+            ret += 'Z';
+        } else if (compression == SWFCompression.ZLIB) {
+            ret += 'C';
+        } else {
+            if (gfx) {
+                ret += 'G';
+            } else {
+                ret += 'F';
+            }
+        }
+        if (gfx) {
+            ret += 'F';
+            ret += 'X';
+        } else {
+            ret += 'W';
+            ret += 'S';
+        }
+        return ret;
+    }
+
     /**
      * Saves this SWF into new file
      *
@@ -1566,7 +1589,7 @@ public final class SWF implements TreeItem, Timelined {
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            File f = new File(foutdir + File.separator + (fframes.get(fi)+1) + ".png");
+                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
                             ImageIO.write(frameImages.next(), "PNG", f);
                             ret.add(f);
                         }
