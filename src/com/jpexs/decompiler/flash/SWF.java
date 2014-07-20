@@ -757,7 +757,10 @@ public final class SWF implements TreeItem, Timelined {
                     header.compression = SWFCompression.ZLIB;
                     break;
                 }
-                case 'Z': { // ZWS
+                case 'Z': { // ZWS                   
+                    byte lzmaprop[] = new byte[9];
+                    is.read(lzmaprop);
+                    sis = new SWFInputStream(null, lzmaprop);
                     sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,
                     // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
                     int propertiesSize = 5;
