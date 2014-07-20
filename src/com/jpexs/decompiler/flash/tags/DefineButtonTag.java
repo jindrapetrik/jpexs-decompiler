@@ -73,14 +73,13 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      */
     //public List<Action> actions;
     @Internal
-    public byte[] actionBytes;
+    public ByteArrayRange actionBytes;
     public static final int ID = 7;
 
     @Override
     public int getCharacterId() {
         return buttonId;
     }
-    private final long hdrSize;
 
     private Timeline timeline;
 
@@ -103,8 +102,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         super(sis.getSwf(), ID, "DefineButton", data);
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
-        hdrSize = sis.getPos();
-        actionBytes = sis.readBytesEx(sis.available(), "actionBytes");
+        int pos = (int) sis.getPos();
+        byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
+        actionBytes = new ByteArrayRange(data.array, pos, bytes.length);
     }
 
     /**
@@ -123,7 +123,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         try {
             sos.writeUI16(buttonId);
             sos.writeBUTTONRECORDList(characters, false);
-            sos.write(actionBytes);
+            sos.write(getActionBytes());
             //sos.write(Action.actionsToBytes(actions, true, version));
             sos.close();
         } catch (IOException e) {
@@ -166,15 +166,10 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            int prevLength;
-            SWFInputStream rri;
-            if (actionBytes == null) {
-                prevLength = (int) (getDataPos() + hdrSize);
-                rri = new SWFInputStream(swf, getOriginalRange().array);
+            int prevLength = actionBytes.pos;
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            if (prevLength != 0) {
                 rri.seek(prevLength);
-            } else {
-                prevLength = 0;
-                rri = new SWFInputStream(swf, actionBytes);
             }
             List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
@@ -188,17 +183,18 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     @Override
     public void setActions(List<Action> actions) {
-        actionBytes = Action.actionsToBytes(actions, true, swf.version);
+        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
+        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
     }
 
     @Override
     public byte[] getActionBytes() {
-        return actionBytes;
+        return actionBytes.getRangeData();
     }
 
     @Override
     public void setActionBytes(byte[] actionBytes) {
-        this.actionBytes = actionBytes;
+        this.actionBytes = new ByteArrayRange(actionBytes);
     }
 
     @Override
@@ -208,7 +204,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());
     }
 
     @Override

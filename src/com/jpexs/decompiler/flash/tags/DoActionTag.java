@@ -44,7 +44,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     //public List<Action> actions = new ArrayList<Action>();
     @Internal
-    public byte[] actionBytes;
+    public ByteArrayRange actionBytes;
     public static final int ID = 12;
 
     /**
@@ -56,8 +56,9 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoAction", data);
-        //do not store actionBytes. Disassebler will use the original SWF stream in this case
-        sis.readBytesEx(sis.available(), "actionBytes");
+        int pos = (int) sis.getPos();
+        byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
+        actionBytes = new ByteArrayRange(data.array, pos, bytes.length);
     }
 
     /**
@@ -68,7 +69,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWF swf, ByteArrayRange data) {
         super(swf, ID, "DoAction", data);
-        actionBytes = new byte[0];
+        actionBytes = new ByteArrayRange(new byte[0]);
     }
 
     /**
@@ -78,7 +79,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     @Override
     public byte[] getData() {
-        return actionBytes;//Action.actionsToBytes(actions, true, version);
+        return getActionBytes();
     }
 
     /**
@@ -120,15 +121,10 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            int prevLength;
-            SWFInputStream rri;
-            if (actionBytes == null) {
-                prevLength = (int) getDataPos();
-                rri = new SWFInputStream(swf, getOriginalRange().array);
+            int prevLength = actionBytes.pos;
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            if (prevLength != 0) {
                 rri.seek(prevLength);
-            } else {
-                prevLength = 0;
-                rri = new SWFInputStream(swf, actionBytes);
             }
             List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
@@ -142,17 +138,18 @@ public class DoActionTag extends Tag implements ASMSource {
 
     @Override
     public void setActions(List<Action> actions) {
-        actionBytes = Action.actionsToBytes(actions, true, swf.version);
+        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
+        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
     }
 
     @Override
     public byte[] getActionBytes() {
-        return actionBytes;
+        return actionBytes.getRangeData();
     }
 
     @Override
     public void setActionBytes(byte[] actionBytes) {
-        this.actionBytes = actionBytes;
+        this.actionBytes = new ByteArrayRange(actionBytes);
     }
 
     @Override
@@ -162,7 +159,7 @@ public class DoActionTag extends Tag implements ASMSource {
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();

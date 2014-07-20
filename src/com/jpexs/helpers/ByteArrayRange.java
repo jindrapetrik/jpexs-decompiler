@@ -26,10 +26,21 @@ public class ByteArrayRange {
     public final int pos; 
     public final int length; 
     
+    public ByteArrayRange(byte[] array) {
+        this.array = array;
+        this.pos = 0;
+        this.length = array.length;
+    }
+
     public ByteArrayRange(byte[] array, int pos, int length) {
         this.array = array;
         this.pos = pos;
         this.length = length;
     }
 
+    public byte[] getRangeData() {
+        byte[] data = new byte[length];
+        System.arraycopy(array, pos, data, 0, length);
+        return data;
+    }
 }
