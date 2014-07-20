@@ -56,14 +56,9 @@ public class WithAVM2Item extends AVM2Item {
         }
         writer.append("(");
         scope.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
-        /*for (GraphTargetItem ti : items) {
-         ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
-         }*/
-        writer.unindent();
-        return writer.append("}");
+        writer.append(")").startBlock();
+        //NOTE: endBlock is added with WithEndAVM2Item
+        return writer;      
     }
 
     @Override

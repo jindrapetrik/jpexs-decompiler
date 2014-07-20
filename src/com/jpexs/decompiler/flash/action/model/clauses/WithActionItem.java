@@ -55,14 +55,11 @@ public class WithActionItem extends ActionItem {
         }
         writer.append("(");
         scope.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
         for (GraphTargetItem ti : items) {
             ti.toString(writer, localData).newLine();
         }
-        writer.unindent();
-        return writer.append("}");
+        return writer.endBlock();
     }
 
     @Override

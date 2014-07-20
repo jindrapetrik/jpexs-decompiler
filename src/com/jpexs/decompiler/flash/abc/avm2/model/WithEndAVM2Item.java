@@ -33,7 +33,7 @@ public class WithEndAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("}");
+        return writer.endBlock();
     }
 
     @Override
