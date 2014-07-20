@@ -92,16 +92,13 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         }
         writer.append("(");
         expression.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        writer.unindent();
-        writer.append("}");
+        writer.endBlock();
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

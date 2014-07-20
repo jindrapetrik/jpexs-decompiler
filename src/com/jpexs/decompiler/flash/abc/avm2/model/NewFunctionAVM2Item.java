@@ -66,9 +66,8 @@ public class NewFunctionAVM2Item extends AVM2Item {
         methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
         methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
-        writer.endMethod();
-        writer.newLine();
-        writer.append("{").newLine();
+        writer.endMethod();        
+        writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {
                 body.convert(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null, false);
@@ -76,7 +75,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
                 body.toString(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
             }
         }
-        writer.append("}");
+        writer.endBlock();
         return writer;
     }
 

@@ -66,43 +66,34 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("try").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append("try").startBlock();       
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
-        }
-        writer.unindent();
-        writer.append("}");
+        }        
+        writer.endBlock();
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
             writer.append("catch(" + catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames) + ")");
-            writer.newLine();
-            writer.append("{").newLine();
-            writer.indent();
+            writer.startBlock();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
                     ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            writer.unindent();
-            writer.append("}");
+            writer.endBlock();
         }
         if (finallyCommands.size() > 0) {
             writer.newLine();
-            writer.append("finally").newLine();
-            writer.append("{").newLine();
-            writer.indent();
+            writer.append("finally").startBlock();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
                     ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            writer.unindent();
-            writer.append("}");
+            writer.endBlock();
         }
         return writer;
     }

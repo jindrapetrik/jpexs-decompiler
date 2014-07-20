@@ -96,11 +96,11 @@ public class TraitMethodGetterSetter extends Trait {
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");
         } else {
-            writer.appendNoHilight(" {").newLine();
+            writer.startBlock();
             if (bodyIndex != -1) {
                 abc.bodies.get(bodyIndex).toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
-            }
-            writer.appendNoHilight("}");
+            }           
+            writer.endBlock();
         }
         writer.newLine();
         return writer;
