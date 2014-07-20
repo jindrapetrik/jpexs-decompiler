@@ -859,6 +859,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public long readSB(int nBits, String name) throws IOException {
+        if (nBits == 0) {
+            return 0;
+        }
         newDumpLevel(name, "SB");
         long ret = readSBInternal(nBits);
         endDumpLevel(ret);
