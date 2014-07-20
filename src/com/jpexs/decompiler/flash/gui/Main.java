@@ -612,6 +612,9 @@ public class Main {
 
     public static boolean openFileDialog() {
         JFileChooser fc = new JFileChooser();
+        if (Configuration.openMultipleFiles.get()) {
+            fc.setMultiSelectionEnabled(true);
+        }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
             private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
@@ -705,8 +708,11 @@ public class Main {
         int returnVal = fc.showOpenDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-            File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-            Main.openFile(selfile.getAbsolutePath(), null);
+            File[] selFiles = fc.getSelectedFiles();
+            for (File file : selFiles) {
+                File selfile = Helper.fixDialogFile(file);
+                Main.openFile(selfile.getAbsolutePath(), null);
+            }
             return true;
         } else {
             return false;
