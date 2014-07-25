@@ -29,6 +29,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 /**
  *
@@ -116,7 +117,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (SWF.unitDivisor * width), 0, (int) (SWF.unitDivisor * height));
     }
 }

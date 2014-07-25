@@ -45,8 +45,10 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -280,12 +282,12 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        RECT r = getRect();
+        RECT r = getRect(new HashSet<BoundedTag>());
         return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (previewSize * SWF.unitDivisor), 0, (int) (previewSize * SWF.unitDivisor));
     }
 

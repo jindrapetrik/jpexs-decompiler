@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -114,6 +115,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -1072,7 +1074,7 @@ public class XFLConverter {
             ret += " symbolType=\"graphic\" loop=\"loop\"";
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
-            RECT spriteRect = sprite.getRect();
+            RECT spriteRect = sprite.getRect(new HashSet<BoundedTag>());
             double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
             double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
             ret += " centerPoint3DX=\"" + centerPoint3DX + "\" centerPoint3DY=\"" + centerPoint3DY + "\"";

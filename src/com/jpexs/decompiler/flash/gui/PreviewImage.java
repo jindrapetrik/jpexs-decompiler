@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -185,7 +186,7 @@ public class PreviewImage extends JPanel {
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
-            RECT rect = boundedTag.getRect();
+            RECT rect = boundedTag.getRect(new HashSet<BoundedTag>());
             width = (int) (rect.getWidth() / SWF.unitDivisor) + 1;
             height = (int) (rect.getHeight() / SWF.unitDivisor) + 1;
             m.translate(-rect.Xmin, -rect.Ymin);

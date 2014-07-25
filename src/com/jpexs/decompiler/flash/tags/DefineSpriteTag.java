@@ -84,7 +84,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
-            timeline = new Timeline(swf, subTags, spriteId, getRect());
+            timeline = new Timeline(swf, subTags, spriteId, getRect(new HashSet<BoundedTag>()));
         }
         return timeline;
     }
@@ -99,14 +99,18 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         return spriteId;
     }
 
-    private RECT getCharacterBounds(Set<Integer> characters) {
+    private RECT getCharacterBounds(Set<Integer> characters, Set<BoundedTag> added) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
         for (int c : characters) {
             Tag t = swf.characters.get(c);
             RECT r = null;
             if (t instanceof BoundedTag) {
-                r = ((BoundedTag) t).getRect();
+                BoundedTag bt = (BoundedTag) t;
+                if (!added.contains(bt)) {
+                    added.add(bt);
+                    r = bt.getRect(added);
+                }
             }
             if (r != null) {
                 foundSomething = true;
@@ -121,14 +125,14 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         }
         return ret;
     }
+    
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         if (rectCache.contains(this)) {
             return rectCache.get(this);
         }
-        RECT emptyRet = new RECT();
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
         boolean foundSomething = false;
@@ -156,7 +160,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
             }
             Set<Integer> need = new HashSet<>();
             need.add(characterId);
-            RECT r = getCharacterBounds(need);
+            RECT r = getCharacterBounds(need, added);
 
             if (m != null) {
                 AffineTransform trans = SWF.matrixToTransform(m);
@@ -205,7 +209,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         spriteId = sis.readUI16("spriteId");
         frameCount = sis.readUI16("frameCount");
         List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
-        if (subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
+        if (subTags.size() > 0 && subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
             subTags.remove(subTags.size() - 1);
         }
@@ -223,7 +227,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData().getRangeData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {

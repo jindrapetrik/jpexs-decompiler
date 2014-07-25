@@ -54,6 +54,7 @@ import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -213,7 +214,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
                 Timeline tim = ((Timelined) timelined).getTimeline();
                 BoundedTag bounded = (BoundedTag) timelined;
-                RECT rect = bounded.getRect();
+                RECT rect = bounded.getRect(new HashSet<BoundedTag>());
                 int width = rect.getWidth();
                 double scale = 1.0;
                 /*if (width > swf.displayRect.getWidth()) {
@@ -495,7 +496,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (img == null) {
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
-                RECT rect = bounded.getRect();
+                RECT rect = bounded.getRect(new HashSet<BoundedTag>());
                 if (rect == null) { //??? Why?
                     rect = new RECT(0, 0, 1, 1);
                 }

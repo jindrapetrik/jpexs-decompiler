@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
+import java.util.Set;
 
 /**
  *
@@ -24,5 +25,5 @@ import com.jpexs.decompiler.flash.types.RECT;
  */
 public interface BoundedTag {
 
-    public RECT getRect();
+    public RECT getRect(Set<BoundedTag> added);
 }

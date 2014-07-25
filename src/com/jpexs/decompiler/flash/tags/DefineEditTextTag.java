@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -54,6 +55,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -622,7 +624,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         return bounds;
     }
 
@@ -779,7 +781,7 @@ public class DefineEditTextTag extends TextTag {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
-            drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
+            drawBorder(swf, image, borderColor, fillColor, getRect(new HashSet<BoundedTag>()), getTextMatrix(), transformation, colorTransform);
         }
         if (hasText) {
             DynamicTextModel textModel = new DynamicTextModel();

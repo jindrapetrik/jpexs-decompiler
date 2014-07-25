@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -143,7 +144,7 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
         rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);

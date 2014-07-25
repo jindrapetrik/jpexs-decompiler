@@ -41,6 +41,8 @@ import java.awt.Shape;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -124,7 +126,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         style.fillStyle0 = 1;
         style.stateMoveTo = true;
         shape.shapeRecords.add(style);
-        RECT rect = getRect();
+        RECT rect = getRect(new HashSet<BoundedTag>());
         StraightEdgeRecord top = new StraightEdgeRecord();
         top.generalLineFlag = true;
         top.deltaX = rect.getWidth();
@@ -146,7 +148,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
     
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         SerializableImage image = getImage();
         int widthInTwips = (int) (image.getWidth() * SWF.unitDivisor);
         int heightInTwips = (int) (image.getHeight() * SWF.unitDivisor);

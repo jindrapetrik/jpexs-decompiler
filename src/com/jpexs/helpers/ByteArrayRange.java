@@ -26,6 +26,10 @@ public class ByteArrayRange {
     public final int pos; 
     public final int length; 
     
+    public ByteArrayRange() {
+        this(new byte[0]);
+    }
+    
     public ByteArrayRange(byte[] array) {
         this.array = array;
         this.pos = 0;

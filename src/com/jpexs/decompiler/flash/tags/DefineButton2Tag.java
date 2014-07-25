@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -123,7 +124,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData());
+            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData().getRangeData());
             os = new CopyOutputStream(os, bais);
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
@@ -199,7 +200,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         if (rectCache.contains(this)) {
             return rectCache.get(this);
         }
@@ -207,15 +208,19 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = swf.characters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                RECT r2 = ((BoundedTag) ch).getRect();
-                MATRIX mat = r.placeMatrix;
-                if (mat != null) {
-                    r2 = mat.apply(r2);
+                BoundedTag bt = (BoundedTag) ch;
+                if (!added.contains(bt)) {
+                    added.add(bt);
+                    RECT r2 = bt.getRect(added);
+                    MATRIX mat = r.placeMatrix;
+                    if (mat != null) {
+                        r2 = mat.apply(r2);
+                    }
+                    rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
+                    rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
+                    rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
+                    rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
                 }
-                rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
-                rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
-                rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
-                rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
             }
         }
         rectCache.put(this, rect);
@@ -252,7 +257,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect());
+        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
 
         int maxDepth = 0;
         Frame frameUp = new Frame(timeline);

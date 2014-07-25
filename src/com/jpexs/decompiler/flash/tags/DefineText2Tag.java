@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -414,7 +416,7 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         return textBounds;
     }
 
@@ -510,7 +512,7 @@ public class DefineText2Tag extends TextTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-        staticTextToSVG(swf, textRecords, 2, exporter, getRect(), getTextMatrix(), colorTransform);
+        staticTextToSVG(swf, textRecords, 2, exporter, getRect(new HashSet<BoundedTag>()), getTextMatrix(), colorTransform);
     }
 
     @Override

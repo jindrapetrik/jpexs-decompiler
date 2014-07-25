@@ -403,6 +403,14 @@ public class SWFInputStream implements AutoCloseable {
             dumpInfo = dumpInfo.parent;
         }
     }
+    
+    private void endDumpLevelUntil(DumpInfo di) {
+        if (di != null) {
+            while (dumpInfo != null && dumpInfo != di) {
+                endDumpLevel();
+            }
+        }
+    }
 
     /**
      * Reads one byte from the stream
@@ -951,14 +959,14 @@ public class SWFInputStream implements AutoCloseable {
 
     private class TagResolutionTask implements Callable<Tag> {
 
-        private final Tag tag;
+        private final TagStub tag;
         private final DumpInfo dumpInfo;
         private final int level;
         private final boolean parallel;
         private final boolean skipUnusualTags;
         private final boolean gfx;
 
-        public TagResolutionTask(Tag tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
+        public TagResolutionTask(TagStub tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
             this.tag = tag;
             this.dumpInfo = dumpInfo;
             this.level = level;
@@ -969,6 +977,7 @@ public class SWFInputStream implements AutoCloseable {
 
         @Override
         public Tag call() throws Exception {
+            DumpInfo di = dumpInfo;
             try {
                 Tag t = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
                 if (dumpInfo!= null && t != null) {
@@ -976,6 +985,7 @@ public class SWFInputStream implements AutoCloseable {
                 }
                 return t;
             } catch (EndOfStreamException ex) {
+                tag.getDataStream().endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, null, ex);
                 return tag;
             }
@@ -1006,7 +1016,7 @@ public class SWFInputStream implements AutoCloseable {
         List<Tag> tags = new ArrayList<>();
         Tag tag;
         boolean isAS3 = false;
-        while (true) {
+        while (available() > 0) {
             long pos = getPos();
             newDumpLevel(null, "TAG");
             try {
@@ -1037,7 +1047,9 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        tag = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
+                        if (tag instanceof TagStub) {
+                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, gfx);
+                        }
                         FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
@@ -1077,9 +1089,9 @@ public class SWFInputStream implements AutoCloseable {
 
                 }
             }
-            if (parseTags && doParse) {
+            if (parseTags && doParse && tag instanceof TagStub) {
                 if (parallel) {
-                    Future<Tag> future = executor.submit(new TagResolutionTask(tag, di, level, parallel, skipUnusualTags, gfx));
+                    Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags, gfx));
                     futureResults.add(future);
                 }
             }
@@ -1105,17 +1117,12 @@ public class SWFInputStream implements AutoCloseable {
         return tags;
     }
 
-    public static Tag resolveTag(Tag tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
+    public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
         Tag ret;
-
-        if (!(tag instanceof TagStub)) {
-            return tag;
-        }
 
         ByteArrayRange data = tag.getOriginalRange();
         SWF swf = tag.getSwf();
-        TagStub tagStub = (TagStub) tag;
-        SWFInputStream sis = tagStub.getDataStream();
+        SWFInputStream sis = tag.getDataStream();
 
         try {
             switch (tag.getId()) {
@@ -1425,21 +1432,28 @@ public class SWFInputStream implements AutoCloseable {
         }
         int headerLength = readLong ? 6 : 2;
         SWFInputStream tagDataStream = getLimitedStream((int) tagLength);
+        int available = available();
+        if (tagLength > available) {
+            tagLength = available;
+        }
+        
         ByteArrayRange dataRange = new ByteArrayRange(swf.uncompressedData, (int) pos, (int) (tagLength + headerLength));
         TagStub tagStub = new TagStub(swf, tagID, "Unresolved", dataRange, tagDataStream);
+        tagStub.forceWriteAsLong = readLong;
         Tag ret = tagStub;
-        ret.forceWriteAsLong = readLong;
         skipBytes((int) tagLength);
 
         if (resolve) {
+            DumpInfo di = dumpInfo;
             try {
-                ret = resolveTag(ret, level, parallel, skipUnusualTags, gfx);
+                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
+                tagDataStream.endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);
             }
 
             if (Configuration.debugMode.get()) {
-                byte[] data = ret.getOriginalData();
+                byte[] data = ret.getOriginalData().getRangeData();
                 byte[] dataNew = ret.getData();
                 int ignoreFirst = 0;
                 for (int i = 0; i < data.length; i++) {
@@ -2566,7 +2580,8 @@ public class SWFInputStream implements AutoCloseable {
                 }
                 if (stateNewStyles) {
                     if (morphShape) {
-                        //This should never happen
+                        // This should never happen
+                        throw new IOException("MorphShape should not have new styles.");
                     } else {
                         scr.fillStyles = readFILLSTYLEARRAY(shapeNum, "fillStyles");
                         scr.lineStyles = readLINESTYLEARRAY(shapeNum, "lineStyles");

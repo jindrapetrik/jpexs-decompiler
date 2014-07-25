@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ReflectionTools;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -661,7 +662,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
         this.tag = tag;
         SWF swf = tag.getSwf();
         try {
-            this.editedTag = SWFInputStream.resolveTag(tag, 0, false, true, swf.gfx);
+            if (tag instanceof TagStub) {
+                this.editedTag = SWFInputStream.resolveTag((TagStub)tag, 0, false, true, swf.gfx);
+            }
         } catch (InterruptedException ex) {
         }
         tree.setEditable(edit);

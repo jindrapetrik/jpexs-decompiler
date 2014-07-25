@@ -47,6 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -117,7 +118,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData().getRangeData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
@@ -233,7 +234,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         if (rectCache.contains(this)) {
             return rectCache.get(this);
         }
@@ -241,15 +242,19 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = swf.characters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                RECT r2 = ((BoundedTag) ch).getRect();
-                MATRIX mat = r.placeMatrix;
-                if (mat != null) {
-                    r2 = mat.apply(r2);
+                BoundedTag bt = (BoundedTag) ch;
+                if (!added.contains(bt)){
+                    added.add(bt);
+                    RECT r2 = bt.getRect(added);
+                    MATRIX mat = r.placeMatrix;
+                    if (mat != null) {
+                        r2 = mat.apply(r2);
+                    }
+                    rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
+                    rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
+                    rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
+                    rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
                 }
-                rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
-                rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
-                rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
-                rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
             }
         }
 
@@ -318,7 +323,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect());
+        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
 
         ColorTransform clrTrans = null;
         for (Tag t : swf.tags) {

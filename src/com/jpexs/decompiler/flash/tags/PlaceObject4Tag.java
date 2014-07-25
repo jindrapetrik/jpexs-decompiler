@@ -228,7 +228,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData().getRangeData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {

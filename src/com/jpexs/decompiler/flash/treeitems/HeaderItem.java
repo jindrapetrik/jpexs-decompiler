@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.SWF;
  */
 public class HeaderItem implements TreeItem {
 
-    private SWF swf;
+    private final SWF swf;
 
     public HeaderItem(SWF swf) {
         this.swf = swf;

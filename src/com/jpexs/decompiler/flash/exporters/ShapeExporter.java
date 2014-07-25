@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -88,14 +89,14 @@ public class ShapeExporter {
                         switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    ExportRectangle rect = new ExportRectangle(st.getRect());
+                                    ExportRectangle rect = new ExportRectangle(st.getRect(new HashSet<BoundedTag>()));
                                     SVGExporter exporter = new SVGExporter(rect);
                                     st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
                             case PNG:
-                                RECT rect = st.getRect();
+                                RECT rect = st.getRect(new HashSet<BoundedTag>());
                                 int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
                                 int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
                                 SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);

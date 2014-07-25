@@ -868,7 +868,7 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     @Override
-    public RECT getRect() {
+    public RECT getRect(Set<BoundedTag> added) {
         return displayRect;
     }
 
@@ -2498,16 +2498,16 @@ public final class SWF implements TreeItem, Timelined {
 
                 String assetName;
                 Tag drawableTag = (Tag) drawable;
+                RECT boundRect = drawable.getRect(new HashSet<BoundedTag>());
                 if (exporter.exportedTags.containsKey(drawableTag)) {
                     assetName = exporter.exportedTags.get(drawableTag);
                 } else {
                     assetName = getTagIdPrefix(drawableTag, exporter);
                     exporter.exportedTags.put(drawableTag, assetName);
-                    exporter.createDefGroup(new ExportRectangle(drawable.getRect()), assetName);
+                    exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
                     drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 }
-                RECT boundRect = drawable.getRect();
                 ExportRectangle rect = new ExportRectangle(boundRect);
 
                 // TODO: if (layer.filters != null)
@@ -2661,7 +2661,7 @@ public final class SWF implements TreeItem, Timelined {
                     }
                 }
 
-                RECT boundRect = drawable.getRect();
+                RECT boundRect = drawable.getRect(new HashSet<BoundedTag>());
                 ExportRectangle rect = new ExportRectangle(boundRect);
                 rect = mat.transform(rect);
                 Matrix m = mat.clone();
@@ -2809,7 +2809,7 @@ public final class SWF implements TreeItem, Timelined {
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect();
+                RECT r = b.getRect(new HashSet<BoundedTag>());
                 int div = (int) unzoom;
                 g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
                 g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));

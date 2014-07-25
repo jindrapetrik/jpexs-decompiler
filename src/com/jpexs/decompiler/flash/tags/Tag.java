@@ -68,7 +68,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      * Original tag data
      */
     @Internal
-    private ByteArrayRange originalData;
+    private ByteArrayRange originalRange;
 
     public String getTagName() {
         return tagName;
@@ -120,7 +120,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     public Tag(SWF swf, int id, String name, ByteArrayRange data) {
         this.id = id;
         this.tagName = name;
-        this.originalData = data;
+        this.originalRange = data;
         this.swf = swf;
         if (swf == null) {
             throw new Error("swf parameter cannot be null.");
@@ -330,7 +330,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
             sos.write(newHeaderData);
             sos.write(newData);
         } else {
-            sos.write(originalData.array, originalData.pos, originalData.length);
+            sos.write(originalRange.array, originalRange.pos, originalRange.length);
         }
     }
 
@@ -350,34 +350,33 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      * @return Bytes of data
      */
     public byte[] getData() {
-        return getOriginalData();
+        return getOriginalData().getRangeData();
     }
 
     public final ByteArrayRange getOriginalRange() {
-        return originalData;
+        return originalRange;
     }
 
-    public final byte[] getOriginalData() {
-        if (originalData == null) {
-            return new byte[0];
+    public final ByteArrayRange getOriginalData() {
+        if (originalRange == null) {
+            return new ByteArrayRange();
         }
-        // todo honfika: do not copy data
+
         int dataLength = getOriginalDataLength();
-        byte[] data = new byte[dataLength];
-        System.arraycopy(originalData.array, (int) (originalData.pos + originalData.length - dataLength), data, 0, dataLength);
-        return data;
+        int pos = (int) (originalRange.pos + originalRange.length - dataLength);
+        return new ByteArrayRange(originalRange.array, pos, dataLength);
     }
 
     public final int getOriginalDataLength() {
-        if (originalData == null) {
+        if (originalRange == null) {
             return 0;
         }
         
-        return originalData.length - (isLongOriginal() ? 6 : 2);
+        return originalRange.length - (isLongOriginal() ? 6 : 2);
     }
 
     private final boolean isLongOriginal() {
-        int shortLength = originalData.array[(int) originalData.pos] & 0x003F;
+        int shortLength = originalRange.array[(int) originalRange.pos] & 0x003F;
         return shortLength == 0x3f;
     }
 
@@ -390,11 +389,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     public long getPos() {
-        return originalData.pos;
+        return originalRange.pos;
     }
 
     public long getDataPos() {
-        return originalData.pos + (isLongOriginal() ? 6 : 2);
+        return originalRange.pos + (isLongOriginal() ? 6 : 2);
     }
 
     public void setModified(boolean value) {
@@ -407,7 +406,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
         byte[] tagData = new byte[data.length + headerData.length];
         System.arraycopy(headerData, 0, tagData, 0, headerData.length);
         System.arraycopy(data, 0, tagData, headerData.length, data.length);
-        originalData = new ByteArrayRange(tagData, 0, tagData.length);
+        originalRange = new ByteArrayRange(tagData, 0, tagData.length);
     }
 
     public boolean isModified() {

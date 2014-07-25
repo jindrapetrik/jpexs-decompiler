@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -79,7 +80,7 @@ public class MorphShapeExporter {
                         switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    ExportRectangle rect = new ExportRectangle(mst.getRect());
+                                    ExportRectangle rect = new ExportRectangle(mst.getRect(new HashSet<BoundedTag>()));
                                     SVGExporter exporter = new SVGExporter(rect);
                                     mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
