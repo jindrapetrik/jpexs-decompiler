@@ -608,7 +608,8 @@ public final class SWF implements TreeItem, Timelined {
 
         ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
         getABCTags(objs, newAbcList);
-        this.abcList = newAbcList;
+        isAS3 = !newAbcList.isEmpty();
+        abcList = newAbcList;
     }
 
     private static void getABCTags(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {

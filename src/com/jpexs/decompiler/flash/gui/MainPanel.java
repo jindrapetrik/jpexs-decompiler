@@ -592,13 +592,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         for (SWF swf : newSwfs) {
 
-            boolean hasAbc = !swf.abcList.isEmpty();
-            swf.isAS3 = hasAbc;
-
             tagTree.setModel(new TagTreeModel(mainFrame, swfs));
             dumpTree.setModel(new DumpTreeModel(swfs));
 
-            if (hasAbc) {
+            if (swf.isAS3) {
                 if (abcPanel == null) {
                     abcPanel = new ABCPanel(this);
                     displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
