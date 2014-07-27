@@ -123,7 +123,9 @@
     
     <target name="archive" depends="dist">
         <mkdir dir="${RELEASESDIR}"/>
-        <zip destfile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" basedir="${DISTRIBUTIONDIR}" />
+        <zip destfile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
+            <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
+        </zip>
     </target>
     
     <target name="-exe-config">
