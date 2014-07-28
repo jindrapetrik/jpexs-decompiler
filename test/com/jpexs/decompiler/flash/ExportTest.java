@@ -38,10 +38,10 @@ import org.testng.annotations.Test;
 public class ExportTest {
 
     @BeforeClass
-    public void init(){
+    public void init() {
         Main.initLogging(false);
     }
-    
+
     public static final String TESTDATADIR = "testdata/decompile";
 
     @BeforeClass

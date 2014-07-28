@@ -60,8 +60,7 @@ public class HeaderInfoPanel extends JPanel {
         add(displayRectTwipsLabel);
         add(new JLabel(""));
         add(displayRectPixelsLabel);
-        
-        
+
         SpringUtilities.makeCompactGrid(this,
                 9, 2, //rows, cols
                 6, 6, //initX, initY
@@ -87,22 +86,23 @@ public class HeaderInfoPanel extends JPanel {
         frameRateLabel.setText("" + swf.frameRate);
         frameCountLabel.setText("" + swf.frameCount);
         displayRectTwipsLabel.setText(AppStrings.translate("header.displayrect.value.twips")
-                .replace("%xmin%", ""+swf.displayRect.Xmin)
-                .replace("%ymin%", ""+swf.displayRect.Ymin)
-                .replace("%xmax%", ""+swf.displayRect.Xmax)
-                .replace("%ymax%", ""+swf.displayRect.Ymax));
+                .replace("%xmin%", "" + swf.displayRect.Xmin)
+                .replace("%ymin%", "" + swf.displayRect.Ymin)
+                .replace("%xmax%", "" + swf.displayRect.Xmax)
+                .replace("%ymax%", "" + swf.displayRect.Ymax));
         displayRectPixelsLabel.setText(AppStrings.translate("header.displayrect.value.pixels")
-                .replace("%xmin%", ""+fmtDouble(swf.displayRect.Xmin/SWF.unitDivisor))
-                .replace("%ymin%", ""+fmtDouble(swf.displayRect.Ymin/SWF.unitDivisor))
-                .replace("%xmax%", ""+fmtDouble(swf.displayRect.Xmax/SWF.unitDivisor))
-                .replace("%ymax%", ""+fmtDouble(swf.displayRect.Ymax/SWF.unitDivisor)));       
+                .replace("%xmin%", "" + fmtDouble(swf.displayRect.Xmin / SWF.unitDivisor))
+                .replace("%ymin%", "" + fmtDouble(swf.displayRect.Ymin / SWF.unitDivisor))
+                .replace("%xmax%", "" + fmtDouble(swf.displayRect.Xmax / SWF.unitDivisor))
+                .replace("%ymax%", "" + fmtDouble(swf.displayRect.Ymax / SWF.unitDivisor)));
     }
-    private String fmtDouble(double d){
-        String r = ""+d;
-        if(r.endsWith(".0")){
-            r = r.substring(0,r.length()-2);
+
+    private String fmtDouble(double d) {
+        String r = "" + d;
+        if (r.endsWith(".0")) {
+            r = r.substring(0, r.length() - 2);
         }
         return r;
     }
-    
+
 }

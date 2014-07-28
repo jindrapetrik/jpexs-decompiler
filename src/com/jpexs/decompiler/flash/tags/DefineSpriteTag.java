@@ -125,7 +125,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         }
         return ret;
     }
-    
+
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override

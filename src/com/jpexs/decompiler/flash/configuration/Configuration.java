@@ -585,7 +585,7 @@ public class Configuration {
         if (parallelThreadCount.get() > processorCount) {
             parallelThreadCount.set(processorCount);
         }
-        
+
         if (lastUpdatesCheckDate.get() == null) {
             GregorianCalendar mingc = new GregorianCalendar();
             mingc.setTime(new Date(Long.MIN_VALUE));

@@ -32,10 +32,10 @@ import org.testng.annotations.Test;
 public class SWFStreamTest {
 
     @BeforeClass
-    public void init(){
+    public void init() {
         Main.initLogging(false);
     }
-    
+
     @Test
     public void testNeededBits() {
         assertEquals(SWFOutputStream.getNeededBitsU(3), 2);

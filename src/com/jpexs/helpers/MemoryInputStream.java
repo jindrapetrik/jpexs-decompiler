@@ -87,10 +87,10 @@ public class MemoryInputStream extends SeekableInputStream {
             pos += toRead;
             return toRead;
         }
-        
+
         return -1;
     }
-    
+
     @Override
     public int available() throws IOException {
         return maxLength - (int) pos;

@@ -76,7 +76,7 @@ public class RecompileTest {
         }
     }
 
-    private void testAS2DirectEditingOneRecursive(int swfVersion,List<TreeNode> nodeList) {
+    private void testAS2DirectEditingOneRecursive(int swfVersion, List<TreeNode> nodeList) {
         for (TreeNode node : nodeList) {
             if (node.subNodes.isEmpty()) {
                 TreeItem item = node.getItem();
@@ -113,7 +113,7 @@ public class RecompileTest {
                     }
                 }
             } else {
-                testAS2DirectEditingOneRecursive(swfVersion,node.subNodes);
+                testAS2DirectEditingOneRecursive(swfVersion, node.subNodes);
             }
         }
     }
@@ -121,43 +121,44 @@ public class RecompileTest {
     @Test(dataProvider = "provideFiles")
     public void testDirectEditing(String filename) throws IOException, InterruptedException, com.jpexs.decompiler.flash.abc.avm2.parser.ParseException, CompilationException {
         Configuration.autoDeobfuscate.set(false);
-        try{SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
-        if (swf.fileAttributes.actionScript3) {
-            boolean dotest=false;
-            List<ABC> allAbcs = new ArrayList<>();
-            for (ABCContainerTag ct : swf.abcList) {
-                allAbcs.add(ct.getABC());
-            }
-            for (ABC abc : allAbcs) {
-                for (int s = 0; s < abc.script_info.size(); s++) {
-                    
-                    String startAfter=null;
-                    HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
-                    MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
-                    if(startAfter==null || en.key.toString().equals(startAfter)){
-                        dotest = true;
-                    }
-                    if(!dotest){
-                        System.out.println("Skipped:"+en.key.toString());
-                        continue;
-                    }
-                    
-                    System.out.println("Recompiling:"+en.key.toString()+"...");
-                    en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
-                    String original = htw.toString();
-                    ABC nabc = new ABC(swf);
-                    com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc,allAbcs, false, en.key.className + ".as");                                                            
+        try {
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+            if (swf.fileAttributes.actionScript3) {
+                boolean dotest = false;
+                List<ABC> allAbcs = new ArrayList<>();
+                for (ABCContainerTag ct : swf.abcList) {
+                    allAbcs.add(ct.getABC());
                 }
-            }
-        } else {
-            List<ContainerItem> list2 = new ArrayList<>();
-            list2.addAll(swf.tags);
-            List<TreeNode> list = SWF.createASTagList(list2, null);
+                for (ABC abc : allAbcs) {
+                    for (int s = 0; s < abc.script_info.size(); s++) {
 
-            TagNode.setExport(list, true);
-            testAS2DirectEditingOneRecursive(swf.version,list);
-        }
-        }catch(Exception ex){
+                        String startAfter = null;
+                        HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
+                        MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
+                        if (startAfter == null || en.key.toString().equals(startAfter)) {
+                            dotest = true;
+                        }
+                        if (!dotest) {
+                            System.out.println("Skipped:" + en.key.toString());
+                            continue;
+                        }
+
+                        System.out.println("Recompiling:" + en.key.toString() + "...");
+                        en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                        String original = htw.toString();
+                        ABC nabc = new ABC(swf);
+                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.key.className + ".as");
+                    }
+                }
+            } else {
+                List<ContainerItem> list2 = new ArrayList<>();
+                list2.addAll(swf.tags);
+                List<TreeNode> list = SWF.createASTagList(list2, null);
+
+                TagNode.setExport(list, true);
+                testAS2DirectEditingOneRecursive(swf.version, list);
+            }
+        } catch (Exception ex) {
             System.out.println("FAIL");
             throw ex;
         }

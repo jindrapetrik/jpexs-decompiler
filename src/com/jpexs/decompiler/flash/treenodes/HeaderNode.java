@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.treenodes;
 
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
@@ -28,10 +27,10 @@ public class HeaderNode extends TreeNode {
     public HeaderNode(HeaderItem item) {
         super(item);
     }
-    
+
     @Override
     public HeaderItem getItem() {
         return (HeaderItem) item;
     }
-    
+
 }

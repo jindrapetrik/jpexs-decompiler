@@ -397,7 +397,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
         }
         return clipActions.clipActionRecords.size();
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
         if (placeFlagHasCharacter) {

@@ -36,7 +36,7 @@ public class EndTag extends Tag {
     public byte[] getData() {
         return new byte[0];
     }
-    
+
     public static final int ID = 0;
 
     /**

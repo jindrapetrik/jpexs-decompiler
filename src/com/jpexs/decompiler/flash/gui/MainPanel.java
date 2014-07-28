@@ -485,10 +485,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
         displayPanel.add(createDumpPreviewCard(), CARDDUMPVIEW);
-        
-        headerPanel  = new HeaderInfoPanel();
-        displayPanel.add(headerPanel,CARDHEADER);
-        
+
+        headerPanel = new HeaderInfoPanel();
+        displayPanel.add(headerPanel, CARDHEADER);
+
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
 
@@ -1133,7 +1133,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         }
-        
+
         return null;
     }
 
@@ -1859,7 +1859,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             setDumpTreeSelectedNode(dumpInfo);
         }
     }
-    
+
     public void refreshDecompiled() {
         clearCache();
         if (abcPanel != null) {
@@ -2153,18 +2153,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDEMPTYPANEL);
             return;
         }
-        
+
         dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData, dumpInfo);
         dumpViewPanel.revalidate();
         showCard(CARDDUMPVIEW);
     }
-    
+
     public void reload(boolean forceReload) {
         if (Configuration.dumpView.get()) {
             dumpViewReload(forceReload);
             return;
         }
-        
+
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
             return;
@@ -2249,9 +2249,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         previewPanel.setImageReplaceButtonVisible(false);
 
-        if(treeNode instanceof HeaderNode) {
+        if (treeNode instanceof HeaderNode) {
             showCard(CARDHEADER);
-            headerPanel.load(((HeaderNode)treeNode).getItem().getSwf());
+            headerPanel.load(((HeaderNode) treeNode).getItem().getSwf());
         } else if (treeNode instanceof StringNode) {
             showCard(CARDFOLDERPREVIEWPANEL);
             showFolderPreview(treeNode);
@@ -2543,7 +2543,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
                     tim.frames.add(f);
-                }   
+                }
                 tim.displayRect = getRect(new HashSet<BoundedTag>());
                 return tim;
             }

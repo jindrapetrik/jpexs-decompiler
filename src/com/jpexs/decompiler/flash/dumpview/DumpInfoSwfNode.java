@@ -25,16 +25,16 @@ import com.jpexs.decompiler.flash.SWF;
 public class DumpInfoSwfNode extends DumpInfo {
 
     private final SWF swf;
-    
+
     public DumpInfoSwfNode(SWF swf, String name, String type, Object value, long startByte, long lengthBytes) {
         super(name, type, value, startByte, lengthBytes);
         this.swf = swf;
     }
-    
+
     public SWF getSwf() {
         return swf;
     }
-    
+
     public static DumpInfoSwfNode getSwfNode(DumpInfo dumpInfo) {
         while (!(dumpInfo instanceof DumpInfoSwfNode)) {
             dumpInfo = dumpInfo.parent;

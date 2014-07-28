@@ -66,12 +66,12 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("try").startBlock();       
+        writer.append("try").startBlock();
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
-        }        
+        }
         writer.endBlock();
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();

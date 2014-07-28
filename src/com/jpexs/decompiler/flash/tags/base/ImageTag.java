@@ -146,7 +146,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         shape.shapeRecords.add(new EndShapeRecord());
         return shape;
     }
-    
+
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         SerializableImage image = getImage();

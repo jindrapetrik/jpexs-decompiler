@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.AppStrings;
@@ -31,9 +30,7 @@ public class HeaderItem implements TreeItem {
     public HeaderItem(SWF swf) {
         this.swf = swf;
     }
-    
-    
-    
+
     @Override
     public SWF getSwf() {
         return swf;
@@ -43,7 +40,5 @@ public class HeaderItem implements TreeItem {
     public String toString() {
         return AppStrings.translate("node.header");
     }
-    
-    
-    
+
 }

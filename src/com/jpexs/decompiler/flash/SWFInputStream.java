@@ -321,7 +321,7 @@ public class SWFInputStream implements AutoCloseable {
             }
         }
     }
-    
+
     public void setPercentMax(long percentMax) {
         this.percentMax = percentMax;
     }
@@ -403,7 +403,7 @@ public class SWFInputStream implements AutoCloseable {
             dumpInfo = dumpInfo.parent;
         }
     }
-    
+
     private void endDumpLevelUntil(DumpInfo di) {
         if (di != null) {
             while (dumpInfo != null && dumpInfo != di) {
@@ -706,7 +706,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return new byte[0];
         }
-        
+
         informListeners();
         bitPos = 0;
         byte[] ret = new byte[(int) count];
@@ -980,7 +980,7 @@ public class SWFInputStream implements AutoCloseable {
             DumpInfo di = dumpInfo;
             try {
                 Tag t = resolveTag(tag, level, parallel, skipUnusualTags, gfx);
-                if (dumpInfo!= null && t != null) {
+                if (dumpInfo != null && t != null) {
                     dumpInfo.name = t.getName();
                 }
                 return t;
@@ -1436,7 +1436,7 @@ public class SWFInputStream implements AutoCloseable {
         if (tagLength > available) {
             tagLength = available;
         }
-        
+
         ByteArrayRange dataRange = new ByteArrayRange(swf.uncompressedData, (int) pos, (int) (tagLength + headerLength));
         TagStub tagStub = new TagStub(swf, tagID, "Unresolved", dataRange, tagDataStream);
         tagStub.forceWriteAsLong = readLong;

@@ -57,7 +57,7 @@ public class NewObjectAVM2Item extends AVM2Item {
             writer.newLine();
             writer.unindent();
         }
-        writer.append("}");        
+        writer.append("}");
         return writer;
     }
 

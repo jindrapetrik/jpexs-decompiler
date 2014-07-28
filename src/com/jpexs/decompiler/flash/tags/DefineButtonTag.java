@@ -243,7 +243,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             CharacterTag ch = swf.characters.get(r.characterId);
             if (ch instanceof BoundedTag) {
                 BoundedTag bt = (BoundedTag) ch;
-                if (!added.contains(bt)){
+                if (!added.contains(bt)) {
                     added.add(bt);
                     RECT r2 = bt.getRect(added);
                     MATRIX mat = r.placeMatrix;

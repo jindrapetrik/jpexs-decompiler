@@ -99,7 +99,7 @@ public class TraitMethodGetterSetter extends Trait {
             writer.startBlock();
             if (bodyIndex != -1) {
                 abc.bodies.get(bodyIndex).toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
-            }           
+            }
             writer.endBlock();
         }
         writer.newLine();

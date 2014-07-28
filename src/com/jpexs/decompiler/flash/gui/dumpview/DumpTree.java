@@ -156,7 +156,7 @@ public class DumpTree extends JTree implements ActionListener {
             }
         }
     }
-    
+
     @Override
     public void setModel(TreeModel tm) {
         super.setModel(tm);

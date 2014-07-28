@@ -66,7 +66,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
         methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
-        writer.endMethod();        
+        writer.endMethod();
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {

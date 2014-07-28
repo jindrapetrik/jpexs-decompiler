@@ -58,7 +58,7 @@ public class WithAVM2Item extends AVM2Item {
         scope.toString(writer, localData);
         writer.append(")").startBlock();
         //NOTE: endBlock is added with WithEndAVM2Item
-        return writer;      
+        return writer;
     }
 
     @Override

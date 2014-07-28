@@ -350,7 +350,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      * @return Bytes of data
      */
     public abstract byte[] getData();
-    
+
     public final ByteArrayRange getOriginalRange() {
         return originalRange;
     }
@@ -369,7 +369,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
         if (originalRange == null) {
             return 0;
         }
-        
+
         return originalRange.length - (isLongOriginal() ? 6 : 2);
     }
 

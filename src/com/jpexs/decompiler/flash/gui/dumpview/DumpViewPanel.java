@@ -59,7 +59,7 @@ public class DumpViewPanel extends JPanel {
         }
         return end - 1;
     }
-    
+
     public void setData(byte[] data, DumpInfo dumpInfo) {
         List<DumpInfo> dumpInfos = new ArrayList<>();
         DumpInfo di = dumpInfo;
@@ -81,7 +81,7 @@ public class DumpViewPanel extends JPanel {
             int selectionEnd = getEndIndex(dumpInfo);
 
             dumpViewHexTable.scrollToByte(highlightStarts, highlightEnds);
-            
+
             setLabelText("startByte: " + dumpInfo.startByte
                     + " startBit: " + dumpInfo.startBit
                     + " lengthBytes: " + dumpInfo.lengthBytes
@@ -89,7 +89,7 @@ public class DumpViewPanel extends JPanel {
                     + " selectionStart: " + selectionStart
                     + " selectionEnd: " + selectionEnd);
         }
-        
+
         repaint();
     }
 

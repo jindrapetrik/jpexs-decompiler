@@ -257,8 +257,8 @@ public class ConstantPool {
                     }
                 }
                 return m;
-                }
             }
+        }
         return 0;
     }
 

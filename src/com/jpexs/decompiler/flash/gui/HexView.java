@@ -33,7 +33,7 @@ import javax.swing.table.TableColumn;
  * @author JPEXS
  */
 public class HexView extends JTable {
-    
+
     private final int bytesInRow = 16;
     private long[] highlightStarts;
     private long[] highlightEnds;
@@ -51,7 +51,7 @@ public class HexView extends JTable {
             JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
             int level = -1;
             if (col > 0 && highlightStarts != null) {
-                if(col!=bytesInRow+1){
+                if (col != bytesInRow + 1) {
                     int idx = row * bytesInRow + ((col > bytesInRow + 1) ? (col - bytesInRow - 2) : (col - 1));
                     for (int i = 0; i < highlightStarts.length; i++) {
                         if (highlightStarts[i] <= idx && highlightEnds[i] >= idx) {
@@ -73,14 +73,14 @@ public class HexView extends JTable {
 
             return l;
         }
-    }    
+    }
 
     public HexView() {
         highlightColors = new Color[highlightColorsStr.length];
         for (int i = 0; i < highlightColors.length; i++) {
             highlightColors[i] = Color.decode("#" + highlightColorsStr[i]);
         }
-        
+
         setModel(new AbstractTableModel() {
 
             @Override
@@ -137,7 +137,7 @@ public class HexView extends JTable {
         setFont(new Font("Monospaced", Font.PLAIN, 12));
         setTableHeader(new JTableHeader());
         setMaximumSize(new Dimension(200, 200));
-        
+
         setShowHorizontalLines(false);
         setShowVerticalLines(false);
         setRowSelectionAllowed(false);
@@ -152,10 +152,10 @@ public class HexView extends JTable {
             column.setMaxWidth(25);
             column.setCellRenderer(cellRenderer);
         }
-        
+
         column = columnModel.getColumn(bytesInRow + 1);
         column.setMaxWidth(10);
-        
+
         for (int i = 0; i < bytesInRow; i++) {
             column = columnModel.getColumn(i + bytesInRow + 1 + 1);
             column.setMaxWidth(10);
@@ -164,28 +164,28 @@ public class HexView extends JTable {
     }
 
     public void setData(byte[] data, long[] highlightStarts, long[] highlightEnds) {
-        
+
         if ((highlightStarts == null) ^ (highlightEnds == null)) {
             throw new Error("highlightStarts and highlightEnds should be both null or not null.");
         }
-        
+
         if (highlightStarts != null && highlightStarts.length != highlightEnds.length) {
             throw new Error("highlightStarts and highlightEnds should have the same number of elements.");
         }
-        
+
         this.data = data;
         this.highlightStarts = highlightStarts;
         this.highlightEnds = highlightEnds;
     }
-    
+
     public void scrollToByte(long byteNum) {
         int row = (int) (byteNum / bytesInRow);
 
         //final int pageSize = (int) (getParent().getSize().getHeight() / getRowHeight());
         getSelectionModel().setSelectionInterval(row, row);
-        scrollRectToVisible(new Rectangle(getCellRect(row, 0, true)));            
+        scrollRectToVisible(new Rectangle(getCellRect(row, 0, true)));
     }
-    
+
     public void scrollToByte(long[] byteNumStarts, long[] byteNumEnds) {
         for (int i = 0; i < byteNumStarts.length; i++) {
             scrollToByte(byteNumStarts[i]);

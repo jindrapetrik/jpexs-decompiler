@@ -244,9 +244,8 @@ public class TagTreeModel implements TreeModel {
         }
         swfNode.scriptsNode = actionScriptNode;
 
-        
         ret.add(new HeaderNode(new HeaderItem(swf)));
-        
+
         if (!shapesNode.subNodes.isEmpty()) {
             ret.add(shapesNode);
         }
@@ -341,7 +340,7 @@ public class TagTreeModel implements TreeModel {
                     return newPath;
                 }
             }
-            
+
             if (obj instanceof StringItem && n.getItem() instanceof StringItem) {
                 // StringItems are always recreated, so compare them by name
                 StringItem nds = (StringItem) n.getItem();

@@ -128,7 +128,6 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-
     /**
      * Names of ActionScript properties
      */

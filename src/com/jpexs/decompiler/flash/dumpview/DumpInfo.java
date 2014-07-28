@@ -65,14 +65,14 @@ public class DumpInfo {
     public int getChildCount() {
         return childInfos == null ? 0 : childInfos.size();
     }
-    
+
     public List<DumpInfo> getChildInfos() {
         if (childInfos == null) {
             childInfos = new ArrayList<>();
         }
         return childInfos;
     }
-    
+
     @Override
     public String toString() {
         String value = previewValue == null ? "" : previewValue.toString();

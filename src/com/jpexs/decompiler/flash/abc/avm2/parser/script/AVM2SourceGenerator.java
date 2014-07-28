@@ -2032,7 +2032,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
                 TraitMethodGetterSetter tmgs = new TraitMethodGetterSetter();
-                tmgs.kindType = (item instanceof GetterAVM2Item)?Trait.TRAIT_GETTER:((item instanceof SetterAVM2Item) ? Trait.TRAIT_SETTER : Trait.TRAIT_METHOD);
+                tmgs.kindType = (item instanceof GetterAVM2Item) ? Trait.TRAIT_GETTER : ((item instanceof SetterAVM2Item) ? Trait.TRAIT_SETTER : Trait.TRAIT_METHOD);
                 //tmgs.name_index = traitName(((MethodAVM2Item) item).namespace, ((MethodAVM2Item) item).functionName);
                 tmgs.disp_id = mai.isStatic() ? disp_id++ : 0; //For a reason, there is disp_id only for static methods (or not?)
                 if (mai.isFinal() || mai.isStatic()) {

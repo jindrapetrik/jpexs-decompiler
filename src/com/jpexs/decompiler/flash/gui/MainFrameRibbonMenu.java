@@ -329,29 +329,27 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
 
         importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);
-        
-        
+
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
         viewBand.setResizePolicies(getResizePolicies(viewBand));
-        
-        CommandToggleButtonGroup grp=new CommandToggleButtonGroup();
-        
+
+        CommandToggleButtonGroup grp = new CommandToggleButtonGroup();
+
         viewModeResourcesToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.resources")), View.getResizableIcon("viewresources16"));
-        assignListener(viewModeResourcesToggleButton, ACTION_VIEWMODE_RESOURCES);       
-        
+        assignListener(viewModeResourcesToggleButton, ACTION_VIEWMODE_RESOURCES);
+
         viewModeHexToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.hex")), View.getResizableIcon("viewhex16"));
         assignListener(viewModeHexToggleButton, ACTION_VIEWMODE_HEX);
-        
+
         grp.add(viewModeResourcesToggleButton);
         grp.add(viewModeHexToggleButton);
-        
-        if(Configuration.dumpView.get()){
+
+        if (Configuration.dumpView.get()) {
             grp.setSelected(viewModeHexToggleButton, true);
-        }else{
+        } else {
             grp.setSelected(viewModeResourcesToggleButton, true);
         }
-        
-        
+
         viewBand.addCommandButton(viewModeResourcesToggleButton, RibbonElementPriority.MEDIUM);
         viewBand.addCommandButton(viewModeHexToggleButton, RibbonElementPriority.MEDIUM);
 
@@ -460,10 +458,9 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         miAutoRenameIdentifiers.addActionListener(this);
 
         /*miDumpView = new JCheckBox(translate("menu.settings.dumpView"));
-        miDumpView.setSelected(Configuration.dumpView.get());
-        miDumpView.setActionCommand(ACTION_DUMP_VIEW_SWITCH);
-        miDumpView.addActionListener(this);*/
-
+         miDumpView.setSelected(Configuration.dumpView.get());
+         miDumpView.setActionCommand(ACTION_DUMP_VIEW_SWITCH);
+         miDumpView.addActionListener(this);*/
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
@@ -652,7 +649,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
                 mainFrame.panel.reload(true);
                 break;
-                
+
             case ACTION_VIEWMODE_RESOURCES:
                 Configuration.dumpView.set(false);
                 mainFrame.panel.showDumpView(false);

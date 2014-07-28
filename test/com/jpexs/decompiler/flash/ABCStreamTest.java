@@ -32,8 +32,9 @@ import org.testng.annotations.Test;
  * @author JPEXS
  */
 public class ABCStreamTest {
+
     @BeforeClass
-    public void init(){
+    public void init() {
         Main.initLogging(false);
     }
 
