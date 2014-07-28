@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class RemoveObject2Tag extends Tag implements RemoveTag {
 
@@ -32,6 +35,23 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
     public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "RemoveObject2", data);
         depth = sis.readUI16("depth");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(depth);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 
     @Override

@@ -17,9 +17,12 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  *
@@ -44,5 +47,22 @@ public class SoundStreamBlockTag extends Tag {
         super(sis.getSwf(), ID, "SoundStreamBlock", data);
         //all data is streamSoundData
         streamSoundData = sis.readBytesEx(sis.available(), "streamSoundData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.write(streamSoundData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 }

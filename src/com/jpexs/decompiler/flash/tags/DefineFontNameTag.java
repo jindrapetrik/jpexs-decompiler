@@ -17,10 +17,13 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class DefineFontNameTag extends Tag {
 
@@ -35,5 +38,24 @@ public class DefineFontNameTag extends Tag {
         fontId = sis.readUI16("fontId");
         fontName = sis.readString("fontName");
         fontCopyright = sis.readString("fontCopyright");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(fontId);
+            sos.writeString(fontName);
+            sos.writeString(fontCopyright);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 }

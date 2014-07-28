@@ -62,6 +62,16 @@ public class ShowFrameTag extends Tag {
         super(swf, ID, "ShowFrame", null);
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        return new byte[0];
+    }
+
     public static boolean isNestedTagType(int tagTypeId) {
         return nestedTagTypeIds.contains(tagTypeId);
     }

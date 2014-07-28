@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -24,7 +25,9 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 
 public class DefineShape3Tag extends ShapeTag {
@@ -74,6 +77,25 @@ public class DefineShape3Tag extends ShapeTag {
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
         shapes = sis.readSHAPEWITHSTYLE(3, false, "shapes");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(shapeId);
+            sos.writeRECT(shapeBounds);
+            sos.writeSHAPEWITHSTYLE(shapes, 3);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 
     @Override

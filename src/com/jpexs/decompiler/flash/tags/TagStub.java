@@ -43,6 +43,16 @@ public class TagStub extends Tag {
         dataStream = sis;
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        return getOriginalData().getRangeData();
+    }
+
     public SWFInputStream getDataStream() {
         return dataStream;
     }

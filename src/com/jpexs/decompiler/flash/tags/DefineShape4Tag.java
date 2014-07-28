@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -25,7 +26,9 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 
 public class DefineShape4Tag extends ShapeTag {
@@ -87,6 +90,30 @@ public class DefineShape4Tag extends ShapeTag {
         usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
         usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
         shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(shapeId);
+            sos.writeRECT(shapeBounds);
+            sos.writeRECT(edgeBounds);
+            sos.writeUB(5, reserved);
+            sos.writeUB(1, usesFillWindingRule ? 1 : 0);
+            sos.writeUB(5, usesNonScalingStrokes ? 1 : 0);
+            sos.writeUB(5, usesScalingStrokes ? 1 : 0);
+            sos.writeSHAPEWITHSTYLE(shapes, 4);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 
     @Override

@@ -29,9 +29,18 @@ public class UnknownTag extends Tag {
         super(swf, id, "Unknown", data);
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        return getOriginalRange().getRangeData();
+    }
+
     @Override
     public String toString() {
         return super.toString() + " (ID=" + id + ")";
     }
-
 }

@@ -48,6 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -662,10 +663,14 @@ public class GenericTagTreePanel extends GenericTagPanel {
         this.tag = tag;
         SWF swf = tag.getSwf();
         try {
-            if (tag instanceof TagStub) {
-                this.editedTag = SWFInputStream.resolveTag((TagStub)tag, 0, false, true, swf.gfx);
-            }
+            byte[] data = tag.getData();
+            SWFInputStream tagDataStream = new SWFInputStream(swf, data, 0, data.length);
+            TagStub copy = new TagStub(swf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
+            copy.forceWriteAsLong = tag.forceWriteAsLong;
+            this.editedTag = SWFInputStream.resolveTag(copy, 0, false, true, swf.gfx);
         } catch (InterruptedException ex) {
+        } catch (IOException ex) {
+            Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         tree.setEditable(edit);
         if (!edit) {

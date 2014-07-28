@@ -131,8 +131,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     private static final Object lockObject = new Object();
-    private static List<Integer> knownTagIds;
-    private static List<Integer> requiredTagIds;
+    private volatile static List<Integer> knownTagIds;
+    private volatile static List<Integer> requiredTagIds;
 
     public static List<Integer> getKnownTags() {
         if (knownTagIds == null) {
@@ -349,10 +349,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      *
      * @return Bytes of data
      */
-    public byte[] getData() {
-        return getOriginalData().getRangeData();
-    }
-
+    public abstract byte[] getData();
+    
     public final ByteArrayRange getOriginalRange() {
         return originalRange;
     }
@@ -375,7 +373,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
         return originalRange.length - (isLongOriginal() ? 6 : 2);
     }
 
-    private final boolean isLongOriginal() {
+    private boolean isLongOriginal() {
         int shortLength = originalRange.array[(int) originalRange.pos] & 0x003F;
         return shortLength == 0x3f;
     }
