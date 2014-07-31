@@ -122,9 +122,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
-        boolean deobfuscate = Configuration.autoDeobfuscate.get();
-
+    private static List<Action> readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         ConstantPool cpool = new ConstantPool();
 
         // List of the actions. N. item contains the action which starts in offset N.
@@ -189,7 +187,7 @@ public class ActionListReader {
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 
-        if (deobfuscate) {
+        if (Configuration.autoDeobfuscate.get()) {
             try {
                 actions = deobfuscateActionList(listeners, actions, version, ip, path);
                 updateActionLengths(actions, version);
@@ -216,7 +214,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
+    private static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
             return actions;
         }
@@ -525,7 +523,7 @@ public class ActionListReader {
      * @param removeWhenLast
      * @return
      */
-    public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
+    private static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
 
         if (index < 0 || actions.size() <= index) {
             return false;

@@ -2139,6 +2139,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showDetail(DETAILCARDEMPTYPANEL);
         } else {
             treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
+            treePanel.add(searchPanel, BorderLayout.SOUTH);
             treePanelMode = TreePanelMode.TAG_TREE;
         }
         reload(true);
