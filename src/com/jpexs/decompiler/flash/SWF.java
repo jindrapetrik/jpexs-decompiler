@@ -531,6 +531,7 @@ public final class SWF implements TreeItem, Timelined {
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
         compression = header.compression;
+        lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
@@ -778,6 +779,7 @@ public final class SWF implements TreeItem, Timelined {
                     }
 
                     header.compression = SWFCompression.LZMA;
+                    header.lzmaProperties = lzmaProperties;
                     break;
                 }
                 default: { // FWS, GFX

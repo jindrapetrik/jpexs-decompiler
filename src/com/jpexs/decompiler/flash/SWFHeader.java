@@ -38,6 +38,11 @@ public class SWFHeader {
     public SWFCompression compression = SWFCompression.NONE;
 
     /**
+     * LZMA properties
+     */
+    public byte[] lzmaProperties;
+
+    /**
      * ScaleForm GFx
      */
     public boolean gfx = false;
