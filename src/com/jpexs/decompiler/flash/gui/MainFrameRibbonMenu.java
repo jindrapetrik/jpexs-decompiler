@@ -211,6 +211,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, ACTION_CHECK_UPDATES), JCommandButton.CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, ACTION_ABOUT), JCommandButton.CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, ACTION_OPEN), JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
+        RibbonApplicationMenuEntryPrimary saveFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("save32"), translate("menu.file.save"), new ActionRedirector(this, ACTION_SAVE), JCommandButton.CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary saveAsFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("saveas32"), translate("menu.file.saveas"), new ActionRedirector(this, ACTION_SAVE_AS), JCommandButton.CommandButtonKind.ACTION_ONLY);
         closeFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.close"), new ActionRedirector(this, ACTION_CLOSE), JCommandButton.CommandButtonKind.ACTION_ONLY);
         closeAllFilesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.closeAll"), new ActionRedirector(this, ACTION_CLOSE_ALL), JCommandButton.CommandButtonKind.ACTION_ONLY);
         openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
@@ -251,6 +253,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
 
         mainMenu.addMenuEntry(openFileMenu);
+        mainMenu.addMenuEntry(saveFileMenu);
+        mainMenu.addMenuEntry(saveAsFileMenu);
         mainMenu.addMenuEntry(closeFileMenu);
         mainMenu.addMenuEntry(closeAllFilesMenu);
         mainMenu.addMenuSeparator();
