@@ -1131,6 +1131,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (treePanelMode == TreePanelMode.DUMP_TREE) {
             DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
 
+            if (dumpInfo == null) {
+                return null;
+            }
+            
             return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         }
 
@@ -1297,6 +1301,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void renameOneIdentifier(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
         if (swf.fileAttributes != null && swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
             final List<ABCContainerTag> abcList = swf.abcList;
@@ -1345,6 +1352,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void exportFla(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
@@ -1731,6 +1741,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void renameIdentifiers(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
         if (confirmExperimental()) {
             final RenameType renameType = new RenameDialog().display();
             if (renameType != null) {
@@ -1835,6 +1848,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void removeNonScripts(SWF swf) {
+        if (swf == null) {
+            return;
+        }
         List<Tag> tags = new ArrayList<>(swf.tags);
         for (Tag tag : tags) {
             System.out.println(tag.getClass());

@@ -323,6 +323,9 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> textExportExportFontFace = null;
 
+    @ConfigurationDefaultInt(128)
+    public static final ConfigurationItem<Integer> lzmaFastBytes = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

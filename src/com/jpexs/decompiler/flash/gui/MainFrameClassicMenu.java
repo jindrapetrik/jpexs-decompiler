@@ -482,43 +482,47 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
-                boolean saved = false;
-                if (snode.binaryData != null) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        swf.saveTo(baos);
-                        snode.binaryData.binaryData = baos.toByteArray();
-                        snode.binaryData.setModified(true);
-                        saved = true;
-                    } catch (IOException ex) {
-                        Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                if (swf != null) {
+                    SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
+                    boolean saved = false;
+                    if (snode.binaryData != null) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        try {
+                            swf.saveTo(baos);
+                            snode.binaryData.binaryData = baos.toByteArray();
+                            snode.binaryData.setModified(true);
+                            saved = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                        }
+                    } else if (swf.file == null) {
+                        saved = saveAs(swf, SaveFileMode.SAVEAS);
+                    } else {
+                        try {
+                            Main.saveFile(swf, swf.file);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);
+                            View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                } else if (swf.file == null) {
-                    saved = saveAs(swf, SaveFileMode.SAVEAS);
-                } else {
-                    try {
-                        Main.saveFile(swf, swf.file);
-                    } catch (IOException ex) {
-                        Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);
-                        View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    if (saved) {
+                        swf.clearModified();
                     }
-                }
-                if (saved) {
-                    swf.clearModified();
                 }
             }
             break;
             case ACTION_SAVE_AS: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                if (saveAs(swf, SaveFileMode.SAVEAS)) {
+                if (swf != null && saveAs(swf, SaveFileMode.SAVEAS)) {
                     swf.clearModified();
                 }
             }
             break;
             case ACTION_SAVE_AS_EXE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                saveAs(swf, SaveFileMode.EXE);
+                if (swf != null) {
+                    saveAs(swf, SaveFileMode.EXE);
+                }
             }
             break;
             case ACTION_OPEN:

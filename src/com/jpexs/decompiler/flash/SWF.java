@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpacker.JPacker;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -447,6 +448,9 @@ public final class SWF implements TreeItem, Timelined {
                 for (int i = 0; i < 4; i++) {
                     dictionarySize += ((int) (lzmaProperties[1 + i]) & 0xFF) << (i * 8);
                 }
+                if (Configuration.lzmaFastBytes.get() > 0) {
+                    enc.SetNumFastBytes(Configuration.lzmaFastBytes.get());
+                }
                 enc.SetDictionarySize(dictionarySize);
                 enc.SetLcLpPb(lc, lp, pb);
                 baos = new ByteArrayOutputStream();
@@ -459,7 +463,7 @@ public final class SWF implements TreeItem, Timelined {
                 udata[2] = (byte) ((data.length >> 16) & 0xFF);
                 udata[3] = (byte) ((data.length >> 24) & 0xFF);
                 os.write(udata);
-                os.write(lzmaProperties);
+                enc.WriteCoderProperties(os);
             } else if (compression == SWFCompression.ZLIB) {
                 os = new DeflaterOutputStream(os);
             }
@@ -770,7 +774,7 @@ public final class SWF implements TreeItem, Timelined {
                     if (lzmaProperties.length != propertiesSize) {
                         throw new IOException("LZMA:input .lzma file is too short");
                     }
-                    SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+                    Decoder decoder = new Decoder();
                     if (!decoder.SetDecoderProperties(lzmaProperties)) {
                         throw new IOException("LZMA:Incorrect stream properties");
                     }
