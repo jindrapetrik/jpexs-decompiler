@@ -121,7 +121,7 @@ public class TagTreeModel implements TreeModel {
         List<TreeNode> binaryData = new ArrayList<>();
         List<TreeNode> others = new ArrayList<>();
 
-        List<TreeNode> actionScript = SWF.createASTagList(list, null);
+        List<TreeNode> actionScript = SWF.createASTagList(list, swf);
         List<Tag> actionScriptTags = new ArrayList<>();
         SWF.getTagsFromTreeNodes(actionScript, actionScriptTags);
 

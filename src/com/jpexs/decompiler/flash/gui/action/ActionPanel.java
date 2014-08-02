@@ -220,7 +220,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
-            List<TreeNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
+            SWF swf = mainPanel.getCurrentSwf();
+            List<TreeNode> list = SWF.createASTagList(swf.tags, swf);
             Map<String, ASMSource> asms = new HashMap<>();
             getASMs("", list, asms);
             final List<ActionSearchResult> found = new ArrayList<>();

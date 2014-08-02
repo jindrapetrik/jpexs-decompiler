@@ -933,7 +933,7 @@ public final class SWF implements TreeItem, Timelined {
         List<File> ret = new ArrayList<>();
         List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(tags);
-        List<TreeNode> list = createASTagList(list2, null);
+        List<TreeNode> list = createASTagList(list2, this);
 
         TagNode.setExport(list, true);
         if (!outdir.endsWith(File.separator)) {

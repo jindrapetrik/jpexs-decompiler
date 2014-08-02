@@ -183,7 +183,7 @@ public class ActionListReader {
         }
 
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
-        //updateActionStores(actions, jumps);
+        updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 
@@ -417,7 +417,6 @@ public class ActionListReader {
                     if (a1 == null || a1 == nextActionAfterStore) {
                         break;
                     }
-                    actions.remove(a1);
                     store.add(a1);
                 }
                 aStore.setStore(store);
@@ -579,7 +578,7 @@ public class ActionListReader {
 
         updateAddresses(actions, startIp, version);
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
-        //updateActionStores(actions, jumps);
+        updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 
