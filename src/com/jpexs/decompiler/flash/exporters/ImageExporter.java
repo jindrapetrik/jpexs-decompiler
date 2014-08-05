@@ -60,7 +60,7 @@ public class ImageExporter {
                     fileFormat = "jpg";
                 }
 
-                final File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + fileFormat);
+                final File file = new File(outdir + File.separator + ((ImageTag) t).getExportFileName2() + "." + fileFormat);
                 final List<Tag> ttags = tags;
                 final String ffileFormat = fileFormat;
                 new RetryTask(new RunnableIOEx() {
