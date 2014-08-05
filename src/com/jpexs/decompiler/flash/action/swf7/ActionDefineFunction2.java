@@ -348,16 +348,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public List<Long> getAllRefs(int version) {
-        return super.getAllRefs(version);//return Action.getActionsAllRefs(code, version);
-    }
-
-    @Override
-    public List<Action> getAllIfsOrJumps() {
-        return super.getAllIfsOrJumps(); //return Action.getActionsAllIfsOrJumps(code);
-    }
-
-    @Override
     public List<Long> getContainerSizes() {
         List<Long> ret = new ArrayList<>();
         ret.add((Long) (long) codeSize);

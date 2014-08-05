@@ -194,16 +194,6 @@ public class Action implements GraphSourceItem {
     }
 
     /**
-     * Gets all ActionIf or ActionJump actions from subactions
-     *
-     * @return List of actions
-     */
-    public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<>();
-        return ret;
-    }
-
-    /**
      * Gets all ActionIf or ActionJump actions from list of actions
      *
      * @param list List of actions
@@ -212,8 +202,9 @@ public class Action implements GraphSourceItem {
     public static List<Action> getActionsAllIfsOrJumps(List<Action> list) {
         List<Action> ret = new ArrayList<>();
         for (Action a : list) {
-            List<Action> part = a.getAllIfsOrJumps();
-            ret.addAll(part);
+            if (a instanceof ActionIf || a instanceof ActionJump) {
+                ret.add(a);
+            }
         }
         return ret;
     }

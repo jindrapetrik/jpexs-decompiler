@@ -93,13 +93,6 @@ public class ActionIf extends Action {
     }
 
     @Override
-    public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<>();
-        ret.add(this);
-        return ret;
-    }
-
-    @Override
     public String toString() {
         return "ActionIf";
     }

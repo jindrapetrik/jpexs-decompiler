@@ -169,18 +169,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<>();
-        return ret;
-    }
-
-    @Override
-    public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<>();
-        return ret;
-    }
-
-    @Override
     public long getHeaderSize() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);

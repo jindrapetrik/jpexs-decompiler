@@ -183,16 +183,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public List<Long> getAllRefs(int version) {
-        return super.getAllRefs(version);//Action.getActionsAllRefs(getActions(null), version);
-    }
-
-    @Override
-    public List<Action> getAllIfsOrJumps() {
-        return super.getAllIfsOrJumps(); //Action.getActionsAllIfsOrJumps(code);
-    }
-
-    @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 

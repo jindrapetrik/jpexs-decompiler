@@ -85,16 +85,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public List<Long> getAllRefs(int version) {
-        return super.getAllRefs(version);
-    }
-
-    @Override
-    public List<Action> getAllIfsOrJumps() {
-        return super.getAllIfsOrJumps();
-    }
-
-    @Override
     public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         output.add(new WithActionItem(this, stack.pop(), content.get(0)));
     }
