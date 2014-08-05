@@ -1134,7 +1134,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (dumpInfo == null) {
                 return null;
             }
-            
+
             return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         }
 

@@ -72,7 +72,7 @@ public class FontExporter {
                 if (settings.mode == FontExportMode.WOFF) {
                     ext = ".woff";
                 }
-                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ext);
+                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + ext));
                 newfile = file;
                 new RetryTask(new RunnableIOEx() {
                     @Override

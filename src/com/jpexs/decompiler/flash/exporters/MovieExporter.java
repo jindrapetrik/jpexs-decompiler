@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,7 +62,7 @@ public class MovieExporter {
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
                 final DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                final File file = new File(outdir + File.separator + ((DefineVideoStreamTag) t).getCharacterExportFileName() + ".flv");
+                final File file = new File(outdir + File.separator + Helper.makeFileName(videoStream.getCharacterExportFileName() + ".flv"));
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {

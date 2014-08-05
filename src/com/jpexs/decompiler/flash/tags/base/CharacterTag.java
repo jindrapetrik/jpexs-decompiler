@@ -56,24 +56,9 @@ public abstract class CharacterTag extends CharacterIdTag {
         }
         return tagName;
     }
-     /*
-    export with classname/export namme
-    */
-    public String getExportFileName2() {
-        String nameAppend = "";
-        if (exportName != null) {
-            nameAppend = ": " + exportName;
-            return exportName;
-        }
-        if (className != null) {
-            nameAppend = ": " + className;
-            return className;
-        }
-        if (getCharacterId() != -1) {
-            return getCharacterId()+"";
-           // return tagName + " (" + getCharacterId() + nameAppend + ")";
-        }
-        
-        return tagName;
+
+    @Override
+    public String getCharacterExportFileName() {
+        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (className != null ? "_" + className : "");
     }
 }

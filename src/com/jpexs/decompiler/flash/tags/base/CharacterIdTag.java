@@ -43,6 +43,9 @@ public abstract class CharacterIdTag extends Tag {
     protected String exportName;
 
     public void setExportName(String exportName) {
+        if ("".equals(exportName)) {
+            exportName = null;
+        }
         this.exportName = exportName;
     }
 
@@ -63,11 +66,11 @@ public abstract class CharacterIdTag extends Tag {
 
     @Override
     public String getExportFileName() {
-        return super.getName() + "_" + getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
+        return super.getName() + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "");
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
+        return getCharacterId() + (exportName != null ? "_" + exportName : "");
     }
 
     public String getExportName() {

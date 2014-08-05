@@ -65,7 +65,7 @@ public class TextExporter {
             for (Tag t : tags) {
                 if (t instanceof TextTag) {
                     final TextTag textTag = (TextTag) t;
-                    final File file = new File(outdir + File.separator + textTag.getExportFileName2()+ ".svg");
+                    final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName()+ ".svg"));
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
@@ -110,7 +110,7 @@ public class TextExporter {
             for (Tag t : tags) {
                 if (t instanceof TextTag) {
                     final TextTag textTag = (TextTag) t;
-                    final File file = new File(outdir + File.separator + textTag.getCharacterId() + ".txt");
+                    final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".txt"));
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {

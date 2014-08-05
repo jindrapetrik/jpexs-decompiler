@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,14 +61,15 @@ public class ImageExporter {
                     fileFormat = "jpg";
                 }
 
-                final File file = new File(outdir + File.separator + ((ImageTag) t).getExportFileName2() + "." + fileFormat);
+                final ImageTag imageTag = (ImageTag) t;
+                final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
                 final List<Tag> ttags = tags;
                 final String ffileFormat = fileFormat;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
 
-                        ImageIO.write(((ImageTag) t).getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                        ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
                     }
                 }, handler).run();
                 ret.add(file);
