@@ -1259,7 +1259,7 @@ public class CommandLineArgumentParser {
             return vals[0];
         }
         for (E e : vals) {
-            if (e.toString().toLowerCase().equals(str.toLowerCase())) {
+            if (e.toString().toLowerCase().replace("_", "").equals(str.toLowerCase().replace("_", ""))) {
                 return e;
             }
         }
