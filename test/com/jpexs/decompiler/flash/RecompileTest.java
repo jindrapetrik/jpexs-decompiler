@@ -123,7 +123,7 @@ public class RecompileTest {
         Configuration.autoDeobfuscate.set(false);
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
-            if (swf.fileAttributes.actionScript3) {
+            if ((swf.fileAttributes != null && swf.fileAttributes.actionScript3) || (swf.fileAttributes == null && swf.isAS3)) {
                 boolean dotest = false;
                 List<ABC> allAbcs = new ArrayList<>();
                 for (ABCContainerTag ct : swf.abcList) {

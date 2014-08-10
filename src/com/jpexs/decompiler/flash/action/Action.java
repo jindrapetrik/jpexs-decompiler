@@ -97,7 +97,6 @@ import java.util.logging.Logger;
  */
 public class Action implements GraphSourceItem {
 
-    public Action replaceWith;
     private boolean ignored = false;
     /**
      * Action type identifier
@@ -184,29 +183,9 @@ public class Action implements GraphSourceItem {
     /**
      * Gets all addresses which are referenced from this action and/or
      * subactions
-     *
-     * @param version SWF version
-     * @return List of addresses
+     * @param refs list of addresses
      */
-    public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<>();
-        return ret;
-    }
-
-    /**
-     * Gets all ActionIf or ActionJump actions from list of actions
-     *
-     * @param list List of actions
-     * @return List of actions
-     */
-    public static List<Action> getActionsAllIfsOrJumps(List<Action> list) {
-        List<Action> ret = new ArrayList<>();
-        for (Action a : list) {
-            if (a instanceof ActionIf || a instanceof ActionJump) {
-                ret.add(a);
-            }
-        }
-        return ret;
+    public void getRef(List<Long> refs) {
     }
 
     /**
@@ -219,14 +198,13 @@ public class Action implements GraphSourceItem {
     public static List<Long> getActionsAllRefs(List<Action> list, int version) {
         List<Long> ret = new ArrayList<>();
         for (Action a : list) {
-            if (a.replaceWith != null) {
-                a.replaceWith.setAddress(a.getAddress(), version, false);
-                ret.addAll(a.replaceWith.getAllRefs(version));
-            }
-            List<Long> part = a.getAllRefs(version);
-            ret.addAll(part);
+            a.getRef(ret);
         }
         return ret;
+    }
+
+    public int getTotalActionLength() {
+        return actionLength + 1 + ((actionCode >= 0x80) ? 2 : 0);
     }
 
     /**
@@ -408,15 +386,14 @@ public class Action implements GraphSourceItem {
      * @param listeners
      * @param address
      * @param list List of actions
-     * @param importantOffsets List of important offsets to mark as labels
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @param writer
      * @param path
      * @return HilightedTextWriter
      */
-    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
-        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, exportMode, writer, path);
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
+        return actionsToString(listeners, address, list, new ArrayList<String>(), version, exportMode, writer, path);
     }
 
     /**
@@ -432,12 +409,9 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return HilightedTextWriter
      */
-    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
+    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
         long offset;
-        if (importantOffsets == null) {
-            //setActionsAddresses(list, 0, version);
-            importantOffsets = getActionsAllRefs(list, version);
-        }
+        List<Long> importantOffsets = getActionsAllRefs(list, version);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
          if (!cps.isEmpty()) {
          setConstantPool(list, cps.get(cps.size() - 1));
@@ -505,15 +479,7 @@ public class Action implements GraphSourceItem {
                 writer.appendNoHilight(":");
             }
 
-            if (a.replaceWith != null) {
-                if (lastPush) {
-                    writer.newLine();
-                    lastPush = false;
-                }
-                writer.append("", offset);
-                writer.appendNoHilight(a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, exportMode));
-                writer.newLine();
-            } else if (a.isIgnored()) {
+            if (a.isIgnored()) {
                 if (lastPush) {
                     writer.newLine();
                     lastPush = false;
@@ -1224,7 +1190,7 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ScriptExportMode.PCODE, writer, path);
+            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, version, ScriptExportMode.PCODE, writer, path);
             s = writer.toString();
             ret = ASMParser.parse(address, true, s, SWF.DEFAULT_VERSION, false);
         } catch (IOException | ParseException ex) {

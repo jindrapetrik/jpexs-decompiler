@@ -457,9 +457,12 @@ public class ASMParser {
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
         List<Action> ret = parse(ignoreNops, labels, address, lexer, constantPool, version);
-        List<Action> links = Action.getActionsAllIfsOrJumps(ret);
         //Action.setActionsAddresses(ret, address, version);
-        for (Action link : links) {
+        for (Action link : ret) {
+            if (!(link instanceof ActionIf || link instanceof ActionJump)) {
+                continue;
+            }
+
             boolean found = false;
             String identifier = null;
             if (link instanceof ActionJump) {
@@ -473,8 +476,7 @@ public class ASMParser {
                         break;
                     }
                 }
-            }
-            if (link instanceof ActionIf) {
+            } else if (link instanceof ActionIf) {
                 identifier = ((ActionIf) link).identifier;
 
                 for (Label label : labels) {
@@ -485,13 +487,12 @@ public class ASMParser {
                     }
                 }
             }
-            if ((link instanceof ActionJump) || (link instanceof ActionIf)) {
-                if (!found) {
-                    if (throwOnError) {
-                        throw new ParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
-                    } else {
-                        Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
-                    }
+            
+            if (!found) {
+                if (throwOnError) {
+                    throw new ParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
+                } else {
+                    Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
                 }
             }
         }

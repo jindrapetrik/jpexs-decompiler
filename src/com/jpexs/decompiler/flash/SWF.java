@@ -540,9 +540,7 @@ public final class SWF implements TreeItem, Timelined {
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
-        if (Configuration.dumpInfoCollecting.get()) {
-            sis.dumpInfo = dumpInfo;
-        }
+        sis.dumpInfo = dumpInfo;
         sis.readBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
         fileSize = sis.readUI32("fileSize");
@@ -556,7 +554,7 @@ public final class SWF implements TreeItem, Timelined {
         sis.readUI8("tmpFirstByetOfFrameRate"); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8("frameRate");
         frameCount = sis.readUI16("frameCount");
-        List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
+        List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
         if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
             tags.remove(tags.size() - 1);

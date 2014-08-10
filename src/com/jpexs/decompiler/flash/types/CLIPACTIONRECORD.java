@@ -180,7 +180,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, swf.version, exportMode, writer, toString()/*FIXME?*/);
     }
 
     /**

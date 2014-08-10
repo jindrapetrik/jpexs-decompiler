@@ -208,7 +208,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         super(sis.getSwf(), ID, "DefineSprite", data);
         spriteId = sis.readUI16("spriteId");
         frameCount = sis.readUI16("frameCount");
-        List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
+        List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true);
         if (subTags.size() > 0 && subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
             hasEndTag = true;
             subTags.remove(subTags.size() - 1);

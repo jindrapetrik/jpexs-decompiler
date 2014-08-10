@@ -96,9 +96,9 @@ public class Configuration {
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> dumpView = null;
 
-    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> dumpInfoCollecting = null;
+    public static final ConfigurationItem<Boolean> lazyDumpInfoCollecting = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")

@@ -141,7 +141,7 @@ public class ActionListReader {
         int index = getNextNotNullIndex(actionMap, 0);
         if (index != -1 && entryAction != actionMap.get(index)) {
             ActionJump jump = new ActionJump(0);
-            int size = getTotalActionLength(jump);
+            int size = jump.getTotalActionLength();
             jump.setJumpOffset((int) (entryAction.getAddress() - size));
             actions.add(jump);
         }
@@ -157,7 +157,7 @@ public class ActionListReader {
                 if (!action.isExit() && !(action instanceof ActionJump)) {
                     ActionJump jump = new ActionJump(0);
                     jump.setAddress(action.getAddress(), version);
-                    int size = getTotalActionLength(jump);
+                    int size = jump.getTotalActionLength();
                     jump.setJumpOffset((int) (nextOffset - action.getAddress() - size));
                     actions.add(jump);
                 }
@@ -179,7 +179,7 @@ public class ActionListReader {
             aEnd.setAddress(endAddress, version);
             actions.add(aEnd);
         } else {
-            endAddress -= getTotalActionLength(aEnd);
+            endAddress -= aEnd.getTotalActionLength();
         }
 
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
@@ -270,17 +270,6 @@ public class ActionListReader {
             }
             last = a;
         }
-        for (int i = 0; i < retdups.size(); i++) {
-            Action a = retdups.get(i);
-            if (a instanceof ActionEnd) {
-                if (i < retdups.size() - 1) {
-                    ActionJump jmp = new ActionJump(0);
-                    jmp.setJumpOffset(retdups.size() - i - jmp.getBytes(version).length);
-                    a.replaceWith = jmp;
-                }
-            }
-        }
-
         ret = Action.removeNops(0, ret, version, path);
         List<Action> reta = new ArrayList<>();
         for (Object o : ret) {
@@ -329,17 +318,17 @@ public class ActionListReader {
             long target = -1;
             if (a instanceof ActionIf) {
                 ActionIf aIf = (ActionIf) a;
-                target = aIf.getAddress() + getTotalActionLength(a) + aIf.getJumpOffset();
+                target = aIf.getAddress() + a.getTotalActionLength() + aIf.getJumpOffset();
             } else if (a instanceof ActionJump) {
                 ActionJump aJump = (ActionJump) a;
-                target = aJump.getAddress() + getTotalActionLength(a) + aJump.getJumpOffset();
+                target = aJump.getAddress() + a.getTotalActionLength() + aJump.getJumpOffset();
             } else if (a instanceof ActionStore) {
                 ActionStore aStore = (ActionStore) a;
                 int storeSize = aStore.getStoreSize();
                 // skip storeSize + 1 actions (+1 is the current action)
                 Action targetAction = a;
                 for (int i = 0; i <= storeSize; i++) {
-                    long address = targetAction.getAddress() + getTotalActionLength(targetAction);
+                    long address = targetAction.getAddress() + targetAction.getTotalActionLength();
                     targetAction = actionMap.get(address);
                     if (targetAction == null) {
                         break;
@@ -387,7 +376,7 @@ public class ActionListReader {
             int length = a.getBytes(version).length;
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
-                length = getTotalActionLength(new ActionJump(0));
+                length = new ActionJump(0).getTotalActionLength();
             }
             address += length;
         }
@@ -412,7 +401,7 @@ public class ActionListReader {
                 Action a1 = a;
                 List<Action> store = new ArrayList<>();
                 while (true) {
-                    long address = a1.getAddress() + getTotalActionLength(a1);
+                    long address = a1.getAddress() + a1.getTotalActionLength();
                     a1 = actionMap.get(address);
                     if (a1 == null || a1 == nextActionAfterStore) {
                         break;
@@ -433,7 +422,7 @@ public class ActionListReader {
                 long startAddress = a.getAddress() + container.getHeaderSize();
                 for (int j = 0; j < lastActions.size(); j++) {
                     Action lastAction = lastActions.get(j);
-                    int length = (int) (lastAction.getAddress() + getTotalActionLength(lastAction) - startAddress);
+                    int length = (int) (lastAction.getAddress() + lastAction.getTotalActionLength() - startAddress);
                     container.setContainerSize(j, length);
                     startAddress += length;
                 }
@@ -469,7 +458,7 @@ public class ActionListReader {
             Action a = actions.get(i);
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 ActionJump aJump = new ActionJump(0);
-                aJump.setJumpOffset((int) (endAddress - a.getAddress() - getTotalActionLength(aJump)));
+                aJump.setJumpOffset((int) (endAddress - a.getAddress() - aJump.getTotalActionLength()));
                 aJump.setAddress(a.getAddress(), version);
                 replaceJumpTargets(jumps, a, aJump);
                 replaceContainerLastActions(containerLastActions, a, aJump);
@@ -480,9 +469,9 @@ public class ActionListReader {
                 Action target = jumps.get(a);
                 long offset;
                 if (target != null) {
-                    offset = target.getAddress() - a.getAddress() - getTotalActionLength(a);
+                    offset = target.getAddress() - a.getAddress() - a.getTotalActionLength();
                 } else {
-                    offset = endAddress - a.getAddress() - getTotalActionLength(a);
+                    offset = endAddress - a.getAddress() - a.getTotalActionLength();
                 }
                 aIf.setJumpOffset((int) offset);
             } else if (a instanceof ActionJump) {
@@ -490,9 +479,9 @@ public class ActionListReader {
                 Action target = jumps.get(a);
                 long offset;
                 if (target != null) {
-                    offset = target.getAddress() - a.getAddress() - getTotalActionLength(a);
+                    offset = target.getAddress() - a.getAddress() - a.getTotalActionLength();
                 } else {
-                    offset = endAddress - a.getAddress() - getTotalActionLength(a);
+                    offset = endAddress - a.getAddress() - a.getTotalActionLength();
                 }
                 aJump.setJumpOffset((int) offset);
             }
@@ -531,7 +520,7 @@ public class ActionListReader {
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         int lastIdx = (int) lastAction.getAddress();
-        long endAddress = lastAction.getAddress() + getTotalActionLength(lastAction);
+        long endAddress = lastAction.getAddress() + lastAction.getTotalActionLength();
 
         List<Action> actionMap = new ArrayList<>(lastIdx);
         for (int i = 0; i <= lastIdx; i++) {
@@ -608,16 +597,16 @@ public class ActionListReader {
                     break;
                 }
 
-                int actionLengthWithHeader = getTotalActionLength(a);
+                int actionLengthWithHeader = a.getTotalActionLength();
 
                 // unknown action, replace with jump
                 if (a instanceof ActionNop) {
                     ActionJump aJump = new ActionJump(0);
-                    int jumpLength = getTotalActionLength(aJump);
+                    int jumpLength = aJump.getTotalActionLength();
                     aJump.setAddress(a.getAddress(), version);
                     aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
                     a = aJump;
-                    actionLengthWithHeader = getTotalActionLength(a);
+                    actionLengthWithHeader = a.getTotalActionLength();
                 }
 
                 if (entryAction == null) {
@@ -688,10 +677,6 @@ public class ActionListReader {
         return entryAction;
     }
 
-    private static int getTotalActionLength(Action action) {
-        return action.actionLength + 1 + ((action.actionCode >= 0x80) ? 2 : 0);
-    }
-
     private static void ensureCapacity(List<Action> actions, List<Long> nextOffsets, long index) {
         while (actions.size() <= index) {
             actions.add(null);
@@ -715,7 +700,7 @@ public class ActionListReader {
                 throw new InterruptedException();
             }
 
-            int actionLen = getTotalActionLength(a);
+            int actionLen = a.getTotalActionLength();
             if (!visited.containsKey(ip)) {
                 visited.put(ip, 0);
             }
@@ -725,7 +710,7 @@ public class ActionListReader {
             for (int i = 0; i < listeners.size(); i++) {
                 listeners.get(i).progress(AppStrings.translate("disassemblingProgress.deobfuscating"), ip, actions.size());
             }
-            int info = a.actionLength + 1 + ((a.actionCode >= 0x80) ? 2 : 0);
+            int info = a.getTotalActionLength();
 
             if (a instanceof ActionPush) {
                 if (cpool != null) {

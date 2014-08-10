@@ -28,7 +28,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,14 +58,8 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<>();
-        ret.add(getRef(version));
-        return ret;
-    }
-
-    public long getRef(int version) {
-        return getAddress() + getBytes(version).length + offset;
+    public void getRef(List<Long> refs) {
+        refs.add(getAddress() + getTotalActionLength() + offset);
     }
 
     @Override

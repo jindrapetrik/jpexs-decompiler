@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.dumpview;
 
+import com.jpexs.decompiler.flash.tags.TagStub;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class DumpInfo {
 
     public String name;
     public String type;
+    public TagStub tagToResolve = null;
 
     public Object previewValue;
 

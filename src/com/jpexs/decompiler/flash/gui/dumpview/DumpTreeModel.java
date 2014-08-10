@@ -17,10 +17,15 @@
 package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -88,12 +93,26 @@ public class DumpTreeModel implements TreeModel {
 
     @Override
     public int getChildCount(Object o) {
-        return ((DumpInfo) o).getChildCount();
+        DumpInfo di = (DumpInfo) o; 
+        if (di.tagToResolve != null) {
+            TagStub tagStub = di.tagToResolve;
+            try {
+                SWFInputStream sis = tagStub.getDataStream();
+                sis.seek(tagStub.getDataPos());
+                sis.dumpInfo = di;
+                SWFInputStream.resolveTag(tagStub, 0, false, true);
+            } catch (InterruptedException | IOException ex) {
+                Logger.getLogger(DumpTreeModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            di.tagToResolve = null;
+        }
+        return di.getChildCount();
     }
 
     @Override
     public boolean isLeaf(Object o) {
-        return ((DumpInfo) o).getChildCount() == 0;
+        DumpInfo di = (DumpInfo) o; 
+        return (di.tagToResolve == null) && di.getChildCount() == 0;
     }
 
     @Override
