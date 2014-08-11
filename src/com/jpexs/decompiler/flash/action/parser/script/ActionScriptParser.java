@@ -1675,7 +1675,7 @@ public class ActionScriptParser {
                     GetMemberActionItem mem = (GetMemberActionItem) newvar;
                     ret = new NewMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod, variables));
                 } else if (newvar instanceof VariableActionItem) {
-                    ret = new NewObjectActionItem(null, newvar, call(registerVars, inFunction, inMethod, variables));
+                    ret = new NewObjectActionItem(null, new DirectValueActionItem(((VariableActionItem)newvar).getVariableName()), call(registerVars, inFunction, inMethod, variables));
                 } else {
                     throw new ParseException("Invalid new item", lexer.yyline());
                 }
