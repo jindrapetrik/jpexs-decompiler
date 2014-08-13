@@ -3288,9 +3288,9 @@ public class SWFInputStream implements AutoCloseable {
 
     public SWFInputStream getLimitedStream(int limit) throws IOException {
         SWFInputStream sis = new SWFInputStream(swf, is.getAllRead(), startingPos, (int) (is.getPos() + limit));
-        if (Configuration.lazyDumpInfoCollecting.get()) {
-            sis.dumpInfo = dumpInfo;
-        }
+
+        // uncomment the following line to turn off lazy dump info collecting
+        //sis.dumpInfo = dumpInfo;
         sis.seek(is.getPos() + startingPos);
         return sis;
     }
