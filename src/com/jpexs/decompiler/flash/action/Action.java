@@ -498,14 +498,15 @@ public class Action implements GraphSourceItem {
             } else {
                 //if (!(a instanceof ActionNop)) {
                 String add = "";
-                if (a instanceof ActionIf) {
+                // honfika: commented out the following lines, because it makes no sense
+                /*if (a instanceof ActionIf) {
                     add = " change: " + ((ActionIf) a).getJumpOffset();
                 }
                 if (a instanceof ActionJump) {
                     add = " change: " + ((ActionJump) a).getJumpOffset();
                 }
                 add = "; ofs" + Helper.formatAddress(offset) + add;
-                add = "";
+                add = "";*/
                 if ((a instanceof ActionPush) && lastPush) {
                     writer.appendNoHilight(" ");
                     ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, exportMode, writer);
@@ -552,7 +553,7 @@ public class Action implements GraphSourceItem {
                 }
                 //}
             }
-            offset += a.getBytes(version).length;
+            offset += a.getTotalActionLength();
         }
         if (lastPush) {
             writer.newLine();
@@ -1184,14 +1185,10 @@ public class Action implements GraphSourceItem {
 
     public static List<Action> removeNops(long address, List<Action> actions, int version, String path) {
         List<Action> ret = actions;
-        if (true) {
-            //return ret;
-        }
-        String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
             Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, version, ScriptExportMode.PCODE, writer, path);
-            s = writer.toString();
+            String s = writer.toString();
             ret = ASMParser.parse(address, true, s, SWF.DEFAULT_VERSION, false);
         } catch (IOException | ParseException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error. path: " + path, ex);

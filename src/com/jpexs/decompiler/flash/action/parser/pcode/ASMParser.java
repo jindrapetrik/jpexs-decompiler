@@ -170,7 +170,7 @@ public class ASMParser {
                     containers.pop();
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                String instructionName = ((String) symb.value).toLowerCase();
+                String instructionName = (String) symb.value;
                 Action a = parseAction(instructionName, lexer, constantPool, version);
                 if (ignoreNops && a instanceof ActionNop) {
                     a = null;
@@ -202,211 +202,211 @@ public class ASMParser {
 
     private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         Action a = null;
-        if (instructionName.equals("GetURL".toLowerCase())) {
+        if (instructionName.compareToIgnoreCase("GetURL") == 0) {
             a = new ActionGetURL(lexer);
-        } else if (instructionName.equals("GoToLabel".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GoToLabel") == 0) {
             a = (new ActionGoToLabel(lexer));
-        } else if (instructionName.equals("GotoFrame".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GotoFrame") == 0) {
             a = (new ActionGotoFrame(lexer));
-        } else if (instructionName.equals("NextFrame".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("NextFrame") == 0) {
             a = (new ActionNextFrame());
-        } else if (instructionName.equals("Play".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Play") == 0) {
             a = (new ActionPlay());
-        } else if (instructionName.equals("PrevFrame".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("PrevFrame") == 0) {
             a = (new ActionPrevFrame());
-        } else if (instructionName.equals("SetTarget".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("SetTarget") == 0) {
             a = (new ActionSetTarget(lexer));
-        } else if (instructionName.equals("Stop".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Stop") == 0) {
             a = (new ActionStop());
-        } else if (instructionName.equals("StopSounds".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StopSounds") == 0) {
             a = (new ActionStopSounds());
-        } else if (instructionName.equals("ToggleQuality".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ToggleQuality") == 0) {
             a = (new ActionToggleQuality());
-        } else if (instructionName.equals("WaitForFrame".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("WaitForFrame") == 0) {
             a = (new ActionWaitForFrame(lexer));
-        } else if (instructionName.equals("Add".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Add") == 0) {
             a = (new ActionAdd());
-        } else if (instructionName.equals("And".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("And") == 0) {
             a = (new ActionAnd());
-        } else if (instructionName.equals("AsciiToChar".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("AsciiToChar") == 0) {
             a = (new ActionAsciiToChar());
-        } else if (instructionName.equals("Call".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Call") == 0) {
             a = (new ActionCall());
-        } else if (instructionName.equals("CharToAscii".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("CharToAscii") == 0) {
             a = (new ActionCharToAscii());
-        } else if (instructionName.equals("CloneSprite".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("CloneSprite") == 0) {
             a = (new ActionCloneSprite());
-        } else if (instructionName.equals("Divide".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Divide") == 0) {
             a = (new ActionDivide());
-        } else if (instructionName.equals("EndDrag".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("EndDrag") == 0) {
             a = (new ActionEndDrag());
-        } else if (instructionName.equals("Equals".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Equals") == 0) {
             a = (new ActionEquals());
-        } else if (instructionName.equals("GetProperty".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GetProperty") == 0) {
             a = (new ActionGetProperty());
-        } else if (instructionName.equals("GetTime".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GetTime") == 0) {
             a = (new ActionGetTime());
-        } else if (instructionName.equals("GetURL2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GetURL2") == 0) {
             a = (new ActionGetURL2(lexer));
-        } else if (instructionName.equals("GetVariable".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GetVariable") == 0) {
             a = (new ActionGetVariable());
-        } else if (instructionName.equals("GotoFrame2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GotoFrame2") == 0) {
             a = (new ActionGotoFrame2(lexer));
-        } else if (instructionName.equals("If".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("If") == 0) {
             a = (new ActionIf(lexer));
-        } else if (instructionName.equals("Jump".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Jump") == 0) {
             a = (new ActionJump(lexer));
-        } else if (instructionName.equals("Less".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Less") == 0) {
             a = (new ActionLess());
-        } else if (instructionName.equals("MBAsciiToChar".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("MBAsciiToChar") == 0) {
             a = (new ActionMBAsciiToChar());
-        } else if (instructionName.equals("MBCharToAscii".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("MBCharToAscii") == 0) {
             a = (new ActionMBCharToAscii());
-        } else if (instructionName.equals("MBStringExtract".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("MBStringExtract") == 0) {
             a = (new ActionMBStringExtract());
-        } else if (instructionName.equals("MBStringLength".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("MBStringLength") == 0) {
             a = (new ActionMBStringLength());
-        } else if (instructionName.equals("Multiply".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Multiply") == 0) {
             a = (new ActionMultiply());
-        } else if (instructionName.equals("Not".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Not") == 0) {
             a = (new ActionNot());
-        } else if (instructionName.equals("Or".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Or") == 0) {
             a = (new ActionOr());
-        } else if (instructionName.equals("Pop".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Pop") == 0) {
             a = (new ActionPop());
-        } else if (instructionName.equals("Push".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Push") == 0) {
             a = (new ActionPush(lexer, constantPool));
-        } else if (instructionName.equals("RandomNumber".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("RandomNumber") == 0) {
             a = (new ActionRandomNumber());
-        } else if (instructionName.equals("RemoveSprite".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("RemoveSprite") == 0) {
             a = (new ActionRemoveSprite());
-        } else if (instructionName.equals("SetProperty".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("SetProperty") == 0) {
             a = (new ActionSetProperty());
-        } else if (instructionName.equals("SetTarget2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("SetTarget2") == 0) {
             a = (new ActionSetTarget2());
-        } else if (instructionName.equals("SetVariable".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("SetVariable") == 0) {
             a = (new ActionSetVariable());
-        } else if (instructionName.equals("StartDrag".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StartDrag") == 0) {
             a = (new ActionStartDrag());
-        } else if (instructionName.equals("StringAdd".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringAdd") == 0) {
             a = (new ActionStringAdd());
-        } else if (instructionName.equals("StringEquals".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringEquals") == 0) {
             a = (new ActionStringEquals());
-        } else if (instructionName.equals("StringExtract".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringExtract") == 0) {
             a = (new ActionStringExtract());
-        } else if (instructionName.equals("StringLength".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringLength") == 0) {
             a = (new ActionStringLength());
-        } else if (instructionName.equals("StringLess".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringLess") == 0) {
             a = (new ActionStringLess());
-        } else if (instructionName.equals("Subtract".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Subtract") == 0) {
             a = (new ActionSubtract());
-        } else if (instructionName.equals("ToInteger".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ToInteger") == 0) {
             a = (new ActionToInteger());
-        } else if (instructionName.equals("Trace".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Trace") == 0) {
             a = (new ActionTrace());
-        } else if (instructionName.equals("WaitForFrame2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("WaitForFrame2") == 0) {
             a = (new ActionWaitForFrame2(lexer));
-        } else if (instructionName.equals("Add2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Add2") == 0) {
             a = (new ActionAdd2());
-        } else if (instructionName.equals("BitAnd".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitAnd") == 0) {
             a = (new ActionBitAnd());
-        } else if (instructionName.equals("BitLShift".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitLShift") == 0) {
             a = (new ActionBitLShift());
-        } else if (instructionName.equals("BitOr".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitOr") == 0) {
             a = (new ActionBitOr());
-        } else if (instructionName.equals("BitRShift".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitRShift") == 0) {
             a = (new ActionBitRShift());
-        } else if (instructionName.equals("BitURShift".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitURShift") == 0) {
             a = (new ActionBitURShift());
-        } else if (instructionName.equals("BitXor".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("BitXor") == 0) {
             a = (new ActionBitXor());
-        } else if (instructionName.equals("CallFunction".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("CallFunction") == 0) {
             a = (new ActionCallFunction());
-        } else if (instructionName.equals("CallMethod".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("CallMethod") == 0) {
             a = (new ActionCallMethod());
-        } else if (instructionName.equals("ConstantPool".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ConstantPool") == 0) {
             a = new ActionConstantPool(lexer);
-        } else if (instructionName.equals("Decrement".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Decrement") == 0) {
             a = (new ActionDecrement());
-        } else if (instructionName.equals("DefineFunction".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("DefineFunction") == 0) {
             a = (new ActionDefineFunction(lexer));
-        } else if (instructionName.equals("DefineLocal".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("DefineLocal") == 0) {
             a = (new ActionDefineLocal());
-        } else if (instructionName.equals("DefineLocal2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("DefineLocal2") == 0) {
             a = (new ActionDefineLocal2());
-        } else if (instructionName.equals("Delete".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Delete") == 0) {
             a = (new ActionDelete());
-        } else if (instructionName.equals("Delete2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Delete2") == 0) {
             a = (new ActionDelete2());
-        } else if (instructionName.equals("Enumerate".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Enumerate") == 0) {
             a = (new ActionEnumerate());
-        } else if (instructionName.equals("Equals2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Equals2") == 0) {
             a = (new ActionEquals2());
-        } else if (instructionName.equals("GetMember".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("GetMember") == 0) {
             a = (new ActionGetMember());
-        } else if (instructionName.equals("Increment".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Increment") == 0) {
             a = (new ActionIncrement());
-        } else if (instructionName.equals("InitArray".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("InitArray") == 0) {
             a = (new ActionInitArray());
-        } else if (instructionName.equals("InitObject".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("InitObject") == 0) {
             a = (new ActionInitObject());
-        } else if (instructionName.equals("Less2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Less2") == 0) {
             a = (new ActionLess2());
-        } else if (instructionName.equals("Modulo".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Modulo") == 0) {
             a = (new ActionModulo());
-        } else if (instructionName.equals("NewMethod".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("NewMethod") == 0) {
             a = (new ActionNewMethod());
-        } else if (instructionName.equals("NewObject".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("NewObject") == 0) {
             a = (new ActionNewObject());
-        } else if (instructionName.equals("PushDuplicate".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("PushDuplicate") == 0) {
             a = (new ActionPushDuplicate());
-        } else if (instructionName.equals("Return".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Return") == 0) {
             a = (new ActionReturn());
-        } else if (instructionName.equals("SetMember".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("SetMember") == 0) {
             a = (new ActionSetMember());
-        } else if (instructionName.equals("StackSwap".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StackSwap") == 0) {
             a = (new ActionStackSwap());
-        } else if (instructionName.equals("StoreRegister".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StoreRegister") == 0) {
             a = (new ActionStoreRegister(lexer));
-        } else if (instructionName.equals("TargetPath".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("TargetPath") == 0) {
             a = (new ActionTargetPath());
-        } else if (instructionName.equals("ToNumber".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ToNumber") == 0) {
             a = (new ActionToNumber());
-        } else if (instructionName.equals("ToString".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ToString") == 0) {
             a = (new ActionToString());
-        } else if (instructionName.equals("TypeOf".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("TypeOf") == 0) {
             a = (new ActionTypeOf());
-        } else if (instructionName.equals("With".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("With") == 0) {
             a = (new ActionWith(lexer));
-        } else if (instructionName.equals("Enumerate2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Enumerate2") == 0) {
             a = (new ActionEnumerate2());
-        } else if (instructionName.equals("Greater".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Greater") == 0) {
             a = (new ActionGreater());
-        } else if (instructionName.equals("InstanceOf".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("InstanceOf") == 0) {
             a = (new ActionInstanceOf());
-        } else if (instructionName.equals("StrictEquals".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StrictEquals") == 0) {
             a = (new ActionStrictEquals());
-        } else if (instructionName.equals("StringGreater".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StringGreater") == 0) {
             a = (new ActionStringGreater());
-        } else if (instructionName.equals("CastOp".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("CastOp") == 0) {
             a = (new ActionCastOp());
-        } else if (instructionName.equals("DefineFunction2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("DefineFunction2") == 0) {
             a = (new ActionDefineFunction2(lexer));
-        } else if (instructionName.equals("Extends".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Extends") == 0) {
             a = (new ActionExtends());
-        } else if (instructionName.equals("ImplementsOp".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("ImplementsOp") == 0) {
             a = (new ActionImplementsOp());
-        } else if (instructionName.equals("Throw".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Throw") == 0) {
             a = (new ActionThrow());
-        } else if (instructionName.equals("Try".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Try") == 0) {
             a = (new ActionTry(lexer, version));
-        } else if (instructionName.equals("FSCommand2".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("FSCommand2") == 0) {
             a = (new ActionFSCommand2());
-        } else if (instructionName.equals("StrictMode".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("StrictMode") == 0) {
             a = (new ActionStrictMode(lexer));
-        } else if (instructionName.equals("Nop".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("Nop") == 0) {
             a = (new ActionNop());
-        } else if (instructionName.equals("FFDec_DeobfuscatePop".toLowerCase())) {
+        } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscatePop") == 0) {
             a = (new ActionDeobfuscatePop());
         } else {
             throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
@@ -429,7 +429,7 @@ public class ASMParser {
                     containers.pop();
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                String instructionName = ((String) symb.value).toLowerCase();
+                String instructionName = (String) symb.value;
                 Action a = parseAction(instructionName, lexer, emptyList, version);
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);

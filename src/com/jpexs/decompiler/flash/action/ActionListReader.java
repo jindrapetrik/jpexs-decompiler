@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -125,20 +126,24 @@ public class ActionListReader {
     private static List<Action> readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         ConstantPool cpool = new ConstantPool();
 
-        // List of the actions. N. item contains the action which starts in offset N.
-        List<Action> actionMap = new ArrayList<>();
-        List<Long> nextOffsets = new ArrayList<>();
+        // Map of the actions. Use TreeMap to sort the keys in ascending order
+        Map<Long, Action> actionMap = new TreeMap<>();
+        Map<Long,Long> nextOffsets = new HashMap<>();
         Action entryAction = readActionListAtPos(listeners, cpool,
                 sis, actionMap, nextOffsets,
                 ip, ip, endIp, version, path, false, new ArrayList<Long>());
 
-        Map<Action, List<Action>> containerLastActions = new HashMap<>();
-        getContainerLastActions(actionMap, containerLastActions);
-
         List<Action> actions = new ArrayList<>();
+        if (actionMap.isEmpty()) {
+            return actions;
+        }
+        
+        Map<Action, List<Action>> containerLastActions = new HashMap<>();
+        List<Long> addresses = new ArrayList<>(actionMap.keySet());
+        getContainerLastActions(actionMap, addresses, containerLastActions);
 
         // jump to the entry action when it is diffrent from the first action in the map
-        int index = getNextNotNullIndex(actionMap, 0);
+        long index = addresses.get(0);
         if (index != -1 && entryAction != actionMap.get(index)) {
             ActionJump jump = new ActionJump(0);
             int size = jump.getTotalActionLength();
@@ -147,11 +152,11 @@ public class ActionListReader {
         }
 
         // remove nulls
-        index = getNextNotNullIndex(actionMap, index);
+        index = getNextAddress(addresses, index);
         while (index > -1) {
             Action action = actionMap.get(index);
             long nextOffset = nextOffsets.get(index);
-            int nextIndex = getNextNotNullIndex(actionMap, index + 1);
+            long nextIndex = getNextAddress(addresses, index + 1);
             actions.add(action);
             if (nextIndex != -1 && nextOffset != nextIndex) {
                 if (!action.isExit() && !(action instanceof ActionJump)) {
@@ -170,7 +175,7 @@ public class ActionListReader {
         Map<Action, Action> jumps = new HashMap<>();
         getJumps(actions, jumps);
 
-        long endAddress = updateAddresses(actions, ip, version);
+        long endAddress = updateAddresses(actions, 0, version);
 
         // add end action
         Action lastAction = actions.get(actions.size() - 1);
@@ -189,7 +194,7 @@ public class ActionListReader {
 
         if (Configuration.autoDeobfuscate.get()) {
             try {
-                actions = deobfuscateActionList(listeners, actions, version, ip, path);
+                actions = deobfuscateActionList(listeners, actions, version, 0, path);
                 updateActionLengths(actions, version);
                 removeZeroJumps(actions, version);
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
@@ -222,7 +227,7 @@ public class ActionListReader {
         Action lastAction = actions.get(actions.size() - 1);
         int endIp = (int) lastAction.getAddress();
 
-        List<Action> retdups = new ArrayList<>();
+        List<Action> retdups = new ArrayList<>(endIp);
         for (int i = 0; i < endIp; i++) {
             Action a = new ActionNop();
             a.setAddress(i, version);
@@ -257,11 +262,6 @@ public class ActionListReader {
 
         deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
-        if (!retdups.isEmpty()) {
-            for (int i = 0; i < ip; i++) {
-                retdups.remove(0);
-            }
-        }
         List<Action> ret = new ArrayList<>();
         Action last = null;
         for (Action a : retdups) {
@@ -280,25 +280,42 @@ public class ActionListReader {
         return reta;
     }
 
-    private static int getPrevNotNullIndex(List<Action> actionMap, int startIndex) {
-        startIndex = Math.min(startIndex, actionMap.size() - 1);
-        for (int i = startIndex; i >= 0; i--) {
-            if (actionMap.get(i) != null) {
-                return i;
-            }
+    private static long getNextAddress(List<Long> addresses, long address) {
+        int min = 0;
+        int max = addresses.size() - 1;
+        
+        while (max >= min) {
+            int mid = (min + max) / 2;
+            long midValue = addresses.get(mid);
+            if(midValue == address)
+                return address; 
+            else if (midValue < address)
+                min = mid + 1;
+            else         
+                max = mid - 1;
         }
-        return -1;
+        
+        return min < addresses.size() ? addresses.get(min) : -1;
     }
-
-    private static int getNextNotNullIndex(List<Action> actionMap, int startIndex) {
-        for (int i = startIndex; i < actionMap.size(); i++) {
-            if (actionMap.get(i) != null) {
-                return i;
-            }
+    
+    private static long getPrevAddress(List<Long> addresses, long address) {
+        int min = 0;
+        int max = addresses.size() - 1;
+        
+        while (max >= min) {
+            int mid = (min + max) / 2;
+            long midValue = addresses.get(mid);
+            if(midValue == address)
+                return address; 
+            else if (midValue < address)
+                min = mid + 1;
+            else         
+                max = mid - 1;
         }
-        return -1;
+        
+        return max > 0 ? addresses.get(max) : -1;
     }
-
+    
     private static Map<Long, Action> actionListToMap(List<Action> actions) {
         Map<Long, Action> map = new HashMap<>(actions.size());
         for (Action a : actions) {
@@ -343,12 +360,9 @@ public class ActionListReader {
         }
     }
 
-    private static void getContainerLastActions(List<Action> actionMap, Map<Action, List<Action>> lastActions) {
-        for (int i = 0; i < actionMap.size(); i++) {
-            Action a = actionMap.get(i);
-            if (a == null) {
-                continue;
-            }
+    private static void getContainerLastActions(Map<Long, Action> actionMap, List<Long> addresses, Map<Action, List<Action>> lastActions) {
+        for (Long address : actionMap.keySet()) {
+            Action a = actionMap.get(address);
 
             if (a instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer container = (GraphSourceItemContainer) a;
@@ -357,7 +371,7 @@ public class ActionListReader {
                 List<Action> lasts = new ArrayList<>(sizes.size());
                 for (long size : sizes) {
                     endAddress += size;
-                    int lastActionIndex = getPrevNotNullIndex(actionMap, (int) (endAddress - 1));
+                    long lastActionIndex = getPrevAddress(addresses, endAddress);
                     Action lastAction = null;
                     if (lastActionIndex != -1) {
                         lastAction = actionMap.get(lastActionIndex);
@@ -519,19 +533,16 @@ public class ActionListReader {
 
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
-        int lastIdx = (int) lastAction.getAddress();
         long endAddress = lastAction.getAddress() + lastAction.getTotalActionLength();
 
-        List<Action> actionMap = new ArrayList<>(lastIdx);
-        for (int i = 0; i <= lastIdx; i++) {
-            actionMap.add(null);
-        }
+        Map<Long, Action> actionMap = new TreeMap<>();
         for (Action a : actions) {
-            actionMap.set((int) a.getAddress(), a);
+            actionMap.put(a.getAddress(), a);
         }
+        List<Long> addresses = new ArrayList<>(actionMap.keySet());
 
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
-        getContainerLastActions(actionMap, containerLastActions);
+        getContainerLastActions(actionMap, addresses, containerLastActions);
 
         Map<Action, Action> jumps = new HashMap<>();
         getJumps(actions, jumps);
@@ -575,7 +586,7 @@ public class ActionListReader {
     }
 
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
-            SWFInputStream sis, List<Action> actions, List<Long> nextOffsets,
+            SWFInputStream sis, Map<Long, Action> actions, Map<Long, Long> nextOffsets,
             long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
 
         Action entryAction = null;
@@ -589,7 +600,7 @@ public class ActionListReader {
         jumpQueue.add(ip);
         while (!jumpQueue.isEmpty()) {
             ip = jumpQueue.remove();
-            while ((endIp == -1) || (endIp > ip)) {
+            while (endIp == -1 || endIp > ip) {
                 sis.seek((int) ip);
 
                 Action a;
@@ -613,15 +624,13 @@ public class ActionListReader {
                     entryAction = a;
                 }
 
-                ensureCapacity(actions, nextOffsets, ip);
-
-                Action existingAction = actions.get((int) ip);
+                Action existingAction = actions.get(ip);
                 if (existingAction != null) {
                     break;
                 }
 
-                actions.set((int) ip, a);
-                nextOffsets.set((int) ip, ip + actionLengthWithHeader);
+                actions.put(ip, a);
+                nextOffsets.put(ip, ip + actionLengthWithHeader);
 
                 long pos = sis.getPos();
                 long length = pos + sis.available();
@@ -675,13 +684,6 @@ public class ActionListReader {
             }
         }
         return entryAction;
-    }
-
-    private static void ensureCapacity(List<Action> actions, List<Long> nextOffsets, long index) {
-        while (actions.size() <= index) {
-            actions.add(null);
-            nextOffsets.add(-1L);
-        }
     }
 
     private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {

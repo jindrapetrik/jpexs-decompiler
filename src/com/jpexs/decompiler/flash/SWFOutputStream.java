@@ -123,6 +123,13 @@ public class SWFOutputStream extends OutputStream {
         pos++;
     }
 
+    @Override
+    public void write(byte[] b) throws IOException {
+        alignByte();
+        os.write(b);
+        pos += b.length;
+    }
+    
     private void alignByte() throws IOException {
         if (bitPos > 0) {
             bitPos = 0;

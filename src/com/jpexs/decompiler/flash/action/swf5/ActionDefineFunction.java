@@ -155,10 +155,9 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
-        String paramStr = "";
+        StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
-            paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
-            paramStr += " ";
+            paramStr.append("\"").append(Helper.escapeString(paramNames.get(i))).append("\" ");
         }
 
         return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");// + "\r\n" +Action.actionsToString(getAddress() + getHeaderLength(),getItems(container) , knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";

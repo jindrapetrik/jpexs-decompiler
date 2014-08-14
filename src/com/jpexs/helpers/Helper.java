@@ -149,33 +149,33 @@ public class Helper {
      * @return Escaped string
      */
     public static String escapeString(String s) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '\n') {
-                ret += "\\n";
+                ret.append("\\n");
             } else if (c == '\r') {
-                ret += "\\r";
+                ret.append("\\r");
             } else if (c == '\t') {
-                ret += "\\t";
+                ret.append("\\t");
             } else if (c == '\b') {
-                ret += "\\b";
+                ret.append("\\b");
             } else if (c == '\t') {
-                ret += "\\t";
+                ret.append("\\t");
             } else if (c == '\f') {
-                ret += "\\f";
+                ret.append("\\f");
             } else if (c == '\\') {
-                ret += "\\\\";
+                ret.append("\\\\");
             } else if (c == '"') {
-                ret += "\\\"";
+                ret.append("\\\"");
             } else if (c == '\'') {
-                ret += "\\'";
+                ret.append("\\'");
             } else {
-                ret += c;
+                ret.append(c);
             }
-
         }
-        return ret;
+
+        return ret.toString();
     }
 
     public static String getValidHtmlId(String text) {

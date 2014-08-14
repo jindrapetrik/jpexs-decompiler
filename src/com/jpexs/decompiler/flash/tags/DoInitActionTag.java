@@ -120,7 +120,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
