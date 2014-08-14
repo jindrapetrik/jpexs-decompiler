@@ -127,12 +127,17 @@
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
         </zip>
     </target>
-    
+    <target name="-set-gui-type">
+        <property name="EXETYPE" value="gui" />
+    </target>
+    <target name="-set-console-type">
+      <property name="EXETYPE" value="console" />
+    </target>
     <target name="-exe-config">
         <echoxml file="${EXECONFIG}">
             <launch4jConfig>
                 <dontWrapJar>true</dontWrapJar>
-                <headerType>gui</headerType>
+                <headerType>${EXETYPE}</headerType>
                 <jar>${JARFILENAME}.jar</jar>
                 <outfile>${DISTRIBUTIONDIR}/${EXEFILENAME}.exe</outfile>
                 <errTitle></errTitle>
@@ -171,7 +176,7 @@
         <echoxml file="${EXE64CONFIG}">
             <launch4jConfig>
                 <dontWrapJar>true</dontWrapJar>
-                <headerType>gui</headerType>
+                <headerType>${EXETYPE}</headerType>
                 <jar>${JARFILENAME}.jar</jar>
                 <outfile>${DISTRIBUTIONDIR}/${EXE64FILENAME}.exe</outfile>
                 <errTitle></errTitle>
@@ -221,8 +226,11 @@
             <arg file="${EXE64CONFIG}" />
         </exec>
     </target>
-    <target name="exe" depends="-exe-linux,-exe-windows,-exe64-windows">
+    <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows,-exe64-windows">
         
+    </target>
+    <target name="exe-console" depends="-set-console-type,-exe-linux,-exe-windows,-exe64-windows">
+
     </target>
 
     <target name="release" depends="archive,installer,locales">        
