@@ -371,7 +371,7 @@ public class ActionListReader {
                 List<Action> lasts = new ArrayList<>(sizes.size());
                 for (long size : sizes) {
                     endAddress += size;
-                    long lastActionIndex = getPrevAddress(addresses, endAddress);
+                    long lastActionIndex = getPrevAddress(addresses, endAddress - 1);
                     Action lastAction = null;
                     if (lastActionIndex != -1) {
                         lastAction = actionMap.get(lastActionIndex);
