@@ -61,11 +61,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public void setAddress(long address, int version, boolean recursive) {
-        super.setAddress(address, version, recursive);
-    }
-
-    @Override
     public byte[] getBytes(int version) {
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

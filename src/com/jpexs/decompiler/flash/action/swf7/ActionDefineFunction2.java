@@ -226,14 +226,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public void setAddress(long address, int version, boolean recursive) {
-        super.setAddress(address, version, recursive);
-        if (recursive) {
-            //Action.setActionsAddresses(code, address + getPreLen(version), version);
-        }
-    }
-
-    @Override
     public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         List<String> oldParamNames = paramNames;
         if (replacedParamNames != null) {

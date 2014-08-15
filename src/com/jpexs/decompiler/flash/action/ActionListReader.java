@@ -131,7 +131,7 @@ public class ActionListReader {
         Map<Long,Long> nextOffsets = new HashMap<>();
         Action entryAction = readActionListAtPos(listeners, cpool,
                 sis, actionMap, nextOffsets,
-                ip, ip, endIp, version, path, false, new ArrayList<Long>());
+                ip, 0, endIp, path, false, new ArrayList<Long>());
 
         List<Action> actions = new ArrayList<>();
         if (actionMap.isEmpty()) {
@@ -161,7 +161,7 @@ public class ActionListReader {
             if (nextIndex != -1 && nextOffset != nextIndex) {
                 if (!action.isExit() && !(action instanceof ActionJump)) {
                     ActionJump jump = new ActionJump(0);
-                    jump.setAddress(action.getAddress(), version);
+                    jump.setAddress(action.getAddress());
                     int size = jump.getTotalActionLength();
                     jump.setJumpOffset((int) (nextOffset - action.getAddress() - size));
                     actions.add(jump);
@@ -181,7 +181,7 @@ public class ActionListReader {
         Action lastAction = actions.get(actions.size() - 1);
         Action aEnd = new ActionEnd();
         if (!(lastAction instanceof ActionEnd)) {
-            aEnd.setAddress(endAddress, version);
+            aEnd.setAddress(endAddress);
             actions.add(aEnd);
         } else {
             endAddress -= aEnd.getTotalActionLength();
@@ -204,6 +204,19 @@ public class ActionListReader {
         }
 
         return actions;
+    }
+
+    public static List<Action> getOriginalActions(SWFInputStream sis, int startIp, int endIp) throws IOException, InterruptedException {
+        ConstantPool cpool = new ConstantPool();
+
+        // Map of the actions. Use TreeMap to sort the keys in ascending order
+        Map<Long, Action> actionMap = new TreeMap<>();
+        Map<Long,Long> nextOffsets = new HashMap<>();
+        readActionListAtPos(new ArrayList<DisassemblyListener>(), cpool,
+                sis, actionMap, nextOffsets,
+                startIp, startIp, endIp, "", false, new ArrayList<Long>());
+
+        return new ArrayList<>(actionMap.values());
     }
 
     /**
@@ -230,7 +243,7 @@ public class ActionListReader {
         List<Action> retdups = new ArrayList<>(endIp);
         for (int i = 0; i < endIp; i++) {
             Action a = new ActionNop();
-            a.setAddress(i, version);
+            a.setAddress(i);
             retdups.add(a);
         }
         List<Action> actionMap = new ArrayList<>(endIp);
@@ -370,7 +383,7 @@ public class ActionListReader {
     private static long updateAddresses(List<Action> actions, long address, int version) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
-            a.setAddress(address, version);
+            a.setAddress(address);
             int length = a.getBytes(version).length;
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
@@ -457,7 +470,7 @@ public class ActionListReader {
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 ActionJump aJump = new ActionJump(0);
                 aJump.setJumpOffset((int) (endAddress - a.getAddress() - aJump.getTotalActionLength()));
-                aJump.setAddress(a.getAddress(), version);
+                aJump.setAddress(a.getAddress());
                 replaceJumpTargets(jumps, a, aJump);
                 replaceContainerLastActions(containerLastActions, a, aJump);
                 a = aJump;
@@ -571,7 +584,7 @@ public class ActionListReader {
 
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
             SWFInputStream sis, Map<Long, Action> actions, Map<Long, Long> nextOffsets,
-            long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
+            long ip, long startIp, long endIp, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
 
         Action entryAction = null;
 
@@ -584,6 +597,10 @@ public class ActionListReader {
         jumpQueue.add(ip);
         while (!jumpQueue.isEmpty()) {
             ip = jumpQueue.remove();
+            if (ip < startIp) {
+                continue;
+            }
+            
             while (endIp == -1 || endIp > ip) {
                 sis.seek((int) ip);
 
@@ -598,7 +615,7 @@ public class ActionListReader {
                 if (a instanceof ActionNop) {
                     ActionJump aJump = new ActionJump(0);
                     int jumpLength = aJump.getTotalActionLength();
-                    aJump.setAddress(a.getAddress(), version);
+                    aJump.setAddress(a.getAddress());
                     aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
                     a = aJump;
                     actionLengthWithHeader = a.getTotalActionLength();
@@ -622,7 +639,7 @@ public class ActionListReader {
                     listeners.get(i).progress(AppStrings.translate("disassemblingProgress.reading"), pos, length);
                 }
 
-                a.setAddress(ip, version, false);
+                a.setAddress(ip);
 
                 if (a instanceof ActionPush && cpool != null) {
                     ((ActionPush) a).constantPool = cpool.constants;
@@ -654,7 +671,7 @@ public class ActionListReader {
                             //long endIp2 = ip + actionLengthWithHeader + size;
                             readActionListAtPos(listeners, cpool,
                                     sis, actions, nextOffsets,
-                                    ip2, startIp, endIp, version, newPath, indeterminate, visitedContainers);
+                                    ip2, startIp, endIp, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
                         }
                     }
@@ -815,10 +832,10 @@ public class ActionListReader {
                 if (a instanceof ActionNop) {
                     int prevPos = (int) a.getAddress();
                     a = new ActionNop();
-                    a.setAddress(prevPos, version);
+                    a.setAddress(prevPos);
                     nopos++;
                     if (nopos > 0) {
-                        a.setAddress(a.getAddress() + 1, version);
+                        a.setAddress(a.getAddress() + 1);
                     }
 
                 }

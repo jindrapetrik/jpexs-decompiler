@@ -138,7 +138,7 @@ public class ASMParser {
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
-        cpool.setAddress(address, version, false);
+        cpool.setAddress(address);
         address += cpool.getBytes(version).length;
         list.add(cpool);
 
@@ -179,10 +179,10 @@ public class ASMParser {
                     a = null;
                 }
                 if (a instanceof ActionNop) {
-                    a.setAddress(address, version, false);
+                    a.setAddress(address);
                     address += 1;
                 } else if (a != null) {
-                    a.setAddress(address, version, false);
+                    a.setAddress(address);
                     address += a.getBytes(version).length;
                 }
                 if (a instanceof GraphSourceItemContainer) {

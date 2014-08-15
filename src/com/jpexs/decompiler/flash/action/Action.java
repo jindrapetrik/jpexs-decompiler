@@ -192,10 +192,9 @@ public class Action implements GraphSourceItem {
      * Gets all addresses which are referenced from the list of actions
      *
      * @param list List of actions
-     * @param version SWF version
      * @return List of addresses
      */
-    public static List<Long> getActionsAllRefs(List<Action> list, int version) {
+    public static List<Long> getActionsAllRefs(List<Action> list) {
         List<Long> ret = new ArrayList<>();
         for (Action a : list) {
             a.getRef(ret);
@@ -211,13 +210,8 @@ public class Action implements GraphSourceItem {
      * Sets address of this instruction
      *
      * @param address Address
-     * @param version SWF version
      */
-    public final void setAddress(long address, int version) {
-        setAddress(address, version, true);
-    }
-
-    public void setAddress(long address, int version, boolean recursive) {
+    public void setAddress(long address) {
         this.address = address;
     }
 
@@ -375,7 +369,7 @@ public class Action implements GraphSourceItem {
     public static void setActionsAddresses(List<Action> list, long baseAddress, int version) {
         long offset = baseAddress;
         for (Action a : list) {
-            a.setAddress(offset, version);
+            a.setAddress(offset);
             offset += a.getBytes(version).length;
         }
     }
@@ -411,7 +405,7 @@ public class Action implements GraphSourceItem {
      */
     private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
         long offset;
-        List<Long> importantOffsets = getActionsAllRefs(list, version);
+        List<Long> importantOffsets = getActionsAllRefs(list);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
          if (!cps.isEmpty()) {
          setConstantPool(list, cps.get(cps.size() - 1));

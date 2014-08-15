@@ -83,11 +83,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public void setAddress(long address, int version, boolean recursive) {
-        super.setAddress(address, version, recursive);
-    }
-
-    @Override
     public byte[] getBytes(int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
