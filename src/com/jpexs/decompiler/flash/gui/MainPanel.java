@@ -1414,8 +1414,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
-        int returnVal = fc.showSaveDialog(f);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 

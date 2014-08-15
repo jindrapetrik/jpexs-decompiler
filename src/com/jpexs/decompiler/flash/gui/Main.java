@@ -584,8 +584,7 @@ public class Main {
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
-        int returnVal = fc.showSaveDialog(f);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
             File file = Helper.fixDialogFile(fc.getSelectedFile());
             FileFilter selFilter = fc.getFileFilter();
             try {

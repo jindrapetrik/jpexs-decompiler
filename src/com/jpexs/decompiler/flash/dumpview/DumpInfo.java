@@ -75,6 +75,20 @@ public class DumpInfo {
         return childInfos;
     }
 
+    public long getEndByte() {
+        int end = (int) startByte;
+        if (lengthBytes != 0) {
+            end += lengthBytes;
+        } else {
+            int bits = startBit + lengthBits;
+            end += bits / 8;
+            if (bits % 8 != 0) {
+                end++;
+            }
+        }
+        return end - 1;
+    }
+    
     @Override
     public String toString() {
         String value = previewValue == null ? "" : previewValue.toString();

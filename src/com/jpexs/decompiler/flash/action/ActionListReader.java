@@ -152,11 +152,11 @@ public class ActionListReader {
         }
 
         // remove nulls
-        index = getNextAddress(addresses, index);
+        index = getNearAddress(addresses, index, true);
         while (index > -1) {
             Action action = actionMap.get(index);
             long nextOffset = nextOffsets.get(index);
-            long nextIndex = getNextAddress(addresses, index + 1);
+            long nextIndex = getNearAddress(addresses, index + 1, true);
             actions.add(action);
             if (nextIndex != -1 && nextOffset != nextIndex) {
                 if (!action.isExit() && !(action instanceof ActionJump)) {
@@ -280,7 +280,7 @@ public class ActionListReader {
         return reta;
     }
 
-    private static long getNextAddress(List<Long> addresses, long address) {
+    private static long getNearAddress(List<Long> addresses, long address, boolean next) {
         int min = 0;
         int max = addresses.size() - 1;
         
@@ -295,25 +295,9 @@ public class ActionListReader {
                 max = mid - 1;
         }
         
-        return min < addresses.size() ? addresses.get(min) : -1;
-    }
-    
-    private static long getPrevAddress(List<Long> addresses, long address) {
-        int min = 0;
-        int max = addresses.size() - 1;
-        
-        while (max >= min) {
-            int mid = (min + max) / 2;
-            long midValue = addresses.get(mid);
-            if(midValue == address)
-                return address; 
-            else if (midValue < address)
-                min = mid + 1;
-            else         
-                max = mid - 1;
-        }
-        
-        return max > 0 ? addresses.get(max) : -1;
+        return next 
+                ? (min < addresses.size() ? addresses.get(min) : -1)
+                : (max > 0 ? addresses.get(max) : -1);
     }
     
     private static Map<Long, Action> actionListToMap(List<Action> actions) {
@@ -371,7 +355,7 @@ public class ActionListReader {
                 List<Action> lasts = new ArrayList<>(sizes.size());
                 for (long size : sizes) {
                     endAddress += size;
-                    long lastActionIndex = getPrevAddress(addresses, endAddress - 1);
+                    long lastActionIndex = getNearAddress(addresses, endAddress - 1, false);
                     Action lastAction = null;
                     if (lastActionIndex != -1) {
                         lastAction = actionMap.get(lastActionIndex);

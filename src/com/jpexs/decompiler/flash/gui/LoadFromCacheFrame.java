@@ -268,8 +268,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                     fc.setAcceptAllFileFilterUsed(false);
                     JFrame f = new JFrame();
                     View.setWindowIcon(f);
-                    int returnVal = fc.showSaveDialog(f);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
                             if (selected.size() == 1) {

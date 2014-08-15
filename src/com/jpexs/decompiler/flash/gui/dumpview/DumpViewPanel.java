@@ -46,20 +46,6 @@ public class DumpViewPanel extends JPanel {
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
-    private int getEndIndex(DumpInfo dumpInfo) {
-        int end = (int) dumpInfo.startByte;
-        if (dumpInfo.lengthBytes != 0) {
-            end += dumpInfo.lengthBytes;
-        } else {
-            int bits = dumpInfo.startBit + dumpInfo.lengthBits;
-            end += bits / 8;
-            if (bits % 8 != 0) {
-                end++;
-            }
-        }
-        return end - 1;
-    }
-
     public void setData(byte[] data, DumpInfo dumpInfo) {
         List<DumpInfo> dumpInfos = new ArrayList<>();
         DumpInfo di = dumpInfo;
@@ -72,13 +58,13 @@ public class DumpViewPanel extends JPanel {
         for (int i = 0; i < dumpInfos.size(); i++) {
             DumpInfo di2 = dumpInfos.get(highlightStarts.length - i - 1);
             highlightStarts[i] = di2.startByte;
-            highlightEnds[i] = getEndIndex(di2);
+            highlightEnds[i] = di2.getEndByte();
         }
         dumpViewHexTable.setData(data, highlightStarts, highlightEnds);
 
         if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
             int selectionStart = (int) dumpInfo.startByte;
-            int selectionEnd = getEndIndex(dumpInfo);
+            int selectionEnd = (int) dumpInfo.getEndByte();
 
             dumpViewHexTable.scrollToByte(highlightStarts, highlightEnds);
 

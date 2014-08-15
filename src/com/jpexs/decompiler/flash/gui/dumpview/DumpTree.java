@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.dumpview;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -29,7 +30,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -48,6 +57,7 @@ public class DumpTree extends JTree implements ActionListener {
 
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
+    private static final String ACTION_SAVE_TO_FILE = "SAVETOFILE";
 
     private final MainPanel mainPanel;
 
@@ -100,6 +110,11 @@ public class DumpTree extends JTree implements ActionListener {
         expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
         contextPopupMenu.add(expandRecursiveMenuItem);
 
+        final JMenuItem saveToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveToFile"));
+        saveToFileMenuItem.addActionListener(this);
+        saveToFileMenuItem.setActionCommand(ACTION_SAVE_TO_FILE);
+        contextPopupMenu.add(saveToFileMenuItem);
+
         final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
@@ -122,12 +137,17 @@ public class DumpTree extends JTree implements ActionListener {
                     }
                     closeSelectionMenuItem.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
+                    saveToFileMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
                         DumpInfo treeNode = (DumpInfo) paths[0].getLastPathComponent();
 
                         if (treeNode instanceof DumpInfoSwfNode) {
                             closeSelectionMenuItem.setVisible(true);
+                        }
+                        
+                        if (treeNode.getEndByte() - treeNode.startByte > 3) {
+                            saveToFileMenuItem.setVisible(true);
                         }
 
                         TreeModel model = getModel();
@@ -149,6 +169,28 @@ public class DumpTree extends JTree implements ActionListener {
                     return;
                 }
                 View.expandTreeNodesRecursive(this, path, true);
+            }
+            break;
+            case ACTION_SAVE_TO_FILE: {
+                TreePath[] paths = getSelectionPaths();
+                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+                JFileChooser fc = new JFileChooser();
+                String selDir = Configuration.lastOpenDir.get();
+                fc.setCurrentDirectory(new File(selDir));
+                if (!selDir.endsWith(File.separator)) {
+                    selDir += File.separator;
+                }
+                JFrame f = new JFrame();
+                View.setWindowIcon(f);
+                if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+                    File sf = Helper.fixDialogFile(fc.getSelectedFile());
+                    try (FileOutputStream fos = new FileOutputStream(sf)) {
+                        byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData;
+                        fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
+                    } catch (IOException ex) {
+                        Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
             break;
             case ACTION_CLOSE_SWF: {
