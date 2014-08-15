@@ -156,7 +156,7 @@ public class DumpTree extends JTree implements ActionListener {
                         if (treeNode instanceof DumpInfoSwfNode) {
                             closeSelectionMenuItem.setVisible(true);
                         }
-                        
+
                         if (treeNode.getEndByte() - treeNode.startByte > 3) {
                             saveToFileMenuItem.setVisible(true);
                         }
@@ -164,7 +164,7 @@ public class DumpTree extends JTree implements ActionListener {
                         if (treeNode.name.equals("actionBytes") && treeNode.getChildCount() == 0) {
                             parseActionsMenuItem.setVisible(true);
                         }
-                        
+
                         TreeModel model = getModel();
                         expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
                     }

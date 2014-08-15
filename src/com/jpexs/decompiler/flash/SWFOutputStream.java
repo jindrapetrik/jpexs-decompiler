@@ -129,7 +129,7 @@ public class SWFOutputStream extends OutputStream {
         os.write(b);
         pos += b.length;
     }
-    
+
     private void alignByte() throws IOException {
         if (bitPos > 0) {
             bitPos = 0;

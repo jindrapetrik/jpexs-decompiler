@@ -487,7 +487,7 @@ public class ASMParser {
                     }
                 }
             }
-            
+
             if (!found) {
                 if (throwOnError) {
                     throw new ParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);

@@ -1443,7 +1443,7 @@ public class SWFInputStream implements AutoCloseable {
         if (tagDataStream.dumpInfo == null && dumpInfo != null) {
             dumpInfo.tagToResolve = tagStub;
         }
-        
+
         if (resolve) {
             DumpInfo di = dumpInfo;
             try {

@@ -88,7 +88,7 @@ public class DumpInfo {
         }
         return end - 1;
     }
-    
+
     @Override
     public String toString() {
         String value = previewValue == null ? "" : previewValue.toString();

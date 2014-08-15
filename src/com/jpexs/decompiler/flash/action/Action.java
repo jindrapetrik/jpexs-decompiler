@@ -49,7 +49,6 @@ import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -183,6 +182,7 @@ public class Action implements GraphSourceItem {
     /**
      * Gets all addresses which are referenced from this action and/or
      * subactions
+     *
      * @param refs list of addresses
      */
     public void getRef(List<Long> refs) {
@@ -494,13 +494,13 @@ public class Action implements GraphSourceItem {
                 String add = "";
                 // honfika: commented out the following lines, because it makes no sense
                 /*if (a instanceof ActionIf) {
-                    add = " change: " + ((ActionIf) a).getJumpOffset();
-                }
-                if (a instanceof ActionJump) {
-                    add = " change: " + ((ActionJump) a).getJumpOffset();
-                }
-                add = "; ofs" + Helper.formatAddress(offset) + add;
-                add = "";*/
+                 add = " change: " + ((ActionIf) a).getJumpOffset();
+                 }
+                 if (a instanceof ActionJump) {
+                 add = " change: " + ((ActionJump) a).getJumpOffset();
+                 }
+                 add = "; ofs" + Helper.formatAddress(offset) + add;
+                 add = "";*/
                 if ((a instanceof ActionPush) && lastPush) {
                     writer.appendNoHilight(" ");
                     ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, exportMode, writer);

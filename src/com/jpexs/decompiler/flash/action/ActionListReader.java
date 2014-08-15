@@ -128,7 +128,7 @@ public class ActionListReader {
 
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         Map<Long, Action> actionMap = new TreeMap<>();
-        Map<Long,Long> nextOffsets = new HashMap<>();
+        Map<Long, Long> nextOffsets = new HashMap<>();
         Action entryAction = readActionListAtPos(listeners, cpool,
                 sis, actionMap, nextOffsets,
                 ip, 0, endIp, path, false, new ArrayList<Long>());
@@ -137,7 +137,7 @@ public class ActionListReader {
         if (actionMap.isEmpty()) {
             return actions;
         }
-        
+
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         List<Long> addresses = new ArrayList<>(actionMap.keySet());
         getContainerLastActions(actionMap, addresses, containerLastActions);
@@ -211,7 +211,7 @@ public class ActionListReader {
 
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         Map<Long, Action> actionMap = new TreeMap<>();
-        Map<Long,Long> nextOffsets = new HashMap<>();
+        Map<Long, Long> nextOffsets = new HashMap<>();
         readActionListAtPos(new ArrayList<DisassemblyListener>(), cpool,
                 sis, actionMap, nextOffsets,
                 startIp, startIp, endIp, "", false, new ArrayList<Long>());
@@ -296,23 +296,24 @@ public class ActionListReader {
     private static long getNearAddress(List<Long> addresses, long address, boolean next) {
         int min = 0;
         int max = addresses.size() - 1;
-        
+
         while (max >= min) {
             int mid = (min + max) / 2;
             long midValue = addresses.get(mid);
-            if(midValue == address)
-                return address; 
-            else if (midValue < address)
+            if (midValue == address) {
+                return address;
+            } else if (midValue < address) {
                 min = mid + 1;
-            else         
+            } else {
                 max = mid - 1;
+            }
         }
-        
-        return next 
+
+        return next
                 ? (min < addresses.size() ? addresses.get(min) : -1)
                 : (max > 0 ? addresses.get(max) : -1);
     }
-    
+
     private static Map<Long, Action> actionListToMap(List<Action> actions) {
         Map<Long, Action> map = new HashMap<>(actions.size());
         for (Action a : actions) {
@@ -600,7 +601,7 @@ public class ActionListReader {
             if (ip < startIp) {
                 continue;
             }
-            
+
             while (endIp == -1 || endIp > ip) {
                 sis.seek((int) ip);
 
