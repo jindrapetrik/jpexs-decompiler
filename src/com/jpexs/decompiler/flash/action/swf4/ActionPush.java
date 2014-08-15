@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -77,7 +78,9 @@ public class ActionPush extends Action {
         super(0x96, actionLength);
         int type;
         values = new ArrayList<>();
-        sis = new SWFInputStream(sis.getSwf(), sis.readBytesEx(actionLength, "actionPush"));
+        DumpInfo di = sis.dumpInfo;
+        sis = sis.getLimitedStream(actionLength);
+        sis.dumpInfo = di; 
         try {
             while (sis.available() > 0) {
                 type = sis.readUI8("type");

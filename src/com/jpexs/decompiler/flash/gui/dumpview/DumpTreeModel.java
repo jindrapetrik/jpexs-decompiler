@@ -93,7 +93,7 @@ public class DumpTreeModel implements TreeModel {
 
     @Override
     public int getChildCount(Object o) {
-        DumpInfo di = (DumpInfo) o;
+        DumpInfo di = (DumpInfo) o; 
         if (di.tagToResolve != null) {
             TagStub tagStub = di.tagToResolve;
             try {

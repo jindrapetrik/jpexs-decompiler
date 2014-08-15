@@ -87,7 +87,7 @@ public class ActionIf extends Action {
 
     @Override
     public String toString() {
-        return "ActionIf";
+        return "ActionIf " + offset;
     }
 
     @Override

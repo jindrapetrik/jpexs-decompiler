@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
@@ -223,6 +224,9 @@ public class DumpTree extends JTree implements ActionListener {
                     for (Action action : actions) {
                         DumpInfo di = new DumpInfo(action.toString(), "Action", null, action.getAddress(), action.getTotalActionLength());
                         di.parent = dumpInfo;
+                        rri.dumpInfo = di;
+                        rri.seek(action.getAddress());
+                        rri.readAction(new ConstantPool());
                         dumpInfo.getChildInfos().add(di);
                     }
                 } catch (IOException | InterruptedException ex) {
