@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -28,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -64,6 +68,8 @@ public class DumpTree extends JTree implements ActionListener {
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
     private static final String ACTION_SAVE_TO_FILE = "SAVETOFILE";
     private static final String ACTION_PARSE_ACTIONS = "PARSEACTIONS";
+    private static final String ACTION_PARSE_ABC = "PARSEABC";
+    private static final String ACTION_PARSE_INSTRUCTIONS = "PARSEINSTRUCTIONS";
 
     private final MainPanel mainPanel;
 
@@ -131,6 +137,16 @@ public class DumpTree extends JTree implements ActionListener {
         parseActionsMenuItem.addActionListener(this);
         contextPopupMenu.add(parseActionsMenuItem);
 
+        final JMenuItem parseAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseABC"));
+        parseAbcMenuItem.setActionCommand(ACTION_PARSE_ABC);
+        parseAbcMenuItem.addActionListener(this);
+        contextPopupMenu.add(parseAbcMenuItem);
+
+        final JMenuItem parseInstructionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseInstructions"));
+        parseInstructionsMenuItem.setActionCommand(ACTION_PARSE_INSTRUCTIONS);
+        parseInstructionsMenuItem.addActionListener(this);
+        contextPopupMenu.add(parseInstructionsMenuItem);
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -150,6 +166,8 @@ public class DumpTree extends JTree implements ActionListener {
                     expandRecursiveMenuItem.setVisible(false);
                     saveToFileMenuItem.setVisible(false);
                     parseActionsMenuItem.setVisible(false);
+                    parseAbcMenuItem.setVisible(false);
+                    parseInstructionsMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
                         DumpInfo treeNode = (DumpInfo) paths[0].getLastPathComponent();
@@ -162,8 +180,17 @@ public class DumpTree extends JTree implements ActionListener {
                             saveToFileMenuItem.setVisible(true);
                         }
 
+                        // todo honfika: do not use string names, because it has conflicts e.g with DefineFont.code
                         if (treeNode.name.equals("actionBytes") && treeNode.getChildCount() == 0) {
                             parseActionsMenuItem.setVisible(true);
+                        }
+
+                        if (treeNode.name.equals("abcBytes") && treeNode.getChildCount() == 0) {
+                            parseAbcMenuItem.setVisible(true);
+                        }
+
+                        if (treeNode.name.equals("code") && treeNode.parent.name.equals("method_body") && treeNode.getChildCount() == 0) {
+                            parseInstructionsMenuItem.setVisible(true);
                         }
 
                         TreeModel model = getModel();
@@ -229,9 +256,44 @@ public class DumpTree extends JTree implements ActionListener {
                         rri.readAction(new ConstantPool());
                         dumpInfo.getChildInfos().add(di);
                     }
+                    repaint();
                 } catch (IOException | InterruptedException ex) {
                     Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+            break;
+            case ACTION_PARSE_ABC: {
+                TreePath[] paths = getSelectionPaths();
+                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+                SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+                byte[] data = swf.uncompressedData;
+                int prevLength = (int) dumpInfo.startByte;
+                try {
+                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
+                    ais.seek(prevLength);
+                    ais.dumpInfo = dumpInfo;
+                    new ABC(ais, swf, null);
+                } catch (IOException ex) {
+                    Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                repaint();
+            }
+            break;
+            case ACTION_PARSE_INSTRUCTIONS: {
+                TreePath[] paths = getSelectionPaths();
+                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+                SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+                byte[] data = swf.uncompressedData;
+                int prevLength = (int) dumpInfo.startByte;
+                try {
+                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
+                    ais.seek(prevLength);
+                    ais.dumpInfo = dumpInfo;
+                    new AVM2Code(ais);
+                } catch (IOException ex) {
+                    Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                repaint();
             }
             break;
             case ACTION_CLOSE_SWF: {

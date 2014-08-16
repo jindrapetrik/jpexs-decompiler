@@ -214,6 +214,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -231,7 +232,6 @@ import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -784,46 +784,51 @@ public class AVM2Code implements Serializable {
         return null;
     }
 
-    public AVM2Code(InputStream is) throws IOException {
-        ABCInputStream ais = new ABCInputStream(is);
+    public AVM2Code(ABCInputStream ais) throws IOException {
         while (ais.available() > 0) {
+            DumpInfo di = ais.newDumpLevel("instruction", "instruction");
             long startOffset = ais.getPosition();
             ais.startBuffer();
-            int instructionCode = ais.read();
+            int instructionCode = ais.read("instructionCode");
             InstructionDefinition instr = instructionSetByCode[instructionCode];
+            if (di != null) {
+                di.name = instr.instructionName;
+            }
             if (instr != null) {
                 int[] actualOperands;
                 if (instructionCode == 0x1b) { //switch
-                    int firstOperand = ais.readS24();
-                    int case_count = ais.readU30();
+                    int firstOperand = ais.readS24("firstOperand");
+                    int case_count = ais.readU30("case_count");
                     actualOperands = new int[case_count + 3];
                     actualOperands[0] = firstOperand;
                     actualOperands[1] = case_count;
                     for (int c = 0; c < case_count + 1; c++) {
-                        actualOperands[2 + c] = ais.readS24();
+                        actualOperands[2 + c] = ais.readS24("actualOperand");
                     }
                 } else {
                     actualOperands = new int[instr.operands.length];
                     for (int op = 0; op < instr.operands.length; op++) {
                         switch (instr.operands[op] & 0xff00) {
                             case OPT_U30:
-                                actualOperands[op] = ais.readU30();
+                                actualOperands[op] = ais.readU30("operand");
                                 break;
                             case OPT_U8:
-                                actualOperands[op] = ais.read();
+                                actualOperands[op] = ais.read("operand");
                                 break;
                             case OPT_BYTE:
-                                actualOperands[op] = (byte) ais.read();
+                                actualOperands[op] = (byte) ais.read("operand");
                                 break;
                             case OPT_S24:
-                                actualOperands[op] = ais.readS24();
+                                actualOperands[op] = ais.readS24("operand");
                                 break;
                         }
                     }
                 }
 
                 code.add(new AVM2Instruction(startOffset, instr, actualOperands, ais.stopBuffer()));
+                ais.endDumpLevel(instr.instructionCode);
             } else {
+                ais.endDumpLevel(instr.instructionCode);
                 break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
                 //throw new UnknownInstructionCode(instructionCode);
             }

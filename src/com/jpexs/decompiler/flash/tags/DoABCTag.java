@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -59,7 +60,11 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      */
     public DoABCTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoABC", data);
-        abc = new ABC(sis, swf, this);
+
+        ABCInputStream ais = new ABCInputStream(sis.getBaseStream());
+        // put it to the dumpview:
+        sis.readBytesEx(sis.available(), "abcBytes");
+        abc = new ABC(ais, swf, this);
     }
 
     /**

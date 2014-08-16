@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
@@ -36,7 +37,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -194,7 +195,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 MethodBody mb = abc.bodies.get(bodyIndex);
                 mb.codeBytes = data;
                 try {
-                    mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
+                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(mb.codeBytes));
+                    mb.code = new AVM2Code(ais);
                 } catch (UnknownInstructionCode re) {
                     mb.code = new AVM2Code();
                     Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);
