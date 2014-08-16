@@ -441,7 +441,13 @@ public class Helper {
     }
 
     public static String readTextFile(String... file) {
-        return new String(readFile(file), Utf8Helper.charset);
+        byte[] data = readFile(file);
+        if (data.length > 1 && data[0] == (byte) 0xef && data[1] == (byte) 0xbb && data[2] == (byte) 0xbf) {
+            // remove UTF-8 BOM
+            return new String(data, 3, data.length - 3, Utf8Helper.charset);
+        }
+
+        return new String(data, Utf8Helper.charset);
     }
 
     public static byte[] readStream(InputStream is) {
