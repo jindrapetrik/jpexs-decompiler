@@ -335,7 +335,7 @@ public class DefineTextTag extends TextTag {
                         break;
                     case TEXT:
                         String txt = (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
-                        if (txt == null) {
+                        if (txt == null || (font == null && txt.isEmpty())) {
                             continue;
                         }
                         

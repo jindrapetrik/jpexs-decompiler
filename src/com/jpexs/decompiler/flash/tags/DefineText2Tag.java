@@ -328,6 +328,11 @@ public class DefineText2Tag extends TextTag {
                         }
                         break;
                     case TEXT:
+                        String txt = (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
+                        if (txt == null || (font == null && txt.isEmpty())) {
+                            continue;
+                        }
+
                         if (font == null) {
                             throw new ParseException("Font not defined", lexer.yyline());
                         }
@@ -354,7 +359,6 @@ public class DefineText2Tag extends TextTag {
                             tr.styleFlagsHasYOffset = true;
                             y = null;
                         }
-                        String txt = (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
