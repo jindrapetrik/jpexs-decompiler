@@ -108,8 +108,8 @@ public class DefineShape4Tag extends ShapeTag {
             sos.writeRECT(edgeBounds);
             sos.writeUB(5, reserved);
             sos.writeUB(1, usesFillWindingRule ? 1 : 0);
-            sos.writeUB(5, usesNonScalingStrokes ? 1 : 0);
-            sos.writeUB(5, usesScalingStrokes ? 1 : 0);
+            sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
+            sos.writeUB(1, usesScalingStrokes ? 1 : 0);
             sos.writeSHAPEWITHSTYLE(shapes, 4);
         } catch (IOException e) {
         }
