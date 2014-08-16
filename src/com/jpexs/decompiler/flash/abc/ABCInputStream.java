@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ABCInputStream {
+public class ABCInputStream implements AutoCloseable {
 
     private static final int CLASS_PROTECTED_NS = 8;
     private static final int ATTR_METADATA = 4;
@@ -475,5 +475,9 @@ public class ABCInputStream {
      }*/
     public long getPosition() {
         return bytesRead;
+    }
+
+    @Override
+    public void close() {
     }
 }

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.gui.Main;
-import java.io.ByteArrayInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import static org.testng.Assert.assertEquals;
@@ -45,10 +45,10 @@ public class ABCStreamTest {
             long number = 1531;
             aos.writeU30(number);
             aos.close();
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                    ABCInputStream ais = new ABCInputStream(bais);) {
-                assertEquals(number, ais.readU30());
-                assertEquals(0, bais.available());
+            try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
+                    ABCInputStream ais = new ABCInputStream(mis);) {
+                assertEquals(number, ais.readU30("test"));
+                assertEquals(0, mis.available());
             }
         } catch (IOException ex) {
             fail();
