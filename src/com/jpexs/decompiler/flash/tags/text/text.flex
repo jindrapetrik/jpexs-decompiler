@@ -86,7 +86,7 @@ Divider = [ \r\n]+
   /* error cases */
   \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }   
   .                              { if(string==null) string=new StringBuffer(); string.append( yytext() ); }
- <<EOF>>                         { if(finish){return null;}else{finish=true; return new ParsedSymbol(SymbolType.TEXT,string.toString());}}
+ <<EOF>>                         { if(finish){return null;}else{finish=true; return new ParsedSymbol(SymbolType.TEXT,string==null?null:string.toString());}}
 }
 
 <PARAMETER> {
