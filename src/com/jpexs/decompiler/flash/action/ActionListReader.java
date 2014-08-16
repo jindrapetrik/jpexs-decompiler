@@ -214,7 +214,7 @@ public class ActionListReader {
         Map<Long, Long> nextOffsets = new HashMap<>();
         readActionListAtPos(new ArrayList<DisassemblyListener>(), cpool,
                 sis, actionMap, nextOffsets,
-                startIp, startIp, endIp, "", false, new ArrayList<Long>());
+                startIp, startIp, endIp + 1, "", false, new ArrayList<Long>());
 
         return new ArrayList<>(actionMap.values());
     }
