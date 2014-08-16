@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
 import java.io.Serializable;
@@ -80,6 +81,10 @@ public class RGB implements Serializable {
 
     @Override
     public String toString() {
-        return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + "]";
+        if (Configuration.useHexColorFormat.get()) {
+            return "[RGB " + toHexRGB() + "]";
+        } else {
+            return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + "]";
+        }
     }
 }

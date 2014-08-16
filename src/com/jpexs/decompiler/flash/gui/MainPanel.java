@@ -2170,7 +2170,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
 
-        dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData, dumpInfo);
+        dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData, dumpInfo);
         dumpViewPanel.revalidate();
         showCard(CARDDUMPVIEW);
     }

@@ -253,6 +253,7 @@ public final class SWF implements TreeItem, Timelined {
      */
     public byte[] lzmaProperties;
     public byte[] uncompressedData;
+    public byte[] originalUncompressedData;
     public FileAttributesTag fileAttributes;
     /**
      * ScaleForm GFx
@@ -537,6 +538,7 @@ public final class SWF implements TreeItem, Timelined {
         compression = header.compression;
         lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
+        originalUncompressedData = uncompressedData;
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);

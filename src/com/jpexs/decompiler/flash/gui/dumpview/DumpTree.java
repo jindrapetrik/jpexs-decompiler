@@ -228,7 +228,7 @@ public class DumpTree extends JTree implements ActionListener {
                 if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
                     File sf = Helper.fixDialogFile(fc.getSelectedFile());
                     try (FileOutputStream fos = new FileOutputStream(sf)) {
-                        byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().uncompressedData;
+                        byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                         fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
                     } catch (IOException ex) {
                         Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
@@ -240,7 +240,7 @@ public class DumpTree extends JTree implements ActionListener {
                 TreePath[] paths = getSelectionPaths();
                 DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
                 SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.uncompressedData;
+                byte[] data = swf.originalUncompressedData;
                 int prevLength = (int) dumpInfo.startByte;
                 try {
                     SWFInputStream rri = new SWFInputStream(swf, data);
@@ -266,7 +266,7 @@ public class DumpTree extends JTree implements ActionListener {
                 TreePath[] paths = getSelectionPaths();
                 DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
                 SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.uncompressedData;
+                byte[] data = swf.originalUncompressedData;
                 int prevLength = (int) dumpInfo.startByte;
                 try {
                     ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
@@ -283,7 +283,7 @@ public class DumpTree extends JTree implements ActionListener {
                 TreePath[] paths = getSelectionPaths();
                 DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
                 SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.uncompressedData;
+                byte[] data = swf.originalUncompressedData;
                 int prevLength = (int) dumpInfo.startByte;
                 try {
                     ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
