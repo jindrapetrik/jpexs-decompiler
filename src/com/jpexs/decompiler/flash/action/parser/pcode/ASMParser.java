@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscatePop;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
@@ -408,6 +409,8 @@ public class ASMParser {
             a = (new ActionNop());
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscatePop") == 0) {
             a = (new ActionDeobfuscatePop());
+        } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscateJump") == 0) {
+            a = (new ActionDeobfuscateJump(lexer));
         } else {
             throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }

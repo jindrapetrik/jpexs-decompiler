@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
@@ -145,7 +146,7 @@ public class ActionListReader {
         // jump to the entry action when it is diffrent from the first action in the map
         long index = addresses.get(0);
         if (index != -1 && entryAction != actionMap.get(index)) {
-            ActionJump jump = new ActionJump(0);
+            ActionJump jump = new ActionDeobfuscateJump(0);
             int size = jump.getTotalActionLength();
             jump.setJumpOffset((int) (entryAction.getAddress() - size));
             actions.add(jump);
@@ -160,7 +161,7 @@ public class ActionListReader {
             actions.add(action);
             if (nextIndex != -1 && nextOffset != nextIndex) {
                 if (!action.isExit() && !(action instanceof ActionJump)) {
-                    ActionJump jump = new ActionJump(0);
+                    ActionJump jump = new ActionDeobfuscateJump(0);
                     jump.setAddress(action.getAddress());
                     int size = jump.getTotalActionLength();
                     jump.setJumpOffset((int) (nextOffset - action.getAddress() - size));
@@ -388,7 +389,7 @@ public class ActionListReader {
             int length = a.getBytes(version).length;
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
-                length = new ActionJump(0).getTotalActionLength();
+                length = new ActionDeobfuscateJump(0).getTotalActionLength();
             }
             address += length;
         }
@@ -469,7 +470,7 @@ public class ActionListReader {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
-                ActionJump aJump = new ActionJump(0);
+                ActionJump aJump = new ActionDeobfuscateJump(0);
                 aJump.setJumpOffset((int) (endAddress - a.getAddress() - aJump.getTotalActionLength()));
                 aJump.setAddress(a.getAddress());
                 replaceJumpTargets(jumps, a, aJump);
@@ -614,7 +615,7 @@ public class ActionListReader {
 
                 // unknown action, replace with jump
                 if (a instanceof ActionNop) {
-                    ActionJump aJump = new ActionJump(0);
+                    ActionJump aJump = new ActionDeobfuscateJump(0);
                     int jumpLength = aJump.getTotalActionLength();
                     aJump.setAddress(a.getAddress());
                     aJump.setJumpOffset(actionLengthWithHeader - jumpLength);

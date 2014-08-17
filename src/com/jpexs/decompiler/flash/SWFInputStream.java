@@ -1169,7 +1169,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 15:
                     ret = new StartSoundTag(sis, data);
                     break;
-                //case 16:
+                //case 16: StopSound
                 case 17:
                     ret = new DefineButtonSoundTag(sis, data);
                     break;
@@ -1179,11 +1179,11 @@ public class SWFInputStream implements AutoCloseable {
                 case 19:
                     ret = new SoundStreamBlockTag(sis, data);
                     break;
-                case 21:
-                    ret = new DefineBitsJPEG2Tag(sis, data);
-                    break;
                 case 20:
                     ret = new DefineBitsLosslessTag(sis, data);
+                    break;
+                case 21:
+                    ret = new DefineBitsJPEG2Tag(sis, data);
                     break;
                 case 22:
                     ret = new DefineShape2Tag(sis, data);
@@ -1235,7 +1235,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 43:
                     ret = new FrameLabelTag(sis, data);
                     break;
-                //case 44:
+                //case 44: DefineBehavior
                 case 45:
                     ret = new SoundStreamHead2Tag(sis, data);
                     break;
@@ -1250,7 +1250,9 @@ public class SWFInputStream implements AutoCloseable {
                 //case 50: DefineCommandObject
                 //case 51: CharacterSet
                 //case 52: ExternalFont
-                //case 53-55
+                //case 53: DefineFunction
+                //case 54: PlaceFunction
+                //case 55: GenTagObject
                 case 56:
                     ret = new ExportAssetsTag(sis, data);
                     break;
@@ -1284,7 +1286,8 @@ public class SWFInputStream implements AutoCloseable {
                 case 66:
                     ret = new SetTabIndexTag(sis, data);
                     break;
-                //case 67-68:
+                //case 67: DefineShape4 ???
+                //case 68: DefineMorphShape2 ???
                 case 69:
                     ret = new FileAttributesTag(sis, data);
                     break;
