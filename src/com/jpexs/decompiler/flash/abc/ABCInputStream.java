@@ -322,7 +322,7 @@ public class ABCInputStream implements AutoCloseable {
             param_types[i] = readU30("param_type");
         }
         int name_index = readU30("name_index");
-        int flags = readInternal();
+        int flags = read("flags");
 
         //// 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional (16=ignore_rest, 32=explicit,) 64=setsdxns, 128=has_paramnames
         ValueKind[] optional = new ValueKind[0];
@@ -350,7 +350,7 @@ public class ABCInputStream implements AutoCloseable {
         long pos = getPosition();
         startBuffer();
         int name_index = readU30("name_index");
-        int kind = readInternal();
+        int kind = read("kind");
         int kindType = 0xf & kind;
         int kindFlags = kind >> 4;
         Trait trait;
@@ -363,7 +363,7 @@ public class ABCInputStream implements AutoCloseable {
                 t1.type_index = readU30("type_index");
                 t1.value_index = readU30("value_index");
                 if (t1.value_index != 0) {
-                    t1.value_kind = readInternal();
+                    t1.value_kind = read("value_kind");
                 }
                 trait = t1;
                 break;
@@ -418,7 +418,7 @@ public class ABCInputStream implements AutoCloseable {
         return traits;
     }
 
-    public byte[] readBytesInternal(int count) throws IOException {
+    private byte[] readBytesInternal(int count) throws IOException {
         byte[] ret = new byte[count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) readInternal();
