@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -134,8 +135,8 @@ import java.util.logging.Logger;
 
 public class ASMParser {
 
-    public static List<Action> parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-        List<Action> list = new ArrayList<>();
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+        ActionList list = new ActionList();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
@@ -446,7 +447,7 @@ public class ASMParser {
         }
     }
 
-    public static List<Action> parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
+    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version);
 
@@ -459,7 +460,7 @@ public class ASMParser {
 
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
-        List<Action> ret = parse(ignoreNops, labels, address, lexer, constantPool, version);
+        ActionList ret = parse(ignoreNops, labels, address, lexer, constantPool, version);
         //Action.setActionsAddresses(ret, address, version);
         for (Action link : ret) {
             if (!(link instanceof ActionIf || link instanceof ActionJump)) {

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.helpers.Cache;
@@ -877,6 +878,16 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+
+        String pluginPath = Configuration.pluginPath.get();
+        if (pluginPath != null) {
+            try {
+                SWFDecompilerPlugin.loadPlugin(pluginPath);
+            } catch (Throwable e) {
+                View.showMessageDialog(null, "Failed to load plugin: " + pluginPath);
+            }
+        }
+        
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration.debugMode.get());
         initLang();

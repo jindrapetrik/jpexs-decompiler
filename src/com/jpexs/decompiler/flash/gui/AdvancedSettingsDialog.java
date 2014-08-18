@@ -327,7 +327,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                         // Reflection exceptions. This should never happen
                         throw new Error(ex.getMessage());
                     }
-                    if (item.get() != null && !item.get().equals(value)) {
+                    if (item.get() == null || !item.get().equals(value)) {
                         item.set(value);
                         modified = true;
                     }

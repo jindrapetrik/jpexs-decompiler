@@ -38,6 +38,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -90,13 +92,15 @@ public class ActionListReader {
      */
     public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
-            return CancellableWorker.call(new Callable<List<Action>>() {
+            ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
 
                 @Override
-                public List<Action> call() throws IOException, InterruptedException {
+                public ActionList call() throws IOException, InterruptedException {
                     return readActionList(listeners, sis, version, ip, endIp, path);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
+            
+            return actions;
         } catch (ExecutionException ex) {
             Throwable cause = ex.getCause();
             if (cause instanceof InterruptedException) {
@@ -124,7 +128,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    private static List<Action> readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
+    private static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         ConstantPool cpool = new ConstantPool();
 
         // Map of the actions. Use TreeMap to sort the keys in ascending order
@@ -134,7 +138,7 @@ public class ActionListReader {
                 sis, actionMap, nextOffsets,
                 ip, 0, endIp, path, false, new ArrayList<Long>());
 
-        List<Action> actions = new ArrayList<>();
+        ActionList actions = new ActionList();
         if (actionMap.isEmpty()) {
             return actions;
         }
@@ -188,10 +192,24 @@ public class ActionListReader {
             endAddress -= aEnd.getTotalActionLength();
         }
 
-        updateJumps(actions, jumps, containerLastActions, endAddress, version);
+        updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
+
+        if (SWFDecompilerPlugin.listener != null) {
+            try {
+                SWFDecompilerPlugin.listener.actionListParsed(actions);
+
+                updateAddresses(actions, 0, version);
+                updateJumps(actions, jumps, containerLastActions, endAddress);
+                updateActionStores(actions, jumps);
+                updateContainerSizes(actions, containerLastActions);
+                updateActionLengths(actions, version);
+            } catch (Throwable e) {
+                View.showMessageDialog(null, "Failed to call plugin method actionListParsed. Exception: " + e.getMessage());
+            }
+        }
 
         if (Configuration.autoDeobfuscate.get()) {
             try {
@@ -233,7 +251,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    private static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
+    private static ActionList deobfuscateActionList(List<DisassemblyListener> listeners, ActionList actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
             return actions;
         }
@@ -255,12 +273,6 @@ public class ActionListReader {
             actionMap.set((int) a.getAddress(), a);
         }
 
-        ConstantPool cpool = new ConstantPool();
-
-        Stack<GraphTargetItem> stack = new Stack<>();
-
-        ActionLocalData localData = new ActionLocalData();
-
         int maxRecursionLevel = 0;
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
@@ -274,7 +286,16 @@ public class ActionListReader {
             }
         }
 
-        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
+        deobfustaceActionListAtPosRecursive(listeners, 
+                new ArrayList<GraphTargetItem>(), 
+                new HashMap<Long, List<GraphSourceItemContainer>>(), 
+                new ActionLocalData(), 
+                new Stack<GraphTargetItem>(), 
+                new ConstantPool(), 
+                actionMap, ip, retdups, ip, endIp, path, 
+                new HashMap<Integer, Integer>(), false, 
+                new HashMap<Integer, HashMap<String, GraphTargetItem>>(), 
+                version, 0, maxRecursionLevel);
 
         List<Action> ret = new ArrayList<>();
         Action last = null;
@@ -285,7 +306,7 @@ public class ActionListReader {
             last = a;
         }
         ret = Action.removeNops(0, ret, version, path);
-        List<Action> reta = new ArrayList<>();
+        ActionList reta = new ActionList();
         for (Object o : ret) {
             if (o instanceof Action) {
                 reta.add((Action) o);
@@ -462,7 +483,7 @@ public class ActionListReader {
         }
     }
 
-    private static void updateJumps(List<Action> actions, Map<Action, Action> jumps, Map<Action, List<Action>> containerLastActions, long endAddress, int version) {
+    private static void updateJumps(List<Action> actions, Map<Action, Action> jumps, Map<Action, List<Action>> containerLastActions, long endAddress) {
         if (actions.isEmpty()) {
             return;
         }
@@ -524,7 +545,7 @@ public class ActionListReader {
      * @param removeWhenLast
      * @return
      */
-    private static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
+    public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
 
         if (index < 0 || actions.size() <= index) {
             return false;
@@ -576,7 +597,7 @@ public class ActionListReader {
         actions.remove(index);
 
         updateAddresses(actions, startIp, version);
-        updateJumps(actions, jumps, containerLastActions, endAddress, version);
+        updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);

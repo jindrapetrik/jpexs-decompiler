@@ -326,6 +326,8 @@ public class Configuration {
     @ConfigurationDefaultInt(128)
     public static final ConfigurationItem<Integer> lzmaFastBytes = null;
 
+    public static final ConfigurationItem<String> pluginPath = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
