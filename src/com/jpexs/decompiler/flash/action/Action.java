@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -42,7 +40,6 @@ import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
-import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
@@ -59,7 +56,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -402,11 +398,10 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @param writer
-     * @param path
      * @return HilightedTextWriter
      */
-    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
-        return actionsToString(listeners, address, list, new ArrayList<String>(), version, exportMode, writer, path);
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
+        return actionsToString(listeners, address, list, new ArrayList<String>(), version, exportMode, writer);
     }
 
     /**
@@ -419,10 +414,9 @@ public class Action implements GraphSourceItem {
      * @param constantPool Constant pool
      * @param version SWF version
      * @param hex Add hexadecimal?
-     * @param path
      * @return HilightedTextWriter
      */
-    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, String path) {
+    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         long offset;
         List<Long> importantOffsets = getActionsAllRefs(list);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
@@ -544,8 +538,9 @@ public class Action implements GraphSourceItem {
                     }
 
                     if (fixBranch > -1) {
-                        writer.appendNoHilight("FFDec_DeobfuscatePop").newLine();
-                        if (fixBranch == 0) { //jump                               
+                        writer.appendNoHilight("FFDec_DeobfuscatePop");
+                        if (fixBranch == 0) { //jump
+                            writer.newLine();
                             writer.appendNoHilight("Jump loc");
                             writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getTotalActionLength() + ((ActionIf) a).getJumpOffset()));
                         } else {
@@ -598,7 +593,6 @@ public class Action implements GraphSourceItem {
      * @param container
      * @param knownAddreses List of important offsets to mark as labels
      * @param constantPool Constant pool
-     * @param version SWF version
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */

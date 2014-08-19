@@ -142,7 +142,7 @@ public class ActionListReader {
         if (actionMap.isEmpty()) {
             return actions;
         }
-
+        
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         List<Long> addresses = new ArrayList<>(actionMap.keySet());
         getContainerLastActions(actionMap, addresses, containerLastActions);
@@ -259,11 +259,9 @@ public class ActionListReader {
         Action lastAction = actions.get(actions.size() - 1);
         int endIp = (int) lastAction.getAddress();
 
-        List<Action> retdups = new ArrayList<>(endIp);
+        List<Action> retMap = new ArrayList<>(endIp);
         for (int i = 0; i < endIp; i++) {
-            Action a = new ActionNop();
-            a.setAddress(i);
-            retdups.add(a);
+            retMap.add(null);
         }
         List<Action> actionMap = new ArrayList<>(endIp);
         for (int i = 0; i <= endIp; i++) {
@@ -292,15 +290,15 @@ public class ActionListReader {
                 new ActionLocalData(), 
                 new Stack<GraphTargetItem>(), 
                 new ConstantPool(), 
-                actionMap, ip, retdups, ip, endIp, path, 
+                actionMap, ip, retMap, ip, endIp, path, 
                 new HashMap<Integer, Integer>(), false, 
                 new HashMap<Integer, HashMap<String, GraphTargetItem>>(), 
                 version, 0, maxRecursionLevel);
 
         ActionList ret = new ActionList();
         Action last = null;
-        for (Action a : retdups) {
-            if (a != last) {
+        for (Action a : retMap) {
+            if (a != last && a != null) {
                 ret.add(a);
             }
             last = a;
@@ -849,18 +847,7 @@ public class ActionListReader {
                     }
                 }
             }
-            int nopos = -1;
             for (int i = 0; i < actionLen; i++) {
-                if (a instanceof ActionNop) {
-                    int prevPos = (int) a.getAddress();
-                    a = new ActionNop();
-                    a.setAddress(prevPos);
-                    nopos++;
-                    if (nopos > 0) {
-                        a.setAddress(a.getAddress() + 1);
-                    }
-
-                }
                 ret.set(ip + i, a);
             }
 
