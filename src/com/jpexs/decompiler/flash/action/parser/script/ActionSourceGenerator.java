@@ -157,7 +157,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                     || (((ActionJump) onTrue.get(onTrue.size() - 1)).isBreak)))) {
                 ajmp = new ActionJump(0);
                 ret.add(ajmp);
-                onTrueLen += ajmp.getBytes(SWF.DEFAULT_VERSION).length;
+                onTrueLen += ajmp.getBytesLength(SWF.DEFAULT_VERSION);
             }
             ifaif.setJumpOffset(onTrueLen);
             byte[] onFalseBytes = Action.actionsToBytes(onFalse, false, SWF.DEFAULT_VERSION);
@@ -182,7 +182,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     private void fixLoop(List<Action> code, int breakOffset, int continueOffset) {
         int pos = 0;
         for (Action a : code) {
-            pos += a.getBytes(SWF.DEFAULT_VERSION).length;
+            pos += a.getBytesLength(SWF.DEFAULT_VERSION);
             if (a instanceof ActionJump) {
                 ActionJump aj = (ActionJump) a;
                 if (aj.isContinue && (continueOffset != Integer.MAX_VALUE)) {
@@ -248,8 +248,9 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(doExpr);
         ActionIf doif = new ActionIf(0);
         ret.add(doif);
-        doif.setJumpOffset(-doBodyLen - doExprLen - doif.getBytes(SWF.DEFAULT_VERSION).length);
-        fixLoop(doBody, doBodyLen + doExprLen + doif.getBytes(SWF.DEFAULT_VERSION).length, doBodyLen);
+        int offset = doBodyLen + doExprLen + doif.getBytesLength(SWF.DEFAULT_VERSION);
+        doif.setJumpOffset(-offset);
+        fixLoop(doBody, offset, doBodyLen);
         return ret;
     }
 
@@ -264,7 +265,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ActionIf foraif = new ActionIf(0);
         forExpr.add(foraif);
         ActionJump forajmp = new ActionJump(0);
-        int forajmpLen = forajmp.getBytes(SWF.DEFAULT_VERSION).length;
+        int forajmpLen = forajmp.getBytesLength(SWF.DEFAULT_VERSION);
         int forExprLen = Action.actionsToBytes(forExpr, false, SWF.DEFAULT_VERSION).length;
         int forBodyLen = Action.actionsToBytes(forBody, false, SWF.DEFAULT_VERSION).length;
         int forFinalLen = Action.actionsToBytes(forFinalCommands, false, SWF.DEFAULT_VERSION).length;
@@ -278,6 +279,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen);
         return ret;
     }
+    
     private long uniqLast = 0;
 
     public String uniqId() {
@@ -371,7 +373,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                         jmpPos += exprLengths.get(k).get(m);
                     }
                 }
-                jmpPos += defJump.getBytes(SWF.DEFAULT_VERSION).length;
+                jmpPos += defJump.getBytesLength(SWF.DEFAULT_VERSION);
                 for (int n = 0; n < i; n++) {
                     jmpPos += caseLengths.get(n);
                 }

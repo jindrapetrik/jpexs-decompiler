@@ -76,12 +76,12 @@ public class ActionJump extends Action {
 
     @Override
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
-        String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+        String ofsStr = Helper.formatAddress(getAddress() + getBytesLength(version) + offset);
         return "Jump loc" + ofsStr;
     }
 
     public ActionJump(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x99, 0);
+        super(0x99, 2);
         identifier = lexIdentifier(lexer);
     }
 
@@ -98,11 +98,12 @@ public class ActionJump extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        int ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset);
+        int version = ((ActionGraphSource) code).version;
+        int length = getBytesLength(version);
+        int ofs = code.adr2pos(getAddress() + length + offset);
         if (ofs == -1) {
-            ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length);
-            new Exception().printStackTrace();
-            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset) + " from ofs" + Helper.formatAddress(getAddress()));
+            ofs = code.adr2pos(getAddress() + length);
+            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(getAddress() + length + offset) + " from ofs" + Helper.formatAddress(getAddress()));
         }
         ret.add(ofs);
         return ret;

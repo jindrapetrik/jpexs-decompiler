@@ -141,7 +141,7 @@ public class ASMParser {
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
         cpool.setAddress(address);
-        address += cpool.getBytes(version).length;
+        address += cpool.getBytesLength(version);
         list.add(cpool);
 
         while (true) {
@@ -185,7 +185,7 @@ public class ASMParser {
                     address += 1;
                 } else if (a != null) {
                     a.setAddress(address);
-                    address += a.getBytes(version).length;
+                    address += a.getBytesLength(version);
                 }
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
@@ -475,7 +475,7 @@ public class ASMParser {
                 for (Label label : labels) {
 
                     if (((ActionJump) link).identifier.equals(label.name)) {
-                        ((ActionJump) link).setJumpOffset((int) (label.address - (((ActionJump) link).getAddress() + ((ActionJump) link).getBytes(version).length)));
+                        ((ActionJump) link).setJumpOffset((int) (label.address - (((ActionJump) link).getAddress() + ((ActionJump) link).getBytesLength(version))));
                         found = true;
                         break;
                     }
@@ -485,7 +485,7 @@ public class ASMParser {
 
                 for (Label label : labels) {
                     if (((ActionIf) link).identifier.equals(label.name)) {
-                        ((ActionIf) link).setJumpOffset((int) (label.address - (((ActionIf) link).getAddress() + ((ActionIf) link).getBytes(version).length)));
+                        ((ActionIf) link).setJumpOffset((int) (label.address - (((ActionIf) link).getAddress() + ((ActionIf) link).getBytesLength(version))));
                         found = true;
                         break;
                     }

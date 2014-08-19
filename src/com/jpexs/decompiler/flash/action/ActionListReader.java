@@ -194,8 +194,8 @@ public class ActionListReader {
 
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
-        updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
+        updateContainerSizes(actions, containerLastActions);
 
         if (SWFDecompilerPlugin.listener != null) {
             try {
@@ -204,8 +204,8 @@ public class ActionListReader {
                 updateAddresses(actions, 0, version);
                 updateJumps(actions, jumps, containerLastActions, endAddress);
                 updateActionStores(actions, jumps);
-                updateContainerSizes(actions, containerLastActions);
                 updateActionLengths(actions, version);
+                updateContainerSizes(actions, containerLastActions);
             } catch (Throwable e) {
                 View.showMessageDialog(null, "Failed to call plugin method actionListParsed. Exception: " + e.getMessage());
             }
@@ -407,7 +407,7 @@ public class ActionListReader {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
             a.setAddress(address);
-            int length = a.getBytes(version).length;
+            int length = a.getBytesLength(version);
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
                 length = new ActionDeobfuscateJump(0).getTotalActionLength();
@@ -420,7 +420,7 @@ public class ActionListReader {
     private static void updateActionLengths(List<Action> actions, int version) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
-            int length = a.getBytes(version).length;
+            int length = a.getBytesLength(version);
             a.actionLength = length - 1 - ((a.actionCode >= 0x80) ? 2 : 0);
         }
     }
@@ -599,8 +599,8 @@ public class ActionListReader {
         updateAddresses(actions, startIp, version);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
-        updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
+        updateContainerSizes(actions, containerLastActions);
 
         return true;
     }
@@ -691,10 +691,10 @@ public class ActionListReader {
                     for (long size : cnt.getContainerSizes()) {
                         if (size != 0) {
                             long ip2 = ip + actionLengthWithHeader;
-                            //long endIp2 = ip + actionLengthWithHeader + size;
+                            long endIp2 = ip + actionLengthWithHeader + size;
                             readActionListAtPos(listeners, cpool,
                                     sis, actions, nextOffsets,
-                                    ip2, startIp, endIp, newPath, indeterminate, visitedContainers);
+                                    ip2, startIp, endIp2, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
                         }
                     }

@@ -46,6 +46,7 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
     public void init() throws IOException, InterruptedException {
         Main.initLogging(false);
         Configuration.autoDeobfuscate.set(false);
+        Configuration.pluginPath.set(null);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
@@ -69,15 +70,21 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
     public void testRemoveAction() {
         String actionsString = 
                 "ConstantPool\n" + 
-                "Push 1\n" + 
-                "Jump l1\n" +
-                "l1:Push 2";
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label1\n" +
+                "label1:Push 3";
         String expectedResult = 
                 "ConstantPool\n" + 
-                "Push 1 2\n";
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "}\n" +
+                "Push 2 3";
         try {
             ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
-            actions.removeAction(2);
+            actions.removeAction(4); // jump
             
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));

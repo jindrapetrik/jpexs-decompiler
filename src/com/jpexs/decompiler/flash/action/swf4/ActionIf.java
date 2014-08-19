@@ -76,7 +76,7 @@ public class ActionIf extends Action {
 
     @Override
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
-        String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+        String ofsStr = Helper.formatAddress(getAddress() + getBytesLength(version) + offset);
         return "If loc" + ofsStr + (!jumpUsed ? " ;compileTimeIgnore" : (!ignoreUsed ? " ;compileTimeJump" : ""));
     }
 
@@ -98,10 +98,12 @@ public class ActionIf extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        int jmp = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset);
-        int after = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length);
+        int version = ((ActionGraphSource) code).version;
+        int length = getBytesLength(version);
+        int jmp = code.adr2pos(getAddress() + length + offset);
+        int after = code.adr2pos(getAddress() + length);
         if (jmp == -1) {
-            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs" + Helper.formatAddress(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs" + Helper.formatAddress(getAddress() + length + offset));
             ret.add(after);
         } else {
             ret.add(jmp);

@@ -314,6 +314,16 @@ public class Action implements GraphSourceItem {
     }
 
     /**
+     * Gets the length of action converted to bytes
+     *
+     * @param version SWF version
+     * @return Length
+     */
+    public int getBytesLength(int version) {
+        return getBytes(version).length;
+    }
+
+    /**
      * Surrounds byte array with Action header
      *
      * @param data Byte array
@@ -370,7 +380,7 @@ public class Action implements GraphSourceItem {
         long offset = baseAddress;
         for (Action a : list) {
             a.setAddress(offset);
-            offset += a.getBytes(version).length;
+            offset += a.getBytesLength(version);
         }
     }
 
@@ -455,6 +465,7 @@ public class Action implements GraphSourceItem {
             if (containers.containsKey(offset)) {
                 for (int i = 0; i < containers.get(offset).size(); i++) {
                     writer.appendNoHilight("}").newLine();
+                    lastPush = false;
                     GraphSourceItemContainer cnt = containers.get(offset).get(i);
                     int cntPos = containersPos.get(cnt);
                     writer.appendNoHilight(cnt.getASMSourceBetween(cntPos));
@@ -482,7 +493,7 @@ public class Action implements GraphSourceItem {
                 if (pos + 1 < list.size()) {
                     len = (int) (((Action) (list.get(pos + 1))).getAddress() - a.getAddress());
                 } else {
-                    len = a.getBytes(version).length;
+                    len = a.getBytesLength(version);
                 }
                 if (!(a instanceof ActionEnd)) {
                     for (int i = 0; i < len; i++) {
@@ -527,7 +538,7 @@ public class Action implements GraphSourceItem {
                         writer.appendNoHilight("FFDec_DeobfuscatePop").newLine();
                         if (fixBranch == 0) { //jump                               
                             writer.appendNoHilight("Jump loc");
-                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getBytes(version).length + ((ActionIf) a).getJumpOffset()));
+                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getBytesLength(version) + ((ActionIf) a).getJumpOffset()));
                         } else {
                             //nojump, ignore
                         }
@@ -636,7 +647,7 @@ public class Action implements GraphSourceItem {
             if (actions.isEmpty()) {
                 return 0;
             }
-            return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytes(version).length;
+            return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytesLength(version);
         }
         if (ip == -1) {
             return 0;
@@ -659,7 +670,7 @@ public class Action implements GraphSourceItem {
             }
         }
         if (actions.size() > 0) {
-            long outpos = actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytes(version).length;
+            long outpos = actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytesLength(version);
             if (addr == outpos) {
                 return actions.size();
             }
