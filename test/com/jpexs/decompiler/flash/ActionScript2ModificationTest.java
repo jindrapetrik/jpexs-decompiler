@@ -66,25 +66,13 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
         return actions;
     }
     
-    @Test
-    public void testRemoveAction() {
-        String actionsString = 
-                "ConstantPool\n" + 
-                "DefineFunction \"test\" 1 \"p1\" {\n" +
-                "Push 1\n" +
-                "}\n" +
-                "Push 2\n" + 
-                "Jump label1\n" +
-                "label1:Push 3";
-        String expectedResult = 
-                "ConstantPool\n" + 
-                "DefineFunction \"test\" 1 \"p1\" {\n" +
-                "Push 1\n" +
-                "}\n" +
-                "Push 2 3";
+    public void testRemoveAction(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
             ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
-            actions.removeAction(4); // jump
+
+            for (int i : actionsToRemove) {
+                actions.removeAction(i);
+            }
             
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -99,5 +87,121 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
         } catch (IOException | ParseException | InterruptedException ex) {
             fail();
         }
+    }
+    
+    @Test
+    public void testRemoveJumpAction() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "Return\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label_1\n" + // remove this action
+                "label_1:Push 3";
+        String expectedResult = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "Return\n" +
+                "}\n" +
+                "Push 2 3";
+        testRemoveAction(actionsString, expectedResult, new int[] {5});
+    }
+
+    @Test
+    public void testRemoveActionFromContainer() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" + // remove this action
+                "Return\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label_1\n" +
+                "label_1:Push 3";
+        String expectedResult = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Return\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label_1\n" +
+                "label_1:Push 3";
+        testRemoveAction(actionsString, expectedResult, new int[] {2});
+    }
+
+    @Test
+    public void testRemoveLastActionFromContainer() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" + // remove this action
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label_1\n" +
+                "label_1:Push 3";
+        String expectedResult = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "Jump label_1\n" +
+                "label_1:Push 3";
+        testRemoveAction(actionsString, expectedResult, new int[] {3});
+    }
+
+    @Test
+    public void testRemoveIfTargetAction() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4\n" + // remove this action
+                "Push 5"; // after removing the previous action the if action should jump here
+        String expectedResult = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 5";
+        testRemoveAction(actionsString, expectedResult, new int[] {7});
+    }
+
+    @Test
+    public void testRemoveIfTargetLastAction() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4"; // remove this action
+        String expectedResult =
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:";
+        testRemoveAction(actionsString, expectedResult, new int[] {7});
     }
 }

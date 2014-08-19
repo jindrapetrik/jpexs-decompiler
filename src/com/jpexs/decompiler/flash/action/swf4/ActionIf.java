@@ -81,7 +81,7 @@ public class ActionIf extends Action {
     }
 
     public ActionIf(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x9D, -1);
+        super(0x9D, 2);
         identifier = lexIdentifier(lexer);
     }
 
