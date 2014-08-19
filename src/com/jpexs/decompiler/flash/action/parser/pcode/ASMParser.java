@@ -141,7 +141,7 @@ public class ASMParser {
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
         cpool.setAddress(address);
-        address += cpool.getBytesLength(version);
+        address += cpool.getTotalActionLength();
         list.add(cpool);
 
         while (true) {
@@ -185,7 +185,7 @@ public class ASMParser {
                     address += 1;
                 } else if (a != null) {
                     a.setAddress(address);
-                    address += a.getBytesLength(version);
+                    address += a.getTotalActionLength();
                 }
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
@@ -415,6 +415,8 @@ public class ASMParser {
         } else {
             throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
+        
+        a.updateLength(version);
         return a;
     }
 
@@ -473,19 +475,21 @@ public class ASMParser {
                 identifier = ((ActionJump) link).identifier;
 
                 for (Label label : labels) {
+                    ActionJump actionJump = (ActionJump) link;
 
-                    if (((ActionJump) link).identifier.equals(label.name)) {
-                        ((ActionJump) link).setJumpOffset((int) (label.address - (((ActionJump) link).getAddress() + ((ActionJump) link).getBytesLength(version))));
+                    if (actionJump.identifier.equals(label.name)) {
+                        actionJump.setJumpOffset((int) (label.address - (actionJump.getAddress() + actionJump.getTotalActionLength())));
                         found = true;
                         break;
                     }
                 }
             } else if (link instanceof ActionIf) {
-                identifier = ((ActionIf) link).identifier;
+                ActionIf actionIf = (ActionIf) link;
+                identifier = actionIf.identifier;
 
                 for (Label label : labels) {
-                    if (((ActionIf) link).identifier.equals(label.name)) {
-                        ((ActionIf) link).setJumpOffset((int) (label.address - (((ActionIf) link).getAddress() + ((ActionIf) link).getBytesLength(version))));
+                    if (actionIf.identifier.equals(label.name)) {
+                        actionIf.setJumpOffset((int) (label.address - (actionIf.getAddress() + actionIf.getTotalActionLength())));
                         found = true;
                         break;
                     }

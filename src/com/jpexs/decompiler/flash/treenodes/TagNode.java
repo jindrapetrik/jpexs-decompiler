@@ -150,7 +150,7 @@ public class TagNode extends ContainerNode {
                                     asm.getActionSourceSuffix(writer);
                                 } else {
                                     List<Action> as = asm.getActions();
-                                    Action.setActionsAddresses(as, 0, asm.getSwf().version);
+                                    Action.setActionsAddresses(as, 0);
                                     Action.actionsToSource(asm, as, ""/*FIXME*/, writer);
                                 }
                             }

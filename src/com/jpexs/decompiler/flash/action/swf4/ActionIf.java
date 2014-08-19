@@ -75,8 +75,8 @@ public class ActionIf extends Action {
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
-        String ofsStr = Helper.formatAddress(getAddress() + getBytesLength(version) + offset);
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
+        String ofsStr = Helper.formatAddress(getAddress() + getTotalActionLength() + offset);
         return "If loc" + ofsStr + (!jumpUsed ? " ;compileTimeIgnore" : (!ignoreUsed ? " ;compileTimeJump" : ""));
     }
 
@@ -98,8 +98,7 @@ public class ActionIf extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        int version = ((ActionGraphSource) code).version;
-        int length = getBytesLength(version);
+        int length = getTotalActionLength();
         int jmp = code.adr2pos(getAddress() + length + offset);
         int after = code.adr2pos(getAddress() + length);
         if (jmp == -1) {

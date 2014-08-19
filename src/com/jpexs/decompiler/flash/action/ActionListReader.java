@@ -90,7 +90,7 @@ public class ActionListReader {
      * @throws java.lang.InterruptedException
      * @throws java.util.concurrent.TimeoutException
      */
-    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
+    public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
             ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
 
@@ -111,7 +111,7 @@ public class ActionListReader {
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return new ArrayList<>();
+        return new ActionList();
     }
 
     /**
@@ -180,7 +180,8 @@ public class ActionListReader {
         Map<Action, Action> jumps = new HashMap<>();
         getJumps(actions, jumps);
 
-        long endAddress = updateAddresses(actions, 0, version);
+        updateActionLengths(actions, version);
+        long endAddress = updateAddresses(actions, 0);
 
         // add end action
         Action lastAction = actions.get(actions.size() - 1);
@@ -194,17 +195,16 @@ public class ActionListReader {
 
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
-        updateActionLengths(actions, version);
         updateContainerSizes(actions, containerLastActions);
 
         if (SWFDecompilerPlugin.listener != null) {
             try {
                 SWFDecompilerPlugin.listener.actionListParsed(actions);
 
-                updateAddresses(actions, 0, version);
+                updateActionLengths(actions, version);
+                updateAddresses(actions, 0);
                 updateJumps(actions, jumps, containerLastActions, endAddress);
                 updateActionStores(actions, jumps);
-                updateActionLengths(actions, version);
                 updateContainerSizes(actions, containerLastActions);
             } catch (Throwable e) {
                 View.showMessageDialog(null, "Failed to call plugin method actionListParsed. Exception: " + e.getMessage());
@@ -297,7 +297,7 @@ public class ActionListReader {
                 new HashMap<Integer, HashMap<String, GraphTargetItem>>(), 
                 version, 0, maxRecursionLevel);
 
-        List<Action> ret = new ArrayList<>();
+        ActionList ret = new ActionList();
         Action last = null;
         for (Action a : retdups) {
             if (a != last) {
@@ -305,7 +305,7 @@ public class ActionListReader {
             }
             last = a;
         }
-        ret = Action.removeNops(0, ret, version, path);
+        ret.removeNops();
         ActionList reta = new ActionList();
         for (Object o : ret) {
             if (o instanceof Action) {
@@ -403,11 +403,11 @@ public class ActionListReader {
         }
     }
 
-    private static long updateAddresses(List<Action> actions, long address, int version) {
+    private static long updateAddresses(List<Action> actions, long address) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
             a.setAddress(address);
-            int length = a.getBytesLength(version);
+            int length = a.getTotalActionLength();
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
                 length = new ActionDeobfuscateJump(0).getTotalActionLength();
@@ -419,9 +419,7 @@ public class ActionListReader {
 
     private static void updateActionLengths(List<Action> actions, int version) {
         for (int i = 0; i < actions.size(); i++) {
-            Action a = actions.get(i);
-            int length = a.getBytesLength(version);
-            a.actionLength = length - 1 - ((a.actionCode >= 0x80) ? 2 : 0);
+            actions.get(i).updateLength(version);
         }
     }
 
@@ -538,6 +536,7 @@ public class ActionListReader {
 
     /**
      * Removes an action from the action list, and updates all references
+     * This method will keep the inner actions of the container when you remove the container
      *
      * @param actions
      * @param index
@@ -596,10 +595,10 @@ public class ActionListReader {
 
         actions.remove(index);
 
-        updateAddresses(actions, startIp, version);
+        updateActionLengths(actions, version);
+        updateAddresses(actions, startIp);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
-        updateActionLengths(actions, version);
         updateContainerSizes(actions, containerLastActions);
 
         return true;
@@ -745,7 +744,7 @@ public class ActionListReader {
             }
 
             if (debugMode) {
-                String atos = a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, ScriptExportMode.PCODE);
+                String atos = a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, ScriptExportMode.PCODE);
                 if (a instanceof GraphSourceItemContainer) {
                     atos = a.toString();
                 }

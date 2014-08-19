@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -194,15 +195,15 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     }
 
     @Override
-    public List<Action> getActions() throws InterruptedException {
+    public ActionList getActions() throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<>();
+            return new ActionList();
         }
     }
 

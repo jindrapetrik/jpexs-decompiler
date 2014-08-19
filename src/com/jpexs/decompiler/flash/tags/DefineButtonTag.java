@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -165,20 +166,20 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * @throws java.lang.InterruptedException
      */
     @Override
-    public List<Action> getActions() throws InterruptedException {
+    public ActionList getActions() throws InterruptedException {
         try {
             int prevLength = actionBytes.pos;
             SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<>();
+            return new ActionList();
         }
     }
 

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -55,7 +56,7 @@ public interface ASMSource extends TreeItem {
      * @return List of actions
      * @throws java.lang.InterruptedException
      */
-    public List<Action> getActions() throws InterruptedException;
+    public ActionList getActions() throws InterruptedException;
 
     /**
      * Sets actions associated with this object

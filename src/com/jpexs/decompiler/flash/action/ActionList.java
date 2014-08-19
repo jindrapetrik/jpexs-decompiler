@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.special.ActionNop;
 import java.util.ArrayList;
 
 /**
@@ -29,6 +30,29 @@ public class ActionList extends ArrayList<Action> {
         ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
     }
     
+    public void removeAction(int index, int count) {
+        if (size() <= index + count - 1) {
+            // Can't remove count elements, only size - index is available
+            count = size() - index;
+        }
+        
+        for (int i = 0; i < count; i++) {
+            ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
+        }
+    }
+    
+    public void addAction(int index, Action action) {
+        ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
+    }
+    
+    public void removeNops() {
+        for (int i = 0; i < size(); i++) {
+           if (get(i) instanceof ActionNop) {
+               removeAction(i);
+           }
+        }
+    }
+
     public Action getByAddress(long address) {
         for (Action action : this) {
             if (action.getAddress() == address) {

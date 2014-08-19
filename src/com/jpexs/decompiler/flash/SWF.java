@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionDeobfuscation;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -1682,7 +1683,7 @@ public final class SWF implements TreeItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;
@@ -1844,12 +1845,12 @@ public final class SWF implements TreeItem, Timelined {
 
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ASMSource src, String path) throws InterruptedException {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
-        List<Action> actions = src.getActions();
+        ActionList actions = src.getActions();
         actionsMap.put(src, actions);
         getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path);
         return ret;
     }
-    private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<>();
+    private HashMap<ASMSource, ActionList> actionsMap = new HashMap<>();
 
     private void getVariables(List<ContainerItem> objs, String path) throws InterruptedException {
         List<String> processed = new ArrayList<>();
@@ -2155,7 +2156,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
         for (ASMSource src : actionsMap.keySet()) {
-            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, ""/*FIXME path*/));
+            actionsMap.get(src).removeNops();
             src.setActions(actionsMap.get(src));
             src.setModified();
         }

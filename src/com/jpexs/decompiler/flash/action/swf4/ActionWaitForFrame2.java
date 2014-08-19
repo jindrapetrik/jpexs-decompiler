@@ -116,7 +116,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
         String ret = "WaitForFrame2 " + skipCount;
         /*for (int i = 0; i < skipped.size(); i++) {
          if (skipped.get(i) instanceof ActionEnd) {

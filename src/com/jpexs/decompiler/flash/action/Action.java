@@ -324,6 +324,16 @@ public class Action implements GraphSourceItem {
     }
 
     /**
+     * Uptates the action length to the length calculated from action bytes
+     *
+     * @param version SWF version
+     */
+    public void updateLength(int version) {
+        int length = getBytes(version).length;
+        actionLength = length - 1 - ((actionCode >= 0x80) ? 2 : 0);
+    }
+
+    /**
      * Surrounds byte array with Action header
      *
      * @param data Byte array
@@ -374,13 +384,12 @@ public class Action implements GraphSourceItem {
      *
      * @param list List of actions
      * @param baseAddress Address of first action in the list
-     * @param version SWF version
      */
-    public static void setActionsAddresses(List<Action> list, long baseAddress, int version) {
+    public static void setActionsAddresses(List<Action> list, long baseAddress) {
         long offset = baseAddress;
         for (Action a : list) {
             a.setAddress(offset);
-            offset += a.getBytesLength(version);
+            offset += a.getTotalActionLength();
         }
     }
 
@@ -493,7 +502,7 @@ public class Action implements GraphSourceItem {
                 if (pos + 1 < list.size()) {
                     len = (int) (((Action) (list.get(pos + 1))).getAddress() - a.getAddress());
                 } else {
-                    len = a.getBytesLength(version);
+                    len = a.getTotalActionLength();
                 }
                 if (!(a instanceof ActionEnd)) {
                     for (int i = 0; i < len; i++) {
@@ -538,12 +547,12 @@ public class Action implements GraphSourceItem {
                         writer.appendNoHilight("FFDec_DeobfuscatePop").newLine();
                         if (fixBranch == 0) { //jump                               
                             writer.appendNoHilight("Jump loc");
-                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getBytesLength(version) + ((ActionIf) a).getJumpOffset()));
+                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getTotalActionLength() + ((ActionIf) a).getJumpOffset()));
                         } else {
                             //nojump, ignore
                         }
                     } else {
-                        a.getASMSourceReplaced(list, importantOffsets, constantPool, version, exportMode, writer);
+                        a.getASMSourceReplaced(list, importantOffsets, constantPool, exportMode, writer);
                     }
                     writer.appendNoHilight(a.isIgnored() ? "; ignored" : "");
                     writer.appendNoHilight(add);
@@ -593,7 +602,7 @@ public class Action implements GraphSourceItem {
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
         return toString();
     }
 
@@ -633,10 +642,9 @@ public class Action implements GraphSourceItem {
      *
      * @param actions List of actions
      * @param ip Action index
-     * @param version SWF version
      * @return address
      */
-    public static long ip2adr(List<Action> actions, int ip, int version) {
+    public static long ip2adr(List<Action> actions, int ip) {
         /*  List<Action> actions=new ArrayList<Action>();
          for(GraphSourceItem s:sources){
          if(s instanceof Action){
@@ -647,7 +655,7 @@ public class Action implements GraphSourceItem {
             if (actions.isEmpty()) {
                 return 0;
             }
-            return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytesLength(version);
+            return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getTotalActionLength();
         }
         if (ip == -1) {
             return 0;
@@ -660,17 +668,16 @@ public class Action implements GraphSourceItem {
      *
      * @param actions List of actions
      * @param addr Address
-     * @param version SWF version
      * @return action index
      */
-    public static int adr2ip(List<Action> actions, long addr, int version) {
+    public static int adr2ip(List<Action> actions, long addr) {
         for (int ip = 0; ip < actions.size(); ip++) {
             if (actions.get(ip).getAddress() == addr) {
                 return ip;
             }
         }
         if (actions.size() > 0) {
-            long outpos = actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytesLength(version);
+            long outpos = actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getTotalActionLength();
             if (addr == outpos) {
                 return actions.size();
             }
@@ -824,7 +831,7 @@ public class Action implements GraphSourceItem {
         loopip:
         while (ip <= end) {
 
-            long addr = ip2adr(actions, ip, version);
+            long addr = ip2adr(actions, ip);
             if (ip > end) {
                 break;
             }
@@ -858,7 +865,7 @@ public class Action implements GraphSourceItem {
                     }
                     List<GraphTargetItem> out;
                     try {
-                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
@@ -877,7 +884,7 @@ public class Action implements GraphSourceItem {
                     endAddr += size;
                 }
                 ((GraphSourceItemContainer) action).translateContainer(outs, stack, output, registerNames, variables, functions);
-                ip = adr2ip(actions, endAddr, version);
+                ip = adr2ip(actions, endAddr);
                 continue;
             }
 
@@ -888,7 +895,7 @@ public class Action implements GraphSourceItem {
                         if (actions.get(ip + 2) instanceof ActionNot) {
                             if (actions.get(ip + 3) instanceof ActionIf) {
                                 ActionIf aif = (ActionIf) actions.get(ip + 3);
-                                if (adr2ip(actions, ip2adr(actions, ip + 4, version) + aif.getJumpOffset(), version) == ip) {
+                                if (adr2ip(actions, ip2adr(actions, ip + 4) + aif.getJumpOffset()) == ip) {
                                     ip += 4;
                                     continue;
                                 }
@@ -1188,19 +1195,6 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-    public static List<Action> removeNops(long address, List<Action> actions, int version, String path) {
-        List<Action> ret = actions;
-        try {
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, version, ScriptExportMode.PCODE, writer, path);
-            String s = writer.toString();
-            ret = ASMParser.parse(address, true, s, SWF.DEFAULT_VERSION, false);
-        } catch (IOException | ParseException ex) {
-            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error. path: " + path, ex);
-        }
-        return ret;
-    }
-
     public static void setConstantPool(List<? extends GraphSourceItem> actions, ConstantPool cpool) {
         for (GraphSourceItem a : actions) {
             if (a instanceof ActionPush) {
@@ -1221,8 +1215,8 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
-        writer.appendNoHilight(getASMSource(container, knownAddreses, constantPool, version, exportMode));
+    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode, GraphTextWriter writer) {
+        writer.appendNoHilight(getASMSource(container, knownAddreses, constantPool, exportMode));
         return writer;
     }
 
