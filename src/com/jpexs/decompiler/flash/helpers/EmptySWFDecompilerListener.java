@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.ActionList;
 
 /**
@@ -25,7 +26,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 public class EmptySWFDecompilerListener implements SWFDecompilerListener {
 
     @Override
-    public void actionListParsed(ActionList actions) {
+    public void actionListParsed(ActionList actions, SWF swf) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

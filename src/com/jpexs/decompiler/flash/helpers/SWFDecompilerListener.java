@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.ActionList;
 
 /**
@@ -24,5 +25,5 @@ import com.jpexs.decompiler.flash.action.ActionList;
  */
 public interface SWFDecompilerListener {
     
-    void actionListParsed(ActionList actions);
+    void actionListParsed(ActionList actions, SWF swf);
 }

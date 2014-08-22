@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +49,11 @@ public class ActionList extends ArrayList<Action> {
     public ActionList(Collection<Action> actions) {
         super(actions);
     } 
+
+    public void setActions(List<Action> list) {
+        clear();
+        addAll(list);
+    }
     
     public void removeAction(int index) {
         ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);

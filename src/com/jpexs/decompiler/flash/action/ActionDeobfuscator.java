@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
@@ -26,18 +29,19 @@ import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
@@ -46,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -53,14 +59,17 @@ import java.util.Stack;
  */
 public class ActionDeobfuscator implements SWFDecompilerListener {
 
+    private final int executionLimit = 30000;
+    
     @Override
-    public void actionListParsed(ActionList actions) {
+    public void actionListParsed(ActionList actions, SWF swf) {
         combinePushs(actions);
         removeFakeFunction(actions);
         removeUnreachableActions(actions);
         removeObfuscationIfs(actions);
         removeUnreachableActions(actions);
         removeZeroJumps(actions);
+        rereadActionList(actions, swf); // this call will fix the contant pool assigments
     }
     
     private void combinePushs(ActionList actions) {
@@ -77,6 +86,18 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
             }
         }
+    }
+    
+    private boolean rereadActionList(ActionList actions, SWF swf) {
+        byte[] actionBytes = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
+        try {
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes);
+            ActionList newActions = ActionListReader.readActionList(new ArrayList<DisassemblyListener>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", false);
+            actions.setActions(newActions);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
     }
     
     private boolean removeUnreachableActions(ActionList actions) {
@@ -177,18 +198,23 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 int lastOkIdx = -1;
                 int lastOkInstructionsProcessed = -1;
                 int instructionsProcessed = 0;
-                Map<String, Object> variables = new HashMap<>();
+                Map<String, Object> lastOkVariables = new HashMap<>();
                 Set<String> defines = new HashSet<>();
+                ActionConstantPool lastOkConstantPool = null;
                 ActionConstantPool constantPool = null;
                 while (true) {
                     Action action = actions.get(idx);
                     instructionsProcessed++;
                     
-                    System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
+                    if (instructionsProcessed > executionLimit) {
+                        break;
+                    }
+                    
+                    /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
                     for (int j = 0; j < stack.size(); j++) {
                         System.out.print(" '" + stack.get(j).getResult() + "'");
                     }
-                    System.out.println();
+                    System.out.println();*/
                     
                     if (action instanceof ActionConstantPool) {
                         constantPool = (ActionConstantPool) action;
@@ -216,6 +242,20 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                             action instanceof ActionIf ||
                             action instanceof ActionConstantPool)) {
                         break;
+                    }
+                    
+                    if (action instanceof ActionPush) {
+                        ActionPush push = (ActionPush) action;
+                        boolean ok = true; 
+                        for (Object value : push.values) {
+                            if (value instanceof ConstantIndex) {
+                                ok = false;
+                                break;
+                            }
+                        }
+                        if (!ok) {
+                            break;
+                        }
                     }
                     
                     /*for (String variable : localData.variables.keySet()) {
@@ -248,17 +288,18 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     if (/*localData.variables.size() == 1 && */stack.empty()) {
                         lastOkIdx = idx;
                         lastOkInstructionsProcessed = instructionsProcessed;
-                        variables.clear();
+                        lastOkConstantPool = constantPool;
+                        lastOkVariables.clear();
                         for (String variableName : localData.variables.keySet()) {
                             Object value = localData.variables.get(variableName).getResult();
-                            variables.put(variableName, value);
+                            lastOkVariables.put(variableName, value);
                         }
                     }
                 }
                 
                 if (lastOkIdx != -1) {
                     int newIstructionCount = constantPool != null ? 2 : 1;
-                    newIstructionCount += 2 * variables.size();
+                    newIstructionCount += 2 * lastOkVariables.size();
                     
                     if (newIstructionCount < lastOkInstructionsProcessed) {
                         Action target = actions.get(lastOkIdx);
@@ -269,8 +310,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                             prevAction = constantPool;
                         }
 
-                        for (String variableName : variables.keySet()) {
-                            Object value = variables.get(variableName);
+                        for (String variableName : lastOkVariables.keySet()) {
+                            Object value = lastOkVariables.get(variableName);
                             ActionPush push = new ActionPush(variableName);
                             push.values.add(value);
                             push.setAddress(prevAction.getAddress());

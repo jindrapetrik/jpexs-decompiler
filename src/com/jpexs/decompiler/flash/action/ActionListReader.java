@@ -95,7 +95,7 @@ public class ActionListReader {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {
-                    return readActionList(listeners, sis, version, ip, endIp, path);
+                    return readActionList(listeners, sis, version, ip, endIp, path, Configuration.autoDeobfuscate.get());
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
             
@@ -123,11 +123,12 @@ public class ActionListReader {
      * @param ip
      * @param endIp
      * @param path
+     * @param deobfuscate
      * @return List of actions
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    private static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
+    public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, boolean deobfuscate) throws IOException, InterruptedException {
         ConstantPool cpool = new ConstantPool();
 
         // Map of the actions. Use TreeMap to sort the keys in ascending order
@@ -166,7 +167,7 @@ public class ActionListReader {
 
         if (SWFDecompilerPlugin.listener != null) {
             try {
-                SWFDecompilerPlugin.listener.actionListParsed(actions);
+                SWFDecompilerPlugin.listener.actionListParsed(actions, sis.getSwf());
 
                 actions = fixActionList(actions, null, version);
             } catch (Throwable e) {
@@ -175,9 +176,9 @@ public class ActionListReader {
             }
         }
 
-        if (Configuration.autoDeobfuscate.get()) {
+        if (deobfuscate) {
             try {
-                new ActionDeobfuscator().actionListParsed(actions);
+                new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
                 /*actions = deobfuscateActionList(listeners, actions, version, 0, path);
                 updateActionLengths(actions, version);
                 removeZeroJumps(actions, version);*/
