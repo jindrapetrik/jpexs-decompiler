@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class ActionDeobfuscation {
+public class Deobfuscation {
 
     private final Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;

@@ -41,7 +41,7 @@ public interface ASMSource extends TreeItem {
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
-    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
+    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException;
 
     /**
      * Whether or not this object contains ASM source

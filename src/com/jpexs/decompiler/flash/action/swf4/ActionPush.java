@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -231,7 +232,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString(writer);
         }
@@ -242,7 +243,7 @@ public class ActionPush extends Action {
         return writer;
     }
 
-    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
         }

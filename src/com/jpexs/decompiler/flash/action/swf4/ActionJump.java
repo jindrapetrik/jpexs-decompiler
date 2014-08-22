@@ -20,11 +20,11 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphSource;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,8 +75,9 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
-        String ofsStr = Helper.formatAddress(getAddress() + getTotalActionLength() + offset);
+    public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
+        long address = getAddress() + getTotalActionLength() + offset;
+        String ofsStr = Helper.formatAddress(address);
         return "Jump loc" + ofsStr;
     }
 

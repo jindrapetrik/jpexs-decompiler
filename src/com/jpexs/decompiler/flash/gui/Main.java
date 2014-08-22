@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.flash.helpers.EmptySWFDecompilerListener;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -880,7 +881,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         String pluginPath = Configuration.pluginPath.get();
-        if (pluginPath != null) {
+        if (pluginPath != null && !pluginPath.isEmpty()) {
             try {
                 SWFDecompilerPlugin.loadPlugin(pluginPath);
             } catch (Throwable e) {

@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -80,8 +82,29 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
             doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
             String actualResult = normalizeLabels(writer.toString());
 
-            actualResult = actualResult.replaceAll("[ \r\n]", "");
-            expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+            actualResult = cleanPCode(actualResult);
+            expectedResult = cleanPCode(expectedResult);
+            
+            Assert.assertEquals(actualResult, expectedResult);
+        } catch (IOException | ParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+    
+    public void testAddAction(String actionsString, String expectedResult, Action action, int index) {
+        try {
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+
+            actions.addAction(index, action);
+            
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            String actualResult = normalizeLabels(writer.toString());
+
+            actualResult = cleanPCode(actualResult);
+            expectedResult = cleanPCode(expectedResult);
             
             Assert.assertEquals(actualResult, expectedResult);
         } catch (IOException | ParseException | InterruptedException ex) {
@@ -203,5 +226,108 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
                 "Push 3\n" +
                 "label_1:";
         testRemoveAction(actionsString, expectedResult, new int[] {7});
+    }
+
+    @Test
+    public void testAddAtion1() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4";
+        String expectedResult =
+                "ConstantPool\n" + 
+                "GetMember\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4";
+        testAddAction(actionsString, expectedResult, new ActionGetMember(), 1);
+    }
+
+    @Test
+    public void testAddAtionToContainer() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4";
+        String expectedResult =
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "GetMember\n" + 
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4";
+        testAddAction(actionsString, expectedResult, new ActionGetMember(), 2);
+    }
+
+    @Test
+    public void testAddActionIf() {
+        String actionsString = 
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "label_1:Push 4";
+        String expectedResult =
+                "ConstantPool\n" + 
+                "DefineFunction \"test\" 1 \"p1\" {\n" +
+                "Push 1\n" +
+                "GetVariable\n" +
+                "}\n" +
+                "Push 2\n" + 
+                "If label_1\n" +
+                "Push 3\n" +
+                "GetMember\n" + 
+                "label_1:Push 4";
+        testAddAction(actionsString, expectedResult, new ActionGetMember(), 7);
+    }
+
+    @Test
+    public void testAddToJumpTarget() {
+        String actionsString = 
+                "ConstantPool\n" +
+                "If label_1\n" +
+                "GetMember\n" +
+                "label_1:Jump label_2\n" + // address 9
+                "label_2:Jump label_3\n" +
+                "label_3:Jump labelend\n" +
+                "labelend:End"; // address 24
+        String expectedResult =
+                "ConstantPool\n" +
+                "If label_1\n" +
+                "GetMember\n" +
+                "Jump label_4\n" +
+                "label_1:Jump label_2\n" +
+                "label_2:Jump label_3\n" +
+                "label_3:Jump label_4\n" +
+                "label_4:";
+        ActionJump jump = new ActionJump(0);
+        jump.setAddress(9);
+        jump.setJumpOffset(24 - 9 - 5);
+        testAddAction(actionsString, expectedResult, jump, 3);
     }
 }

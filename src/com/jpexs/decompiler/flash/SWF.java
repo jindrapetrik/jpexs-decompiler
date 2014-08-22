@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionDeobfuscation;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
@@ -1672,7 +1672,7 @@ public final class SWF implements TreeItem, Timelined {
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueActionItem, ConstantPool> allStrings = new HashMap<>();
     private final HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
-    private final ActionDeobfuscation deobfuscation = new ActionDeobfuscation();
+    private final Deobfuscation deobfuscation = new Deobfuscation();
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
@@ -1683,7 +1683,7 @@ public final class SWF implements TreeItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new ArrayList<Long>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;

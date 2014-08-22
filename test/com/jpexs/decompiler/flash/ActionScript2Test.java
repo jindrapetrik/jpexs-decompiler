@@ -57,8 +57,8 @@ public class ActionScript2Test extends ActionStript2TestBase {
         } catch (InterruptedException ex) {
             fail();
         }
-        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
-        expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+        String actualResult = cleanPCode(writer.toString());
+        expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);
 
     }

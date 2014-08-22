@@ -136,13 +136,14 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     /**
      * Converts actions to ASM source
      *
-     * @param actions
+     * @param exportMode PCode or hex?
      * @param writer
+     * @param actions
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
     @Override
-    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
+    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {
         if (actions == null) {
             actions = getActions();
         }

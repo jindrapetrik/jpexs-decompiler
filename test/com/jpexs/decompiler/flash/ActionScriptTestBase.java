@@ -16,23 +16,15 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
-
 /**
  *
  * @author JPEXS
  */
-public class ActionStript2TestBase extends ActionScriptTestBase {
-
-    protected SWF swf;
-
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.tags) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
+public class ActionScriptTestBase {
+    
+    protected String cleanPCode(String pCode) {
+        pCode = pCode.replaceAll(" *[\r\n]+ *", "\n").trim();
+        pCode = pCode.replaceAll("  +", " ").trim();
+        return pCode;
     }
 }

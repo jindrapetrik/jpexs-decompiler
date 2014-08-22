@@ -398,25 +398,9 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @param writer
-     * @return HilightedTextWriter
+     * @return GraphTextWriter
      */
-    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
-        return actionsToString(listeners, address, list, new ArrayList<String>(), version, exportMode, writer);
-    }
-
-    /**
-     * Converts list of actions to ASM source
-     *
-     * @param listeners
-     * @param address
-     * @param list List of actions
-     * @param importantOffsets List of important offsets to mark as labels
-     * @param constantPool Constant pool
-     * @param version SWF version
-     * @param hex Add hexadecimal?
-     * @return HilightedTextWriter
-     */
-    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         long offset;
         List<Long> importantOffsets = getActionsAllRefs(list);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
@@ -467,8 +451,11 @@ public class Action implements GraphSourceItem {
 
             if (containers.containsKey(offset)) {
                 for (int i = 0; i < containers.get(offset).size(); i++) {
+                    if (lastPush) {
+                        writer.newLine();
+                        lastPush = false;
+                    }
                     writer.appendNoHilight("}").newLine();
-                    lastPush = false;
                     GraphSourceItemContainer cnt = containers.get(offset).get(i);
                     int cntPos = containersPos.get(cnt);
                     writer.appendNoHilight(cnt.getASMSourceBetween(cntPos));
@@ -517,7 +504,7 @@ public class Action implements GraphSourceItem {
                  add = "";*/
                 if ((a instanceof ActionPush) && lastPush) {
                     writer.appendNoHilight(" ");
-                    ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, exportMode, writer);
+                    ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, exportMode, writer);
                 } else {
                     if (lastPush) {
                         writer.newLine();
@@ -547,7 +534,7 @@ public class Action implements GraphSourceItem {
                             //nojump, ignore
                         }
                     } else {
-                        a.getASMSourceReplaced(list, importantOffsets, constantPool, exportMode, writer);
+                        a.getASMSourceReplaced(list, importantOffsets, exportMode, writer);
                     }
                     writer.appendNoHilight(a.isIgnored() ? "; ignored" : "");
                     writer.appendNoHilight(add);
@@ -592,11 +579,10 @@ public class Action implements GraphSourceItem {
      *
      * @param container
      * @param knownAddreses List of important offsets to mark as labels
-     * @param constantPool Constant pool
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
         return toString();
     }
 
@@ -1209,8 +1195,8 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode, GraphTextWriter writer) {
-        writer.appendNoHilight(getASMSource(container, knownAddreses, constantPool, exportMode));
+    public GraphTextWriter getASMSourceReplaced(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+        writer.appendNoHilight(getASMSource(container, knownAddreses, exportMode));
         return writer;
     }
 

@@ -71,7 +71,6 @@ public class SWFDecompilerPlugin {
         // Creating an instance of our compiled class and
         try {
             listener = (SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).newInstance();
-            listener = new EmptySWFDecompilerListener();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }

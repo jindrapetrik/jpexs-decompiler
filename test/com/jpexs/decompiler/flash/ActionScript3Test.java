@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript3Test {
+public class ActionScript3Test extends ActionScriptTestBase {
 
     private SWF swf;
     private int clsIndex;
@@ -79,8 +79,8 @@ public class ActionScript3Test {
         } catch (InterruptedException ex) {
             fail();
         }
-        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
-        expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+        String actualResult = cleanPCode(writer.toString());
+        expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);
     }
 

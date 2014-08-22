@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscatePop;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
@@ -408,6 +409,8 @@ public class ASMParser {
             a = (new ActionStrictMode(lexer));
         } else if (instructionName.compareToIgnoreCase("Nop") == 0) {
             a = (new ActionNop());
+        } else if (instructionName.compareToIgnoreCase("End") == 0) {
+            a = (new ActionEnd());
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscatePop") == 0) {
             a = (new ActionDeobfuscatePop());
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscateJump") == 0) {

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
@@ -112,7 +113,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private boolean ignoreCarret = false;
     private boolean editMode = false;
     private boolean editDecompiledMode = false;
-    private List<Action> lastCode;
+    private ActionList lastCode;
     private ASMSource src;
     public JPanel topButtonsPan;
     private HilightedText srcWithHex;
@@ -395,7 +396,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
-                List<Action> actions = asm.getActions();
+                ActionList actions = asm.getActions();
                 lastCode = actions;
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = null;

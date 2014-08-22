@@ -19,13 +19,13 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -146,7 +146,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
         StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
             paramStr.append("\"").append(Helper.escapeString(paramNames.get(i))).append("\" ");
@@ -156,7 +156,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         List<String> oldParamNames = paramNames;
         if (replacedParamNames != null) {
             paramNames = replacedParamNames;
@@ -165,7 +165,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(container, knownAddreses, constantPool, exportMode);
+        String ret = getASMSource(container, knownAddreses, exportMode);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         writer.appendNoHilight(ret);
