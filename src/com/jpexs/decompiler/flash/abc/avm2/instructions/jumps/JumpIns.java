@@ -29,7 +29,6 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class JumpIns extends InstructionDefinition implements IfTypeIns {
 
@@ -43,6 +42,6 @@ public class JumpIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
+    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
     }
 }

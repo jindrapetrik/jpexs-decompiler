@@ -381,7 +381,7 @@ public class Graph {
             part = part.getSubParts().get(0).nextParts.get(0);
         }
         /*localData = prepareBranchLocalData(localData);
-         Stack<GraphTargetItem> st = new Stack<>();
+         TranslateStack st = new TranslateStack();
          List<GraphTargetItem> output=new ArrayList<>();
          GraphPart startPart = part;
          for (int i = part.start; i <= part.end; i++) {

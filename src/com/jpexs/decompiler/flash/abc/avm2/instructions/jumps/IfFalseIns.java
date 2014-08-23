@@ -30,7 +30,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.NotItem;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class IfFalseIns extends InstructionDefinition implements IfTypeIns {
 
@@ -45,7 +44,7 @@ public class IfFalseIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
+    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
         //String v1 = stack.pop().toString();
         //stack.push("(" + v1 + ")");
     }
