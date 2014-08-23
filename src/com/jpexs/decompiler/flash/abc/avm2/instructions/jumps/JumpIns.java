@@ -29,7 +29,6 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class JumpIns extends InstructionDefinition implements IfTypeIns {
 
