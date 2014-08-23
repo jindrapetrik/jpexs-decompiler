@@ -35,12 +35,12 @@ import javax.tools.ToolProvider;
 public class SWFDecompilerPlugin {
 
     public static SWFDecompilerListener listener;
-    
+
     public static void loadPlugin(String path) {
-        
+
         // Here we specify the source code of the class to be compiled
         String src = Helper.readTextFile(path);
-        
+
         // Full name of the class that will be compiled.
         // If class should be in some package,
         // fullName should contain it too
@@ -53,8 +53,7 @@ public class SWFDecompilerPlugin {
         // we create a file manager
         // (our custom implementation of it)
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        JavaFileManager fileManager = new
-            ClassFileManager(compiler.getStandardFileManager(null, null, null));
+        JavaFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
         // Dynamic compiling requires specifying
         // a list of "files" to compile. In our case

@@ -1555,7 +1555,7 @@ public class Graph {
 
                     List<GraphPart> nps;
                     /*nps = new ArrayList<>(part.nextParts);
-                    for(int i=0;i<nps.size();i++){
+                     for(int i=0;i<nps.size();i++){
                      nps.set(i,getNextNoJump(nps.get(i),localData));
                      }
                      if(nps.get(0) == nps.get(1)){

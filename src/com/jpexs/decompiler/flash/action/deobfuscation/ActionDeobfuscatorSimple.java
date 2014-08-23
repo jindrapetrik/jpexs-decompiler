@@ -56,17 +56,17 @@ import java.util.List;
 public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
     private final int executionLimit = 30000;
-    
+
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
         removeObfuscationIfs(actions);
     }
-    
+
     private boolean removeObfuscationIfs(ActionList actions) {
         if (actions.size() == 0) {
             return false;
         }
-        
+
         for (int i = 0; i < actions.size(); i++) {
             ExecutionResult result = new ExecutionResult();
             executeActions(actions, i, actions.size() - 1, result);
@@ -100,7 +100,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -124,34 +124,33 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 }
 
                 /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-                for (int j = 0; j < stack.size(); j++) {
-                    System.out.print(" '" + stack.get(j).getResult() + "'");
-                }
-                System.out.println();*/
-
+                 for (int j = 0; j < stack.size(); j++) {
+                 System.out.print(" '" + stack.get(j).getResult() + "'");
+                 }
+                 System.out.println();*/
                 action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
 
-                if (!(action instanceof ActionPush ||
-                        action instanceof ActionPushDuplicate ||
-                        action instanceof ActionAdd ||
-                        action instanceof ActionAdd2 ||
-                        action instanceof ActionSubtract ||
-                        action instanceof ActionModulo ||
-                        action instanceof ActionMultiply ||
-                        action instanceof ActionBitXor ||
-                        action instanceof ActionBitAnd ||
-                        action instanceof ActionBitOr ||
-                        action instanceof ActionBitLShift ||
-                        action instanceof ActionBitRShift ||
-                        action instanceof ActionEquals ||
-                        action instanceof ActionNot ||
-                        action instanceof ActionIf)) {
+                if (!(action instanceof ActionPush
+                        || action instanceof ActionPushDuplicate
+                        || action instanceof ActionAdd
+                        || action instanceof ActionAdd2
+                        || action instanceof ActionSubtract
+                        || action instanceof ActionModulo
+                        || action instanceof ActionMultiply
+                        || action instanceof ActionBitXor
+                        || action instanceof ActionBitAnd
+                        || action instanceof ActionBitOr
+                        || action instanceof ActionBitLShift
+                        || action instanceof ActionBitRShift
+                        || action instanceof ActionEquals
+                        || action instanceof ActionNot
+                        || action instanceof ActionIf)) {
                     break;
                 }
 
                 if (action instanceof ActionPush) {
                     ActionPush push = (ActionPush) action;
-                    boolean ok = true; 
+                    boolean ok = true;
                     for (Object value : push.values) {
                         if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
                             ok = false;
@@ -187,8 +186,9 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         } catch (EmptyStackException | TranslateException | InterruptedException ex) {
         }
     }
-    
+
     class ExecutionResult {
+
         public int idx = -1;
         public int instructionsProcessed = -1;
         public TranslateStack stack = new TranslateStack();

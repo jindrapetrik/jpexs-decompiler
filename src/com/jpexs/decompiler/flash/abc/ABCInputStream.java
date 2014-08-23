@@ -85,7 +85,7 @@ public class ABCInputStream implements AutoCloseable {
             dumpInfo.getChildInfos().add(di);
             dumpInfo = di;
         }
-        
+
         return dumpInfo;
     }
 
@@ -114,7 +114,7 @@ public class ABCInputStream implements AutoCloseable {
         }
         return i;
     }
-    
+
     public int read(String name) throws IOException {
         newDumpLevel(name, "byte");
         int ret = readInternal();

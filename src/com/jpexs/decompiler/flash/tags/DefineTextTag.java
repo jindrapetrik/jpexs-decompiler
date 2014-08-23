@@ -338,7 +338,7 @@ public class DefineTextTag extends TextTag {
                         if (txt == null || (font == null && txt.isEmpty())) {
                             continue;
                         }
-                        
+
                         if (font == null) {
                             throw new ParseException("Font not defined", lexer.yyline());
                         }

@@ -66,7 +66,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-                sos.writeUI16(frame);
+            sos.writeUI16(frame);
             sos.writeUI8(skipCount);
             sos.close();
         } catch (IOException e) {

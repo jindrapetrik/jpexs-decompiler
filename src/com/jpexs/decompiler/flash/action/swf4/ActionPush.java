@@ -81,7 +81,7 @@ public class ActionPush extends Action {
         values = new ArrayList<>();
         DumpInfo di = sis.dumpInfo;
         sis = sis.getLimitedStream(actionLength);
-        sis.dumpInfo = di; 
+        sis.dumpInfo = di;
         try {
             while (sis.available() > 0) {
                 type = sis.readUI8("type");

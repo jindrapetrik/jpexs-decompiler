@@ -203,7 +203,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         //miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
         //miAutoDeobfuscation.addActionListener(this);
         //miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
-
         JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
         miRenameOneIdentifier.setActionCommand(ACTION_RENAME_ONE_IDENTIFIER);
         miRenameOneIdentifier.addActionListener(this);
@@ -443,13 +442,13 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                 mainFrame.panel.searchAs();
                 break;
             /*case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    mainFrame.panel.autoDeobfuscateChanged();
-                } else {
-                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-                }
-                break;*/
+             if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+             Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
+             mainFrame.panel.autoDeobfuscateChanged();
+             } else {
+             miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
+             }
+             break;*/
             case ACTION_EXIT:
                 mainFrame.panel.setVisible(false);
                 if (Main.proxyFrame != null) {

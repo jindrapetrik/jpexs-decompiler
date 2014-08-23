@@ -26,7 +26,7 @@ import java.io.IOException;
  * @author JPEXS
  */
 public class ActionDeobfuscateJump extends ActionJump {
-    
+
     public ActionDeobfuscateJump(int offset) {
         super(2);
     }

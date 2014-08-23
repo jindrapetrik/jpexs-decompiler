@@ -887,7 +887,7 @@ public class Main {
                 View.showMessageDialog(null, "Failed to load plugin: " + pluginPath);
             }
         }
-        
+
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration.debugMode.get());
         initLang();

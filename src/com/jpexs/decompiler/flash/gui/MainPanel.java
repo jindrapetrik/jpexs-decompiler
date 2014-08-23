@@ -980,7 +980,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 allSwfs.add(swf);
             }
         }
-        
+
         for (int j = 0; j < allSwfs.size(); j++) {
             List<ScriptPack> as3scripts = new ArrayList<>();
             List<Tag> images = new ArrayList<>();
@@ -1000,7 +1000,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (!allSwfs.contains(selectedNodeSwf)) {
                     allSwfs.add(selectedNodeSwf);
                 }
-                
+
                 if (selectedNodeSwf != swf) {
                     continue;
                 }

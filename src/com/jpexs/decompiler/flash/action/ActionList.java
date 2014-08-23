@@ -48,32 +48,32 @@ public class ActionList extends ArrayList<Action> {
 
     public ActionList(Collection<Action> actions) {
         super(actions);
-    } 
+    }
 
     public void setActions(List<Action> list) {
         clear();
         addAll(list);
     }
-    
+
     public void removeAction(int index) {
         ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
     }
-    
+
     public void removeAction(int index, int count) {
         if (size() <= index + count - 1) {
             // Can't remove count elements, only size - index is available
             count = size() - index;
         }
-        
+
         for (int i = 0; i < count; i++) {
             ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
         }
     }
-    
+
     public void addAction(int index, Action action) {
         ActionListReader.addAction(this, index, action, SWF.DEFAULT_VERSION, false, false);
     }
-    
+
     public void fixActionList() {
         ActionListReader.fixActionList(this, null, SWF.DEFAULT_VERSION);
     }
@@ -81,7 +81,7 @@ public class ActionList extends ArrayList<Action> {
     public List<Action> getContainerLastActions(Action action) {
         return ActionListReader.getContainerLastActions(this, action);
     }
-    
+
     public Iterator<Action> getReferencesFor(final Action target) {
         final ActionList diz = this;
         return new Iterator<Action>() {
@@ -89,7 +89,7 @@ public class ActionList extends ArrayList<Action> {
             private final Iterator<Action> iterator = diz.iterator();
 
             private Action action = getNext();
-            
+
             @Override
             public boolean hasNext() {
                 return action != null;
@@ -101,7 +101,7 @@ public class ActionList extends ArrayList<Action> {
                 action = getNext();
                 return a;
             }
-            
+
             private Action getNext() {
                 while (iterator.hasNext()) {
                     Action a = iterator.next();
@@ -140,12 +140,12 @@ public class ActionList extends ArrayList<Action> {
             }
         };
     }
-    
+
     public void removeNops() {
         for (int i = 0; i < size(); i++) {
-           if (get(i) instanceof ActionNop) {
-               removeAction(i);
-           }
+            if (get(i) instanceof ActionNop) {
+                removeAction(i);
+            }
         }
     }
 
@@ -181,5 +181,5 @@ public class ActionList extends ArrayList<Action> {
             Logger.getLogger(EmptySWFDecompilerListener.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }

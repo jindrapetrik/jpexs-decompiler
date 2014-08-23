@@ -341,11 +341,11 @@ public class ABC {
         minor_version = ais.readU16("minor_version");
         major_version = ais.readU16("major_version");
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
-        
+
         constants = new ConstantPool();
         deobfuscation = new AVM2Deobfuscation(constants);
         ais.newDumpLevel("constant_pool", "cpool_info");
-        
+
         //constant integers
         int constant_int_pool_count = ais.readU30("int_count");
         constants.constant_int = new ArrayList<>(constant_int_pool_count);
@@ -471,7 +471,7 @@ public class ABC {
             }
             ais.endDumpLevel();
         }
-        
+
         ais.endDumpLevel(); //cpool_info
 
         //method info

@@ -418,7 +418,7 @@ public class ASMParser {
         } else {
             throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
-        
+
         a.updateLength(version);
         return a;
     }

@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 public class FixItemCounterTranslateStack extends TranslateStack {
 
     private int fixItemCount = Integer.MAX_VALUE;
-    
+
     @Override
     public GraphTargetItem pop() {
         GraphTargetItem result = super.pop();
@@ -44,11 +44,11 @@ public class FixItemCounterTranslateStack extends TranslateStack {
         }
         return super.remove(index);
     }
-    
+
     public boolean allItemsFixed() {
         return size() <= fixItemCount;
     }
-    
+
     public int getFixItemCount() {
         return fixItemCount;
     }

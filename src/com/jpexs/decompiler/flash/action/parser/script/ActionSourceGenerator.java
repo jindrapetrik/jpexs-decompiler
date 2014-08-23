@@ -279,7 +279,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen);
         return ret;
     }
-    
+
     private long uniqLast = 0;
 
     public String uniqId() {

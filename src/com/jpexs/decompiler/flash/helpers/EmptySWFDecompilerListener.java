@@ -29,5 +29,5 @@ public class EmptySWFDecompilerListener implements SWFDecompilerListener {
     public void actionListParsed(ActionList actions, SWF swf) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

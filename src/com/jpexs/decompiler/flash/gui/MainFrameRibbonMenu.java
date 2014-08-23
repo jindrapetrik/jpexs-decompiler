@@ -430,7 +430,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         //miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
         //miAutoDeobfuscation.addActionListener(this);
         //miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
-
         miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
         miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
         if (externalFlashPlayerUnavailable) {
@@ -718,13 +717,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 mainFrame.panel.timeline();
                 break;
             /*case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    mainFrame.panel.autoDeobfuscateChanged();
-                } else {
-                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-                }
-                break;*/
+             if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+             Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
+             mainFrame.panel.autoDeobfuscateChanged();
+             } else {
+             miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
+             }
+             break;*/
             case ACTION_CLEAR_RECENT_FILES:
                 Configuration.recentFiles.set(null);
                 break;

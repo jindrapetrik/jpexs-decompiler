@@ -16,10 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimple;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -100,7 +100,7 @@ public class ActionListReader {
                     return readActionList(listeners, sis, version, ip, endIp, path, Configuration.deobfuscationMode.get());
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
-            
+
             return actions;
         } catch (ExecutionException ex) {
             Throwable cause = ex.getCause();
@@ -144,7 +144,7 @@ public class ActionListReader {
         if (actionMap.isEmpty()) {
             return new ActionList();
         }
-        
+
         List<Long> addresses = new ArrayList<>(actionMap.keySet());
 
         // add end action
@@ -157,7 +157,7 @@ public class ActionListReader {
             actionMap.put(aEnd.getAddress(), aEnd);
             nextOffsets.put(endAddress, endAddress + 1);
         }
-        
+
         ActionList actions = fixActionList(new ActionList(actionMap.values()), nextOffsets, version);
 
         // jump to the entry action when it is diffrent from the first action in the map
@@ -198,13 +198,13 @@ public class ActionListReader {
 
         return actions;
     }
-    
+
     public static ActionList fixActionList(ActionList actions, Map<Long, Long> nextOffsets, int version) {
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         getContainerLastActions(actions, containerLastActions);
 
         ActionList ret = new ActionList();
-        
+
         if (nextOffsets != null) {
             int index = 0;
             while (index != -1 && index < actions.size()) {
@@ -240,7 +240,7 @@ public class ActionListReader {
         updateJumps(ret, jumps, containerLastActions, endAddress);
         updateActionStores(ret, jumps);
         updateContainerSizes(ret, containerLastActions);
-        
+
         return ret;
     }
 
@@ -303,15 +303,15 @@ public class ActionListReader {
             }
         }
 
-        deobfustaceActionListAtPosRecursive(listeners, 
-                new ArrayList<GraphTargetItem>(), 
-                new HashMap<Long, List<GraphSourceItemContainer>>(), 
-                new ActionLocalData(), 
-                new TranslateStack(), 
-                new ConstantPool(), 
-                actionMap, ip, retMap, ip, endIp, path, 
-                new HashMap<Integer, Integer>(), false, 
-                new HashMap<Integer, HashMap<String, GraphTargetItem>>(), 
+        deobfustaceActionListAtPosRecursive(listeners,
+                new ArrayList<GraphTargetItem>(),
+                new HashMap<Long, List<GraphSourceItemContainer>>(),
+                new ActionLocalData(),
+                new TranslateStack(),
+                new ConstantPool(),
+                actionMap, ip, retMap, ip, endIp, path,
+                new HashMap<Integer, Integer>(), false,
+                new HashMap<Integer, HashMap<String, GraphTargetItem>>(),
                 version, 0, maxRecursionLevel);
 
         ActionList ret = new ActionList();
@@ -413,7 +413,7 @@ public class ActionListReader {
         }
         return lasts;
     }
-    
+
     private static void getContainerLastActions(ActionList actions, Map<Action, List<Action>> lastActions) {
         for (Action a : actions) {
             if (a instanceof GraphSourceItemContainer) {
@@ -540,8 +540,9 @@ public class ActionListReader {
     }
 
     /**
-     * Removes an action from the action list, and updates all references
-     * This method will keep the inner actions of the container when you remove the container
+     * Removes an action from the action list, and updates all references This
+     * method will keep the inner actions of the container when you remove the
+     * container
      *
      * @param actions
      * @param index
@@ -604,7 +605,8 @@ public class ActionListReader {
     }
 
     /**
-     * Adds an action to the action list to the specified location, and updates all references
+     * Adds an action to the action list to the specified location, and updates
+     * all references
      *
      * @param actions
      * @param index
@@ -614,7 +616,7 @@ public class ActionListReader {
      * @param replaceJump
      * @return
      */
-    public static boolean addAction(ActionList actions, int index, Action action, 
+    public static boolean addAction(ActionList actions, int index, Action action,
             int version, boolean addToContainer, boolean replaceJump) {
 
         if (index < 0 || actions.size() < index) {
@@ -629,7 +631,7 @@ public class ActionListReader {
             actions.add(aEnd);
             lastAction = aEnd;
         }
-        
+
         long endAddress = lastAction.getAddress();
 
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
@@ -651,7 +653,7 @@ public class ActionListReader {
                 }
             }
         }
-        
+
         if (replaceJump) {
             for (Action a : jumps.keySet()) {
                 Action targetAction = jumps.get(a);
@@ -999,7 +1001,7 @@ public class ActionListReader {
 
                 TranslateStack subStack = (TranslateStack) stack.clone();
                 ActionLocalData subLocalData = new ActionLocalData(new HashMap<>(localData.regNames),
-                    new HashMap<>(localData.variables), new HashMap<>(localData.functions));
+                        new HashMap<>(localData.variables), new HashMap<>(localData.functions));
                 deobfustaceActionListAtPosRecursive(listeners, output, containers, subLocalData, subStack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
             }
 

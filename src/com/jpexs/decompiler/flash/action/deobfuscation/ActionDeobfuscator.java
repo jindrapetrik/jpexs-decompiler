@@ -77,7 +77,7 @@ import java.util.logging.Logger;
 public class ActionDeobfuscator implements SWFDecompilerListener {
 
     private final int executionLimit = 30000;
-    
+
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
         combinePushs(actions);
@@ -88,15 +88,15 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         removeZeroJumps(actions);
         rereadActionList(actions, swf); // this call will fix the contant pool assigments
     }
-    
+
     private void combinePushs(ActionList actions) {
         for (int i = 0; i < actions.size() - 1; i++) {
-            Action action = actions.get(i); 
-            Action action2 = actions.get(i + 1); 
+            Action action = actions.get(i);
+            Action action2 = actions.get(i + 1);
             if (action instanceof ActionPush && action2 instanceof ActionPush) {
                 if (!actions.getReferencesFor(action2).hasNext()) {
-                    ActionPush push = (ActionPush) action; 
-                    ActionPush push2 = (ActionPush) action2; 
+                    ActionPush push = (ActionPush) action;
+                    ActionPush push2 = (ActionPush) action2;
                     push.values.addAll(push2.values);
                     actions.remove(i + 1);
                     i--;
@@ -104,7 +104,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             }
         }
     }
-    
+
     private boolean rereadActionList(ActionList actions, SWF swf) {
         byte[] actionBytes = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         try {
@@ -116,7 +116,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         }
         return true;
     }
-    
+
     private boolean removeUnreachableActions(ActionList actions) {
         Set<Action> reachableActions = new HashSet<>();
         Set<Action> processedActions = new HashSet<>();
@@ -174,7 +174,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
             }
         }
-        
+
         boolean result = false;
         for (int i = 0; i < actions.size(); i++) {
             if (!reachableActions.contains(actions.get(i))) {
@@ -183,10 +183,10 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 result = true;
             }
         }
-        
+
         return result;
     }
-    
+
     private boolean removeZeroJumps(ActionList actions) {
         boolean result = false;
         for (int i = 0; i < actions.size(); i++) {
@@ -199,12 +199,12 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         }
         return result;
     }
-    
-    private boolean removeObfuscationIfs(ActionList actions, Map<String,Object> fakeFunctions) {
+
+    private boolean removeObfuscationIfs(ActionList actions, Map<String, Object> fakeFunctions) {
         if (actions.size() == 0) {
             return false;
         }
-        
+
         for (int i = 0; i < actions.size(); i++) {
             ExecutionResult result = new ExecutionResult();
             executeActions(actions, i, actions.size() - 1, result, fakeFunctions);
@@ -271,11 +271,11 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
             }
         }
-        
+
         return false;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result, Map<String,Object> fakeFunctions) {
+    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result, Map<String, Object> fakeFunctions) {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack();
@@ -296,11 +296,10 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
 
                 /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-                for (int j = 0; j < stack.size(); j++) {
-                    System.out.print(" '" + stack.get(j).getResult() + "'");
-                }
-                System.out.println();*/
-
+                 for (int j = 0; j < stack.size(); j++) {
+                 System.out.print(" '" + stack.get(j).getResult() + "'");
+                 }
+                 System.out.println();*/
                 if (action instanceof ActionConstantPool) {
                     constantPool = (ActionConstantPool) action;
                 }
@@ -319,7 +318,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     }
                 }
 
-                if (action instanceof ActionCallFunction){
+                if (action instanceof ActionCallFunction) {
                     String functionName = stack.pop().getResult().toString();
                     long numArgs = EcmaScript.toUint32(stack.pop().getResult());
                     if (numArgs == 0) {
@@ -335,35 +334,35 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                 }
 
-                if (!(action instanceof ActionPush ||
-                        action instanceof ActionPushDuplicate ||
-                        action instanceof ActionAdd ||
-                        action instanceof ActionAdd2 ||
-                        action instanceof ActionSubtract ||
-                        action instanceof ActionModulo ||
-                        action instanceof ActionMultiply ||
-                        action instanceof ActionBitXor ||
-                        action instanceof ActionBitAnd ||
-                        action instanceof ActionBitOr ||
-                        action instanceof ActionBitLShift ||
-                        action instanceof ActionBitRShift ||
-                        action instanceof ActionDefineLocal ||
-                        action instanceof ActionJump ||
-                        action instanceof ActionGetVariable ||
-                        action instanceof ActionSetVariable ||
-                        action instanceof ActionEquals ||
-                        action instanceof ActionNot ||
-                        action instanceof ActionIf ||
-                        action instanceof ActionConstantPool ||
-                        action instanceof ActionCallFunction ||
-                        action instanceof ActionReturn ||
-                        action instanceof ActionEnd)) {
+                if (!(action instanceof ActionPush
+                        || action instanceof ActionPushDuplicate
+                        || action instanceof ActionAdd
+                        || action instanceof ActionAdd2
+                        || action instanceof ActionSubtract
+                        || action instanceof ActionModulo
+                        || action instanceof ActionMultiply
+                        || action instanceof ActionBitXor
+                        || action instanceof ActionBitAnd
+                        || action instanceof ActionBitOr
+                        || action instanceof ActionBitLShift
+                        || action instanceof ActionBitRShift
+                        || action instanceof ActionDefineLocal
+                        || action instanceof ActionJump
+                        || action instanceof ActionGetVariable
+                        || action instanceof ActionSetVariable
+                        || action instanceof ActionEquals
+                        || action instanceof ActionNot
+                        || action instanceof ActionIf
+                        || action instanceof ActionConstantPool
+                        || action instanceof ActionCallFunction
+                        || action instanceof ActionReturn
+                        || action instanceof ActionEnd)) {
                     break;
                 }
 
                 if (action instanceof ActionPush) {
                     ActionPush push = (ActionPush) action;
-                    boolean ok = true; 
+                    boolean ok = true;
                     for (Object value : push.values) {
                         if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
                             ok = false;
@@ -376,9 +375,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
 
                 /*for (String variable : localData.variables.keySet()) {
-                    System.out.println(Helper.byteArrToString(variable.getBytes()));
-                }*/
-
+                 System.out.println(Helper.byteArrToString(variable.getBytes()));
+                 }*/
                 idx++;
 
                 if (action instanceof ActionJump) {
@@ -422,8 +420,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
 
                 if (action instanceof ActionReturn) {
-                    if (output.size() >  0) {
-                        ReturnActionItem ret = (ReturnActionItem) output.get(output.size() - 1); 
+                    if (output.size() > 0) {
+                        ReturnActionItem ret = (ReturnActionItem) output.get(output.size() - 1);
                         result.resultValue = ret.value.getResult();
                     }
                     break;
@@ -432,22 +430,22 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         } catch (EmptyStackException | TranslateException | InterruptedException ex) {
         }
     }
-    
+
     private Map<String, Object> getFakeFunctionResults(ActionList actions) {
         /*
-            DefineFunction "fakeName" 0  {
-                Push 1777
-                Return
-            }        
-        */
-        
+         DefineFunction "fakeName" 0  {
+         Push 1777
+         Return
+         }        
+         */
+
         Map<String, Object> results = new HashMap<>();
-        
+
         for (int i = 0; i < actions.size(); i++) {
-            Action action = actions.get(i); 
+            Action action = actions.get(i);
             if (action instanceof ActionDefineFunction) {
                 ActionDefineFunction def = (ActionDefineFunction) action;
-                if(def.paramNames.isEmpty()) {
+                if (def.paramNames.isEmpty()) {
                     ExecutionResult result = new ExecutionResult();
                     List<Action> lastActions = actions.getContainerLastActions(action);
                     int lastActionIdx = actions.indexOf(lastActions.get(0));
@@ -461,11 +459,12 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
             }
         }
-        
+
         return results;
     }
-    
+
     class ExecutionResult {
+
         public int idx = -1;
         public int instructionsProcessed = -1;
         public ActionConstantPool constantPool;
