@@ -694,7 +694,7 @@ public class Action implements GraphSourceItem {
                 }
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException | ExecutionException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex);
             convertException = ex;
             if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
                 convertException = (Exception) ex.getCause();
@@ -706,10 +706,10 @@ public class Action implements GraphSourceItem {
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendTimeoutComment(writer, timeout);
         } else {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendErrorComment(writer, convertException);
         }
         asm.getActionSourceSuffix(writer);
