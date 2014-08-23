@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -52,6 +53,11 @@ public class GetVariableActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if((!(name instanceof DirectValueActionItem)) || (!((DirectValueActionItem)name).isString()) ||(!Deobfuscation.isValidName(((DirectValueActionItem)name).toStringNoQuotes(localData)))){
+            writer.append("eval(");
+            name.appendTo(writer, localData);
+            return writer.append(")");
+        }            
         return stripQuotes(name, localData, writer);
     }
 

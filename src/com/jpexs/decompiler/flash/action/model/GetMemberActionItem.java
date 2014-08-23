@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -50,17 +51,13 @@ public class GetMemberActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
-        if ((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String)) {
-            String memNameStr = (String) ((DirectValueActionItem) memberName).value;
-            if (!Action.isReservedWord(memNameStr)) {
-                writer.append(".");
-                return stripQuotes(memberName, localData, writer);
-            }
+        if((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem)memberName).isString()) ||(!Deobfuscation.isValidName(((DirectValueActionItem)memberName).toStringNoQuotes(localData)))){                    
+            writer.append("[");
+            memberName.toString(writer, localData);
+            return writer.append("]");                        
         }
-        writer.append("[");
-        memberName.toString(writer, localData);
-        return writer.append("]");
-
+        writer.append(".");
+        return stripQuotes(memberName, localData, writer);
     }
 
     @Override

@@ -175,18 +175,8 @@ public class Deobfuscation {
         return null;
     }
 
-    public String deobfuscateName(String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public static boolean isValidName(String s){
         boolean isValid = true;
-        if (usageType == null) {
-            usageType = "name";
-        }
-
-        if (selected != null) {
-            if (selected.containsKey(s)) {
-                return selected.get(s);
-            }
-        }
-
         if (Action.isReservedWord(s)) {
             isValid = false;
         }
@@ -206,6 +196,22 @@ public class Deobfuscation {
                 isValid = false;
             }
         }
+        return isValid;
+    }
+    
+    public String deobfuscateName(String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+        boolean isValid = true;
+        if (usageType == null) {
+            usageType = "name";
+        }
+
+        if (selected != null) {
+            if (selected.containsKey(s)) {
+                return selected.get(s);
+            }
+        }
+
+        isValid = isValidName(s);
         if (!isValid) {
             if (namesMap.containsKey(s)) {
                 return namesMap.get(s);
