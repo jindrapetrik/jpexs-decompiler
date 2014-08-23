@@ -93,11 +93,12 @@ public class ActionListReader {
      */
     public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
+            final int deobfuscationMode = Configuration.autoDeobfuscate.get() ? Configuration.deobfuscationMode.get() : -1;
             ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {
-                    return readActionList(listeners, sis, version, ip, endIp, path, Configuration.deobfuscationMode.get());
+                    return readActionList(listeners, sis, version, ip, endIp, path, deobfuscationMode);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
 
@@ -125,7 +126,7 @@ public class ActionListReader {
      * @param ip
      * @param endIp
      * @param path
-     * @param deobfuscate
+     * @param deobfuscationMode
      * @return List of actions
      * @throws IOException
      * @throws java.lang.InterruptedException
@@ -178,7 +179,7 @@ public class ActionListReader {
             }
         }
 
-        if (deobfuscationMode == 1) {
+        if (deobfuscationMode == 0) {
             try {
                 actions = deobfuscateActionList(listeners, actions, version, 0, path);
                 updateActionLengths(actions, version);
@@ -186,7 +187,7 @@ public class ActionListReader {
                 // keep orignal (not deobfuscated) actions
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
+        } else if (deobfuscationMode == 1) {
             try {
                 new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
                 new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());

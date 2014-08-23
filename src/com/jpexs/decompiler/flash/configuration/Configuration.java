@@ -80,6 +80,10 @@ public class Configuration {
     @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Integer> parallelThreadCount = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
+
     @ConfigurationDefaultInt(0)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Integer> deobfuscationMode = null;

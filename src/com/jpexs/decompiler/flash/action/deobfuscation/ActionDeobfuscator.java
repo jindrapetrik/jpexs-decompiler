@@ -109,7 +109,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         byte[] actionBytes = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         try {
             SWFInputStream rri = new SWFInputStream(swf, actionBytes);
-            ActionList newActions = ActionListReader.readActionList(new ArrayList<DisassemblyListener>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", 0);
+            ActionList newActions = ActionListReader.readActionList(new ArrayList<DisassemblyListener>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", -1);
             actions.setActions(newActions);
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
