@@ -974,129 +974,140 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         List<File> ret = new ArrayList<>();
         List<TreeNode> sel = tagTree.getAllSelected(tagTree);
 
+        List<SWF> allSwfs = new ArrayList<>();
         for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
-                List<ScriptPack> as3scripts = new ArrayList<>();
-                List<Tag> images = new ArrayList<>();
-                List<Tag> shapes = new ArrayList<>();
-                List<Tag> morphshapes = new ArrayList<>();
-                List<Tag> movies = new ArrayList<>();
-                List<Tag> sounds = new ArrayList<>();
-                List<Tag> texts = new ArrayList<>();
-                List<TreeNode> as12scripts = new ArrayList<>();
-                List<Tag> binaryData = new ArrayList<>();
-                Map<Integer, List<Integer>> frames = new HashMap<>();
-                List<Tag> fonts = new ArrayList<>();
+                allSwfs.add(swf);
+            }
+        }
+        
+        for (int j = 0; j < allSwfs.size(); j++) {
+            List<ScriptPack> as3scripts = new ArrayList<>();
+            List<Tag> images = new ArrayList<>();
+            List<Tag> shapes = new ArrayList<>();
+            List<Tag> morphshapes = new ArrayList<>();
+            List<Tag> movies = new ArrayList<>();
+            List<Tag> sounds = new ArrayList<>();
+            List<Tag> texts = new ArrayList<>();
+            List<TreeNode> as12scripts = new ArrayList<>();
+            List<Tag> binaryData = new ArrayList<>();
+            Map<Integer, List<Integer>> frames = new HashMap<>();
+            List<Tag> fonts = new ArrayList<>();
 
-                for (TreeNode d : sel) {
-                    if (d.getItem().getSwf() != swf) {
-                        continue;
+            SWF swf = allSwfs.get(j);
+            for (TreeNode d : sel) {
+                SWF selectedNodeSwf = d.getItem().getSwf();
+                if (!allSwfs.contains(selectedNodeSwf)) {
+                    allSwfs.add(selectedNodeSwf);
+                }
+                
+                if (selectedNodeSwf != swf) {
+                    continue;
+                }
+                if (d instanceof ContainerNode) {
+                    ContainerNode n = (ContainerNode) d;
+                    TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
+                    if (nodeType == TreeNodeType.IMAGE) {
+                        images.add((Tag) n.getItem());
                     }
-                    if (d instanceof ContainerNode) {
-                        ContainerNode n = (ContainerNode) d;
-                        TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
-                        if (nodeType == TreeNodeType.IMAGE) {
-                            images.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.SHAPE) {
-                            shapes.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.MORPH_SHAPE) {
-                            morphshapes.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.AS) {
-                            as12scripts.add(n);
-                        }
-                        if (nodeType == TreeNodeType.MOVIE) {
-                            movies.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.SOUND) {
-                            sounds.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.BINARY_DATA) {
-                            binaryData.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.TEXT) {
-                            texts.add((Tag) n.getItem());
-                        }
-                        if (nodeType == TreeNodeType.FONT) {
-                            fonts.add((Tag) n.getItem());
-                        }
+                    if (nodeType == TreeNodeType.SHAPE) {
+                        shapes.add((Tag) n.getItem());
                     }
-                    if (d instanceof FrameNode) {
-                        FrameNode fn = (FrameNode) d;
-                        if (!fn.scriptsNode) {
-
-                            FrameNodeItem fni = (FrameNodeItem) d.getItem();
-                            Timelined parent = fni.getParent();
-                            int frame = fni.getFrame() - 1; //Fix to zero based
-                            int parentId = 0;
-                            if (parent instanceof CharacterTag) {
-                                parentId = ((CharacterTag) parent).getCharacterId();
-                            }
-                            if (!frames.containsKey(parentId)) {
-                                frames.put(parentId, new ArrayList<Integer>());
-                            }
-                            frames.get(parentId).add(frame);
-                        }
+                    if (nodeType == TreeNodeType.MORPH_SHAPE) {
+                        morphshapes.add((Tag) n.getItem());
                     }
-                    if (d instanceof TreeElement) {
-                        if (((TreeElement) d).isLeaf()) {
-                            TreeElement treeElement = (TreeElement) d;
-                            as3scripts.add((ScriptPack) treeElement.getItem());
-                        }
+                    if (nodeType == TreeNodeType.AS) {
+                        as12scripts.add(n);
+                    }
+                    if (nodeType == TreeNodeType.MOVIE) {
+                        movies.add((Tag) n.getItem());
+                    }
+                    if (nodeType == TreeNodeType.SOUND) {
+                        sounds.add((Tag) n.getItem());
+                    }
+                    if (nodeType == TreeNodeType.BINARY_DATA) {
+                        binaryData.add((Tag) n.getItem());
+                    }
+                    if (nodeType == TreeNodeType.TEXT) {
+                        texts.add((Tag) n.getItem());
+                    }
+                    if (nodeType == TreeNodeType.FONT) {
+                        fonts.add((Tag) n.getItem());
                     }
                 }
+                if (d instanceof FrameNode) {
+                    FrameNode fn = (FrameNode) d;
+                    if (!fn.scriptsNode) {
 
+                        FrameNodeItem fni = (FrameNodeItem) d.getItem();
+                        Timelined parent = fni.getParent();
+                        int frame = fni.getFrame() - 1; //Fix to zero based
+                        int parentId = 0;
+                        if (parent instanceof CharacterTag) {
+                            parentId = ((CharacterTag) parent).getCharacterId();
+                        }
+                        if (!frames.containsKey(parentId)) {
+                            frames.put(parentId, new ArrayList<Integer>());
+                        }
+                        frames.get(parentId).add(frame);
+                    }
+                }
+                if (d instanceof TreeElement) {
+                    if (((TreeElement) d).isLeaf()) {
+                        TreeElement treeElement = (TreeElement) d;
+                        as3scripts.add((ScriptPack) treeElement.getItem());
+                    }
+                }
+            }
+
+            if (selFile == null) {
+                selFile = selectExportDir();
                 if (selFile == null) {
-                    selFile = selectExportDir();
-                    if (selFile == null) {
-                        return new ArrayList<>();
-                    }
+                    return new ArrayList<>();
                 }
+            }
 
-                final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
-                ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
-                        new ImageExportSettings(export.getValue(ImageExportMode.class))));
-                ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
-                        new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
-                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
-                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
-                ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
-                        new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
-                ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
-                        new MovieExportSettings(export.getValue(MovieExportMode.class))));
-                ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds,
-                        new SoundExportSettings(export.getValue(SoundExportMode.class))));
-                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData,
-                        new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class))));
-                ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts,
-                        new FontExportSettings(export.getValue(FontExportMode.class))));
+            final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
+            ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
+                    new ImageExportSettings(export.getValue(ImageExportMode.class))));
+            ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
+                    new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
+            ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
+                    new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
+            ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
+                    new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
+            ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
+                    new MovieExportSettings(export.getValue(MovieExportMode.class))));
+            ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds,
+                    new SoundExportSettings(export.getValue(SoundExportMode.class))));
+            ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData,
+                    new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class))));
+            ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts,
+                    new FontExportSettings(export.getValue(FontExportMode.class))));
 
-                for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
-                    ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
-                            new FramesExportSettings(export.getValue(FramesExportMode.class))));
+            for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
+                ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
+                        new FramesExportSettings(export.getValue(FramesExportMode.class))));
+            }
+            List<ABCContainerTag> abcList = swf.abcList;
+            if (abcPanel != null) {
+                for (int i = 0; i < as3scripts.size(); i++) {
+                    ScriptPack tls = as3scripts.get(i);
+                    Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
+                    ret.add(tls.export(selFile, abcList, scriptMode, Configuration.parallelSpeedUp.get()));
                 }
-                List<ABCContainerTag> abcList = swf.abcList;
-                if (abcPanel != null) {
-                    for (int i = 0; i < as3scripts.size(); i++) {
-                        ScriptPack tls = as3scripts.get(i);
-                        Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
-                        ret.add(tls.export(selFile, abcList, scriptMode, Configuration.parallelSpeedUp.get()));
-                    }
-                } else {
-                    List<TreeNode> allNodes = new ArrayList<>();
-                    List<TreeNode> allAs12Scripts = new ArrayList<>();
+            } else {
+                List<TreeNode> allNodes = new ArrayList<>();
+                List<TreeNode> allAs12Scripts = new ArrayList<>();
 
-                    if (abcPanel == null) {
-                        allAs12Scripts = getASTreeNodes(tagTree);
-                    }
-                    for (TreeNode asn : allAs12Scripts) {
-                        allNodes.add(asn);
-                        TagNode.setExport(allNodes, false);
-                        TagNode.setExport(as12scripts, true);
-                        ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, scriptMode, null));
-                    }
+                if (abcPanel == null) {
+                    allAs12Scripts = getASTreeNodes(tagTree);
+                }
+                for (TreeNode asn : allAs12Scripts) {
+                    allNodes.add(asn);
+                    TagNode.setExport(allNodes, false);
+                    TagNode.setExport(as12scripts, true);
+                    ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, scriptMode, null));
                 }
             }
         }
