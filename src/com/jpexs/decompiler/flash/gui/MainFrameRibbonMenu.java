@@ -277,8 +277,17 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     }
 
     private List<RibbonBandResizePolicy> getEmptyResizePolicies(JRibbonBand ribbonBand) {
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
-        resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();       
+        resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
+            @Override
+            public int getPreferredWidth(int i, int i1) {
+                return 105;
+            }
+
+            @Override
+            public void install(int i, int i1) {
+            }
+        });
         return resizePolicies;
     }
 
