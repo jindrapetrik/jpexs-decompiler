@@ -2264,6 +2264,7 @@ public class SWFInputStream implements AutoCloseable {
         if (!ret.buttonHasBlendMode && !ret.buttonHasFilterList
                 && !ret.buttonStateHitTest && !ret.buttonStateDown
                 && !ret.buttonStateOver && !ret.buttonStateUp && ret.reserved == 0) {
+            endDumpLevel();
             return null;
         }
 

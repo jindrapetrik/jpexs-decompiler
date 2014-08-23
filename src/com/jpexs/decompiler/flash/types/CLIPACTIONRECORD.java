@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Serializable;
@@ -94,16 +95,13 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     private final Tag tag;
     @Internal
     private long pos;
-    @Internal
-    private long hdrPos;
 
     //Constructor for Generic tag editor. TODO:Handle this somehow better
     public CLIPACTIONRECORD() {
         swf = null;
         tag = null;
         eventFlags = new CLIPEVENTFLAGS();
-        actionBytes = new byte[0];
-        hdrPos = 0;
+        actionBytes = new ByteArrayRange(new byte[0]);
     }
 
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, long pos, Tag tag) throws IOException {
@@ -118,8 +116,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
             keyCode = sis.readUI8("keyCode");
             actionRecordSize--;
         }
-        hdrPos = sis.getPos();
-        actionBytes = sis.readBytesEx(actionRecordSize, "actionBytes");
+        int actionBytesPos = (int) sis.getPos();
+        byte[] bytes = sis.readBytesEx(actionRecordSize, "actionBytes");
+        actionBytes = new ByteArrayRange(swf.uncompressedData, actionBytesPos, bytes.length);
         this.pos = pos;
     }
 
@@ -142,7 +141,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
      */
     //public List<Action> actions;
     @Internal
-    public byte[] actionBytes;
+    public ByteArrayRange actionBytes;
 
     /**
      * Returns a string representation of the object
@@ -198,7 +197,12 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            ActionList list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            int prevLength = actionBytes.pos;
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            if (prevLength != 0) {
+                rri.seek(prevLength);
+            }
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
@@ -210,17 +214,18 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
 
     @Override
     public void setActions(List<Action> actions) {
-        actionBytes = Action.actionsToBytes(actions, true, swf.version);
+        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
+        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
     }
 
     @Override
     public byte[] getActionBytes() {
-        return actionBytes;
+        return actionBytes.getRangeData();
     }
 
     @Override
     public void setActionBytes(byte[] actionBytes) {
-        this.actionBytes = actionBytes;
+        this.actionBytes = new ByteArrayRange(actionBytes);
     }
 
     @Override
@@ -232,7 +237,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();

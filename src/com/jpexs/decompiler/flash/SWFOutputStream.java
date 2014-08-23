@@ -695,7 +695,7 @@ public class SWFOutputStream extends OutputStream {
             if (value.eventFlags.clipEventKeyPress) {
                 sos.writeUI8(value.keyCode);
             }
-            sos.write(value.actionBytes);
+            sos.write(value.actionBytes.getRangeData());
         }
         byte[] data = baos.toByteArray();
         writeUI32(data.length);     //actionRecordSize
@@ -1037,7 +1037,7 @@ public class SWFOutputStream extends OutputStream {
             sos.writeUB(1, value.condIdleToOverUp ? 1 : 0);
             sos.writeUB(7, value.condKeyPress);
             sos.writeUB(1, value.condOverDownToIdle ? 1 : 0);
-            sos.write(value.actionBytes);
+            sos.write(value.actionBytes.getRangeData());
         }
         byte[] data = baos.toByteArray();
         if (isLast) {

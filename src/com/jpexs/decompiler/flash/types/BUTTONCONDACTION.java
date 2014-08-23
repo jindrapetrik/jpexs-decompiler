@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Serializable;
@@ -71,11 +72,14 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         condIdleToOverUp = sis.readUB(1, "condIdleToOverUp") == 1;
         condKeyPress = (int) sis.readUB(7, "condKeyPress");
         condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
+        int actionBytesPos = (int) sis.getPos();
+        byte[] bytes;
         if (condActionSize <= 0) {
-            actionBytes = sis.readBytesEx(sis.available(), "actionBytes");
+            bytes = sis.readBytesEx(sis.available(), "actionBytes");
         } else {
-            actionBytes = sis.readBytesEx(condActionSize - 4, "actionBytes");
+            bytes = sis.readBytesEx(condActionSize - 4, "actionBytes");
         }
+        actionBytes = new ByteArrayRange(swf.uncompressedData, actionBytesPos, bytes.length);
     }
     /**
      * Is this BUTTONCONDACTION last in the list?
@@ -132,7 +136,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
      * Actions to perform in byte array
      */
     @Internal
-    public byte[] actionBytes;
+    public ByteArrayRange actionBytes;
 
     /**
      * Sets actions associated with this object
@@ -188,7 +192,12 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            ActionList list = ActionListReader.readActionListTimeout(listeners, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            int prevLength = actionBytes.pos;
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            if (prevLength != 0) {
+                rri.seek(prevLength);
+            }
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
             return list;
 
         } catch (InterruptedException ex) {
@@ -201,17 +210,18 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
 
     @Override
     public void setActions(List<Action> actions) {
-        actionBytes = Action.actionsToBytes(actions, true, swf.version);
+        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
+        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
     }
 
     @Override
     public byte[] getActionBytes() {
-        return actionBytes;
+        return actionBytes.getRangeData();
     }
 
     @Override
     public void setActionBytes(byte[] actionBytes) {
-        this.actionBytes = actionBytes;
+        this.actionBytes = new ByteArrayRange(actionBytes);
     }
 
     @Override
@@ -223,7 +233,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();
