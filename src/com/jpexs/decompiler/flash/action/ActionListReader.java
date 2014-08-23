@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimple;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
@@ -178,6 +180,7 @@ public class ActionListReader {
 
         if (deobfuscate) {
             try {
+                new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
                 new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
                 /*actions = deobfuscateActionList(listeners, actions, version, 0, path);
                 updateActionLengths(actions, version);

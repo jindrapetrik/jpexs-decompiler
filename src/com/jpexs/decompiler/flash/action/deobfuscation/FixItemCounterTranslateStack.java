@@ -14,30 +14,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.swf5;
+package com.jpexs.decompiler.flash.action.deobfuscation;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.HashMap;
-import java.util.List;
 
-public class ActionPushDuplicate extends Action {
+/**
+ *
+ * @author JPEXS
+ */
+public class FixItemCounterTranslateStack extends TranslateStack {
 
-    public ActionPushDuplicate() {
-        super(0x4C, 0);
+    private int fixItemCount = Integer.MAX_VALUE;
+    
+    @Override
+    public GraphTargetItem pop() {
+        GraphTargetItem result = super.pop();
+        int itemCount = size();
+        if (itemCount < fixItemCount) {
+            fixItemCount = itemCount;
+        }
+        return result;
     }
 
     @Override
-    public String toString() {
-        return "PushDuplicate";
+    public synchronized GraphTargetItem remove(int index) {
+        if (index < fixItemCount) {
+            fixItemCount = index;
+        }
+        return super.remove(index);
     }
-
-    @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        GraphTargetItem value = stack.peek();
-        stack.push(value);
-        value.moreSrc.add(new GraphSourceItemPos(this, 0));
+    
+    public boolean allItemsFixed() {
+        return size() <= fixItemCount;
+    }
+    
+    public int getFixItemCount() {
+        return fixItemCount;
     }
 }
