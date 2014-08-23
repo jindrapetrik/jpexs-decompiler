@@ -78,6 +78,10 @@ public class ActionList extends ArrayList<Action> {
         ActionListReader.fixActionList(this, null, SWF.DEFAULT_VERSION);
     }
 
+    public List<Action> getContainerLastActions(Action action) {
+        return ActionListReader.getContainerLastActions(this, action);
+    }
+    
     public Iterator<Action> getReferencesFor(final Action target) {
         final ActionList diz = this;
         return new Iterator<Action>() {

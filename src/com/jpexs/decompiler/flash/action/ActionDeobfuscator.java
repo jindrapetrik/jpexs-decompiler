@@ -19,23 +19,30 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
+import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -64,9 +71,9 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
         combinePushs(actions);
-        removeFakeFunction(actions);
+        Map<String, Object> fakeFunctions = getFakeFunctionResults(actions);
         removeUnreachableActions(actions);
-        removeObfuscationIfs(actions);
+        removeObfuscationIfs(actions, fakeFunctions);
         removeUnreachableActions(actions);
         removeZeroJumps(actions);
         rereadActionList(actions, swf); // this call will fix the contant pool assigments
@@ -183,142 +190,39 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         return result;
     }
     
-    private boolean removeObfuscationIfs(ActionList actions) {
+    private boolean removeObfuscationIfs(ActionList actions, Map<String,Object> fakeFunctions) {
         if (actions.size() == 0) {
             return false;
         }
         
         for (int i = 0; i < actions.size(); i++) {
-            int idx = i;
-            List<GraphTargetItem> output = new ArrayList<>();
-            ActionLocalData localData = new ActionLocalData();
-            Stack<GraphTargetItem> stack = new Stack<>();
-
             try {
-                int lastOkIdx = -1;
-                int lastOkInstructionsProcessed = -1;
-                int instructionsProcessed = 0;
-                Map<String, Object> lastOkVariables = new HashMap<>();
-                Set<String> defines = new HashSet<>();
-                ActionConstantPool lastOkConstantPool = null;
-                ActionConstantPool constantPool = null;
-                while (true) {
-                    Action action = actions.get(idx);
-                    instructionsProcessed++;
-                    
-                    if (instructionsProcessed > executionLimit) {
-                        break;
-                    }
-                    
-                    /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-                    for (int j = 0; j < stack.size(); j++) {
-                        System.out.print(" '" + stack.get(j).getResult() + "'");
-                    }
-                    System.out.println();*/
-                    
-                    if (action instanceof ActionConstantPool) {
-                        constantPool = (ActionConstantPool) action;
-                    }
-                    
-                    if (action instanceof ActionDefineLocal) {
-                        GraphTargetItem top = stack.pop();
-                        String variableName = stack.peek().getResult().toString();
-                        defines.add(variableName);
-                        stack.push(top);
-                    }
-                    
-                    action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
-
-                    if (!(action instanceof ActionPush ||
-                            action instanceof ActionAdd ||
-                            action instanceof ActionAdd2 ||
-                            action instanceof ActionSubtract ||
-                            action instanceof ActionDefineLocal ||
-                            action instanceof ActionJump ||
-                            action instanceof ActionGetVariable ||
-                            action instanceof ActionSetVariable ||
-                            action instanceof ActionEquals ||
-                            action instanceof ActionNot ||
-                            action instanceof ActionIf ||
-                            action instanceof ActionConstantPool)) {
-                        break;
-                    }
-                    
-                    if (action instanceof ActionPush) {
-                        ActionPush push = (ActionPush) action;
-                        boolean ok = true; 
-                        for (Object value : push.values) {
-                            if (value instanceof ConstantIndex) {
-                                ok = false;
-                                break;
-                            }
-                        }
-                        if (!ok) {
-                            break;
-                        }
-                    }
-                    
-                    /*for (String variable : localData.variables.keySet()) {
-                        System.out.println(Helper.byteArrToString(variable.getBytes()));
-                    }*/
-                    
-                    idx++;
-
-                    if (action instanceof ActionJump) {
-                        ActionJump jump = (ActionJump) action;
-                        long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
-                        idx = actions.indexOf(actions.getByAddress(address));
-                        if (idx == -1) {
-                            int a = 1;
-                        }
-                    }
-
-                    if (action instanceof ActionIf) {
-                        ActionIf aif = (ActionIf) action;
-                        if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                            System.out.println("if true");
-                            long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
-                            idx = actions.indexOf(actions.getByAddress(address));
-                            if (idx == -1) {
-                                int a = 1;
-                            }
-                        }
-                    }
-
-                    if (/*localData.variables.size() == 1 && */stack.empty()) {
-                        lastOkIdx = idx;
-                        lastOkInstructionsProcessed = instructionsProcessed;
-                        lastOkConstantPool = constantPool;
-                        lastOkVariables.clear();
-                        for (String variableName : localData.variables.keySet()) {
-                            Object value = localData.variables.get(variableName).getResult();
-                            lastOkVariables.put(variableName, value);
-                        }
-                    }
-                }
+                ExecutionResult result = new ExecutionResult();
+                executeActions(actions, i, actions.size() - 1, result, fakeFunctions);
                 
-                if (lastOkIdx != -1) {
-                    int newIstructionCount = constantPool != null ? 2 : 1;
-                    newIstructionCount += 2 * lastOkVariables.size();
+                if (result.idx != -1) {
+                    int newIstructionCount = result.constantPool != null ? 2 : 1;
+                    newIstructionCount += 2 * result.variables.size();
                     
-                    if (newIstructionCount < lastOkInstructionsProcessed) {
-                        Action target = actions.get(lastOkIdx);
+                    if (newIstructionCount * 2 < result.instructionsProcessed) {
+                        Action target = actions.get(result.idx);
                         Action prevAction = actions.get(i);
 
-                        if (constantPool != null) {
-                            actions.addAction(i++, constantPool);
-                            prevAction = constantPool;
+                        if (result.constantPool != null) {
+                            ActionConstantPool constantPool2 = new ActionConstantPool(new ArrayList<>(result.constantPool.constantPool));
+                            actions.addAction(i++, constantPool2);
+                            prevAction = constantPool2;
                         }
 
-                        for (String variableName : lastOkVariables.keySet()) {
-                            Object value = lastOkVariables.get(variableName);
+                        for (String variableName : result.variables.keySet()) {
+                            Object value = result.variables.get(variableName);
                             ActionPush push = new ActionPush(variableName);
                             push.values.add(value);
                             push.setAddress(prevAction.getAddress());
                             actions.addAction(i++, push);
                             prevAction = push;
 
-                            if (defines.contains(variableName)) {
+                            if (result.defines.contains(variableName)) {
                                 Action defineLocal = new ActionDefineLocal();
                                 defineLocal.setAddress(prevAction.getAddress());
                                 actions.addAction(i++, defineLocal);
@@ -346,7 +250,154 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         return false;
     }
 
-    private boolean removeFakeFunction(ActionList actions) {
+    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result, Map<String,Object> fakeFunctions) throws InterruptedException {
+        List<GraphTargetItem> output = new ArrayList<>();
+        ActionLocalData localData = new ActionLocalData();
+        Stack<GraphTargetItem> stack = new Stack<>();
+        int instructionsProcessed = 0;
+        ActionConstantPool constantPool = null;
+
+        while (true) {
+            if (idx > endIdx) {
+                break;
+            }
+            
+            Action action = actions.get(idx);
+            instructionsProcessed++;
+
+            if (instructionsProcessed > executionLimit) {
+                break;
+            }
+
+            System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
+            for (int j = 0; j < stack.size(); j++) {
+                System.out.print(" '" + stack.get(j).getResult() + "'");
+            }
+            System.out.println();
+
+            if (action instanceof ActionConstantPool) {
+                constantPool = (ActionConstantPool) action;
+            }
+
+            if (action instanceof ActionDefineLocal) {
+                GraphTargetItem top = stack.pop();
+                String variableName = stack.peek().getResult().toString();
+                result.defines.add(variableName);
+                stack.push(top);
+            }
+
+            if (action instanceof ActionGetVariable) {
+                String variableName = stack.peek().getResult().toString();
+                if (!localData.variables.containsKey(variableName)) {
+                    break;
+                }
+            }
+            
+            if (action instanceof ActionCallFunction){
+                String functionName = stack.pop().getResult().toString();
+                long numArgs = EcmaScript.toUint32(stack.pop().getResult());
+                if (numArgs == 0) {
+                    if (fakeFunctions != null && fakeFunctions.containsKey(functionName)) {
+                        stack.push(new DirectValueActionItem(fakeFunctions.get(functionName)));
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            } else {
+                action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+            }
+
+            if (!(action instanceof ActionPush ||
+                    action instanceof ActionAdd ||
+                    action instanceof ActionAdd2 ||
+                    action instanceof ActionSubtract ||
+                    action instanceof ActionModulo ||
+                    action instanceof ActionMultiply ||
+                    action instanceof ActionDefineLocal ||
+                    action instanceof ActionJump ||
+                    action instanceof ActionGetVariable ||
+                    action instanceof ActionSetVariable ||
+                    action instanceof ActionEquals ||
+                    action instanceof ActionNot ||
+                    action instanceof ActionIf ||
+                    action instanceof ActionConstantPool ||
+                    action instanceof ActionCallFunction ||
+                    action instanceof ActionReturn ||
+                    action instanceof ActionEnd)) {
+                break;
+            }
+
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                boolean ok = true; 
+                for (Object value : push.values) {
+                    if (value instanceof ConstantIndex) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (!ok) {
+                    break;
+                }
+            }
+
+            /*for (String variable : localData.variables.keySet()) {
+                System.out.println(Helper.byteArrToString(variable.getBytes()));
+            }*/
+
+            idx++;
+
+            if (action instanceof ActionJump) {
+                ActionJump jump = (ActionJump) action;
+                long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
+                idx = actions.indexOf(actions.getByAddress(address));
+                if (idx == -1) {
+                    int a = 1;
+                }
+            }
+
+            if (action instanceof ActionIf) {
+                ActionIf aif = (ActionIf) action;
+                if (EcmaScript.toBoolean(stack.pop().getResult())) {
+                    System.out.println("if true");
+                    long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
+                    idx = actions.indexOf(actions.getByAddress(address));
+                    if (idx == -1) {
+                        int a = 1;
+                    }
+                }
+            }
+            
+            if (action instanceof ActionDefineFunction) {
+                List<Action> lastActions = actions.getContainerLastActions(action);
+                int lastActionIdx = actions.indexOf(lastActions.get(0));
+                idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
+            }
+
+            if (/*localData.variables.size() == 1 && */stack.empty() || action instanceof ActionEnd) {
+                result.idx = idx == actions.size() ? idx - 1 : idx;
+                result.instructionsProcessed = instructionsProcessed;
+                result.constantPool = constantPool;
+                result.variables.clear();
+                for (String variableName : localData.variables.keySet()) {
+                    Object value = localData.variables.get(variableName).getResult();
+                    result.variables.put(variableName, value);
+                }
+            }
+            
+            if (action instanceof ActionReturn) {
+                if (output.size() >  0) {
+                    ReturnActionItem ret = (ReturnActionItem) output.get(output.size() - 1); 
+                    result.resultValue = ret.value.getResult();
+                }
+                break;
+            }
+        }
+    }
+    
+    private Map<String, Object> getFakeFunctionResults(ActionList actions) {
         /*
             DefineFunction "fakeName" 0  {
                 Push 1777
@@ -354,45 +405,40 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             }        
         */
         
-        for (int i = 0; i < actions.size() - 2; i++) {
+        Map<String, Object> results = new HashMap<>();
+        
+        for (int i = 0; i < actions.size(); i++) {
             Action action = actions.get(i); 
             if (action instanceof ActionDefineFunction) {
-                Action action2 = actions.get(i + 1);
-                Action action3 = actions.get(i + 2);
-                if (action2 instanceof ActionPush && action3 instanceof ActionReturn) {
-                    ActionDefineFunction def = (ActionDefineFunction) action;
-                    ActionPush push = (ActionPush) action2;
-                    if (def.paramNames.isEmpty() && push.values.size() == 1) {
-                        Object pushValueObj = push.values.get(0);
-                        if (pushValueObj instanceof Long) {
-                            String functionName = def.functionName;
-                            long pushValue = (Long) pushValueObj;
-                            for (int j = 0; j < 3; j++) {
+                ActionDefineFunction def = (ActionDefineFunction) action;
+                if(def.paramNames.isEmpty()) {
+                    try {
+                        ExecutionResult result = new ExecutionResult();
+                        List<Action> lastActions = actions.getContainerLastActions(action);
+                        int lastActionIdx = actions.indexOf(lastActions.get(0));
+                        executeActions(actions, i + 1, lastActionIdx, result, null);
+                        if (result.resultValue != null) {
+                            results.put(def.functionName, result.resultValue);
+                            for (int j = i; j <= lastActionIdx; j++) {
                                 actions.removeAction(i);
                             }
-
-                            for (int j = 0; j < actions.size() - 1; j++) {
-                                action = actions.get(j); 
-                                if (action instanceof ActionPush) {
-                                    push = (ActionPush) action;
-                                    int pushValuesCount = push.values.size(); 
-                                    if (pushValuesCount >= 2
-                                            && push.values.get(pushValuesCount - 1).equals(functionName)) {
-                                        push.values.remove(pushValuesCount - 1);
-                                        push.values.remove(pushValuesCount - 2);
-                                        push.values.add(pushValue);
-                                        actions.removeAction(j + 1);
-                                    }
-                                }
-                            }
-
-                            return true;
                         }
+                    } catch (EmptyStackException | TranslateException | InterruptedException ex) {
+                        Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
         }
         
-        return false;
+        return results;
+    }
+    
+    class ExecutionResult {
+        public int idx = -1;
+        public int instructionsProcessed = -1;
+        public ActionConstantPool constantPool;
+        public Map<String, Object> variables = new HashMap<>();
+        public Set<String> defines = new HashSet<>();
+        public Object resultValue;
     }
 }

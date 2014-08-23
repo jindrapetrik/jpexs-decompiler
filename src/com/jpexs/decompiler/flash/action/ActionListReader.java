@@ -389,23 +389,27 @@ public class ActionListReader {
         }
     }
 
+    public static List<Action> getContainerLastActions(ActionList actions, Action action) {
+        GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+        List<Long> sizes = container.getContainerSizes();
+        long endAddress = action.getAddress() + container.getHeaderSize();
+        List<Action> lasts = new ArrayList<>(sizes.size());
+        for (long size : sizes) {
+            endAddress += size;
+            long lastActionAddress = getNearAddress(actions, endAddress - 1, false);
+            Action lastAction = null;
+            if (lastActionAddress != -1) {
+                lastAction = actions.getByAddress(lastActionAddress);
+            }
+            lasts.add(lastAction);
+        }
+        return lasts;
+    }
+    
     private static void getContainerLastActions(ActionList actions, Map<Action, List<Action>> lastActions) {
         for (Action a : actions) {
             if (a instanceof GraphSourceItemContainer) {
-                GraphSourceItemContainer container = (GraphSourceItemContainer) a;
-                List<Long> sizes = container.getContainerSizes();
-                long endAddress = a.getAddress() + container.getHeaderSize();
-                List<Action> lasts = new ArrayList<>(sizes.size());
-                for (long size : sizes) {
-                    endAddress += size;
-                    long lastActionAddress = getNearAddress(actions, endAddress - 1, false);
-                    Action lastAction = null;
-                    if (lastActionAddress != -1) {
-                        lastAction = actions.getByAddress(lastActionAddress);
-                    }
-                    lasts.add(lastAction);
-                }
-                lastActions.put(a, lasts);
+                lastActions.put(a, getContainerLastActions(actions, a));
             }
         }
     }
