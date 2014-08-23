@@ -84,7 +84,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             Action action = actions.get(i); 
             Action action2 = actions.get(i + 1); 
             if (action instanceof ActionPush && action2 instanceof ActionPush) {
-                if (actions.getReferencesFor(action2).hasNext()) {
+                if (!actions.getReferencesFor(action2).hasNext()) {
                     ActionPush push = (ActionPush) action; 
                     ActionPush push2 = (ActionPush) action2; 
                     push.values.addAll(push2.values);
@@ -269,11 +269,11 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 break;
             }
 
-            System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
+            /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
             for (int j = 0; j < stack.size(); j++) {
                 System.out.print(" '" + stack.get(j).getResult() + "'");
             }
-            System.out.println();
+            System.out.println();*/
 
             if (action instanceof ActionConstantPool) {
                 constantPool = (ActionConstantPool) action;
