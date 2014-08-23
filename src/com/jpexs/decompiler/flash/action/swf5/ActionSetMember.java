@@ -28,9 +28,9 @@ import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionSetMember extends Action {
 
@@ -44,7 +44,7 @@ public class ActionSetMember extends Action {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem memberName = stack.pop();
         GraphTargetItem object = stack.pop();

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +38,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class AVM2Instruction implements Serializable, GraphSourceItem {
 
@@ -277,7 +277,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public List<Object> replaceWith;
 
     @Override
-    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+    public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         definition.translate(aLocalData.isStatic,
                 aLocalData.scriptIndex,

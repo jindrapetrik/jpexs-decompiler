@@ -30,10 +30,10 @@ import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionSetVariable extends Action implements StoreTypeAction {
 
@@ -47,7 +47,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
         variables.put(name.toStringNoQuotes(LocalData.empty), value);
@@ -121,7 +121,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool) {
+    public String getVariableName(TranslateStack stack, ConstantPool cpool) {
         if (stack.size() < 2) {
             return null;
         }

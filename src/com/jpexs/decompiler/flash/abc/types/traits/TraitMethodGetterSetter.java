@@ -22,10 +22,9 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import java.util.List;
-import java.util.Stack;
 
 public class TraitMethodGetterSetter extends Trait {
 
@@ -83,7 +82,7 @@ public class TraitMethodGetterSetter extends Trait {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, null, true);
             }
         }
     }
@@ -98,7 +97,7 @@ public class TraitMethodGetterSetter extends Trait {
         } else {
             writer.startBlock();
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
+                abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
             }
             writer.endBlock();
         }

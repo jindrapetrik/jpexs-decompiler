@@ -45,7 +45,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -418,7 +417,7 @@ public class Graph {
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
-        Stack<GraphTargetItem> stack = new Stack<>();
+        TranslateStack stack = new TranslateStack();
         List<Loop> loops = new ArrayList<>();
         getLoops(localData, heads.get(0), loops, null);
         /*System.out.println("<loops>");
@@ -441,7 +440,7 @@ public class Graph {
 
     }
 
-    public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
     }
 
     private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
@@ -606,22 +605,22 @@ public class Graph {
         return false;
     }
 
-    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
     }
 
-    protected GraphPart checkPart(Stack<GraphTargetItem> stack, BaseLocalData localData, GraphPart part, List<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart part, List<GraphPart> allParts) {
         return part;
     }
 
-    @SuppressWarnings("unchecked")
-    protected GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation) throws InterruptedException {
-        stack = (Stack<GraphTargetItem>) stack.clone();
+    //@SuppressWarnings("unchecked")
+    protected GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation) throws InterruptedException {
+        stack = (TranslateStack) stack.clone();
         translatePart(localData, part, stack, staticOperation, null);
         return stack.pop();
     }
 
-    protected List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
         List<GraphPart> sub = part.getSubParts();
         List<GraphTargetItem> ret = new ArrayList<>();
         int end;
@@ -682,7 +681,7 @@ public class Graph {
         list.remove(list.size() - 1);
     }
 
-    protected List<GraphTargetItem> printGraph(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> printGraph(BaseLocalData localData, TranslateStack stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) throws InterruptedException {
         List<GraphPart> visited = new ArrayList<>();
         return printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops, null, staticOperation, path, 0);
     }
@@ -1180,7 +1179,7 @@ public class Graph {
         }
     }
 
-    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, BaseLocalData localData, TranslateStack stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -1554,8 +1553,9 @@ public class Graph {
                 }
                 if (nextOnePart == null) {
 
-                    List<GraphPart> nps = new ArrayList<>(part.nextParts);
-                    /*for(int i=0;i<nps.size();i++){
+                    List<GraphPart> nps;
+                    /*nps = new ArrayList<>(part.nextParts);
+                    for(int i=0;i<nps.size();i++){
                      nps.set(i,getNextNoJump(nps.get(i),localData));
                      }
                      if(nps.get(0) == nps.get(1)){
@@ -1564,10 +1564,8 @@ public class Graph {
                     nps = part.nextParts;
                     GraphPart next = getCommonPart(localData, nps, loops);
 
-                    @SuppressWarnings("unchecked")
-                    Stack<GraphTargetItem> trueStack = (Stack<GraphTargetItem>) stack.clone();
-                    @SuppressWarnings("unchecked")
-                    Stack<GraphTargetItem> falseStack = (Stack<GraphTargetItem>) stack.clone();
+                    TranslateStack trueStack = (TranslateStack) stack.clone();
+                    TranslateStack falseStack = (TranslateStack) stack.clone();
                     int trueStackSizeBefore = trueStack.size();
                     int falseStackSizeBefore = falseStack.size();
                     List<GraphTargetItem> onTrue = new ArrayList<>();
@@ -1640,7 +1638,7 @@ public class Graph {
                     stopContPart.add(currentLoop.loopContinue);
                     GraphPart precoBackup = currentLoop.loopPreContinue;
                     currentLoop.loopPreContinue = null;
-                    loopItem.commands.addAll(printGraph(visited, localData, new Stack<GraphTargetItem>(), allParts, null, precoBackup, stopContPart, loops, null, staticOperation, path, recursionLevel + 1));
+                    loopItem.commands.addAll(printGraph(visited, localData, new TranslateStack(), allParts, null, precoBackup, stopContPart, loops, null, staticOperation, path, recursionLevel + 1));
                 }
             }
 
@@ -1697,7 +1695,7 @@ public class Graph {
                             currentLoop.loopPreContinue = null;
                             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                             stopPart2.add(currentLoop.loopContinue);
-                            finalComm = printGraph(visited, localData, new Stack<GraphTargetItem>(), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                            finalComm = printGraph(visited, localData, new TranslateStack(), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                             currentLoop.loopPreContinue = backup;
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
@@ -1778,7 +1776,7 @@ public class Graph {
                     currentLoop.loopPreContinue = null;
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     stopPart2.add(currentLoop.loopContinue);
-                    List<GraphTargetItem> finalComm = printGraph(visited, localData, new Stack<GraphTargetItem>(), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                    List<GraphTargetItem> finalComm = printGraph(visited, localData, new TranslateStack(), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(finalComm, currentLoop);
 

@@ -21,11 +21,11 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,7 +73,7 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException {
+    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path));
     }
     private List<Long> posCache = null;

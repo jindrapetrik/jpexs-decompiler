@@ -30,13 +30,13 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionTry extends Action implements GraphSourceItemContainer {
 
@@ -265,7 +265,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translateContainer(List<List<GraphTargetItem>> contents, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         List<GraphTargetItem> tryCommands = contents.get(0);
         ActionItem catchName;
         if (catchInRegisterFlag) {

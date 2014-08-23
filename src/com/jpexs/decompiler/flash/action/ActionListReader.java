@@ -45,6 +45,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -56,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -299,7 +299,7 @@ public class ActionListReader {
                 new ArrayList<GraphTargetItem>(), 
                 new HashMap<Long, List<GraphSourceItemContainer>>(), 
                 new ActionLocalData(), 
-                new Stack<GraphTargetItem>(), 
+                new TranslateStack(), 
                 new ConstantPool(), 
                 actionMap, ip, retMap, ip, endIp, path, 
                 new HashMap<Integer, Integer>(), false, 
@@ -769,7 +769,7 @@ public class ActionListReader {
         return entryAction;
     }
 
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -931,7 +931,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new Stack<GraphTargetItem>(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -989,8 +989,7 @@ public class ActionListReader {
                     break loopip;
                 }
 
-                @SuppressWarnings("unchecked")
-                Stack<GraphTargetItem> subStack = (Stack<GraphTargetItem>) stack.clone();
+                TranslateStack subStack = (TranslateStack) stack.clone();
                 ActionLocalData subLocalData = new ActionLocalData(new HashMap<>(localData.regNames),
                     new HashMap<>(localData.variables), new HashMap<>(localData.functions));
                 deobfustaceActionListAtPosRecursive(listeners, output, containers, subLocalData, subStack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);

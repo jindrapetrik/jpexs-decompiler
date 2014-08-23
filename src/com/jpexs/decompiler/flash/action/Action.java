@@ -65,6 +65,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -79,7 +80,6 @@ import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -598,7 +598,7 @@ public class Action implements GraphSourceItem {
      * @param path the value of path
      * @throws java.lang.InterruptedException
      */
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
 
     /**
@@ -607,7 +607,7 @@ public class Action implements GraphSourceItem {
      * @param stack Stack
      * @return long value
      */
-    protected long popLong(Stack<GraphTargetItem> stack) {
+    protected long popLong(TranslateStack stack) {
         GraphTargetItem item = stack.pop();
         if (item instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) item).value instanceof Long) {
@@ -735,7 +735,7 @@ public class Action implements GraphSourceItem {
     }
 
     @Override
-    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+    public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         ActionLocalData aLocalData = (ActionLocalData) localData;
         translate(stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
     }
@@ -797,7 +797,7 @@ public class Action implements GraphSourceItem {
         logger.fine(s);
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
+    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }

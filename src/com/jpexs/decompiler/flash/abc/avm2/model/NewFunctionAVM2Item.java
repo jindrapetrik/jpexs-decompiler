@@ -25,10 +25,10 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
-import java.util.Stack;
 
 public class NewFunctionAVM2Item extends AVM2Item {
 
@@ -70,9 +70,9 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {
-                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null, false);
+                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new ScopeStack(), false, writer, fullyQualifiedNames, null, false);
             } else {
-                body.toString(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
+                body.toString(path + "/inner", ScriptExportMode.AS, abc, null, constants, methodInfo, writer, fullyQualifiedNames);
             }
         }
         writer.endBlock();

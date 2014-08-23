@@ -33,11 +33,11 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionStoreRegister extends Action implements StoreTypeAction {
 
@@ -76,7 +76,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         RegisterNumber rn = new RegisterNumber(registerNumber);
         if (regNames.containsKey(registerNumber)) {
@@ -134,7 +134,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
     }
 
     @Override
-    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool) {
+    public String getVariableName(TranslateStack stack, ConstantPool cpool) {
         return "__register" + registerNumber;
     }
 }

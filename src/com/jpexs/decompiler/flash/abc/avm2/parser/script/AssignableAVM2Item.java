@@ -101,7 +101,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
      ret.add(ins(new KillIns(), register.getVal()));
      return ret;
      }*/
-    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     public static List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Reference<Integer> register : registers) {

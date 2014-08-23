@@ -19,9 +19,9 @@ package com.jpexs.decompiler.flash.action.swf6;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.operations.GtActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionGreater extends Action {
 
@@ -35,7 +35,7 @@ public class ActionGreater extends Action {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem a = stack.pop();
         GraphTargetItem b = stack.pop();
         stack.push(new GtActionItem(this, b, a));

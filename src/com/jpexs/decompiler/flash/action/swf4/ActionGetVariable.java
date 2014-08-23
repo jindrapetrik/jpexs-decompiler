@@ -22,10 +22,10 @@ import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionGetVariable extends Action {
 
@@ -39,7 +39,7 @@ public class ActionGetVariable extends Action {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
         GraphTargetItem computedVal = variables.get(name.toStringNoQuotes(LocalData.empty));
         if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {

@@ -224,7 +224,9 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -243,7 +245,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1254,7 +1255,7 @@ public class AVM2Code implements Serializable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
+    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1582,7 +1583,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -1811,7 +1812,7 @@ public class AVM2Code implements Serializable {
         ret.isStatic = localData.isStatic;
         ret.classIndex = localData.classIndex;
         ret.localRegs = new HashMap<>(localData.localRegs);
-        ret.scopeStack = (Stack<GraphTargetItem>) (localData.scopeStack).clone();
+        ret.scopeStack = (ScopeStack) (localData.scopeStack).clone();
         ret.constants = localData.constants;
         ret.methodInfo = localData.methodInfo;
         ret.methodBody = localData.methodBody;
@@ -1835,7 +1836,7 @@ public class AVM2Code implements Serializable {
         localData.isStatic = isStatic;
         localData.classIndex = classIndex;
         localData.localRegs = new HashMap<>();
-        localData.scopeStack = new Stack<>();
+        localData.scopeStack = new ScopeStack();
         localData.constants = abc.constants;
         localData.methodInfo = abc.method_info;
         localData.methodBody = body;
@@ -1852,7 +1853,7 @@ public class AVM2Code implements Serializable {
         localData.refs = refs;
         localData.code = this;
         int ret = 0;
-        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
+        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
         removeIgnored(constants, trait, info, body);
         removeDeadCode(constants, trait, info, body);
 
@@ -2603,7 +2604,7 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -2836,7 +2837,7 @@ public class AVM2Code implements Serializable {
                     }
 
                     for (int b : branches) {
-                        Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
+                        TranslateStack brStack = (TranslateStack) stack.clone();
                         if (b >= 0) { //useVisited || (!ins.isJump())
                             ret += removeTraps(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
                         } else {
@@ -2858,7 +2859,7 @@ public class AVM2Code implements Serializable {
 
     public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
+        removeTraps(refs, false, false, localData, new TranslateStack(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
         int cnt = 0;
         for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);

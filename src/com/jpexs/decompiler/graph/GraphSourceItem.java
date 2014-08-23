@@ -19,7 +19,6 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -27,7 +26,7 @@ import java.util.Stack;
  */
 public interface GraphSourceItem extends Serializable {
 
-    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException;
+    public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException;
 
     public boolean isJump();
 

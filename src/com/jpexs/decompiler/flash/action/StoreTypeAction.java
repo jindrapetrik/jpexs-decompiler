@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.Stack;
+import com.jpexs.decompiler.graph.TranslateStack;
 
 /**
  *
@@ -26,5 +25,5 @@ import java.util.Stack;
  */
 public interface StoreTypeAction {
 
-    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool);
+    public String getVariableName(TranslateStack stack, ConstantPool cpool);
 }

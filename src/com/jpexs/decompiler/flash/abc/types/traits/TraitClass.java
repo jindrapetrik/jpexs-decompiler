@@ -35,11 +35,10 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class TraitClass extends Trait implements TraitWithSlot {
 
@@ -460,7 +459,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 writer.newLine();
                 writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size() + 1);
                 writer.appendNoHilight("{").newLine();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits);
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
                 writer.appendNoHilight("}").newLine();
                 writer.endTrait();
             }
@@ -499,7 +498,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             writer.appendNoHilight(")").startBlock();
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits);
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
             }
             writer.endBlock().newLine();
             writer.endTrait();
@@ -524,7 +523,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits, true);
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -532,7 +531,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (!abc.instance_info.get(class_info).isInterface()) {
             bodyIndex = abc.findBodyIndex(abc.instance_info.get(class_info).iinit_index);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits, true);
+                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits, true);
             }
         }
 

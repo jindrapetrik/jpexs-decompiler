@@ -14,23 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2;
+package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.List;
+import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public class ConvertOutput {
+public class ScopeStack extends Stack<GraphTargetItem> {
 
-    public TranslateStack stack;
-    public List<GraphTargetItem> output;
-
-    public ConvertOutput(TranslateStack stack, List<GraphTargetItem> output) {
-        this.stack = stack;
-        this.output = output;
-    }
 }

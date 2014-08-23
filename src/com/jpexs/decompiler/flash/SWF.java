@@ -146,6 +146,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
@@ -1674,7 +1675,7 @@ public final class SWF implements TreeItem, Timelined {
     private final HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
     private final Deobfuscation deobfuscation = new Deobfuscation();
 
-    private static void getVariables(ConstantPool constantPool, BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
+    private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1821,8 +1822,7 @@ public final class SWF implements TreeItem, Timelined {
                 visited.add(ip);
                 List<Integer> branches = ins.getBranches(code);
                 for (int b : branches) {
-                    @SuppressWarnings("unchecked")
-                    Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
+                    TranslateStack brStack = (TranslateStack) stack.clone();
                     if (b >= 0) {
                         getVariables(constantPool, localData, brStack, output, code, b, variables, functions, strings, visited, usageTypes, path);
                     } else {
@@ -1840,7 +1840,7 @@ public final class SWF implements TreeItem, Timelined {
 
     private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ActionGraphSource code, int addr, String path) throws InterruptedException {
         ActionLocalData localData = new ActionLocalData();
-        getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType, path);
+        getVariables(null, localData, new TranslateStack(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType, path);
     }
 
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ASMSource src, String path) throws InterruptedException {

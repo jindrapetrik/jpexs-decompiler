@@ -28,12 +28,11 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Stack;
 
 /**
  *
@@ -67,8 +66,8 @@ public class AS3Generator {
                     s.append("\", ");
                     HilightedTextWriter src = new HilightedTextWriter(new CodeFormatting(), false);
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);
-                    b.toString("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info.get(classId).instance_traits);
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);
+                    b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<String>());
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

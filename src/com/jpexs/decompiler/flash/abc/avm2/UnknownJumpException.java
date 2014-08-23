@@ -17,16 +17,16 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
-import java.util.Stack;
 
 public class UnknownJumpException extends RuntimeException {
 
-    public Stack stack;
+    public TranslateStack stack;
     public int ip;
     public List<GraphTargetItem> output;
 
-    public UnknownJumpException(Stack stack, int ip, List<GraphTargetItem> output) {
+    public UnknownJumpException(TranslateStack stack, int ip, List<GraphTargetItem> output) {
         this.stack = stack;
         this.ip = ip;
         this.output = output;

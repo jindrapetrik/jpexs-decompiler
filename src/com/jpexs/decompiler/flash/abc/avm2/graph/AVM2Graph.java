@@ -60,6 +60,8 @@ import com.jpexs.decompiler.graph.GraphPartMulti;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
@@ -71,7 +73,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -87,7 +88,7 @@ public class AVM2Graph extends Graph {
         return avm2code;
     }
 
-    public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs), body.getExceptionEntries());
         this.avm2code = code;
         this.abc = abc;
@@ -103,7 +104,7 @@ public class AVM2Graph extends Graph {
 
     }
 
-    public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs);
 
         AVM2LocalData localData = new AVM2LocalData();
@@ -176,7 +177,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
@@ -318,7 +319,7 @@ public class AVM2Graph extends Graph {
                     }
                     stack.add(new ExceptionAVM2Item(catchedExceptions.get(e)));
                     AVM2LocalData localData2 = new AVM2LocalData(aLocalData);
-                    localData2.scopeStack = new Stack<>();
+                    localData2.scopeStack = new ScopeStack();
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     stopPart2.add(nepart);
                     if (retPart != null) {
@@ -463,7 +464,7 @@ public class AVM2Graph extends Graph {
                 }
                 GraphPart numPart = part.nextParts.get(reversed ? 0 : 1);
                 AVM2Instruction ins = null;
-                Stack<GraphTargetItem> sstack = new Stack<>();
+                TranslateStack sstack = new TranslateStack();
                 do {
                     for (int n = 0; n < numPart.getHeight(); n++) {
                         ins = this.avm2code.code.get(numPart.getPosAt(n));
@@ -504,7 +505,7 @@ public class AVM2Graph extends Graph {
 
             GraphPart numPart = dp;
             AVM2Instruction ins = null;
-            Stack<GraphTargetItem> sstack = new Stack<>();
+            TranslateStack sstack = new TranslateStack();
             do {
                 for (int n = 0; n < numPart.getHeight(); n++) {
                     ins = this.avm2code.code.get(numPart.getPosAt(n));
@@ -603,7 +604,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPart(Stack<GraphTargetItem> stack, BaseLocalData localData, GraphPart next, List<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart next, List<GraphPart> allParts) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         List<Integer> finallyJumps = aLocalData.finallyJumps;
         List<Integer> ignoredSwitches = aLocalData.ignoredSwitches;
@@ -805,7 +806,7 @@ public class AVM2Graph extends Graph {
     public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         AVM2LocalData ret = new AVM2LocalData(aLocalData);
-        Stack<GraphTargetItem> copyScopeStack = new Stack<>();
+        ScopeStack copyScopeStack = new ScopeStack();
         copyScopeStack.addAll(ret.scopeStack);
         ret.scopeStack = copyScopeStack;
         return ret;

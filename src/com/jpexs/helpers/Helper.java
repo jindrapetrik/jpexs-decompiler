@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Component;
@@ -47,7 +47,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -490,7 +489,7 @@ public class Helper {
         }
     }
 
-    public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) throws InterruptedException {
+    public static String stackToString(TranslateStack stack, LocalData localData) throws InterruptedException {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {
             if (i < stack.size() - 1) {

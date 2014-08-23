@@ -23,10 +23,10 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -37,7 +37,7 @@ public class AVM2LocalData extends BaseLocalData {
     public Boolean isStatic;
     public Integer classIndex;
     public HashMap<Integer, GraphTargetItem> localRegs;
-    public Stack<GraphTargetItem> scopeStack;
+    public ScopeStack scopeStack;
     public ConstantPool constants;
     public List<MethodInfo> methodInfo;
     public MethodBody methodBody;

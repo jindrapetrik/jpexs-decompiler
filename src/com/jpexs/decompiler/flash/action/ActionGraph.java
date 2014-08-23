@@ -44,6 +44,7 @@ import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
@@ -51,7 +52,6 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -78,7 +78,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
         if (stack.size() > 0) {
             for (int i = stack.size() - 1; i >= 0; i--) {
                 //System.err.println(stack.get(i));
@@ -247,7 +247,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
                 StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);

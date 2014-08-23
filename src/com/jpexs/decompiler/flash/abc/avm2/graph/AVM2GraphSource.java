@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -42,7 +43,7 @@ public class AVM2GraphSource extends GraphSource {
     int classIndex;
     int scriptIndex;
     HashMap<Integer, GraphTargetItem> localRegs;
-    Stack<GraphTargetItem> scopeStack;
+    ScopeStack scopeStack;
     ABC abc;
     MethodBody body;
     HashMap<Integer, String> localRegNames;
@@ -54,7 +55,7 @@ public class AVM2GraphSource extends GraphSource {
         return code;
     }
 
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp, HashMap<Integer, List<Integer>> refs) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp, HashMap<Integer, List<Integer>> refs) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;
@@ -85,9 +86,9 @@ public class AVM2GraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException {
+    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
-        Stack<GraphTargetItem> newstack = ((AVM2LocalData) localData).scopeStack;
+        ScopeStack newstack = ((AVM2LocalData) localData).scopeStack;
         ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
         ret.addAll(co.output);
         return ret;

@@ -42,12 +42,12 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -56,7 +56,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -240,7 +239,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                         jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
                         actions.addAction(i++, jump);
 
-                        return true;
+                        //return true;
                     }
                 }
             } catch (EmptyStackException | TranslateException | InterruptedException ex) {
@@ -253,7 +252,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result, Map<String,Object> fakeFunctions) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
-        Stack<GraphTargetItem> stack = new Stack<>();
+        TranslateStack stack = new TranslateStack();
         int instructionsProcessed = 0;
         ActionConstantPool constantPool = null;
 
@@ -354,7 +353,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
                 idx = actions.indexOf(actions.getByAddress(address));
                 if (idx == -1) {
-                    int a = 1;
+                    throw new TranslateException("Jump target not found: " + address);
                 }
             }
 
@@ -365,7 +364,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
                     idx = actions.indexOf(actions.getByAddress(address));
                     if (idx == -1) {
-                        int a = 1;
+                        throw new TranslateException("If target not found: " + address);
                     }
                 }
             }
@@ -376,7 +375,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
             }
 
-            if (/*localData.variables.size() == 1 && */stack.empty() || action instanceof ActionEnd) {
+            if (/*localData.variables.size() == 1 && */stack.isEmpty() || action instanceof ActionEnd) {
                 result.idx = idx == actions.size() ? idx - 1 : idx;
                 result.instructionsProcessed = instructionsProcessed;
                 result.constantPool = constantPool;

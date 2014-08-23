@@ -19,7 +19,6 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -39,7 +38,7 @@ public interface GraphSourceItemContainer {
 
     public HashMap<Integer, String> getRegNames();
 
-    public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
+    public void translateContainer(List<List<GraphTargetItem>> contents, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
 
     public String getName();
 }

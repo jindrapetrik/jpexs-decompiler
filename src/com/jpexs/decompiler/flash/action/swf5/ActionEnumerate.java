@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class ActionEnumerate extends Action {
 
@@ -38,7 +38,7 @@ public class ActionEnumerate extends Action {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem object = stack.pop();
         stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
         stack.push(new EnumerateActionItem(this, object));

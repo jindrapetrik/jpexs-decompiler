@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -35,7 +36,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -123,7 +123,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -163,7 +163,7 @@ public class MethodBody implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) throws InterruptedException {
+    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<String> fullyQualifiedNames) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
             code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
@@ -191,7 +191,7 @@ public class MethodBody implements Cloneable, Serializable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, List<MethodInfo> method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
+    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody b = Helper.deepCopy(this);
         AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();

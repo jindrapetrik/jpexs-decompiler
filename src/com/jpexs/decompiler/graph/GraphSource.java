@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -36,7 +35,7 @@ public abstract class GraphSource implements Serializable {
 
     public abstract boolean isEmpty();
 
-    public abstract List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException;
+    public abstract List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException;
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
