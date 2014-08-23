@@ -1044,10 +1044,11 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
+                        Tag ft = tag;
+                        if (ft instanceof TagStub) {
+                            ft = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
                         }
-                        FileAttributesTag fileAttributes = (FileAttributesTag) tag;
+                        FileAttributesTag fileAttributes = (FileAttributesTag) ft;
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
