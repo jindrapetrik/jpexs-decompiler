@@ -21,7 +21,7 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public class ActionScriptTestBase {
-    
+
     protected String cleanPCode(String pCode) {
         pCode = pCode.replaceAll(" *[\r\n]+ *", "\n").trim();
         pCode = pCode.replaceAll("  +", " ").trim();

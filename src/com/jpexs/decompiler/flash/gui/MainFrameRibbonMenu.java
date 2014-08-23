@@ -123,13 +123,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_CHECK_RESOURCES = "CHECKRESOURCES";
     static final String ACTION_VIEWMODE_RESOURCES = "VIEWMODERESOURCES";
     static final String ACTION_VIEWMODE_HEX = "VIEWMODEHEX";
-    static final String ACTION_DEOBFUSCATION_MODE_DISABLED = "DEOBFUSCATIONMODEDISABLED";
     static final String ACTION_DEOBFUSCATION_MODE_OLD = "DEOBFUSCATIONMODEOLD";
     static final String ACTION_DEOBFUSCATION_MODE_NEW = "DEOBFUSCATIONMODENEW";
 
     private final MainFrameRibbon mainFrame;
 
-    //private JCheckBox miAutoDeobfuscation;
+    private JCheckBox miAutoDeobfuscation;
     private JCheckBox miInternalViewer;
     private JCheckBox miDumpView;
     private JCheckBox miParallelSpeedUp;
@@ -147,7 +146,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton importTextCommandButton;
     private JCommandToggleButton viewModeResourcesToggleButton;
     private JCommandToggleButton viewModeHexToggleButton;
-    private JCommandToggleButton deobfuscationModeDisabledToggleButton;
     private JCommandToggleButton deobfuscationModeOldToggleButton;
     private JCommandToggleButton deobfuscationModeNewToggleButton;
 
@@ -283,7 +281,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
         return resizePolicies;
     }
-    
+
     private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
         List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
         resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
@@ -432,10 +430,11 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
         settingsBand.setResizePolicies(getResizePolicies(settingsBand));
 
-        //miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
-        //miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
-        //miAutoDeobfuscation.addActionListener(this);
-        //miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
+        miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
+        miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
+        miAutoDeobfuscation.addActionListener(this);
+        miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
+
         miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
         miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
         if (externalFlashPlayerUnavailable) {
@@ -478,7 +477,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
          miDumpView.setSelected(Configuration.dumpView.get());
          miDumpView.setActionCommand(ACTION_DUMP_VIEW_SWITCH);
          miDumpView.addActionListener(this);*/
-        //settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
         settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
@@ -507,13 +506,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
         advancedSettingsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
 
-        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);        
+        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);
         deobfuscationBand.setResizePolicies(getEmptyResizePolicies(deobfuscationBand)); //TODO: add icons and change this to getResizePolicies
 
         CommandToggleButtonGroup grpDeobfuscation = new CommandToggleButtonGroup();
-
-        deobfuscationModeDisabledToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.disabled")), null);
-        assignListener(deobfuscationModeDisabledToggleButton, ACTION_DEOBFUSCATION_MODE_DISABLED);
 
         deobfuscationModeOldToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.old")), null);
         assignListener(deobfuscationModeOldToggleButton, ACTION_DEOBFUSCATION_MODE_OLD);
@@ -521,24 +517,19 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         deobfuscationModeNewToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.new")), null);
         assignListener(deobfuscationModeNewToggleButton, ACTION_DEOBFUSCATION_MODE_NEW);
 
-        grpDeobfuscation.add(deobfuscationModeDisabledToggleButton);
         grpDeobfuscation.add(deobfuscationModeOldToggleButton);
         grpDeobfuscation.add(deobfuscationModeNewToggleButton);
 
         int deobfuscationMode = Configuration.deobfuscationMode.get();
         switch (deobfuscationMode) {
             case 0:
-                grpDeobfuscation.setSelected(deobfuscationModeDisabledToggleButton, true);
-                break;
-            case 1:
                 grpDeobfuscation.setSelected(deobfuscationModeOldToggleButton, true);
                 break;
-            case 2:
+            case 1:
                 grpDeobfuscation.setSelected(deobfuscationModeNewToggleButton, true);
                 break;
         }
 
-        deobfuscationBand.addCommandButton(deobfuscationModeDisabledToggleButton, RibbonElementPriority.MEDIUM);
         deobfuscationBand.addCommandButton(deobfuscationModeOldToggleButton, RibbonElementPriority.MEDIUM);
         deobfuscationBand.addCommandButton(deobfuscationModeNewToggleButton, RibbonElementPriority.MEDIUM);
 
@@ -712,6 +703,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.dumpView.set(true);
                 mainFrame.panel.showDumpView(true);
                 break;
+            case ACTION_DEOBFUSCATION_MODE_OLD:
+                Configuration.deobfuscationMode.set(0);
+                mainFrame.panel.autoDeobfuscateChanged();
+                break;
+            case ACTION_DEOBFUSCATION_MODE_NEW:
+                Configuration.deobfuscationMode.set(1);
+                mainFrame.panel.autoDeobfuscateChanged();
+                break;
             case ACTION_DUMP_VIEW_SWITCH:
                 Configuration.dumpView.set(miDumpView.isSelected());
                 mainFrame.panel.showDumpView(miDumpView.isSelected());
@@ -722,14 +721,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             case ACTION_TIMELINE:
                 mainFrame.panel.timeline();
                 break;
-            /*case ACTION_AUTO_DEOBFUSCATE:
-             if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-             Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-             mainFrame.panel.autoDeobfuscateChanged();
-             } else {
-             miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-             }
-             break;*/
+            case ACTION_AUTO_DEOBFUSCATE:
+                if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
+                    mainFrame.panel.autoDeobfuscateChanged();
+                } else {
+                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
+                }
+                break;
             case ACTION_CLEAR_RECENT_FILES:
                 Configuration.recentFiles.set(null);
                 break;

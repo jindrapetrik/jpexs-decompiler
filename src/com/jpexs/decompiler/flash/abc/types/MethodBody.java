@@ -195,7 +195,7 @@ public class MethodBody implements Cloneable, Serializable {
         MethodBody b = Helper.deepCopy(this);
         AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
-        if (Configuration.deobfuscationMode.get() != 0) {
+        if (Configuration.autoDeobfuscate.get()) {
             try {
                 deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (StackOverflowError ex) {
