@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
@@ -108,7 +109,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         byte[] actionBytes = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         try {
             SWFInputStream rri = new SWFInputStream(swf, actionBytes);
-            ActionList newActions = ActionListReader.readActionList(new ArrayList<DisassemblyListener>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", false);
+            ActionList newActions = ActionListReader.readActionList(new ArrayList<DisassemblyListener>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", 0);
             actions.setActions(newActions);
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
@@ -364,7 +365,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     ActionPush push = (ActionPush) action;
                     boolean ok = true; 
                     for (Object value : push.values) {
-                        if (value instanceof ConstantIndex) {
+                        if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
                             ok = false;
                             break;
                         }

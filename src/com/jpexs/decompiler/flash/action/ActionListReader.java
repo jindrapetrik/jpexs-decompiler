@@ -97,7 +97,7 @@ public class ActionListReader {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {
-                    return readActionList(listeners, sis, version, ip, endIp, path, Configuration.autoDeobfuscate.get());
+                    return readActionList(listeners, sis, version, ip, endIp, path, Configuration.deobfuscationMode.get());
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
             
@@ -130,7 +130,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, boolean deobfuscate) throws IOException, InterruptedException {
+    public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
         ConstantPool cpool = new ConstantPool();
 
         // Map of the actions. Use TreeMap to sort the keys in ascending order
@@ -178,13 +178,18 @@ public class ActionListReader {
             }
         }
 
-        if (deobfuscate) {
+        if (deobfuscationMode == 1) {
+            try {
+                actions = deobfuscateActionList(listeners, actions, version, 0, path);
+                updateActionLengths(actions, version);
+            } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
+                // keep orignal (not deobfuscated) actions
+                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
             try {
                 new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
                 new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
-                /*actions = deobfuscateActionList(listeners, actions, version, 0, path);
-                updateActionLengths(actions, version);
-                removeZeroJumps(actions, version);*/
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);

@@ -105,7 +105,7 @@ public class CommandLineArgumentParser {
         Configuration.decompile,
         Configuration.parallelSpeedUp,
         Configuration.internalFlashViewer,
-        Configuration.autoDeobfuscate,
+        //Configuration.autoDeobfuscate,
         Configuration.cacheOnDisk
     };
 

@@ -87,7 +87,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
 
     private final MainFrameClassic mainFrame;
 
-    private JCheckBoxMenuItem miAutoDeobfuscation;
+    //private JCheckBoxMenuItem miAutoDeobfuscation;
     private JCheckBoxMenuItem miInternalViewer;
     private JCheckBoxMenuItem miParallelSpeedUp;
     private JCheckBoxMenuItem miAssociate;
@@ -199,10 +199,10 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miDeobfuscation.setActionCommand(ACTION_DEOBFUSCATE);
         miDeobfuscation.addActionListener(this);
 
-        miAutoDeobfuscation = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
-        miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
-        miAutoDeobfuscation.addActionListener(this);
-        miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
+        //miAutoDeobfuscation = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
+        //miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
+        //miAutoDeobfuscation.addActionListener(this);
+        //miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
 
         JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
         miRenameOneIdentifier.setActionCommand(ACTION_RENAME_ONE_IDENTIFIER);
@@ -271,7 +271,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miAutoRenameIdentifiers.addActionListener(this);
 
         JMenu menuSettings = new JMenu(translate("menu.settings"));
-        menuSettings.add(miAutoDeobfuscation);
+        //menuSettings.add(miAutoDeobfuscation);
         menuSettings.add(miInternalViewer);
         menuSettings.add(miParallelSpeedUp);
         menuSettings.add(miDecompile);
@@ -442,14 +442,14 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
             case ACTION_SEARCH_AS:
                 mainFrame.panel.searchAs();
                 break;
-            case ACTION_AUTO_DEOBFUSCATE:
+            /*case ACTION_AUTO_DEOBFUSCATE:
                 if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
                     mainFrame.panel.autoDeobfuscateChanged();
                 } else {
                     miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
                 }
-                break;
+                break;*/
             case ACTION_EXIT:
                 mainFrame.panel.setVisible(false);
                 if (Main.proxyFrame != null) {

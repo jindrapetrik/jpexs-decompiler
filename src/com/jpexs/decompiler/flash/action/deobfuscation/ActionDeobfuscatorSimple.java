@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
@@ -152,7 +153,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     ActionPush push = (ActionPush) action;
                     boolean ok = true; 
                     for (Object value : push.values) {
-                        if (value instanceof ConstantIndex) {
+                        if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
                             ok = false;
                             break;
                         }
