@@ -43,7 +43,6 @@ public class AddActionItem extends BinaryOpItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (rightSide.getPrecedence() >= precedence) { //string + vs number +
-            String ret = "";
             if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");
                 leftSide.toString(writer, localData);

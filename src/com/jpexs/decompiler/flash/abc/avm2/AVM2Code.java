@@ -1271,7 +1271,6 @@ public class AVM2Code implements Serializable {
             }
         }
         List<GraphTargetItem> output = new ArrayList<>();
-        String ret = "";
         int ip = start;
         //try {
         //int addr;

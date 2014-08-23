@@ -255,31 +255,31 @@ public class ActionPush extends Action {
     }
 
     public String toStringNoQ(int i) {
-        String ret = "";
+        String ret;
         if (values.get(i) instanceof ConstantIndex) {
             ((ConstantIndex) values.get(i)).constantPool = constantPool;
-            ret += ((ConstantIndex) values.get(i)).toStringNoQ();
+            ret = ((ConstantIndex) values.get(i)).toStringNoQ();
         } else if (values.get(i) instanceof String) {
-            ret += (String) values.get(i);
+            ret = (String) values.get(i);
         } else if (values.get(i) instanceof RegisterNumber) {
-            ret += ((RegisterNumber) values.get(i)).toStringNoName();
+            ret = ((RegisterNumber) values.get(i)).toStringNoName();
         } else {
-            ret += values.get(i).toString();
+            ret = values.get(i).toString();
         }
         return ret;
     }
 
     public String toString(int i) {
-        String ret = "";
+        String ret;
         if (values.get(i) instanceof ConstantIndex) {
             ((ConstantIndex) values.get(i)).constantPool = constantPool;
-            ret += ((ConstantIndex) values.get(i)).toString();
+            ret = ((ConstantIndex) values.get(i)).toString();
         } else if (values.get(i) instanceof String) {
-            ret += "\"" + Helper.escapeString((String) values.get(i)) + "\"";
+            ret = "\"" + Helper.escapeString((String) values.get(i)) + "\"";
         } else if (values.get(i) instanceof RegisterNumber) {
-            ret += ((RegisterNumber) values.get(i)).toStringNoName();
+            ret = ((RegisterNumber) values.get(i)).toStringNoName();
         } else {
-            ret += values.get(i).toString();
+            ret = values.get(i).toString();
         }
         return ret;
     }

@@ -72,25 +72,25 @@ public class ChunkedInputStream extends InputStream {
     private String readLine() throws IOException {
         int i;
         boolean inr = false;
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         while ((i = is.read()) > -1) {
             if (inr) {
                 inr = false;
                 if (i == '\n') {
                     break;
                 } else {
-                    ret += "\r";
+                    ret.append("\r");
                 }
             }
             if (i == '\r') {
                 inr = true;
                 continue;
             }
-            ret += (char) i;
+            ret.append((char) i);
         }
         if (inr) {
-            ret += "\r";
+            ret.append("\r");
         }
-        return ret;
+        return ret.toString();
     }
 }
