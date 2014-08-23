@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -81,10 +82,21 @@ public class FunctionActionItem extends ActionItem {
         writer.append("function");
         if (calculatedFunctionName != null) {
             writer.append(" ");
-            calculatedFunctionName.toStringNoQuotes(writer, localData);
+            String fname = calculatedFunctionName.toStringNoQuotes(localData);
+            if(!Deobfuscation.isValidName(fname)){
+                calculatedFunctionName.appendTo(writer, localData); //Use quotes
+            }else{
+                calculatedFunctionName.appendToNoQuotes(writer, localData);
+            }
         } else if (!functionName.isEmpty()) {
             writer.append(" ");
-            writer.append(functionName);
+            if(!Deobfuscation.isValidName(functionName)){    
+                writer.append("\"");
+                writer.append(Helper.escapeString(functionName));
+                writer.append("\"");
+            }else{
+                writer.append(functionName);
+            }
         }
         writer.spaceBeforeCallParenthesies(paramNames.size());
         writer.append("(");
@@ -96,6 +108,11 @@ public class FunctionActionItem extends ActionItem {
             String pname = paramNames.get(p);
             if (pname == null || pname.isEmpty()) {
                 pname = new RegisterNumber(regStart + p).translate();
+            }
+            if(!Deobfuscation.isValidName(pname)){
+                writer.append("\"");
+                writer.append(Helper.escapeString(pname));
+                writer.append("\"");
             }
             writer.append(pname);
         }
