@@ -43,6 +43,6 @@ public class JumpIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
+    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
     }
 }

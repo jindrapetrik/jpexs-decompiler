@@ -567,7 +567,7 @@ public class ABC {
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
          GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
          try {
-         bod.toString("script", ScriptExportMode.PCODE, false,i, 0, this, null, constants, method_info, new Stack<GraphTargetItem>(), false, t ,new ArrayList<String>(), null);
+         bod.toString("script", ScriptExportMode.PCODE, false,i, 0, this, null, constants, method_info, new TranslateStack(), false, t ,new ArrayList<String>(), null);
          } catch (InterruptedException ex) {
          Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
          }

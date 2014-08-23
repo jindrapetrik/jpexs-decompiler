@@ -2883,7 +2883,7 @@ public class AVM2Code implements Serializable {
                 }
             }
         }
-        //int cnt = removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
+        //int cnt = removeTraps(refs, true, false, localData, new TranslateStack(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         code.getCode().removeIgnored(constants, trait, info, body);
         return cnt;
     }
