@@ -167,7 +167,6 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 if (action instanceof ActionIf) {
                     ActionIf aif = (ActionIf) action;
                     if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                        System.out.println("if true");
                         long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
                         idx = actions.indexOf(actions.getByAddress(address));
                         if (idx == -1) {
