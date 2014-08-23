@@ -278,6 +278,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         return mainMenu;
     }
 
+    private List<RibbonBandResizePolicy> getEmptyResizePolicies(JRibbonBand ribbonBand) {
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
+        resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
+        return resizePolicies;
+    }
+    
     private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
         List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
         resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
@@ -501,8 +507,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
         advancedSettingsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
 
-        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);
-        deobfuscationBand.setResizePolicies(getResizePolicies(deobfuscationBand));
+        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);        
+        deobfuscationBand.setResizePolicies(getEmptyResizePolicies(deobfuscationBand)); //TODO: add icons and change this to getResizePolicies
 
         CommandToggleButtonGroup grpDeobfuscation = new CommandToggleButtonGroup();
 
