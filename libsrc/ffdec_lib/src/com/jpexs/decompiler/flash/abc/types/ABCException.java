@@ -56,13 +56,13 @@ public class ABCException implements Serializable {
         if (name_index == 0) {
             return "";
         }
-        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames,false);
+        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames, false);
     }
 
     public String getTypeName(ConstantPool constants, List<String> fullyQualifiedNames) {
         if (type_index == 0) {
             return "*";
         }
-        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames,false);
+        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
     }
 }

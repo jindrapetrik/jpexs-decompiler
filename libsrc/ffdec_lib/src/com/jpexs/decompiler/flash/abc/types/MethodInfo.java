@@ -286,7 +286,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", "param", i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames,false), "param", i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false), "param", i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
@@ -313,7 +313,7 @@ public class MethodInfo {
     }
 
     public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
-        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames,false), "returns");
+        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, false), "returns");
     }
 
     public void setBody(MethodBody body) {

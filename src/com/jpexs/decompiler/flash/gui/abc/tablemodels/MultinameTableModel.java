@@ -126,7 +126,7 @@ public class MultinameTableModel implements TableModel {
                 if (abc.constants.getMultiname(rowIndex).name_index == -1) {
                     return "";
                 }
-                return abc.constants.getMultiname(rowIndex).getName(abc.constants, new ArrayList<String>(),true);
+                return abc.constants.getMultiname(rowIndex).getName(abc.constants, new ArrayList<String>(), true);
             case 3:
                 if (rowIndex == 0) {
                     return "";

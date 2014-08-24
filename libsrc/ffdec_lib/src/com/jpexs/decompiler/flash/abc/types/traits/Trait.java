@@ -175,7 +175,7 @@ public abstract class Trait implements Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, new ArrayList<String>(),false);
+        String objectName = name.getName(abc.constants, new ArrayList<String>(), false);
         return packageName + "." + objectName; //assume not null name
     }
 }

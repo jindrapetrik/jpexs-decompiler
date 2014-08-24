@@ -232,7 +232,7 @@ public class Multiname {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames,raw);
+        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw);
         if (!params.isEmpty()) {
             typeNameStr += ".<";
             for (int i = 0; i < params.size(); i++) {
@@ -242,7 +242,7 @@ public class Multiname {
                 if (params.get(i) == 0) {
                     typeNameStr += "*";
                 } else {
-                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames,raw);
+                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw);
                 }
             }
             typeNameStr += ">";
@@ -252,7 +252,7 @@ public class Multiname {
 
     public String getName(ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
         if (kind == TYPENAME) {
-            return typeNameToStr(constants, fullyQualifiedNames,raw);
+            return typeNameToStr(constants, fullyQualifiedNames, raw);
         }
         if (name_index == -1) {
             return "";
@@ -262,13 +262,13 @@ public class Multiname {
         } else {
             String name = constants.getString(name_index);
             if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
-                return getNameWithNamespace(constants,raw);
+                return getNameWithNamespace(constants, raw);
             }
-            return (isAttribute() ? "@" : "") + (raw?name:Deobfuscation.printIdentifier(name));
+            return (isAttribute() ? "@" : "") + (raw ? name : Deobfuscation.printIdentifier(name));
         }
     }
 
-    public String getNameWithNamespace(ConstantPool constants,boolean raw) {
+    public String getNameWithNamespace(ConstantPool constants, boolean raw) {
         String ret = "";
         Namespace ns = getNamespace(constants);
         if (ns != null) {

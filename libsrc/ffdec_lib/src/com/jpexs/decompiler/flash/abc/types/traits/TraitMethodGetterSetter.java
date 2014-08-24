@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -68,7 +67,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         writer.appendNoHilight(modifier);
         writer.hilightSpecial("function " + addKind, "traittype");
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames,false), "traitname");
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), "traitname");
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -78,7 +77,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames,false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
         convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
@@ -90,7 +89,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames,false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
         toStringHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {

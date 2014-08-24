@@ -55,7 +55,7 @@ public class InstanceInfo {
     public String getClassHeaderStr(ABC abc, List<String> fullyQualifiedNames) {
         String supIndexStr = "";
         if (super_index > 0) {
-            supIndexStr = " extends " + abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames,false);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
+            supIndexStr = " extends " + abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
         }
         String implStr = "";
         if (interfaces.length > 0) {
@@ -68,7 +68,7 @@ public class InstanceInfo {
                 if (i > 0) {
                     implStr += ", ";
                 }
-                implStr += abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames,false);
+                implStr += abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false);
             }
         }
         String modifiers;
@@ -88,7 +88,7 @@ public class InstanceInfo {
         if (isInterface()) {
             objType = "interface ";
         }
-        return modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/,false) + supIndexStr + implStr;
+        return modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false) + supIndexStr + implStr;
     }
 
     public Multiname getName(ConstantPool constants) {

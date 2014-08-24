@@ -175,18 +175,18 @@ public class Deobfuscation {
         }
         return null;
     }
-        
-    public static boolean isValidName(String s,String ...exceptions) {
+
+    public static boolean isValidName(String s, String... exceptions) {
         boolean isValid = true;
-        
-        for(String e:exceptions){
-            if(e.equals(s)){
+
+        for (String e : exceptions) {
+            if (e.equals(s)) {
                 return true;
             }
         }
-        
-        if (Action.isReservedWord(s)) {            
-            isValid = false;            
+
+        if (Action.isReservedWord(s)) {
+            isValid = false;
         }
 
         if (isValid) {
@@ -249,28 +249,29 @@ public class Deobfuscation {
         }
         return null;
     }
-    
-    public static String makeObfuscatedIdentifier(String s){
+
+    public static String makeObfuscatedIdentifier(String s) {
         return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
-    
-    
-    private static Cache<String> nameCache = Cache.getInstance(false);
-    
+
+    private static final Cache<String> nameCache = Cache.getInstance(false);
+
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
+     *
      * @param s Identifier
-     * @param validExceptions Exceptions which are valid (e.g. some reserved words)
-     * @return 
+     * @param validExceptions Exceptions which are valid (e.g. some reserved
+     * words)
+     * @return
      */
-    public static String printIdentifier(String s,String ...validExceptions){               
-        if(s.startsWith("\u00A7")&&s.endsWith("\u00A7")){ //Assuming already printed - TODO:detect better
+    public static String printIdentifier(String s, String... validExceptions) {
+        if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
             return s;
         }
-        if(nameCache.contains(s)){
+        if (nameCache.contains(s)) {
             return nameCache.get(s);
-        }        
-        if(isValidName(s, validExceptions)){
+        }
+        if (isValidName(s, validExceptions)) {
             nameCache.put(s, s);
             return s;
         }
@@ -279,11 +280,11 @@ public class Deobfuscation {
         return ret;
     }
 
-    public static String printNamespace(String pkg,String ...validNameExceptions){
-        if(nameCache.contains(pkg)){
+    public static String printNamespace(String pkg, String... validNameExceptions) {
+        if (nameCache.contains(pkg)) {
             return nameCache.get(pkg);
         }
-        if(pkg.equals("")){
+        if (pkg.isEmpty()) {
             nameCache.put(pkg, pkg);
             return pkg;
         }
@@ -293,18 +294,17 @@ public class Deobfuscation {
         } else {
             parts = new String[]{pkg};
         }
-        String ret="";
-        for(int i=0;i<parts.length;i++){
-            if(i>0){
-                ret+=".";
+        String ret = "";
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                ret += ".";
             }
             ret += printIdentifier(parts[i], validNameExceptions);
         }
         nameCache.put(pkg, ret);
         return ret;
     }
-    
-    
+
     public static String escapeOIdentifier(String s) {
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {

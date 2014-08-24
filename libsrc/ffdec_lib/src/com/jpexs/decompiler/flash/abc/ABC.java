@@ -694,7 +694,7 @@ public class ABC {
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(),true))) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(), true))) {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
