@@ -1091,8 +1091,13 @@ public class SWFInputStream implements AutoCloseable {
                 Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags));
                 futureResults.add(future);
             } else {
-                Future<Tag> future = new ImmediateFuture(tag);
+                Future<Tag> future = new ImmediateFuture<Tag>(tag);
                 futureResults.add(future);
+                if (!(tag instanceof TagStub)) {
+                    if (di != null) {
+                        di.name = tag.getName();
+                    }
+                }
             }
 
             if (tag.getId() == EndTag.ID) {
