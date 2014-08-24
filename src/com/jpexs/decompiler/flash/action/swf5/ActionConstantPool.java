@@ -79,14 +79,12 @@ public class ActionConstantPool extends Action {
 
     @Override
     public String toString() {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
+        ret.append("ConstantPool");
         for (int i = 0; i < constantPool.size(); i++) {
-            if (i > 0) {
-                ret += " ";
-            }
-            ret += "\"" + Helper.escapeString(constantPool.get(i)) + "\"";
+            ret.append("\"").append(Helper.escapeString(constantPool.get(i))).append("\"");
         }
-        return "ConstantPool " + ret;
+        return ret.toString();
     }
 
     @Override

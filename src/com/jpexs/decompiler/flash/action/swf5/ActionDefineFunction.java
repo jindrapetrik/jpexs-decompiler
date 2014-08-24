@@ -46,7 +46,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public int codeSize;
     private int version;
     public List<String> constantPool;
-    private long hdrSize;
 
     public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, int version) {
         super(0x9B, 0);
@@ -59,21 +58,12 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x9B, actionLength);
         this.version = version;
-        //byte[] data=sis.readBytes(actionLength);
-        //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
-        long startPos = sis.getPos();
         functionName = sis.readString("functionName");
         int numParams = sis.readUI16("numParams");
         for (int i = 0; i < numParams; i++) {
             paramNames.add(sis.readString("paramName"));
         }
         codeSize = sis.readUI16("codeSize");
-        long endPos = sis.getPos();
-        //code = new ArrayList<Action>();
-        hdrSize = endPos - startPos;
-        //int posBef2 = (int) rri.getPos();
-        //code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
-        //rri.setPos(posBef2 + codeSize);
     }
 
     public ActionDefineFunction(FlasmLexer lexer) throws IOException, ParseException {
@@ -88,22 +78,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public long getHeaderSize() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            for (String s : paramNames) {
-                sos.writeString(s);
-            }
-            sos.writeUI16(0);
-            sos.close();
-
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-        }
-        return baos2.toByteArray().length;
+        return getBytes(version).length;
     }
 
     @Override
@@ -117,32 +92,13 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             for (String s : paramNames) {
                 sos.writeString(s);
             }
-            //byte[] codeBytes = Action.actionsToBytes(code, false, version);
-            sos.writeUI16(codeSize); //codeBytes.length);
+            sos.writeUI16(codeSize);
             sos.close();
 
             baos2.write(surroundWithAction(baos.toByteArray(), version));
-            //baos2.write(codeBytes);
         } catch (IOException e) {
         }
         return baos2.toByteArray();
-    }
-
-    private long getPreLen(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            for (String s : paramNames) {
-                sos.writeString(s);
-            }
-            sos.writeUI16(0);
-            sos.close();
-        } catch (IOException e) {
-        }
-
-        return surroundWithAction(baos.toByteArray(), version).length;
     }
 
     @Override

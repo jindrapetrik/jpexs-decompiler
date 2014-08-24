@@ -41,12 +41,13 @@ public class ActionGetProperty extends Action {
         GraphTargetItem target = stack.pop();
         int indexInt = 0;
         if (index instanceof DirectValueActionItem) {
-            if (((DirectValueActionItem) index).value instanceof Long) {
-                indexInt = (int) (long) (Long) ((DirectValueActionItem) index).value;
-            } else if (((DirectValueActionItem) index).value instanceof Double) {
-                indexInt = (int) Math.round((Double) ((DirectValueActionItem) index).value);
-            } else if (((DirectValueActionItem) index).value instanceof Float) {
-                indexInt = (int) Math.round((Float) ((DirectValueActionItem) index).value);
+            Object value = ((DirectValueActionItem) index).value; 
+            if (value instanceof Long) {
+                indexInt = (int) (long) (Long) value;
+            } else if (value instanceof Double) {
+                indexInt = (int) Math.round((Double) value);
+            } else if (value instanceof Float) {
+                indexInt = (int) Math.round((Float) value);
             }
         }
         stack.push(new GetPropertyActionItem(this, target, indexInt));

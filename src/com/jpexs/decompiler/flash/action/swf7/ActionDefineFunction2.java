@@ -55,10 +55,8 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public boolean preloadGlobalFlag;
     public int registerCount;
     public int codeSize;
-    //public List<Action> code;
     private int version;
     public List<String> constantPool;
-    private long hdrSize;
 
     public ActionDefineFunction2(String functionName, boolean preloadParentFlag, boolean preloadRootFlag, boolean suppressSuperFlag, boolean preloadSuperFlag, boolean suppressArgumentsFlag, boolean preloadArgumentsFlag, boolean suppressThisFlag, boolean preloadThisFlag, boolean preloadGlobalFlag, int registerCount, int codeSize, int version, List<String> paramNames, List<Integer> paramRegisters) {
         super(0x8E, 0);
@@ -81,7 +79,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8E, actionLength);
-        long posBef = sis.getPos();
         this.version = version;
         functionName = sis.readString("functionName");
         int numParams = sis.readUI16("numParams");
@@ -101,12 +98,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             paramNames.add(sis.readString("paramName"));
         }
         codeSize = sis.readUI16("codeSize");
-        long posAfter = sis.getPos();
-        hdrSize = posAfter - posBef;
-        //code = new ArrayList<Action>();
-        //int posBef2 = (int) rri.getPos();
-        //code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
-        //rri.setPos(posBef2 + codeSize);
     }
 
     public ActionDefineFunction2(FlasmLexer lexer) throws IOException, ParseException {
@@ -132,34 +123,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public long getHeaderSize() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            sos.writeUI8(registerCount);
-            sos.writeUB(1, preloadParentFlag ? 1 : 0);
-            sos.writeUB(1, preloadRootFlag ? 1 : 0);
-            sos.writeUB(1, suppressSuperFlag ? 1 : 0);
-            sos.writeUB(1, preloadSuperFlag ? 1 : 0);
-            sos.writeUB(1, suppressArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, suppressThisFlag ? 1 : 0);
-            sos.writeUB(1, preloadThisFlag ? 1 : 0);
-            sos.writeUB(7, reserved);
-            sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
-            for (int i = 0; i < paramNames.size(); i++) {
-                sos.writeUI8(paramRegisters.get(i));
-
-                sos.writeString(paramNames.get(i));
-            }
-            sos.writeUI16(0);
-            sos.close();
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-        }
-        return baos2.toByteArray().length;
+        return getBytes(version).length;
     }
 
     @Override
@@ -179,50 +143,19 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
             sos.writeUB(1, suppressThisFlag ? 1 : 0);
             sos.writeUB(1, preloadThisFlag ? 1 : 0);
-            sos.writeUB(7, 0);
+            sos.writeUB(7, reserved);
             sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
             for (int i = 0; i < paramNames.size(); i++) {
                 sos.writeUI8(paramRegisters.get(i));
                 sos.writeString(paramNames.get(i));
             }
-            //byte[] codeBytes = Action.actionsToBytes(code, false, version);
-            sos.writeUI16(codeSize);//codeBytes.length);
+            sos.writeUI16(codeSize);
             sos.close();
 
             baos2.write(surroundWithAction(baos.toByteArray(), version));
-            //baos2.write(codeBytes);
         } catch (IOException e) {
         }
         return baos2.toByteArray();
-    }
-
-    private long getPreLen(int version) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            sos.writeUI8(registerCount);
-            sos.writeUB(1, preloadParentFlag ? 1 : 0);
-            sos.writeUB(1, preloadRootFlag ? 1 : 0);
-            sos.writeUB(1, suppressSuperFlag ? 1 : 0);
-            sos.writeUB(1, preloadSuperFlag ? 1 : 0);
-            sos.writeUB(1, suppressArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, suppressThisFlag ? 1 : 0);
-            sos.writeUB(1, preloadThisFlag ? 1 : 0);
-            sos.writeUB(7, 0);
-            sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
-            for (int i = 0; i < paramNames.size(); i++) {
-                sos.writeUI8(paramRegisters.get(i));
-                sos.writeString(paramNames.get(i));
-            }
-            sos.writeUI16(0);
-            sos.close();
-        } catch (IOException e) {
-        }
-        return surroundWithAction(baos.toByteArray(), version).length;
     }
 
     @Override

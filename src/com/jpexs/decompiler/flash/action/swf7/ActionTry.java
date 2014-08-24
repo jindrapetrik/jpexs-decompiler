@@ -149,44 +149,23 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
-        String ret = "";
-        ret += "Try ";
+        StringBuilder ret = new StringBuilder();
+        ret.append("Try ");
         if (catchBlockFlag) {
             if (catchInRegisterFlag) {
-                ret += "register" + catchRegister;
+                ret.append("register").append(catchRegister);
             } else {
-                ret += "\"" + Helper.escapeString(catchName) + "\"";
+                ret.append("\"").append(Helper.escapeString(catchName)).append("\"");
             }
-            ret += " ";
+            ret.append(" ");
         }
-        ret += "{";
-        return ret;
+        ret.append("{");
+        return ret.toString();
     }
 
     @Override
     public long getHeaderSize() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUB(5, reserved);
-            sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
-            sos.writeUB(1, finallyBlockFlag ? 1 : 0);
-            sos.writeUB(1, catchBlockFlag ? 1 : 0);
-            sos.writeUI16((int) trySize);
-            sos.writeUI16((int) catchSize);
-            sos.writeUI16((int) finallySize);
-            if (catchInRegisterFlag) {
-                sos.writeUI8(catchRegister);
-            } else {
-                sos.writeString(catchName == null ? "" : catchName);
-            }
-            /*sos.write(tryBodyBytes);
-             sos.write(catchBodyBytes);
-             sos.write(finallyBodyBytes);*/
-            sos.close();
-        } catch (IOException e) {
-        }
-        return surroundWithAction(baos.toByteArray(), version).length;
+        return getBytes(version).length;
     }
 
     public long getTrySize() {

@@ -66,7 +66,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-            sos.writeUI16(codeSize);//codeBytes.length);
+            sos.writeUI16(codeSize);
             sos.close();
             baos2.write(surroundWithAction(baos.toByteArray(), version));
         } catch (IOException e) {
