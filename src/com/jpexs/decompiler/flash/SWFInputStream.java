@@ -723,7 +723,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param count Number of bytes to skip
      * @throws IOException
      */
-    public void skipBytes(int count) throws IOException {
+    public void skipBytes(long count) throws IOException {
         try {
             bitPos = 0;
             for (int i = 0; i < count; i++) {
@@ -1446,7 +1446,7 @@ public class SWFInputStream implements AutoCloseable {
         }
 
         ByteArrayRange dataRange = new ByteArrayRange(swf.uncompressedData, (int) pos, (int) (tagLength + headerLength));
-        skipBytes((int) tagLength);
+        skipBytes(tagLength);
 
         TagStub tagStub = new TagStub(swf, tagID, "Unresolved", dataRange, tagDataStream);
         tagStub.forceWriteAsLong = readLong;
@@ -3296,7 +3296,7 @@ public class SWFInputStream implements AutoCloseable {
 
     public MemoryInputStream getBaseStream() throws IOException {
         int pos = (int) is.getPos();
-        return new MemoryInputStream(is.getAllRead(), pos, pos + is.available());
+        return new MemoryInputStream(is.getAllRead(), pos, is.available());
     }
 
     public SWFInputStream getLimitedStream(int limit) throws IOException {
