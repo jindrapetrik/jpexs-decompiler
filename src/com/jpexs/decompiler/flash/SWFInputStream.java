@@ -1010,6 +1010,9 @@ public class SWFInputStream implements AutoCloseable {
             executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             futureResults = new ArrayList<>();
         }
+        int tagCnt = 0;
+        int faPos = 0;
+        FileAttributesTag fileAttributes = null;
         List<Tag> tags = new ArrayList<>();
         Tag tag;
         boolean isAS3 = false;
@@ -1021,6 +1024,7 @@ public class SWFInputStream implements AutoCloseable {
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
+            tagCnt++;
             DumpInfo di = dumpInfo;
             if (di != null && tag != null) {
                 di.name = tag.getName();
@@ -1044,11 +1048,11 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        Tag ft = tag;
-                        if (ft instanceof TagStub) {
-                            ft = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
+                        faPos = tagCnt-1; //should be 0, as it is first tag, but anyway
+                        if (tag instanceof TagStub) {
+                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
                         }
-                        FileAttributesTag fileAttributes = (FileAttributesTag) ft;
+                        fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -1111,6 +1115,10 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             executor.shutdown();
+        }
+        //Workaround to not reading fileattributes twice. TODO:Handle this better
+        if(parallel && fileAttributes!=null){
+            tags.add(faPos,fileAttributes);
         }
         return tags;
     }
