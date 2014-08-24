@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.helpers.MemoryInputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -160,5 +162,24 @@ public class GFxInputStream {
 
     void read(byte[] bytes) throws IOException {
         is.read(bytes);
+    }
+
+    /**
+     * Reads one string value from the stream
+     *
+     * @param name
+     * @return String value
+     * @throws IOException
+     */
+    public String readString() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int r;
+        while (true) {
+            r = readUI8();
+            if (r == 0) {
+                return new String(baos.toByteArray(), Utf8Helper.charset);
+            }
+            baos.write(r);
+        }
     }
 }

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
 import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -101,13 +102,19 @@ public class FontTextureInfo extends Tag {
         nominalGlyphSz = sis.readUI16("nominalGlyphSz");
         int numTexGlyphs = sis.readUI16("numTexGlyphs");
         texGlyphs = new TEXGLYPH[numTexGlyphs];
+        MemoryInputStream mis = sis.getBaseStream();
         for (int i = 0; i < numTexGlyphs; i++) {
-            texGlyphs[i] = new TEXGLYPH(new GFxInputStream(sis.getBaseStream()));
+            texGlyphs[i] = new TEXGLYPH(new GFxInputStream(mis));
         }
+        // todo: honfika: add GFx data to dump view
+        sis.skipBytes(mis.getPos());
         int numFonts = sis.readUI16("numFonts");
         fonts = new FONTINFO[numFonts];
+        mis = sis.getBaseStream();
         for (int i = 0; i < numFonts; i++) {
             fonts[i] = new FONTINFO(new GFxInputStream(sis.getBaseStream()));
         }
+        // todo: honfika: add GFx data to dump view
+        sis.skipBytes(mis.getPos());
     }
 }
