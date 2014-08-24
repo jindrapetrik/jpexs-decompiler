@@ -65,7 +65,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames,false));
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
     }
 
     @Override

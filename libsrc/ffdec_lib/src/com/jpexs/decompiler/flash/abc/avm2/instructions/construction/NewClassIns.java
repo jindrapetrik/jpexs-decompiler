@@ -45,7 +45,7 @@ public class NewClassIns extends InstructionDefinition {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         stack.pop().toString(writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
         String baseType = writer.toString();
-        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(constants, fullyQualifiedNames,false) + ".class extends " + baseType));
+        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(constants, fullyQualifiedNames, false) + ".class extends " + baseType));
     }
 
     @Override

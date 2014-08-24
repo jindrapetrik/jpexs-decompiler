@@ -163,7 +163,6 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         }
     }
 
-
     public void showQuickFind(final JTextComponent t, DocumentSearchData ds) {
         dsd = new WeakReference<>(ds);
         oldCaretPosition = t.getCaretPosition();

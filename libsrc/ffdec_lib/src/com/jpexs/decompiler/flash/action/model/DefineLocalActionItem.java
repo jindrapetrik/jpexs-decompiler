@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -74,8 +75,8 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("var ");
-                
-        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!Deobfuscation.isValidName(((DirectValueActionItem) name).toStringNoQuotes(localData),"this","super"))){
+
+        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!Deobfuscation.isValidName(((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
             writer.append(Deobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
         } else {
             stripQuotes(name, localData, writer);

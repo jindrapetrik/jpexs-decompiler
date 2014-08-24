@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -1090,7 +1091,7 @@ public class SWFInputStream implements AutoCloseable {
                 Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags));
                 futureResults.add(future);
             } else {
-                Future<Tag> future = new ImmediateFuture<Tag>(tag);
+                Future<Tag> future = new ImmediateFuture<>(tag);
                 futureResults.add(future);
                 if (!(tag instanceof TagStub)) {
                     if (di != null) {

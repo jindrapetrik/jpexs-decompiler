@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import java.util.concurrent.ExecutionException;
@@ -28,11 +29,11 @@ import java.util.concurrent.TimeoutException;
 public class ImmediateFuture<V> implements Future<V> {
 
     private final V value;
-    
+
     public ImmediateFuture(V value) {
         this.value = value;
     }
-    
+
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         return false;

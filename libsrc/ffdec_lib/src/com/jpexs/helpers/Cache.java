@@ -90,14 +90,14 @@ public class Cache<E> {
     }
 
     public boolean contains(Object key) {
-        if (storageType == STORAGE_FILES) {          
+        if (storageType == STORAGE_FILES) {
             return cacheFiles.containsKey(key);
         } else if (storageType == STORAGE_MEMORY) {
             return cacheMemory.containsKey(key);
         }
         return false;
     }
-    
+
     public void clear() {
         cacheMemory.clear();
         for (File f : cacheFiles.values()) {

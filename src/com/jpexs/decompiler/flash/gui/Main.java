@@ -878,7 +878,7 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        
+
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
             try {

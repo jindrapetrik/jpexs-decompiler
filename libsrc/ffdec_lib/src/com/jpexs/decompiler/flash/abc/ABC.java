@@ -300,7 +300,7 @@ public class ABC {
                     int mIndex = body.code.code.get(ip).operands[0];
                     if (mIndex > 0) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(constants,true).equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(constants, true).equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.code.code.get(ip - 1).operands[0];
@@ -698,7 +698,7 @@ public class ABC {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(),true))) {
+                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(), true))) {
                             for (MethodBody body : bodies) {
                                 if (body.method_info == t2.method_info) {
                                     return body;
@@ -711,11 +711,11 @@ public class ABC {
             }
         }
         for (int i = 0; i < class_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(),true))) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(), true))) {
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(),true))) {
+                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(), true))) {
                             for (MethodBody body : bodies) {
                                 if (body.method_info == t2.method_info) {
                                     return body;
@@ -794,7 +794,7 @@ public class ABC {
                     TraitSlotConst s = ((TraitSlotConst) t);
                     if (s.isNamespace()) {
                         String key = constants.getNamespace(s.value_index).getName(constants); //assume not null
-                        String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants,true);
+                        String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
                         namespaceMap.put(key, val);
                     }
                 }
@@ -955,7 +955,7 @@ public class ABC {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, new ArrayList<String>(),true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, new ArrayList<String>(), true).equals(methodName)) {
                         return ((TraitMethodGetterSetter) t).method_info;
                     }
                 }
@@ -968,7 +968,7 @@ public class ABC {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, new ArrayList<String>(),true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, new ArrayList<String>(), true).equals(methodName)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
                     }
                 }
@@ -984,7 +984,7 @@ public class ABC {
 
     public int findClassByName(String name) {
         for (int c = 0; c < instance_info.size(); c++) {
-            String s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants,true);
+            String s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants, true);
             if (name.equals(s)) {
                 return c;
             }

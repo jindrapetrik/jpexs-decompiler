@@ -96,7 +96,7 @@ public class ConstructIns extends InstructionDefinition {
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isXML = glt.propertyName.getName(constants, fullyQualifiedNames,true).equals("XML");
+            isXML = glt.propertyName.getName(constants, fullyQualifiedNames, true).equals("XML");
         }
 
         if (isXML) {

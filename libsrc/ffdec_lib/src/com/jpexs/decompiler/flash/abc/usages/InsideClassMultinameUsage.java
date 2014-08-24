@@ -37,7 +37,7 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants,false);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, false);
     }
 
     public int getMultinameIndex() {

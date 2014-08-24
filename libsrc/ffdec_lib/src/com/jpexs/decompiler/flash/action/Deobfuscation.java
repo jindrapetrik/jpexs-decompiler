@@ -251,7 +251,7 @@ public class Deobfuscation {
     }
     
     public static String makeObfuscatedIdentifier(String s){
-        return "\u00A7"+escapeOIdentifier(s)+"\u00A7";
+        return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
     
     

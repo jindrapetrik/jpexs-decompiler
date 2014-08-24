@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import org.testng.annotations.Test;
 
 /**
@@ -26,5 +27,5 @@ public class SampleTest {
     public void testDecompilePcode() {
         System.out.println("Hello, this is a test");
     }
-   
+
 }

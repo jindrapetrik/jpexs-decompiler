@@ -34,39 +34,38 @@ import java.util.regex.Pattern;
 public class LicenseUpdater {
 
     public static void updateLicense() {
-        updateLicenseInDir(new File(".\\src\\"),false);
-        updateLicenseInDir(new File(".\\test\\"),false);
-        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\src\\"),true);
-        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\test\\"),true);
+        updateLicenseInDir(new File(".\\src\\"), false);
+        updateLicenseInDir(new File(".\\test\\"), false);
+        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\src\\"), true);
+        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\test\\"), true);
     }
 
     /**
      * Script for updating license header in java files :-)
      *
      * @param dir Star directory (e.g. "src/")
+     * @param lgpl
      */
     public static void updateLicenseInDir(File dir, boolean lgpl) {
-        
-        
+
         /*
-        Copyright (c) ${year}, ${owner}, All rights reserved.
+         Copyright (c) ${year}, ${owner}, All rights reserved.
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 3.0 of the License, or (at your option) any later version.
+         This library is free software; you can redistribute it and/or
+         modify it under the terms of the GNU Lesser General Public
+         License as published by the Free Software Foundation; either
+         version 3.0 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+         This library is distributed in the hope that it will be useful,
+         but WITHOUT ANY WARRANTY; without even the implied warranty of
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+         Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library.
+         You should have received a copy of the GNU Lesser General Public
+         License along with this library.
         
         
-        */
-        
+         */
         int defaultStartYear = 2010;
         int defaultFinalYear = 2014;
         String defaultAuthor = "JPEXS";
@@ -75,28 +74,27 @@ License along with this library.
             defaultYearStr += "-" + defaultFinalYear;
         }
         String gplLicense = "/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */";
-        
-        
+
         String lgplLicense = "/*\r\n *  Copyright (C) {year} {author}, All rights reserved.\r\n * \r\n"
-                + " * This library is free software; you can redistribute it and/or\r\n" +
-" * modify it under the terms of the GNU Lesser General Public\r\n" +
-" * License as published by the Free Software Foundation; either\r\n" +
-" * version 3.0 of the License, or (at your option) any later version.\r\n" +
-" * \r\n" +
-" * This library is distributed in the hope that it will be useful,\r\n" +
-" * but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n" +
-" * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\r\n" +
-" * Lesser General Public License for more details.\r\n" +
-" * \r\n" +
-" * You should have received a copy of the GNU Lesser General Public\r\n" +
-" * License along with this library.\r"+
-" */";
-        String license = lgpl?lgplLicense:gplLicense;
+                + " * This library is free software; you can redistribute it and/or\r\n"
+                + " * modify it under the terms of the GNU Lesser General Public\r\n"
+                + " * License as published by the Free Software Foundation; either\r\n"
+                + " * version 3.0 of the License, or (at your option) any later version.\r\n"
+                + " * \r\n"
+                + " * This library is distributed in the hope that it will be useful,\r\n"
+                + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n"
+                + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\r\n"
+                + " * Lesser General Public License for more details.\r\n"
+                + " * \r\n"
+                + " * You should have received a copy of the GNU Lesser General Public\r\n"
+                + " * License along with this library.\r"
+                + " */";
+        String license = lgpl ? lgplLicense : gplLicense;
 
         File[] files = dir.listFiles();
         for (File f : files) {
             if (f.isDirectory()) {
-                updateLicenseInDir(f,lgpl);
+                updateLicenseInDir(f, lgpl);
             } else {
                 if (f.getName().endsWith(".java")) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -113,7 +111,7 @@ License along with this library.
                                         packageFound = true;
                                         pw.println(license.replace("{year}", yearStr).replace("{author}", author));
                                     } else {
-                                        Matcher mAuthor = Pattern.compile(lgpl?"^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*), All rights reserved.*":"^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
+                                        Matcher mAuthor = Pattern.compile(lgpl ? "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*), All rights reserved.*" : "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
                                         if (mAuthor.matches()) {
                                             author = mAuthor.group(3).trim();
                                             int startYear = Integer.parseInt(mAuthor.group(1).trim());

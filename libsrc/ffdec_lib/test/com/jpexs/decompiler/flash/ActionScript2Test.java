@@ -17,7 +17,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-//import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -90,7 +89,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     @Test
     public void frame24_unicodeTest() {
         compareSrc(24, "trace(\"unicodeTest\");\r\n"
-                + "var k = \"×”×™×¤×•×¤×•×�×ž×™, ×�×• ×�\";\r\n"
+                + "var k = \"היפופוטמי, או א\";\r\n"
                 + "trace(k);\r\n"
         );
     }

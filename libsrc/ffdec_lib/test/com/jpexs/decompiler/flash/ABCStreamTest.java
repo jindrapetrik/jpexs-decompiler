@@ -17,7 +17,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
-////import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
