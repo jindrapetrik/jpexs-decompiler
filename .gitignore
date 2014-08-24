@@ -24,3 +24,11 @@ hs_err_pid*.log
 /revision.txt
 /libsrc/gnujpdf/dist/
 /libsrc/jsyntaxpane/jsyntaxpane/target/
+/libsrc/ffdec_lib/build/
+/libsrc/ffdec_lib/nbproject/private/
+/libsrc/ffdec_lib/javadoc/
+/libsrc/ffdec_lib/coverage/
+/libsrc/ffdec_lib/dist/
+/libsrc/ffdec_lib/testdata/decompile/
+/libsrc/ffdec_lib/testdata/recompile/
+/libsrc/ffdec_lib/revision.txt
