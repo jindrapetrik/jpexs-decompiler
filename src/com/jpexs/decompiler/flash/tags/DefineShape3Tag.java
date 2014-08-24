@@ -94,6 +94,7 @@ public class DefineShape3Tag extends ShapeTag {
             sos.writeRECT(shapeBounds);
             sos.writeSHAPEWITHSTYLE(shapes, 3);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

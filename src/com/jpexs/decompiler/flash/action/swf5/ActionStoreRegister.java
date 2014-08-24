@@ -66,6 +66,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             sos.writeUI8(registerNumber);
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

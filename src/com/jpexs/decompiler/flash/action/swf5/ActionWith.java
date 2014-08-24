@@ -70,6 +70,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
             sos.close();
             baos2.write(surroundWithAction(baos.toByteArray(), version));
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos2.toByteArray();
     }

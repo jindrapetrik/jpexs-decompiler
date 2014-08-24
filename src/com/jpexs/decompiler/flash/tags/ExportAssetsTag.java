@@ -90,6 +90,7 @@ public class ExportAssetsTag extends Tag {
                 sos.writeString(names.get(i));
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

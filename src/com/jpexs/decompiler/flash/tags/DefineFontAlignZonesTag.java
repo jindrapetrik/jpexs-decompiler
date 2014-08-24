@@ -73,6 +73,7 @@ public class DefineFontAlignZonesTag extends Tag {
                 sos.writeZONERECORD(z);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

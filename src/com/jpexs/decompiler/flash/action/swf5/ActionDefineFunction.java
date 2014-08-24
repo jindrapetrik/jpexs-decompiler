@@ -97,6 +97,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
             baos2.write(surroundWithAction(baos.toByteArray(), version));
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos2.toByteArray();
     }

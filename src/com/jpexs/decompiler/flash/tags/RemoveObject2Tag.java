@@ -50,6 +50,7 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
         try {
             sos.writeUI16(depth);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

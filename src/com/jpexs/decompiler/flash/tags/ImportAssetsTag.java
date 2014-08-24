@@ -88,6 +88,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
                 sos.writeString(names.get(i));
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

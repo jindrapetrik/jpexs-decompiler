@@ -78,6 +78,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
                 ft.write(new GFxOutputStream(sos));
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

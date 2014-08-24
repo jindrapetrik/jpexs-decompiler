@@ -60,6 +60,7 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
             sos.writeUI16(characterId);
             sos.writeUI16(depth);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

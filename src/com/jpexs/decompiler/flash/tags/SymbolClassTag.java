@@ -66,6 +66,7 @@ public class SymbolClassTag extends Tag {
                 sos.writeString(names[ii]);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

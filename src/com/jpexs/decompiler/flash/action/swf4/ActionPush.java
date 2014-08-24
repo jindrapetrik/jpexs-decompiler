@@ -178,7 +178,7 @@ public class ActionPush extends Action {
             }
             sos.close();
         } catch (IOException e) {
-            Logger.getLogger(ActionPush.class.getName()).log(Level.SEVERE, "Error during push to bytes", e);
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

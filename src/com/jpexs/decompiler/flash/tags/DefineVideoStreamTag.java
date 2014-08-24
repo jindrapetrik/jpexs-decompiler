@@ -93,6 +93,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
             sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
             sos.writeUI8(codecID);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

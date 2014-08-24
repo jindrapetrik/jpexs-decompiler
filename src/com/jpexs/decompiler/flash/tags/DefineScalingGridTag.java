@@ -56,6 +56,7 @@ public class DefineScalingGridTag extends Tag {
             sos.writeUI16(characterId);
             sos.writeRECT(splitter);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

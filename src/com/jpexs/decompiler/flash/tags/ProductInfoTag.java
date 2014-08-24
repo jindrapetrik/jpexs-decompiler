@@ -88,6 +88,7 @@ public class ProductInfoTag extends Tag {
             sos.writeUI32(compilationDateLow);
             sos.writeUI32(compilationDateHigh);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

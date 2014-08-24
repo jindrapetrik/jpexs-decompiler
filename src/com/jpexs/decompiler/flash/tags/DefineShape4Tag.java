@@ -112,6 +112,7 @@ public class DefineShape4Tag extends ShapeTag {
             sos.writeUB(1, usesScalingStrokes ? 1 : 0);
             sos.writeSHAPEWITHSTYLE(shapes, 4);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

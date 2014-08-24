@@ -93,6 +93,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
                 sos.writeCXFORM(colorTransform);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

@@ -46,6 +46,7 @@ public class SetBackgroundColorTag extends Tag {
         try {
             sos.writeRGB(backgroundColor);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

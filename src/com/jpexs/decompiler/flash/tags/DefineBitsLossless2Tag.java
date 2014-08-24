@@ -171,6 +171,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             }
             sos.write(zlibBitmapData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

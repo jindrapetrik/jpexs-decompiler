@@ -59,6 +59,7 @@ public class ActionSetTarget extends Action {
             sos.writeString(targetName);
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

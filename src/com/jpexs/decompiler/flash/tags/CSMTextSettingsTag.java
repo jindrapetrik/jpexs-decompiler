@@ -77,6 +77,7 @@ public class CSMTextSettingsTag extends Tag {
             sos.writeFLOAT(sharpness); //F32 = FLOAT
             sos.writeUI8(reserved2);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

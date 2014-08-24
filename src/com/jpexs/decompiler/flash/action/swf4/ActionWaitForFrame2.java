@@ -106,6 +106,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
             sos.writeUI8(skipCount);
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

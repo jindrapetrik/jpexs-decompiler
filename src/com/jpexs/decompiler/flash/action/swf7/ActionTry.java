@@ -101,6 +101,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             }
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

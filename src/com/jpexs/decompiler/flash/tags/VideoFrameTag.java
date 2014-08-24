@@ -54,6 +54,7 @@ public class VideoFrameTag extends Tag {
             sos.writeUI16(frameNum);
             sos.write(videoData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

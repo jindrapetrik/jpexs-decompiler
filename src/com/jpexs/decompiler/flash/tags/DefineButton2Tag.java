@@ -147,7 +147,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
             sos.writeBUTTONCONDACTIONList(actions);
             sos.close();
         } catch (IOException e) {
-            Logger.getLogger(DefineButton2Tag.class.getName()).log(Level.SEVERE, null, e);
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

@@ -73,6 +73,7 @@ public class ActionConstantPool extends Action {
             }
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

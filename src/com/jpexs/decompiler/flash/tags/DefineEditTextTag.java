@@ -690,6 +690,7 @@ public class DefineEditTextTag extends TextTag {
             }
 
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

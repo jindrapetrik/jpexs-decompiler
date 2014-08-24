@@ -132,6 +132,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             sos.write(imageData);
             sos.writeBytesZlib(bitmapAlphaData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

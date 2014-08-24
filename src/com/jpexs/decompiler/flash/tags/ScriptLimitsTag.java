@@ -55,6 +55,7 @@ public class ScriptLimitsTag extends Tag {
             sos.writeUI16(maxRecursionDepth);
             sos.writeUI16(scriptTimeoutSeconds);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

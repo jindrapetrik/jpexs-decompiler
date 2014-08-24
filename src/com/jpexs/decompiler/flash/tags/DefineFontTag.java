@@ -129,6 +129,7 @@ public class DefineFontTag extends FontTag {
             }
             sos.write(baos2.toByteArray());
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

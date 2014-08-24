@@ -56,6 +56,7 @@ public class ActionGotoFrame extends Action {
             sos.writeUI16(frame);
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }

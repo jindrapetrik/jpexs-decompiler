@@ -347,6 +347,7 @@ public class Action implements GraphSourceItem {
             sos2.write(data);
             sos2.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos2.toByteArray();
     }

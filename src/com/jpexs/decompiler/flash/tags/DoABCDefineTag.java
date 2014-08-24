@@ -102,8 +102,8 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
             }
             return bos.toByteArray();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
-        return new byte[0];
     }
 
     @Override

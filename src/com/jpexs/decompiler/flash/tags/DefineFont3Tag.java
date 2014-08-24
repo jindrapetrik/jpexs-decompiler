@@ -264,6 +264,7 @@ public class DefineFont3Tag extends FontTag {
             }
 
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

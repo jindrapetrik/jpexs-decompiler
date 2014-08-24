@@ -459,6 +459,7 @@ public class DefineText2Tag extends TextTag {
             }
             sos.writeUI8(0);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

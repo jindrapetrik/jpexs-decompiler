@@ -299,6 +299,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
                 sos.writeSI32(tagLength);
             }
         } catch (IOException iex) {
+            throw new Error("This should never happen.", iex);
         }
         return baos.toByteArray();
     }
@@ -313,6 +314,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
                 sos.writeSI32(tagLength);
             }
         } catch (IOException iex) {
+            throw new Error("This should never happen.", iex);
         }
         return baos.toByteArray();
     }

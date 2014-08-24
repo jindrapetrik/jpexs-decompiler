@@ -57,6 +57,7 @@ public class DefineSubImage extends Tag {
             sos.writeUI16(x2);
             sos.writeUI16(y2);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

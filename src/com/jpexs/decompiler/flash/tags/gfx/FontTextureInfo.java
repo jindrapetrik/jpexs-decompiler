@@ -79,6 +79,7 @@ public class FontTextureInfo extends Tag {
                 fonts[i].write(new GFxOutputStream(sos));
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

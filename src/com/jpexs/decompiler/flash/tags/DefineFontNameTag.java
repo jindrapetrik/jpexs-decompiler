@@ -55,6 +55,7 @@ public class DefineFontNameTag extends Tag {
             sos.writeString(fontName);
             sos.writeString(fontCopyright);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

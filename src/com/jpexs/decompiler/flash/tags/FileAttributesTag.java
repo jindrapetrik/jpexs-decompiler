@@ -85,6 +85,7 @@ public class FileAttributesTag extends Tag {
             sos.writeUB(1, useNetwork ? 1 : 0);
             sos.writeUB(24, reserved3); //reserved
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

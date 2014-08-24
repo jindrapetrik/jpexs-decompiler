@@ -50,6 +50,7 @@ public class DefineGradientMap extends Tag {
                 sos.writeUI16(indices[i]);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

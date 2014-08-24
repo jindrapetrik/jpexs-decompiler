@@ -123,6 +123,7 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
                 sos.writeSI16(latencySeek);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

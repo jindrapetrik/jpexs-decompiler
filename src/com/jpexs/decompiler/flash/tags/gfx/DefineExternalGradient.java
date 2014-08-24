@@ -58,6 +58,7 @@ public class DefineExternalGradient extends Tag {
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

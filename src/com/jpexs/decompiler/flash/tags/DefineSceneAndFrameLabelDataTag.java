@@ -71,6 +71,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
                 sos.writeString(frameNames[i]);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

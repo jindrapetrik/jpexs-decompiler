@@ -57,6 +57,7 @@ public class EnableDebugger2Tag extends Tag {
             sos.writeString(passwordHash);
 
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

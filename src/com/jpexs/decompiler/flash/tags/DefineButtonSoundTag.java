@@ -92,6 +92,7 @@ public class DefineButtonSoundTag extends CharacterIdTag {
                 sos.writeSOUNDINFO(buttonSoundInfo3);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

@@ -82,6 +82,7 @@ public class DefineFontInfoTag extends Tag {
                 }
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

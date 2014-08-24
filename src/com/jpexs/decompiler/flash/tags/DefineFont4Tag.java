@@ -77,6 +77,7 @@ public class DefineFont4Tag extends CharacterTag {
             sos.writeString(fontName);
             sos.write(fontData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

@@ -52,6 +52,7 @@ public class StartSoundTag extends Tag {
             sos.writeUI16(soundId);
             sos.writeSOUNDINFO(soundInfo);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

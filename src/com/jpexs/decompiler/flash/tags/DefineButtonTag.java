@@ -129,6 +129,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             //sos.write(Action.actionsToBytes(actions, true, version));
             sos.close();
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

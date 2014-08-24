@@ -52,6 +52,7 @@ public class DefineButtonCxformTag extends Tag {
             sos.writeUI16(buttonId);
             sos.writeCXFORM(buttonColorTransform);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

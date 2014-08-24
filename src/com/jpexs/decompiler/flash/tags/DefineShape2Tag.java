@@ -94,6 +94,7 @@ public class DefineShape2Tag extends ShapeTag {
             sos.writeRECT(shapeBounds);
             sos.writeSHAPEWITHSTYLE(shapes, 2);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

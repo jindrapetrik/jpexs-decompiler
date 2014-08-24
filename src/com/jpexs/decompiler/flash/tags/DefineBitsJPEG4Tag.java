@@ -126,6 +126,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             sos.write(imageData);
             sos.write(bitmapAlphaData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

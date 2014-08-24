@@ -58,6 +58,7 @@ public class SetTabIndexTag extends Tag {
             sos.writeUI16(depth);
             sos.writeUI16(tabIndex);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

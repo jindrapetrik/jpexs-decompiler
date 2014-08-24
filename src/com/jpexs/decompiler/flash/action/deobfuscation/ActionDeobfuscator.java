@@ -97,9 +97,17 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 if (!actions.getReferencesFor(action2).hasNext()) {
                     ActionPush push = (ActionPush) action;
                     ActionPush push2 = (ActionPush) action2;
-                    push.values.addAll(push2.values);
-                    actions.remove(i + 1);
-                    i--;
+                    if (!(push.constantPool != null && push2.constantPool != null && push.constantPool != push.constantPool)) {
+                        ActionPush newPush = new ActionPush(0);
+                        newPush.constantPool = push.constantPool == null ? push2.constantPool : push.constantPool;
+                        newPush.values.clear();
+                        newPush.values.addAll(push.values);
+                        newPush.values.addAll(push2.values);
+                        actions.addAction(i + 1, newPush);
+                        actions.removeAction(i + 2);
+                        actions.removeAction(i);
+                        i--;
+                    }
                 }
             }
         }

@@ -96,6 +96,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             sos.writeUI16(characterID);
             sos.write(imageData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

@@ -48,6 +48,7 @@ public class JPEGTablesTag extends Tag {
         try {
             sos.write(jpegData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

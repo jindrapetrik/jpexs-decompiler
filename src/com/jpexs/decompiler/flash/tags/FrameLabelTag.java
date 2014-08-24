@@ -63,6 +63,7 @@ public class FrameLabelTag extends Tag {
                 sos.writeUI8(1);
             }
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

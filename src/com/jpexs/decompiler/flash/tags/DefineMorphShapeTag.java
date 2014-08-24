@@ -120,6 +120,7 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
             sos.writeSHAPE(endEdges, 1);
 
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

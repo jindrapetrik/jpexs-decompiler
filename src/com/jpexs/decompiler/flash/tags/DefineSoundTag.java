@@ -89,6 +89,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
             sos.write(soundData);
 
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

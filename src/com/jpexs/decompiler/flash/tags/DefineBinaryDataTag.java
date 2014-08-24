@@ -55,6 +55,7 @@ public class DefineBinaryDataTag extends CharacterTag {
             sos.writeUI32(reserved);
             sos.write(binaryData);
         } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }

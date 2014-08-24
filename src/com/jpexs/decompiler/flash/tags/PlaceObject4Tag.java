@@ -292,7 +292,8 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
                 sos.writeCLIPACTIONS(clipActions);
             }
             sos.close();
-        } catch (IOException ex) {
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
     }
