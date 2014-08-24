@@ -73,12 +73,12 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (((name instanceof DirectValueActionItem) && ((DirectValueActionItem) name).isString() && Deobfuscation.isValidName(((DirectValueActionItem) name).toStringNoQuotes(localData))) || name instanceof VariableActionItem) {
-            stripQuotes(name, localData, writer);
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {               
+        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!Deobfuscation.isValidName(((DirectValueActionItem) name).toStringNoQuotes(localData),"this","super"))){
+            writer.append(Deobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
             writer.append(" = ");
             return value.toString(writer, localData);
-        } else {
+        }else if ((!(name instanceof DirectValueActionItem)) || (!((DirectValueActionItem) name).isString())) {
             writer.append("set");
             writer.spaceBeforeCallParenthesies(2);
             writer.append("(");
@@ -87,6 +87,9 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
             value.toString(writer, localData);
             return writer.append(")");
         }
+        stripQuotes(name, localData, writer);
+        writer.append(" = ");
+        return value.toString(writer, localData);
     }
 
     @Override

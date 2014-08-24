@@ -84,16 +84,14 @@ public class FunctionActionItem extends ActionItem {
             writer.append(" ");
             String fname = calculatedFunctionName.toStringNoQuotes(localData);
             if (!Deobfuscation.isValidName(fname)) {
-                calculatedFunctionName.appendTo(writer, localData); //Use quotes
+                writer.append(Deobfuscation.makeObfuscatedIdentifier(fname));
             } else {
                 calculatedFunctionName.appendToNoQuotes(writer, localData);
             }
         } else if (!functionName.isEmpty()) {
             writer.append(" ");
             if (!Deobfuscation.isValidName(functionName)) {
-                writer.append("\"");
-                writer.append(Helper.escapeString(functionName));
-                writer.append("\"");
+                writer.append(Deobfuscation.makeObfuscatedIdentifier(functionName));
             } else {
                 writer.append(functionName);
             }
@@ -110,9 +108,7 @@ public class FunctionActionItem extends ActionItem {
                 pname = new RegisterNumber(regStart + p).translate();
             }
             if (!Deobfuscation.isValidName(pname)) {
-                writer.append("\"");
-                writer.append(Helper.escapeString(pname));
-                writer.append("\"");
+                writer.append(Deobfuscation.makeObfuscatedIdentifier(pname));
             }
             writer.append(pname);
         }

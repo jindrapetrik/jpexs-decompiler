@@ -103,7 +103,9 @@ NewVector = "new" {WhiteSpace}* "<"
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
-%state STRING, CHARLITERAL, XMLSTARTTAG, XML
+OIdentifierCharacter = [^\r\n\u00A7\\]
+
+%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
 
 %%
 
@@ -226,6 +228,11 @@ SingleCharacter = [^\r\n\'\\]
                                     tokenStart = yychar; 
                                     tokenLength = 1; 
                                  }
+ "\u00A7"                             {
+                                    yybegin(OIDENTIFIER); 
+                                    tokenStart = yychar; 
+                                    tokenLength = 1;    
+                                 }
 
   /* character literal */
   \'                             {  
@@ -301,6 +308,22 @@ SingleCharacter = [^\r\n\'\\]
   {StringCharacter}+             { tokenLength += yylength(); }
 
   \\[0-3]?{OctDigit}?{OctDigit}  { tokenLength += yylength(); }
+  
+  /* escape sequences */
+
+  \\.                            { tokenLength += 2; }
+  {LineTerminator}               { yybegin(YYINITIAL);  }
+}
+
+<OIDENTIFIER> {
+  "\u00A7"                            { 
+                                     yybegin(YYINITIAL); 
+                                     // length also includes the trailing quote
+                                     return token(TokenType.REGEX, tokenStart, tokenLength + 1);
+                                 }
+  
+  {OIdentifierCharacter}+             { tokenLength += yylength(); }
+
   
   /* escape sequences */
 

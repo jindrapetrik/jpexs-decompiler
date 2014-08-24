@@ -44,7 +44,7 @@ import jsyntaxpane.components.Markers;
  *
  * @author JPEXS
  */
-public class QuickFindPanel extends JPanel implements ActionListener, jsyntaxpane.actions.QuickFindHandler {
+public class QuickFindPanel extends JPanel implements ActionListener {
 
     public JTextField findTextField;
     public JButton prevButton, nextButton;
@@ -163,7 +163,7 @@ public class QuickFindPanel extends JPanel implements ActionListener, jsyntaxpan
         }
     }
 
-    @Override
+
     public void showQuickFind(final JTextComponent t, DocumentSearchData ds) {
         dsd = new WeakReference<>(ds);
         oldCaretPosition = t.getCaretPosition();

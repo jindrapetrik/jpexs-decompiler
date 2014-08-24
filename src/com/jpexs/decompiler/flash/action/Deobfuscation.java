@@ -175,10 +175,17 @@ public class Deobfuscation {
         return null;
     }
 
-    public static boolean isValidName(String s) {
+    public static boolean isValidName(String s,String ...exceptions) {
         boolean isValid = true;
-        if (Action.isReservedWord(s)) {
-            isValid = false;
+        
+        for(String e:exceptions){
+            if(e.equals(s)){
+                return true;
+            }
+        }
+        
+        if (Action.isReservedWord(s)) {            
+            isValid = false;            
         }
 
         if (isValid) {
@@ -241,5 +248,37 @@ public class Deobfuscation {
         }
         return null;
     }
+    
+    public static String makeObfuscatedIdentifier(String s){
+        return "§"+escapeOIdentifier(s)+"§";
+    }
 
+    
+    public static String escapeOIdentifier(String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n') {
+                ret.append("\\n");
+            } else if (c == '\r') {
+                ret.append("\\r");
+            } else if (c == '\t') {
+                ret.append("\\t");
+            } else if (c == '\b') {
+                ret.append("\\b");
+            } else if (c == '\t') {
+                ret.append("\\t");
+            } else if (c == '\f') {
+                ret.append("\\f");
+            } else if (c == '\\') {
+                ret.append("\\\\");
+            } else if (c == '§') {
+                ret.append("\\§");
+            } else {
+                ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
 }

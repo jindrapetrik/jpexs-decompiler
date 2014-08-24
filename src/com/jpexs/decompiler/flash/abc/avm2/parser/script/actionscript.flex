@@ -195,8 +195,9 @@ Exponent = [eE] [+-]? [0-9]+
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
+OIdentifierCharacter = [^\r\n\u00A7\\]
 
-%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML
+%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER
 
 %%
 
@@ -321,6 +322,10 @@ SingleCharacter = [^\r\n\'\\]
                                     string.setLength(0);
                                     yybegin(STRING); 
                                  }
+  "\u00A7"                       {  
+                                    string.setLength(0);
+                                    yybegin(OIDENTIFIER); 
+                                 }
 
   /* character literal */
   \'                             {  
@@ -353,6 +358,7 @@ SingleCharacter = [^\r\n\'\\]
   "<{"                           {  return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
   /* identifiers */ 
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.IDENTIFIER, yytext()); }  
+  
 }
 
 <XMLOPENTAG> {
@@ -556,6 +562,30 @@ SingleCharacter = [^\r\n\'\\]
                                   } 
    {LineTerminator}               { string.append( yytext() );  yyline++;}
    .|\n                           { string.append( yytext() ); }
+}
+
+<OIDENTIFIER> {
+    "\u00A7"                         { 
+                                     yybegin(YYINITIAL); 
+                                     // length also includes the trailing quote
+                                     return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.IDENTIFIER,string.toString());
+                                 }
+  
+  {OIdentifierCharacter}+             { string.append( yytext() ); }
+
+  /* escape sequences */
+  "\\b"                          { string.append( '\b' ); }
+  "\\t"                          { string.append( '\t' ); }
+  "\\n"                          { string.append( '\n' ); }
+  "\\f"                          { string.append( '\f' ); }
+  "\\§"                          { string.append( '\u00A7' ); }
+  "\\r"                          { string.append( '\r' ); }
+  "\\\\"                         { string.append( '\\' ); }
+  
+  /* escape sequences */
+
+  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
+  {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 
 <STRING> {
