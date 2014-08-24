@@ -63,11 +63,15 @@ public class FontType implements Serializable {
             kerning.add(new KerningPairType(sis));
         }
 
+        long pos = sis.getPos();
+
         glyphs = new ArrayList<>();
         for (int i = 0; i < glyphInfo.size(); i++) {
             sis.setPos(glyphInfo.get(i).globalOffset);
             glyphs.add(new GlyphType(sis));
         }
+
+        sis.setPos(pos);
     }
 
     public List<SHAPE> getGlyphShapes() {

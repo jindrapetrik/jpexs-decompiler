@@ -1048,7 +1048,7 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        faPos = tagCnt-1; //should be 0, as it is first tag, but anyway
+                        faPos = tagCnt - 1; //should be 0, as it is first tag, but anyway
                         if (tag instanceof TagStub) {
                             tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
                         }
@@ -1117,8 +1117,8 @@ public class SWFInputStream implements AutoCloseable {
             executor.shutdown();
         }
         //Workaround to not reading fileattributes twice. TODO:Handle this better
-        if(parallel && fileAttributes!=null){
-            tags.add(faPos,fileAttributes);
+        if (parallel && fileAttributes != null) {
+            tags.add(faPos, fileAttributes);
         }
         return tags;
     }
@@ -1460,7 +1460,7 @@ public class SWFInputStream implements AutoCloseable {
             DumpInfo di = dumpInfo;
             try {
                 ret = resolveTag(tagStub, level, parallel, skipUnusualTags);
-            } catch (EndOfStreamException ex) {
+            } catch (Exception ex) {
                 tagDataStream.endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);
             }

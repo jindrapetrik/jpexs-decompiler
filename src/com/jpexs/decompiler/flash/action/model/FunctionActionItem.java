@@ -83,18 +83,18 @@ public class FunctionActionItem extends ActionItem {
         if (calculatedFunctionName != null) {
             writer.append(" ");
             String fname = calculatedFunctionName.toStringNoQuotes(localData);
-            if(!Deobfuscation.isValidName(fname)){
+            if (!Deobfuscation.isValidName(fname)) {
                 calculatedFunctionName.appendTo(writer, localData); //Use quotes
-            }else{
+            } else {
                 calculatedFunctionName.appendToNoQuotes(writer, localData);
             }
         } else if (!functionName.isEmpty()) {
             writer.append(" ");
-            if(!Deobfuscation.isValidName(functionName)){    
+            if (!Deobfuscation.isValidName(functionName)) {
                 writer.append("\"");
                 writer.append(Helper.escapeString(functionName));
                 writer.append("\"");
-            }else{
+            } else {
                 writer.append(functionName);
             }
         }
@@ -109,7 +109,7 @@ public class FunctionActionItem extends ActionItem {
             if (pname == null || pname.isEmpty()) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
-            if(!Deobfuscation.isValidName(pname)){
+            if (!Deobfuscation.isValidName(pname)) {
                 writer.append("\"");
                 writer.append(Helper.escapeString(pname));
                 writer.append("\"");

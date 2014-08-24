@@ -175,7 +175,7 @@ public class Deobfuscation {
         return null;
     }
 
-    public static boolean isValidName(String s){
+    public static boolean isValidName(String s) {
         boolean isValid = true;
         if (Action.isReservedWord(s)) {
             isValid = false;
@@ -198,7 +198,7 @@ public class Deobfuscation {
         }
         return isValid;
     }
-    
+
     public String deobfuscateName(String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
         boolean isValid = true;
         if (usageType == null) {

@@ -41,7 +41,7 @@ public class ActionGetProperty extends Action {
         GraphTargetItem target = stack.pop();
         int indexInt = 0;
         if (index instanceof DirectValueActionItem) {
-            Object value = ((DirectValueActionItem) index).value; 
+            Object value = ((DirectValueActionItem) index).value;
             if (value instanceof Long) {
                 indexInt = (int) (long) (Long) value;
             } else if (value instanceof Double) {

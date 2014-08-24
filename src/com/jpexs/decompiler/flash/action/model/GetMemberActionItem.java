@@ -50,10 +50,10 @@ public class GetMemberActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
-        if((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem)memberName).isString()) ||(!Deobfuscation.isValidName(((DirectValueActionItem)memberName).toStringNoQuotes(localData)))){                    
+        if ((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem) memberName).isString()) || (!Deobfuscation.isValidName(((DirectValueActionItem) memberName).toStringNoQuotes(localData)))) {
             writer.append("[");
             memberName.toString(writer, localData);
-            return writer.append("]");                        
+            return writer.append("]");
         }
         writer.append(".");
         return stripQuotes(memberName, localData, writer);

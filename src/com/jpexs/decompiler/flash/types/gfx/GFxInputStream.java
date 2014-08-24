@@ -167,7 +167,6 @@ public class GFxInputStream {
     /**
      * Reads one string value from the stream
      *
-     * @param name
      * @return String value
      * @throws IOException
      */
