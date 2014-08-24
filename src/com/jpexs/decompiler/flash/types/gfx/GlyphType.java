@@ -64,9 +64,9 @@ public class GlyphType implements Serializable {
     public GlyphType(GFxInputStream sis) throws IOException {
         boundingBox = new int[4];
         for (int i = 0; i < 4; i++) {
-            boundingBox[i] = sis.readSI15();
+            boundingBox[i] = sis.readSI15("boundingBox");
         }
-        int numContours = sis.readUI15();
+        int numContours = sis.readUI15("numContours");
         contours = new ContourType[numContours];
         for (int i = 0; i < numContours; i++) {
             contours[i] = new ContourType(sis);

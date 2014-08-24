@@ -71,15 +71,15 @@ public class ContourType implements Serializable {
     }
 
     public ContourType(GFxInputStream sis) throws IOException {
-        moveToX = sis.readSI15();
-        moveToY = sis.readSI15();
-        long numEdgesRef = sis.readUI30();
+        moveToX = sis.readSI15("moveToX");
+        moveToY = sis.readSI15("moveToY");
+        long numEdgesRef = sis.readUI30("numEdgesRef");
         isReference = (numEdgesRef & 1) == 1;
         numEdgesRef >>= 1;
         long oldPos = sis.getPos();
         if (isReference) {
             sis.setPos(numEdgesRef);
-            numEdgesRef = sis.readUI30();
+            numEdgesRef = sis.readUI30("numEdgesRef");
             numEdgesRef >>= 1;
         }
 

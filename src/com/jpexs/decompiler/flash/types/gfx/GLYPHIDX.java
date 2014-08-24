@@ -34,8 +34,8 @@ public class GLYPHIDX implements Serializable {
     }
 
     public GLYPHIDX(GFxInputStream sis) throws IOException {
-        this.indexInFont = sis.readUI16();
-        this.indexInTexture = sis.readUI16();
+        this.indexInFont = sis.readUI16("indexInFont");
+        this.indexInTexture = sis.readUI16("indexInTexture");
     }
 
     public void write(GFxOutputStream sos) throws IOException {

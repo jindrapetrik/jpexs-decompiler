@@ -36,9 +36,9 @@ public class KerningPairType implements Serializable {
     }
 
     public KerningPairType(GFxInputStream sis) throws IOException {
-        this.char1 = sis.readUI16();
-        this.char2 = sis.readUI16();
-        this.advance = sis.readSI16();
+        this.char1 = sis.readUI16("char1");
+        this.char2 = sis.readUI16("char2");
+        this.advance = sis.readSI16("advance");
     }
 
     public void write(GFxOutputStream sos) throws IOException {

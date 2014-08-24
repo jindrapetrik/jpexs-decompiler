@@ -34,8 +34,8 @@ public class FONTINFO implements Serializable {
     }
 
     public FONTINFO(GFxInputStream sis) throws IOException {
-        fontId = sis.readUI16();
-        int numGlyphs = sis.readUI16();
+        fontId = sis.readUI16("fontId");
+        int numGlyphs = sis.readUI16("numGlyphs");
         glyphIndices = new GLYPHIDX[numGlyphs];
         for (int i = 0; i < numGlyphs; i++) {
             glyphIndices[i] = new GLYPHIDX(sis);

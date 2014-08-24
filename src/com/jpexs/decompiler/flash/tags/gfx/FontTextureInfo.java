@@ -106,7 +106,6 @@ public class FontTextureInfo extends Tag {
         for (int i = 0; i < numTexGlyphs; i++) {
             texGlyphs[i] = new TEXGLYPH(new GFxInputStream(mis));
         }
-        // todo: honfika: add GFx data to dump view
         sis.skipBytes(mis.getPos());
         int numFonts = sis.readUI16("numFonts");
         fonts = new FONTINFO[numFonts];
@@ -114,7 +113,6 @@ public class FontTextureInfo extends Tag {
         for (int i = 0; i < numFonts; i++) {
             fonts[i] = new FONTINFO(new GFxInputStream(sis.getBaseStream()));
         }
-        // todo: honfika: add GFx data to dump view
         sis.skipBytes(mis.getPos());
     }
 }

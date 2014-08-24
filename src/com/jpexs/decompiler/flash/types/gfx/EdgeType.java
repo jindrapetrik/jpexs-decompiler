@@ -120,13 +120,13 @@ public class EdgeType implements Serializable {
     }
 
     private byte[] readRawEdge(GFxInputStream sis) throws IOException {
-        int firstByte = sis.readUI8();
+        int firstByte = sis.readUI8("firstByte");
         int nb = sizes[firstByte & 0xF];
         byte ret[] = new byte[1 + nb];
         ret[0] = (byte) firstByte;
         int i;
         for (i = 0; i < nb; i++) {
-            ret[i + 1] = (byte) sis.readUI8();
+            ret[i + 1] = (byte) sis.readUI8("byte");
         }
 
         return ret;

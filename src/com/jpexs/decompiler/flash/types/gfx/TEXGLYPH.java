@@ -42,12 +42,12 @@ public class TEXGLYPH implements Serializable {
     }
 
     public TEXGLYPH(GFxInputStream sis) throws IOException {
-        this.uvBoundsLeft = sis.readFLOAT();
-        this.uvBoundsTop = sis.readFLOAT();
-        this.uvBoundsRight = sis.readFLOAT();
-        this.uvBoundsBottom = sis.readFLOAT();
-        this.uvOriginX = sis.readFLOAT();
-        this.uvOriginY = sis.readFLOAT();
+        this.uvBoundsLeft = sis.readFLOAT("uvBoundsLeft");
+        this.uvBoundsTop = sis.readFLOAT("uvBoundsTop");
+        this.uvBoundsRight = sis.readFLOAT("uvBoundsRight");
+        this.uvBoundsBottom = sis.readFLOAT("uvBoundsBottom");
+        this.uvOriginX = sis.readFLOAT("uvOriginX");
+        this.uvOriginY = sis.readFLOAT("uvOriginY");
     }
 
     public void write(GFxOutputStream sos) throws IOException {

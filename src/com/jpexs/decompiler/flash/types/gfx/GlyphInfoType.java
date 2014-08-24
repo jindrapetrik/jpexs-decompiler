@@ -36,9 +36,9 @@ public class GlyphInfoType implements Serializable {
     }
 
     public GlyphInfoType(GFxInputStream sis) throws IOException {
-        this.glyphCode = sis.readUI16();
-        this.advanceX = sis.readSI16();
-        this.globalOffset = sis.readUI32();
+        this.glyphCode = sis.readUI16("glyphCode");
+        this.advanceX = sis.readSI16("advanceX");
+        this.globalOffset = sis.readUI32("globalOffset");
     }
 
     public void write(GFxOutputStream sos) throws IOException {
