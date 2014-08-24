@@ -60,6 +60,9 @@ public class MemoryInputStream extends SeekableInputStream {
 
     @Override
     public void seek(long pos) throws IOException {
+        if (pos < 0) {
+            throw new IOException("Seek to negative position");
+        }
         this.pos = pos;
     }
 
