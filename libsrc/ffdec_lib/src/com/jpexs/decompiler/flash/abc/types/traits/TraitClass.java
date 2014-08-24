@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -202,7 +203,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames);
+            String name = m.getName(abc.constants, fullyQualifiedNames,false);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
@@ -233,7 +234,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames);
+            String name = m.getName(abc.constants, fullyQualifiedNames,false);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseImportsUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
@@ -458,7 +459,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 writer.newLine();
                 writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size() + 1);
                 writer.appendNoHilight("{").newLine();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false) + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
                 writer.appendNoHilight("}").newLine();
                 writer.endTrait();
             }
@@ -487,7 +488,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size());
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
-            writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/));
+            writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/,false));
             writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(abc.instance_info.get(class_info).iinit_index);
             if (bodyIndex != -1) {
@@ -497,16 +498,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             writer.appendNoHilight(")").startBlock();
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false) + ".initializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
             }
             writer.endBlock().newLine();
             writer.endTrait();
         }
 
         //static variables,constants & methods
-        abc.class_info.get(class_info).static_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.class_info.get(class_info).static_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         writer.endBlock(); // class
         writer.endClass();
@@ -522,7 +523,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits, true);
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -530,14 +531,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (!abc.instance_info.get(class_info).isInterface()) {
             bodyIndex = abc.findBodyIndex(abc.instance_info.get(class_info).iinit_index);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits, true);
+                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, abc.instance_info.get(class_info).instance_traits, true);
             }
         }
 
         //static variables,constants & methods
-        abc.class_info.get(class_info).static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.class_info.get(class_info).static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info.get(class_info).instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.instance_info.get(class_info).instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames,false), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
     }
 
     @Override

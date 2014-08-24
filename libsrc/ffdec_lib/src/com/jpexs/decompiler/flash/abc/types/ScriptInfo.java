@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -50,7 +51,7 @@ public class ScriptInfo {
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
                 String packageName = ns.getName(abc.constants); //assume not null package
-                String objectName = name.getName(abc.constants, new ArrayList<String>());
+                String objectName = name.getName(abc.constants, new ArrayList<String>(),false);
                 List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);

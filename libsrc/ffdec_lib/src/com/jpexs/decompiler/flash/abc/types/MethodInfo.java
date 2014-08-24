@@ -12,13 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
@@ -274,9 +276,9 @@ public class MethodInfo {
                 writer.appendNoHilight(", ");
             }
             if (!localRegNames.isEmpty()) {
-                writer.appendNoHilight(localRegNames.get(i + 1));
+                writer.appendNoHilight(Deobfuscation.printIdentifier(localRegNames.get(i + 1)));
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                writer.appendNoHilight(constants.getString(paramNames[i]));
+                writer.appendNoHilight(Deobfuscation.printIdentifier(constants.getString(paramNames[i])));
             } else {
                 writer.appendNoHilight("param" + (i + 1));
             }
@@ -284,7 +286,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", "param", i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames), "param", i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames,false), "param", i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
@@ -311,7 +313,7 @@ public class MethodInfo {
     }
 
     public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
-        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames), "returns");
+        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames,false), "returns");
     }
 
     public void setBody(MethodBody body) {

@@ -12,11 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 
 public class Namespace {
 
@@ -99,7 +101,7 @@ public class Namespace {
         if (name_index == 0) {
             return null;
         }
-        return constants.getString(name_index);
+        return Deobfuscation.printNamespace(constants.getString(name_index));
     }
 
     public boolean hasName(ConstantPool constants, String name) {

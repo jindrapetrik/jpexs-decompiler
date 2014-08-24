@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.helpers.Cache;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -174,7 +175,7 @@ public class Deobfuscation {
         }
         return null;
     }
-
+        
     public static boolean isValidName(String s,String ...exceptions) {
         boolean isValid = true;
         
@@ -250,9 +251,59 @@ public class Deobfuscation {
     }
     
     public static String makeObfuscatedIdentifier(String s){
-        return "Â§"+escapeOIdentifier(s)+"Â§";
+        return "\u00A7"+escapeOIdentifier(s)+"\u00A7";
+    }
+    
+    
+    private static Cache<String> nameCache = Cache.getInstance(false);
+    
+    /**
+     * Ensures identifier is valid and if not, uses paragraph syntax
+     * @param s Identifier
+     * @param validExceptions Exceptions which are valid (e.g. some reserved words)
+     * @return 
+     */
+    public static String printIdentifier(String s,String ...validExceptions){               
+        if(s.startsWith("\u00A7")&&s.endsWith("\u00A7")){ //Assuming already printed - TODO:detect better
+            return s;
+        }
+        if(nameCache.contains(s)){
+            return nameCache.get(s);
+        }        
+        if(isValidName(s, validExceptions)){
+            nameCache.put(s, s);
+            return s;
+        }
+        String ret = makeObfuscatedIdentifier(s);
+        nameCache.put(s, ret);
+        return ret;
     }
 
+    public static String printNamespace(String pkg,String ...validNameExceptions){
+        if(nameCache.contains(pkg)){
+            return nameCache.get(pkg);
+        }
+        if(pkg.equals("")){
+            nameCache.put(pkg, pkg);
+            return pkg;
+        }
+        String[] parts = null;
+        if (pkg.contains(".")) {
+            parts = pkg.split("\\.");
+        } else {
+            parts = new String[]{pkg};
+        }
+        String ret="";
+        for(int i=0;i<parts.length;i++){
+            if(i>0){
+                ret+=".";
+            }
+            ret += printIdentifier(parts[i], validNameExceptions);
+        }
+        nameCache.put(pkg, ret);
+        return ret;
+    }
+    
     
     public static String escapeOIdentifier(String s) {
         StringBuilder ret = new StringBuilder(s.length());
@@ -273,7 +324,7 @@ public class Deobfuscation {
             } else if (c == '\\') {
                 ret.append("\\\\");
             } else if (c == '\u00A7') {
-                ret.append("\\\\u00A7");
+                ret.append("\\\u00A7");
             } else {
                 ret.append(c);
             }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -32,7 +33,7 @@ public class ClassAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
+        return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames,false));
     }
 
     @Override

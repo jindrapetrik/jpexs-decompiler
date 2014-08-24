@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -97,7 +98,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         if (slotname != null) {
             if (value instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item lr = (LocalRegAVM2Item) value;
-                String slotNameStr = slotname.getName(constants, fullyQualifiedNames);
+                String slotNameStr = slotname.getName(constants, fullyQualifiedNames, true);
                 if (localRegNames.containsKey(lr.regIndex)) {
                     if (localRegNames.get(lr.regIndex).equals(slotNameStr)) {
                         return; //Register with same name to slot
@@ -167,7 +168,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         for (int t = 0; t < body.traits.traits.size(); t++) {
             if (body.traits.traits.get(t) instanceof TraitSlotConst) {
                 if (((TraitSlotConst) body.traits.traits.get(t)).slot_id == slotIndex) {
-                    slotname = body.traits.traits.get(t).getName(abc).getName(abc.constants, fullyQualifiedNames);
+                    slotname = body.traits.traits.get(t).getName(abc).getName(abc.constants, fullyQualifiedNames, true);
                 }
             }
 

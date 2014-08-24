@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -174,7 +175,7 @@ public abstract class Trait implements Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, new ArrayList<String>());
+        String objectName = name.getName(abc.constants, new ArrayList<String>(),false);
         return packageName + "." + objectName; //assume not null name
     }
 }

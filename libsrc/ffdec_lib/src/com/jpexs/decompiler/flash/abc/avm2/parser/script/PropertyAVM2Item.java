@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -108,7 +109,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             return new ApplyTypeAVM2Item(null, obj, params);
         } else {
-            return new TypeItem(m.getNameWithNamespace(constants));
+            return new TypeItem(m.getNameWithNamespace(constants,true));
         }
     }
 
@@ -218,7 +219,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, new ArrayList<String>(),true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                                     objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
@@ -238,7 +239,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     for (MethodBody b : callStack) {
                         for (int i = 0; i < b.traits.traits.size(); i++) {
                             Trait t = b.traits.traits.get(i);
-                            if (t.getName(abc).getName(abc.constants, new ArrayList<String>()).equals(propertyName)) {
+                            if (t.getName(abc).getName(abc.constants, new ArrayList<String>(),true).equals(propertyName)) {
                                 if (t instanceof TraitSlotConst) {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
                                     objType = new TypeItem("Function");
@@ -261,7 +262,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             int name_index = 0;
                             for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
                                 Multiname mname = abc.constants.constant_multiname.get(m);
-                                if (mname.kind == Multiname.QNAME && mname.getName(abc.constants, new ArrayList<String>()).equals(propertyName) && mname.namespace_index == nsindex) {
+                                if (mname.kind == Multiname.QNAME && mname.getName(abc.constants, new ArrayList<String>(),true).equals(propertyName) && mname.namespace_index == nsindex) {
                                     name_index = m;
                                     break;
                                 }
@@ -336,7 +337,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                             Reference<ValueKind> outPropValue = new Reference<>(null);
 
-                                            if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                            if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>(),true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                                                 objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
                                                 propType = outPropType.getVal();
                                                 propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,

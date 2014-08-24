@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -60,7 +61,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames);
+            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
         }
         return typeStr;
     }
@@ -85,7 +86,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             slotconst = "namespace";
         }
         writer.hilightSpecial(slotconst + " ", "traittype");
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname");
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), "traitname");
         writer.hilightSpecial(typeStr, "traittypename");
         return writer;
     }

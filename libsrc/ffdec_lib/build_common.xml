@@ -221,4 +221,8 @@
             <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                                    
         </testng>     
     </target>
+    
+    <target name="run">        
+        <ant antfile="../../build.xml" target="run" inheritall="false"/>
+    </target>
 </project>

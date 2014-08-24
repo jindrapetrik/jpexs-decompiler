@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SWC;
@@ -125,7 +126,7 @@ import java.util.logging.Logger;
 public class ActionScriptParser {
 
     private long uniqLast = 0;
-    private final boolean debugMode = false;
+    private final boolean debugMode = true;
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
     private final ABC abc;

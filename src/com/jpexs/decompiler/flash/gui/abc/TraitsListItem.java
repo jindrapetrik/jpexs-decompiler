@@ -74,9 +74,9 @@ public class TraitsListItem {
 
     public String toStringName() {
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>());
+            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>(),false);
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>());
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>(),false);
         } else if (!isStatic) {
             return "__" + STR_INSTANCE_INITIALIZER;
         } else {

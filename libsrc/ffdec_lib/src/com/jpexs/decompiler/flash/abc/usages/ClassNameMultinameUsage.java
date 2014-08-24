@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -31,6 +32,6 @@ public class ClassNameMultinameUsage extends InsideClassMultinameUsage implement
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants,false);
     }
 }

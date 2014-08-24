@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -96,7 +98,7 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
         if (localRegNames.containsKey(reg)) {
-            return localRegNames.get(reg);
+            return Deobfuscation.printIdentifier(localRegNames.get(reg));
         } else {
             if (reg == 0) {
                 return "this";

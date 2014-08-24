@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -55,13 +56,13 @@ public class ABCException implements Serializable {
         if (name_index == 0) {
             return "";
         }
-        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames);
+        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames,false);
     }
 
     public String getTypeName(ConstantPool constants, List<String> fullyQualifiedNames) {
         if (type_index == 0) {
             return "*";
         }
-        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames);
+        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames,false);
     }
 }

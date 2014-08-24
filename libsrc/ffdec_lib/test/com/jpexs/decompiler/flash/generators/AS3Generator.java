@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -56,7 +57,7 @@ public class AS3Generator {
         StringBuilder s = new StringBuilder();
         for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
             if (t instanceof TraitMethodGetterSetter) {
-                String name = t.getName(abc).getName(abc.constants, new ArrayList<String>());
+                String name = t.getName(abc).getName(abc.constants, new ArrayList<String>(),true);
                 if (name.startsWith("test")) {
                     s.append("@Test\r\npublic void ");
                     s.append(name);

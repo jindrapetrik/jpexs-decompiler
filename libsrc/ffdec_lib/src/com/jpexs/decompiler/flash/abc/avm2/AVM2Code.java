@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -1464,7 +1465,7 @@ public class AVM2Code implements Serializable {
                                         if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames);
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames,true);
                                                     scopeStack.pop();//with
                                                     output.remove(output.size() - 1); //with
                                                     ip = ip + plus + 4; //+1 below

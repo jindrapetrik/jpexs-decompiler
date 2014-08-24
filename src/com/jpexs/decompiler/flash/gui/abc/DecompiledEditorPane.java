@@ -322,7 +322,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 String name = "";
                 if (abc != null) {
                     if (classIndex > -1) {
-                        name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants);
+                        name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants,false);
                     }
                 }
                 currentTrait = null;
@@ -333,7 +333,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
+                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>(),false);
                         }
                     }
                 }
@@ -371,11 +371,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 String name = "";
                 currentTrait = null;
                 if (abc != null) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants);
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants,false);
                     currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                     isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                     if (currentTrait != null) {
-                        name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
+                        name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>(),false);
                     }
                 }
 

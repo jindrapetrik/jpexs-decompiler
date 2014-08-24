@@ -325,6 +325,11 @@
         <copy file="${CORELIBPATH}" todir="${LIBRARIESDIR}" />
     </target>
     
+    <target name="clean_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" />
+    </target>
+    
+    
     <target name="test_lib">
         <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" />
     </target>
@@ -386,7 +391,7 @@
             </classpath>
         </javadoc>
     </target>
-    <target name="clean">        
+    <target name="clean" depends="clean_lib">        
         <delete dir="${DISTRIBUTIONDIR}"/>
         <delete dir="${COMPILETESTSDIR}"/>
         <delete dir="${COMPILEDIR}"/>

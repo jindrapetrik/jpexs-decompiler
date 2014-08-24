@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import java.io.File;
@@ -89,14 +90,14 @@ public class Cache<E> {
     }
 
     public boolean contains(Object key) {
-        if (storageType == STORAGE_FILES) {
+        if (storageType == STORAGE_FILES) {          
             return cacheFiles.containsKey(key);
         } else if (storageType == STORAGE_MEMORY) {
             return cacheMemory.containsKey(key);
         }
         return false;
     }
-
+    
     public void clear() {
         cacheMemory.clear();
         for (File f : cacheFiles.values()) {

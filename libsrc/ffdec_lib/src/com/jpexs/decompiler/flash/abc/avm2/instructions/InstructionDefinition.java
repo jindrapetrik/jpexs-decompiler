@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -118,7 +119,7 @@ public class InstructionDefinition implements Serializable {
         if (constants.getMultiname(multinameIndex).needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames), ins.offset);
+            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames,false), ins.offset);
         }
         return name + ns;
     }

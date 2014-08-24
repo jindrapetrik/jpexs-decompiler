@@ -12,16 +12,20 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConstantPool {
 
@@ -34,7 +38,7 @@ public class ConstantPool {
     public List<Namespace> constant_namespace = new ArrayList<>();
     public List<NamespaceSet> constant_namespace_set = new ArrayList<>();
     public List<Multiname> constant_multiname = new ArrayList<>();
-
+    
     public synchronized int addInt(long value) {
         constant_int.add(value);
         return constant_int.size() - 1;

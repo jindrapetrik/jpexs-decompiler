@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -95,7 +96,7 @@ public class ConstructIns extends InstructionDefinition {
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isXML = glt.propertyName.getName(constants, fullyQualifiedNames).equals("XML");
+            isXML = glt.propertyName.getName(constants, fullyQualifiedNames,true).equals("XML");
         }
 
         if (isXML) {

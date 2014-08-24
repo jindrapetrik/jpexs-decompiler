@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -86,7 +87,7 @@ public class ScriptPack implements TreeElementItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, new ArrayList<String>());
+                scriptName = name.getName(abc.constants, new ArrayList<String>(),false);
             }
         }
         return scriptName;

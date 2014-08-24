@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -363,7 +364,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                     if (a.instance_info.get(c).deleted) {
                         continue;
                     }
-                    if (a.instance_info.get(c).name_index > 0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
+                    if (a.instance_info.get(c).name_index > 0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants,true))) {
                         if (!subtypes.isEmpty() && parts.size() > i + 1) {
                             continue;
                         }
@@ -407,12 +408,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                     }
                     if ((a.instance_info.get(c).getName(a.constants) != null && a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni)
                             || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants), a.constants))) {
-                        String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, new ArrayList<String>());
+                        String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, new ArrayList<String>(),true);
                         if (parts.get(0).equals(cname)) {
                             if (!subtypes.isEmpty() && parts.size() > 1) {
                                 continue;
                             }
-                            TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants));
+                            TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants,true));
                             /*for (String s : subtypes) {
                              UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
                              su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);

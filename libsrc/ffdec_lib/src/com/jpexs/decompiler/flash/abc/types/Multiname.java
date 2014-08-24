@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -226,11 +228,11 @@ public class Multiname {
         return null;
     }
 
-    private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames) {
+    private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames);
+        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames,raw);
         if (!params.isEmpty()) {
             typeNameStr += ".<";
             for (int i = 0; i < params.size(); i++) {
@@ -240,7 +242,7 @@ public class Multiname {
                 if (params.get(i) == 0) {
                     typeNameStr += "*";
                 } else {
-                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames);
+                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames,raw);
                 }
             }
             typeNameStr += ">";
@@ -248,9 +250,9 @@ public class Multiname {
         return typeNameStr;
     }
 
-    public String getName(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getName(ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
         if (kind == TYPENAME) {
-            return typeNameToStr(constants, fullyQualifiedNames);
+            return typeNameToStr(constants, fullyQualifiedNames,raw);
         }
         if (name_index == -1) {
             return "";
@@ -260,13 +262,13 @@ public class Multiname {
         } else {
             String name = constants.getString(name_index);
             if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
-                return getNameWithNamespace(constants);
+                return getNameWithNamespace(constants,raw);
             }
-            return (isAttribute() ? "@" : "") + name;
+            return (isAttribute() ? "@" : "") + (raw?name:Deobfuscation.printIdentifier(name));
         }
     }
 
-    public String getNameWithNamespace(ConstantPool constants) {
+    public String getNameWithNamespace(ConstantPool constants,boolean raw) {
         String ret = "";
         Namespace ns = getNamespace(constants);
         if (ns != null) {
@@ -275,7 +277,7 @@ public class Multiname {
                 ret += nsname + ".";
             }
         }
-        ret += getName(constants, null);
+        ret += getName(constants, null, raw);
         return ret;
     }
 

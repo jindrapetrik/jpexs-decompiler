@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -44,7 +45,7 @@ public class NewClassIns extends InstructionDefinition {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         stack.pop().toString(writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
         String baseType = writer.toString();
-        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(constants, fullyQualifiedNames) + ".class extends " + baseType));
+        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(constants, fullyQualifiedNames,false) + ".class extends " + baseType));
     }
 
     @Override
