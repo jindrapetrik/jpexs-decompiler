@@ -97,7 +97,11 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
         MemoryInputStream mis = sis.getBaseStream();
         while (mis.available() > 0) {
-            fonts.add(new FontType(new GFxInputStream(mis)));
+            GFxInputStream gis = new GFxInputStream(mis);
+            gis.dumpInfo = sis.dumpInfo;
+            gis.newDumpLevel("fontType", "FontType");
+            fonts.add(new FontType(gis));
+            gis.endDumpLevel();
         }
         rebuildShapeCache();
     }

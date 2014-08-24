@@ -93,6 +93,7 @@ public class GFxInputStream {
     /**
      * Reads one SI16 (Signed 16bit integer) value from the stream
      *
+     * @param name
      * @return SI16 value
      * @throws IOException
      */
@@ -206,6 +207,7 @@ public class GFxInputStream {
      * Reads bytes from the stream
      *
      * @param count Number of bytes to read
+     * @param name
      * @return Array of read bytes
      * @throws IOException
      */
@@ -229,6 +231,7 @@ public class GFxInputStream {
     /**
      * Reads one string value from the stream
      *
+     * @param name
      * @return String value
      * @throws IOException
      */

@@ -264,6 +264,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -1010,9 +1011,6 @@ public class SWFInputStream implements AutoCloseable {
             executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             futureResults = new ArrayList<>();
         }
-        int tagCnt = 0;
-        int faPos = 0;
-        FileAttributesTag fileAttributes = null;
         List<Tag> tags = new ArrayList<>();
         Tag tag;
         boolean isAS3 = false;
@@ -1024,7 +1022,6 @@ public class SWFInputStream implements AutoCloseable {
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
-            tagCnt++;
             DumpInfo di = dumpInfo;
             if (di != null && tag != null) {
                 di.name = tag.getName();
@@ -1048,11 +1045,10 @@ public class SWFInputStream implements AutoCloseable {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        faPos = tagCnt - 1; //should be 0, as it is first tag, but anyway
                         if (tag instanceof TagStub) {
                             tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
                         }
-                        fileAttributes = (FileAttributesTag) tag;
+                        FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -1091,11 +1087,12 @@ public class SWFInputStream implements AutoCloseable {
 
                 }
             }
-            if (parseTags && doParse && tag instanceof TagStub) {
-                if (parallel) {
-                    Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags));
-                    futureResults.add(future);
-                }
+            if (parseTags && doParse && parallel && tag instanceof TagStub) {
+                Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags));
+                futureResults.add(future);
+            } else {
+                Future<Tag> future = new ImmediateFuture(tag);
+                futureResults.add(future);
             }
 
             if (tag.getId() == EndTag.ID) {
@@ -1115,10 +1112,6 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             executor.shutdown();
-        }
-        //Workaround to not reading fileattributes twice. TODO:Handle this better
-        if (parallel && fileAttributes != null) {
-            tags.add(faPos, fileAttributes);
         }
         return tags;
     }
@@ -3296,7 +3289,9 @@ public class SWFInputStream implements AutoCloseable {
 
     public MemoryInputStream getBaseStream() throws IOException {
         int pos = (int) is.getPos();
-        return new MemoryInputStream(is.getAllRead(), pos, is.available());
+        MemoryInputStream mis = new MemoryInputStream(is.getAllRead(), 0, pos + is.available());
+        mis.seek(pos);
+        return mis;
     }
 
     public SWFInputStream getLimitedStream(int limit) throws IOException {

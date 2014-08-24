@@ -452,8 +452,10 @@ public class Configuration {
 
         Map<String, String> result = new HashMap<>();
         for (String pair : fonts.split("::")) {
-            String[] splittedPair = pair.split("=");
-            result.put(splittedPair[0], splittedPair[1]);
+            if (!pair.isEmpty()) {
+                String[] splittedPair = pair.split("=");
+                result.put(splittedPair[0], splittedPair[1]);
+            }
         }
         return result;
     }

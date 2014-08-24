@@ -42,6 +42,7 @@ public class FontType implements Serializable {
     public List<KerningPairType> kerning;
 
     public FontType(GFxInputStream sis) throws IOException {
+        long offset = sis.getPos();
         fontName = sis.readString("fontName");
         flags = sis.readUI16("flags");
         nominalSize = sis.readUI16("nominalSize");
@@ -54,21 +55,27 @@ public class FontType implements Serializable {
         sis.read(glyphBytes);
         glyphInfo = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
+            sis.newDumpLevel("glyphInfoType", "GlyphInfoType");
             glyphInfo.add(new GlyphInfoType(sis));
+            sis.endDumpLevel();
         }
 
         long kerningTableSize = sis.readUI30("kerningTableSize");
         kerning = new ArrayList<>();
         for (int i = 0; i < kerningTableSize; i++) {
+            sis.newDumpLevel("kerningPairType", "KerningPairType");
             kerning.add(new KerningPairType(sis));
+            sis.endDumpLevel();
         }
 
         long pos = sis.getPos();
 
         glyphs = new ArrayList<>();
         for (int i = 0; i < glyphInfo.size(); i++) {
-            sis.setPos(glyphInfo.get(i).globalOffset);
+            sis.setPos(glyphInfo.get(i).globalOffset + offset);
+            sis.newDumpLevel("glyphType", "GlyphType");
             glyphs.add(new GlyphType(sis));
+            sis.endDumpLevel();
         }
 
         sis.setPos(pos);

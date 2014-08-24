@@ -104,14 +104,18 @@ public class FontTextureInfo extends Tag {
         texGlyphs = new TEXGLYPH[numTexGlyphs];
         MemoryInputStream mis = sis.getBaseStream();
         for (int i = 0; i < numTexGlyphs; i++) {
-            texGlyphs[i] = new TEXGLYPH(new GFxInputStream(mis));
+            GFxInputStream gis = new GFxInputStream(mis);
+            gis.dumpInfo = sis.dumpInfo;
+            texGlyphs[i] = new TEXGLYPH(gis);
         }
         sis.skipBytes(mis.getPos());
         int numFonts = sis.readUI16("numFonts");
         fonts = new FONTINFO[numFonts];
         mis = sis.getBaseStream();
         for (int i = 0; i < numFonts; i++) {
-            fonts[i] = new FONTINFO(new GFxInputStream(sis.getBaseStream()));
+            GFxInputStream gis = new GFxInputStream(mis);
+            gis.dumpInfo = sis.dumpInfo;
+            fonts[i] = new FONTINFO(gis);
         }
         sis.skipBytes(mis.getPos());
     }

@@ -69,7 +69,9 @@ public class GlyphType implements Serializable {
         int numContours = sis.readUI15("numContours");
         contours = new ContourType[numContours];
         for (int i = 0; i < numContours; i++) {
+            sis.newDumpLevel("contourType", "ContourType");
             contours[i] = new ContourType(sis);
+            sis.endDumpLevel();
         }
     }
 

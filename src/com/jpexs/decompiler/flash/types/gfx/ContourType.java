@@ -85,7 +85,9 @@ public class ContourType implements Serializable {
 
         edges = new EdgeType[(int) numEdgesRef];
         for (int i = 0; i < edges.length; i++) {
+            sis.newDumpLevel("edgeType", "EdgeType");
             edges[i] = new EdgeType(sis);
+            sis.endDumpLevel();
         }
         if (isReference) {
             sis.setPos(oldPos);
