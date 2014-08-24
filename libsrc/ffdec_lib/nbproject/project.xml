@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>ffdec_lib</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. 
+ To prevent the customizer from showing, create nbproject/project.properties file and enter 
+auxiliary.show.customizer=false 
+property there. Adding 
+auxiliary.show.customizer.message=<message>
+ will show your customized message when someone attempts to open the customizer.  -->
+            <name>ffdec_lib</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>ffdec_lib</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>test</label>
+                    <type>java</type>
+                    <location>test</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="javadoc">
+                    <target>javadoc</target>
+                </action>
+                <action name="run">
+                    <target>run</target>
+                </action>
+                <action name="test">
+                    <target>test</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+            </ide-actions>
+            <export>
+                <type>folder</type>
+                <location>build</location>
+                <build-target>build</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>src</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test</label>
+                        <location>test</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="run"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+            <compilation-unit>
+                <package-root>src</package-root>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/flamingo-6.2.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jargs.jar;../../lib/jl1.0.1.jar;../../lib/jna-3.5.1.jar;../../lib/jpacker.jar;../../lib/jpproxy.jar;../../lib/jsyntaxpane-0.9.5.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/substance-6.2.jar;../../lib/substance-flamingo-6.2.jar;../../lib/trident-6.2.jar;../../lib/ttf.jar</classpath>
+                <built-to>build</built-to>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test</package-root>
+                <unit-tests/>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/flamingo-6.2.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jargs.jar;../../lib/jl1.0.1.jar;../../lib/jna-3.5.1.jar;../../lib/jpacker.jar;../../lib/jpproxy.jar;../../lib/jsyntaxpane-0.9.5.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/substance-6.2.jar;../../lib/substance-flamingo-6.2.jar;../../lib/trident-6.2.jar;../../lib/ttf.jar;build/classes;testlib/emma.jar;testlib/emma_ant.jar;testlib/testng-6.8.jar</classpath>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

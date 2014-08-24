@@ -1,0 +1,110 @@
+/*
+ *  Copyright (C) 2014 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. */
+package com.jpexs.decompiler.flash.types.sound;
+
+import com.jpexs.decompiler.flash.SWFInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import javazoom.jl.decoder.Bitstream;
+import javazoom.jl.decoder.BitstreamException;
+import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.DecoderException;
+import javazoom.jl.decoder.Header;
+import javazoom.jl.decoder.SampleBuffer;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class MP3Decoder extends SoundDecoder {
+
+    public MP3Decoder(SoundFormat soundFormat) {
+        super(soundFormat);
+    }
+
+    @Override
+    public void decode(SWFInputStream sis, OutputStream os) throws IOException {
+        Decoder decoder = new Decoder();
+        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
+        SampleBuffer buf;
+        while ((buf = readFrame(decoder, bitstream)) != null) {
+            short audio[] = buf.getBuffer();
+            byte d[] = new byte[buf.getBufferLength() * 2];
+            for (int i = 0; i < buf.getBufferLength(); i++) {
+                int s = audio[i];
+                d[i * 2] = (byte) (s & 0xff);
+                d[i * 2 + 1] = (byte) ((s >> 8) & 0xff);
+            }
+            os.write(d);
+        }
+    }
+
+    private SampleBuffer readFrame(Decoder decoder, Bitstream bitstream) {
+        try {
+            Header h = bitstream.readFrame();
+            if (h == null) {
+                return null;
+            }
+            soundFormat.samplingRate = getSamplingRate(h);
+            soundFormat.stereo = h.mode() != Header.SINGLE_CHANNEL;
+            try {
+                SampleBuffer ret = (SampleBuffer) decoder.decodeFrame(h, bitstream);
+                bitstream.closeFrame();
+                return ret;
+            } catch (DecoderException ex) {
+                return null;
+            }
+        } catch (BitstreamException ex) {
+            return null;
+        }
+
+    }
+
+    private static int getSamplingRate(Header h) {
+        switch (h.sample_frequency()) {
+            case Header.THIRTYTWO:
+                if (h.version() == Header.MPEG1) {
+                    return 32000;
+                } else if (h.version() == Header.MPEG2_LSF) {
+                    return 16000;
+                } else // SZD
+                {
+                    return 8000;
+                }
+            case Header.FOURTYFOUR_POINT_ONE:
+                if (h.version() == Header.MPEG1) {
+                    return 44100;
+                } else if (h.version() == Header.MPEG2_LSF) {
+                    return 22050;
+                } else // SZD
+                {
+                    return 11025;
+                }
+            case Header.FOURTYEIGHT:
+                if (h.version() == Header.MPEG1) {
+                    return 48000;
+                } else if (h.version() == Header.MPEG2_LSF) {
+                    return 24000;
+                } else // SZD
+                {
+                    return 12000;
+                }
+            default:
+                return 0;
+        }
+    }
+}

@@ -1,0 +1,6 @@
+List of differences between FFDec and official compiler
+--------------------------------------------------------
+- Maximal stack count in method body can be lower in FFDec as official compiler in some cases calculates it wrong (e.g. increments and set/get property).
+- In names of type Multiname(L/LA), namespaceset can have namespaces in different order, this is because official compiler generates
+  this based on constructor position inside class
+- XML literal has different rules for string addition

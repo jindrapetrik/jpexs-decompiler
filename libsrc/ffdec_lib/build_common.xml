@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="common build script for library" default="build" basedir=".">
+    <description>Builds project</description>      
+    <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>        
+        <include name="**/?*.bin"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.txt"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.mid"/>
+        <include name="**/?*.wav"/>
+        <include name="**/?*.js"/>
+    </patternset>
+
+    <path id="emma.lib">
+        <pathelement location="${TESTLIBDIR}/emma.jar"/>
+        <pathelement location="${TESTLIBDIR}/emma_ant.jar"/>
+    </path>
+    <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
+
+    <target name="coverage.instrumentation">
+        <mkdir dir="${INSTRDIR}"/>
+        <mkdir dir="${COVERAGEDIR}"/>
+        <emma>
+            <instr instrpath="${COMPILEDIR}" destdir="${INSTRDIR}" metadatafile="${COVERAGEDIR}/metadata.emma"
+                   mode="copy">
+            </instr>
+        </emma>
+        <copy todir="${INSTRDIR}">
+            <fileset dir="${SOURCEDIR}">
+                <patternset refid="compiler.resources" />
+                <type type="file" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile">
+        <!--<delete dir="${COMPILEDIR}"/>-->        
+        <mkdir dir="${COMPILEDIR}"/>
+        <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true"
+               debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
+            <compilerarg line="-Xlint:unchecked"/> <!-- For Java 8: -Xdiags:verbose -->
+            <classpath>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <copy todir="${COMPILEDIR}">
+            <fileset dir="${SOURCEDIR}">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="compile-tests">
+        <delete dir="${COMPILETESTSDIR}"/>
+        <mkdir dir="${COMPILETESTSDIR}"/>
+        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true" includeantruntime="false" encoding="utf-8">                        
+            <classpath>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile,compile-tests">
+        <delete dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+        
+        <antcall target="coverage.instrumentation"/>
+        
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
+    
+        
+        <testng 
+            outputDir="${TESTRESULTSDIR}"
+            haltOnFailure="false" verbose="2" workingDir="${basedir}" >
+        
+            <classpath>
+                <pathelement path="${COMPILETESTSDIR}"/>
+                <pathelement path="${INSTRDIR}"/>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <jvmarg value="-Demma.coverage.out.file=${COVERAGEDIR}/coverage.emma"/>
+            <jvmarg value="-Demma.coverage.out.merge=true"/>
+            <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                        
+            
+        </testng>                
+        <!-- Coverage report -->
+        <mkdir dir="${COVERAGERESULTSDIR}"/>
+        <emma>
+            <report sourcepath="${SOURCEDIR}" depth="method">
+                <fileset dir="${COVERAGEDIR}">
+                    <include name="*.emma"/>
+                </fileset>
+                <html outfile="${COVERAGERESULTSDIR}/index.html" />
+            </report>
+        </emma>
+    </target>
+    
+   
+    
+    <target name="nightly">
+        <property name="NIGHTLY" value="true" />                                 
+        <antcall target="all" />      
+    </target>             
+    
+    <target name="-nightly-suffix" if="NIGHTLY">        
+        <property name="VERSIONSUFFIX" value="_${GITSHORTTAG}"/>         
+    </target>
+    
+    <target name="-nonightly-suffix" unless="NIGHTLY">
+        <property name="VERSIONSUFFIX" value=""/>         
+    </target>
+    
+    <target name="-timestamp">
+        <tstamp>
+            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
+            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
+        </tstamp>
+        <exec executable="git" outputproperty="GITTAG">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>  
+        <echo message="${GITTAG}" file="${REVFILE}"/>
+        
+        
+        <loadfile srcfile="${REVFILE}" property="GITSHORTTAG">
+            <filterchain>
+               <headfilter lines="1" skip="0"/>
+               <tokenfilter>
+                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
+               </tokenfilter>
+               <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo message="Git tag:${GITTAG}"/>
+        <echo message="Git shorttag:${GITSHORTTAG}"/>
+        <echo message="Library Version: ${VERSION}"/>
+    </target>
+    
+    <target name="build" depends="-timestamp,-nightly-suffix,-nonightly-suffix,compile">
+        <mkdir dir="${DISTRIBUTIONDIR}"/>                        
+                                                     
+        <propertyfile file="${COMPILEDIR}/${PROPERTIESNAME}"
+                      comment="This file is automatically generated - DO NOT EDIT">        
+            <entry key="buildtime" value="${BUILTAT}"/>
+            <entry key="build" value="${GITTAG}"/>
+            <entry key="builder" value="${BUILDER}"/>             
+            <entry key="version" value="${VERSION}"/>          
+            <entry key="nightly" value="${NIGHTLY}"/>
+        </propertyfile>        
+
+        <jar destfile="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" basedir="${COMPILEDIR}">
+            
+        </jar>
+    </target>
+    
+    <target name="javadoc">
+        <mkdir dir="${JAVADOCDIR}"/>
+        <javadoc sourcepath="${SOURCEDIR}" destdir="${JAVADOCDIR}" windowtitle="${PROJECTNAME}"
+                 useexternalfile="yes">
+            <fileset dir="${SOURCEDIR}" includes="**/*.java"/>
+            <classpath>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+    <target name="clean">        
+        <delete dir="${DISTRIBUTIONDIR}"/>
+        <delete dir="${COMPILETESTSDIR}"/>
+        <delete dir="${COMPILEDIR}"/>
+        <delete dir="${COVERAGEDIR}"/>
+        <delete dir="${TESTRESULTSDIR}"/>
+        <delete dir="${LOCALESTARGETDIR}"/>
+    </target>
+    
+    <!-- Debug one test method (Netbeans IDE) -->
+    <target name="debug-test-method" depends="compile-tests">
+        <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
+        <fail unless="test.method">Must select some method in the IDE or set test.method</fail>
+        <delete dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+     
+        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
+            <classpath>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+        </nbjpdastart>
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
+    
+        <testng 
+            outputDir="${TESTRESULTSDIR}"
+            haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
+        
+            <classpath>
+                <pathelement path="${COMPILETESTSDIR}"/>
+                <pathelement path="${INSTRDIR}"/>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                                    
+        </testng>     
+    </target>
+</project>

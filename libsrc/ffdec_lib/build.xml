@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="FFDec Library" basedir="." default="build">
+    <description>Builds project FFDec Library</description>    
+    <property name="VERSION" value="1.0.0" />
+    <property name="VERSIONNUMBER" value="1.0.0" />
+    <property name="BUILDER" value="jpexs" />
+    <property name="PROJECTNAME" value="FFDec_Lib"/>
+    
+    <property name="PREFIXFILENAME" value="ffdec_lib"/>
+    <property name="JARFILENAME" value="${PREFIXFILENAME}"/>
+    <property name="TARGETJAVA" value="1.7"/>
+    <property name="MINJAVAVERSION" value="1.7.0"/>
+    <property name="VENDOR" value="JPEXS" />
+    <property name="INTERNALNAME" value="FFDec_Lib" />
+    <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler Library" />
+       
+    
+    <property name="SOURCEDIR" value="${basedir}/src"/>
+    
+    <property name="TESTDIR" value="${basedir}/test"/>
+    <property name="TESTLIBDIR" value="${basedir}/testlib"/>
+    <property name="TESTRESULTSDIR" value="${basedir}/reports/tests"/>
+    <property name="COVERAGERESULTSDIR" value="${basedir}/reports/coverage"/>
+    <property name="DISTRIBUTIONDIR" value="${basedir}/dist"/>
+    <property name="COMPILEDIR" value="${basedir}/build/classes"/>
+    <property name="INSTRDIR" value="${basedir}/build/instr-classes"/>
+    <property name="COVERAGEDIR" value="${basedir}/coverage"/>
+    <property name="COMPILETESTSDIR" value="${basedir}/build/test"/>
+    <property name="LIBRARIESDIR" value="${basedir}/../../lib"/>
+    <property name="PROPERTIESNAME" value="project.properties"/>
+
+    <property name="RELEASESDIR" value="${basedir}/releases"/>
+    <property name="DISTLIBRARIESDIRNAME" value="lib"/>
+    <property name="JAVADOCDIR" value="${basedir}/javadoc"/>             
+    <property name="REVFILE" value="${basedir}/revision.txt"/>
+    
+    <property name="RUNPARAMS" value=""/>
+
+    <import file="${basedir}/build_common.xml"/>
+</project>

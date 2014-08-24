@@ -28,6 +28,7 @@ hs_err_pid*.log
 /libsrc/ffdec_lib/nbproject/private/
 /libsrc/ffdec_lib/javadoc/
 /libsrc/ffdec_lib/coverage/
+/libsrc/ffdec_lib/reports/
 /libsrc/ffdec_lib/dist/
 /libsrc/ffdec_lib/testdata/decompile/
 /libsrc/ffdec_lib/testdata/recompile/

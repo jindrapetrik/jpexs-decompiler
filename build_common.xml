@@ -71,7 +71,7 @@
         </javac>
     </target>
 
-    <target name="test" depends="compile,compile-tests">
+    <target name="test" depends="test_lib,compile,compile-tests">
         <delete dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
@@ -320,7 +320,16 @@
         <echo message="Version: ${VERSION}"/>
     </target>
     
-    <target name="build" depends="-timestamp,-nightly-suffix,-nonightly-suffix,compile">
+    <target name="build_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="build" inheritAll="false" />
+        <copy file="${CORELIBPATH}" todir="${LIBRARIESDIR}" />
+    </target>
+    
+    <target name="test_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" />
+    </target>
+    
+    <target name="build" depends="build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
         <mkdir dir="${DISTRIBUTIONDIR}"/>
         <!-- <delete dir="${DISTLIBRARIESFULLDIR}"/> -->
         <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
