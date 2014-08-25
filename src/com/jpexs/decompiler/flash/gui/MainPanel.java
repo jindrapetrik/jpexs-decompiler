@@ -68,6 +68,8 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.helpers.Freed;
+import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -2032,15 +2034,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
                                 SWF swf = it.getSwf();
-                                if (it instanceof DefineBitsTag) {
-                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalRange(), it.getCharacterId(), data);
-                                    jpeg2Tag.setModified(true);
-                                    swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
-                                    swf.updateCharacters();
+                                Tag newTag = new ImageImporter().importImage(it, data);
+                                if (newTag != null) {
                                     refreshTree();
-                                    setTagTreeSelectedNode(jpeg2Tag);
-                                } else {
-                                    it.setImage(data);
+                                    setTagTreeSelectedNode(newTag);
                                 }
                                 SWF.clearImageCache();
                             } catch (IOException ex) {
@@ -2062,8 +2059,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                        bt.binaryData = data;
-                        bt.setModified(true);
+                        new BinaryDataImporter().importData(bt, data);
                         reload(true);
                     }
                 }

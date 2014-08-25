@@ -56,11 +56,14 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
@@ -223,7 +226,7 @@ public class CommandLineArgumentParser {
         System.out.println(" " + (cnt++) + ") -zoom <N>");
         System.out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
         System.out.println(" " + (cnt++) + ") -replaceBinaryData <infile> <outfile> <characterId> <newBinaryFile>");
-        System.out.println(" ...replaces the specified BinaryData tag");
+        System.out.println(" ...replaces the binary data of the specified BinaryData or Image tag");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -1264,15 +1267,20 @@ public class CommandLineArgumentParser {
                     System.err.println("CharacterId not exits");
                     badArguments();
                 }
+                
                 CharacterTag characterTag = swf.characters.get(characterId);
-                if (!(characterTag instanceof DefineBinaryDataTag)) {
-                    System.err.println("The specified CharacterId it not a BinaryData tag");
+                byte[] data = Helper.readFile(args.remove());
+                if (characterTag instanceof DefineBinaryDataTag) {
+                    DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
+                    new BinaryDataImporter().importData(defineBinaryData, data);
+                } else if (characterTag instanceof ImageTag) {
+                    ImageTag imageTag = (ImageTag) characterTag;
+                    new ImageImporter().importImage(imageTag, data);
+                } else {
+                    System.err.println("The specified tag type it not supported for import");
                     badArguments();
                 }
-                DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
-                byte[] data = Helper.readFile(args.remove());
-                defineBinaryData.binaryData = data;
-                defineBinaryData.setModified(true);
+
                 try {
                     try (FileOutputStream fos = new FileOutputStream(outFile)) {
                         swf.saveTo(fos);
