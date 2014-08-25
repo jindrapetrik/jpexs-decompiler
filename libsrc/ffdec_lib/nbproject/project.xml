@@ -87,7 +87,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/flamingo-6.2.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jargs.jar;../../lib/jl1.0.1.jar;../../lib/jna-3.5.1.jar;../../lib/jpacker.jar;../../lib/jpproxy.jar;../../lib/jsyntaxpane-0.9.5.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/substance-6.2.jar;../../lib/substance-flamingo-6.2.jar;../../lib/trident-6.2.jar;../../lib/ttf.jar</classpath>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/flamingo-6.2.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jargs.jar;../../lib/jl1.0.1.jar;../../lib/jna-3.5.1.jar;../../lib/jpacker.jar;../../lib/jpproxy.jar;../../lib/jsyntaxpane-0.9.5.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/substance-6.2.jar;../../lib/substance-flamingo-6.2.jar;../../lib/trident-6.2.jar;../../lib/ttf.jar;../../src;../../build/classes;../../dist/ffdec.jar</classpath>
                 <built-to>build</built-to>
                 <source-level>1.7</source-level>
             </compilation-unit>
