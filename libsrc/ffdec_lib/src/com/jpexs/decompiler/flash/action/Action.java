@@ -15,7 +15,7 @@
  * License along with this library. */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -414,7 +414,7 @@ public class Action implements GraphSourceItem {
         boolean lastPush = false;
         for (GraphSourceItem s : list) {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress(AppStrings.translate("disassemblingProgress.toString"), pos + 2, list.size());
+                listeners.get(i).progressToString(pos + 2, list.size());
             }
             Action a = null;
             if (s instanceof Action) {
@@ -854,9 +854,9 @@ public class Action implements GraphSourceItem {
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[]{
                             "",
-                            " * " + AppStrings.translate("decompilationError"),
-                            " * " + AppStrings.translate("decompilationError.obfuscated"),
-                            " * " + AppStrings.translate("decompilationError.errorType") + ": "
+                            " * " + AppResources.translate("decompilationError"),
+                            " * " + AppResources.translate("decompilationError.obfuscated"),
+                            " * " + AppResources.translate("decompilationError.errorType") + ": "
                             + ex2.getClass().getSimpleName(),
                             ""}));
                     }

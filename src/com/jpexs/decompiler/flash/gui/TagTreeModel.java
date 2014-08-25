@@ -244,7 +244,7 @@ public class TagTreeModel implements TreeModel {
         }
         swfNode.scriptsNode = actionScriptNode;
 
-        ret.add(new HeaderNode(new HeaderItem(swf)));
+        ret.add(new HeaderNode(new HeaderItem(swf, AppStrings.translate("node.header"))));
 
         if (!shapesNode.subNodes.isEmpty()) {
             ret.add(shapesNode);

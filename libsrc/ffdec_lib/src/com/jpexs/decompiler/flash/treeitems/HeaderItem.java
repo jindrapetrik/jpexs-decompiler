@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 
 /**
@@ -25,9 +25,11 @@ import com.jpexs.decompiler.flash.SWF;
 public class HeaderItem implements TreeItem {
 
     private final SWF swf;
+    private final String name;
 
-    public HeaderItem(SWF swf) {
+    public HeaderItem(SWF swf, String name) {
         this.swf = swf;
+        this.name = name;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class HeaderItem implements TreeItem {
 
     @Override
     public String toString() {
-        return AppStrings.translate("node.header");
+        return name;
     }
 
 }

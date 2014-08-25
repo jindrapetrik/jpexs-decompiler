@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import java.util.ResourceBundle;
@@ -21,24 +22,9 @@ import java.util.ResourceBundle;
  *
  * @author JPEXS
  */
-public class AppStrings {
+public class AppResources {
 
-    private static Class resourceClass;
-    private static ResourceBundle resourceBundle;
-
-    public static void setResourceClass(Class cls) {
-        resourceClass = cls;
-        updateLanguage();
-    }
-
-    public static String getResourcePath(Class cls) {
-        String name = cls.getName();
-        if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {
-            name = name.substring("com.jpexs.decompiler.flash.gui.".length());
-            name = "com.jpexs.decompiler.flash.gui.locales." + name;
-        }
-        return name;
-    }
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.jpexs.decompiler.flash.gui.locales.AppResources");
 
     public static String translate(String key) {
         return resourceBundle.getString(key);
@@ -49,7 +35,4 @@ public class AppStrings {
         return b.getString(key);
     }
 
-    public static void updateLanguage() {
-        resourceBundle = ResourceBundle.getBundle(getResourcePath(resourceClass));
-    }
 }

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

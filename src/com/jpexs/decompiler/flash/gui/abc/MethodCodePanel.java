@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;

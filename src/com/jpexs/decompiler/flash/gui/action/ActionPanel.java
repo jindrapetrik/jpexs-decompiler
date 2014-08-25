@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
@@ -29,6 +28,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -361,8 +361,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             int percent = 0;
             String phase = "";
 
-            @Override
-            public void progress(String phase, long pos, long total) {
+            private void progress(String phase, long pos, long total) {
                 if (total < 1) {
                     return;
                 }
@@ -372,6 +371,21 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     this.phase = phase;
                     setEditorText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
                 }
+            }
+
+            @Override
+            public void progressReading(long pos, long total) {
+                progress(AppStrings.translate("disassemblingProgress.reading"), pos, total);
+            }
+
+            @Override
+            public void progressToString(long pos, long total) {
+                progress(AppStrings.translate("disassemblingProgress.toString"), pos, total);
+            }
+
+            @Override
+            public void progressDeobfuscating(long pos, long total) {
+                progress(AppStrings.translate("disassemblingProgress.deobfuscating"), pos, total);
             }
         };
         return listener;

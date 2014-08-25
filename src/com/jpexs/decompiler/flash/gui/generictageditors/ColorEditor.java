@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;

@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;

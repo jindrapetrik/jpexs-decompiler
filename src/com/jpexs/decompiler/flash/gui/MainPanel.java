@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;

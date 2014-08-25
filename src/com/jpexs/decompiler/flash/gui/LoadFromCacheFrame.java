@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.browsers.cache.CacheEntry;
 import com.jpexs.browsers.cache.CacheImplementation;
 import com.jpexs.browsers.cache.CacheReader;
-import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;

@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
@@ -727,7 +728,7 @@ public class ActionListReader {
                 long pos = sis.getPos();
                 long length = pos + sis.available();
                 for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).progress(AppStrings.translate("disassemblingProgress.reading"), pos, length);
+                    listeners.get(i).progressReading(pos, length);
                 }
 
                 a.setAddress(ip);
@@ -802,7 +803,7 @@ public class ActionListReader {
             curVisited++;
             visited.put(ip, curVisited);
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress(AppStrings.translate("disassemblingProgress.deobfuscating"), ip, actions.size());
+                listeners.get(i).progressDeobfuscating(ip, actions.size());
             }
             int info = a.getTotalActionLength();
 
@@ -1015,7 +1016,7 @@ public class ActionListReader {
             }
         }
         for (DisassemblyListener listener : listeners) {
-            listener.progress(AppStrings.translate("disassemblingProgress.deobfuscating"), ip, actions.size());
+            listener.progressDeobfuscating(ip, actions.size());
         }
     }
 }

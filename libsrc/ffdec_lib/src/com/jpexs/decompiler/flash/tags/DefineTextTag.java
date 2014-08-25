@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -168,7 +169,7 @@ public class DefineTextTag extends TextTag {
             }
 
             if (fnt == null) {
-                ret += AppStrings.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId));
+                ret += AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId));
             } else {
                 ret += Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]");
             }

@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -34,7 +35,7 @@ public class MarkItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("//" + AppStrings.translate("decompilerMark") + ":" + mark);
+        return writer.append("//" + AppResources.translate("decompilerMark") + ":" + mark);
     }
 
     public String getMark() {

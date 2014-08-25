@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -31,7 +32,7 @@ public class UnsupportedActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("//" + AppStrings.translate("decompilation.unsupported") + ":" + value);
+        return writer.append("//" + AppResources.translate("decompilation.unsupported") + ":" + value);
     }
 
     @Override

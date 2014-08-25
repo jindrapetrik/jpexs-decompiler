@@ -16,11 +16,10 @@
  */
 package com.jpexs.helpers;
 
-import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -651,13 +650,13 @@ public class Helper {
         timeM %= 60;
 
         String timeStr = "";
-        String strAnd = AppStrings.translate("timeFormat.and");
-        String strHour = AppStrings.translate("timeFormat.hour");
-        String strHours = AppStrings.translate("timeFormat.hours");
-        String strMinute = AppStrings.translate("timeFormat.minute");
-        String strMinutes = AppStrings.translate("timeFormat.minutes");
-        String strSecond = AppStrings.translate("timeFormat.second");
-        String strSeconds = AppStrings.translate("timeFormat.seconds");
+        String strAnd = AppResources.translate("timeFormat.and");
+        String strHour = AppResources.translate("timeFormat.hour");
+        String strHours = AppResources.translate("timeFormat.hours");
+        String strMinute = AppResources.translate("timeFormat.minute");
+        String strMinutes = AppResources.translate("timeFormat.minutes");
+        String strSecond = AppResources.translate("timeFormat.second");
+        String strSeconds = AppResources.translate("timeFormat.seconds");
 
         if (timeH > 0) {
             timeStr += timeH + " " + (timeH > 1 ? strHours : strHour);
@@ -681,10 +680,10 @@ public class Helper {
 
     public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
         writer.appendNoHilight("#hexdata").newLine().newLine();
-        return byteArrayToHex(writer, data, 8, 8, -1, false, false);
+        return byteArrayToHex(writer, data, 8, 8, false, false);
     }
 
-    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, int limit, boolean addChars, boolean showAddress) {
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
          Scanner scanner = new Scanner(srcWithHex);
@@ -697,9 +696,6 @@ public class Helper {
          }
          }*/
         int length = data.length;
-        if (limit != -1 && length > limit) {
-            length = limit;
-        }
 
         int rowCount = length / bytesPerRow;
         if (length % bytesPerRow > 0) {
@@ -754,17 +750,7 @@ public class Helper {
         }
 
         writer.newLine();
-        if (limit != -1 && data.length > limit) {
-            writer.appendNoHilight(AppStrings.translate("binaryData.truncateWarning").replace("%count%", Integer.toString(data.length - limit)));
-        }
-
         return writer;
-    }
-
-    public static String byteArrayToHex(byte[] data, int bytesPerRow, int limit) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-        byteArrayToHex(writer, data, bytesPerRow, 8, limit, true, true);
-        return writer.toString();
     }
 
     public static byte[] getBytesFromHexaText(String text) {
@@ -809,23 +795,23 @@ public class Helper {
 
     public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
         writer.appendNoHilight("/*").newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppResources.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
         writer.appendNoHilight(" */").newLine();
         writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
-                appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
+                appendNoHilight(AppResources.translate("decompilationError.timeout.description")).
                 appendNoHilight("\");").newLine();
     }
 
     public static void appendErrorComment(GraphTextWriter writer, Throwable ex) {
         writer.appendNoHilight("/*").newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.obfuscated")).newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.obfuscated")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.errorType")).
                 appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
         writer.appendNoHilight(" */").newLine();
         writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
-                appendNoHilight(AppStrings.translate("decompilationError.error.description")).
+                appendNoHilight(AppResources.translate("decompilationError.error.description")).
                 appendNoHilight("\");").newLine();
     }
 

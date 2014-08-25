@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 /**
@@ -21,5 +22,7 @@ package com.jpexs.decompiler.flash;
  */
 public interface DisassemblyListener {
 
-    public void progress(String phase, long pos, long total);
+    public void progressReading(long pos, long total);
+    public void progressToString(long pos, long total);
+    public void progressDeobfuscating(long pos, long total);
 }
