@@ -22,6 +22,7 @@
 hs_err_pid*.log
 *.~*
 /revision.txt
+/lib/ffdec_lib.jar
 /libsrc/gnujpdf/dist/
 /libsrc/jsyntaxpane/jsyntaxpane/target/
 /libsrc/ffdec_lib/build/
