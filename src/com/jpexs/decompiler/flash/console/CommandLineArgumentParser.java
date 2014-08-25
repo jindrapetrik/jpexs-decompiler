@@ -56,9 +56,11 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
@@ -220,6 +222,8 @@ public class CommandLineArgumentParser {
         System.out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
         System.out.println(" " + (cnt++) + ") -zoom <N>");
         System.out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
+        System.out.println(" " + (cnt++) + ") -replaceBinaryData <infile> <outfile> <characterId> <newBinaryFile>");
+        System.out.println(" ...replaces the specified BinaryData tag");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -341,6 +345,8 @@ public class CommandLineArgumentParser {
             parseDumpSwf(args);
         } else if (nextParam.equals("-flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args);
+        } else if (nextParam.equals("-replacebinarydata")) {
+            parseReplaceBinaryData(args);
         } else if (nextParam.equals("-as3compiler")) {
             ActionScriptParser.compile(null /*?*/, args.remove(), args.remove());
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
@@ -1237,6 +1243,51 @@ public class CommandLineArgumentParser {
         System.exit(0);
     }
 
+    private static void parseReplaceBinaryData(Queue<String> args) {
+        if (args.size() < 4) {
+            badArguments();
+        }
+
+        File inFile = new File(args.remove());
+        File outFile = new File(args.remove());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                try {
+                    
+                } catch (NumberFormatException nfe) {
+                    System.err.println("CharacterId should be integer");
+                    badArguments();
+                }
+                int characterId = Integer.parseInt(args.remove());
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                if (!swf.characters.containsKey(characterId)) {
+                    System.err.println("CharacterId not exits");
+                    badArguments();
+                }
+                CharacterTag characterTag = swf.characters.get(characterId);
+                if (!(characterTag instanceof DefineBinaryDataTag)) {
+                    System.err.println("The specified CharacterId it not a BinaryData tag");
+                    badArguments();
+                }
+                DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
+                byte[] data = Helper.readFile(args.remove());
+                defineBinaryData.binaryData = data;
+                defineBinaryData.setModified(true);
+                try {
+                    try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+    
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();

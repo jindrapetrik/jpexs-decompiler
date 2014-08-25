@@ -2106,10 +2106,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         cl.show(displayPanel, card);
     }
 
-    private void dumpTreeValueChanged(TreeSelectionEvent e) {
-        dumpViewReload(false);
-    }
-
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object source = e.getSource();

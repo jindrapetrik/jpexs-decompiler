@@ -53,6 +53,8 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
         } else {
             hexEditor.setData(new byte[0], null, null);
         }
+        hexEditor.revalidate();
+        hexEditor.repaint();
     }
 
     @Override
