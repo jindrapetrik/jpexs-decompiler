@@ -182,7 +182,6 @@
             </compilation-unit>
             <compilation-unit>
                 <package-root>libsrc/ffdec_lib/src</package-root>
-                <classpath mode="compile">src</classpath>
                 <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>

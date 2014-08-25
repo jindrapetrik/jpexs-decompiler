@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="ffdec_lib-IDE">
+    <import file="../../../build.xml"/>
+    <target name="debug-nb" depends="build">
+        <path id="cp">
+            <pathelement path="${basedir}/build/classes"/>
+            <pathelement path="${basedir}/../../build/classes"/>
+            <fileset dir="${basedir}/../../lib" includes="**/*.jar"/>
+        </path>
+        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
+            <classpath refid="cp"/>
+        </nbjpdastart>
+        <java classname="com.jpexs.decompiler.flash.gui.Main" fork="true">
+            <classpath refid="cp"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg value="-Xmx3072m"/>
+            <arg line="${RUNPARAMS}"/>
+        </java>
+    </target>
+</project>
