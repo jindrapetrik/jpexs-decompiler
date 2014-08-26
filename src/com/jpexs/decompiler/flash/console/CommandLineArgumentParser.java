@@ -317,6 +317,9 @@ public class CommandLineArgumentParser {
                     traceLevel = Level.FINE;
                     break;
                 case "-debug":
+                    for (int i = 0; i < arguments.length; i++) {
+                        System.out.println(i + ".:" + arguments.length);
+                    }
                     Configuration.debugMode.set(true);
                     break;
                 default:
