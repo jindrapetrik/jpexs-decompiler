@@ -267,12 +267,12 @@ public class CommandLineArgumentParser {
         double zoom = 1;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
-        String nextParam;
+        String nextParam = null, nextParamOriginal = null;
         OUTER:
         while (true) {
-            nextParam = args.remove();
-            if (nextParam != null) {
-                nextParam = nextParam.toLowerCase();
+            nextParamOriginal = args.remove();
+            if (nextParamOriginal != null) {
+                nextParam = nextParamOriginal.toLowerCase();
             }
             switch (nextParam) {
                 case "-selectid":
@@ -357,7 +357,7 @@ public class CommandLineArgumentParser {
             printCmdLineUsage();
             System.exit(0);
         } else if (args.isEmpty()) {
-            return nextParam;
+            return nextParamOriginal; // file names should be the original one
         } else {
             badArguments();
         }
