@@ -318,7 +318,7 @@ public class CommandLineArgumentParser {
                     break;
                 case "-debug":
                     for (int i = 0; i < arguments.length; i++) {
-                        System.out.println(i + ".:" + arguments.length);
+                        System.out.println(i + ".:" + arguments[i]);
                     }
                     Configuration.debugMode.set(true);
                     break;
