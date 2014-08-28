@@ -13,8 +13,10 @@
 package com.sun.jna.platform.win32;
 
 import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.win32.W32APIOptions;
 
 // TODO: Auto-generated Javadoc
@@ -226,7 +228,7 @@ public interface Kernel32 extends WinNT {
     public static int MEM_MAPPED = 0x40000;
     public static int MEM_PRIVATE = 0x20000;
 
-    boolean ReadProcessMemory(HANDLE hProcess, int inBaseAddress, Pointer outputBuffer, int nSize, IntByReference outNumberOfBytesRead);
+    boolean ReadProcessMemory(HANDLE hProcess, Pointer inBaseAddress, Pointer outputBuffer, NativeLong nSize, NativeLongByReference outNumberOfBytesRead);
 
     /**
      * Takes a snapshot of the specified processes, as well as the heaps,

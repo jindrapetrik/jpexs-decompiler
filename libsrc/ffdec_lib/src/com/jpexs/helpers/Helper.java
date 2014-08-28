@@ -473,7 +473,7 @@ public class Helper {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+            //ignore
         }
     }
 

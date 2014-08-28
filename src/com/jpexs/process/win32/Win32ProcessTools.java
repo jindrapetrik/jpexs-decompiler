@@ -38,6 +38,7 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -390,22 +391,22 @@ public class Win32ProcessTools extends ProcessTools {
         for (int pg = 0; pg < pages.size(); pg++) {
             MEMORY_BASIC_INFORMATION mbi = pages.get(pg);
             if (pageReadable(mbi)) {
-                int addr = (int) pointerToAddress(mbi.baseAddress);
+                long addr = pointerToAddress(mbi.baseAddress);  
                 int maxsize = mbi.regionSize.intValue();
-                int pos = 0;
-                int bufSize = 1024;
-                do {
-                    IntByReference bytesReadRef = new IntByReference();
+                long pos = 0;
+                long bufSize = 1024*512;
+                do {                    
+                    NativeLongByReference bytesReadRef = new NativeLongByReference();
                     Memory buf = new Memory(bufSize);
-                    boolean ok = Kernel32.INSTANCE.ReadProcessMemory(hOtherProcess, addr + pos, buf, bufSize, bytesReadRef);
+                    boolean ok = Kernel32.INSTANCE.ReadProcessMemory(hOtherProcess, new Pointer(addr + pos), buf, new NativeLong(bufSize), bytesReadRef);
                     if (!ok) {
                         break;
                     }
-                    if (bytesReadRef.getValue() == 0) {
+                    if (bytesReadRef.getValue().longValue() == 0) {
                         break;
                     }
 
-                    byte[] data = buf.getByteArray(0, bytesReadRef.getValue());
+                    byte[] data = buf.getByteArray(0, bytesReadRef.getValue().intValue());
 
                     prevBytes = Arrays.copyOfRange(data, data.length - maxFindLen, data.length);
                     byte[] dataPlusPrev = mergeArrays(prevBytes, data);
@@ -425,7 +426,7 @@ public class Win32ProcessTools extends ProcessTools {
                         }
 
                     }
-                    pos += bytesReadRef.getValue();
+                    pos += bytesReadRef.getValue().longValue();
                     if (progListener != null) {
                         int newprogress = Math.round((actualPos + pos) * 100 / totalMemLen);
                         if (newprogress != progress) {
@@ -529,13 +530,13 @@ public class Win32ProcessTools extends ProcessTools {
 
         private final List<MEMORY_BASIC_INFORMATION> pages;
         private int currentPage = 0;
-        private int pagePos = 0;
-        private static final int BUFFER_SIZE = 1024;
+        private long pagePos = 0;
+        private static final int BUFFER_SIZE = 1024*512;
         private byte[] buf;
         private int bufPos;
         private final HANDLE hOtherProcess;
 
-        public ProcessMemoryInputStream(List<MEMORY_BASIC_INFORMATION> pages, HANDLE hOtherProcess, int currentPage, int pagePos) {
+        public ProcessMemoryInputStream(List<MEMORY_BASIC_INFORMATION> pages, HANDLE hOtherProcess, int currentPage, long pagePos) {
             this.pages = pages;
             this.hOtherProcess = hOtherProcess;
             this.currentPage = currentPage;
@@ -559,15 +560,15 @@ public class Win32ProcessTools extends ProcessTools {
                 }
                 return false;
             }
-            int addr = (int) pointerToAddress(mbi.baseAddress);
+            long addr = pointerToAddress(mbi.baseAddress);
             int maxsize = mbi.regionSize.intValue();
-            IntByReference bytesReadRef = new IntByReference();
+            NativeLongByReference bytesReadRef = new NativeLongByReference();
             Memory membuf = new Memory(BUFFER_SIZE);
-            int bufSize = BUFFER_SIZE;
-            if (pagePos + bufSize > maxsize) {
-                bufSize = maxsize - pagePos;
+            NativeLong bufSize = new NativeLong(BUFFER_SIZE);
+            if (pagePos + bufSize.longValue() > maxsize) {
+                bufSize.setValue(maxsize - pagePos);
             }
-            if (bufSize == 0) {
+            if (bufSize.longValue() == 0) {
                 if (currentPage + 1 < pages.size()) {
                     pagePos = 0;
                     currentPage++;
@@ -575,16 +576,16 @@ public class Win32ProcessTools extends ProcessTools {
                 }
                 return false;
             }
-            boolean ok = Kernel32.INSTANCE.ReadProcessMemory(hOtherProcess, addr + pagePos, membuf, bufSize, bytesReadRef);
+            boolean ok = Kernel32.INSTANCE.ReadProcessMemory(hOtherProcess, new Pointer(addr + pagePos), membuf, bufSize, bytesReadRef);
             if (!ok) {
                 throw new IOException("Cannot read memory");
             }
-            if (bytesReadRef.getValue() == 0) {
+            if (bytesReadRef.getValue().longValue() == 0) {
                 return readNext();
             }
-            pagePos += bytesReadRef.getValue();
+            pagePos += bytesReadRef.getValue().longValue();
 
-            buf = membuf.getByteArray(0, bytesReadRef.getValue());
+            buf = membuf.getByteArray(0, bytesReadRef.getValue().intValue());
             return true;
         }
 
