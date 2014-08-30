@@ -74,7 +74,7 @@ public class HexViewTableModel extends AbstractTableModel {
         } else {
             int pos = row * bytesInRow + column - bytesInRow - 1 - 1;
             if (pos < data.length) {
-                return (char) data[pos];
+                return (char) (data[pos] & 0xff);
             }
             return null;
         }

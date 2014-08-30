@@ -2172,8 +2172,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
 
-        dumpViewPanel.setSelectedNode(dumpInfo);
         dumpViewPanel.revalidate();
+        dumpViewPanel.setSelectedNode(dumpInfo);
         showCard(CARDDUMPVIEW);
     }
 

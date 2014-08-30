@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.gui.hexview;
  */
 public interface HexViewListener {
 
-    public void byteMouseClicked(int address, byte b);
+    public void byteValueChanged(int address, byte b);
 
     public void byteMouseMoved(int address, byte b);
 }

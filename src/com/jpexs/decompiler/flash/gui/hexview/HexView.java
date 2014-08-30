@@ -51,7 +51,6 @@ public class HexView extends JTable {
     private int itsRow = 0;
     private int itsColumn = 0;
     private HexViewListener listener;
-    private boolean disableScroll;
     
     private class HighlightCellRenderer extends DefaultTableCellRenderer {
 
@@ -112,10 +111,11 @@ public class HexView extends JTable {
 
             if (col > 0 && highlightStarts != null && col != bytesInRow + 1) {
                 int idx = row * bytesInRow + ((col > bytesInRow + 1) ? (col - bytesInRow - 2) : (col - 1));
-                if (listener != null) {
-                    disableScroll = true;
-                    listener.byteMouseClicked(idx, getModel().getData()[idx]);
-                    disableScroll = false;
+                byte[] data = getModel().getData();
+                if (idx < data.length) {
+                    if (listener != null) {
+                        listener.byteValueChanged(idx, data[idx]);
+                    }
                 }
             }
         }
@@ -213,9 +213,6 @@ public class HexView extends JTable {
     }
 
     public void scrollToByte(long byteNum) {
-        if (disableScroll) {
-            return;
-        }
 
         int row = (int) (byteNum / bytesInRow);
 

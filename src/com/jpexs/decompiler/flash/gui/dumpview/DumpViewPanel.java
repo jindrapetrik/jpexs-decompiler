@@ -42,6 +42,8 @@ public class DumpViewPanel extends JPanel {
     private final HexView dumpViewHexTable;
     private final DumpTree dumpTree;
     private DumpInfo selectedDumpInfo;
+    private boolean skipNextScroll;
+    private boolean skipValueChange;
 
     public DumpViewPanel(final DumpTree dumpTree) {
         super(new BorderLayout());
@@ -55,13 +57,18 @@ public class DumpViewPanel extends JPanel {
 
         dumpViewLabel = new JLabel();
         dumpViewLabel.setMinimumSize(new Dimension(100, 20));
+        dumpViewLabel.setText("-");
         add(dumpViewLabel, BorderLayout.SOUTH);
 
         dumpViewHexTable = new HexView();
         dumpViewHexTable.addListener(new HexViewListener() {
 
             @Override
-            public void byteMouseClicked(int address, byte b) {
+            public void byteValueChanged(int address, byte b) {
+                if (skipValueChange) {
+                    return;
+                }
+                
                 TreeModel model = dumpTree.getModel();
                 DumpInfo di = DumpInfoSwfNode.getSwfNode(selectedDumpInfo);
                 while (model.getChildCount(di) > 0) {
@@ -86,17 +93,19 @@ public class DumpViewPanel extends JPanel {
                 }
                 path.add(0, model.getRoot());
                 TreePath tp = new TreePath(path.toArray());
+                skipNextScroll = true;
                 dumpTree.setSelectionPath(tp);
                 dumpTree.scrollPathToVisible(tp);
             }
 
             @Override
             public void byteMouseMoved(int address, byte b) {
+                int b2 = b & 0xff;
                 selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8) + 
-                        " Hex: " + Helper.padZeros(Integer.toHexString(b), 2) + 
-                        " Dec: " + b + 
-                        " Bin: " + Helper.padZeros(Integer.toBinaryString(b), 8) + 
-                        " Ascii: " + (char) b);
+                        " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2) + 
+                        " Dec: " + b2 + 
+                        " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8) + 
+                        " Ascii: " + (char) b2);
             }
         });
         
@@ -105,6 +114,7 @@ public class DumpViewPanel extends JPanel {
 
     public void setSelectedNode(DumpInfo dumpInfo) {
         if (this.selectedDumpInfo == dumpInfo) {
+            skipNextScroll = false;
             return;
         }
         
@@ -124,12 +134,17 @@ public class DumpViewPanel extends JPanel {
             highlightEnds[i] = di2.getEndByte();
         }
         dumpViewHexTable.setData(data, highlightStarts, highlightEnds);
+        dumpViewHexTable.revalidate();
 
         if (dumpInfo.lengthBytes != 0 || dumpInfo.lengthBits != 0) {
             int selectionStart = (int) dumpInfo.startByte;
             int selectionEnd = (int) dumpInfo.getEndByte();
 
-            dumpViewHexTable.scrollToByte(highlightStarts, highlightEnds);
+            if (!skipNextScroll) {
+                skipValueChange = true;
+                dumpViewHexTable.scrollToByte(highlightStarts, highlightEnds);
+                skipValueChange = false;
+            }
 
             setLabelText("startByte: " + dumpInfo.startByte
                     + " startBit: " + dumpInfo.startBit
@@ -139,6 +154,7 @@ public class DumpViewPanel extends JPanel {
                     + " selectionEnd: " + selectionEnd);
         }
 
+        skipNextScroll = false;
         repaint();
     }
 
