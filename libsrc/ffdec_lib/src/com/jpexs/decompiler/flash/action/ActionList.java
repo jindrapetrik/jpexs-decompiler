@@ -137,6 +137,12 @@ public class ActionList extends ArrayList<Action> {
                 }
                 return null;
             }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
