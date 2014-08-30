@@ -358,7 +358,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createDumpPreviewCard() {
         JPanel dumpViewCard = new JPanel(new BorderLayout());
-        dumpViewPanel = new DumpViewPanel();
+        dumpViewPanel = new DumpViewPanel(dumpTree);
         dumpViewCard.add(new JScrollPane(dumpViewPanel), BorderLayout.CENTER);
 
         return dumpViewCard;
@@ -2172,7 +2172,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
 
-        dumpViewPanel.setData(DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData, dumpInfo);
+        dumpViewPanel.setSelectedNode(dumpInfo);
         dumpViewPanel.revalidate();
         showCard(CARDDUMPVIEW);
     }

@@ -17,7 +17,10 @@
 package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
-import com.jpexs.decompiler.flash.gui.HexView;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.gui.hexview.HexView;
+import com.jpexs.decompiler.flash.gui.hexview.HexViewListener;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -32,21 +37,79 @@ import javax.swing.JScrollPane;
  */
 public class DumpViewPanel extends JPanel {
 
+    private final JLabel selectedByteInfo;
     private final JLabel dumpViewLabel;
     private final HexView dumpViewHexTable;
+    private final DumpTree dumpTree;
+    private DumpInfo selectedDumpInfo;
 
-    public DumpViewPanel() {
+    public DumpViewPanel(final DumpTree dumpTree) {
         super(new BorderLayout());
+
+        this.dumpTree = dumpTree;
+        
+        selectedByteInfo = new JLabel();
+        selectedByteInfo.setMinimumSize(new Dimension(100, 20));
+        selectedByteInfo.setText("-");
+        add(selectedByteInfo, BorderLayout.NORTH);
 
         dumpViewLabel = new JLabel();
         dumpViewLabel.setMinimumSize(new Dimension(100, 20));
         add(dumpViewLabel, BorderLayout.SOUTH);
 
         dumpViewHexTable = new HexView();
+        dumpViewHexTable.addListener(new HexViewListener() {
+
+            @Override
+            public void byteMouseClicked(int address, byte b) {
+                TreeModel model = dumpTree.getModel();
+                DumpInfo di = DumpInfoSwfNode.getSwfNode(selectedDumpInfo);
+                while (model.getChildCount(di) > 0) {
+                    boolean found = false;
+                    for (DumpInfo child : di.getChildInfos()) {
+                        if (child.startByte > address) {
+                            break;
+                        }
+                        if (child.getEndByte() >= address) {
+                            di = child;
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                }
+                List<Object> path = new ArrayList<>();
+                while (di != null) {
+                    path.add(0, di);
+                    di = di.parent;
+                }
+                path.add(0, model.getRoot());
+                TreePath tp = new TreePath(path.toArray());
+                dumpTree.setSelectionPath(tp);
+                dumpTree.scrollPathToVisible(tp);
+            }
+
+            @Override
+            public void byteMouseMoved(int address, byte b) {
+                selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8) + 
+                        " Hex: " + Helper.padZeros(Integer.toHexString(b), 2) + 
+                        " Dec: " + b + 
+                        " Bin: " + Helper.padZeros(Integer.toBinaryString(b), 8) + 
+                        " Ascii: " + (char) b);
+            }
+        });
+        
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
-    public void setData(byte[] data, DumpInfo dumpInfo) {
+    public void setSelectedNode(DumpInfo dumpInfo) {
+        if (this.selectedDumpInfo == dumpInfo) {
+            return;
+        }
+        
+        this.selectedDumpInfo = dumpInfo;
+        byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
         List<DumpInfo> dumpInfos = new ArrayList<>();
         DumpInfo di = dumpInfo;
         while (di.parent != null) {

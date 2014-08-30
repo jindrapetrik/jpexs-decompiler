@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
