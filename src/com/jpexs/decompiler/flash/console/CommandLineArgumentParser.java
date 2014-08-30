@@ -1262,13 +1262,13 @@ public class CommandLineArgumentParser {
                     
                 } catch (NumberFormatException nfe) {
                     System.err.println("CharacterId should be integer");
-                    badArguments();
+                    System.exit(1);
                 }
                 int characterId = Integer.parseInt(args.remove());
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 if (!swf.characters.containsKey(characterId)) {
                     System.err.println("CharacterId not exits");
-                    badArguments();
+                    System.exit(1);
                 }
                 
                 CharacterTag characterTag = swf.characters.get(characterId);
@@ -1281,7 +1281,7 @@ public class CommandLineArgumentParser {
                     new ImageImporter().importImage(imageTag, data);
                 } else {
                     System.err.println("The specified tag type it not supported for import");
-                    badArguments();
+                    System.exit(1);
                 }
 
                 try {
