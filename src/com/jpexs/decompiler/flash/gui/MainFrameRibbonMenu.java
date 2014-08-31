@@ -276,12 +276,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         return mainMenu;
     }
 
-    private List<RibbonBandResizePolicy> getEmptyResizePolicies(JRibbonBand ribbonBand) {
+    private List<RibbonBandResizePolicy> titleResizePolicies(final JRibbonBand ribbonBand) {
         List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
         resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
             @Override
             public int getPreferredWidth(int i, int i1) {
-                return 105;
+                return ribbonBand.getGraphics().getFontMetrics(ribbonBand.getFont()).stringWidth(ribbonBand.getTitle())+20;
             }
 
             @Override
@@ -292,7 +292,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     }
 
     private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();       
         resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
         resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
         return resizePolicies;
@@ -516,14 +516,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         advancedSettingsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);
-        deobfuscationBand.setResizePolicies(getEmptyResizePolicies(deobfuscationBand)); //TODO: add icons and change this to getResizePolicies
+        deobfuscationBand.setResizePolicies(titleResizePolicies(deobfuscationBand));
 
         CommandToggleButtonGroup grpDeobfuscation = new CommandToggleButtonGroup();
 
-        deobfuscationModeOldToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.old")), null);
+        deobfuscationModeOldToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.old")), View.getResizableIcon("deobfuscateold16"));
         assignListener(deobfuscationModeOldToggleButton, ACTION_DEOBFUSCATION_MODE_OLD);
 
-        deobfuscationModeNewToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.new")), null);
+        deobfuscationModeNewToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.new")), View.getResizableIcon("deobfuscatenew16"));
         assignListener(deobfuscationModeNewToggleButton, ACTION_DEOBFUSCATION_MODE_NEW);
 
         grpDeobfuscation.add(deobfuscationModeOldToggleButton);
