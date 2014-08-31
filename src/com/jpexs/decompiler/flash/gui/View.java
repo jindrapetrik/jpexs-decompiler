@@ -17,9 +17,11 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -35,6 +37,9 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -233,7 +238,7 @@ public class View {
      * @return loaded Image
      */
     public static BufferedImage loadImage(String name) {
-        java.net.URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
+        URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
         try {
             return ImageIO.read(imageURL);
         } catch (IOException ex) {
@@ -247,7 +252,7 @@ public class View {
      * @param f Frame to set icon in
      */
     public static void setWindowIcon(Window f) {
-        java.util.List<Image> images = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         images.add(loadImage("icon16"));
         images.add(loadImage("icon32"));
         images.add(loadImage("icon48"));
@@ -519,4 +524,22 @@ public class View {
         JMenuItem findUsagesMenu = new JMenuItem(a);
         pmenu.add(findUsagesMenu);
     }
+
+    public static boolean navigateUrl(String url) {
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    URI uri = new URI(url);
+                    desktop.browse(uri);
+                    return true;
+                } catch (URISyntaxException | IOException ex) {
+                    Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+        return false;
+    }
 }
+

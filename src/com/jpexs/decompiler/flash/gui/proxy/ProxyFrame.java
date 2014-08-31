@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -182,7 +183,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 setVisible(false);
             }
         });
-        java.util.List<Image> images = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         images.add(View.loadImage("proxy16"));
         images.add(View.loadImage("proxy32"));
         setIconImages(images);
@@ -271,7 +272,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 started = false;
                 return;
             }
-            java.util.List<String> catchedContentTypes = new ArrayList<>();
+            List<String> catchedContentTypes = new ArrayList<>();
             catchedContentTypes.add("application/x-shockwave-flash");
             catchedContentTypes.add("application/x-javascript");
             catchedContentTypes.add("application/javascript");

@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -41,7 +42,7 @@ public class TimelineFrame extends AppFrame {
         cnt.setLayout(new BorderLayout());
         cnt.add(timeline = new TimelinePanel(timelined), BorderLayout.CENTER);
 
-        java.util.List<Image> images = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         images.add(View.loadImage("timeline16"));
         images.add(View.loadImage("timeline32"));
         setIconImages(images);

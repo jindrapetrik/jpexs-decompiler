@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import javax.swing.JLabel;
 
 /**
@@ -82,15 +80,6 @@ public class LinkLabel extends JLabel {
     }
 
     protected void clicked() {
-        if (java.awt.Desktop.isDesktopSupported()) {
-            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-            try {
-                java.net.URI uri = new java.net.URI(getNormalText());
-                desktop.browse(uri);
-            } catch (URISyntaxException | IOException e) {
-
-                System.err.println(e.getMessage());
-            }
-        }
+        View.navigateUrl(getNormalText());
     }
 }

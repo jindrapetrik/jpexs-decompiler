@@ -23,8 +23,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -143,26 +141,15 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand() == ACTION_OK) {
-            java.awt.Desktop desktop = null;
-            if (java.awt.Desktop.isDesktopSupported()) {
-                desktop = java.awt.Desktop.getDesktop();
-                if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
-                    try {
-                        if (latestVersion.updateLink != null) {
-                            java.net.URI uri = new java.net.URI(latestVersion.updateLink);
-                            desktop.browse(uri);
-                        } else {
-                            java.net.URI uri = new java.net.URI(ApplicationInfo.updatePage);
-                            desktop.browse(uri);
-                        }
-                        Main.exit();
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
-                    desktop = null;
-                }
+            String url; 
+            if (latestVersion.updateLink != null) {
+                url = latestVersion.updateLink;
+            } else {
+                url = ApplicationInfo.updatePage;
             }
-            if (desktop == null) {
+            if (View.navigateUrl(url)) {
+                Main.exit();
+            } else {
                 View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
             }
         }

@@ -388,7 +388,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         cnt.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel), BorderLayout.CENTER);
         View.setWindowIcon(this);
         View.centerScreen(this);
-        java.util.List<Image> images = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         images.add(View.loadImage("loadmemory16"));
         images.add(View.loadImage("loadmemory32"));
         setIconImages(images);

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
+import java.net.URL;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -32,7 +33,7 @@ public class IconListRenderer extends DefaultListCellRenderer {
 
     private Icon loadIcon(String path) {
         ClassLoader cldr = this.getClass().getClassLoader();
-        java.net.URL imageURL = cldr.getResource(path);
+        URL imageURL = cldr.getResource(path);
         return new ImageIcon(imageURL);
     }
 

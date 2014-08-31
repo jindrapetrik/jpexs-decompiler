@@ -124,8 +124,8 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
             ret.add((JRibbonApplicationMenuButton) comp);
             return;
         }
-        if (comp instanceof java.awt.Container) {
-            java.awt.Container cont = (java.awt.Container) comp;
+        if (comp instanceof Container) {
+            Container cont = (Container) comp;
             for (int i = 0; i < cont.getComponentCount(); i++) {
                 getApplicationMenuButtons(cont.getComponent(i), ret);
             }
@@ -135,81 +135,6 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-
-        /*        final MainFrameRibbon t = this;
-
-         //TODO: Handle this better. This is awful :-(
-         new Timer().schedule(new TimerTask() {
-         @Override
-         public void run() {
-         List<JRibbonApplicationMenuButton> mbuttons = new ArrayList<>();
-         getApplicationMenuButtons(t, mbuttons);
-         if (mbuttons.size() < 2) {
-         //return, task will run again
-         return;
-         }
-
-         for (final JRibbonApplicationMenuButton mbutton : mbuttons) {
-         mbutton.setIcon(View.getResizableIcon("buttonicon_256"));
-         mbutton.setDisplayState(new CommandButtonDisplayState(
-         "My Ribbon Application Menu Button", mbutton.getSize().width) {
-         @Override
-         public CommandButtonLayoutManager createLayoutManager(
-         AbstractCommandButton commandButton) {
-         return new CommandButtonLayoutManager() {
-         @Override
-         public int getPreferredIconSize() {
-         return mbutton.getSize().width;
-         }
-
-         @Override
-         public CommandButtonLayoutManager.CommandButtonLayoutInfo getLayoutInfo(
-         AbstractCommandButton commandButton, Graphics g) {
-         CommandButtonLayoutManager.CommandButtonLayoutInfo result = new CommandButtonLayoutManager.CommandButtonLayoutInfo();
-         result.actionClickArea = new Rectangle(0, 0, 0, 0);
-         result.popupClickArea = new Rectangle(0, 0, commandButton
-         .getWidth(), commandButton.getHeight());
-         result.popupActionRect = new Rectangle(0, 0, 0, 0);
-         ResizableIcon icon = commandButton.getIcon();
-         icon.setDimension(new Dimension(commandButton.getWidth(), commandButton.getHeight()));
-         result.iconRect = new Rectangle(
-         0,
-         0,
-         commandButton.getWidth(), commandButton.getHeight());
-         result.isTextInActionArea = false;
-         return result;
-         }
-
-         @Override
-         public Dimension getPreferredSize(
-         AbstractCommandButton commandButton) {
-         return new Dimension(40, 40);
-         }
-
-         @Override
-         public void propertyChange(PropertyChangeEvent evt) {
-         }
-
-         @Override
-         public Point getKeyTipAnchorCenterPoint(
-         AbstractCommandButton commandButton) {
-         // dead center
-         return new Point(commandButton.getWidth() / 2,
-         commandButton.getHeight() / 2);
-         }
-         };
-         }
-         });
-
-         MyRibbonApplicationMenuButtonUI mui = (MyRibbonApplicationMenuButtonUI) mbutton.getUI();
-         mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
-         mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
-         mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
-         mbutton.repaint();
-         }
-         cancel(); //cancel task so it does not run again
-         }
-         }, 1, 50);*/
         panel.setVisible(b);
     }
 

@@ -1147,7 +1147,7 @@ public class Main {
                                     if (!ver.changes.containsKey(changeType)) {
                                         ver.changes.put(changeType, new ArrayList<String>());
                                     }
-                                    java.util.List<String> chlist = ver.changes.get(changeType);
+                                    List<String> chlist = ver.changes.get(changeType);
                                     chlist.add(change);
                                 }
                             }

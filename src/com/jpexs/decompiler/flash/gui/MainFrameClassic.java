@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
@@ -102,7 +103,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
             }
         });
 
-        java.awt.Container cnt = getContentPane();
+        Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         cnt.add(panel);
 

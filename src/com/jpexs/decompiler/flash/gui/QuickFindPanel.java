@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.BorderFactory;
@@ -80,7 +81,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         setName("QuickFindDialog"); // NOI18N
 
         jLabel1.setLabelFor(findTextField);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        ResourceBundle bundle = ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("QuickFindDialog.jLabel1.text")); // NOI18N
         pan1.add(jLabel1);
 

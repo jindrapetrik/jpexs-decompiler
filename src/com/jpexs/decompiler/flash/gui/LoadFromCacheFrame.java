@@ -148,7 +148,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         openButton.setEnabled(false);
         saveButton.setEnabled(false);
 
-        java.util.List<Image> images = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         images.add(View.loadImage("loadcache16"));
         images.add(View.loadImage("loadcache32"));
         setIconImages(images);

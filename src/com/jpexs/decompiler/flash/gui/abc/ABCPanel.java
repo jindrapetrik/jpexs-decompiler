@@ -85,7 +85,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -758,19 +757,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 if (swc == null) {
                     if (View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%", adobePage), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
 
-                        java.awt.Desktop desktop = null;
-                        if (java.awt.Desktop.isDesktopSupported()) {
-                            desktop = java.awt.Desktop.getDesktop();
-                            if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
-                                try {
-                                    java.net.URI uri = new java.net.URI(adobePage);
-                                    desktop.browse(uri);
-                                } catch (URISyntaxException | IOException ex) {
-                                }
-                            } else {
-                                desktop = null;
-                            }
-                        }
+                        View.navigateUrl(adobePage);
 
                         int ret = 0;
                         do {

@@ -36,7 +36,6 @@ import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -292,7 +291,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     }
 
     private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();       
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
         resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
         resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
         return resizePolicies;
@@ -844,27 +843,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_HELP_US:
                 String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(helpUsURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
+                if (!View.navigateUrl(helpUsURL)) {
                     View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
                 }
                 break;
             case ACTION_HOMEPAGE:
                 String homePageURL = ApplicationInfo.PROJECT_PAGE;
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(homePageURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
+                if (!View.navigateUrl(homePageURL)) {
                     View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
                 }
                 break;
