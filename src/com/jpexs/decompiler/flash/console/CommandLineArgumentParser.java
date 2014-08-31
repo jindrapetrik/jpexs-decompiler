@@ -64,8 +64,10 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -80,6 +82,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -209,7 +212,7 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Extracts SWF files from ZIP or other binary files");
         System.out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
         System.out.println("  ...-o parameter should contain a folder path when no exctaction mode or \"all\" parameter is specified");
-        System.out.println(" " + (cnt++) + ") -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
+        System.out.println(" " + (cnt++) + ") -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfile>");
         System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
         System.out.println(" " + (cnt++) + ") -config key=value[,key2=value2][,key3=value3...] [other parameters]");
         System.out.print("  ...Sets configuration values. Available keys[current setting]:");
@@ -232,8 +235,8 @@ public class CommandLineArgumentParser {
         System.out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
         System.out.println(" " + (cnt++) + ") -zoom <N>");
         System.out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
-        System.out.println(" " + (cnt++) + ") -replaceBinaryData <infile> <outfile> <characterId> <newBinaryFile>");
-        System.out.println(" ...replaces the binary data of the specified BinaryData or Image tag");
+        System.out.println(" " + (cnt++) + ") -replace <infile> <outfile> <characterId> <importDataFile>");
+        System.out.println(" ...replaces the data of the specified BinaryData, Image or DefineSound tag");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -362,8 +365,8 @@ public class CommandLineArgumentParser {
             parseDumpSwf(args);
         } else if (nextParam.equals("-flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args);
-        } else if (nextParam.equals("-replacebinarydata")) {
-            parseReplaceBinaryData(args);
+        } else if (nextParam.equals("-replace")) {
+            parseReplace(args);
         } else if (nextParam.equals("-as3compiler")) {
             ActionScriptParser.compile(null /*?*/, args.remove(), args.remove());
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
@@ -1267,36 +1270,48 @@ public class CommandLineArgumentParser {
         System.exit(0);
     }
 
-    private static void parseReplaceBinaryData(Queue<String> args) {
+    private static void parseReplace(Queue<String> args) {
         if (args.size() < 4) {
             badArguments();
         }
-
+        
         File inFile = new File(args.remove());
         File outFile = new File(args.remove());
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
+                int characterId = 0;
                 try {
-                    
+                    characterId = Integer.parseInt(args.remove());
                 } catch (NumberFormatException nfe) {
                     System.err.println("CharacterId should be integer");
                     System.exit(1);
-                }
-                int characterId = Integer.parseInt(args.remove());
+                }                 
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 if (!swf.characters.containsKey(characterId)) {
-                    System.err.println("CharacterId not exits");
+                    System.err.println("CharacterId does not exist");
                     System.exit(1);
                 }
                 
                 CharacterTag characterTag = swf.characters.get(characterId);
-                byte[] data = Helper.readFile(args.remove());
+                String repFile = args.remove();
+                byte[] data = Helper.readFile(repFile);
                 if (characterTag instanceof DefineBinaryDataTag) {
                     DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
                     new BinaryDataImporter().importData(defineBinaryData, data);
                 } else if (characterTag instanceof ImageTag) {
                     ImageTag imageTag = (ImageTag) characterTag;
                     new ImageImporter().importImage(imageTag, data);
+                } else if (characterTag instanceof SoundTag){
+                    SoundTag st = (SoundTag)characterTag;
+                    int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                    if (repFile.toLowerCase().endsWith(".mp3")) {
+                        soundFormat = SoundFormat.FORMAT_MP3;
+                    }
+                    boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
+                    if(!ok){
+                        System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
+                        System.exit(1);
+                    }
                 } else {
                     System.err.println("The specified tag type it not supported for import");
                     System.exit(1);
