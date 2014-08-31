@@ -83,6 +83,7 @@ import java.awt.print.Paper;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -90,6 +91,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -121,140 +123,146 @@ public class CommandLineArgumentParser {
         return commandLineMode;
     }
 
-    //(as|pcode|pcodehex|hex|image|shape|movie|sound|binaryData|text|textplain|all|all_as|all_pcode|all_pcodehex|all_hex)
     public static void printCmdLineUsage() {
-        int cnt = 1;
-        System.out.println("Commandline arguments:");
-        System.out.println(" " + (cnt++) + ") -help | --help | /?");
-        System.out.println(" ...shows commandline arguments (this help)");
-        System.out.println(" " + (cnt++) + ") <infile>");
-        System.out.println(" ...opens SWF file with the decompiler GUI");
-        System.out.println(" " + (cnt++) + ") -proxy [-P<port>]");
-        System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" " + (cnt++) + ") -export <itemtypes> <outdirectory> <infile> [-selectas3class <class1> <class2> ...]");
-        System.out.println("  ...export <infile> sources to <outdirectory> ");
-        System.out.println("     Values for <itemtypes> parameter:");
-        System.out.println("        script - Scripts (Default format: ActionScript source)");
-        System.out.println("               - Optional DEPRECATED \"-selectas3class\" parameter can be passed in same way as -selectclass");
-        System.out.println("        image - Images (Default format: PNG/JPEG)");
-        System.out.println("        shape - Shapes (Default format: SVG)");
-        System.out.println("   morphshape - MorphShapes (Default format: SVG)");
-        System.out.println("        movie - Movies (Default format: FLV without sound)");
-        System.out.println("        frame - Frames (Default format: PNG)");
-        System.out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
-        System.out.println("        binaryData - Binary data (Default format:  Raw data)");
-        System.out.println("        text - Texts (Default format: Formatted text)");
-        System.out.println("        all - Every resource");
-        System.out.println("        fla - Everything to FLA compressed format");
-        System.out.println("        xfl - Everything to uncompressed FLA format (XFL)");
-        System.out.println("   You can export multiple types of items by using colon \",\"");
-        System.out.println("      DO NOT PUT space between comma (,) and next value.");
-        System.out.println();
-        System.out.println("   Old DEPRECATED aliases include: (please use basic itemtypes and -format parameter instead)");
-        System.out.println("        as, pcode, pcodehex, hex, all_as, all_pcode, all_pcodehex, textplain");
-        System.out.println();
-        System.out.println(" " + (cnt++) + ") -format <formats>");
-        System.out.println("  ...sets output formats for export");
-        System.out.println("    Values for <formats> parameter:");
-        System.out.println("         script:as - ActionScript source");
-        System.out.println("         script:pcode - ActionScript P-code");
-        System.out.println("         script:pcodehex - ActionScript P-code with hex");
-        System.out.println("         script:hex - ActionScript Hex only");
-        System.out.println("         shape:svg - SVG format for Shapes");
-        System.out.println("         shape:png - PNG format for Shapes");
-        System.out.println("         shape:canvas - HTML5 Canvas  format for Shapes");
-        System.out.println("         morphshape:svg - SVG format for MorphShapes");
-        System.out.println("         morphshape:canvas - HTML5 Canvas  format for MorphShapes");
-        System.out.println("         frame:png - PNG format for Frames");
-        System.out.println("         frame:gif - GIF format for Frames");
-        System.out.println("         frame:avi - AVI format for Frames");
-        System.out.println("         frame:canvas - HTML5 Canvas format for Frames");
-        System.out.println("         frame:pdf - PDF format for Frames");
-        System.out.println("         image:png_jpeg - PNG/JPEG format for Images");
-        System.out.println("         image:png - PNG format for Images");
-        System.out.println("         image:jpeg - JPEG format for Images");
-        System.out.println("         text:plain - Plain text format for Texts");
-        System.out.println("         text:formatted - Formatted text format for Texts");
-        System.out.println("         sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds");
-        System.out.println("         sound:mp3_wav - MP3/WAV format for Sounds");
-        System.out.println("         sound:wav - WAV format for Sounds");
-        System.out.println("         sound:flv - FLV format for Sounds");
-        System.out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
-        System.out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
+        printCmdLineUsage(System.out, true);
+    }
 
-        System.out.println("      You can set multiple formats at once using comma (,)");
-        System.out.println("      DO NOT PUT space between comma (,) and next value.");
-        System.out.println("      The prefix with colon (:) is neccessary.");
-        System.out.println(" " + (cnt++) + ") -select <ranges>");
-        System.out.println("  ...selects frames/pages for export");
-        System.out.println("    Example <ranges> formats:");
-        System.out.println("                      1-5");
-        System.out.println("                      2,3");
-        System.out.println("                      2-5,7,9-");
-        System.out.println("      DO NOT PUT space between comma (,) and next ramge.");
-        System.out.println(" " + (cnt++) + ") -selectid <ranges>");
-        System.out.println("  ...selects characters for export by character id");
-        System.out.println("     <ranges> format is same as in -select");
-        System.out.println(" " + (cnt++) + ") -selectclass <classnames>");
-        System.out.println("  ...selects scripts to export by class name (ActionScript 3 ONLY)");
-        System.out.println("     <classnames> format:");
-        System.out.println("                    com.example.MyClass");
-        System.out.println("                    com.example.+   (all classes in package \"com.example\")");
-        System.out.println("                    com.++,net.company.MyClass   (all classes in package \"com\" and all subpackages, class net.company.MyClass)");
-        System.out.println("      DO NOT PUT space between comma (,) and next class.");
-        System.out.println(" " + (cnt++) + ") -dumpSWF <infile>");
-        System.out.println("  ...dumps list of SWF tags to console");
-        System.out.println(" " + (cnt++) + ") -compress <infile> <outfile>");
-        System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
-        System.out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
-        System.out.println("  ...Decompress <infile> and save it to <outfile>");
-        System.out.println(" " + (cnt++) + ") -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
-        System.out.println("  ...Extracts SWF files from ZIP or other binary files");
-        System.out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
-        System.out.println("  ...-o parameter should contain a folder path when no exctaction mode or \"all\" parameter is specified");
-        System.out.println(" " + (cnt++) + ") -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfile>");
-        System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
-        System.out.println(" " + (cnt++) + ") -config key=value[,key2=value2][,key3=value3...] [other parameters]");
-        System.out.print("  ...Sets configuration values. Available keys[current setting]:");
-        for (ConfigurationItem item : commandlineConfigBoolean) {
-            System.out.print(" " + item + "[" + item.get() + "]");
+    public static void printCmdLineUsage(PrintStream out, boolean printConfigs) {
+        int cnt = 1;
+        out.println("Commandline arguments:");
+        out.println(" " + (cnt++) + ") -help | --help | /?");
+        out.println(" ...shows commandline arguments (this help)");
+        out.println(" " + (cnt++) + ") <infile>");
+        out.println(" ...opens SWF file with the decompiler GUI");
+        out.println(" " + (cnt++) + ") -proxy [-P<port>]");
+        out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
+        out.println(" " + (cnt++) + ") -export <itemtypes> <outdirectory> <infile> [-selectas3class <class1> <class2> ...]");
+        out.println("  ...export <infile> sources to <outdirectory> ");
+        out.println("     Values for <itemtypes> parameter:");
+        out.println("        script - Scripts (Default format: ActionScript source)");
+        out.println("               - Optional DEPRECATED \"-selectas3class\" parameter can be passed in same way as -selectclass");
+        out.println("        image - Images (Default format: PNG/JPEG)");
+        out.println("        shape - Shapes (Default format: SVG)");
+        out.println("   morphshape - MorphShapes (Default format: SVG)");
+        out.println("        movie - Movies (Default format: FLV without sound)");
+        out.println("        frame - Frames (Default format: PNG)");
+        out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
+        out.println("        binaryData - Binary data (Default format:  Raw data)");
+        out.println("        text - Texts (Default format: Formatted text)");
+        out.println("        all - Every resource");
+        out.println("        fla - Everything to FLA compressed format");
+        out.println("        xfl - Everything to uncompressed FLA format (XFL)");
+        out.println("   You can export multiple types of items by using colon \",\"");
+        out.println("      DO NOT PUT space between comma (,) and next value.");
+        out.println();
+        out.println("   Old DEPRECATED aliases include: (please use basic itemtypes and -format parameter instead)");
+        out.println("        as, pcode, pcodehex, hex, all_as, all_pcode, all_pcodehex, textplain");
+        out.println();
+        out.println(" " + (cnt++) + ") -format <formats>");
+        out.println("  ...sets output formats for export");
+        out.println("    Values for <formats> parameter:");
+        out.println("         script:as - ActionScript source");
+        out.println("         script:pcode - ActionScript P-code");
+        out.println("         script:pcodehex - ActionScript P-code with hex");
+        out.println("         script:hex - ActionScript Hex only");
+        out.println("         shape:svg - SVG format for Shapes");
+        out.println("         shape:png - PNG format for Shapes");
+        out.println("         shape:canvas - HTML5 Canvas  format for Shapes");
+        out.println("         morphshape:svg - SVG format for MorphShapes");
+        out.println("         morphshape:canvas - HTML5 Canvas  format for MorphShapes");
+        out.println("         frame:png - PNG format for Frames");
+        out.println("         frame:gif - GIF format for Frames");
+        out.println("         frame:avi - AVI format for Frames");
+        out.println("         frame:canvas - HTML5 Canvas format for Frames");
+        out.println("         frame:pdf - PDF format for Frames");
+        out.println("         image:png_jpeg - PNG/JPEG format for Images");
+        out.println("         image:png - PNG format for Images");
+        out.println("         image:jpeg - JPEG format for Images");
+        out.println("         text:plain - Plain text format for Texts");
+        out.println("         text:formatted - Formatted text format for Texts");
+        out.println("         sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds");
+        out.println("         sound:mp3_wav - MP3/WAV format for Sounds");
+        out.println("         sound:wav - WAV format for Sounds");
+        out.println("         sound:flv - FLV format for Sounds");
+        out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
+        out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
+
+        out.println("      You can set multiple formats at once using comma (,)");
+        out.println("      DO NOT PUT space between comma (,) and next value.");
+        out.println("      The prefix with colon (:) is neccessary.");
+        out.println(" " + (cnt++) + ") -select <ranges>");
+        out.println("  ...selects frames/pages for export");
+        out.println("    Example <ranges> formats:");
+        out.println("                      1-5");
+        out.println("                      2,3");
+        out.println("                      2-5,7,9-");
+        out.println("      DO NOT PUT space between comma (,) and next ramge.");
+        out.println(" " + (cnt++) + ") -selectid <ranges>");
+        out.println("  ...selects characters for export by character id");
+        out.println("     <ranges> format is same as in -select");
+        out.println(" " + (cnt++) + ") -selectclass <classnames>");
+        out.println("  ...selects scripts to export by class name (ActionScript 3 ONLY)");
+        out.println("     <classnames> format:");
+        out.println("                    com.example.MyClass");
+        out.println("                    com.example.+   (all classes in package \"com.example\")");
+        out.println("                    com.++,net.company.MyClass   (all classes in package \"com\" and all subpackages, class net.company.MyClass)");
+        out.println("      DO NOT PUT space between comma (,) and next class.");
+        out.println(" " + (cnt++) + ") -dumpSWF <infile>");
+        out.println("  ...dumps list of SWF tags to console");
+        out.println(" " + (cnt++) + ") -compress <infile> <outfile>");
+        out.println("  ...Compress SWF <infile> and save it to <outfile>");
+        out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
+        out.println("  ...Decompress <infile> and save it to <outfile>");
+        out.println(" " + (cnt++) + ") -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
+        out.println("  ...Extracts SWF files from ZIP or other binary files");
+        out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
+        out.println("  ...-o parameter should contain a folder path when no exctaction mode or \"all\" parameter is specified");
+        out.println(" " + (cnt++) + ") -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfile>");
+        out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
+        out.println(" " + (cnt++) + ") -config key=value[,key2=value2][,key3=value3...] [other parameters]");
+        out.print("  ...Sets configuration values. ");
+        if (printConfigs) {
+            out.print("Available keys[current setting]:");
+            for (ConfigurationItem item : commandlineConfigBoolean) {
+                out.print(" " + item + "[" + item.get() + "]");
+            }
         }
-        System.out.println("");
-        System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
-        System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
-        System.out.println("    DO NOT PUT space between comma (,) and next value.");
-        System.out.println(" " + (cnt++) + ") -onerror (abort|retryN|ignore)");
-        System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
-        System.out.println(" " + (cnt++) + ") -timeout <N>");
-        System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
-        System.out.println(" " + (cnt++) + ") -exportTimeout <N>");
-        System.out.println("  ...total export timeout in seconds");
-        System.out.println(" " + (cnt++) + ") -exportFileTimeout <N>");
-        System.out.println("  ...export timeout for a single AS3 class in seconds");
-        System.out.println(" " + (cnt++) + ") -flashpaper2pdf <infile> <outfile>");
-        System.out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
-        System.out.println(" " + (cnt++) + ") -zoom <N>");
-        System.out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
-        System.out.println(" " + (cnt++) + ") -replace <infile> <outfile> <characterId> <importDataFile>");
-        System.out.println(" ...replaces the data of the specified BinaryData, Image or DefineSound tag");
-        System.out.println();
-        System.out.println("Examples:");
-        System.out.println("java -jar ffdec.jar myfile.swf");
-        System.out.println("java -jar ffdec.jar -proxy");
-        System.out.println("java -jar ffdec.jar -proxy -P1234");
-        System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
-        System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
-        System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("");
-        System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
+        out.println("");
+        out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
+        out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
+        out.println("    DO NOT PUT space between comma (,) and next value.");
+        out.println(" " + (cnt++) + ") -onerror (abort|retryN|ignore)");
+        out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
+        out.println(" " + (cnt++) + ") -timeout <N>");
+        out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
+        out.println(" " + (cnt++) + ") -exportTimeout <N>");
+        out.println("  ...total export timeout in seconds");
+        out.println(" " + (cnt++) + ") -exportFileTimeout <N>");
+        out.println("  ...export timeout for a single AS3 class in seconds");
+        out.println(" " + (cnt++) + ") -flashpaper2pdf <infile> <outfile>");
+        out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
+        out.println(" " + (cnt++) + ") -zoom <N>");
+        out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
+        out.println(" " + (cnt++) + ") -replace <infile> <outfile> <characterId> <importDataFile>");
+        out.println(" ...replaces the data of the specified BinaryData, Image or DefineSound tag");
+        out.println();
+        out.println("Examples:");
+        out.println("java -jar ffdec.jar myfile.swf");
+        out.println("java -jar ffdec.jar -proxy");
+        out.println("java -jar ffdec.jar -proxy -P1234");
+        out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
+        out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
+        out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
+        out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
+        out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
+        out.println("");
+        out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
 
     /**
@@ -352,7 +360,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
         } else if (nextParam.equals("-export")) {
-            parseExport(selectionClasses,selection, selectionIds, args, handler, traceLevel, format);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format);
         } else if (nextParam.equals("-compress")) {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
@@ -373,6 +381,12 @@ public class CommandLineArgumentParser {
             printHeader();
             printCmdLineUsage();
             System.exit(0);
+        } else if (nextParam.equals("--webhelp")) { //for generating commandline usage on webpages
+            ByteArrayOutputStream whbaos = new ByteArrayOutputStream();
+            printCmdLineUsage(new PrintStream(whbaos, true), false);
+            String wh = new String(whbaos.toByteArray());
+            wh = wh.replace("<", "&lt;").replace(">", "&gt;");
+            System.out.println(wh);
         } else if (args.isEmpty()) {
             return nextParamOriginal; // file names should be the original one
         } else {
@@ -724,26 +738,26 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static List<String> parseSelectClass(Queue<String> args) {        
+    private static List<String> parseSelectClass(Queue<String> args) {
         if (args.size() < 1) {
             badArguments();
         }
         List<String> ret = new ArrayList<>();
         String classesStr = args.remove();
         String classes[];
-        if(classesStr.contains(",")){
+        if (classesStr.contains(",")) {
             classes = classesStr.split(",");
-        }else{
+        } else {
             classes = new String[]{classesStr};
         }
-        for(String c:classes){
+        for (String c : classes) {
             ret.add(c);
         }
         return ret;
 
     }
-    
-    private static void parseExport(List<String> selectionClasses,Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
+
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
         if (args.size() < 3) {
             badArguments();
         }
@@ -797,7 +811,7 @@ public class CommandLineArgumentParser {
         boolean exportOK = true;
 
         List<String> as3classes = new ArrayList<>();
-        if(selectionClasses!=null){
+        if (selectionClasses != null) {
             as3classes.addAll(selectionClasses);
         }
 
@@ -844,7 +858,7 @@ public class CommandLineArgumentParser {
                 commandLineMode = true;
 
                 switch (exportFormat) {
-                    case "all":{
+                    case "all": {
                         ScriptExportMode allExportMode = ScriptExportMode.AS;
                         if (!exportFormat.equals("all")) {
                             allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
@@ -893,7 +907,7 @@ public class CommandLineArgumentParser {
                         new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class)));
                     }
                     break;
-                    case "script":{
+                    case "script": {
                         System.out.println("Exporting scripts...");
                         boolean parallel = Configuration.parallelSpeedUp.get();
                         if (as3classes.isEmpty()) {
@@ -1274,7 +1288,7 @@ public class CommandLineArgumentParser {
         if (args.size() < 4) {
             badArguments();
         }
-        
+
         File inFile = new File(args.remove());
         File outFile = new File(args.remove());
         try {
@@ -1285,13 +1299,13 @@ public class CommandLineArgumentParser {
                 } catch (NumberFormatException nfe) {
                     System.err.println("CharacterId should be integer");
                     System.exit(1);
-                }                 
+                }
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 if (!swf.characters.containsKey(characterId)) {
                     System.err.println("CharacterId does not exist");
                     System.exit(1);
                 }
-                
+
                 CharacterTag characterTag = swf.characters.get(characterId);
                 String repFile = args.remove();
                 byte[] data = Helper.readFile(repFile);
@@ -1301,14 +1315,14 @@ public class CommandLineArgumentParser {
                 } else if (characterTag instanceof ImageTag) {
                     ImageTag imageTag = (ImageTag) characterTag;
                     new ImageImporter().importImage(imageTag, data);
-                } else if (characterTag instanceof SoundTag){
-                    SoundTag st = (SoundTag)characterTag;
+                } else if (characterTag instanceof SoundTag) {
+                    SoundTag st = (SoundTag) characterTag;
                     int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
                     if (repFile.toLowerCase().endsWith(".mp3")) {
                         soundFormat = SoundFormat.FORMAT_MP3;
                     }
                     boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
-                    if(!ok){
+                    if (!ok) {
                         System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
                         System.exit(1);
                     }
@@ -1331,7 +1345,7 @@ public class CommandLineArgumentParser {
             System.exit(2);
         }
     }
-    
+
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();
