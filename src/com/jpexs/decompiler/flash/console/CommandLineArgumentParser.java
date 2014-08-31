@@ -377,7 +377,7 @@ public class CommandLineArgumentParser {
             parseReplace(args);
         } else if (nextParam.equals("-as3compiler")) {
             ActionScriptParser.compile(null /*?*/, args.remove(), args.remove());
-        } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
+        } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage();
             System.exit(0);
