@@ -132,7 +132,7 @@ public class CommandLineArgumentParser {
         System.out.println("  ...export <infile> sources to <outdirectory> ");
         System.out.println("     Values for <itemtypes> parameter:");
         System.out.println("        script - Scripts (Default format: ActionScript source)");
-        System.out.println("               - For this type, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
+        System.out.println("               - Optional DEPRECATED \"-selectas3class\" parameter can be passed in same way as -selectclass");
         System.out.println("        image - Images (Default format: PNG/JPEG)");
         System.out.println("        shape - Shapes (Default format: SVG)");
         System.out.println("   morphshape - MorphShapes (Default format: SVG)");
@@ -192,6 +192,13 @@ public class CommandLineArgumentParser {
         System.out.println(" " + (cnt++) + ") -selectid <ranges>");
         System.out.println("  ...selects characters for export by character id");
         System.out.println("     <ranges> format is same as in -select");
+        System.out.println(" " + (cnt++) + ") -selectclass <classnames>");
+        System.out.println("  ...selects scripts to export by class name (ActionScript 3 ONLY)");
+        System.out.println("     <classnames> format:");
+        System.out.println("                    com.example.MyClass");
+        System.out.println("                    com.example.+   (all classes in package \"com.example\")");
+        System.out.println("                    com.++,net.company.MyClass   (all classes in package \"com\" and all subpackages, class net.company.MyClass)");
+        System.out.println("      DO NOT PUT space between comma (,) and next class.");
         System.out.println(" " + (cnt++) + ") -dumpSWF <infile>");
         System.out.println("  ...dumps list of SWF tags to console");
         System.out.println(" " + (cnt++) + ") -compress <infile> <outfile>");
@@ -233,7 +240,7 @@ public class CommandLineArgumentParser {
         System.out.println("java -jar ffdec.jar -proxy");
         System.out.println("java -jar ffdec.jar -proxy -P1234");
         System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
+        System.out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
         System.out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
         System.out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
         System.out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
@@ -267,6 +274,7 @@ public class CommandLineArgumentParser {
         double zoom = 1;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
+        List<String> selectionClasses = null;
         String nextParam = null, nextParamOriginal = null;
         OUTER:
         while (true) {
@@ -280,6 +288,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-select":
                     selection = parseSelect(args);
+                    break;
+                case "-selectclass":
+                    selectionClasses = parseSelectClass(args);
                     break;
                 case "-zoom":
                     zoom = parseZoom(args);
@@ -338,7 +349,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
         } else if (nextParam.equals("-export")) {
-            parseExport(selection, selectionIds, args, handler, traceLevel, format);
+            parseExport(selectionClasses,selection, selectionIds, args, handler, traceLevel, format);
         } else if (nextParam.equals("-compress")) {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
@@ -697,20 +708,39 @@ public class CommandLineArgumentParser {
         Main.startProxy(port);
     }
 
-    private static List<String> parseSelectClasses(Queue<String> args) {
+    private static List<String> parseSelectClassOld(Queue<String> args) {
         List<String> ret = new ArrayList<>();
         if (!args.isEmpty() && args.peek().equals("-selectas3class")) {
             args.remove();
             while (!args.isEmpty()) {
                 ret.add(args.remove());
-
             }
+            System.err.println("WARNING: Using deprecated -selectas3class parameter. Please use -selectclass instead. See --help for usage.");
         }
         return ret;
 
     }
 
-    private static void parseExport(Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
+    private static List<String> parseSelectClass(Queue<String> args) {        
+        if (args.size() < 1) {
+            badArguments();
+        }
+        List<String> ret = new ArrayList<>();
+        String classesStr = args.remove();
+        String classes[];
+        if(classesStr.contains(",")){
+            classes = classesStr.split(",");
+        }else{
+            classes = new String[]{classesStr};
+        }
+        for(String c:classes){
+            ret.add(c);
+        }
+        return ret;
+
+    }
+    
+    private static void parseExport(List<String> selectionClasses,Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
         if (args.size() < 3) {
             badArguments();
         }
@@ -730,9 +760,11 @@ public class CommandLineArgumentParser {
             "font"
         };
 
-        String[] deprecatedExportFormats = new String[]{
+        String[] removedExportFormats = new String[]{
             "as",
             "pcode",
+            "hex",
+            "pcodehex",
             "all_as",
             "all_pcode",
             "all_pcodehex",
@@ -762,6 +794,9 @@ public class CommandLineArgumentParser {
         boolean exportOK = true;
 
         List<String> as3classes = new ArrayList<>();
+        if(selectionClasses!=null){
+            as3classes.addAll(selectionClasses);
+        }
 
         try {
             SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
@@ -794,22 +829,19 @@ public class CommandLineArgumentParser {
             });
 
             for (String exportFormat : exportFormats) {
-                if (!Arrays.asList(validExportItems).contains(exportFormat) && !Arrays.asList(deprecatedExportFormats).contains(exportFormat)) {
+                if (!Arrays.asList(validExportItems).contains(exportFormat) && !Arrays.asList(removedExportFormats).contains(exportFormat)) {
                     System.err.println("Invalid export item:" + exportFormat);
                     badArguments();
                 }
-                if (Arrays.asList(deprecatedExportFormats).contains(exportFormat)) {
-                    System.err.println("Warning: Using DEPRECATED export item: " + exportFormat + ". Run application with --help parameter to see available formats.");
+                if (Arrays.asList(removedExportFormats).contains(exportFormat)) {
+                    System.err.println("Error: Export format : " + exportFormat + " was REMOVED. Run application with --help parameter to see available formats.");
+                    System.exit(1);
                 }
 
                 commandLineMode = true;
 
                 switch (exportFormat) {
-                    case "all":
-                    case "all_as":
-                    case "all_pcode":
-                    case "all_pcodehex":
-                    case "all_hex": {
+                    case "all":{
                         ScriptExportMode allExportMode = ScriptExportMode.AS;
                         if (!exportFormat.equals("all")) {
                             allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
@@ -858,15 +890,11 @@ public class CommandLineArgumentParser {
                         new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class)));
                     }
                     break;
-                    case "script":
-                    case "as":
-                    case "pcode":
-                    case "pcodehex":
-                    case "hex": {
+                    case "script":{
                         System.out.println("Exporting scripts...");
                         boolean parallel = Configuration.parallelSpeedUp.get();
                         if (as3classes.isEmpty()) {
-                            as3classes = parseSelectClasses(args);
+                            as3classes = parseSelectClassOld(args);
                         }
                         if (!as3classes.isEmpty()) {
                             for (String as3class : as3classes) {
@@ -921,16 +949,6 @@ public class CommandLineArgumentParser {
                         }
                         new TextExporter().exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), extags,
                                 new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile));
-                    }
-                    break;
-                    case "textplain": {
-                        System.out.println("Exporting texts...");
-                        Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
-                        if (singleTextFile == null) {
-                            singleTextFile = Configuration.textExportSingleFile.get();
-                        }
-                        new TextExporter().exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), extags,
-                                new TextExportSettings(TextExportMode.PLAIN, singleTextFile));
                     }
                     break;
                     case "fla": {
