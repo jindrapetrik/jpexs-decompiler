@@ -63,49 +63,69 @@ public class DumpViewPanel extends JPanel {
         dumpViewHexTable = new HexView();
         dumpViewHexTable.addListener(new HexViewListener() {
 
+            private int lastAddressUnderCursor = -1;
+            
             @Override
             public void byteValueChanged(int address, byte b) {
                 if (skipValueChange) {
                     return;
                 }
                 
-                TreeModel model = dumpTree.getModel();
-                DumpInfo di = DumpInfoSwfNode.getSwfNode(selectedDumpInfo);
-                while (model.getChildCount(di) > 0) {
-                    boolean found = false;
-                    for (DumpInfo child : di.getChildInfos()) {
-                        if (child.startByte > address) {
+                if (address != -1) {
+                    TreeModel model = dumpTree.getModel();
+                    DumpInfo di = DumpInfoSwfNode.getSwfNode(selectedDumpInfo);
+                    while (model.getChildCount(di) > 0) {
+                        boolean found = false;
+                        for (DumpInfo child : di.getChildInfos()) {
+                            if (child.startByte > address) {
+                                break;
+                            }
+                            if (child.getEndByte() >= address) {
+                                di = child;
+                                found = true;
+                            }
+                        }
+                        if (!found) {
                             break;
                         }
-                        if (child.getEndByte() >= address) {
-                            di = child;
-                            found = true;
-                        }
                     }
-                    if (!found) {
-                        break;
+                    List<Object> path = new ArrayList<>();
+                    while (di != null) {
+                        path.add(0, di);
+                        di = di.parent;
                     }
+                    path.add(0, model.getRoot());
+                    TreePath tp = new TreePath(path.toArray());
+                    skipNextScroll = true;
+                    dumpTree.setSelectionPath(tp);
+                    dumpTree.scrollPathToVisible(tp);
                 }
-                List<Object> path = new ArrayList<>();
-                while (di != null) {
-                    path.add(0, di);
-                    di = di.parent;
-                }
-                path.add(0, model.getRoot());
-                TreePath tp = new TreePath(path.toArray());
-                skipNextScroll = true;
-                dumpTree.setSelectionPath(tp);
-                dumpTree.scrollPathToVisible(tp);
+                
+                byte[] data = dumpViewHexTable.getData();
+                byteMouseMoved(lastAddressUnderCursor, lastAddressUnderCursor == -1 ? 0 : data[lastAddressUnderCursor]);
             }
 
             @Override
             public void byteMouseMoved(int address, byte b) {
-                int b2 = b & 0xff;
-                selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8) + 
-                        " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2) + 
-                        " Dec: " + b2 + 
-                        " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8) + 
-                        " Ascii: " + (char) b2);
+                lastAddressUnderCursor = address;
+                if (address == -1) {
+                    address = dumpViewHexTable.getFocusedByteIdx();
+                    if (address != -1) {
+                        byte[] data = dumpViewHexTable.getData();
+                        b = data[address];
+                    }
+                }
+                
+                if (address != -1) {
+                    int b2 = b & 0xff;
+                    selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8) + 
+                            " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2) + 
+                            " Dec: " + b2 + 
+                            " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8) + 
+                            " Ascii: " + (char) b2);
+                } else {
+                    selectedByteInfo.setText("-");
+                }
             }
         });
         
