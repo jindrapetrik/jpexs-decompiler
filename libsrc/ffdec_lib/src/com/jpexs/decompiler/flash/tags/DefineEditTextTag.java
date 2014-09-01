@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -259,7 +260,7 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = fontSize * style.font.getDivider();
+                                        style.fontHeight = fontSize * (style.font == null ? 1 : style.font.getDivider());
                                         style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes
@@ -340,7 +341,13 @@ public class DefineEditTextTag extends TextTag {
     public String getFormattedText() {
         String ret = "";
         ret += "[";
-        String[] alignValues = {"left", "right", "center", "justify"};
+        String[] alignNames = {"left", "right", "center", "justify"};
+        String alignment;
+        if (align < alignNames.length) {
+            alignment = alignNames[align];
+        } else {
+            alignment = "unknown";
+        }
         ret += "\r\nxmin " + bounds.Xmin + "\r\nymin " + bounds.Ymin + "\r\nxmax " + bounds.Xmax + "\r\nymax " + bounds.Ymax + "\r\n";
         ret += (wordWrap ? "wordwrap 1\r\n" : "") + (multiline ? "multiline 1\r\n" : "")
                 + (password ? "password 1\r\n" : "") + (readOnly ? "readonly 1\r\n" : "")
@@ -349,7 +356,7 @@ public class DefineEditTextTag extends TextTag {
                 + (html ? "html 1\r\n" : "") + (useOutlines ? "useoutlines 1\r\n" : "")
                 + (hasFont ? "font " + fontId + "\r\n" + "height " + fontHeight + "\r\n" : "") + (hasTextColor ? "color " + textColor.toHexARGB() + "\r\n" : "")
                 + (hasFontClass ? "fontclass " + fontClass + "\r\n" : "") + (hasMaxLength ? "maxlength " + maxLength + "\r\n" : "")
-                + "align " + alignValues[align] + "\r\n"
+                + "align " + alignment + "\r\n"
                 + (hasLayout ? "leftmargin " + leftMargin + "\r\nrightmargin " + rightMargin + "\r\nindent " + indent + "\r\nleading " + leading + "\r\n" : "")
                 + (!variableName.isEmpty() ? "variablename " + variableName + "\r\n" : "");
         ret += "]";
@@ -737,7 +744,7 @@ public class DefineEditTextTag extends TextTag {
             maxLength = sis.readUI16("maxLength");
         }
         if (hasLayout) {
-            align = sis.readUI8("align"); //0 left,1 right, 2 center, 3 justify
+            align = sis.readUI8("align"); //0 left, 1 right, 2 center, 3 justify
             leftMargin = sis.readUI16("leftMargin");
             rightMargin = sis.readUI16("rightMargin");
             indent = sis.readUI16("indent");
@@ -810,8 +817,8 @@ public class DefineEditTextTag extends TextTag {
                     int advance;
                     FontTag font = lastStyle.font;
                     GLYPHENTRY ge = new GLYPHENTRY();
-                    ge.glyphIndex = font.charToGlyph(c);
-                    if (font.hasLayout()) {
+                    ge.glyphIndex = font == null ? -1 : font.charToGlyph(c);
+                    if (font != null && font.hasLayout()) {
                         int kerningAdjustment = 0;
                         if (nextChar != null) {
                             kerningAdjustment = font.getGlyphKerningAdjustment(ge.glyphIndex, font.charToGlyph(nextChar));
@@ -820,7 +827,8 @@ public class DefineEditTextTag extends TextTag {
                         advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                     } else {
                         String fontName = FontTag.defaultFontName;
-                        advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+                        int fontStyle = font == null ? 0 : font.getFontStyle();
+                        advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
                     }
                     ge.glyphAdvance = advance;
                     textModel.addGlyph(c, ge);
@@ -927,7 +935,7 @@ public class DefineEditTextTag extends TextTag {
                 }
                 for (SameStyleTextRecord tr : line) {
                     TEXTRECORD tr2 = new TEXTRECORD();
-                    tr2.styleFlagsHasFont = true;
+                    tr2.styleFlagsHasFont = fontId != 0;
                     tr2.fontId = fontId;
                     tr2.textHeight = tr.style.fontHeight;
                     if (tr.style.textColor != null) {

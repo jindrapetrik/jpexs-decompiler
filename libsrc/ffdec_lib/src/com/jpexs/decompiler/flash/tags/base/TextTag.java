@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -297,7 +298,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 y = rec.yOffset;
             }
 
-            double rat = textHeight / 1024.0 / font.getDivider();
+            double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = transformation.clone();

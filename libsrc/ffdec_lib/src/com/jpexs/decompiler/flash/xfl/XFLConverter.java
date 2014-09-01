@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -2616,7 +2617,11 @@ public class XFLConverter {
                     indent = det.indent;
                     lineSpacing = det.leading;
                     String[] alignNames = {"left", "right", "center", "justify"};
-                    alignment = alignNames[det.align];
+                    if (det.align < alignNames.length) {
+                        alignment = alignNames[det.align];
+                    } else {
+                        alignment = "unknown";
+                    }
                 }
                 ret += "<textAttrs>";
                 ret += "<DOMTextAttrs";
@@ -3258,7 +3263,11 @@ public class XFLConverter {
                 indent = det.indent;
                 lineSpacing = det.leading;
                 String[] alignNames = {"left", "right", "center", "justify"};
-                alignment = alignNames[det.align];
+                if (det.align < alignNames.length) {
+                    alignment = alignNames[det.align];
+                } else {
+                    alignment = "unknown";
+                }
             }
             this.tags = tags;
         }
