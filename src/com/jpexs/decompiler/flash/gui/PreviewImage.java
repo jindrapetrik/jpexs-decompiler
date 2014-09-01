@@ -169,7 +169,6 @@ public class PreviewImage extends JPanel {
 
     private Image renderImage(SWF swf, TreeItem treeItem) {
 
-        double scale = 1;
         int width = 0;
         int height = 0;
         SerializableImage imgSrc = null;
@@ -206,7 +205,7 @@ public class PreviewImage extends JPanel {
             w = w2;
         }
 
-        scale = (double) w / (double) w1;
+        double scale = (double) w / (double) w1;
         if (w1 <= w2 && h1 <= h2) {
             scale = 1;
         }

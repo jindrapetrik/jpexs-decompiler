@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
  */
 public class AppResources {
 
-    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.jpexs.decompiler.flash.gui.locales.AppResources");
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.jpexs.decompiler.flash.locales.AppResources");
 
     public static String translate(String key) {
         return resourceBundle.getString(key);

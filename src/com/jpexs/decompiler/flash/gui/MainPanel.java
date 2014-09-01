@@ -1255,7 +1255,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
             textSearchPanel.setOptions(ignoreCase, regexp);
             List<TextTag> found = new ArrayList<>();
-            Pattern pat = null;
+            Pattern pat;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             } else {
@@ -1379,7 +1379,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         List<FileFilter> flaFilters = new ArrayList<>();
         List<FileFilter> xflFilters = new ArrayList<>();
         List<FLAVersion> versions = new ArrayList<>();
-        FileFilter defaultFilter = null;
         for (int i = FLAVersion.values().length - 1; i >= 0; i--) {
             final FLAVersion v = FLAVersion.values()[i];
             if (!swf.isAS3 && v.minASVersion() > 2) {
@@ -1398,7 +1397,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                 };
                 if (v == FLAVersion.CS6) {
-                    defaultFilter = f;
                     fc.setFileFilter(f);
                 } else {
                     fc.addChoosableFileFilter(f);
@@ -1418,9 +1416,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 fc.addChoosableFileFilter(f);
                 xflFilters.add(f);
             }
-        }
-        if (defaultFilter == null) {
-            defaultFilter = flaFilters.get(0);
         }
 
         fc.setAcceptAllFileFilterUsed(false);
@@ -2302,7 +2297,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             final Tag tag = (Tag) tagObj;
             showCard(CARDPREVIEWPANEL);
             DrawableTag d = (DrawableTag) tag;
-            Timelined timelined = null;
+            Timelined timelined;
             if (tagObj instanceof Timelined && !(tagObj instanceof ButtonTag)) {
                 timelined = (Timelined) tag;
             } else {

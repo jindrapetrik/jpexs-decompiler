@@ -329,7 +329,7 @@ public class Main {
         if (mode == SaveFileMode.EXE) {
             InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
             byte[] buffer = new byte[4096];
-            int bytesRead = 0;
+            int bytesRead;
             while ((bytesRead = exeStream.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
             }

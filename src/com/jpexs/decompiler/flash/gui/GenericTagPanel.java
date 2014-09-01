@@ -560,7 +560,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         int propCount = 0;
         for (String key : keys) {
 
-            Component dependentEditor = null;
+            Component dependentEditor;
             if (addKeys.contains(key)) {
                 dependentEditor = addButtons.get(key);
             } else if (removeButtons.containsKey(key)) { //It's array/list, add remove button

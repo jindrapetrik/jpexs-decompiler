@@ -693,11 +693,14 @@ public class Action implements GraphSourceItem {
                     return tree;
                 }
             }, timeout, TimeUnit.SECONDS);
-        } catch (TimeoutException | ExecutionException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+        } catch (InterruptedException ex) {
+            throw ex;
+        } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex);
             convertException = ex;
-            if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
-                convertException = (Exception) ex.getCause();
+            Throwable cause = ex.getCause();
+            if (ex instanceof ExecutionException && cause instanceof Exception) {
+                convertException = cause;
             }
         }
         writer.continueMeasure();

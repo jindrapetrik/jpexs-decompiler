@@ -386,7 +386,6 @@ public class Win32ProcessTools extends ProcessTools {
         }
 
         long actualPos = 0;
-        byte[] prevBytes = new byte[0];
         List<Integer> guardedPages = new ArrayList<>();
         for (int pg = 0; pg < pages.size(); pg++) {
             MEMORY_BASIC_INFORMATION mbi = pages.get(pg);
@@ -408,7 +407,7 @@ public class Win32ProcessTools extends ProcessTools {
 
                     byte[] data = buf.getByteArray(0, bytesReadRef.getValue().intValue());
 
-                    prevBytes = Arrays.copyOfRange(data, data.length - maxFindLen, data.length);
+                    byte[] prevBytes = Arrays.copyOfRange(data, data.length - maxFindLen, data.length);
                     byte[] dataPlusPrev = mergeArrays(prevBytes, data);
                     loopi:
                     for (int i = 0; i < dataPlusPrev.length - maxFindLen; i++) {

@@ -49,10 +49,9 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
         }
         Scanner sc = new Scanner(System.in);
         System.out.println("Error occured: " + thrown.getLocalizedMessage());
-        String n = null;
         do {
             System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
-            n = sc.nextLine();
+            String n = sc.nextLine();
             switch (n.toLowerCase()) {
                 case "a":
                     return AbortRetryIgnoreHandler.ABORT;

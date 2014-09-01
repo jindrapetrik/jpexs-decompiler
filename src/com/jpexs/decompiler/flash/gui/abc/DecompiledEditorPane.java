@@ -459,7 +459,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) throws InterruptedException {
         int maxCacheSize = 50;
         int scriptIndex = scriptLeaf.scriptIndex;
-        HilightedText hilightedCode = null;
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
@@ -469,7 +468,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             boolean parallel = Configuration.parallelSpeedUp.get();
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
             scriptLeaf.toSource(writer, abcList, script.traits.traits, ScriptExportMode.AS, parallel);
-            hilightedCode = new HilightedText(writer);
+            HilightedText hilightedCode = new HilightedText(writer);
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }
     }

@@ -64,12 +64,11 @@ public class MapBucket extends CacheEntry {
 
     @Override
     public String getRequestURL() {
-        String req = null;
         MetaData m = getMetaData();
         if (m == null) {
             return null;
         }
-        req = m.request;
+        String req = m.request;
         if (req == null) {
             return null;
         }

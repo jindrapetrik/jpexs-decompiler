@@ -1185,6 +1185,31 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
+    public Map<String, ASMSource> getASMs() {
+        List<TreeNode> list = createASTagList(tags, this);
+        Map<String, ASMSource> asms = new HashMap<>();
+        getASMs("", list, asms);
+        return asms;
+    }
+    
+    private static void getASMs(String path, List<TreeNode> nodes, Map<String, ASMSource> result) {
+        for (TreeNode n : nodes) {
+            String subPath = path + "/" + n.toString();
+            if (n.getItem() instanceof ASMSource) {
+                //cacheScript((ASMSource) n.tag);
+                String npath = subPath;
+                int ppos = 1;
+                while (result.containsKey(npath)) {
+                    ppos++;
+                    npath = subPath + "[" + ppos + "]";
+                }
+                result.put(npath, (ASMSource) n.getItem());
+            }
+
+            getASMs(subPath, n.subNodes, result);
+        }
+    }
+    
     public static void getTagsFromTreeNodes(List<TreeNode> treeNodes, List<Tag> result) {
         for (TreeNode treeNode : treeNodes) {
             TreeItem treeItem = treeNode.getItem();

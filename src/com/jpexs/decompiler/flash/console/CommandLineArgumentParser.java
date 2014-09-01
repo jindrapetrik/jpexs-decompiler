@@ -990,7 +990,6 @@ public class CommandLineArgumentParser {
 
             }
         } catch (OutOfMemoryError | Exception ex) {
-            exportOK = false;
             System.err.print("FAIL: Exporting Failed on Exception - ");
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);

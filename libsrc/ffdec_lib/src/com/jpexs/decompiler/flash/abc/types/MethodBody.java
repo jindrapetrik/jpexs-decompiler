@@ -56,7 +56,7 @@ public class MethodBody implements Cloneable, Serializable {
     public ABCException[] exceptions = new ABCException[0];
     public Traits traits = new Traits();
     public transient List<GraphTargetItem> convertedItems;
-    public transient Exception convertException;
+    public transient Throwable convertException;
 
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
@@ -152,11 +152,12 @@ public class MethodBody implements Cloneable, Serializable {
                 }
             } catch (InterruptedException ex) {
                 throw ex;
-            } catch (Exception ex) {
+            } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                 convertException = ex;
-                if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
-                    convertException = (Exception) ex.getCause();
+                Throwable cause = ex.getCause();
+                if (ex instanceof ExecutionException && cause instanceof Exception) {
+                    convertException = (Exception) cause;
                 }
             }
         }

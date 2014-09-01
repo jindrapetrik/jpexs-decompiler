@@ -93,8 +93,7 @@ public class LoadingPanel extends JPanel {
         lastSize = size;
         drawTimer = new Timer();
         int timeSpin = 1000;
-        double delay = 0;
-        delay = timeSpin / o;
+        double delay = timeSpin / o;
         while (delay < 10) {
             o--;
             delay = timeSpin / o;

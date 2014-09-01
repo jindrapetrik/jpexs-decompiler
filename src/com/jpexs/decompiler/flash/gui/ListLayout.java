@@ -80,9 +80,8 @@ public class ListLayout implements LayoutManager {
     @Override
     public void layoutContainer(Container parent) {
         Dimension dim = preferredLayoutSize(parent);
-        int top = 0;
         Insets ins = parent.getInsets();
-        top = ins.top;
+        int top = ins.top;
         boolean first = true;
         for (Component c : parent.getComponents()) {
             if (!c.isVisible()) {

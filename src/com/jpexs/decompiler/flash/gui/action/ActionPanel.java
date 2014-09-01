@@ -200,33 +200,13 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         }
     }
 
-    private void getASMs(String path, List<TreeNode> nodes, Map<String, ASMSource> result) {
-        for (TreeNode n : nodes) {
-            String subPath = path + "/" + n.toString();
-            if (n.getItem() instanceof ASMSource) {
-                //cacheScript((ASMSource) n.tag);
-                String npath = subPath;
-                int ppos = 1;
-                while (result.containsKey(npath)) {
-                    ppos++;
-                    npath = subPath + "[" + ppos + "]";
-                }
-                result.put(npath, (ASMSource) n.getItem());
-            }
-
-            getASMs(subPath, n.subNodes, result);
-        }
-    }
-
     public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             SWF swf = mainPanel.getCurrentSwf();
-            List<TreeNode> list = SWF.createASTagList(swf.tags, swf);
-            Map<String, ASMSource> asms = new HashMap<>();
-            getASMs("", list, asms);
+            Map<String, ASMSource> asms = swf.getASMs();
             final List<ActionSearchResult> found = new ArrayList<>();
-            Pattern pat = null;
+            Pattern pat;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             } else {

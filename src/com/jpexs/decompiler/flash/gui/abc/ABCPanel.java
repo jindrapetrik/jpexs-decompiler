@@ -759,7 +759,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                         View.navigateUrl(adobePage);
 
-                        int ret = 0;
+                        int ret;
                         do {
                             ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                             swc = Configuration.getPlayerSWC();

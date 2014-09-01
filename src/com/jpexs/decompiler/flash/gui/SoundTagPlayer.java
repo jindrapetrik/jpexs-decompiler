@@ -131,7 +131,7 @@ public class SoundTagPlayer implements MediaDisplay {
             public void run() {
                 boolean playAgain = true;
                 while (playAgain) {
-                    int startPos = 0;
+                    int startPos;
                     synchronized (playLock) {
                         startPos = actualPos * FRAME_DIVISOR;
                     }
