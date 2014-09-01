@@ -12,12 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.deobfuscation;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -467,6 +470,18 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         }
 
         return results;
+    }
+
+    @Override
+    public void swfParsed(SWF swf) {
+    }
+
+    @Override
+    public void abcParsed(ABC abc, SWF swf) {
+    }
+
+    @Override
+    public void methodBodyParsed(MethodBody body, SWF swf) {
     }
 
     class ExecutionResult {

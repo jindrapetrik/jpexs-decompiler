@@ -12,9 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.plugin.CharSequenceJavaFileObject;
 import com.jpexs.helpers.plugin.ClassFileManager;
@@ -33,7 +38,8 @@ import javax.tools.ToolProvider;
  */
 public class SWFDecompilerPlugin {
 
-    public static SWFDecompilerListener listener;
+    private static final Logger logger = Logger.getLogger(SWFDecompilerPlugin.class.getName());
+    private static final List<SWFDecompilerListener> listeners = new ArrayList<>();
 
     public static void loadPlugin(String path) {
 
@@ -68,9 +74,53 @@ public class SWFDecompilerPlugin {
 
         // Creating an instance of our compiled class and
         try {
-            listener = (SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).newInstance();
+            listeners.add((SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).newInstance());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static boolean fireSwfParsed(SWF swf) {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.swfParsed(swf);
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method swfParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
+    }
+
+    public static boolean fireActionListParsed(ActionList actions, SWF swf) {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.actionListParsed(actions, swf);
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method actionListParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
+    }
+
+    public static boolean fireAbcParsed(ABC abc, SWF swf) {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.abcParsed(abc, swf);
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method abcParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
+    }
+
+    public static boolean fireMethodBodyParsed(MethodBody body, SWF swf) {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.methodBodyParsed(body, swf);
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method methodBodyParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
     }
 }

@@ -492,7 +492,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                             snode.binaryData.setModified(true);
                             saved = true;
                         } catch (IOException ex) {
-                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                            Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                         }
                     } else if (swf.file == null) {
                         saved = saveAs(swf, SaveFileMode.SAVEAS);

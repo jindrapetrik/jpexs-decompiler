@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -206,7 +207,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
-            Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CLIPACTIONRECORD.class.getName()).log(Level.SEVERE, null, ex);
             return new ActionList();
         }
     }

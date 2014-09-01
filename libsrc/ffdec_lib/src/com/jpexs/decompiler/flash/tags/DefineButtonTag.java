@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -179,7 +180,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
-            Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex);
             return new ActionList();
         }
     }

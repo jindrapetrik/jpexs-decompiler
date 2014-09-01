@@ -628,7 +628,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                     updateClassesList();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -1347,7 +1347,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         try {
                             renameIdentifier(swf, identifier);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                         return null;
                     }
@@ -1463,7 +1463,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         try {
                             Desktop.getDesktop().open(selfile.getAbsoluteFile().getParentFile());
                         } catch (IOException ex) {
-                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 }
@@ -1686,7 +1686,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
                             }
                         } catch (Exception ex) {
-                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error during export", ex);
+                            logger.log(Level.SEVERE, "Error during export", ex);
                             View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                         }
                         return null;
@@ -1784,7 +1784,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     updateClassesList();
                                     reload(true);
                                 } catch (Exception ex) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                    logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
                                     Main.stopWork();
                                     View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                                 }
@@ -1834,7 +1834,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
                         }
                     } catch (Exception ex) {
-                        Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
+                        logger.log(Level.SEVERE, "Deobfuscation error", ex);
                     }
                     return true;
                 }
@@ -2041,7 +2041,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 }
                                 SWF.clearImageCache();
                             } catch (IOException ex) {
-                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
+                                logger.log(Level.SEVERE, "Invalid image", ex);
                                 View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             reload(true);
@@ -2346,7 +2346,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 previewPanel.setMedia(soundThread);
                 soundThread.play();
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag) || (tagObj instanceof SoundStreamHeadTypeTag)) {
             showCard(CARDPREVIEWPANEL);

@@ -777,7 +777,7 @@ public class Main {
             field.setAccessible(true);
             field.set(null, null);
         } catch (Throwable ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));

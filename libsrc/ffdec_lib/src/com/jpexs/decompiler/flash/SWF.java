@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Decoder;
@@ -271,6 +272,7 @@ public final class SWF implements TreeItem, Timelined {
     public JPEGTablesTag jtt;
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
     public static final double unitDivisor = 20;
+    private static final Logger logger = Logger.getLogger(SWF.class.getName());
 
     private Timeline timeline;
 
@@ -491,12 +493,12 @@ public final class SWF implements TreeItem, Timelined {
             byte[] swfData = baos.toByteArray();
             uncompressedData = swfData;
         } catch (IOException ex) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+            logger.log(Level.SEVERE, "Cannot save SWF", ex);
         }
     }
 
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, null, parallelRead);
+        this(is, null, parallelRead, false);
     }
 
     /**
@@ -851,7 +853,7 @@ public final class SWF implements TreeItem, Timelined {
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
             for (MyEntry<ClassPath, ScriptPack> itemOld : ret) {
                 if (item.key.equals(itemOld.key)) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found (" + itemOld.key + ")!");
+                    logger.log(Level.SEVERE, "Duplicate pack path found (" + itemOld.key + ")!");
                     break;
                 }
             }
@@ -970,9 +972,9 @@ public final class SWF implements TreeItem, Timelined {
                     }
                 }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             } catch (TimeoutException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
+                logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
             } catch (Exception ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                logger.log(Level.SEVERE, "Error during ABC export", ex);
             }
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
@@ -985,7 +987,7 @@ public final class SWF implements TreeItem, Timelined {
             try {
                 executor.shutdown();
                 if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
-                    Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
+                    logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
                 }
             } catch (InterruptedException ex) {
             } finally {
@@ -999,7 +1001,7 @@ public final class SWF implements TreeItem, Timelined {
                     }
                 } catch (InterruptedException ex) {
                 } catch (ExecutionException ex) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                    logger.log(Level.SEVERE, "Error during ABC export", ex);
                 }
             }
         }
@@ -1527,7 +1529,7 @@ public final class SWF implements TreeItem, Timelined {
                             JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
                             f.delete();
                         } catch (Exception | Error e) { //Something wrong in the packer
-                            Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "JPacker: Cannot minimize script");
+                            logger.log(Level.WARNING, "JPacker: Cannot minimize script");
                             f.renameTo(fmin);
                         }
                     } else {

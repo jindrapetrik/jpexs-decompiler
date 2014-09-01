@@ -542,7 +542,7 @@ public class ABC {
                 mb.code = new AVM2Code(ais2);
             } catch (UnknownInstructionCode re) {
                 mb.code = new AVM2Code();
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);
+                logger.log(Level.SEVERE, null, re);
             }
             mb.code.compact();
             int ex_count = ais.readU30("ex_count");

@@ -750,9 +750,7 @@ public class CommandLineArgumentParser {
         } else {
             classes = new String[]{classesStr};
         }
-        for (String c : classes) {
-            ret.add(c);
-        }
+        ret.addAll(Arrays.asList(classes));
         return ret;
 
     }

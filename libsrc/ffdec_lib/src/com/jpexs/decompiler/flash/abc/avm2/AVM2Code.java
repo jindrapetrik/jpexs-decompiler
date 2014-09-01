@@ -251,6 +251,7 @@ import java.util.logging.Logger;
 public class AVM2Code implements Serializable {
 
     public static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(AVM2Code.class.getName());
     private static final boolean DEBUG_MODE = false;
     public static int toSourceLimit = -1;
     public List<AVM2Instruction> code = new ArrayList<>();
@@ -730,7 +731,7 @@ public class AVM2Code implements Serializable {
         InstructionDefinition[] result = new InstructionDefinition[256];
         for (InstructionDefinition id : instructionSet) {
             if (result[id.instructionCode] != null) {
-                Logger.getLogger(AVM2Code.class.getName()).log(Level.WARNING, "Duplicate OPCODE for instruction {0} {1}", new Object[]{result[id.instructionCode], id});
+                logger.log(Level.WARNING, "Duplicate OPCODE for instruction {0} {1}", new Object[]{result[id.instructionCode], id});
             }
             result[id.instructionCode] = id;
         }
@@ -1296,7 +1297,7 @@ public class AVM2Code implements Serializable {
                 throw new UnknownJumpException(stack, ip, output);
             }
             if (visited[ip]) {
-                Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
+                logger.warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
                 break;
             }
             visited[ip] = true;
@@ -2059,13 +2060,13 @@ public class AVM2Code implements Serializable {
                     ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
                     continue;
                 } catch (ConvertException ex) {
-                    Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                    logger.log(Level.FINE, null, ex);
                 }
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
                     visitCode(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), ip, refs);
                 } catch (ConvertException ex) {
-                    Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                    logger.log(Level.FINE, null, ex);
                 }
             }
             ip++;
@@ -2087,7 +2088,7 @@ public class AVM2Code implements Serializable {
                 visitCode(adr2pos(e.target), adr2pos(e.end), refs);
                 visitCode(adr2pos(e.end), -pos, refs);
             } catch (ConvertException ex) {
-                Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                logger.log(Level.FINE, null, ex);
             }
         }
         return refs;
@@ -2129,7 +2130,7 @@ public class AVM2Code implements Serializable {
                     prev = ins;
                     continue;
                 } catch (ConvertException ex) {
-                    Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                    logger.log(Level.FINE, null, ex);
                 }
             } else if (ins.definition instanceof IfTypeIns) {
                 if ((prev != null) && (prev2 != null)) {
@@ -2195,7 +2196,7 @@ public class AVM2Code implements Serializable {
                 try {
                     ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited, prev, prev2);
                 } catch (ConvertException ex) {
-                    Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                    logger.log(Level.FINE, null, ex);
                 }
             }
             ip++;
@@ -2322,7 +2323,7 @@ public class AVM2Code implements Serializable {
                         restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
                         restoreControlFlow(adr2pos(e.end), refs, visited2, appended);
                     } catch (ConvertException ex) {
-                        Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+                        logger.log(Level.FINE, null, ex);
                     }
                 }
             }
@@ -2330,7 +2331,7 @@ public class AVM2Code implements Serializable {
                 code.get(ip).replaceWith = appended.get(ip);
             }
         } catch (ConvertException cex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error during restore control flow", cex);
+            logger.log(Level.SEVERE, "Error during restore control flow", cex);
         }
         invalidateCache();
         try {
@@ -2354,9 +2355,9 @@ public class AVM2Code implements Serializable {
             }
             this.code = acode.code;
         } catch (IOException ex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+            logger.log(Level.FINE, null, ex);
         }
         invalidateCache();
         removeDeadCode(constants, trait, info, body);
@@ -2446,7 +2447,7 @@ public class AVM2Code implements Serializable {
             }
             return copy;
         } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error during deepCopy", ex);
+            logger.log(Level.SEVERE, "Error during deepCopy", ex);
             return null;
         }
     }

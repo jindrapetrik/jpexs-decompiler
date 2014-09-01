@@ -443,7 +443,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         val = ReflectionTools.newInstanceOf(field.getType());
                         ReflectionTools.setValue(obj, field, index, val);
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
                         return null;
                     }
                 }
@@ -695,7 +695,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             try {
                 f.set(t, f.get(assigned));
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

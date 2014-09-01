@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class SWC extends ZippedSWFBundle {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SWC.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

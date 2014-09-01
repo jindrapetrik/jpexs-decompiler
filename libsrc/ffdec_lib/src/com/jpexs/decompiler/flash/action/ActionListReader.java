@@ -72,7 +72,7 @@ import java.util.logging.Logger;
  */
 public class ActionListReader {
 
-    private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
+    private static final Logger logger = Logger.getLogger(ActionListReader.class.getName());
 
     /**
      * Reads list of actions from the stream. Reading ends with
@@ -108,7 +108,7 @@ public class ActionListReader {
             } else if (cause instanceof InterruptedException) {
                 throw (IOException) cause;
             } else {
-                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         return new ActionList();
@@ -166,15 +166,8 @@ public class ActionListReader {
             jump.setJumpOffset((int) (entryAction.getAddress() - jump.getTotalActionLength()));
         }
 
-        if (SWFDecompilerPlugin.listener != null) {
-            try {
-                SWFDecompilerPlugin.listener.actionListParsed(actions, sis.getSwf());
-
-                actions = fixActionList(actions, null, version);
-            } catch (Throwable e) {
-                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, e);
-                //View.showMessageDialog(null, "Failed to call plugin method actionListParsed. Exception: " + e.getMessage());
-            }
+        if (SWFDecompilerPlugin.fireActionListParsed(actions, sis.getSwf())) {
+            actions = fixActionList(actions, null, version);
         }
 
         if (deobfuscationMode == 0) {
@@ -183,7 +176,7 @@ public class ActionListReader {
                 updateActionLengths(actions, version);
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
-                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } else if (deobfuscationMode == 1) {
             try {
@@ -191,7 +184,7 @@ public class ActionListReader {
                 new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
-                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 

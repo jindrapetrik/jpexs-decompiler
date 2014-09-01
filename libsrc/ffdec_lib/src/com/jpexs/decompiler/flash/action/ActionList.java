@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -23,7 +24,6 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.helpers.EmptySWFDecompilerListener;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import java.io.File;
@@ -183,7 +183,7 @@ public class ActionList extends ArrayList<Action> {
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
         } catch (IOException ex) {
-            Logger.getLogger(EmptySWFDecompilerListener.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -199,7 +199,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                     mb.code = new AVM2Code(ais);
                 } catch (UnknownInstructionCode re) {
                     mb.code = new AVM2Code();
-                    Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);
+                    Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, re);
                 }
                 mb.code.compact();
             } else {

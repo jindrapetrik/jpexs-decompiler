@@ -12,10 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.ActionList;
 
 /**
@@ -24,5 +27,11 @@ import com.jpexs.decompiler.flash.action.ActionList;
  */
 public interface SWFDecompilerListener {
 
+    void swfParsed(SWF swf);
+
     void actionListParsed(ActionList actions, SWF swf);
+
+    void abcParsed(ABC abc, SWF swf);
+    
+    void methodBodyParsed(MethodBody body, SWF swf);
 }

@@ -830,7 +830,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             }
             showFlashViewerPanel();
         } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
-            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

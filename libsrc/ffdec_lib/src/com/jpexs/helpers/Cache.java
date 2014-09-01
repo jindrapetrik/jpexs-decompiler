@@ -133,7 +133,7 @@ public class Cache<E> {
                 E item = (E) ois.readObject();
                 return item;
             } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
             }
             return null;
         } else if (storageType == STORAGE_MEMORY) {
@@ -151,8 +151,7 @@ public class Cache<E> {
             try {
                 temp = File.createTempFile("ffdec_cache", ".tmp");
             } catch (IOException ex) {
-                Logger.getLogger(Cache.class
-                        .getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
 
                 return;
             }

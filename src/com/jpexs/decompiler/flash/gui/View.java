@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -534,7 +533,7 @@ public class View {
                     desktop.browse(uri);
                     return true;
                 } catch (URISyntaxException | IOException ex) {
-                    Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
