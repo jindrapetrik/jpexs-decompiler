@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.helpers.Helper;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;
 import com.jpexs.proxy.Replacement;
@@ -347,50 +349,55 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      * @param contentType Content type
      * @param url URL of the method
      * @param data Data stream
+     * @return replacement data
      */
     @Override
-    public void catched(String contentType, String url, InputStream data) {
+    public byte[] catched(String contentType, String url, InputStream data) {
         boolean swfOnly = false;
         if (contentType.contains(";")) {
             contentType = contentType.substring(0, contentType.indexOf(';'));
         }
         if ((!sniffSWFCheckBox.isSelected()) && (contentType.equals("application/x-shockwave-flash"))) {
-            return;
+            return null;
         }
         if ((!sniffJSCheckBox.isSelected()) && (contentType.equals("application/javascript") || contentType.equals("application/x-javascript") || contentType.equals("text/javascript") || contentType.equals("application/json"))) {
-            return;
+            return null;
         }
         if ((!sniffXMLCheckBox.isSelected()) && (contentType.equals("application/xml") || contentType.equals("text/xml"))) {
-            return;
+            return null;
         }
         if ((!sniffOSCheckBox.isSelected()) && (contentType.equals("application/octet-stream"))) {
-            return;
+            return null;
         }
+        
+        byte[] result = null;
+        
         if (!listModel.contains(url)) {
             try {
                 byte[] hdr = new byte[3];
                 data.read(hdr);
                 String shdr = new String(hdr);
-                if ((swfOnly) && ((!shdr.equals("FWS")) && (!shdr.equals("CWS")))) {
-                    return; //NOT SWF
+                if (swfOnly && ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS")))) {
+                    return null; //NOT SWF
                 }
 
-                File f = new File(Main.tempFile(url));
-                try (FileOutputStream fos = new FileOutputStream(f)) {
-                    fos.write(hdr);
-                    byte[] buf = new byte[2048];
-                    int count;
-                    while ((count = data.read(buf)) > 0) {
-                        fos.write(buf, 0, count);
-                    }
+                String tempFilePath = Main.tempFile(url);
+                data.reset();
+                byte[] dataArray = Helper.readStream(data);
+                try (FileOutputStream fos = new FileOutputStream(new File(tempFilePath))) {
+                    fos.write(dataArray);
                 }
-                Replacement r = new Replacement(url, Main.tempFile(url));
+                
+                result = SWFDecompilerPlugin.fireProxyFileCatched(dataArray);
+                
+                Replacement r = new Replacement(url, tempFilePath);
                 r.lastAccess = Calendar.getInstance();
                 listModel.addURL(r);
             } catch (IOException e) {
             }
-
         }
+        
+        return result;
     }
 
     /**

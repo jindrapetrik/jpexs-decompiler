@@ -8,22 +8,22 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main
-{
+public class Main {
 
     public static final String REPLACEMENTSFILE = "." + File.separator + "config" + File.separator + "replacements.ini";
     public static boolean DEBUG_MODE = false;
 
-    public static void main(String[] argv)
-    {
-	List<Replacement> replacements = new ArrayList<Replacement>();
+    public static void main(String[] argv) {
+        List<Replacement> replacements = new ArrayList<Replacement>();
         if ((new File(REPLACEMENTSFILE)).exists()) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(REPLACEMENTSFILE));
                 String s = "";
                 while ((s = br.readLine()) != null) {
                     String fileName = br.readLine();
-                    if (fileName == null) break;
+                    if (fileName == null) {
+                        break;
+                    }
                     fileName = fileName.replaceAll("[\\\\/]", File.separator);
                     Replacement r = new Replacement(s, fileName);
                     if (DEBUG_MODE) {
@@ -40,25 +40,26 @@ public class Main
                 System.out.println("WARNING:REPLACEMENTS FILE NOT FOUND.");
             }
         }
-         Server.startServer(ProxyConfig.port, replacements, new ArrayList<String>(), new CatchedListener() {
+        Server.startServer(ProxyConfig.port, replacements, new ArrayList<String>(), new CatchedListener() {
 
             /**
              * Method called when specified contentType is received
              *
              * @param contentType Content type
-             * @param url         URL of the method
-             * @param data        Data stream
+             * @param url URL of the method
+             * @param data Data stream
              */
-            public void catched(String contentType, String url, InputStream data) {
+            public byte[] catched(String contentType, String url, InputStream data) {
+                return null;
             }
-         }, new ReplacedListener() {
+        }, new ReplacedListener() {
 
             public void replaced(Replacement replacement, String url, String contentType) {
-               if (DEBUG_MODE) {
-                  System.out.println("REPLACED:" + url + " (Content-type:" + contentType + ") WITH FILE " + replacement.targetFile);
-               }
+                if (DEBUG_MODE) {
+                    System.out.println("REPLACED:" + url + " (Content-type:" + contentType + ") WITH FILE " + replacement.targetFile);
+                }
             }
-         });
+        });
 
     }
 }

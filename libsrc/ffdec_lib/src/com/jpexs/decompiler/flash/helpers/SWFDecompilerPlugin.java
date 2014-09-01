@@ -80,6 +80,22 @@ public class SWFDecompilerPlugin {
         }
     }
     
+    public static byte[] fireProxyFileCatched(byte[] data) {
+        byte[] result = null;
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                byte[] newResult = listener.proxyFileCatched(data);
+                if (newResult != null) {
+                    result = newResult;
+                    data = newResult;
+                }
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method proxyFileCatched.", e);
+            }
+        }
+        return result;
+    }
+
     public static boolean fireSwfParsed(SWF swf) {
         for (SWFDecompilerListener listener : listeners) {
             try {

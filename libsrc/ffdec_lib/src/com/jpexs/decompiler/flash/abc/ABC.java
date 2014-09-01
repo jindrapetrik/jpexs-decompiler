@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.MemoryInputStream;
@@ -561,6 +562,8 @@ public class ABC {
             method_info.get(mb.method_info).setBody(mb);
             bodyIdxFromMethodIdx.set(mb.method_info, i);
             ais.endDumpLevel();
+
+            SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
         loadNamespaceMap();
         /*for(int i=0;i<script_count;i++){
@@ -574,6 +577,8 @@ public class ABC {
          System.out.println(""+t.toString());
          }
          System.exit(0);*/
+        
+        SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
     public void saveToStream(OutputStream os) throws IOException {

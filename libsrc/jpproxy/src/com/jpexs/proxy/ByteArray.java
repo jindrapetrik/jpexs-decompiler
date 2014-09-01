@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ByteArray {
+
     public byte[] bytes;
     public int offset = 0;
 

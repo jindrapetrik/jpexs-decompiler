@@ -7,6 +7,10 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 public class DeobfuscatorSample implements SWFDecompilerListener {
 
     @Override
+    public byte[] proxyFileCatched(byte[] data) {
+    }
+
+    @Override
     public void actionListParsed(ActionList actions, SWF swf) {
     }
 

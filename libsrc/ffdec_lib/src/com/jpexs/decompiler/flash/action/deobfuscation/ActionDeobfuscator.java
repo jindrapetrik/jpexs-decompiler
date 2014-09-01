@@ -473,6 +473,11 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
     }
 
     @Override
+    public byte[] proxyFileCatched(byte[] data) {
+        return null;
+    }
+
+    @Override
     public void swfParsed(SWF swf) {
     }
 

@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.action.ActionList;
  */
 public interface SWFDecompilerListener {
 
+    byte[] proxyFileCatched(byte[] data);
+
     void swfParsed(SWF swf);
 
     void actionListParsed(ActionList actions, SWF swf);

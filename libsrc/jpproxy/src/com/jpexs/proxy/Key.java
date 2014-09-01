@@ -1,6 +1,7 @@
 package com.jpexs.proxy;
 
 class Key {
+
     private String name = null;
 
     /**
