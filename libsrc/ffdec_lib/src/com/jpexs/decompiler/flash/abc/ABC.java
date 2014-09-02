@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -56,6 +58,9 @@ import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
@@ -1004,17 +1009,17 @@ public class ABC {
             name = name.substring(0, name.length() - 2);
 
             for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
-                if (en.key.toString().startsWith(name)) {
-                    ret.add(en.value);
+                if (en.getKey().toString().startsWith(name)) {
+                    ret.add(en.getValue());
                 }
             }
         } else if (name.endsWith(".*") || name.equals("*") || name.endsWith(".+") || name.equals("+")) {
             name = name.substring(0, name.length() - 1);
             for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
-                if (en.key.toString().startsWith(name)) {
-                    String rem = name.isEmpty() ? en.key.toString() : en.key.toString().substring(name.length());
+                if (en.getKey().toString().startsWith(name)) {
+                    String rem = name.isEmpty() ? en.getKey().toString() : en.getKey().toString().substring(name.length());
                     if (!rem.contains(".")) {
-                        ret.add(en.value);
+                        ret.add(en.getValue());
                     }
                 }
             }
@@ -1031,8 +1036,8 @@ public class ABC {
     public ScriptPack findScriptPackByPath(String name) {
         List<MyEntry<ClassPath, ScriptPack>> packs = getScriptPacks();
         for (MyEntry<ClassPath, ScriptPack> en : packs) {
-            if (en.key.toString().equals(name)) {
-                return en.value;
+            if (en.getKey().toString().equals(name)) {
+                return en.getValue();
             }
         }
         return null;
@@ -1148,6 +1153,34 @@ public class ABC {
         method_info.remove(index);
     }
 
+    public void replaceSciptPack(ScriptPack pack, String as) throws ParseException, CompilationException, IOException, InterruptedException {
+        String scriptName = pack.getPathScriptName() + ".as";
+        int oldIndex = pack.scriptIndex;
+        int newIndex = script_info.size();
+        String documentClass = "";
+        loopt:
+        for (Tag t : swf.tags) {
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sc = (SymbolClassTag) t;
+                for (int i = 0; i < sc.tags.length; i++) {
+                    if (sc.tags[i] == 0) {
+                        documentClass = sc.names[i];
+                        break loopt;
+                    }
+                }
+            }
+        }
+        boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
+
+        script_info.get(oldIndex).delete(this, true);
+        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName);
+        //Move newly added script to its position
+        script_info.set(oldIndex, script_info.get(newIndex));
+        script_info.remove(newIndex);
+        pack(); //removes old classes/methods
+        ((Tag) parentTag).setModified(true);
+    }
+    
     public void pack() {
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).deleted) {

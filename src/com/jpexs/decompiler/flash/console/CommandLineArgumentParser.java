@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -73,6 +74,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -251,8 +253,8 @@ public class CommandLineArgumentParser {
         out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
         out.println(" " + (cnt++) + ") -zoom <N>");
         out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
-        out.println(" " + (cnt++) + ") -replace <infile> <outfile> <characterId> <importDataFile>");
-        out.println(" ...replaces the data of the specified BinaryData, Image or DefineSound tag");
+        out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<sctipName1>) <importDataFile1> [(<characterId2>|<sctipName2>) <importDataFile2>]...");
+        out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
         out.println();
         out.println("Examples:");
         out.println("java -jar ffdec.jar myfile.swf");
@@ -1350,14 +1352,38 @@ public class CommandLineArgumentParser {
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
                             // replace AS1/2
-                            // todo: implement
+                            String repFile = args.remove();
+                            String as = Helper.readTextFile(repFile);
+                            ASMSource src = asms.get(objectToReplace);
+                            com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(swf.version);
+                            try {
+                                src.setActions(par.actionsFromString(as));
+                            } catch (ParseException ex) {
+                                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                                System.exit(1);
+                            } catch (CompilationException ex) {
+                                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                                System.exit(1);
+                            }
+                            src.setModified();
                         } else {
                             List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
                             for (MyEntry<ClassPath, ScriptPack> entry : packs) {
                                 if (entry.toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
-                                    // todo: implement
+                                    String repFile = args.remove();
+                                    String as = Helper.readTextFile(repFile);
+                                    ScriptPack pack = entry.getValue();
+                                    try {
+                                        pack.abc.replaceSciptPack(pack, as);
+                                    } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
+                                        System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                                        System.exit(1);
+                                    } catch (CompilationException ex) {
+                                        System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                                        System.exit(1);
+                                    }
                                 }
                             }
                         }
@@ -1433,7 +1459,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
                 for (MyEntry<ClassPath, ScriptPack> entry : packs) {
-                    System.out.println(entry.key.toString());
+                    System.out.println(entry.getKey().toString());
                 }
             }
         } catch (IOException | InterruptedException e) {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers.collections;
 
 import java.util.Map.Entry;
@@ -26,8 +27,8 @@ import java.util.Objects;
  */
 public class MyEntry<K, V> implements Entry<K, V> {
 
-    public K key;
-    public V value;
+    private final K key;
+    private V value;
 
     public MyEntry(K key, V value) {
         this.key = key;

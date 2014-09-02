@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
@@ -73,7 +72,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
 
-    //private JLabel label = new JLabel();
     private Timelined timelined;
     private boolean stillFrame = false;
     private Timer timer;
@@ -81,7 +79,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private SWF swf;
     private boolean loaded;
     private int mouseButton;
-    private JLabel debugLabel = new JLabel("-");
+    private final JLabel debugLabel = new JLabel("-");
     private DepthState stateUnderCursor = null;
     private MouseEvent lastMouseEvent = null;
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();

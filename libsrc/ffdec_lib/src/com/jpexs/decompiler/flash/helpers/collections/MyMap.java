@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers.collections;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class MyMap<K, V> implements Map<K, V> {
     @Override
     public boolean containsKey(Object key) {
         for (MyEntry<K, V> kv : values) {
-            if (kv.key.equals(key)) {
+            if (kv.getKey().equals(key)) {
                 return true;
             }
         }
@@ -54,7 +55,7 @@ public class MyMap<K, V> implements Map<K, V> {
     @Override
     public boolean containsValue(Object value) {
         for (MyEntry<K, V> kv : values) {
-            if (kv.value.equals(value)) {
+            if (kv.getValue().equals(value)) {
                 return true;
             }
         }
@@ -64,8 +65,8 @@ public class MyMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         for (MyEntry<K, V> kv : values) {
-            if (kv.key.equals(key)) {
-                return kv.value;
+            if (kv.getKey().equals(key)) {
+                return kv.getValue();
             }
         }
         return null;
@@ -74,8 +75,8 @@ public class MyMap<K, V> implements Map<K, V> {
     @Override
     public V put(K key, V value) {
         for (MyEntry<K, V> kv : values) {
-            if (kv.key.equals(key)) {
-                kv.value = value;
+            if (kv.getKey().equals(key)) {
+                kv.setValue(value);
                 return value;
             }
         }
@@ -87,9 +88,9 @@ public class MyMap<K, V> implements Map<K, V> {
     public V remove(Object key) {
         for (int i = 0; i < values.size(); i++) {
             MyEntry<K, V> kv = values.get(i);
-            if (kv.key.equals(key)) {
+            if (kv.getKey().equals(key)) {
                 values.remove(i);
-                return kv.value;
+                return kv.getValue();
             }
         }
         return null;
@@ -111,7 +112,7 @@ public class MyMap<K, V> implements Map<K, V> {
     public Set<K> keySet() {
         Set<K> ret = new MySet<>();
         for (MyEntry<K, V> kv : values) {
-            ret.add(kv.key);
+            ret.add(kv.getKey());
         }
         return ret;
     }
@@ -120,7 +121,7 @@ public class MyMap<K, V> implements Map<K, V> {
     public Collection<V> values() {
         Collection<V> ret = new ArrayList<>();
         for (MyEntry<K, V> kv : values) {
-            ret.add(kv.value);
+            ret.add(kv.getValue());
         }
         return ret;
     }

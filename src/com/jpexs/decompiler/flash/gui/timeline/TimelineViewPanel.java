@@ -16,16 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
-import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 

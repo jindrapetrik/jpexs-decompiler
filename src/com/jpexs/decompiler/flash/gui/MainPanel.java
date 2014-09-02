@@ -64,7 +64,6 @@ import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
-import com.jpexs.decompiler.flash.gui.timeline.TimelinePanel;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;

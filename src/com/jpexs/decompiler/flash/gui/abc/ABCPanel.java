@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -59,8 +58,6 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.SymbolClassTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
@@ -171,7 +168,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     pos++;
                     String workText = AppStrings.translate("work.searching");
                     String decAdd = "";
-                    if (!decompiledTextArea.isCached(item.value)) {
+                    if (!decompiledTextArea.isCached(item.getValue())) {
                         decAdd = ", " + AppStrings.translate("work.decompiling");
                     }
 
@@ -180,18 +177,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                             @Override
                             public Void doInBackground() throws Exception {
-                                decompiledTextArea.cacheScriptPack(item.value, swf.abcList);
-                                if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
+                                decompiledTextArea.cacheScriptPack(item.getValue(), swf.abcList);
+                                if (pat.matcher(decompiledTextArea.getCachedText(item.getValue())).find()) {
                                     ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
-                                    searchResult.scriptPack = item.value;
-                                    searchResult.classPath = item.key;
+                                    searchResult.scriptPack = item.getValue();
+                                    searchResult.classPath = item.getKey();
                                     found.add(searchResult);
                                 }
                                 return null;
                             }
                         };
                         worker.execute();
-                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", worker);
+                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.getKey().toString() + "... ", worker);
                         worker.get();
                     } catch (InterruptedException ex) {
                         break;
@@ -668,8 +665,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
             ScriptPack pack = null;
             for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
-                if (item.key.toString().equals(name)) {
-                    pack = item.value;
+                if (item.getKey().toString().equals(name)) {
+                    pack = item.getValue();
                     break;
                 }
             }
@@ -777,37 +774,16 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 break;
             case ACTION_SAVE_DECOMPILED:
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
-                String scriptName = pack.getPathScriptName() + ".as";
                 int oldIndex = pack.scriptIndex;
-                int newIndex = abc.script_info.size();
-                String documentClass = "";
-                loopt:
-                for (Tag t : swf.tags) {
-                    if (t instanceof SymbolClassTag) {
-                        SymbolClassTag sc = (SymbolClassTag) t;
-                        for (int i = 0; i < sc.tags.length; i++) {
-                            if (sc.tags[i] == 0) {
-                                documentClass = sc.names[i];
-                                break loopt;
-                            }
-                        }
-                    }
-                }
-                boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
 
                 try {
-                    abc.script_info.get(oldIndex).delete(abc, true);
-                    ActionScriptParser.compile(decompiledTextArea.getText(), abc, new ArrayList<ABC>(), isDocumentClass, scriptName);
-                    //Move newly added script to its position
-                    abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
-                    abc.script_info.remove(newIndex);
-                    abc.pack(); //removes old classes/methods
-                    ((Tag) abc.parentTag).setModified(true);
-                    lastDecompiled = decompiledTextArea.getText();
+                    String as = decompiledTextArea.getText();
+                    abc.replaceSciptPack(pack, as);
+                    lastDecompiled = as;
                     mainPanel.updateClassesList();
                     List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
                     if (!packs.isEmpty()) {
-                        hilightScript(swf, packs.get(0).key.toString());
+                        hilightScript(swf, packs.get(0).getKey().toString());
                     }
                     //decompiledTextArea.setClassIndex(-1);
                     //navigator.setClassIndex(-1, oldIndex);

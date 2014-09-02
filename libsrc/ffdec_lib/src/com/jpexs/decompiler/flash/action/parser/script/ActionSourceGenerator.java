@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -690,14 +691,14 @@ public class ActionSourceGenerator implements SourceGenerator {
             }
             for (MyEntry<GraphTargetItem, GraphTargetItem> en : staticVars) {
                 ifbody.add(new ActionPush(new RegisterNumber(1/*static*/)));
-                ifbody.add(new ActionPush(getName(en.key)));
-                ifbody.addAll(toActionList(en.value.toSource(localData, this)));
+                ifbody.add(new ActionPush(getName(en.getKey())));
+                ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
                 ifbody.add(new ActionSetMember());
             }
             for (MyEntry<GraphTargetItem, GraphTargetItem> en : vars) {
                 ifbody.add(new ActionPush(new RegisterNumber(2/*instance*/)));
-                ifbody.add(new ActionPush(getName(en.key)));
-                ifbody.addAll(toActionList(en.value.toSource(localData, this)));
+                ifbody.add(new ActionPush(getName(en.getKey())));
+                ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
                 ifbody.add(new ActionSetMember());
             }
         }

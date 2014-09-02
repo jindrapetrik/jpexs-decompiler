@@ -855,8 +855,8 @@ public final class SWF implements TreeItem, Timelined {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
             for (MyEntry<ClassPath, ScriptPack> itemOld : ret) {
-                if (item.key.equals(itemOld.key)) {
-                    logger.log(Level.SEVERE, "Duplicate pack path found (" + itemOld.key + ")!");
+                if (item.getKey().equals(itemOld.getKey())) {
+                    logger.log(Level.SEVERE, "Duplicate pack path found (" + itemOld.getKey() + ")!");
                     break;
                 }
             }
@@ -968,7 +968,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel);
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcTags, exportMode, parallel);
                             ret.add(task.call());
                         }
                         return null;
@@ -983,7 +983,7 @@ public final class SWF implements TreeItem, Timelined {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel));
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcTags, exportMode, parallel));
                 futureResults.add(future);
             }
 
@@ -1970,7 +1970,7 @@ public final class SWF implements TreeItem, Timelined {
         informListeners("rename", "");
         int fc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
-            String name = it.key.toStringNoH(it.value);
+            String name = it.getKey().toStringNoH(it.getValue());
             deobfuscation.allVariableNamesStr.add(name);
         }
 
@@ -2029,10 +2029,10 @@ public final class SWF implements TreeItem, Timelined {
 
                         List<GraphTargetItem> vars = new ArrayList<>();
                         for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.vars) {
-                            vars.add(item.key);
+                            vars.add(item.getKey());
                         }
                         for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
-                            vars.add(item.key);
+                            vars.add(item.getKey());
                         }
                         for (GraphTargetItem gti : vars) {
                             if (gti instanceof DirectValueActionItem) {
@@ -2139,7 +2139,7 @@ public final class SWF implements TreeItem, Timelined {
         HashSet<String> stringsNoVarH = new HashSet<>();
         List<DirectValueActionItem> allVariableNamesDv = new ArrayList<>();
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
-            allVariableNamesDv.add(it.key);
+            allVariableNamesDv.add(it.getKey());
         }
         for (DirectValueActionItem ti : allStrings.keySet()) {
             if (!allVariableNamesDv.contains(ti)) {
@@ -2150,22 +2150,22 @@ public final class SWF implements TreeItem, Timelined {
         int vc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             vc++;
-            String name = it.key.toStringNoH(it.value);
-            String changed = deobfuscation.deobfuscateName(name, false, usageTypes.get(it.key), deobfuscated, renameType, selected);
+            String name = it.getKey().toStringNoH(it.getValue());
+            String changed = deobfuscation.deobfuscateName(name, false, usageTypes.get(it.getKey()), deobfuscated, renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
-                String h = System.identityHashCode(it.key) + "_" + name;
+                String h = System.identityHashCode(it.getKey()) + "_" + name;
                 if (stringsNoVarH.contains(h)) {
                     addNew = true;
                 }
-                ActionPush pu = (ActionPush) it.key.src;
+                ActionPush pu = (ActionPush) it.getKey().src;
                 if (pu.replacement == null) {
                     pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);
                 }
-                if (pu.replacement.get(it.key.pos) instanceof ConstantIndex) {
-                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(it.key.pos);
-                    ConstantPool pool = it.value;
+                if (pu.replacement.get(it.getKey().pos) instanceof ConstantIndex) {
+                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(it.getKey().pos);
+                    ConstantPool pool = it.getValue();
                     if (pool == null) {
                         continue;
                     }
@@ -2179,7 +2179,7 @@ public final class SWF implements TreeItem, Timelined {
                         pool.constants.set(ci.index, changed);
                     }
                 } else {
-                    pu.replacement.set(it.key.pos, changed);
+                    pu.replacement.set(it.getKey().pos, changed);
                 }
                 ret++;
             }

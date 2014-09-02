@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -91,7 +92,7 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         uninitializedVars.addAll(allMembers);
         for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
-            String s = v.key.toStringNoQuotes(LocalData.empty);
+            String s = v.getKey().toStringNoQuotes(LocalData.empty);
             if (uninitializedVars.contains(s)) {
                 uninitializedVars.remove(s);
             }
@@ -169,9 +170,9 @@ public class ClassActionItem extends ActionItem implements Block {
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
             writer.append("var ");
-            item.key.toStringNoQuotes(writer, localData);
+            item.getKey().toStringNoQuotes(writer, localData);
             writer.append(" = ");
-            item.value.toString(writer, localData);
+            item.getValue().toString(writer, localData);
             writer.append(";").newLine();
         }
         for (String v : uninitializedVars) {
@@ -181,9 +182,9 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
             writer.append("static var ");
-            item.key.toStringNoQuotes(writer, localData);
+            item.getKey().toStringNoQuotes(writer, localData);
             writer.append(" = ");
-            item.value.toString(writer, localData);
+            item.getValue().toString(writer, localData);
             writer.append(";").newLine();
         }
 

@@ -120,13 +120,13 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
         filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
-                if (!item.key.toString().toLowerCase().contains(filter)) {
+                if (!item.getKey().toString().toLowerCase().contains(filter)) {
                     continue;
                 }
             }
             //String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
             //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";            
-            classTree.add(item.key.className, item.key.packageStr, item.value);
+            classTree.add(item.getKey().className, item.getKey().packageStr, item.getValue());
         }
     }
 

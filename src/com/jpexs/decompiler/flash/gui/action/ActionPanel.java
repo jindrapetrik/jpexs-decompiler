@@ -43,7 +43,6 @@ import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
