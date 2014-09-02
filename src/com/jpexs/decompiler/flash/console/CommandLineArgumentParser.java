@@ -23,7 +23,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -56,11 +58,13 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -209,6 +213,10 @@ public class CommandLineArgumentParser {
         out.println("      DO NOT PUT space between comma (,) and next class.");
         out.println(" " + (cnt++) + ") -dumpSWF <infile>");
         out.println("  ...dumps list of SWF tags to console");
+        out.println(" " + (cnt++) + ") -dumpAS2 <infile>");
+        out.println("  ...dumps list of AS1/2 sctipts to console");
+        out.println(" " + (cnt++) + ") -dumpAS3 <infile>");
+        out.println("  ...dumps list of AS3 sctipts to console");
         out.println(" " + (cnt++) + ") -compress <infile> <outfile>");
         out.println("  ...Compress SWF <infile> and save it to <outfile>");
         out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
@@ -371,6 +379,10 @@ public class CommandLineArgumentParser {
             parseRenameInvalidIdentifiers(args);
         } else if (nextParam.equals("-dumpswf")) {
             parseDumpSwf(args);
+        } else if (nextParam.equals("-dumpas2")) {
+            parseDumpAS2(args);
+        } else if (nextParam.equals("-dumpas3")) {
+            parseDumpAS3(args);
         } else if (nextParam.equals("-flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args);
         } else if (nextParam.equals("-replace")) {
@@ -1290,42 +1302,75 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.remove());
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
-                int characterId = 0;
-                try {
-                    characterId = Integer.parseInt(args.remove());
-                } catch (NumberFormatException nfe) {
-                    System.err.println("CharacterId should be integer");
-                    System.exit(1);
-                }
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
-                if (!swf.characters.containsKey(characterId)) {
-                    System.err.println("CharacterId does not exist");
-                    System.exit(1);
-                }
+                while (true) {
+                    String objectToReplace = args.remove();
+                    
+                    if (objectToReplace.matches("\\d+")) {
+                        // replace character tag
+                        int characterId = 0;
+                        try {
+                            characterId = Integer.parseInt(objectToReplace);
+                        } catch (NumberFormatException nfe) {
+                            System.err.println("CharacterId should be integer");
+                            System.exit(1);
+                        }
+                        if (!swf.characters.containsKey(characterId)) {
+                            System.err.println("CharacterId does not exist");
+                            System.exit(1);
+                        }
 
-                CharacterTag characterTag = swf.characters.get(characterId);
-                String repFile = args.remove();
-                byte[] data = Helper.readFile(repFile);
-                if (characterTag instanceof DefineBinaryDataTag) {
-                    DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
-                    new BinaryDataImporter().importData(defineBinaryData, data);
-                } else if (characterTag instanceof ImageTag) {
-                    ImageTag imageTag = (ImageTag) characterTag;
-                    new ImageImporter().importImage(imageTag, data);
-                } else if (characterTag instanceof SoundTag) {
-                    SoundTag st = (SoundTag) characterTag;
-                    int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                    if (repFile.toLowerCase().endsWith(".mp3")) {
-                        soundFormat = SoundFormat.FORMAT_MP3;
+                        CharacterTag characterTag = swf.characters.get(characterId);
+                        String repFile = args.remove();
+                        byte[] data = Helper.readFile(repFile);
+                        if (characterTag instanceof DefineBinaryDataTag) {
+                            DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
+                            new BinaryDataImporter().importData(defineBinaryData, data);
+                        } else if (characterTag instanceof ImageTag) {
+                            ImageTag imageTag = (ImageTag) characterTag;
+                            new ImageImporter().importImage(imageTag, data);
+                        } else if (characterTag instanceof SoundTag) {
+                            SoundTag st = (SoundTag) characterTag;
+                            int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                            if (repFile.toLowerCase().endsWith(".mp3")) {
+                                soundFormat = SoundFormat.FORMAT_MP3;
+                            }
+                            boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
+                            if (!ok) {
+                                System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
+                                System.exit(1);
+                            }
+                        } else {
+                            System.err.println("The specified tag type it not supported for import");
+                            System.exit(1);
+                        }
+                    } else {
+                        Map<String, ASMSource> asms = swf.getASMs();
+                        boolean found = false;
+                        if (asms.containsKey(objectToReplace)) {
+                            found = true;
+                            // replace AS1/2
+                            // todo: implement
+                        } else {
+                            List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
+                            for (MyEntry<ClassPath, ScriptPack> entry : packs) {
+                                if (entry.toString().equals(objectToReplace)) {
+                                    found = true;
+                                    // replace AS3
+                                    // todo: implement
+                                }
+                            }
+                        }
+                        
+                        if (!found) {
+                            System.err.println(objectToReplace + " is not reocginized as a CharacterId or a script name.");
+                            System.exit(1);
+                        }
                     }
-                    boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
-                    if (!ok) {
-                        System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
-                        System.exit(1);
+                    
+                    if (args.isEmpty() || args.peek().startsWith("-")) {
+                        break;
                     }
-                } else {
-                    System.err.println("The specified tag type it not supported for import");
-                    System.exit(1);
                 }
 
                 try {
@@ -1357,6 +1402,44 @@ public class CommandLineArgumentParser {
             System.exit(1);
         }
         System.exit(0);
+    }
+
+    private static void parseDumpAS2(Queue<String> args) {
+        if (args.isEmpty()) {
+            badArguments();
+        }
+        File file = new File(args.remove());
+        try {
+            try (FileInputStream is = new FileInputStream(file)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                Map<String, ASMSource> asms = swf.getASMs();
+                for (String as2 : asms.keySet()) {
+                    System.out.println(as2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseDumpAS3(Queue<String> args) {
+        if (args.isEmpty()) {
+            badArguments();
+        }
+        File file = new File(args.remove());
+        try {
+            try (FileInputStream is = new FileInputStream(file)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
+                for (MyEntry<ClassPath, ScriptPack> entry : packs) {
+                    System.out.println(entry.key.toString());
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
     }
 
     private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {
