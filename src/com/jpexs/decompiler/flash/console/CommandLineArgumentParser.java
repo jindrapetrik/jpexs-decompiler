@@ -1369,7 +1369,7 @@ public class CommandLineArgumentParser {
                         } else {
                             List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
                             for (MyEntry<ClassPath, ScriptPack> entry : packs) {
-                                if (entry.toString().equals(objectToReplace)) {
+                                if (entry.getKey().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
                                     String repFile = args.remove();
