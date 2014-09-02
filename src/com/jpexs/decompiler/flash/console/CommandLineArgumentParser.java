@@ -1352,6 +1352,8 @@ public class CommandLineArgumentParser {
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
                             // replace AS1/2
+                            System.out.println("Replace AS1/2");
+                            System.out.println("Warning: This feature is EXPERIMENTAL");
                             String repFile = args.remove();
                             String as = Helper.readTextFile(repFile);
                             ASMSource src = asms.get(objectToReplace);
@@ -1372,6 +1374,8 @@ public class CommandLineArgumentParser {
                                 if (entry.getKey().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
+                                    System.out.println("Replace AS3");
+                                    System.out.println("Warning: This feature is EXPERIMENTAL");
                                     String repFile = args.remove();
                                     String as = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry.getValue();
