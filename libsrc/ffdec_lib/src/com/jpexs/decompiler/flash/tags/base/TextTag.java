@@ -485,6 +485,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         RECT r = getBounds();
-        return new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()); //TODO: match character shapes
+        Shape shp = new Rectangle.Double(r.Xmin, r.Ymin, r.getWidth(), r.getHeight());
+        return transformation.toTransform().createTransformedShape(shp); //TODO: match character shapes (?)
     }
 }
