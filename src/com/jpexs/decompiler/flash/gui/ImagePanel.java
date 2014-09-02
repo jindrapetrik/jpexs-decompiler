@@ -17,12 +17,14 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -85,6 +87,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
     private final IconPanel iconPanel;
     private int time = 0;
+    private int selectedDepth = -1;
+
+    public void selectDepth(int depth) {
+        if (depth != selectedDepth) {
+            this.selectedDepth = depth;
+        }
+        hideMouseSelection();
+    }
 
     private class IconPanel extends JPanel {
 
@@ -271,6 +281,26 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
+    private void showSelectedName() {
+        if (selectedDepth > -1 && frame > -1) {
+            DepthState ds = timelined.getTimeline().frames.get(frame).layers.get(selectedDepth);
+            if (ds != null) {
+                CharacterTag cht = timelined.getTimeline().swf.characters.get(ds.characterId);
+                if (cht != null) {
+                    debugLabel.setText(cht.getName());
+                }
+            }
+        }
+    }
+
+    public void hideMouseSelection() {
+        if (selectedDepth > -1) {
+            showSelectedName();
+        } else {
+            debugLabel.setText(" - ");
+        }
+    }
+
     public ImagePanel() {
         super(new BorderLayout());
         //iconPanel.setHorizontalAlignment(JLabel.CENTER);
@@ -301,8 +331,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             @Override
             public void mouseExited(MouseEvent e) {
                 stateUnderCursor = null;
+                lastMouseEvent = null;
                 drawFrame();
-                debugLabel.setText(" - ");
+                hideMouseSelection();
             }
 
             @Override
@@ -489,8 +520,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode());
+    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth) {
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode());
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -514,6 +545,30 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
                 List<DepthState> dss = new ArrayList<>();
                 List<Shape> os = new ArrayList<>();
+                DepthState ds = drawable.getTimeline().frames.get(frame).layers.get(selectedDepth);
+                if (ds != null) {
+                    CharacterTag cht = swf.characters.get(ds.characterId);
+                    if (cht != null) {
+                        if (cht instanceof DrawableTag) {
+                            DrawableTag dt = (DrawableTag) cht;
+                            Shape outline = dt.getOutline(0, ds.time, ds.ratio, stateUnderCursor, mouseButton, new Matrix(ds.matrix));
+                            Rectangle bounds = outline.getBounds();
+                            bounds.x /= 20;
+                            bounds.y /= 20;
+                            bounds.width /= 20;
+                            bounds.height /= 20;
+                            bounds.x -= rect.Xmin / 20;
+                            bounds.y -= rect.Ymin / 20;
+                            //SHAPERECORD.resizeSHAPE(outline, 1/20)
+                            gg.setStroke(new BasicStroke(2.0f,
+                                    BasicStroke.CAP_BUTT,
+                                    BasicStroke.JOIN_MITER,
+                                    10.0f, new float[]{10.0f}, 0.0f));
+                            gg.setPaint(Color.red);
+                            gg.draw(bounds);
+                        }
+                    }
+                }
                 /*drawable.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, dss, os);
                  
                  //gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
@@ -544,7 +599,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
         updatePos(lastMouseEvent, false);
-        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton);
+        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);

@@ -63,7 +63,8 @@ import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
+import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
+import com.jpexs.decompiler.flash.gui.timeline.TimelinePanel;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
@@ -219,6 +220,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private ABCPanel abcPanel;
     private ActionPanel actionPanel;
     private final JPanel welcomePanel;
+    private final TimelineViewPanel timelineViewPanel;
     private final MainFrameStatusPanel statusPanel;
     private final MainFrameMenu mainMenu;
     private final JProgressBar progressBar = new JProgressBar(0, 100);
@@ -241,6 +243,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
+    private static final String TIMELINE_PANEL = "TIMELINEPANEL";
     private final JSplitPane splitPane1;
     private final JSplitPane splitPane2;
     private boolean splitsInited = false;
@@ -560,10 +563,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         });
 
+        timelineViewPanel = new TimelineViewPanel();
+
         CardLayout cl3 = new CardLayout();
         contentPanel = new JPanel(cl3);
         contentPanel.add(welcomePanel, WELCOME_PANEL);
         contentPanel.add(splitPane1, SPLIT_PANE1);
+        contentPanel.add(timelineViewPanel, TIMELINE_PANEL);
         add(contentPanel);
         cl3.show(contentPanel, WELCOME_PANEL);
 
@@ -578,7 +584,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
         detailPanel.setVisible(false);
 
-        showDumpView(Configuration.dumpView.get());
+        showView(Configuration.dumpView.get() ? VIEW_DUMP : VIEW_RESOURCES);
         updateUi();
 
         //Opening files with drag&drop to main window
@@ -2143,19 +2149,52 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return mainMenu.isInternalFlashViewerSelected();
     }
 
-    public void showDumpView(boolean show) {
-        treePanel.removeAll();
-        if (show) {
-            treePanel.add(new JScrollPane(dumpTree), BorderLayout.CENTER);
-            treePanelMode = TreePanelMode.DUMP_TREE;
-            showDetail(DETAILCARDEMPTYPANEL);
-        } else {
-            treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
-            treePanel.add(searchPanel, BorderLayout.SOUTH);
-            treePanelMode = TreePanelMode.TAG_TREE;
+    public static final int VIEW_RESOURCES = 0;
+    public static final int VIEW_DUMP = 1;
+    public static final int VIEW_TIMELINE = 2;
+
+    public boolean showView(int view) {
+
+        CardLayout cl = (CardLayout) (contentPanel.getLayout());
+        switch (view) {
+            case VIEW_DUMP:
+                if (!isWelcomeScreen) {
+                    cl.show(contentPanel, SPLIT_PANE1);
+                }
+                treePanel.removeAll();
+                treePanel.add(new JScrollPane(dumpTree), BorderLayout.CENTER);
+                treePanelMode = TreePanelMode.DUMP_TREE;
+                showDetail(DETAILCARDEMPTYPANEL);
+                reload(true);
+                treePanel.revalidate();
+                return true;
+            case VIEW_RESOURCES:
+                if (!isWelcomeScreen) {
+                    cl.show(contentPanel, SPLIT_PANE1);
+                }
+                treePanel.removeAll();
+                treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
+                treePanel.add(searchPanel, BorderLayout.SOUTH);
+                treePanelMode = TreePanelMode.TAG_TREE;
+                reload(true);
+                treePanel.revalidate();
+                return true;
+            case VIEW_TIMELINE:
+                final SWF swf = getCurrentSwf();
+                if (swf != null) {
+                    TreeItem item = tagTree.getCurrentTreeItem();
+                    if (item instanceof DefineSpriteTag) {
+                        timelineViewPanel.setTimelined((DefineSpriteTag) item);
+                    } else {
+                        timelineViewPanel.setTimelined(swf);
+                    }
+                    cl.show(contentPanel, TIMELINE_PANEL);
+                    return true;
+                }
+                return false;
         }
-        reload(true);
-        treePanel.revalidate();
+        return false;
+
     }
 
     private void dumpViewReload(boolean forceReload) {
@@ -2497,21 +2536,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void setErrorState(ErrorState errorState) {
         statusPanel.setErrorState(errorState);
-    }
-
-    public void timeline() {
-        final SWF swf = getCurrentSwf();
-        if (swf != null) {
-            TreeItem item = tagTree.getCurrentTreeItem();
-            if (item instanceof DefineSpriteTag) {
-                TimelineFrame tf = new TimelineFrame((DefineSpriteTag) item);
-                tf.setVisible(true);
-                return;
-            }
-
-            TimelineFrame tf = new TimelineFrame(swf);
-            tf.setVisible(true);
-        }
     }
 
     public static Timelined makeTimelined(final Tag tag) {

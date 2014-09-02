@@ -141,7 +141,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand() == ACTION_OK) {
-            String url; 
+            String url;
             if (latestVersion.updateLink != null) {
                 url = latestVersion.updateLink;
             } else {

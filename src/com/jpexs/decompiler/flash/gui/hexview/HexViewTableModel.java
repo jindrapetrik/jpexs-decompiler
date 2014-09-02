@@ -23,7 +23,7 @@ import javax.swing.table.AbstractTableModel;
  * @author JPEXS
  */
 public class HexViewTableModel extends AbstractTableModel {
-    
+
     private byte[] data;
     private final int bytesInRow;
 
@@ -79,15 +79,15 @@ public class HexViewTableModel extends AbstractTableModel {
             return null;
         }
     }
-    
+
     public byte[] getData() {
         return data;
     }
-    
+
     public void setData(byte[] data) {
         this.data = data;
     }
-    
+
     @Override
     public void fireTableCellUpdated(int row, int columnd) {
         super.fireTableCellUpdated(bytesInRow, bytesInRow);

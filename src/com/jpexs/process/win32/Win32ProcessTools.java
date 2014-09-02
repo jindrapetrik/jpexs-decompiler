@@ -390,11 +390,11 @@ public class Win32ProcessTools extends ProcessTools {
         for (int pg = 0; pg < pages.size(); pg++) {
             MEMORY_BASIC_INFORMATION mbi = pages.get(pg);
             if (pageReadable(mbi)) {
-                long addr = pointerToAddress(mbi.baseAddress);  
+                long addr = pointerToAddress(mbi.baseAddress);
                 int maxsize = mbi.regionSize.intValue();
                 long pos = 0;
-                long bufSize = 1024*512;
-                do {                    
+                long bufSize = 1024 * 512;
+                do {
                     NativeLongByReference bytesReadRef = new NativeLongByReference();
                     Memory buf = new Memory(bufSize);
                     boolean ok = Kernel32.INSTANCE.ReadProcessMemory(hOtherProcess, new Pointer(addr + pos), buf, new NativeLong(bufSize), bytesReadRef);
@@ -530,7 +530,7 @@ public class Win32ProcessTools extends ProcessTools {
         private final List<MEMORY_BASIC_INFORMATION> pages;
         private int currentPage = 0;
         private long pagePos = 0;
-        private static final int BUFFER_SIZE = 1024*512;
+        private static final int BUFFER_SIZE = 1024 * 512;
         private byte[] buf;
         private int bufPos;
         private final HANDLE hOtherProcess;

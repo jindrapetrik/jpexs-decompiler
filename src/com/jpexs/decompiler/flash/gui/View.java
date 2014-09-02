@@ -537,8 +537,7 @@ public class View {
                 }
             }
         }
-        
+
         return false;
     }
 }
-

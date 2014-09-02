@@ -25,6 +25,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -35,15 +37,15 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public class TimelineBodyPanel extends JPanel implements MouseListener {
+public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListener {
 
     private final Timeline timeLine;
 
-    public static Color frameColor = Color.lightGray;
+    public static Color frameColor = new Color(0xbd, 0xd8, 0xfc);
     public static Color emptyFrameColor = Color.white;
-    public static Color emptyFrameSecondColor = new Color(0xed, 0xed, 0xed);
+    public static Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
     public static Color borderColor = Color.black;
-    public static Color emptyBorderColor = Color.lightGray;
+    public static Color emptyBorderColor = new Color(0xbd, 0xd8, 0xfc);
     public static Color keyColor = Color.black;
     public static Color aColor = Color.black;
     public static Color stopColor = Color.white;
@@ -73,6 +75,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
         setSize(dim);
         setPreferredSize(dim);
         addMouseListener(this);
+        addKeyListener(this);
+        setFocusable(true);
     }
 
     @Override
@@ -235,7 +239,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
         }
         cursor = new Point(frame, depth);
         for (FrameSelectionListener l : listeners) {
-            l.frameSelected(frame, -1);
+            l.frameSelected(frame, depth);
         }
         repaint();
     }
@@ -268,6 +272,40 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case 37: //left
+                if (cursor.x > 0) {
+                    frameSelect(cursor.x - 1, cursor.y);
+                }
+                break;
+            case 39: //right
+                if (cursor.x < timeLine.frames.size() - 1) {
+                    frameSelect(cursor.x + 1, cursor.y);
+                }
+                break;
+            case 38: //up
+                if (cursor.y > 0) {
+                    frameSelect(cursor.x, cursor.y - 1);
+                }
+                break;
+            case 40: //down
+                if (cursor.y < timeLine.getMaxDepth()) {
+                    frameSelect(cursor.x, cursor.y + 1);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
     }
 
 }

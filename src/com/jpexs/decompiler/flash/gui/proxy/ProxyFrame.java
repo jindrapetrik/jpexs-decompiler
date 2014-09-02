@@ -369,9 +369,9 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         if ((!sniffOSCheckBox.isSelected()) && (contentType.equals("application/octet-stream"))) {
             return null;
         }
-        
+
         byte[] result = null;
-        
+
         if (!listModel.contains(url)) {
             try {
                 byte[] hdr = new byte[3];
@@ -387,16 +387,16 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 try (FileOutputStream fos = new FileOutputStream(new File(tempFilePath))) {
                     fos.write(dataArray);
                 }
-                
+
                 result = SWFDecompilerPlugin.fireProxyFileCatched(dataArray);
-                
+
                 Replacement r = new Replacement(url, tempFilePath);
                 r.lastAccess = Calendar.getInstance();
                 listModel.addURL(r);
             } catch (IOException e) {
             }
         }
-        
+
         return result;
     }
 

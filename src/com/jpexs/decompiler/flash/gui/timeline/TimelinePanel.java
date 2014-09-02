@@ -32,19 +32,36 @@ import javax.swing.JScrollPane;
  */
 public class TimelinePanel extends JPanel {
 
-    public TimelineBodyPanel timelineBodyPanel;
-    public TimelineTimePanel timePanel;
-    public TimelineDepthPanel depthPanel;
-    public Timeline timeline;
+    private TimelineBodyPanel timelineBodyPanel;
+    private TimelineTimePanel timePanel;
+    private TimelineDepthPanel depthPanel;
+    private Timeline timeline;
 
     public static final int FRAME_WIDTH = 8;
     public static final int FRAME_HEIGHT = 18;
 
     public static Color selectedColor = new Color(0xff, 0x99, 0x99);
     public static Color selectedBorderColor = new Color(0xcc, 0, 0);
-    public static Color backgroundColor = new Color(0xee, 0xee, 0xee);
+    public static Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
 
-    public TimelinePanel(Timelined timelined) {
+    public Timeline getTimeline() {
+        return timeline;
+    }
+
+    public void addFrameSelectionListener(FrameSelectionListener l) {
+        timelineBodyPanel.addFrameSelectionListener(l);
+    }
+
+    public void removeFrameSelectionListener(FrameSelectionListener l) {
+        timelineBodyPanel.removeFrameSelectionListener(l);
+    }
+
+    public void setTimelined(Timelined timelined) {
+        this.removeAll();
+        if (timelined == null) {
+            this.revalidate();
+            return;
+        }
         timeline = timelined.getTimeline();
         timelineBodyPanel = new TimelineBodyPanel(timeline);
         setLayout(new BorderLayout());
@@ -101,6 +118,7 @@ public class TimelinePanel extends JPanel {
                 ftimeline.frameSelect(frame, depth);
             }
         });
-
+        this.revalidate();
     }
+
 }

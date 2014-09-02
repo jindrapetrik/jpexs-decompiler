@@ -50,11 +50,11 @@ public class HexView extends JTable {
     private final Color bgColorAlternate = Color.decode("#EDEDED");
     private int mouseOverIdx = -1;
     private HexViewListener listener;
-    
+
     private class HighlightCellRenderer extends DefaultTableCellRenderer {
 
         public int byteIndex;
-        
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
@@ -81,7 +81,7 @@ public class HexView extends JTable {
                 foreground = Color.black;
                 background = row % 2 == 0 ? bgColor : bgColorAlternate;
             }
-            
+
             if (idx != -1 && idx == mouseOverIdx) {
                 foreground = new Color(255 - foreground.getRed(), 255 - foreground.getGreen(), 255 - foreground.getBlue());
                 background = new Color(255 - background.getRed(), 255 - background.getGreen(), 255 - background.getBlue());
@@ -92,18 +92,18 @@ public class HexView extends JTable {
             return l;
         }
     }
-    
+
     private class HexViewSelectionListener implements ListSelectionListener {
 
         private final HexView table;
-        
+
         public HexViewSelectionListener(HexView table) {
             this.table = table;
         }
-        
+
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            
+
             int col = table.getSelectedColumn();
             int row = table.getSelectedRow();
 
@@ -118,7 +118,7 @@ public class HexView extends JTable {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            HexView table =  (HexView) e.getSource();
+            HexView table = (HexView) e.getSource();
             Point point = e.getPoint();
             int col = table.columnAtPoint(point);
             int row = table.rowAtPoint(point);
@@ -131,17 +131,17 @@ public class HexView extends JTable {
     }
 
     private class HexViewMouseMotionAdapter extends MouseMotionAdapter {
-        
+
         @Override
         public void mouseMoved(MouseEvent e) {
-            HexView table =  (HexView) e.getSource();
+            HexView table = (HexView) e.getSource();
             Point point = e.getPoint();
             int col = table.columnAtPoint(point);
             int row = table.rowAtPoint(point);
             int idx = getIdxByColAndRow(row, col);
             mouseOverIdx = idx;
             getModel().fireTableCellUpdated(row, col);
-            
+
             if (listener != null) {
                 listener.byteMouseMoved(idx, idx == -1 ? 0 : getModel().getData()[idx]);
             }
@@ -182,7 +182,7 @@ public class HexView extends JTable {
             column.setMaxWidth(10);
             column.setCellRenderer(cellRenderer);
         }
-        
+
         addMouseListener(new HexViewMouseAdapter());
         addMouseMotionListener(new HexViewMouseMotionAdapter());
         ListSelectionModel rowSelModel = getSelectionModel();
@@ -195,9 +195,9 @@ public class HexView extends JTable {
     @Override
     public HexViewTableModel getModel() {
         TableModel model = super.getModel();
-        return (HexViewTableModel) model; 
+        return (HexViewTableModel) model;
     }
-    
+
     public void setData(byte[] data, long[] highlightStarts, long[] highlightEnds) {
 
         if ((highlightStarts == null) ^ (highlightEnds == null)) {
@@ -216,7 +216,7 @@ public class HexView extends JTable {
     public byte[] getData() {
         return getModel().getData();
     }
-    
+
     public void scrollToByte(long byteNum) {
 
         int row = (int) (byteNum / bytesInRow);
@@ -237,7 +237,7 @@ public class HexView extends JTable {
         }
         return idx;
     }
-    
+
     public int getFocusedByteIdx() {
         int col = getSelectedColumn();
         int row = getSelectedRow();
@@ -245,7 +245,7 @@ public class HexView extends JTable {
         int idx = getIdxByColAndRow(row, col);
         return idx;
     }
-    
+
     public void scrollToByte(long[] byteNumStarts, long[] byteNumEnds) {
         for (int i = 0; i < byteNumStarts.length; i++) {
             scrollToByte(byteNumStarts[i]);
@@ -253,7 +253,7 @@ public class HexView extends JTable {
             scrollToByte(byteNumStarts[i]);
         }
     }
-    
+
     public void addListener(HexViewListener listener) {
         this.listener = listener;
     }

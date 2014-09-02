@@ -48,6 +48,7 @@ import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
@@ -122,6 +123,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_CHECK_RESOURCES = "CHECKRESOURCES";
     static final String ACTION_VIEWMODE_RESOURCES = "VIEWMODERESOURCES";
     static final String ACTION_VIEWMODE_HEX = "VIEWMODEHEX";
+    static final String ACTION_VIEWMODE_TIMELINE = "VIEWMODETIMELINE";
     static final String ACTION_DEOBFUSCATION_MODE_OLD = "DEOBFUSCATIONMODEOLD";
     static final String ACTION_DEOBFUSCATION_MODE_NEW = "DEOBFUSCATIONMODENEW";
 
@@ -153,9 +155,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton globalrenameCommandButton;
     private JCommandButton deobfuscationCommandButton;
     private JCommandButton searchCommandButton;
-    private JCommandButton timeLineCommandButton;
+    private JCommandToggleButton timeLineToggleButton;
+    private CommandToggleButtonGroup timeLineToggleGroup;
     private JCommandButton gotoDocumentClassCommandButton;
     private JCommandButton clearRecentFilesCommandButton;
+
+    private CommandToggleButtonGroup viewModeToggleGroup;
 
     RibbonApplicationMenuEntryPrimary exportFlaMenu;
     RibbonApplicationMenuEntryPrimary exportAllMenu;
@@ -280,7 +285,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
             @Override
             public int getPreferredWidth(int i, int i1) {
-                return ribbonBand.getGraphics().getFontMetrics(ribbonBand.getFont()).stringWidth(ribbonBand.getTitle())+20;
+                return ribbonBand.getGraphics().getFontMetrics(ribbonBand.getFont()).stringWidth(ribbonBand.getTitle()) + 20;
             }
 
             @Override
@@ -357,7 +362,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
         viewBand.setResizePolicies(getResizePolicies(viewBand));
 
-        CommandToggleButtonGroup grpViewMode = new CommandToggleButtonGroup();
+        viewModeToggleGroup = new CommandToggleButtonGroup();
 
         viewModeResourcesToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.resources")), View.getResizableIcon("viewresources16"));
         assignListener(viewModeResourcesToggleButton, ACTION_VIEWMODE_RESOURCES);
@@ -365,13 +370,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         viewModeHexToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.hex")), View.getResizableIcon("viewhex16"));
         assignListener(viewModeHexToggleButton, ACTION_VIEWMODE_HEX);
 
-        grpViewMode.add(viewModeResourcesToggleButton);
-        grpViewMode.add(viewModeHexToggleButton);
+        viewModeToggleGroup.add(viewModeResourcesToggleButton);
+        viewModeToggleGroup.add(viewModeHexToggleButton);
 
         if (Configuration.dumpView.get()) {
-            grpViewMode.setSelected(viewModeHexToggleButton, true);
+            viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
         } else {
-            grpViewMode.setSelected(viewModeResourcesToggleButton, true);
+            viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
         }
 
         viewBand.addCommandButton(viewModeResourcesToggleButton, RibbonElementPriority.MEDIUM);
@@ -389,8 +394,11 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, ACTION_SEARCH);
 
-        timeLineCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
-        assignListener(timeLineCommandButton, ACTION_TIMELINE);
+        timeLineToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
+        assignListener(timeLineToggleButton, ACTION_TIMELINE);
+
+        timeLineToggleGroup = new CommandToggleButtonGroup();
+        timeLineToggleGroup.add(timeLineToggleButton);
 
         gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
@@ -405,7 +413,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
 
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(timeLineCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(timeLineToggleButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
         toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
@@ -614,7 +622,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         globalrenameCommandButton.setEnabled(swfLoaded);
         deobfuscationCommandButton.setEnabled(swfLoaded);
         searchCommandButton.setEnabled(swfLoaded);
-        timeLineCommandButton.setEnabled(swfLoaded);
+        timeLineToggleButton.setEnabled(swfLoaded);
 
         gotoDocumentClassCommandButton.setEnabled(hasAbc);
         deobfuscationCommandButton.setEnabled(hasAbc);
@@ -705,11 +713,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
             case ACTION_VIEWMODE_RESOURCES:
                 Configuration.dumpView.set(false);
-                mainFrame.panel.showDumpView(false);
+                mainFrame.panel.showView(MainPanel.VIEW_RESOURCES);
+                timeLineToggleGroup.setSelected(timeLineToggleButton, false);
                 break;
             case ACTION_VIEWMODE_HEX:
                 Configuration.dumpView.set(true);
-                mainFrame.panel.showDumpView(true);
+                mainFrame.panel.showView(MainPanel.VIEW_DUMP);
+                timeLineToggleGroup.setSelected(timeLineToggleButton, false);
                 break;
             case ACTION_DEOBFUSCATION_MODE_OLD:
                 Configuration.deobfuscationMode.set(0);
@@ -719,15 +729,28 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.deobfuscationMode.set(1);
                 mainFrame.panel.autoDeobfuscateChanged();
                 break;
-            case ACTION_DUMP_VIEW_SWITCH:
-                Configuration.dumpView.set(miDumpView.isSelected());
-                mainFrame.panel.showDumpView(miDumpView.isSelected());
-                break;
             case ACTION_SEARCH:
                 mainFrame.panel.searchAs();
                 break;
             case ACTION_TIMELINE:
-                mainFrame.panel.timeline();
+                timeLineToggleGroup.setSelected(timeLineToggleButton, timeLineToggleGroup.getSelected() == timeLineToggleButton);
+                if (timeLineToggleGroup.getSelected() == timeLineToggleButton) {
+                    if (!mainFrame.panel.showView(MainPanel.VIEW_TIMELINE)) {
+                        timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+                    } else {
+                        viewModeToggleGroup.setSelected(viewModeHexToggleButton, false);
+                        viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, false);
+                    }
+                } else {
+                    if (Configuration.dumpView.get()) {
+                        viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
+                        mainFrame.panel.showView(MainPanel.VIEW_DUMP);
+                    } else {
+                        viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
+                        mainFrame.panel.showView(MainPanel.VIEW_RESOURCES);
+                    }
+
+                }
                 break;
             case ACTION_AUTO_DEOBFUSCATE:
                 if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {

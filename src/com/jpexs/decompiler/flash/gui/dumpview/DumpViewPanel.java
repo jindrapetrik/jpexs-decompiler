@@ -49,7 +49,7 @@ public class DumpViewPanel extends JPanel {
         super(new BorderLayout());
 
         this.dumpTree = dumpTree;
-        
+
         selectedByteInfo = new JLabel();
         selectedByteInfo.setMinimumSize(new Dimension(100, 20));
         selectedByteInfo.setText("-");
@@ -64,13 +64,13 @@ public class DumpViewPanel extends JPanel {
         dumpViewHexTable.addListener(new HexViewListener() {
 
             private int lastAddressUnderCursor = -1;
-            
+
             @Override
             public void byteValueChanged(int address, byte b) {
                 if (skipValueChange) {
                     return;
                 }
-                
+
                 if (address != -1) {
                     TreeModel model = dumpTree.getModel();
                     DumpInfo di = DumpInfoSwfNode.getSwfNode(selectedDumpInfo);
@@ -100,7 +100,7 @@ public class DumpViewPanel extends JPanel {
                     dumpTree.setSelectionPath(tp);
                     dumpTree.scrollPathToVisible(tp);
                 }
-                
+
                 byte[] data = dumpViewHexTable.getData();
                 byteMouseMoved(lastAddressUnderCursor, lastAddressUnderCursor == -1 ? 0 : data[lastAddressUnderCursor]);
             }
@@ -115,20 +115,20 @@ public class DumpViewPanel extends JPanel {
                         b = data[address];
                     }
                 }
-                
+
                 if (address != -1) {
                     int b2 = b & 0xff;
-                    selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8) + 
-                            " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2) + 
-                            " Dec: " + b2 + 
-                            " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8) + 
-                            " Ascii: " + (char) b2);
+                    selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8)
+                            + " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2)
+                            + " Dec: " + b2
+                            + " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8)
+                            + " Ascii: " + (char) b2);
                 } else {
                     selectedByteInfo.setText("-");
                 }
             }
         });
-        
+
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
@@ -137,7 +137,7 @@ public class DumpViewPanel extends JPanel {
             skipNextScroll = false;
             return;
         }
-        
+
         this.selectedDumpInfo = dumpInfo;
         byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
         List<DumpInfo> dumpInfos = new ArrayList<>();
