@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -71,7 +73,7 @@ public class CallMethodActionItem extends ActionItem {
                 scriptObject.toString(writer, localData);
             }
             writer.append(".");
-            stripQuotes(methodName, localData, writer);
+            writer.append(Deobfuscation.printIdentifier(methodName.toStringNoQuotes(localData)));
         } else {
             scriptObject.toString(writer, localData);
         }
