@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -133,19 +134,19 @@ public class RecompileTest {
                         String startAfter = null;
                         HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
                         MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
-                        if (startAfter == null || en.key.toString().equals(startAfter)) {
+                        if (startAfter == null || en.getKey().toString().equals(startAfter)) {
                             dotest = true;
                         }
                         if (!dotest) {
-                            System.out.println("Skipped:" + en.key.toString());
+                            System.out.println("Skipped:" + en.getKey().toString());
                             continue;
                         }
 
-                        System.out.println("Recompiling:" + en.key.toString() + "...");
-                        en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                        System.out.println("Recompiling:" + en.getKey().toString() + "...");
+                        en.getValue().toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
                         ABC nabc = new ABC(swf);
-                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.key.className + ".as");
+                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as");
                     }
                 }
             } else {
