@@ -830,7 +830,7 @@ public class AVM2Code implements Serializable {
                 code.add(new AVM2Instruction(startOffset, instr, actualOperands, ais.stopBuffer()));
                 ais.endDumpLevel(instr.instructionCode);
             } else {
-                ais.endDumpLevel(instr.instructionCode);
+                ais.endDumpLevel();
                 break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
                 //throw new UnknownInstructionCode(instructionCode);
             }
