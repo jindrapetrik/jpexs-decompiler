@@ -74,7 +74,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
 
         unsupportedTraitPanel = new JPanel(new BorderLayout());
-        JLabel unsup = new JLabel(AppStrings.translate("info.selecttrait"), SwingConstants.CENTER);
+        JLabel unsup = new JLabel("<html>" + AppStrings.translate("info.selecttrait") + "</html>", SwingConstants.CENTER);
         unsupportedTraitPanel.add(unsup, BorderLayout.CENTER);
 
         cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);
