@@ -37,7 +37,7 @@ public class MethodTraitDetailPanel extends JPanel implements TraitDetail {
 
     @Override
     public boolean save() {
-        if (!methodCodePanel.save(abcPanel.abc.constants)) {
+        if (!methodCodePanel.save()) {
             return false;
         }
 

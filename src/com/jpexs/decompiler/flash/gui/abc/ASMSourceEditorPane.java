@@ -187,7 +187,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         View.showMessageDialog(this, "Returned object:" + o.toString());
     }
 
-    public boolean save(ConstantPool constants) {
+    public boolean save() {
         try {
             String text = getText();
             if (text.trim().startsWith("#hexdata")) {
@@ -203,7 +203,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 }
                 mb.code.compact();
             } else {
-                AVM2Code acode = ASM3Parser.parse(new StringReader(text), constants, trait, new MissingSymbolHandler() {
+                AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
                     @Override
                     public boolean missingString(String value) {

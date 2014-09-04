@@ -85,8 +85,8 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.clear();
     }
 
-    public boolean save(ConstantPool constants) {
-        return sourceTextArea.save(constants);
+    public boolean save() {
+        return sourceTextArea.save();
     }
 
     public MethodCodePanel(DecompiledEditorPane decompiledEditor) {

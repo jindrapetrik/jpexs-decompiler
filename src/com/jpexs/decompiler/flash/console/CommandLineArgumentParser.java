@@ -23,11 +23,20 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -59,6 +68,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.abc.ASMSourceEditorPane;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
@@ -76,6 +86,7 @@ import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
@@ -98,6 +109,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1352,51 +1364,31 @@ public class CommandLineArgumentParser {
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
                             // replace AS1/2
-                            System.out.println("Replace AS1/2");
-                            System.out.println("Warning: This feature is EXPERIMENTAL");
                             String repFile = args.remove();
-                            String as = Helper.readTextFile(repFile);
+                            String repText = Helper.readTextFile(repFile);
                             ASMSource src = asms.get(objectToReplace);
-                            com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(swf.version);
-                            try {
-                                src.setActions(par.actionsFromString(as));
-                            } catch (ParseException ex) {
-                                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
-                                System.exit(1);
-                            } catch (CompilationException ex) {
-                                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
-                                System.exit(1);
+                            if (Path.getExtension(repFile).equals(".as")) {
+                                replaceAS2(repText, src);
+                            } else {
+                                replaceAS2PCode(repText, src);
                             }
-                            src.setModified();
                         } else {
                             List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
                             for (MyEntry<ClassPath, ScriptPack> entry : packs) {
                                 if (entry.getKey().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
-                                    System.out.println("Replace AS3");
-                                    System.out.println("Warning: This feature is EXPERIMENTAL");
-                                    File swc = Configuration.getPlayerSWC();
-                                    if(swc == null) {
-                                        final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-                                        System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
-                                        System.err.println(adobePage);
-                                        System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
-                                        System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
-                                        System.exit(1);
-                                    }
-                                    
                                     String repFile = args.remove();
-                                    String as = Helper.readTextFile(repFile);
+                                    String repText = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry.getValue();
-                                    try {
-                                        pack.abc.replaceSciptPack(pack, as);
-                                    } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
-                                        System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
-                                        System.exit(1);
-                                    } catch (CompilationException ex) {
-                                        System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
-                                        System.exit(1);
+                                    if (Path.getExtension(repFile).equals(".as")) {
+                                        replaceAS3(repText, pack);
+                                    } else {
+                                        // todo: get Ids
+                                        int bodyIndex = 0;
+                                        int classIndex = 0;
+                                        int traitId = 0;
+                                        replaceAS3PCode(repText, pack.abc, bodyIndex, classIndex, traitId);
                                     }
                                 }
                             }
@@ -1428,6 +1420,110 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void replaceAS2PCode(String text, ASMSource src) throws IOException, InterruptedException {
+        System.out.println("Replace AS1/2 PCode");
+        if (text.trim().startsWith("#hexdata")) {
+            src.setActionBytes(Helper.getBytesFromHexaText(text));
+        } else {
+            try {
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
+            } catch (ParseException ex) {
+                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                System.exit(1);
+            }
+        }
+        src.setModified();
+    }
+
+    private static void replaceAS2(String as, ASMSource src) throws IOException, InterruptedException {
+        System.out.println("Replace AS1/2");
+        System.out.println("Warning: This feature is EXPERIMENTAL");
+        com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(src.getSwf().version);
+        try {
+            src.setActions(par.actionsFromString(as));
+        } catch (ParseException ex) {
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.exit(1);
+        } catch (CompilationException ex) {
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.exit(1);
+        }
+        src.setModified();
+    }
+
+    private static void replaceAS3PCode(String text, ABC abc, int bodyIndex, int classIndex, int traitId) throws IOException, InterruptedException {
+        System.out.println("Replace AS3 PCode");
+        if (text.trim().startsWith("#hexdata")) {
+            byte[] data = Helper.getBytesFromHexaText(text);
+            MethodBody mb = abc.bodies.get(bodyIndex);
+            mb.codeBytes = data;
+            try {
+                ABCInputStream ais = new ABCInputStream(new MemoryInputStream(mb.codeBytes));
+                mb.code = new AVM2Code(ais);
+            } catch (UnknownInstructionCode re) {
+                mb.code = new AVM2Code();
+                Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, re);
+            }
+            mb.code.compact();
+        } else {
+            Trait trait = abc.findTraitByTraitId(classIndex, traitId);
+            try {
+                AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
+                    //no longer ask for adding new constants
+                    @Override
+                    public boolean missingString(String value) {
+                        return true;
+                    }
+                    
+                    @Override
+                    public boolean missingInt(long value) {
+                        return true;
+                    }
+                    
+                    @Override
+                    public boolean missingUInt(long value) {
+                        return true;
+                    }
+                    
+                    @Override
+                    public boolean missingDouble(double value) {
+                        return true;
+                    }
+                }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
+                acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
+                abc.bodies.get(bodyIndex).code = acode;
+            } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
+                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                System.exit(1);
+            }
+        }
+        ((Tag) abc.parentTag).setModified(true);
+    }
+
+    private static void replaceAS3(String as, ScriptPack pack) throws IOException, InterruptedException {
+        System.out.println("Replace AS3");
+        System.out.println("Warning: This feature is EXPERIMENTAL");
+        File swc = Configuration.getPlayerSWC();
+        if(swc == null) {
+            final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+            System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
+            System.err.println(adobePage);
+            System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
+            System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+            System.exit(1);
+        }
+
+        try {
+            pack.abc.replaceSciptPack(pack, as);
+        } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.exit(1);
+        } catch (CompilationException ex) {
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.exit(1);
+        }
+    }
+    
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();
@@ -1473,7 +1569,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
                 for (MyEntry<ClassPath, ScriptPack> entry : packs) {
-                    System.out.println(entry.getKey().toString());
+                    System.out.println(entry.getKey().toString() + " " + entry.getValue().scriptIndex);
                 }
             }
         } catch (IOException | InterruptedException e) {
