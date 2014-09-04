@@ -1376,6 +1376,16 @@ public class CommandLineArgumentParser {
                                     // replace AS3
                                     System.out.println("Replace AS3");
                                     System.out.println("Warning: This feature is EXPERIMENTAL");
+                                    File swc = Configuration.getPlayerSWC();
+                                    if(swc == null) {
+                                        final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+                                        System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
+                                        System.err.println(adobePage);
+                                        System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
+                                        System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+                                        System.exit(1);
+                                    }
+                                    
                                     String repFile = args.remove();
                                     String as = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry.getValue();
