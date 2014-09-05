@@ -17,9 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
@@ -37,7 +35,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -73,7 +70,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     private HilightedText getHilightedText(ScriptExportMode exportMode) {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-        abc.bodies.get(bodyIndex).code.toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
+        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
         return new HilightedText(writer);
     }
 
@@ -99,7 +96,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             setContentType("text/plain");
             if (textHexOnly == null) {
                 HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).code.getBytes());
+                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCode().getBytes());
                 textHexOnly = new HilightedText(writer);
             }
             setText(textHexOnly);
@@ -171,7 +168,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public void graph() {
         try {
-            AVM2Graph gr = new AVM2Graph(abc.bodies.get(bodyIndex).code, abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies.get(bodyIndex).code.visitCode(abc.bodies.get(bodyIndex)));
+            AVM2Graph gr = new AVM2Graph(abc.bodies.get(bodyIndex).getCode(), abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies.get(bodyIndex).getCode().visitCode(abc.bodies.get(bodyIndex)));
             (new GraphDialog(getAbcPanel().getMainPanel().getMainFrame().getWindow(), gr, name)).setVisible(true);
         } catch (InterruptedException ex) {
             Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
@@ -182,7 +179,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         HashMap<Integer, Object> args = new HashMap<>();
         args.put(0, new Object()); //object "this"
         args.put(1, new Long(466561)); //param1
-        Object o = abc.bodies.get(bodyIndex).code.execute(args, abc.constants);
+        Object o = abc.bodies.get(bodyIndex).getCode().execute(args, abc.constants);
         View.showMessageDialog(this, "Returned object:" + o.toString());
     }
 
@@ -193,14 +190,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 byte[] data = Helper.getBytesFromHexaText(text);
                 MethodBody mb = abc.bodies.get(bodyIndex);
                 mb.codeBytes = data;
-                try {
-                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(mb.codeBytes));
-                    mb.code = new AVM2Code(ais);
-                } catch (UnknownInstructionCode re) {
-                    mb.code = new AVM2Code();
-                    Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, re);
-                }
-                mb.code.compact();
+                mb.setCode(null);
             } else {
                 AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
@@ -225,7 +215,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                     }
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
-                abc.bodies.get(bodyIndex).code = acode;
+                abc.bodies.get(bodyIndex).setCode(acode);
             }
             ((Tag) abc.parentTag).setModified(true);
         } catch (IOException ex) {

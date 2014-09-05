@@ -17,9 +17,12 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -31,6 +34,8 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,27 +57,47 @@ public class MethodBody implements Cloneable, Serializable {
     public int init_scope_depth;
     public int max_scope_depth;
     public byte[] codeBytes;
-    public AVM2Code code;
+    private AVM2Code code;
     public ABCException[] exceptions = new ABCException[0];
     public Traits traits = new Traits();
     public transient List<GraphTargetItem> convertedItems;
     public transient Throwable convertException;
 
+    public synchronized AVM2Code getCode() {
+        if (code == null) {
+            AVM2Code avm2Code;
+            try {
+                ABCInputStream ais = new ABCInputStream(new MemoryInputStream(codeBytes));
+                avm2Code = new AVM2Code(ais);
+            } catch (UnknownInstructionCode | IOException ex) {
+                avm2Code = new AVM2Code();
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            avm2Code.compact();
+            code = avm2Code;
+        }
+        return code;
+    }
+    
+    public void setCode(AVM2Code code) {
+        this.code = code;
+    }
+    
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
-            ret.add(code.adr2pos(e.start));
-            ret.add(code.adr2pos(e.end));
-            ret.add(code.adr2pos(e.target));
+            ret.add(getCode().adr2pos(e.start));
+            ret.add(getCode().adr2pos(e.end));
+            ret.add(getCode().adr2pos(e.target));
         }
         return ret;
     }
 
     public void markOffsets() {
         long offset = 0;
-        for (int i = 0; i < code.code.size(); i++) {
-            code.code.get(i).offset = offset;
-            offset += code.code.get(i).getBytes().length;
+        for (int i = 0; i < getCode().code.size(); i++) {
+            getCode().code.get(i).offset = offset;
+            offset += getCode().code.get(i).getBytes().length;
         }
     }
 
@@ -80,20 +105,20 @@ public class MethodBody implements Cloneable, Serializable {
     public String toString() {
         String s = "";
         s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
-        s += "\r\nCode:\r\n" + code.toString();
+        s += "\r\nCode:\r\n" + getCode().toString();
         return s;
     }
 
     public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
-        return code.removeDeadCode(constants, trait, info, this);
+        return getCode().removeDeadCode(constants, trait, info, this);
     }
 
     public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
-        code.restoreControlFlow(constants, trait, info, this);
+        getCode().restoreControlFlow(constants, trait, info, this);
     }
 
     public int removeTraps(ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        return code.removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
+        return getCode().removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -115,7 +140,7 @@ public class MethodBody implements Cloneable, Serializable {
             pos++;
         }
 
-        HashMap<Integer, String> debugRegNames = code.getLocalRegNamesFromDebug(abc);
+        HashMap<Integer, String> debugRegNames = getCode().getLocalRegNamesFromDebug(abc);
         for (int k : debugRegNames.keySet()) {
             ret.put(k, debugRegNames.get(k));
         }
@@ -127,7 +152,7 @@ public class MethodBody implements Cloneable, Serializable {
             System.err.println("Decompiling " + path);
         }
         if (exportMode != ScriptExportMode.AS) {
-            code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
                 writer.appendNoHilight("//" + AppResources.translate("decompilation.skipped")).newLine();
@@ -140,7 +165,7 @@ public class MethodBody implements Cloneable, Serializable {
                     public Void call() throws InterruptedException {
                         MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                         HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
-                        convertedItems = converted.code.toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.code.visitCode(converted));
+                        convertedItems = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.getCode().visitCode(converted));
                         Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
                         return null;
                     }
@@ -165,7 +190,7 @@ public class MethodBody implements Cloneable, Serializable {
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<String> fullyQualifiedNames) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
-            code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
                 writer.startMethod(this.method_info);
@@ -193,7 +218,7 @@ public class MethodBody implements Cloneable, Serializable {
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody b = Helper.deepCopy(this);
-        AVM2Code deobfuscated = b.code;
+        AVM2Code deobfuscated = b.getCode();
         deobfuscated.markMappedOffsets();
         if (Configuration.autoDeobfuscate.get()) {
             try {
@@ -224,7 +249,7 @@ public class MethodBody implements Cloneable, Serializable {
 
     public boolean autoFillStats(ABC abc, int initScope, boolean hasThis) {
         //System.out.println("--------------");
-        CodeStats stats = code.getStats(abc, this, initScope);
+        CodeStats stats = getCode().getStats(abc, this, initScope);
         if (stats == null) {
             return false;
         }

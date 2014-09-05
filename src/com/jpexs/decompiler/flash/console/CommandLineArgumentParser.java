@@ -1456,14 +1456,7 @@ public class CommandLineArgumentParser {
             byte[] data = Helper.getBytesFromHexaText(text);
             MethodBody mb = abc.bodies.get(bodyIndex);
             mb.codeBytes = data;
-            try {
-                ABCInputStream ais = new ABCInputStream(new MemoryInputStream(mb.codeBytes));
-                mb.code = new AVM2Code(ais);
-            } catch (UnknownInstructionCode re) {
-                mb.code = new AVM2Code();
-                Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, re);
-            }
-            mb.code.compact();
+            mb.setCode(null);
         } else {
             Trait trait = abc.findTraitByTraitId(classIndex, traitId);
             try {
@@ -1490,7 +1483,7 @@ public class CommandLineArgumentParser {
                     }
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
-                abc.bodies.get(bodyIndex).code = acode;
+                abc.bodies.get(bodyIndex).setCode(acode);
             } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
                 System.exit(1);

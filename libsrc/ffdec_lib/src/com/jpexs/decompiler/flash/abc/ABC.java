@@ -171,7 +171,7 @@ public class ABC {
     public Set<Integer> getStringUsages() {
         Set<Integer> ret = new HashSet<>();
         for (MethodBody body : bodies) {
-            for (AVM2Instruction ins : body.code.code) {
+            for (AVM2Instruction ins : body.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_STRING_INDEX) {
                         ret.add(ins.operands[i]);
@@ -301,15 +301,15 @@ public class ABC {
 
         //process reflection using getDefinitionByName too
         for (MethodBody body : bodies) {
-            for (int ip = 0; ip < body.code.code.size(); ip++) {
-                if (body.code.code.get(ip).definition instanceof CallPropertyIns) {
-                    int mIndex = body.code.code.get(ip).operands[0];
+            for (int ip = 0; ip < body.getCode().code.size(); ip++) {
+                if (body.getCode().code.get(ip).definition instanceof CallPropertyIns) {
+                    int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0) {
                         Multiname m = constants.getMultiname(mIndex);
                         if (m.getNameWithNamespace(constants, true).equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
-                                if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
-                                    int strIndex = body.code.code.get(ip - 1).operands[0];
+                                if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
+                                    int strIndex = body.getCode().code.get(ip - 1).operands[0];
                                     String fullname = constants.getString(strIndex);
                                     String pkg = "";
                                     String name = fullname;
@@ -331,7 +331,7 @@ public class ABC {
                                     }
                                     fullChanged += name;
                                     strIndex = constants.getStringId(fullChanged, true);
-                                    body.code.code.get(ip - 1).operands[0] = strIndex;
+                                    body.getCode().code.get(ip - 1).operands[0] = strIndex;
                                 }
                             }
                         }
@@ -543,14 +543,6 @@ public class ABC {
             mb.max_scope_depth = ais.readU30("max_scope_depth");
             int code_length = ais.readU30("code_length");
             mb.codeBytes = ais.readBytes(code_length, "code");
-            try {
-                ABCInputStream ais2 = new ABCInputStream(new MemoryInputStream(mb.codeBytes));
-                mb.code = new AVM2Code(ais2);
-            } catch (UnknownInstructionCode re) {
-                mb.code = new AVM2Code();
-                logger.log(Level.SEVERE, null, re);
-            }
-            mb.code.compact();
             int ex_count = ais.readU30("ex_count");
             mb.exceptions = new ABCException[ex_count];
             for (int j = 0; j < ex_count; j++) {
@@ -673,7 +665,7 @@ public class ABC {
             aos.writeU30(mb.max_regs);
             aos.writeU30(mb.init_scope_depth);
             aos.writeU30(mb.max_scope_depth);
-            byte[] codeBytes = mb.code.getBytes();
+            byte[] codeBytes = mb.getCode().getBytes();
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
             aos.writeU30(mb.exceptions.length);
@@ -755,13 +747,17 @@ public class ABC {
         if (classIndex == -1) {
             return null;
         }
-        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
-            return class_info.get(classIndex).static_traits.traits.get(traitId);
-        } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
-            traitId -= class_info.get(classIndex).static_traits.traits.size();
-            return instance_info.get(classIndex).instance_traits.traits.get(traitId);
+        List<Trait> staticTraits = class_info.get(classIndex).static_traits.traits;
+        if (traitId < staticTraits.size()) {
+            return staticTraits.get(traitId);
         } else {
-            return null; //Can be class or instance initializer
+            List<Trait> instanceTraits = instance_info.get(classIndex).instance_traits.traits;
+            if (traitId < staticTraits.size() + instanceTraits.size()) {
+                traitId -= staticTraits.size();
+                return instanceTraits.get(traitId);
+            } else {
+                return null; //Can be class or instance initializer
+            }
         }
     }
 
@@ -769,27 +765,31 @@ public class ABC {
         if (classIndex == -1) {
             return -1;
         }
-        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
-            if (class_info.get(classIndex).static_traits.traits.get(traitId) instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) class_info.get(classIndex).static_traits.traits.get(traitId)).method_info;
-            } else {
-                return -1;
-            }
-        } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
-            traitId -= class_info.get(classIndex).static_traits.traits.size();
-            if (instance_info.get(classIndex).instance_traits.traits.get(traitId) instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) instance_info.get(classIndex).instance_traits.traits.get(traitId)).method_info;
+        List<Trait> staticTraits = class_info.get(classIndex).static_traits.traits;
+        if (traitId < staticTraits.size()) {
+            if (staticTraits.get(traitId) instanceof TraitMethodGetterSetter) {
+                return ((TraitMethodGetterSetter) staticTraits.get(traitId)).method_info;
             } else {
                 return -1;
             }
         } else {
-            traitId -= class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size();
-            if (traitId == 0) {
-                return instance_info.get(classIndex).iinit_index;
-            } else if (traitId == 1) {
-                return class_info.get(classIndex).cinit_index;
+            List<Trait> instanceTraits = instance_info.get(classIndex).instance_traits.traits;
+            if (traitId < staticTraits.size() + instanceTraits.size()) {
+                traitId -= staticTraits.size();
+                if (instanceTraits.get(traitId) instanceof TraitMethodGetterSetter) {
+                    return ((TraitMethodGetterSetter) instanceTraits.get(traitId)).method_info;
+                } else {
+                    return -1;
+                }
             } else {
-                return -1;
+                traitId -= staticTraits.size() + instanceTraits.size();
+                if (traitId == 0) {
+                    return instance_info.get(classIndex).iinit_index;
+                } else if (traitId == 1) {
+                    return class_info.get(classIndex).cinit_index;
+                } else {
+                    return -1;
+                }
             }
         }
     }
@@ -876,7 +876,7 @@ public class ABC {
                     return;
                 }
             }
-            for (AVM2Instruction ins : body.code.code) {
+            for (AVM2Instruction ins : body.getCode().code) {
                 for (int o = 0; o < ins.definition.operands.length; o++) {
                     if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
                         if (ins.operands[o] == multinameIndex) {
@@ -1058,7 +1058,7 @@ public class ABC {
 
     public void removeClass(int index) {
         for (MethodBody b : bodies) {
-            for (AVM2Instruction ins : b.code.code) {
+            for (AVM2Instruction ins : b.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
                         if (ins.operands[i] > index) {
@@ -1112,7 +1112,7 @@ public class ABC {
             if (b.method_info > index) {
                 b.method_info--;
             }
-            for (AVM2Instruction ins : b.code.code) {
+            for (AVM2Instruction ins : b.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_METHOD_INDEX) {
                         if (ins.operands[i] > index) {

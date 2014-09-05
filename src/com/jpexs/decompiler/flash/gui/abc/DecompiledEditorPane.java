@@ -229,7 +229,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         int pos = getCaretPosition();
         Highlighting h = Highlighting.search(highlights, pos);
         if (h != null) {
-            List<AVM2Instruction> list = abc.bodies.get(abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()).code.code;
+            List<AVM2Instruction> list = abc.bodies.get(abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()).getCode().code;
             AVM2Instruction lastIns = null;
             long inspos = 0;
             AVM2Instruction selIns = null;

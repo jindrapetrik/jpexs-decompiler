@@ -47,9 +47,9 @@ import java.util.logging.Logger;
  */
 public class ScriptPack implements TreeElementItem {
 
-    public ABC abc;
-    public int scriptIndex;
-    public List<Integer> traitIndices;
+    public final ABC abc;
+    public final int scriptIndex;
+    public final List<Integer> traitIndices;
     private final ClassPath path;
 
     @Override

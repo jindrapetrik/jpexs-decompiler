@@ -872,7 +872,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0]));
                         code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0]));
                         code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0]));
-                        body.code = code;
+                        body.setCode(code);
                         Traits traits = new Traits();
                         traits.traits = new ArrayList<>();
                         body.traits = traits;

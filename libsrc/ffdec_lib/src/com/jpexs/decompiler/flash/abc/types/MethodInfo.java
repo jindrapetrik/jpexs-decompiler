@@ -34,7 +34,7 @@ public class MethodInfo {
     public void delete(ABC abc, boolean d) {
         this.deleted = true;
         if (body != null) {
-            for (AVM2Instruction ins : body.code.code) {
+            for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof NewFunctionIns) {
                     abc.method_info.get(ins.operands[0]).delete(abc, d);
                 }
@@ -269,7 +269,7 @@ public class MethodInfo {
     public GraphTextWriter getParamStr(GraphTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
-            localRegNames = body.code.getLocalRegNamesFromDebug(abc);
+            localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
         }
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {

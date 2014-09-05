@@ -1238,10 +1238,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abc.findBody(init);
-            initBody.code.code.addAll(constructor == null ? 0 : 2, initcode);//after getlocal0,pushscope
+            initBody.getCode().code.addAll(constructor == null ? 0 : 2, initcode);//after getlocal0,pushscope
 
-            if (sinitBody.code.code.get(sinitBody.code.code.size() - 1).definition instanceof ReturnVoidIns) {
-                sinitBody.code.code.addAll(2, sinitcode); //after getlocal0,pushscope
+            if (sinitBody.getCode().code.get(sinitBody.getCode().code.size() - 1).definition instanceof ReturnVoidIns) {
+                sinitBody.getCode().code.addAll(2, sinitcode); //after getlocal0,pushscope
             }
         }
         sinitBody.markOffsets();
@@ -1619,8 +1619,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
             mbody.method_info = abc.addMethodInfo(mi);
             mi.setBody(mbody);
-            mbody.code = new AVM2Code();
-            mbody.code.code = toInsList(src);
+            List<AVM2Instruction> mbodyCode = toInsList(src); 
+            mbody.setCode(new AVM2Code());
+            mbody.getCode().code = mbodyCode;
 
             if (needsActivation) {
                 if (localData.traitUsages.containsKey(mbody)) {
@@ -1635,7 +1636,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             NameAVM2Item d = new NameAVM2Item(type, 0, tsc.getName(abc).getName(abc.constants, new ArrayList<String>(), true), NameAVM2Item.getDefaultValue("" + type), true, new ArrayList<Integer>());
                             d.setSlotNumber(tsc.slot_id);
                             d.setSlotScope(slotScope);
-                            mbody.code.code.addAll(0, toInsList(d.toSourceIgnoreReturnValue(localData, this)));
+                            mbodyCode.addAll(0, toInsList(d.toSourceIgnoreReturnValue(localData, this)));
                         }
                     }
                 }
@@ -1646,7 +1647,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 acts.add(AssignableAVM2Item.generateSetLoc(localData.activationReg));
                 acts.add(ins(new PushScopeIns()));
 
-                mbody.code.code.addAll(0, acts);
+                mbodyCode.addAll(0, acts);
             }
 
             if (constructor) {
@@ -1668,7 +1669,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     }
                 }
                 int ac = -1;
-                for (AVM2Instruction ins : mbody.code.code) {
+                for (AVM2Instruction ins : mbodyCode) {
                     if (ins.definition instanceof ConstructSuperIns) {
                         ac = ins.operands[0];
                         if (parentConstMinAC > ac) {
@@ -1679,8 +1680,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 if (ac == -1) {
                     if (parentConstMinAC == 0) {
-                        mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
-                        mbody.code.code.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}));
+                        mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
+                        mbodyCode.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}));
 
                     } else {
                         throw new CompilationException("Parent constructor must be called", line);
@@ -1688,12 +1689,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             if (className != null) {//It's method, not (inner) function
-                mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
-                mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}));
+                mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
+                mbodyCode.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}));
             }
             boolean addRet = false;
-            if (!mbody.code.code.isEmpty()) {
-                InstructionDefinition lastDef = mbody.code.code.get(mbody.code.code.size() - 1).definition;
+            if (!mbodyCode.isEmpty()) {
+                InstructionDefinition lastDef = mbodyCode.get(mbodyCode.size() - 1).definition;
                 if (!((lastDef instanceof ReturnVoidIns) || (lastDef instanceof ReturnValueIns))) {
                     addRet = true;
                 }
@@ -1702,16 +1703,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             if (addRet) {
                 if (retType.toString().equals("*") || retType.toString().equals("void") || constructor) {
-                    mbody.code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}));
+                    mbodyCode.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}));
                 } else {
-                    mbody.code.code.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}));
-                    mbody.code.code.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}));
+                    mbodyCode.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}));
+                    mbodyCode.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}));
                 }
             }
             mbody.exceptions = localData.exceptions.toArray(new ABCException[localData.exceptions.size()]);
             int offset = 0;
-            for (int i = 0; i < mbody.code.code.size(); i++) {
-                AVM2Instruction ins = mbody.code.code.get(i);
+            for (int i = 0; i < mbodyCode.size(); i++) {
+                AVM2Instruction ins = mbodyCode.get(i);
                 if (ins instanceof ExceptionMarkAVM2Instruction) {
                     ExceptionMarkAVM2Instruction m = (ExceptionMarkAVM2Instruction) ins;
                     switch (m.markType) {
@@ -1725,7 +1726,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             mbody.exceptions[m.exceptionId].target = offset;
                             break;
                     }
-                    mbody.code.code.remove(i);
+                    mbodyCode.remove(i);
                     i--;
                     continue;
                 }
@@ -2065,9 +2066,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
         mb.method_info = abc.addMethodInfo(mi);
-        mb.code = new AVM2Code();
-        mb.code.code.add(ins(new GetLocal0Ins()));
-        mb.code.code.add(ins(new PushScopeIns()));
+        mb.setCode(new AVM2Code());
+        List<AVM2Instruction> mbCode = mb.getCode().code;
+        mbCode.add(ins(new GetLocal0Ins()));
+        mbCode.add(ins(new PushScopeIns()));
 
         int traitScope = 2;
 
@@ -2078,37 +2080,37 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = (TraitClass) t;
                 List<Integer> parents = new ArrayList<>();
                 if (localData.documentClass) {
-                    mb.code.code.add(ins(new GetScopeObjectIns(), 0));
+                    mbCode.add(ins(new GetScopeObjectIns(), 0));
                     traitScope++;
                 } else {
                     NamespaceSet nsset = new NamespaceSet(new int[]{abc.constants.constant_multiname.get(tc.name_index).namespace_index});
-                    mb.code.code.add(ins(new FindPropertyStrictIns(), abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.constant_multiname.get(tc.name_index).name_index, 0, abc.constants.getNamespaceSetId(nsset, true), 0, new ArrayList<Integer>()), true)));
+                    mbCode.add(ins(new FindPropertyStrictIns(), abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.constant_multiname.get(tc.name_index).name_index, 0, abc.constants.getNamespaceSetId(nsset, true), 0, new ArrayList<Integer>()), true)));
                 }
                 if (abc.instance_info.get(tc.class_info).isInterface()) {
-                    mb.code.code.add(ins(new PushNullIns()));
+                    mbCode.add(ins(new PushNullIns()));
                 } else {
 
                     parentNamesAddNames(abc, allABCs, abc.instance_info.get(tc.class_info).name_index, parents, new ArrayList<String>(), new ArrayList<String>());
                     for (int i = parents.size() - 1; i >= 1; i--) {
-                        mb.code.code.add(ins(new GetLexIns(), parents.get(i)));
-                        mb.code.code.add(ins(new PushScopeIns()));
+                        mbCode.add(ins(new GetLexIns(), parents.get(i)));
+                        mbCode.add(ins(new PushScopeIns()));
                         traitScope++;
                     }
-                    mb.code.code.add(ins(new GetLexIns(), parents.get(1)));
+                    mbCode.add(ins(new GetLexIns(), parents.get(1)));
                 }
-                mb.code.code.add(ins(new NewClassIns(), tc.class_info));
+                mbCode.add(ins(new NewClassIns(), tc.class_info));
                 if (!abc.instance_info.get(tc.class_info).isInterface()) {
                     for (int i = parents.size() - 1; i >= 1; i--) {
-                        mb.code.code.add(ins(new PopScopeIns()));
+                        mbCode.add(ins(new PopScopeIns()));
                     }
                 }
-                mb.code.code.add(ins(new InitPropertyIns(), tc.name_index));
+                mbCode.add(ins(new InitPropertyIns(), tc.name_index));
                 initScopes.put(t, traitScope);
                 traitScope = 1;
             }
         }
 
-        mb.code.code.add(ins(new ReturnVoidIns()));
+        mbCode.add(ins(new ReturnVoidIns()));
         mb.autoFillStats(abc, 1, false);
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;

@@ -266,7 +266,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             for (ABCException ex : body.exceptions) {
                 parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
             }
-            for (AVM2Instruction ins : body.code.code) {
+            for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ins.operands[0] != method_index) {
                         if (!visitedMethods.contains(ins.operands[0])) {

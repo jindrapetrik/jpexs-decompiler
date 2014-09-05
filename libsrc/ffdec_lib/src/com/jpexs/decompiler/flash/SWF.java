@@ -866,16 +866,12 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public List<MyEntry<ClassPath, ScriptPack>> getAS3Packs() {
-        List<ABCContainerTag> abcTags = new ArrayList<>();
+        List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
-                abcTags.add((ABCContainerTag) t);
+                ABCContainerTag abcTag = (ABCContainerTag) t;
+                packs.addAll(abcTag.getABC().getScriptPacks());
             }
-        }
-        List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
-        for (int i = 0; i < abcTags.size(); i++) {
-            ABCContainerTag t = abcTags.get(i);
-            packs.addAll(t.getABC().getScriptPacks());
         }
         return uniqueAS3Packs(packs);
     }
