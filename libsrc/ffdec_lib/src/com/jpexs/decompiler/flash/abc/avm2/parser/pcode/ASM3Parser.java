@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -881,14 +882,14 @@ public class ASM3Parser {
                         for (int i = 0; i < operandsList.size(); i++) {
                             operands[i] = operandsList.get(i);
                         }
-                        lastIns = new AVM2Instruction(offset, def, operands, new byte[0]);
+                        lastIns = new AVM2Instruction(offset, def, operands);
                         code.code.add(lastIns);
                         offset += lastIns.getBytes().length;
                         break;
                     }
                 }
                 if (symb.value.toString().toLowerCase().equals("ffdec_deobfuscatepop")) {
-                    lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), new int[0], new byte[0]);
+                    lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), new int[0]);
                     code.code.add(lastIns);
                     offset += lastIns.getBytes().length;
                     insFound = true;

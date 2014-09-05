@@ -790,7 +790,6 @@ public class AVM2Code implements Serializable {
         while (ais.available() > 0) {
             DumpInfo di = ais.newDumpLevel("instruction", "instruction");
             long startOffset = ais.getPosition();
-            ais.startBuffer();
             int instructionCode = ais.read("instructionCode");
             InstructionDefinition instr = instructionSetByCode[instructionCode];
             if (di != null) {
@@ -827,7 +826,7 @@ public class AVM2Code implements Serializable {
                     }
                 }
 
-                code.add(new AVM2Instruction(startOffset, instr, actualOperands, ais.stopBuffer()));
+                code.add(new AVM2Instruction(startOffset, instr, actualOperands));
                 ais.endDumpLevel(instr.instructionCode);
             } else {
                 ais.endDumpLevel();
@@ -1077,9 +1076,7 @@ public class AVM2Code implements Serializable {
                     writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
                     writer.newLine();
                 }
-                if (ins.labelname != null) {
-                    writer.appendNoHilight(ins.labelname + ":");
-                } else if (Configuration.showAllAddresses.get() || offsets.contains(ofs)) {
+                if (Configuration.showAllAddresses.get() || offsets.contains(ofs)) {
                     writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
                 }
                 /*for (int e = 0; e < body.exceptions.length; e++) {

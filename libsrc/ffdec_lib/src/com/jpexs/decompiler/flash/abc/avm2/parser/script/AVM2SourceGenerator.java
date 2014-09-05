@@ -150,7 +150,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public static final int MARK_E_FINALLYPART = 3;
 
     private AVM2Instruction ins(InstructionDefinition def, int... operands) {
-        return new AVM2Instruction(0, def, operands, new byte[0]);
+        return new AVM2Instruction(0, def, operands);
     }
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, GetDescendantsAVM2Item item) throws CompilationException {
@@ -635,7 +635,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         cases.addAll(0, preCases);
 
-        AVM2Instruction lookupOp = new AVM2Instruction(0, new LookupSwitchIns(), new int[item.caseValues.size() + 1 + 1 + 1], new byte[0]);
+        AVM2Instruction lookupOp = new AVM2Instruction(0, new LookupSwitchIns(), new int[item.caseValues.size() + 1 + 1 + 1]);
         cases.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(switchedReg))));
         List<AVM2Instruction> bodies = new ArrayList<>();
         List<Integer> bodiesOffsets = new ArrayList<>();
@@ -897,7 +897,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
             List<AVM2Instruction> finallySwitchCmds = new ArrayList<>();
 
-            finSwitch = new AVM2Instruction(0, new LookupSwitchIns(), new int[1 + 1 + 1], new byte[0]);
+            finSwitch = new AVM2Instruction(0, new LookupSwitchIns(), new int[1 + 1 + 1]);
             finSwitch.operands[0] = finSwitch.getBytes().length;
             finSwitch.operands[1] = 0; //switch cnt
 
@@ -1679,8 +1679,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 if (ac == -1) {
                     if (parentConstMinAC == 0) {
-                        mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
-                        mbody.code.code.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}, new byte[0]));
+                        mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
+                        mbody.code.code.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}));
 
                     } else {
                         throw new CompilationException("Parent constructor must be called", line);
@@ -1688,8 +1688,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             if (className != null) {//It's method, not (inner) function
-                mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
-                mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}, new byte[0]));
+                mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
+                mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}));
             }
             boolean addRet = false;
             if (!mbody.code.code.isEmpty()) {
@@ -1702,10 +1702,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             if (addRet) {
                 if (retType.toString().equals("*") || retType.toString().equals("void") || constructor) {
-                    mbody.code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}, new byte[0]));
+                    mbody.code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}));
                 } else {
-                    mbody.code.code.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}, new byte[0]));
-                    mbody.code.code.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}, new byte[0]));
+                    mbody.code.code.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}));
+                    mbody.code.code.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}));
                 }
             }
             mbody.exceptions = localData.exceptions.toArray(new ABCException[localData.exceptions.size()]);

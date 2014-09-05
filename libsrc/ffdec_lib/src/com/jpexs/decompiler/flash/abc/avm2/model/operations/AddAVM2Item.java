@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -74,12 +75,12 @@ public class AddAVM2Item extends BinaryOpItem {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
             if (iv.value == 1) {
                 return toSourceMerge(localData, generator, leftSide,
-                        new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
+                        new AVM2Instruction(0, new IncrementIns(), new int[]{})
                 );
             }
         }
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new AddIns(), new int[]{}, new byte[0])
+                new AVM2Instruction(0, new AddIns(), new int[]{})
         );
     }
 

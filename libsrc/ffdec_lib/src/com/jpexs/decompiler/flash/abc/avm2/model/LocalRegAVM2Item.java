@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -92,19 +93,19 @@ public class LocalRegAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{});
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{});
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{});
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{});
                 break;
             default:
-                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex}, new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex});
                 break;
         }
         return toSourceMerge(localData, generator, ins);

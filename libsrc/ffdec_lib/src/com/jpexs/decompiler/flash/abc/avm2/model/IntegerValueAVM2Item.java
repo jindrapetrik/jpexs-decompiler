@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -59,11 +60,11 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2Instruction ins = null;
         if (value >= -128 && value <= 127) {
-            ins = new AVM2Instruction(0, new PushByteIns(), new int[]{(int) (long) value}, new byte[0]);
+            ins = new AVM2Instruction(0, new PushByteIns(), new int[]{(int) (long) value});
         } else if (value >= -32768 && value <= 32767) {
-            ins = new AVM2Instruction(0, new PushShortIns(), new int[]{((int) (long) value) & 0xffff}, new byte[0]);
+            ins = new AVM2Instruction(0, new PushShortIns(), new int[]{((int) (long) value) & 0xffff});
         } else {
-            ins = new AVM2Instruction(0, new PushIntIns(), new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)}, new byte[0]);
+            ins = new AVM2Instruction(0, new PushIntIns(), new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)});
         }
 
         return toSourceMerge(localData, generator, ins);

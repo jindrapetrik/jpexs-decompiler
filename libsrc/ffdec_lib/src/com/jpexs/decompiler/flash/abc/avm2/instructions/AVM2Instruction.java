@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -44,18 +45,15 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public InstructionDefinition definition;
     public int[] operands;
     public long offset;
-    public byte[] bytes;
     public String comment;
     public boolean ignored = false;
-    public String labelname;
     public long mappedOffset = -1;
     public int changeJumpTo = -1;
 
-    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte[] bytes) {
+    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands) {
         this.definition = definition;
         this.operands = operands;
         this.offset = offset;
-        this.bytes = bytes;
     }
 
     public byte[] getBytes() {

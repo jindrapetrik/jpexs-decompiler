@@ -117,7 +117,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             return toSource(localData, generator);
         }
         List<GraphSourceItem> ret = toSource(localData, generator);
-        ret.add(new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
+        ret.add(new AVM2Instruction(0, new PopIns(), new int[]{}));
         return ret;
     }
 
@@ -133,7 +133,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             opArr[i] = ops.get(i);
         }
 
-        return new AVM2Instruction(0, def, opArr, new byte[0]);
+        return new AVM2Instruction(0, def, opArr);
     }
 
     public static int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {

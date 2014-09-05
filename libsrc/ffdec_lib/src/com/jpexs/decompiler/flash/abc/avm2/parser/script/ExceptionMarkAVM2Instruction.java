@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -28,7 +29,7 @@ public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
     public int exceptionId;
 
     public ExceptionMarkAVM2Instruction(int exceptionId, int markType) {
-        super(0, null, new int[0], new byte[0]);
+        super(0, null, new int[0]);
         this.markType = markType;
         this.exceptionId = exceptionId;
         this.definition = new InstructionDefinition(0, "--mark", new int[0]);

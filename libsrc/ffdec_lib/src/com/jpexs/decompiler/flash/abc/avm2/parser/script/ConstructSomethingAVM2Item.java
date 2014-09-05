@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -70,8 +71,8 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
             TypeItem prop = (TypeItem) resname;
             int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
             return toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
-                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
+                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}), arguments,
+                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()})
             );
         }
 

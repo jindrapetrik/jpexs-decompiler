@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -112,26 +113,26 @@ public class CoerceAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (typeObj.toString()) {
             case "*":
-                ins = new AVM2Instruction(0, new CoerceAIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new CoerceAIns(), new int[]{});
                 break;
             case "String":
-                ins = new AVM2Instruction(0, new CoerceSIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new CoerceSIns(), new int[]{});
                 break;
             case "Boolean":
-                ins = new AVM2Instruction(0, new ConvertBIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new ConvertBIns(), new int[]{});
                 break;
             case "int":
-                ins = new AVM2Instruction(0, new ConvertIIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new ConvertIIns(), new int[]{});
                 break;
             case "uint":
-                ins = new AVM2Instruction(0, new ConvertUIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new ConvertUIns(), new int[]{});
                 break;
             case "Number":
-                ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{}, new byte[0]);
+                ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{});
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc, (((AVM2SourceGenerator) generator).allABCs));
-                ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index}, new byte[0]);
+                ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index});
                 break;
         }
         return toSourceMerge(localData, generator, value, ins);
