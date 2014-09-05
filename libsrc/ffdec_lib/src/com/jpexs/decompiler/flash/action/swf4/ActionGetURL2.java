@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -30,7 +31,7 @@ import com.jpexs.decompiler.flash.action.model.PrintAsBitmapNumActionItem;
 import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -85,7 +86,7 @@ public class ActionGetURL2 extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionGetURL2(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionGetURL2(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x9A, -1);
         loadVariablesFlag = lexBoolean(lexer);
         loadTargetFlag = lexBoolean(lexer);

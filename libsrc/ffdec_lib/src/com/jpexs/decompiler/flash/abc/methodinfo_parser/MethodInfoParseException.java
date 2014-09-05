@@ -14,16 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action;
+package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.flash.ParseException;
 
-/**
- *
- * @author JPEXS
- */
-public interface StoreTypeAction {
+public class MethodInfoParseException extends ParseException {
 
-    public String getVariableName(TranslateStack stack, ConstantPool cpool);
+    public MethodInfoParseException(String text, long line) {
+        super(text, line);
+    }
 }

@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
@@ -124,7 +124,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return ret;
     }
 
-    public List<Object> getParamsAsList(ConstantPool constants) {
+    public List<Object> getParamsAsList(AVM2ConstantPool constants) {
         List<Object> s = new ArrayList<>();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
@@ -163,7 +163,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return s;
     }
 
-    public String getParams(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getParams(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
@@ -266,7 +266,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return writer;
     }
 
-    public String toStringNoAddress(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toStringNoAddress(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         String s = definition.instructionName;
         s += getParams(constants, fullyQualifiedNames) + getComment();
         return s;

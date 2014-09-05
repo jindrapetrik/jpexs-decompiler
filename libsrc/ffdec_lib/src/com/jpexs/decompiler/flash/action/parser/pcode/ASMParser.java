@@ -12,14 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscatePop;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
@@ -135,7 +136,7 @@ import java.util.logging.Logger;
 
 public class ASMParser {
 
-    public static ActionList parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
         ActionList list = new ActionList();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
@@ -165,7 +166,7 @@ public class ASMParser {
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
                 if (containers.isEmpty()) {
-                    throw new ParseException("Block end without start", lexer.yyline());
+                    throw new ActionParseException("Block end without start", lexer.yyline());
                 }
                 GraphSourceItemContainer a = containers.peek();
                 if (!a.parseDivision(address - ((Action) a).getAddress(), lexer)) {
@@ -197,12 +198,12 @@ public class ASMParser {
             } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
                 return list;
             } else {
-                throw new ParseException("Label or Instruction name expected, found:" + symb.type + " " + symb.value, lexer.yyline());
+                throw new ActionParseException("Label or Instruction name expected, found:" + symb.type + " " + symb.value, lexer.yyline());
             }
         }
     }
 
-    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
         Action a = null;
         if (instructionName.compareToIgnoreCase("GetURL") == 0) {
             a = new ActionGetURL(lexer);
@@ -415,14 +416,14 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscateJump") == 0) {
             a = (new ActionDeobfuscateJump(lexer));
         } else {
-            throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
+            throw new ActionParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
 
         a.updateLength(version);
         return a;
     }
 
-    private static List<Action> parseAllActions(FlasmLexer lexer, int version) throws IOException, ParseException {
+    private static List<Action> parseAllActions(FlasmLexer lexer, int version) throws IOException, ActionParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
         List<String> emptyList = new ArrayList<>();
@@ -430,7 +431,7 @@ public class ASMParser {
             ASMParsedSymbol symb = lexer.yylex();
             if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
                 if (containers.isEmpty()) {
-                    throw new ParseException("Block end without start", lexer.yyline());
+                    throw new ActionParseException("Block end without start", lexer.yyline());
                 }
                 GraphSourceItemContainer a = containers.peek();
                 if (!a.parseDivision(0, lexer)) {
@@ -451,7 +452,7 @@ public class ASMParser {
         }
     }
 
-    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
+    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ActionParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version);
 
@@ -500,7 +501,7 @@ public class ASMParser {
 
             if (!found) {
                 if (throwOnError) {
-                    throw new ParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
+                    throw new ActionParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
                 } else {
                     Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
                 }

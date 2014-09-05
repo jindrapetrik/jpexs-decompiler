@@ -12,11 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -38,11 +38,11 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public int classIndex;
     public ABC abc;
     public List<String> fullyQualifiedNames;
-    public ConstantPool constants;
+    public AVM2ConstantPool constants;
     public List<MethodInfo> methodInfo;
     public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, AVM2ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;

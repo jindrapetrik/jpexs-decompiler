@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -116,7 +116,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
             if (!ASM3Parser.parseSlotConst(new StringReader(slotConstEditor.getText()), abc.constants, trait)) {
                 return false;
             }
-        } catch (ParseException ex) {
+        } catch (AVM2ParseException ex) {
             View.showMessageDialog(slotConstEditor, ex.text, AppStrings.translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
             return false;
         } catch (IOException ex) {

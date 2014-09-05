@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.action.Deobfuscation;
@@ -217,7 +217,7 @@ public class MethodInfo {
         return "MethodInfo: param_types=" + Helper.intArrToString(param_types) + " ret_type=" + ret_type + " name_index=" + name_index + " flags=" + flags + " optional=" + optionalStr + " paramNames=" + Helper.intArrToString(paramNames);
     }
 
-    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         String optionalStr = "[";
         if (optional != null) {
             for (int i = 0; i < optional.length; i++) {
@@ -259,14 +259,14 @@ public class MethodInfo {
         return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.getString(name_index) + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
     }
 
-    public String getName(ConstantPool constants) {
+    public String getName(AVM2ConstantPool constants) {
         if (name_index == 0) {
             return "UNKNOWN";
         }
         return constants.getString(name_index);
     }
 
-    public GraphTextWriter getParamStr(GraphTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
@@ -312,7 +312,7 @@ public class MethodInfo {
         return writer;
     }
 
-    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, false), "returns");
     }
 

@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.util.Stack;
 
 /**
@@ -2632,7 +2633,7 @@ public final class Flasm3Lexer {
     }
     ParsedSymbol last;
 
-    public ParsedSymbol lex() throws java.io.IOException, ParseException {
+    public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException {
         ParsedSymbol ret = null;
         if (!pushedBack.isEmpty()) {
             ret = last = pushedBack.pop();
@@ -2869,9 +2870,9 @@ public final class Flasm3Lexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.abc.avm2.parser.ParseException
+     * @throws com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException
      */
-    public ParsedSymbol yylex() throws java.io.IOException, ParseException {
+    public ParsedSymbol yylex() throws java.io.IOException, AVM2ParseException {
         int zzInput;
         int zzAction;
 
@@ -3105,7 +3106,7 @@ public final class Flasm3Lexer {
                 case 119:
                     break;
                 case 19: {
-                    throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+                    throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
                 }
                 case 120:
                     break;
@@ -3216,7 +3217,7 @@ public final class Flasm3Lexer {
                 case 139:
                     break;
                 case 4: {
-                    throw new ParseException("Unterminated string at end of line", yyline + 1);
+                    throw new AVM2ParseException("Unterminated string at end of line", yyline + 1);
                 }
                 case 140:
                     break;

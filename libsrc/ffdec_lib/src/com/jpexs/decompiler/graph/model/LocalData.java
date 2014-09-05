@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ public class LocalData {
 
     public static LocalData empty = new LocalData();
     public ConstantPool constants;
-    public com.jpexs.decompiler.flash.abc.avm2.ConstantPool constantsAvm2;
+    public AVM2ConstantPool constantsAvm2;
     public HashMap<Integer, String> localRegNames;
     public List<String> fullyQualifiedNames;
 
@@ -37,7 +39,7 @@ public class LocalData {
         return localData;
     }
 
-    public static LocalData create(com.jpexs.decompiler.flash.abc.avm2.ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public static LocalData create(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         LocalData localData = new LocalData();
         localData.constantsAvm2 = constants;
         localData.localRegNames = localRegNames;

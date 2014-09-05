@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import javax.swing.ListModel;
@@ -24,7 +24,7 @@ import javax.swing.event.ListDataListener;
 
 public class ConstantsListModel implements ListModel {
 
-    private final ConstantPool constants;
+    private final AVM2ConstantPool constants;
     public static final int TYPE_UINT = 0;
     public static final int TYPE_INT = 1;
     public static final int TYPE_DOUBLE = 2;
@@ -35,7 +35,7 @@ public class ConstantsListModel implements ListModel {
     public static final int TYPE_MULTINAME = 7;
     private int type = TYPE_INT;
 
-    public ConstantsListModel(ConstantPool constants, int type) {
+    public ConstantsListModel(AVM2ConstantPool constants, int type) {
         this.type = type;
         this.constants = constants;
     }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public class MethodInfoParser {
 
-    public static boolean parseSlotConst(String text, TraitSlotConst trait, ABC abc) throws ParseException {
+    public static boolean parseSlotConst(String text, TraitSlotConst trait, ABC abc) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
         ParsedSymbol symb;
         int type_index = -1;
@@ -43,7 +44,7 @@ public class MethodInfoParser {
             } else if (symbType.type == ParsedSymbol.TYPE_MULTINAME) {
                 type_index = (int) (long) (Long) symbType.value;
             } else {
-                throw new ParseException("Multiname or * expected", lexer.yyline());
+                throw new MethodInfoParseException("Multiname or * expected", lexer.yyline());
             }
             ParsedSymbol symbEqual = lexer.yylex();
             if (symbEqual.type == ParsedSymbol.TYPE_ASSIGN) {
@@ -56,7 +57,7 @@ public class MethodInfoParser {
                     }
                 } while (symbValue.type >= 8 && symbValue.type <= 13);
                 if ((!nstype.isEmpty()) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
-                    throw new ParseException("Namespace expected", lexer.yyline());
+                    throw new MethodInfoParseException("Namespace expected", lexer.yyline());
                 }
                 int id = 0;
                 switch (symbValue.type) {
@@ -97,19 +98,19 @@ public class MethodInfoParser {
                         } else if (nstype.isEmpty()) {
                             value = new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_Namespace);
                         } else {
-                            throw new ParseException("Invalid type of namespace", lexer.yyline());
+                            throw new MethodInfoParseException("Invalid type of namespace", lexer.yyline());
                         }
                         break;
                     default:
-                        throw new ParseException("Unexpected symbol", lexer.yyline());
+                        throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
                 }
                 symb = lexer.yylex();
                 if (symb.type != ParsedSymbol.TYPE_EOF) {
-                    throw new ParseException("Unexpected symbol", lexer.yyline());
+                    throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
                 }
             } else if (symbEqual.type == ParsedSymbol.TYPE_EOF) {
             } else {
-                throw new ParseException("Unexpected symbol", lexer.yyline());
+                throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
             }
         } catch (IOException ex) {
             return false;
@@ -120,7 +121,7 @@ public class MethodInfoParser {
         return true;
     }
 
-    public static boolean parseReturnType(String text, MethodInfo update) throws ParseException {
+    public static boolean parseReturnType(String text, MethodInfo update) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
         ParsedSymbol symb;
         int type = -1;
@@ -131,11 +132,11 @@ public class MethodInfoParser {
             } else if (symb.type == ParsedSymbol.TYPE_MULTINAME) {
                 type = (int) (long) (Long) symb.value;
             } else {
-                throw new ParseException("Multiname or * expected", lexer.yyline());
+                throw new MethodInfoParseException("Multiname or * expected", lexer.yyline());
             }
             symb = lexer.yylex();
             if (symb.type != ParsedSymbol.TYPE_EOF) {
-                throw new ParseException("Only one return type allowed", lexer.yyline());
+                throw new MethodInfoParseException("Only one return type allowed", lexer.yyline());
             }
             update.ret_type = type;
             return true;
@@ -144,7 +145,7 @@ public class MethodInfoParser {
         return false;
     }
 
-    public static boolean parseParams(String text, MethodInfo update, ABC abc) throws ParseException {
+    public static boolean parseParams(String text, MethodInfo update, ABC abc) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
         List<String> paramNames = new ArrayList<>();
         List<Long> paramTypes = new ArrayList<>();
@@ -159,17 +160,17 @@ public class MethodInfoParser {
                     needsRest = true;
                     symb = lexer.yylex();
                     if (symb.type != ParsedSymbol.TYPE_IDENTIFIER) {
-                        throw new ParseException("Identifier expected", lexer.yyline());
+                        throw new MethodInfoParseException("Identifier expected", lexer.yyline());
                     }
                     symb = lexer.yylex();
                     if (symb.type != ParsedSymbol.TYPE_EOF) {
-                        throw new ParseException("End expected after rest params", lexer.yyline());
+                        throw new MethodInfoParseException("End expected after rest params", lexer.yyline());
                     }
                     break;
                 }
 
                 if (symb.type != ParsedSymbol.TYPE_IDENTIFIER) {
-                    throw new ParseException("Identifier expected", lexer.yyline());
+                    throw new MethodInfoParseException("Identifier expected", lexer.yyline());
                 }
                 paramNames.add((String) symb.value);
                 symb = lexer.yylex();
@@ -180,7 +181,7 @@ public class MethodInfoParser {
                     } else if (symbType.type == ParsedSymbol.TYPE_MULTINAME) {
                         paramTypes.add((Long) symbType.value);
                     } else {
-                        throw new ParseException("Multiname or * expected", lexer.yyline());
+                        throw new MethodInfoParseException("Multiname or * expected", lexer.yyline());
                     }
                     ParsedSymbol symbEqual = lexer.yylex();
                     if (symbEqual.type == ParsedSymbol.TYPE_ASSIGN) {
@@ -194,7 +195,7 @@ public class MethodInfoParser {
                             }
                         } while (symbValue.type >= 8 && symbValue.type <= 13);
                         if ((!nstype.isEmpty()) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
-                            throw new ParseException("Namespace expected", lexer.yyline());
+                            throw new MethodInfoParseException("Namespace expected", lexer.yyline());
                         }
                         int id = 0;
                         switch (symbValue.type) {
@@ -235,11 +236,11 @@ public class MethodInfoParser {
                                 } else if (nstype.isEmpty()) {
                                     optionalValues.add(new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_Namespace));
                                 } else {
-                                    throw new ParseException("Invalid type of namespace", lexer.yyline());
+                                    throw new MethodInfoParseException("Invalid type of namespace", lexer.yyline());
                                 }
                                 break;
                             default:
-                                throw new ParseException("Unexpected symbol", lexer.yyline());
+                                throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
                         }
                         symb = lexer.yylex();
                         if (symb.type == ParsedSymbol.TYPE_COMMA) {
@@ -248,21 +249,21 @@ public class MethodInfoParser {
                         }
                     } else if (symbEqual.type == ParsedSymbol.TYPE_COMMA) {
                         if (hasOptional) {
-                            throw new ParseException("Parameter must have default value", lexer.yyline());
+                            throw new MethodInfoParseException("Parameter must have default value", lexer.yyline());
                         }
                     } else if (symbEqual.type == ParsedSymbol.TYPE_EOF) {
                         if (hasOptional) {
-                            throw new ParseException("Parameter must have default value", lexer.yyline());
+                            throw new MethodInfoParseException("Parameter must have default value", lexer.yyline());
                         }
                         break;
                     } else {
-                        throw new ParseException("Unexpected symbol", lexer.yyline());
+                        throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
                     }
                 } else if (symb.type == ParsedSymbol.TYPE_COMMA) {
                 } else if (symb.type == ParsedSymbol.TYPE_EOF) {
                     break;
                 } else {
-                    throw new ParseException("Unexpected symbol", lexer.yyline());
+                    throw new MethodInfoParseException("Unexpected symbol", lexer.yyline());
                 }
                 symb = lexer.yylex();
             }
@@ -271,7 +272,7 @@ public class MethodInfoParser {
         }
 
         if (needsRest && (!optionalValues.isEmpty())) {
-            throw new ParseException("Rest parameter canot be combined with default values", lexer.yyline());
+            throw new MethodInfoParseException("Rest parameter canot be combined with default values", lexer.yyline());
         }
 
         update.param_types = new int[paramTypes.size()];

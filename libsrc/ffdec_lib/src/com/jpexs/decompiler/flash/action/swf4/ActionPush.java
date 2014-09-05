@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -187,7 +187,7 @@ public class ActionPush extends Action {
         this.values.add(value);
     }
 
-    public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ParseException {
+    public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ActionParseException {
         super(0x96, 0);
         this.constantPool = constantPool;
         values = new ArrayList<>();
@@ -217,14 +217,14 @@ public class ActionPush extends Action {
                 case ASMParsedSymbol.TYPE_EOL:
                 case ASMParsedSymbol.TYPE_EOF:
                     if (count == 0) {
-                        throw new ParseException("Arguments expected", lexer.yyline());
+                        throw new ActionParseException("Arguments expected", lexer.yyline());
                     } else {
                         break loop;
                     }
                 case ASMParsedSymbol.TYPE_COMMENT:
                     break;
                 default:
-                    throw new ParseException("Arguments expected, " + symb.type + " " + symb.value + " found", lexer.yyline());
+                    throw new ActionParseException("Arguments expected, " + symb.type + " " + symb.value + " found", lexer.yyline());
             }
         }
     }

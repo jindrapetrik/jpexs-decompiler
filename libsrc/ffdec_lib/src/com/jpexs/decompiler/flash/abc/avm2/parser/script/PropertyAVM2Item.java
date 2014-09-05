@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
@@ -96,7 +96,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
-    public static GraphTargetItem multinameToType(int m_index, ConstantPool constants) {
+    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }

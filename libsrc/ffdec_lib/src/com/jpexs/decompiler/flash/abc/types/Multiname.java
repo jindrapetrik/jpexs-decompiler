@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.helpers.Helper;
 import java.util.List;
@@ -151,7 +151,7 @@ public class Multiname {
 
     }
 
-    private static String namespaceToString(ConstantPool constants, int index) {
+    private static String namespaceToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
             return "null";
         }
@@ -170,7 +170,7 @@ public class Multiname {
         return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapeString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
-    private static String namespaceSetToString(ConstantPool constants, int index) {
+    private static String namespaceSetToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
             return "null";
         }
@@ -186,14 +186,14 @@ public class Multiname {
         return ret;
     }
 
-    private static String multinameToString(ConstantPool constants, int index, List<String> fullyQualifiedNames) {
+    private static String multinameToString(AVM2ConstantPool constants, int index, List<String> fullyQualifiedNames) {
         if (index == 0) {
             return "null";
         }
         return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
     }
 
-    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
 
         switch (kind) {
             case QNAME:
@@ -228,7 +228,7 @@ public class Multiname {
         return null;
     }
 
-    private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    private String typeNameToStr(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
@@ -250,7 +250,7 @@ public class Multiname {
         return typeNameStr;
     }
 
-    public String getName(ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    public String getName(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
         if (kind == TYPENAME) {
             return typeNameToStr(constants, fullyQualifiedNames, raw);
         }
@@ -268,7 +268,7 @@ public class Multiname {
         }
     }
 
-    public String getNameWithNamespace(ConstantPool constants, boolean raw) {
+    public String getNameWithNamespace(AVM2ConstantPool constants, boolean raw) {
         String ret = "";
         Namespace ns = getNamespace(constants);
         if (ns != null) {
@@ -281,7 +281,7 @@ public class Multiname {
         return ret;
     }
 
-    public Namespace getNamespace(ConstantPool constants) {
+    public Namespace getNamespace(AVM2ConstantPool constants) {
         if ((namespace_index == 0) || (namespace_index == -1)) {
             return null;
         } else {
@@ -289,7 +289,7 @@ public class Multiname {
         }
     }
 
-    public NamespaceSet getNamespaceSet(ConstantPool constants) {
+    public NamespaceSet getNamespaceSet(AVM2ConstantPool constants) {
         if (namespace_set_index == 0) {
             return null;
         } else if (namespace_set_index == -1) {

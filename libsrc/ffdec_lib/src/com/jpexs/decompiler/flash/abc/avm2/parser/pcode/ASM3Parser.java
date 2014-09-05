@@ -17,11 +17,11 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -74,31 +74,31 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException, InterruptedException {
+    public static AVM2Code parse(Reader reader, AVM2ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         return parse(reader, constants, trait, null, body, info);
     }
 
-    private static int checkMultinameIndex(ConstantPool constants, int index, int line) throws ParseException {
+    private static int checkMultinameIndex(AVM2ConstantPool constants, int index, int line) throws AVM2ParseException {
         if ((index < 0) || (index >= constants.getMultinameCount())) {
-            throw new ParseException("Invalid multiname index", line);
+            throw new AVM2ParseException("Invalid multiname index", line);
         }
         return index;
     }
 
-    private static void expected(int type, String expStr, Flasm3Lexer lexer) throws IOException, ParseException {
+    private static void expected(int type, String expStr, Flasm3Lexer lexer) throws IOException, AVM2ParseException {
         ParsedSymbol s = lexer.lex();
         if (s.type != type) {
-            throw new ParseException(expStr + " expected", lexer.yyline());
+            throw new AVM2ParseException(expStr + " expected", lexer.yyline());
         }
     }
 
-    private static void expected(ParsedSymbol s, int type, String expStr) throws IOException, ParseException {
+    private static void expected(ParsedSymbol s, int type, String expStr) throws IOException, AVM2ParseException {
         if (s.type != type) {
-            throw new ParseException(expStr + " expected", 0);
+            throw new AVM2ParseException(expStr + " expected", 0);
         }
     }
 
-    public static boolean parseSlotConst(Reader reader, ConstantPool constants, TraitSlotConst tsc) throws IOException, ParseException {
+    public static boolean parseSlotConst(Reader reader, AVM2ConstantPool constants, TraitSlotConst tsc) throws IOException, AVM2ParseException {
         Flasm3Lexer lexer = new Flasm3Lexer(reader);
         expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
         int name_index = parseMultiName(constants, lexer);
@@ -119,7 +119,7 @@ public class ASM3Parser {
                     flags |= Trait.ATTR_Metadata;
                     break;
                 default:
-                    throw new ParseException("Invalid trait flag", lexer.yyline());
+                    throw new AVM2ParseException("Invalid trait flag", lexer.yyline());
             }
             symb = lexer.lex();
         }
@@ -150,13 +150,13 @@ public class ASM3Parser {
              case ParsedSymbol.TYPE_KEYWORD_SETTER:
              break;*/
             default:
-                throw new ParseException("Unexpected trait type", lexer.yyline());
+                throw new AVM2ParseException("Unexpected trait type", lexer.yyline());
         }
         tsc.name_index = name_index;
         return true;
     }
 
-    private static int parseNamespaceSet(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+    private static int parseNamespaceSet(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
         List<Integer> namespaceList = new ArrayList<>();
         ParsedSymbol s = lexer.lex();
         if (s.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
@@ -192,7 +192,7 @@ public class ASM3Parser {
         return constants.addNamespaceSet(new NamespaceSet(nss));
     }
 
-    private static int parseNamespace(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+    private static int parseNamespace(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
 
         ParsedSymbol type = lexer.lex();
         int kind = 0;
@@ -221,7 +221,7 @@ public class ASM3Parser {
                 kind = Namespace.KIND_STATIC_PROTECTED;
                 break;
             default:
-                throw new ParseException("Namespace kind expected", lexer.yyline());
+                throw new AVM2ParseException("Namespace kind expected", lexer.yyline());
         }
 
         expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
@@ -231,7 +231,7 @@ public class ASM3Parser {
         } else if (name.type == ParsedSymbol.TYPE_STRING) {
 
         } else {
-            throw new ParseException("String or null expected", lexer.yyline());
+            throw new AVM2ParseException("String or null expected", lexer.yyline());
         }
         ParsedSymbol c = lexer.lex();
         int index = 0;
@@ -241,7 +241,7 @@ public class ASM3Parser {
             try {
                 index = Integer.parseInt((String) extra.value);
             } catch (NumberFormatException nfe) {
-                throw new ParseException("Number expected", lexer.yyline());
+                throw new AVM2ParseException("Number expected", lexer.yyline());
             }
         } else {
             lexer.pushback(c);
@@ -251,7 +251,7 @@ public class ASM3Parser {
         return constants.getNamespaceId(new Namespace(kind, name.type == ParsedSymbol.TYPE_KEYWORD_NULL ? 0 : constants.getStringId((String) name.value, true)), index, true);
     }
 
-    private static int parseMultiName(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+    private static int parseMultiName(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
         ParsedSymbol s = lexer.lex();
         int kind = 0;
         int name_index = 0;
@@ -297,7 +297,7 @@ public class ASM3Parser {
                 kind = Multiname.TYPENAME;
                 break;
             default:
-                throw new ParseException("Name expected", lexer.yyline());
+                throw new AVM2ParseException("Name expected", lexer.yyline());
         }
 
         switch (s.type) {
@@ -370,7 +370,7 @@ public class ASM3Parser {
         return constants.getMultinameId(new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params), true);
     }
 
-    public static ValueKind parseValue(ConstantPool constants, Flasm3Lexer lexer) throws IOException, ParseException {
+    public static ValueKind parseValue(AVM2ConstantPool constants, Flasm3Lexer lexer) throws IOException, AVM2ParseException {
         ParsedSymbol type = lexer.lex();
         ParsedSymbol value;
         int value_index = 0;
@@ -485,13 +485,13 @@ public class ASM3Parser {
                 break;
             default:
                 if (Configuration.debugMode.get()) {
-                    throw new ParseException("Not supported valueType.", lexer.yyline());
+                    throw new AVM2ParseException("Not supported valueType.", lexer.yyline());
                 }
         }
         return new ValueKind(value_index, value_kind);
     }
 
-    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException, InterruptedException {
+    public static AVM2Code parse(Reader reader, AVM2ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<>();
@@ -519,7 +519,7 @@ public class ASM3Parser {
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRAIT) {
                 if (trait == null) {
-                    throw new ParseException("No trait expected", lexer.yyline());
+                    throw new AVM2ParseException("No trait expected", lexer.yyline());
                 }
                 symb = lexer.lex();
                 switch (symb.type) {
@@ -527,7 +527,7 @@ public class ASM3Parser {
                     case ParsedSymbol.TYPE_KEYWORD_GETTER:
                     case ParsedSymbol.TYPE_KEYWORD_SETTER:
                         if (!(trait instanceof TraitMethodGetterSetter)) {
-                            throw new ParseException("Unxpected trait type", lexer.yyline());
+                            throw new AVM2ParseException("Unxpected trait type", lexer.yyline());
                         }
                         TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
                         switch (symb.type) {
@@ -550,7 +550,7 @@ public class ASM3Parser {
                         break;
                     case ParsedSymbol.TYPE_KEYWORD_FUNCTION:
                         if (!(trait instanceof TraitFunction)) {
-                            throw new ParseException("Unxpected trait type", lexer.yyline());
+                            throw new AVM2ParseException("Unxpected trait type", lexer.yyline());
                         }
                         break;
 
@@ -675,7 +675,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).start = offset;
                 continue;
@@ -684,7 +684,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).end = offset;
                 continue;
@@ -693,7 +693,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).target = offset;
                 continue;
@@ -711,15 +711,15 @@ public class ASM3Parser {
                 if (((String) symb.value).toLowerCase(Locale.ENGLISH).equals("exception")) {
                     ParsedSymbol exIndex = lexer.lex();
                     if (exIndex.type != ParsedSymbol.TYPE_INTEGER) {
-                        throw new ParseException("Index expected", lexer.yyline());
+                        throw new AVM2ParseException("Index expected", lexer.yyline());
                     }
                     ParsedSymbol exName = lexer.lex();
                     if (exName.type != ParsedSymbol.TYPE_MULTINAME) {
-                        throw new ParseException("Multiname expected", lexer.yyline());
+                        throw new AVM2ParseException("Multiname expected", lexer.yyline());
                     }
                     ParsedSymbol exType = lexer.lex();
                     if (exType.type != ParsedSymbol.TYPE_MULTINAME) {
-                        throw new ParseException("Multiname expected", lexer.yyline());
+                        throw new AVM2ParseException("Multiname expected", lexer.yyline());
                     }
                     ABCException ex = new ABCException();
 
@@ -757,12 +757,12 @@ public class ASM3Parser {
                                                 if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
                                                     sid = constants.addString((String) parsedOperand.value);
                                                 } else {
-                                                    throw new ParseException("Unknown String", lexer.yyline());
+                                                    throw new AVM2ParseException("Unknown String", lexer.yyline());
                                                 }
                                             }
                                             operandsList.add(sid);
                                         } else {
-                                            throw new ParseException("String or null expected", lexer.yyline());
+                                            throw new AVM2ParseException("String or null expected", lexer.yyline());
                                         }
                                     }
                                     break;
@@ -778,12 +778,12 @@ public class ASM3Parser {
                                                 if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
                                                     iid = constants.addInt(intVal);
                                                 } else {
-                                                    throw new ParseException("Unknown int", lexer.yyline());
+                                                    throw new AVM2ParseException("Unknown int", lexer.yyline());
                                                 }
                                             }
                                             operandsList.add(iid);
                                         } else {
-                                            throw new ParseException("Integer or null expected", lexer.yyline());
+                                            throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                         }
                                     }
                                     break;
@@ -798,12 +798,12 @@ public class ASM3Parser {
                                                 if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
                                                     iid = constants.addUInt(intVal);
                                                 } else {
-                                                    throw new ParseException("Unknown uint", lexer.yyline());
+                                                    throw new AVM2ParseException("Unknown uint", lexer.yyline());
                                                 }
                                             }
                                             operandsList.add(iid);
                                         } else {
-                                            throw new ParseException("Integer or null expected", lexer.yyline());
+                                            throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                         }
                                     }
                                     break;
@@ -825,12 +825,12 @@ public class ASM3Parser {
                                                 if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
                                                     did = constants.addDouble(doubleVal);
                                                 } else {
-                                                    throw new ParseException("Unknown double", lexer.yyline());
+                                                    throw new AVM2ParseException("Unknown double", lexer.yyline());
                                                 }
                                             }
                                             operandsList.add(did);
                                         } else {
-                                            throw new ParseException("Float or null expected", lexer.yyline());
+                                            throw new AVM2ParseException("Float or null expected", lexer.yyline());
                                         }
                                     }
                                     break;
@@ -839,7 +839,7 @@ public class ASM3Parser {
                                         offsetItems.add(new OffsetItem((String) parsedOperand.value, code.code.size(), i));
                                         operandsList.add(0);
                                     } else {
-                                        throw new ParseException("Offset expected", lexer.yyline());
+                                        throw new AVM2ParseException("Offset expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_CASE_BASEOFFSET:
@@ -847,7 +847,7 @@ public class ASM3Parser {
                                         offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i));
                                         operandsList.add(0);
                                     } else {
-                                        throw new ParseException("Offset expected", lexer.yyline());
+                                        throw new AVM2ParseException("Offset expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.OPT_CASE_OFFSETS:
@@ -862,18 +862,18 @@ public class ASM3Parser {
                                                 offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
                                                 operandsList.add(0);
                                             } else {
-                                                throw new ParseException("Offset expected", lexer.yyline());
+                                                throw new AVM2ParseException("Offset expected", lexer.yyline());
                                             }
                                         }
                                     } else {
-                                        throw new ParseException("Case count expected", lexer.yyline());
+                                        throw new AVM2ParseException("Case count expected", lexer.yyline());
                                     }
                                     break;
                                 default:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
                                         operandsList.add((int) (long) (Long) parsedOperand.value);
                                     } else {
-                                        throw new ParseException("Integer expected", lexer.yyline());
+                                        throw new AVM2ParseException("Integer expected", lexer.yyline());
                                     }
                             }
                         }
@@ -895,13 +895,13 @@ public class ASM3Parser {
                     insFound = true;
                 }
                 if (!insFound) {
-                    throw new ParseException("Invalid instruction name:" + (String) symb.value, lexer.yyline());
+                    throw new AVM2ParseException("Invalid instruction name:" + (String) symb.value, lexer.yyline());
                 }
             } else if (symb.type == ParsedSymbol.TYPE_LABEL) {
                 labelItems.add(new LabelItem((String) symb.value, offset));
 
             } else {
-                throw new ParseException("Unexpected symbol", lexer.yyline());
+                throw new AVM2ParseException("Unexpected symbol", lexer.yyline());
             }
         } while (symb.type != ParsedSymbol.TYPE_EOF);
 

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -36,7 +37,7 @@ public class ConditionEvaluator {
         this.cond = cond;
     }
 
-    private void expressionRest(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, ParseException {
+    private void expressionRest(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, AnnotationParseException {
         ConditionToken tok = lex.lex();
         if (tok == null) {
             return;
@@ -60,7 +61,7 @@ public class ConditionEvaluator {
 
     }
 
-    private void expression(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, ParseException {
+    private void expression(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, AnnotationParseException {
         ConditionToken tok = lex.lex();
         if (tok == null) {
             return;
@@ -68,7 +69,7 @@ public class ConditionEvaluator {
         switch (tok.type) {
             case FIELD:
                 if (!fields.containsKey(tok.value)) {
-                    throw new ParseException("Field not found", lex.yyline());
+                    throw new AnnotationParseException("Field not found", lex.yyline());
                 } else {
                     stack.push(fields.get(tok.value));
                 }
@@ -83,16 +84,16 @@ public class ConditionEvaluator {
                 expression(fields, stack, lex);
                 tok = lex.lex();
                 if (tok.type != ConditionTokenType.PARENT_CLOSE) {
-                    throw new ParseException("End of parent expected", lex.yyline());
+                    throw new AnnotationParseException("End of parent expected", lex.yyline());
                 }
                 expressionRest(fields, stack, lex);
                 break;
             default:
-                throw new ParseException("Expression expected", lex.yyline());
+                throw new AnnotationParseException("Expression expected", lex.yyline());
         }
     }
 
-    public boolean eval(Map<String, Boolean> fields) throws ParseException {
+    public boolean eval(Map<String, Boolean> fields) throws AnnotationParseException {
         ConditionLexer lex = new ConditionLexer(new StringReader(prepareCond()));
 
         Stack<Boolean> stack = new Stack<>();
@@ -100,13 +101,13 @@ public class ConditionEvaluator {
         try {
             expression(fields, stack, lex);
         } catch (IOException | EmptyStackException ex) {
-            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
+            throw new AnnotationParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
         if (prepareCond().isEmpty()) {
             return true;
         }
         if (stack.size() != 1) {
-            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
+            throw new AnnotationParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
 
         return stack.pop();
@@ -124,7 +125,7 @@ public class ConditionEvaluator {
         return val;
     }
 
-    public Set<String> getFields() throws ParseException {
+    public Set<String> getFields() throws AnnotationParseException {
         Set<String> ret = new HashSet<>();
         ConditionLexer lex = new ConditionLexer(new StringReader(prepareCond()));
         ConditionToken tok;
@@ -135,7 +136,7 @@ public class ConditionEvaluator {
                 }
             }
         } catch (IOException ex) {
-            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
+            throw new AnnotationParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
         return ret;
     }

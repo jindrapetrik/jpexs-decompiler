@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.text;
 
 /**
@@ -528,9 +529,9 @@ public final class TextLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.tags.text.ParseException
+     * @throws com.jpexs.decompiler.flash.tags.text.TextParseException
      */
-    public ParsedSymbol yylex() throws java.io.IOException, ParseException {
+    public ParsedSymbol yylex() throws java.io.IOException, TextParseException {
         int zzInput;
         int zzAction;
 
@@ -667,7 +668,7 @@ public final class TextLexer {
                 case 18:
                     break;
                 case 7: {
-                    throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+                    throw new TextParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
                 }
                 case 19:
                     break;

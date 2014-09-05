@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -790,7 +790,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     setDecompiledEditMode(false);
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     //reload();
-                } catch (ParseException ex) {
+                } catch (AVM2ParseException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);

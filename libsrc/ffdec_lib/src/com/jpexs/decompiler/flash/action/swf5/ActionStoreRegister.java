@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -27,7 +28,7 @@ import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -52,7 +53,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         registerNumber = sis.readUI8("registerNumber");
     }
 
-    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x87, 0);
         registerNumber = (int) lexLong(lexer);
     }

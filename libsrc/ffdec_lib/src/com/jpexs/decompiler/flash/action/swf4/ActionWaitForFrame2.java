@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -23,7 +24,7 @@ import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -91,7 +92,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
          }*/
     }
 
-    public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x8D, -1);
         skipCount = (int) lexLong(lexer);
         skipped = new ArrayList<>();

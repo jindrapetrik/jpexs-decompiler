@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
@@ -58,7 +58,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getType(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
             typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);

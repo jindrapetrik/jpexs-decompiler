@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.types;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
@@ -26,5 +26,5 @@ import java.util.List;
  */
 public interface CoerceOrConvertTypeIns {
 
-    public GraphTargetItem getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
+    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
 }

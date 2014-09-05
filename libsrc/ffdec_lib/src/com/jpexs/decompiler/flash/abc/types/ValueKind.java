@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
 
 public class ValueKind {
@@ -98,7 +98,7 @@ public class ValueKind {
         }
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(AVM2ConstantPool constants) {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
@@ -140,7 +140,7 @@ public class ValueKind {
         return ret;
     }
 
-    public String toASMString(ConstantPool constants) {
+    public String toASMString(AVM2ConstantPool constants) {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:

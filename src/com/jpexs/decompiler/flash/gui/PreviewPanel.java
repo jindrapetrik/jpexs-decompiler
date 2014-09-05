@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
@@ -684,7 +685,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
                         doa = new DoActionTag(swf, null);
                         actions = ASMParser.parse(0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
+                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
                                 + "Push \"my_sound\" 0.0 \"Sound\"\n"
@@ -703,7 +704,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         new ShowFrameTag(swf).writeTag(sos2);
 
                         actions = ASMParser.parse(0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
+                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
@@ -730,7 +731,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         new ShowFrameTag(swf).writeTag(sos2);
 
                         actions = ASMParser.parse(0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
+                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
@@ -829,7 +830,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
             }
             showFlashViewerPanel();
-        } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
+        } catch (IOException | ActionParseException ex) {
             Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

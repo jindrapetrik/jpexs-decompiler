@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -20,7 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -99,7 +100,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         codeSize = sis.readUI16("codeSize");
     }
 
-    public ActionDefineFunction2(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionDefineFunction2(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x8E, -1);
         functionName = lexString(lexer);
         int numParams = (int) lexLong(lexer);

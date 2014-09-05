@@ -12,13 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -48,7 +49,7 @@ public class ActionConstantPool extends Action {
         }
     }
 
-    public ActionConstantPool(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionConstantPool(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x88, 0);
         while (true) {
             ASMParsedSymbol symb = lexer.yylex();

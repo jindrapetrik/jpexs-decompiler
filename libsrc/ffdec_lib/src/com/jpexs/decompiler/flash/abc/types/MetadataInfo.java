@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
 
 public class MetadataInfo {
@@ -35,7 +35,7 @@ public class MetadataInfo {
         return "name_index=" + name_index + " keys=" + Helper.intArrToString(keys) + " values=" + Helper.intArrToString(values);
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(AVM2ConstantPool constants) {
         String s = "name=" + constants.getString(name_index);
         if (keys.length > 0) {
             s += "\r\n";

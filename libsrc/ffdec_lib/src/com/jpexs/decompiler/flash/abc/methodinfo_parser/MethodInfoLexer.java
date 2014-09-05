@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 /**
@@ -757,9 +758,9 @@ public final class MethodInfoLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException
+     * @throws com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParseException
      */
-    public ParsedSymbol yylex() throws java.io.IOException, ParseException {
+    public ParsedSymbol yylex() throws java.io.IOException, MethodInfoParseException {
         int zzInput;
         int zzAction;
 
@@ -992,7 +993,7 @@ public final class MethodInfoLexer {
                 case 54:
                     break;
                 case 10: {
-                    throw new ParseException("Unterminated string at end of line", yyline + 1);
+                    throw new MethodInfoParseException("Unterminated string at end of line", yyline + 1);
                 }
                 case 55:
                     break;
@@ -1039,7 +1040,7 @@ public final class MethodInfoLexer {
                 case 63:
                     break;
                 case 13: {
-                    throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+                    throw new MethodInfoParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
                 }
                 case 64:
                     break;

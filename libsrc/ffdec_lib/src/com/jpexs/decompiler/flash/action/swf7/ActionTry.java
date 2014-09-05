@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -22,7 +23,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TryActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -105,7 +106,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionTry(FlasmLexer lexer, int version) throws IOException, ParseException {
+    public ActionTry(FlasmLexer lexer, int version) throws IOException, ActionParseException {
         super(0x8F, 0);
         this.version = version;
 
@@ -119,7 +120,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_START) {
             return;
         } else {
-            throw new ParseException("Unknown symbol after Try", lexer.yyline());
+            throw new ActionParseException("Unknown symbol after Try", lexer.yyline());
         }
         lexBlockOpen(lexer);
     }
@@ -231,7 +232,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             } else {
                 lexer.yypushback(lexer.yylength());
             }
-        } catch (IOException | ParseException ex) {
+        } catch (IOException | ActionParseException ex) {
         }
 
         if (finallyBlockFlag) {

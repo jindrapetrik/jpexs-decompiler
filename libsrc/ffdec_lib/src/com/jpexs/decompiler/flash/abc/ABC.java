@@ -19,13 +19,12 @@ package com.jpexs.decompiler.flash.abc;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
@@ -61,7 +60,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -78,7 +76,7 @@ public class ABC {
 
     public int major_version = 46;
     public int minor_version = 16;
-    public ConstantPool constants = new ConstantPool();
+    public AVM2ConstantPool constants = new AVM2ConstantPool();
     public List<MethodInfo> method_info = new ArrayList<>();
     public List<MetadataInfo> metadata_info = new ArrayList<>();
     public List<InstanceInfo> instance_info = new ArrayList<>();
@@ -348,7 +346,7 @@ public class ABC {
         major_version = ais.readU16("major_version");
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
 
-        constants = new ConstantPool();
+        constants = new AVM2ConstantPool();
         deobfuscation = new AVM2Deobfuscation(constants);
         ais.newDumpLevel("constant_pool", "cpool_info");
 
@@ -1153,7 +1151,7 @@ public class ABC {
         method_info.remove(index);
     }
 
-    public void replaceSciptPack(ScriptPack pack, String as) throws ParseException, CompilationException, IOException, InterruptedException {
+    public void replaceSciptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = script_info.size();

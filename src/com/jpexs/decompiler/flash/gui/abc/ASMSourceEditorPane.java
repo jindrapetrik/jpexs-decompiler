@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -220,7 +220,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             ((Tag) abc.parentTag).setModified(true);
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
-        } catch (ParseException ex) {
+        } catch (AVM2ParseException ex) {
             View.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);
             return false;

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -997,7 +997,7 @@ public final class ActionScriptLexer {
     }
     ParsedSymbol last;
 
-    public ParsedSymbol lex() throws java.io.IOException, ParseException {
+    public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException {
         ParsedSymbol ret = null;
         if (!pushedBack.isEmpty()) {
             ret = last = pushedBack.pop();
@@ -1241,9 +1241,9 @@ public final class ActionScriptLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.abc.avm2.parser.ParseException
+     * @throws com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException
      */
-    public ParsedSymbol yylex() throws java.io.IOException, ParseException {
+    public ParsedSymbol yylex() throws java.io.IOException, AVM2ParseException {
         int zzInput;
         int zzAction;
 
@@ -1740,7 +1740,7 @@ public final class ActionScriptLexer {
                 case 236:
                     break;
                 case 77: {
-                    throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+                    throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
                 }
                 case 237:
                     break;

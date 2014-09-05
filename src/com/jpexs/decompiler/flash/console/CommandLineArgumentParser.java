@@ -24,18 +24,17 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -85,7 +84,6 @@ import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
@@ -1426,7 +1424,7 @@ public class CommandLineArgumentParser {
         } else {
             try {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
-            } catch (ParseException ex) {
+            } catch (ActionParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
                 System.exit(1);
             }
@@ -1440,7 +1438,7 @@ public class CommandLineArgumentParser {
         com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(src.getSwf().version);
         try {
             src.setActions(par.actionsFromString(as));
-        } catch (ParseException ex) {
+        } catch (ActionParseException ex) {
             System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
             System.exit(1);
         } catch (CompilationException ex) {
@@ -1484,7 +1482,7 @@ public class CommandLineArgumentParser {
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
                 abc.bodies.get(bodyIndex).setCode(acode);
-            } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
+            } catch (AVM2ParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
                 System.exit(1);
             }
@@ -1507,7 +1505,7 @@ public class CommandLineArgumentParser {
 
         try {
             pack.abc.replaceSciptPack(pack, as);
-        } catch (com.jpexs.decompiler.flash.abc.avm2.parser.ParseException ex) {
+        } catch (AVM2ParseException ex) {
             System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
             System.exit(1);
         } catch (CompilationException ex) {

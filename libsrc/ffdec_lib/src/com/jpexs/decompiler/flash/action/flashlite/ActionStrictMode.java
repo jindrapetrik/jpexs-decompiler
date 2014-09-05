@@ -12,14 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.StrictModeActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -37,7 +38,7 @@ public class ActionStrictMode extends Action {
         mode = sis.readUI8("mode");
     }
 
-    public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionStrictMode(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x89, 1);
         mode = (int) lexLong(lexer);
     }

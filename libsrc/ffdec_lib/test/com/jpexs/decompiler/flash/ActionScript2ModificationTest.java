@@ -12,12 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
@@ -83,7 +84,7 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
             expectedResult = cleanPCode(expectedResult);
 
             Assert.assertEquals(actualResult, expectedResult);
-        } catch (IOException | ParseException | InterruptedException ex) {
+        } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }
     }
@@ -104,7 +105,7 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
             expectedResult = cleanPCode(expectedResult);
 
             Assert.assertEquals(actualResult, expectedResult);
-        } catch (IOException | ParseException | InterruptedException ex) {
+        } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }
     }

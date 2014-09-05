@@ -12,12 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -37,7 +37,7 @@ public class AVM2LocalData extends BaseLocalData {
     public Integer classIndex;
     public HashMap<Integer, GraphTargetItem> localRegs;
     public ScopeStack scopeStack;
-    public ConstantPool constants;
+    public AVM2ConstantPool constants;
     public List<MethodInfo> methodInfo;
     public MethodBody methodBody;
     public ABC abc;

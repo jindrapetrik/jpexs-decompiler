@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.action.Deobfuscation;
 
 public class Namespace {
@@ -76,11 +76,11 @@ public class Namespace {
         return "Namespace: kind=" + getKindStr() + " name_index=" + name_index;
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(AVM2ConstantPool constants) {
         return getName(constants); //getPrefix(constants)+" "+getName(constants);
     }
 
-    public String getNameWithKind(ConstantPool constants) {
+    public String getNameWithKind(AVM2ConstantPool constants) {
         String kindStr = getKindStr();
         String nameStr = constants.getString(name_index);
         return kindStr + (nameStr.isEmpty() ? "" : " " + nameStr);
@@ -97,21 +97,21 @@ public class Namespace {
         return kindStr;
     }
 
-    public String getName(ConstantPool constants) {
+    public String getName(AVM2ConstantPool constants) {
         if (name_index == 0) {
             return null;
         }
         return Deobfuscation.printNamespace(constants.getString(name_index));
     }
 
-    public boolean hasName(ConstantPool constants, String name) {
+    public boolean hasName(AVM2ConstantPool constants, String name) {
         if (name == null) {
             return name_index == 0;
         }
         return name.equals(getName(constants));
     }
 
-    public boolean hasName(String name, ConstantPool constants) {
+    public boolean hasName(String name, AVM2ConstantPool constants) {
         if (name == null && name_index == 0) {
             return true;
         }

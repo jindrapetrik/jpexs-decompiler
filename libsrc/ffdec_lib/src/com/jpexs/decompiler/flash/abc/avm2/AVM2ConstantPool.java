@@ -24,7 +24,7 @@ import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConstantPool {
+public class AVM2ConstantPool {
 
     public List<Long> constant_int = new ArrayList<>();
     public List<Long> constant_uint = new ArrayList<>();

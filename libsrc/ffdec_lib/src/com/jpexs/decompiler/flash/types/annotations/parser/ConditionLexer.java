@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 import java.util.Stack;
@@ -297,7 +298,7 @@ public final class ConditionLexer {
         pushedBack.push(symb);
     }
 
-    public ConditionToken lex() throws java.io.IOException, ParseException {
+    public ConditionToken lex() throws java.io.IOException, AnnotationParseException {
         ConditionToken ret = null;
         if (!pushedBack.isEmpty()) {
             ret = pushedBack.pop();
@@ -541,9 +542,9 @@ public final class ConditionLexer {
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
      * @throws
-     * com.jpexs.decompiler.flash.types.annotations.parser.ParseException
+     * com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException
      */
-    public ConditionToken yylex() throws java.io.IOException, ParseException {
+    public ConditionToken yylex() throws java.io.IOException, AnnotationParseException {
         int zzInput;
         int zzAction;
 

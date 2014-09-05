@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -24,7 +25,7 @@ import com.jpexs.decompiler.flash.action.model.GetURLActionItem;
 import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -54,7 +55,7 @@ public class ActionGetURL extends Action {
         targetString = sis.readString("targetString");
     }
 
-    public ActionGetURL(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionGetURL(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x83, 0);
         urlString = lexString(lexer);
         targetString = lexString(lexer);

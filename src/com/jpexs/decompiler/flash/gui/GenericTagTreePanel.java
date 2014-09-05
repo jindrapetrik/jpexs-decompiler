@@ -35,8 +35,8 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
-import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -529,7 +529,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 break;
                             }
                         }
-                    } catch (ParseException ex) {
+                    } catch (AnnotationParseException ex) {
                         Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -812,7 +812,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         if (!ev.eval(fieldMap)) {
                             continue;
                         }
-                    } catch (ParseException | IllegalArgumentException | IllegalAccessException ex) {
+                    } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {
                         Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }

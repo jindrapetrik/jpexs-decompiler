@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.special;
 
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class ActionDeobfuscateJump extends ActionJump {
         super(2);
     }
 
-    public ActionDeobfuscateJump(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionDeobfuscateJump(FlasmLexer lexer) throws IOException, ActionParseException {
         super(lexer);
     }
 

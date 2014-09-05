@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
@@ -78,14 +78,14 @@ public class InstructionDefinition implements Serializable {
         return s.toString();
     }
 
-    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
         throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
     }
 
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
     }
 
-    protected FullMultinameAVM2Item resolveMultiname(TranslateStack stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
+    protected FullMultinameAVM2Item resolveMultiname(TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (constants.getMultiname(multinameIndex).needsName()) {
@@ -97,7 +97,7 @@ public class InstructionDefinition implements Serializable {
         return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
     }
 
-    protected int resolvedCount(ConstantPool constants, int multinameIndex) {
+    protected int resolvedCount(AVM2ConstantPool constants, int multinameIndex) {
         int pos = 0;
         if (constants.getMultiname(multinameIndex).needsNs()) {
             pos++;
@@ -109,7 +109,7 @@ public class InstructionDefinition implements Serializable {
 
     }
 
-    protected String resolveMultinameNoPop(int pos, Stack<AVM2Item> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+    protected String resolveMultinameNoPop(int pos, Stack<AVM2Item> stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<String> fullyQualifiedNames) {
         String ns = "";
         String name;
         if (constants.getMultiname(multinameIndex).needsNs()) {

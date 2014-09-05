@@ -12,14 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.GotoLabelActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -63,7 +64,7 @@ public class ActionGoToLabel extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionGoToLabel(FlasmLexer lexer) throws IOException, ParseException {
+    public ActionGoToLabel(FlasmLexer lexer) throws IOException, ActionParseException {
         super(0x8C, -1);
         label = lexString(lexer);
     }

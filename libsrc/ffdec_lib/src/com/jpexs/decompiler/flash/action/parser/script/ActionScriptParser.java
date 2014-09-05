@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -114,7 +115,7 @@ import com.jpexs.decompiler.flash.action.model.operations.StringLtActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StringNeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
@@ -166,7 +167,7 @@ public class ActionScriptParser {
         return "" + uniqLast;
     }
 
-    private List<GraphTargetItem> commands(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<VariableActionItem> variables) throws IOException, ParseException {
+    private List<GraphTargetItem> commands(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<VariableActionItem> variables) throws IOException, ActionParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("commands:");
@@ -181,7 +182,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem type(List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem type(List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = null;
 
         ParsedSymbol s = lex();
@@ -199,7 +200,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem memberOrCall(GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem memberOrCall(GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         ParsedSymbol s = lex();
         GraphTargetItem ret = newcmds;
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN, SymbolType.PARENT_OPEN)) {
@@ -227,7 +228,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem member(GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem member(GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = obj;
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN)) {
@@ -252,7 +253,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem variable(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem variable(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
@@ -262,7 +263,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, ParseException {
+    private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, ActionParseException {
         boolean found = false;
         for (Object t : expected) {
             if (symb.type == t) {
@@ -282,17 +283,17 @@ public class ActionScriptParser {
                 expStr += e;
                 first = false;
             }
-            throw new ParseException("" + expStr + " expected but " + symb.type + " found", line);
+            throw new ActionParseException("" + expStr + " expected but " + symb.type + " found", line);
         }
     }
 
-    private ParsedSymbol expectedType(Object... type) throws IOException, ParseException {
+    private ParsedSymbol expectedType(Object... type) throws IOException, ActionParseException {
         ParsedSymbol symb = lex();
         expected(symb, lexer.yyline(), type);
         return symb;
     }
 
-    private ParsedSymbol lex() throws IOException, ParseException {
+    private ParsedSymbol lex() throws IOException, ActionParseException {
         ParsedSymbol ret = lexer.lex();
         if (debugMode) {
             System.out.println(ret);
@@ -300,7 +301,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private List<GraphTargetItem> call(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         ParsedSymbol s = lex();
@@ -315,7 +316,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = null;
         expectedType(SymbolType.PARENT_OPEN);
@@ -351,7 +352,7 @@ public class ActionScriptParser {
         return new FunctionActionItem(null, functionName, paramNames, body, constantPool, -1, subvariables);
     }
 
-    private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables) throws IOException, ActionParseException {
 
         GraphTargetItem ret = null;
         /*for (int i = 0; i < nameStr.size() - 1; i++) {
@@ -464,7 +465,7 @@ public class ActionScriptParser {
         }
     }
 
-    private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = null;
         switch (s.type) {
             case GETVERSION:
@@ -580,7 +581,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem command(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem command(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<VariableActionItem> variables) throws IOException, ActionParseException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         GraphTargetItem ret = null;
@@ -638,7 +639,7 @@ public class ActionScriptParser {
                     variables.remove(varDel);
                     ret = new DeleteActionItem(null, null, pushConst(((VariableActionItem) varDel).getVariableName()));
                 } else {
-                    throw new ParseException("Not a property", lexer.yyline());
+                    throw new ActionParseException("Not a property", lexer.yyline());
                 }
                 break;
             case TRACE:
@@ -665,7 +666,7 @@ public class ActionScriptParser {
                         } else if (s.value.equals("POST")) {
                             getuMethod = 2;
                         } else {
-                            throw new ParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
+                            throw new ActionParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
                         }
                     } else {
                         lexer.pushback(s);
@@ -802,7 +803,7 @@ public class ActionScriptParser {
                     } else if (s.value.equals("GET")) {
                         lvmethod = 1;
                     } else {
-                        throw new ParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
+                        throw new ActionParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
                     }
                 } else {
                     lexer.pushback(s);
@@ -1223,7 +1224,7 @@ public class ActionScriptParser {
 
     }
 
-    private GraphTargetItem expression(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem expression(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
         return expression(false, registerVars, inFunction, inMethod, allowRemainder, variables);
     }
 
@@ -1245,7 +1246,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
@@ -1386,18 +1387,18 @@ public class ActionScriptParser {
                 } else if (expr instanceof GetMemberActionItem) {
                     ret = new SetMemberActionItem(null, ((GetMemberActionItem) expr).object, ((GetMemberActionItem) expr).memberName, assigned);
                 } else {
-                    throw new ParseException("Invalid assignment", lexer.yyline());
+                    throw new ActionParseException("Invalid assignment", lexer.yyline());
                 }
                 break;
             case INCREMENT: //postincrement
                 if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
-                    throw new ParseException("Invalid assignment", lexer.yyline());
+                    throw new ActionParseException("Invalid assignment", lexer.yyline());
                 }
                 ret = new PostIncrementActionItem(null, expr);
                 break;
             case DECREMENT: //postdecrement
                 if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
-                    throw new ParseException("Invalid assignment", lexer.yyline());
+                    throw new ActionParseException("Invalid assignment", lexer.yyline());
                 }
                 ret = new PostDecrementActionItem(null, expr);
                 break;
@@ -1466,7 +1467,7 @@ public class ActionScriptParser {
         return false;
     }
 
-    private int brackets(List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
+    private int brackets(List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1490,7 +1491,7 @@ public class ActionScriptParser {
         return arrCnt;
     }
 
-    private GraphTargetItem commaExpression(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forInLevel, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem commaExpression(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forInLevel, List<VariableActionItem> variables) throws IOException, ActionParseException {
         GraphTargetItem cmd = null;
         List<GraphTargetItem> expr = new ArrayList<>();
         ParsedSymbol s;
@@ -1506,13 +1507,13 @@ public class ActionScriptParser {
             expr.add(expression(registerVars, inFunction, inMethod, true, variables));
         } else {
             if (!cmd.hasReturnValue()) {
-                throw new ParseException("Expression expected", lexer.yyline());
+                throw new ActionParseException("Expression expected", lexer.yyline());
             }
         }
         return new CommaExpressionItem(null, expr);
     }
 
-    private GraphTargetItem expression(boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ParseException {
+    private GraphTargetItem expression(boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
         if (debugMode) {
             System.out.println("expression:");
         }
@@ -1643,7 +1644,7 @@ public class ActionScriptParser {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, gm.object, gm.memberName);
                 } else {
-                    throw new ParseException("Not a property", lexer.yyline());
+                    throw new ActionParseException("Not a property", lexer.yyline());
                 }
                 break;
             case INCREMENT:
@@ -1676,7 +1677,7 @@ public class ActionScriptParser {
                 } else if (newvar instanceof VariableActionItem) {
                     ret = new NewObjectActionItem(null, new DirectValueActionItem(((VariableActionItem) newvar).getVariableName()), call(registerVars, inFunction, inMethod, variables));
                 } else {
-                    throw new ParseException("Invalid new item", lexer.yyline());
+                    throw new ActionParseException("Invalid new item", lexer.yyline());
                 }
                 existsRemainder = true;
                 break;
@@ -1725,7 +1726,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private DirectValueActionItem pushConst(String s) throws IOException, ParseException {
+    private DirectValueActionItem pushConst(String s) throws IOException, ActionParseException {
         int index = constantPool.indexOf(s);
         if (index == -1) {
             constantPool.add(s);
@@ -1736,7 +1737,7 @@ public class ActionScriptParser {
     private ActionScriptLexer lexer = null;
     private List<String> constantPool;
 
-    public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ParseException, IOException {
+    public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException {
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
@@ -1757,7 +1758,7 @@ public class ActionScriptParser {
             }
         }
         if (lexer.lex().type != SymbolType.EOF) {
-            throw new ParseException("Parsing finished before end of the file", lexer.yyline());
+            throw new ActionParseException("Parsing finished before end of the file", lexer.yyline());
         }
         return retTree;
     }
@@ -1777,29 +1778,29 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public List<Action> actionsFromString(String s) throws ParseException, IOException, CompilationException {
+    public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException {
         List<String> constantPool = new ArrayList<>();
         List<GraphTargetItem> tree = treeFromString(s, constantPool);
         return actionsFromTree(tree, constantPool);
     }
 
-    private void versionRequired(ParsedSymbol s, int min) throws ParseException {
+    private void versionRequired(ParsedSymbol s, int min) throws ActionParseException {
         versionRequired(s.value.toString(), min, Integer.MAX_VALUE);
     }
 
-    private void versionRequired(ParsedSymbol s, int min, int max) throws ParseException {
+    private void versionRequired(ParsedSymbol s, int min, int max) throws ActionParseException {
         versionRequired(s.value.toString(), min, max);
     }
 
-    private void versionRequired(String type, int min, int max) throws ParseException {
+    private void versionRequired(String type, int min, int max) throws ActionParseException {
         if (min == max && swfVersion != min) {
-            throw new ParseException(type + " requires SWF version " + min, lexer.yyline());
+            throw new ActionParseException(type + " requires SWF version " + min, lexer.yyline());
         }
         if (swfVersion < min) {
-            throw new ParseException(type + " requires at least SWF version " + min, lexer.yyline());
+            throw new ActionParseException(type + " requires at least SWF version " + min, lexer.yyline());
         }
         if (swfVersion > max) {
-            throw new ParseException(type + " requires SWF version lower than " + max, lexer.yyline());
+            throw new ActionParseException(type + " requires SWF version lower than " + max, lexer.yyline());
         }
     }
 }

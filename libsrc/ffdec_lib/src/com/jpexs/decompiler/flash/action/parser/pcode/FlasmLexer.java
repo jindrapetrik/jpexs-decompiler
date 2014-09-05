@@ -12,10 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
@@ -758,9 +759,9 @@ public final class FlasmLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.action.parser.ParseException
+     * @throws com.jpexs.decompiler.flash.action.parser.ActionParseException
      */
-    public ASMParsedSymbol yylex() throws java.io.IOException, ParseException {
+    public ASMParsedSymbol yylex() throws java.io.IOException, ActionParseException {
         int zzInput;
         int zzAction;
 
@@ -952,7 +953,7 @@ public final class FlasmLexer {
                 case 42:
                     break;
                 case 5: {
-                    throw new ParseException("Unterminated string at end of line", yyline + 1);
+                    throw new ActionParseException("Unterminated string at end of line", yyline + 1);
                 }
                 case 43:
                     break;
@@ -1001,7 +1002,7 @@ public final class FlasmLexer {
                 case 51:
                     break;
                 case 14: {
-                    throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+                    throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
                 }
                 case 52:
                     break;

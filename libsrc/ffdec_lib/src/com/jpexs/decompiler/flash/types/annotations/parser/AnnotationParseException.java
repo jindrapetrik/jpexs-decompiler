@@ -12,17 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
-package com.jpexs.decompiler.flash.tags.text;
+ * License along with this library.
+ */
+package com.jpexs.decompiler.flash.types.annotations.parser;
 
-public class ParseException extends Exception {
+import com.jpexs.decompiler.flash.ParseException;
 
-    public long line;
-    public String text;
+public class AnnotationParseException extends ParseException {
 
-    public ParseException(String text, long line) {
-        super("ParseException:" + text + " on line " + line);
-        this.line = line;
-        this.text = text;
+    public AnnotationParseException(String text, long line) {
+        super(text, line);
     }
 }

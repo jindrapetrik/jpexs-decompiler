@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
@@ -44,10 +44,10 @@ public class AVM2Deobfuscation {
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
-    private final ConstantPool constants;
+    private final AVM2ConstantPool constants;
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
 
-    public AVM2Deobfuscation(ConstantPool constants) {
+    public AVM2Deobfuscation(AVM2ConstantPool constants) {
         this.constants = constants;
     }
 

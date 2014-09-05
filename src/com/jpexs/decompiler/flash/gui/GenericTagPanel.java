@@ -35,8 +35,8 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
-import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -546,7 +546,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                         ((Component) dependentEditor).setVisible(conditionMet);
                         dependentLabel.setVisible(conditionMet);
                         dependentTypeLabel.setVisible(conditionMet);
-                    } catch (ParseException ex) {
+                    } catch (AnnotationParseException ex) {
                         Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, "Invalid condition", ex);
                     }
                 }

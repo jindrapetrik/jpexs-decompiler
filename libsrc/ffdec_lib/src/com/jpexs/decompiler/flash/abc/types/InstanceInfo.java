@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class InstanceInfo {
         return modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false) + supIndexStr + implStr;
     }
 
-    public Multiname getName(ConstantPool constants) {
+    public Multiname getName(AVM2ConstantPool constants) {
         return constants.getMultiname(name_index);
     }
 

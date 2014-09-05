@@ -20,8 +20,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.NotSameException;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -89,7 +90,7 @@ public class RecompileTest {
                         ActionScriptParser par = new ActionScriptParser(swfVersion);
                         try {
                             asm.setActions(par.actionsFromString(as));
-                        } catch (ParseException | CompilationException ex) {
+                        } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
                         writer = new HilightedTextWriter(new CodeFormatting(), false);
@@ -98,7 +99,7 @@ public class RecompileTest {
                         as2 = asm.removePrefixAndSuffix(as2);
                         try {
                             asm.setActions(par.actionsFromString(as2));
-                        } catch (ParseException | CompilationException ex) {
+                        } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
                         writer = new HilightedTextWriter(new CodeFormatting(), false);
@@ -118,7 +119,7 @@ public class RecompileTest {
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testDirectEditing(String filename) throws IOException, InterruptedException, com.jpexs.decompiler.flash.abc.avm2.parser.ParseException, CompilationException {
+    public void testDirectEditing(String filename) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
         Configuration.autoDeobfuscate.set(false);
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);

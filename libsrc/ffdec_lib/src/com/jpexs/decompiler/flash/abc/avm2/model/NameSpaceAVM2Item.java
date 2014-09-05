@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -36,7 +36,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
         if (namespaceIndex == 0) {
             return writer.append("*");
         }
-        ConstantPool constants = localData.constantsAvm2;
+        AVM2ConstantPool constants = localData.constantsAvm2;
         return writer.append(constants.getNamespace(namespaceIndex).toString(constants)); //assume not null name
     }
 

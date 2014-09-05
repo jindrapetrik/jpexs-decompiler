@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 
 public class NamespaceSet {
 
@@ -29,7 +29,7 @@ public class NamespaceSet {
         this.namespaces = namespaces;
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(AVM2ConstantPool constants) {
         String s = "";
         for (int i = 0; i < this.namespaces.length; i++) {
             if (i > 0) {
