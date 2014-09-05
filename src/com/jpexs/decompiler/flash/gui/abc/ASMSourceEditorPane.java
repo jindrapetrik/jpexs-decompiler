@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;

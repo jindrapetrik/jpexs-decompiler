@@ -792,7 +792,19 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             FieldNode condnode = (FieldNode) (mod).getNodeByPath(fulldf);
 
                             if (condnode != null) {
-                                fieldMap.put(sf, (Boolean) ReflectionTools.getValue(condnode.obj, condnode.field, condnode.index));
+                                Object value = ReflectionTools.getValue(condnode.obj, condnode.field, condnode.index);
+                                if (value instanceof Boolean) {
+                                    fieldMap.put(sf, (Boolean) value);
+                                } else if (value instanceof Integer) {
+                                    int intValue = (int) value;
+                                    boolean found = false;
+                                    for (int i : cond.options()) {
+                                        if (i == intValue) {
+                                            found = true;
+                                        }
+                                    }
+                                    fieldMap.put(sf, found);
+                                }
                             } else {
                                 fieldMap.put(sf, true);
                             }

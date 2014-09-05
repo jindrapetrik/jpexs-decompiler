@@ -68,7 +68,6 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.abc.ASMSourceEditorPane;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;

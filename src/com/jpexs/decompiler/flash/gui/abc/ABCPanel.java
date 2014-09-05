@@ -869,9 +869,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         body.max_stack = 1;
                         body.exceptions = new ABCException[0];
                         AVM2Code code = new AVM2Code();
-                        code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0], new byte[0]));
-                        code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0], new byte[0]));
-                        code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0], new byte[0]));
+                        code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0]));
+                        code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0]));
+                        code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0]));
                         body.code = code;
                         Traits traits = new Traits();
                         traits.traits = new ArrayList<>();
