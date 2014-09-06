@@ -796,7 +796,7 @@ public class AVM2Code implements Serializable {
                 di.name = instr.instructionName;
             }
             if (instr != null) {
-                int[] actualOperands;
+                int[] actualOperands = null;
                 if (instructionCode == 0x1b) { //switch
                     int firstOperand = ais.readS24("firstOperand");
                     int case_count = ais.readU30("case_count");
@@ -807,21 +807,23 @@ public class AVM2Code implements Serializable {
                         actualOperands[2 + c] = ais.readS24("actualOperand");
                     }
                 } else {
-                    actualOperands = new int[instr.operands.length];
-                    for (int op = 0; op < instr.operands.length; op++) {
-                        switch (instr.operands[op] & 0xff00) {
-                            case OPT_U30:
-                                actualOperands[op] = ais.readU30("operand");
-                                break;
-                            case OPT_U8:
-                                actualOperands[op] = ais.read("operand");
-                                break;
-                            case OPT_BYTE:
-                                actualOperands[op] = (byte) ais.read("operand");
-                                break;
-                            case OPT_S24:
-                                actualOperands[op] = ais.readS24("operand");
-                                break;
+                    if (instr.operands.length > 0) {
+                        actualOperands = new int[instr.operands.length];
+                        for (int op = 0; op < instr.operands.length; op++) {
+                            switch (instr.operands[op] & 0xff00) {
+                                case OPT_U30:
+                                    actualOperands[op] = ais.readU30("operand");
+                                    break;
+                                case OPT_U8:
+                                    actualOperands[op] = ais.read("operand");
+                                    break;
+                                case OPT_BYTE:
+                                    actualOperands[op] = (byte) ais.read("operand");
+                                    break;
+                                case OPT_S24:
+                                    actualOperands[op] = ais.readS24("operand");
+                                    break;
+                            }
                         }
                     }
                 }

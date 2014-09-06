@@ -113,22 +113,22 @@ public class CoerceAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (typeObj.toString()) {
             case "*":
-                ins = new AVM2Instruction(0, new CoerceAIns(), new int[]{});
+                ins = new AVM2Instruction(0, new CoerceAIns(), null);
                 break;
             case "String":
-                ins = new AVM2Instruction(0, new CoerceSIns(), new int[]{});
+                ins = new AVM2Instruction(0, new CoerceSIns(), null);
                 break;
             case "Boolean":
-                ins = new AVM2Instruction(0, new ConvertBIns(), new int[]{});
+                ins = new AVM2Instruction(0, new ConvertBIns(), null);
                 break;
             case "int":
-                ins = new AVM2Instruction(0, new ConvertIIns(), new int[]{});
+                ins = new AVM2Instruction(0, new ConvertIIns(), null);
                 break;
             case "uint":
-                ins = new AVM2Instruction(0, new ConvertUIns(), new int[]{});
+                ins = new AVM2Instruction(0, new ConvertUIns(), null);
                 break;
             case "Number":
-                ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{});
+                ins = new AVM2Instruction(0, new ConvertDIns(), null);
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc, (((AVM2SourceGenerator) generator).allABCs));

@@ -1680,7 +1680,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 if (ac == -1) {
                     if (parentConstMinAC == 0) {
-                        mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
+                        mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), null));
                         mbodyCode.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}));
 
                     } else {
@@ -1689,8 +1689,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             if (className != null) {//It's method, not (inner) function
-                mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}));
-                mbodyCode.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}));
+                mbodyCode.add(0, new AVM2Instruction(0, new GetLocal0Ins(), null));
+                mbodyCode.add(1, new AVM2Instruction(0, new PushScopeIns(), null));
             }
             boolean addRet = false;
             if (!mbodyCode.isEmpty()) {
@@ -1703,10 +1703,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             if (addRet) {
                 if (retType.toString().equals("*") || retType.toString().equals("void") || constructor) {
-                    mbodyCode.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}));
+                    mbodyCode.add(new AVM2Instruction(0, new ReturnVoidIns(), null));
                 } else {
-                    mbodyCode.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}));
-                    mbodyCode.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}));
+                    mbodyCode.add(new AVM2Instruction(0, new PushUndefinedIns(), null));
+                    mbodyCode.add(new AVM2Instruction(0, new ReturnValueIns(), null));
                 }
             }
             mbody.exceptions = localData.exceptions.toArray(new ABCException[localData.exceptions.size()]);

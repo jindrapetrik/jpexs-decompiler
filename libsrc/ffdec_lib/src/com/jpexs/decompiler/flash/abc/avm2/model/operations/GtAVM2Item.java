@@ -61,7 +61,7 @@ public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new GreaterThanIns(), new int[]{})
+                new AVM2Instruction(0, new GreaterThanIns(), null)
         );
     }
 

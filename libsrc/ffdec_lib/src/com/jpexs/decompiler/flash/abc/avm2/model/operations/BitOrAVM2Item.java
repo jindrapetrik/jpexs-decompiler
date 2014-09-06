@@ -42,7 +42,7 @@ public class BitOrAVM2Item extends BinaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new BitOrIns(), new int[]{})
+                new AVM2Instruction(0, new BitOrIns(), null)
         );
     }
 

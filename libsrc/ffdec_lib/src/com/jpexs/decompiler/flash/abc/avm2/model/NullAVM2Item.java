@@ -54,7 +54,7 @@ public class NullAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, new PushNullIns(), new int[]{})
+                new AVM2Instruction(0, new PushNullIns(), null)
         );
     }
 

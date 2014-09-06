@@ -71,7 +71,7 @@ public class TypeOfAVM2Item extends UnaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, value,
-                new AVM2Instruction(0, new TypeOfIns(), new int[]{})
+                new AVM2Instruction(0, new TypeOfIns(), null)
         );
     }
 

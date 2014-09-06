@@ -72,12 +72,12 @@ public class SubtractAVM2Item extends BinaryOpItem {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
             if (iv.value == 1) {
                 return toSourceMerge(localData, generator, leftSide,
-                        new AVM2Instruction(0, new DecrementIns(), new int[]{})
+                        new AVM2Instruction(0, new DecrementIns(), null)
                 );
             }
         }
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new SubtractIns(), new int[]{})
+                new AVM2Instruction(0, new SubtractIns(), null)
         );
     }
 

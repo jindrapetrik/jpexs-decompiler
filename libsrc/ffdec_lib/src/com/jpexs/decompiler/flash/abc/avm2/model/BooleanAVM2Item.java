@@ -57,7 +57,7 @@ public class BooleanAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, value ? new PushTrueIns() : new PushFalseIns(), new int[]{})
+                new AVM2Instruction(0, value ? new PushTrueIns() : new PushFalseIns(), null)
         );
     }
 

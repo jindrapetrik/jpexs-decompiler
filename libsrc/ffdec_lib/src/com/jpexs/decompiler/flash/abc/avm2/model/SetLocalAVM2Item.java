@@ -71,23 +71,23 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new SetLocal0Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal0Ins(), null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new SetLocal1Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal1Ins(), null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new SetLocal2Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal2Ins(), null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new SetLocal3Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal3Ins(), null);
                 break;
             default:
                 ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex});
                 break;
         }
         return toSourceMerge(localData, generator, value,
-                new AVM2Instruction(0, new DupIns(), new int[]{}), ins);
+                new AVM2Instruction(0, new DupIns(), null), ins);
     }
 
     @Override
@@ -95,16 +95,16 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new SetLocal0Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal0Ins(), null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new SetLocal1Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal1Ins(), null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new SetLocal2Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal2Ins(), null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new SetLocal3Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new SetLocal3Ins(), null);
                 break;
             default:
                 ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex});

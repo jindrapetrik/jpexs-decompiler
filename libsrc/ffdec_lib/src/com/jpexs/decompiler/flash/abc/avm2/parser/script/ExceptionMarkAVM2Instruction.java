@@ -29,7 +29,7 @@ public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
     public int exceptionId;
 
     public ExceptionMarkAVM2Instruction(int exceptionId, int markType) {
-        super(0, null, new int[0]);
+        super(0, null, null);
         this.markType = markType;
         this.exceptionId = exceptionId;
         this.definition = new InstructionDefinition(0, "--mark", new int[0]);

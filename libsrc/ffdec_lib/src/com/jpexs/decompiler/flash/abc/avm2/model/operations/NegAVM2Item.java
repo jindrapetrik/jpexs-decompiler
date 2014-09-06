@@ -42,7 +42,7 @@ public class NegAVM2Item extends UnaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, value,
-                new AVM2Instruction(0, new NegateIns(), new int[]{})
+                new AVM2Instruction(0, new NegateIns(), null)
         );
     }
 

@@ -52,7 +52,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands) {
         this.definition = definition;
-        this.operands = operands;
+        this.operands = operands != null && operands.length > 0 ? operands : null;
         this.offset = offset;
     }
 
@@ -95,9 +95,11 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(definition.instructionName);
-        for (int i = 0; i < operands.length; i++) {
-            s.append(" ");
-            s.append(operands[i]);
+        if (operands !=  null) {
+            for (int i = 0; i < operands.length; i++) {
+                s.append(" ");
+                s.append(operands[i]);
+            }
         }
         return s.toString();
     }

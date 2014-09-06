@@ -93,16 +93,16 @@ public class LocalRegAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new GetLocal0Ins(), null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new GetLocal1Ins(), null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new GetLocal2Ins(), null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{});
+                ins = new AVM2Instruction(0, new GetLocal3Ins(), null);
                 break;
             default:
                 ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex});

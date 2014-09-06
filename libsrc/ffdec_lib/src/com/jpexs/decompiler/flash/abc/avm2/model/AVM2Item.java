@@ -117,7 +117,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             return toSource(localData, generator);
         }
         List<GraphSourceItem> ret = toSource(localData, generator);
-        ret.add(new AVM2Instruction(0, new PopIns(), new int[]{}));
+        ret.add(new AVM2Instruction(0, new PopIns(), null));
         return ret;
     }
 

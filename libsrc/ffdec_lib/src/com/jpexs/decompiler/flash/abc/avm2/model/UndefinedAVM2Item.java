@@ -64,7 +64,7 @@ public class UndefinedAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, new PushUndefinedIns(), new int[]{})
+                new AVM2Instruction(0, new PushUndefinedIns(), null)
         );
     }
 }

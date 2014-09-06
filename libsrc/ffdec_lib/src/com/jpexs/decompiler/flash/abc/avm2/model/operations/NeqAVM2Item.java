@@ -62,8 +62,8 @@ public class NeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondit
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new EqualsIns(), new int[]{}),
-                new AVM2Instruction(0, new NotIns(), new int[]{})
+                new AVM2Instruction(0, new EqualsIns(), null),
+                new AVM2Instruction(0, new NotIns(), null)
         );
     }
 

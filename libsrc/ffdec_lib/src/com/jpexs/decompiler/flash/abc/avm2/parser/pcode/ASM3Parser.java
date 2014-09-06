@@ -889,7 +889,7 @@ public class ASM3Parser {
                     }
                 }
                 if (symb.value.toString().toLowerCase().equals("ffdec_deobfuscatepop")) {
-                    lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), new int[0]);
+                    lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), null);
                     code.code.add(lastIns);
                     offset += lastIns.getBytes().length;
                     insFound = true;

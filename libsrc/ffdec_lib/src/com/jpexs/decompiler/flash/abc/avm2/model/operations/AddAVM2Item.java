@@ -75,12 +75,12 @@ public class AddAVM2Item extends BinaryOpItem {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
             if (iv.value == 1) {
                 return toSourceMerge(localData, generator, leftSide,
-                        new AVM2Instruction(0, new IncrementIns(), new int[]{})
+                        new AVM2Instruction(0, new IncrementIns(), null)
                 );
             }
         }
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new AddIns(), new int[]{})
+                new AVM2Instruction(0, new AddIns(), null)
         );
     }
 

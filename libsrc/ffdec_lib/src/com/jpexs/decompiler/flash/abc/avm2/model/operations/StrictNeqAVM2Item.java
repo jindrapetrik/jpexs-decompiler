@@ -65,8 +65,8 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem, If
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}),
-                new AVM2Instruction(0, new NotIns(), new int[]{})
+                new AVM2Instruction(0, new StrictEqualsIns(), null),
+                new AVM2Instruction(0, new NotIns(), null)
         );
     }
 
