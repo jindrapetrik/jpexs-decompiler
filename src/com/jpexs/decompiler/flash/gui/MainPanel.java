@@ -602,17 +602,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             dumpTree.setModel(new DumpTreeModel(swfs));
 
             if (swf.isAS3) {
-                if (abcPanel == null) {
-                    abcPanel = new ABCPanel(this);
-                    displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
-                    detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
-                }
-                abcPanel.setSwf(swf);
-            } else {
-                if (actionPanel == null) {
-                    actionPanel = new ActionPanel(this);
-                    displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
-                }
+                getABCPanel().setSwf(swf);
             }
 
             expandSwfNodes();
@@ -648,6 +638,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    private ABCPanel getABCPanel() {
+        if (abcPanel == null) {
+            abcPanel = new ABCPanel(this);
+            displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
+            detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
+        }
+        return abcPanel;
+    }
+    
+    private ActionPanel getActionPanel() {
+        if (actionPanel == null) {
+            actionPanel = new ActionPanel(this);
+            displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+        }
+        return actionPanel;
+    }
+    
     private void updateUi(final SWF swf) {
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
@@ -657,7 +664,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         boolean hasAbc = !abcList.isEmpty();
 
         if (hasAbc) {
-            abcPanel.setSwf(swf);
+            getABCPanel().setSwf(swf);
         }
 
         if (isWelcomeScreen) {
@@ -914,8 +921,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void renameMultiname(List<ABCContainerTag> abcList, int multiNameIndex) {
         String oldName = "";
-        if (abcPanel.abc.constants.getMultiname(multiNameIndex).name_index > 0) {
-            oldName = abcPanel.abc.constants.getString(abcPanel.abc.constants.getMultiname(multiNameIndex).name_index);
+        if (getABCPanel().abc.constants.getMultiname(multiNameIndex).name_index > 0) {
+            oldName = getABCPanel().abc.constants.getString(getABCPanel().abc.constants.getMultiname(multiNameIndex).name_index);
         }
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
@@ -941,7 +948,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 updateClassesList();
                 reload(true);
-                abcPanel.hilightScript(abcPanel.swf, abcPanel.decompiledTextArea.getScriptLeaf().getPath().toString());
+                getABCPanel().hilightScript(getABCPanel().swf, getABCPanel().decompiledTextArea.getScriptLeaf().getPath().toString());
             }
         }
     }
@@ -1187,8 +1194,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (documentClass != null && !Configuration.dumpView.get()) {
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
-            abcPanel.setSwf(swf);
-            abcPanel.hilightScript(swf, documentClass);
+            getABCPanel().setSwf(swf);
+            getABCPanel().hilightScript(swf, documentClass);
         }
     }
 
@@ -1228,7 +1235,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     });
                                 }
                             } else {
-                                if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                if (getActionPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
                                     View.execInEventDispatch(new Runnable() {
                                         @Override
@@ -1322,7 +1329,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
         if (swf.fileAttributes != null && swf.fileAttributes.actionScript3) {
-            final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
+            final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCursor();
             final List<ABCContainerTag> abcList = swf.abcList;
             if (multiName > 0) {
                 new CancellableWorker() {
@@ -1343,7 +1350,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            final String identifier = actionPanel.getStringUnderCursor();
+            final String identifier = getActionPanel().getStringUnderCursor();
             if (identifier != null) {
                 new CancellableWorker() {
                     @Override
@@ -1720,15 +1727,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     int cnt = 0;
                     if (all) {
-                        for (ABCContainerTag tag : abcPanel.swf.abcList) {
+                        for (ABCContainerTag tag : getABCPanel().swf.abcList) {
                             tag.getABC().restoreControlFlow();
                         }
                     } else {
-                        int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                        int bi = getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                         if (bi != -1) {
-                            abcPanel.abc.bodies.get(bi).restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
+                            getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                         }
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
+                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait());
                     }
                     return true;
                 }
@@ -1742,7 +1749,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                         @Override
                         public void run() {
-                            abcPanel.reload();
+                            getABCPanel().reload();
                             updateClassesList();
                         }
                     });
@@ -1808,7 +1815,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     try {
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : abcPanel.swf.abcList) {
+                            for (ABCContainerTag tag : getABCPanel().swf.abcList) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
@@ -1819,19 +1826,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 }
                             }
                         } else {
-                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                            Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
+                            int bi = getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                            Trait t = getABCPanel().decompiledTextArea.getCurrentTrait();
                             if (bi != -1) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                    abcPanel.abc.bodies.get(bi).removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
+                                    getABCPanel().abc.bodies.get(bi).removeDeadCode(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    abcPanel.abc.bodies.get(bi).removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    getABCPanel().abc.bodies.get(bi).removeTraps(getABCPanel().abc.constants, getABCPanel().abc, t, getABCPanel().decompiledTextArea.getScriptLeaf().scriptIndex, getABCPanel().decompiledTextArea.getClassIndex(), getABCPanel().decompiledTextArea.getIsStatic(), ""/*FIXME*/);
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    abcPanel.abc.bodies.get(bi).removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                    abcPanel.abc.bodies.get(bi).restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
+                                    getABCPanel().abc.bodies.get(bi).removeTraps(getABCPanel().abc.constants, getABCPanel().abc, t, getABCPanel().decompiledTextArea.getScriptLeaf().scriptIndex, getABCPanel().decompiledTextArea.getClassIndex(), getABCPanel().decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                                 }
                             }
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
+                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t);
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
@@ -1849,7 +1856,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         @Override
                         public void run() {
                             clearCache();
-                            abcPanel.reload();
+                            getABCPanel().reload();
                             updateClassesList();
                         }
                     });
@@ -2257,13 +2264,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 break;
                             }
                         }
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
-                        abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                        abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
-                        abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
-                        abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                        abcPanel.decompiledTextArea.setNoTrait();
+                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.clear();
+                        getABCPanel().navigator.setABC(abcList, scriptLeaf.abc);
+                        getABCPanel().navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
+                        getABCPanel().setAbc(scriptLeaf.abc);
+                        getABCPanel().decompiledTextArea.setScript(scriptLeaf, abcList);
+                        getABCPanel().decompiledTextArea.setClassIndex(classIndex);
+                        getABCPanel().decompiledTextArea.setNoTrait();
                         return null;
                     }
 
@@ -2278,9 +2285,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 try {
                                     get();
                                 } catch (CancellationException ex) {
-                                    abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
+                                    getABCPanel().decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
                                 } catch (Exception ex) {
-                                    abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("decompilationError") + ": " + ex);
+                                    getABCPanel().decompiledTextArea.setText("//" + AppStrings.translate("decompilationError") + ": " + ex);
                                 }
                             }
                         });
@@ -2325,7 +2332,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             previewPanel.showBinaryPanel(binaryTag.binaryData);
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
-            actionPanel.setSource((ASMSource) tagObj, !forceReload);
+            getActionPanel().setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) tagObj;
             previewPanel.setImageReplaceButtonVisible(imageTag.importSupported());

@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -103,6 +105,9 @@ public class ABCInputStream implements AutoCloseable {
     private int readInternal() throws IOException {
         bytesRead++;
         int i = is.read();
+        if (i == -1) {
+            throw new EndOfStreamException();
+        }
         if (DEBUG_READ) {
             System.out.println("Read:0x" + Integer.toHexString(i));
         }

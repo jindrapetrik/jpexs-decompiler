@@ -983,7 +983,7 @@ public class SWFInputStream implements AutoCloseable {
                     dumpInfo.name = t.getName();
                 }
                 return t;
-            } catch (EndOfStreamException ex) {
+            } catch (Exception ex) {
                 tag.getDataStream().endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, null, ex);
                 return tag;

@@ -35,13 +35,12 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class AVM2Instruction implements Serializable, GraphSourceItem {
+public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
-    public static final long serialVersionUID = 1L;
     public InstructionDefinition definition;
     public int[] operands;
     public long offset;
@@ -359,5 +358,14 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     @Override
     public boolean isDeobfuscatePop() {
         return definition instanceof DeobfuscatePopIns;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        AVM2Instruction ret = (AVM2Instruction) super.clone();
+        if (operands != null) {
+            ret.operands = Arrays.copyOf(operands, operands.length);
+        }
+        return ret;
     }
 }

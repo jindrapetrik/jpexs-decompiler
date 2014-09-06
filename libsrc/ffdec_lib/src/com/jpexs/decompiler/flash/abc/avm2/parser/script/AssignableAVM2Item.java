@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -100,7 +101,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
      ret.add(ins(new KillIns(), register.getVal()));
      return ret;
      }*/
-    //@SuppressWarnings("unchecked")
+
     public static List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Reference<Integer> register : registers) {

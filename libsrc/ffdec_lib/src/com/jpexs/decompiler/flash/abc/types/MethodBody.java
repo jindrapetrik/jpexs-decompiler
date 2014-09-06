@@ -35,7 +35,6 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MethodBody implements Cloneable, Serializable {
+public class MethodBody implements Cloneable {
 
     public boolean deleted;
     boolean debugMode = false;
@@ -221,7 +220,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
-        MethodBody b = Helper.deepCopy(this);
+        MethodBody b = (MethodBody) clone();
         AVM2Code deobfuscated = b.getCode();
         deobfuscated.markMappedOffsets();
         if (Configuration.autoDeobfuscate.get()) {
@@ -237,18 +236,25 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        MethodBody ret = new MethodBody();
-        ret.code = code;
-        ret.codeBytes = codeBytes;
-        ret.exceptions = exceptions;
-        ret.max_regs = max_regs;
-        ret.max_scope_depth = max_scope_depth;
-        ret.max_stack = max_stack;
-        ret.method_info = method_info;
-        ret.init_scope_depth = init_scope_depth;
-        ret.traits = traits; //maybe deep clone
-        return ret;
+    public Object clone() {
+        try {
+            MethodBody ret = (MethodBody) super.clone();
+            if (code != null) {
+                ret.code = (AVM2Code) code.clone();
+            }
+            ret.codeBytes = codeBytes;
+            ret.exceptions = exceptions;
+            ret.max_regs = max_regs;
+            ret.max_scope_depth = max_scope_depth;
+            ret.max_stack = max_stack;
+            ret.method_info = method_info;
+            ret.init_scope_depth = init_scope_depth;
+            ret.traits = traits; //maybe deep clone
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public boolean autoFillStats(ABC abc, int initScope, boolean hasThis) {
