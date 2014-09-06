@@ -262,8 +262,9 @@ public class CommandLineArgumentParser {
         out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
         out.println(" " + (cnt++) + ") -zoom <N>");
         out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
-        out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<sctipName1>) <importDataFile1> [(<characterId2>|<sctipName2>) <importDataFile2>]...");
+        out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
         out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
+        out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
         out.println();
         out.println("Examples:");
         out.println("java -jar ffdec.jar myfile.swf");
