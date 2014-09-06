@@ -202,6 +202,11 @@ public class MethodBody implements Cloneable, Serializable {
             if (convertException == null) {
                 HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                 writer.startMethod(this.method_info);
+                if (Configuration.showMethodBodyId.get()) {
+                    writer.appendNoHilight("// method body id:");
+                    writer.appendNoHilight(abc.findBodyIndex(this.method_info));
+                    writer.newLine();
+                }
                 Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
                 writer.endMethod();
             } else if (convertException instanceof TimeoutException) {

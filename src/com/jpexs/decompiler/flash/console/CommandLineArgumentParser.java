@@ -1381,11 +1381,15 @@ public class CommandLineArgumentParser {
                                     if (Path.getExtension(repFile).equals(".as")) {
                                         replaceAS3(repText, pack);
                                     } else {
-                                        // todo: get Ids
-                                        int bodyIndex = 0;
-                                        int classIndex = 0;
-                                        int traitId = 0;
-                                        replaceAS3PCode(repText, pack.abc, bodyIndex, classIndex, traitId);
+                                        // todo: get traits
+                                        if (args.isEmpty()) {
+                                            badArguments();
+                                        }
+                                        int bodyIndex = Integer.parseInt(args.remove());
+                                        //int classIndex = 0;
+                                        //int traitId = 0;
+                                        Trait trait = null; //abc.findTraitByTraitId(classIndex, traitId);
+                                        replaceAS3PCode(repText, pack.abc, bodyIndex, trait);
                                     }
                                 }
                             }
@@ -1448,7 +1452,7 @@ public class CommandLineArgumentParser {
         src.setModified();
     }
 
-    private static void replaceAS3PCode(String text, ABC abc, int bodyIndex, int classIndex, int traitId) throws IOException, InterruptedException {
+    private static void replaceAS3PCode(String text, ABC abc, int bodyIndex, Trait trait) throws IOException, InterruptedException {
         System.out.println("Replace AS3 PCode");
         if (text.trim().startsWith("#hexdata")) {
             byte[] data = Helper.getBytesFromHexaText(text);
@@ -1456,7 +1460,6 @@ public class CommandLineArgumentParser {
             mb.codeBytes = data;
             mb.setCode(null);
         } else {
-            Trait trait = abc.findTraitByTraitId(classIndex, traitId);
             try {
                 AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants

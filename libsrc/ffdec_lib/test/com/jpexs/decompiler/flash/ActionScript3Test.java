@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -63,6 +64,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         Configuration.autoDeobfuscate.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
+        Configuration.showMethodBodyId.set(false);
     }
 
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
