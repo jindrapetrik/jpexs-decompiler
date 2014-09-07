@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -100,6 +101,11 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 int initMethod = abc.class_info.get(tc.class_info).cinit_index;
                 writer.startTrait(traitInitId);
                 writer.startMethod(initMethod);
+                if (Configuration.showMethodBodyId.get()) {
+                    writer.appendNoHilight("// method body id: ");
+                    writer.appendNoHilight(abc.findBodyIndex(initMethod));
+                    writer.newLine();
+                }
             }
             assignedValue.toString(writer, LocalData.create(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
             if (parent instanceof TraitClass) {

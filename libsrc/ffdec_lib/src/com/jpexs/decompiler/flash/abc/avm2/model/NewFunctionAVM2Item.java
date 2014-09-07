@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -64,6 +65,11 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.appendNoHilight("(");
         methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
+        if (Configuration.showMethodBodyId.get()) {
+            writer.appendNoHilight("// method body id: ");
+            writer.appendNoHilight(abc.findBodyIndex(methodIndex));
+            writer.newLine();
+        }
         methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
         writer.endMethod();
         writer.startBlock();
