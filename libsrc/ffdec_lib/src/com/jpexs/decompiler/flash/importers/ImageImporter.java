@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author JPEXS
  */
 public class ImageImporter extends TagImporter {
-    
+
     public Tag importImage(ImageTag it, byte[] newData) throws IOException {
         if (it instanceof DefineBitsTag) {
             SWF swf = it.getSwf();

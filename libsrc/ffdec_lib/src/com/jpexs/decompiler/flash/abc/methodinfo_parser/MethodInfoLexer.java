@@ -758,7 +758,8 @@ public final class MethodInfoLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
-     * @throws com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParseException
+     * @throws
+     * com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParseException
      */
     public ParsedSymbol yylex() throws java.io.IOException, MethodInfoParseException {
         int zzInput;

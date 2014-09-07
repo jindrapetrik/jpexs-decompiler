@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -22,67 +21,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *
  * NOT WORKING STUB!!! FIXME
  *
  * @author JPEXS
  */
 public class TweenDetector {
-       
-    
+
     public static List<TweenRange> detectRanges(List<MATRIX> matrices) {
         //TODO: make this working :-(
         return new ArrayList<>();
         /*
         
-        List<TweenRange> ret = new ArrayList<>();
-        double tolerance = 1;
-        int min = 3;
-        int startpos = 0;
-        Double last = null;
-        int i = min;
-        List<Double> translateX=new ArrayList<>();
-        List<Double> translateY=new ArrayList<>();
-        List<Double> scaleX=new ArrayList<>();
-        List<Double> scaleY=new ArrayList<>();
-        List<Double> rotateSkew0=new ArrayList<>();
-        List<Double> rotateSkew1=new ArrayList<>();
+         List<TweenRange> ret = new ArrayList<>();
+         double tolerance = 1;
+         int min = 3;
+         int startpos = 0;
+         Double last = null;
+         int i = min;
+         List<Double> translateX=new ArrayList<>();
+         List<Double> translateY=new ArrayList<>();
+         List<Double> scaleX=new ArrayList<>();
+         List<Double> scaleY=new ArrayList<>();
+         List<Double> rotateSkew0=new ArrayList<>();
+         List<Double> rotateSkew1=new ArrayList<>();
         
         
-        Set<MATRIX> ms=new HashSet<MATRIX>();
-        ms.addAll(matrices);
-        if(ms.size()==1){
-            return new ArrayList<>();
-        }
+         Set<MATRIX> ms=new HashSet<MATRIX>();
+         ms.addAll(matrices);
+         if(ms.size()==1){
+         return new ArrayList<>();
+         }
         
         
-        for(MATRIX n:matrices){
-            //...
-        }                       
+         for(MATRIX n:matrices){
+         //...
+         }                       
         
-        for (; startpos + i <= matrices.size() + 1; i++) {            
-            double errTranslateX = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(translateX, startpos, i);
-            double errTranslateY = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(translateY, startpos, i);
-            double errScaleX = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(scaleX, startpos, i);
-            double errScaleY = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(scaleY, startpos, i);
-            double errRotateSkew0 = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(rotateSkew0, startpos, i);
-            double errRotateSkew1 = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(rotateSkew1, startpos, i);
-            double err = startpos + i > matrices.size()?Double.MAX_VALUE:(errTranslateX/20+errTranslateY/20+0.1*errScaleX+0.1*errScaleY+errRotateSkew0/360+errRotateSkew1/360);
-            if (err > tolerance) {
-                if (last == null) {
-                    startpos++;
-                    i = min - 1;
-                    continue;
-                }
-                ret.add(new TweenRange(startpos, startpos+i-1-1));                
-                startpos = startpos + i -1;
-                i = min - 1;
-                last = null;
-                continue;
-            }
-            last = err;
-        }
-        return ret;*/
+         for (; startpos + i <= matrices.size() + 1; i++) {            
+         double errTranslateX = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(translateX, startpos, i);
+         double errTranslateY = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(translateY, startpos, i);
+         double errScaleX = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(scaleX, startpos, i);
+         double errScaleY = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(scaleY, startpos, i);
+         double errRotateSkew0 = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(rotateSkew0, startpos, i);
+         double errRotateSkew1 = startpos + i > matrices.size() ? Double.MAX_VALUE : getErrorLevel(rotateSkew1, startpos, i);
+         double err = startpos + i > matrices.size()?Double.MAX_VALUE:(errTranslateX/20+errTranslateY/20+0.1*errScaleX+0.1*errScaleY+errRotateSkew0/360+errRotateSkew1/360);
+         if (err > tolerance) {
+         if (last == null) {
+         startpos++;
+         i = min - 1;
+         continue;
+         }
+         ret.add(new TweenRange(startpos, startpos+i-1-1));                
+         startpos = startpos + i -1;
+         i = min - 1;
+         last = null;
+         continue;
+         }
+         last = err;
+         }
+         return ret;*/
     }
 
     private static double getErrorLevel(List<Double> yValues, int start, int len) {
@@ -96,7 +94,7 @@ public class TweenDetector {
             double ynew = a + b * (i - start);
             double ydelta = Math.abs(ynew - yorig);
             sumdelta += ydelta;
-            if(ydelta>maxdelta){
+            if (ydelta > maxdelta) {
                 maxdelta = ydelta;
             }
         }
@@ -106,7 +104,7 @@ public class TweenDetector {
     private static double[] calc(List<Double> yValues, int start, int len) {
         List<Double> xValues = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            xValues.add((double)i);
+            xValues.add((double) i);
         }
 
         yValues = yValues.subList(start, start + len);

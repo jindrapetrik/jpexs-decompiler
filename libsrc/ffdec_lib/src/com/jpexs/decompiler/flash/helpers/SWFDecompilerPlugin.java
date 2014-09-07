@@ -79,7 +79,7 @@ public class SWFDecompilerPlugin {
             logger.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static byte[] fireProxyFileCatched(byte[] data) {
         byte[] result = null;
         for (SWFDecompilerListener listener : listeners) {

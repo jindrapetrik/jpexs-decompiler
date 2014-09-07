@@ -221,6 +221,4 @@ public class MATRIX implements Serializable {
         return true;
     }
 
-    
-    
 }

@@ -76,11 +76,11 @@ public class MethodBody implements Cloneable {
         }
         return code;
     }
-    
+
     public void setCode(AVM2Code code) {
         this.code = code;
     }
-    
+
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {

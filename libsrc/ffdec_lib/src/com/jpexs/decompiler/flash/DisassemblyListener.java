@@ -23,6 +23,8 @@ package com.jpexs.decompiler.flash;
 public interface DisassemblyListener {
 
     public void progressReading(long pos, long total);
+
     public void progressToString(long pos, long total);
+
     public void progressDeobfuscating(long pos, long total);
 }

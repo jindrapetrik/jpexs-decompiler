@@ -1619,7 +1619,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
             mbody.method_info = abc.addMethodInfo(mi);
             mi.setBody(mbody);
-            List<AVM2Instruction> mbodyCode = toInsList(src); 
+            List<AVM2Instruction> mbodyCode = toInsList(src);
             mbody.setCode(new AVM2Code());
             mbody.getCode().code = mbodyCode;
 

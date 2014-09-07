@@ -572,7 +572,7 @@ public class ABC {
          System.out.println(""+t.toString());
          }
          System.exit(0);*/
-        
+
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
@@ -1178,7 +1178,7 @@ public class ABC {
         pack(); //removes old classes/methods
         ((Tag) parentTag).setModified(true);
     }
-    
+
     public void pack() {
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).deleted) {

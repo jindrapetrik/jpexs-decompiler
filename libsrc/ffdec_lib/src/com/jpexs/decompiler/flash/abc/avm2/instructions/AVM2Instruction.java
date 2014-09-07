@@ -95,7 +95,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(definition.instructionName);
-        if (operands !=  null) {
+        if (operands != null) {
             for (int i = 0; i < operands.length; i++) {
                 s.append(" ");
                 s.append(operands[i]);

@@ -58,7 +58,7 @@ public class Timeline {
     public RECT displayRect;
     public int frameRate;
     public List<Tag> tags;
-    public Map<Integer,Integer> depthMaxFrame = new HashMap<>();
+    public Map<Integer, Integer> depthMaxFrame = new HashMap<>();
 
     public int getMaxDepth() {
         int max_depth = 0;
@@ -191,10 +191,10 @@ public class Timeline {
             frames.add(frame);
         }
         detectTweens();
-        for(int d=1;d<=getMaxDepth();d++){
-            for(int f=frames.size()-1;f>=0;f--){
-                if(frames.get(f).layers.get(d) != null){
-                    depthMaxFrame.put(d, f+1);
+        for (int d = 1; d <= getMaxDepth(); d++) {
+            for (int f = frames.size() - 1; f >= 0; f--) {
+                if (frames.get(f).layers.get(d) != null) {
+                    depthMaxFrame.put(d, f + 1);
                     break;
                 }
             }
@@ -202,7 +202,7 @@ public class Timeline {
     }
 
     private boolean compare(int a, int b, int c, int tolerance) {
-        return Math.abs((b - a) - (c - b))<tolerance;
+        return Math.abs((b - a) - (c - b)) < tolerance;
     }
 
     private void detectTweens() {
@@ -210,29 +210,29 @@ public class Timeline {
             int characterId = -1;
             int len = 0;
             for (int f = 0; f <= frames.size(); f++) {
-                DepthState ds = f>=frames.size()?null:frames.get(f).layers.get(d);
-                
-                if(f<frames.size() && ds!=null && ds.characterId == characterId && ds.characterId!=-1){
+                DepthState ds = f >= frames.size() ? null : frames.get(f).layers.get(d);
+
+                if (f < frames.size() && ds != null && ds.characterId == characterId && ds.characterId != -1) {
                     len++;
-                }else{
-                    if(characterId!=-1){
-                        List<MATRIX> matrices=new ArrayList<>();
-                        for(int k=0;k<len;k++){
-                             matrices.add(frames.get(f-len+k).layers.get(d).matrix);
+                } else {
+                    if (characterId != -1) {
+                        List<MATRIX> matrices = new ArrayList<>();
+                        for (int k = 0; k < len; k++) {
+                            matrices.add(frames.get(f - len + k).layers.get(d).matrix);
                         }
-                        List<TweenRange> ranges=TweenDetector.detectRanges(matrices);
-                        for(TweenRange r:ranges){
-                            System.out.println(""+r);
-                            for(int t = r.startPosition;t<=r.endPosition;t++){
-                                frames.get(f-len+t).layers.get(d).motionTween = true;
-                                frames.get(f-len+t).layers.get(d).key = false;
+                        List<TweenRange> ranges = TweenDetector.detectRanges(matrices);
+                        for (TweenRange r : ranges) {
+                            System.out.println("" + r);
+                            for (int t = r.startPosition; t <= r.endPosition; t++) {
+                                frames.get(f - len + t).layers.get(d).motionTween = true;
+                                frames.get(f - len + t).layers.get(d).key = false;
                             }
                             frames.get(r.startPosition).layers.get(d).key = true;
                         }
                     }
                     len = 1;
                 }
-                characterId = ds==null?-1:ds.characterId;
+                characterId = ds == null ? -1 : ds.characterId;
             }
         }
     }

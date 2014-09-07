@@ -1317,7 +1317,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
                     String objectToReplace = args.remove();
-                    
+
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
                         int characterId = 0;
@@ -1395,13 +1395,13 @@ public class CommandLineArgumentParser {
                                 }
                             }
                         }
-                        
+
                         if (!found) {
                             System.err.println(objectToReplace + " is not reocginized as a CharacterId or a script name.");
                             System.exit(1);
                         }
                     }
-                    
+
                     if (args.isEmpty() || args.peek().startsWith("-")) {
                         break;
                     }
@@ -1468,17 +1468,17 @@ public class CommandLineArgumentParser {
                     public boolean missingString(String value) {
                         return true;
                     }
-                    
+
                     @Override
                     public boolean missingInt(long value) {
                         return true;
                     }
-                    
+
                     @Override
                     public boolean missingUInt(long value) {
                         return true;
                     }
-                    
+
                     @Override
                     public boolean missingDouble(double value) {
                         return true;
@@ -1498,7 +1498,7 @@ public class CommandLineArgumentParser {
         System.out.println("Replace AS3");
         System.out.println("Warning: This feature is EXPERIMENTAL");
         File swc = Configuration.getPlayerSWC();
-        if(swc == null) {
+        if (swc == null) {
             final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
             System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
             System.err.println(adobePage);
@@ -1517,7 +1517,7 @@ public class CommandLineArgumentParser {
             System.exit(1);
         }
     }
-    
+
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();

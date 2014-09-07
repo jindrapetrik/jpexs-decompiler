@@ -34,6 +34,6 @@ public interface SWFDecompilerListener {
     void actionListParsed(ActionList actions, SWF swf);
 
     void abcParsed(ABC abc, SWF swf);
-    
+
     void methodBodyParsed(MethodBody body, SWF swf);
 }

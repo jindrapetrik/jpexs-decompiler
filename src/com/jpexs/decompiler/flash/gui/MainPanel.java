@@ -646,7 +646,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return abcPanel;
     }
-    
+
     private ActionPanel getActionPanel() {
         if (actionPanel == null) {
             actionPanel = new ActionPanel(this);
@@ -654,7 +654,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return actionPanel;
     }
-    
+
     private void updateUi(final SWF swf) {
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));

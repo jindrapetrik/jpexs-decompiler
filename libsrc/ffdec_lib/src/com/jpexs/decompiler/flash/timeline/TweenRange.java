@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.timeline;
 
 /**
@@ -22,6 +21,7 @@ package com.jpexs.decompiler.flash.timeline;
  * @author JPEXS
  */
 public class TweenRange {
+
     public int startPosition;
     public int endPosition;
 
@@ -32,6 +32,6 @@ public class TweenRange {
 
     @Override
     public String toString() {
-        return "["+startPosition+"-"+endPosition+"]";
-    }            
+        return "[" + startPosition + "-" + endPosition + "]";
+    }
 }

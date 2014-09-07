@@ -854,7 +854,7 @@ public class AVM2Code implements Cloneable {
                 ais.endDumpLevelUntil(diParent);
             }
         }
-        
+
         code.addAll(codeMap.values());
     }
 

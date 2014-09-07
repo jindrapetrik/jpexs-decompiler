@@ -573,7 +573,7 @@ public final class SWF implements TreeItem, Timelined {
             assignClassesToSymbols();
             findFileAttributes();
             findABCTags();
-            
+
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
             boolean hasNonUnknownTag = false;
@@ -1188,7 +1188,7 @@ public final class SWF implements TreeItem, Timelined {
         getASMs("", list, asms);
         return asms;
     }
-    
+
     private static void getASMs(String path, List<TreeNode> nodes, Map<String, ASMSource> result) {
         for (TreeNode n : nodes) {
             String subPath = path + "/" + n.toString();
@@ -1206,7 +1206,7 @@ public final class SWF implements TreeItem, Timelined {
             getASMs(subPath, n.subNodes, result);
         }
     }
-    
+
     public static void getTagsFromTreeNodes(List<TreeNode> treeNodes, List<Tag> result) {
         for (TreeNode treeNode : treeNodes) {
             TreeItem treeItem = treeNode.getItem();
