@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -297,6 +298,7 @@ public class DefineFontTag extends FontTag {
             glyphShapeTable.set(pos, shp);
         }
 
+        setModified(true);
     }
 
     @Override
