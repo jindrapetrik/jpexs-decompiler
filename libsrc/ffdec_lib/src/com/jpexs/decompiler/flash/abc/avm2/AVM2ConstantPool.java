@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AVM2ConstantPool {
 
@@ -117,35 +119,75 @@ public class AVM2ConstantPool {
     }
 
     public long getInt(int index) {
-        return constant_int.get(index);
+        try {
+            return constant_int.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return 0;
     }
 
     public Namespace getNamespace(int index) {
-        return constant_namespace.get(index);
+        try {
+            return constant_namespace.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return null;
     }
 
     public NamespaceSet getNamespaceSet(int index) {
-        return constant_namespace_set.get(index);
+        try {
+            return constant_namespace_set.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return null;
     }
 
     public Multiname getMultiname(int index) {
-        return constant_multiname.get(index);
+        try {
+            return constant_multiname.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return null;
     }
 
     public long getUInt(int index) {
-        return constant_uint.get(index);
+        try {
+            return constant_uint.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return 0;
     }
 
     public double getDouble(int index) {
-        return constant_double.get(index);
+        try {
+            return constant_double.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return 0;
     }
 
     public Decimal getDecimal(int index) {
-        return constant_decimal.get(index);
+        try {
+            return constant_decimal.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return null;
     }
 
     public String getString(int index) {
-        return constant_string.get(index);
+        try {
+            return constant_string.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(AVM2ConstantPool.class.getName()).log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+        }
+        return null;
     }
 
     public int getIntCount() {

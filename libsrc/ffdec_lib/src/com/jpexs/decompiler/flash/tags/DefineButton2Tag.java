@@ -195,7 +195,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         return modified;
     }
 
-    private static final Cache<RECT> rectCache = Cache.getInstance(true);
+    private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true);
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {

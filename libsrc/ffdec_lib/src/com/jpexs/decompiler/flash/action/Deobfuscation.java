@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.helpers.Cache;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -254,7 +253,7 @@ public class Deobfuscation {
         return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
 
-    private static final Cache<String> nameCache = Cache.getInstance(false);
+    private static final Map<String, String> nameCache = new HashMap<>();
 
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
@@ -268,7 +267,7 @@ public class Deobfuscation {
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
             return s;
         }
-        if (nameCache.contains(s)) {
+        if (nameCache.containsKey(s)) {
             return nameCache.get(s);
         }
         if (isValidName(s, validExceptions)) {
@@ -281,7 +280,7 @@ public class Deobfuscation {
     }
 
     public static String printNamespace(String pkg, String... validNameExceptions) {
-        if (nameCache.contains(pkg)) {
+        if (nameCache.containsKey(pkg)) {
             return nameCache.get(pkg);
         }
         if (pkg.isEmpty()) {

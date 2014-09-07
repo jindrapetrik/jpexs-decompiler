@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -173,7 +174,12 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getMultiname(operands[i]).toString(constants, fullyQualifiedNames));
+                        Multiname multiname = constants.getMultiname(operands[i]);
+                        if (multiname != null) {
+                            s.append(multiname.toString(constants, fullyQualifiedNames));
+                        } else {
+                            s.append("Multiname not found.");
+                        }
                     }
                     /*s.append(" m[");
                      s.append(operands[i]);

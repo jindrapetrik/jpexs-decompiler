@@ -2203,7 +2203,7 @@ public final class SWF implements TreeItem, Timelined {
                 mat.translateX, mat.translateY);
     }
 
-    private static Cache<SerializableImage> frameCache = Cache.getInstance(false);
+    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false);
 
     public static SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {

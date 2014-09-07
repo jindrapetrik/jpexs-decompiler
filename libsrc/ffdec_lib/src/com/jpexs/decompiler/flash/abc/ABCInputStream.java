@@ -42,7 +42,6 @@ public class ABCInputStream implements AutoCloseable {
     private static final int CLASS_PROTECTED_NS = 8;
     private static final int ATTR_METADATA = 4;
     private final MemoryInputStream is;
-    private long bytesRead = 0;
     private ByteArrayOutputStream bufferOs = null;
     public static final boolean DEBUG_READ = false;
     public DumpInfo dumpInfo;
@@ -102,8 +101,15 @@ public class ABCInputStream implements AutoCloseable {
         }
     }
 
+    public void endDumpLevelUntil(DumpInfo di) {
+        if (di != null) {
+            while (dumpInfo != null && dumpInfo != di) {
+                endDumpLevel();
+            }
+        }
+    }
+
     private int readInternal() throws IOException {
-        bytesRead++;
         int i = is.read();
         if (i == -1) {
             throw new EndOfStreamException();
@@ -128,7 +134,6 @@ public class ABCInputStream implements AutoCloseable {
 
     private int read(byte[] b) throws IOException {
         int currBytesRead = is.read(b);
-        bytesRead += currBytesRead;
         if (DEBUG_READ) {
             StringBuilder sb = new StringBuilder("Read[");
             sb.append(currBytesRead);
@@ -478,7 +483,7 @@ public class ABCInputStream implements AutoCloseable {
      bytesRead=0;
      }*/
     public long getPosition() {
-        return bytesRead;
+        return is.getPos();
     }
 
     @Override

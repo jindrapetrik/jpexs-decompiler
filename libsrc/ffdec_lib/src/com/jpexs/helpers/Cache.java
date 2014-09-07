@@ -34,18 +34,19 @@ import java.util.logging.Logger;
 /**
  *
  * @author JPEXS
- * @param <E>
+ * @param <K>
+ * @param <V>
  */
-public class Cache<E> {
+public class Cache<K, V> {
 
-    private final Map<Object, File> cacheFiles;
-    private final Map<Object, E> cacheMemory;
+    private final Map<K, File> cacheFiles;
+    private final Map<K, V> cacheMemory;
     private static final List<Cache> instances = new ArrayList<>();
     public static final int STORAGE_FILES = 1;
     public static final int STORAGE_MEMORY = 2;
 
-    public static <E> Cache<E> getInstance(boolean weak) {
-        Cache<E> instance = new Cache<>(weak);
+    public static <K, V> Cache<K, V> getInstance(boolean weak) {
+        Cache<K, V> instance = new Cache<>(weak);
         instances.add(instance);
         return instance;
     }
@@ -89,7 +90,7 @@ public class Cache<E> {
         }
     }
 
-    public boolean contains(Object key) {
+    public boolean contains(K key) {
         if (storageType == STORAGE_FILES) {
             return cacheFiles.containsKey(key);
         } else if (storageType == STORAGE_MEMORY) {
@@ -106,7 +107,7 @@ public class Cache<E> {
         cacheFiles.clear();
     }
 
-    public void remove(Object key) {
+    public void remove(K key) {
         if (storageType == STORAGE_FILES) {
             if (cacheFiles.containsKey(key)) {
                 File f = cacheFiles.get(key);
@@ -121,7 +122,7 @@ public class Cache<E> {
 
     }
 
-    public E get(Object key) {
+    public V get(K key) {
         if (storageType == STORAGE_FILES) {
             if (!cacheFiles.containsKey(key)) {
                 return null;
@@ -130,7 +131,7 @@ public class Cache<E> {
             try (FileInputStream fis = new FileInputStream(f)) {
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 @SuppressWarnings("unchecked")
-                E item = (E) ois.readObject();
+                V item = (V) ois.readObject();
                 return item;
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
@@ -145,7 +146,7 @@ public class Cache<E> {
         return null;
     }
 
-    public void put(Object key, E value) {
+    public void put(K key, V value) {
         if (storageType == STORAGE_FILES) {
             File temp = null;
             try {
