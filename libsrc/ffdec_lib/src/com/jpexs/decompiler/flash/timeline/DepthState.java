@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -48,6 +49,7 @@ public class DepthState {
     private final SWF swf;
     public Frame frame;
     public long instanceId;
+    public boolean motionTween = false;
 
     private static AtomicLong lastInstanceId = new AtomicLong(0);
 

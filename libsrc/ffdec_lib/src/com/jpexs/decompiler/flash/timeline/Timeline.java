@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -39,7 +41,9 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -55,6 +59,7 @@ public class Timeline {
     public RECT displayRect;
     public int frameRate;
     public List<Tag> tags;
+    public Map<Integer,Integer> depthMaxFrame= new HashMap<Integer, Integer>();
 
     public int getMaxDepth() {
         int max_depth = 0;
@@ -185,6 +190,51 @@ public class Timeline {
         }
         if (tagAdded) {
             frames.add(frame);
+        }
+        detectTweens();
+        for(int d=1;d<=getMaxDepth();d++){
+            for(int f=frames.size()-1;f>=0;f--){
+                if(frames.get(f).layers.get(d) != null){
+                    depthMaxFrame.put(d, f+1);
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean compare(int a, int b, int c, int tolerance) {
+        return Math.abs((b - a) - (c - b))<tolerance;
+    }
+
+    private void detectTweens() {
+        for (int d = 1; d <= getMaxDepth(); d++) {
+            int characterId = -1;
+            int len = 0;
+            for (int f = 0; f <= frames.size(); f++) {
+                DepthState ds = f>=frames.size()?null:frames.get(f).layers.get(d);
+                
+                if(f<frames.size() && ds!=null && ds.characterId == characterId && ds.characterId!=-1){
+                    len++;
+                }else{
+                    if(characterId!=-1){
+                        List<MATRIX> matrices=new ArrayList<>();
+                        for(int k=0;k<len;k++){
+                             matrices.add(frames.get(f-len+k).layers.get(d).matrix);
+                        }
+                        List<TweenRange> ranges=TweenDetector.detectRanges(matrices);
+                        for(TweenRange r:ranges){
+                            System.out.println(""+r);
+                            for(int t = r.startPosition;t<=r.endPosition;t++){
+                                frames.get(f-len+t).layers.get(d).motionTween = true;
+                                frames.get(f-len+t).layers.get(d).key = false;
+                            }
+                            frames.get(r.startPosition).layers.get(d).key = true;
+                        }
+                    }
+                    len = 1;
+                }
+                characterId = ds==null?-1:ds.characterId;
+            }
         }
     }
 
