@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
@@ -177,4 +178,49 @@ public class MATRIX implements Serializable {
     public boolean isEmpty() {
         return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + this.getScaleX();
+        hash = 37 * hash + this.getScaleY();
+        hash = 37 * hash + this.getRotateSkew0();
+        hash = 37 * hash + this.getRotateSkew1();
+        hash = 37 * hash + this.translateX;
+        hash = 37 * hash + this.translateY;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MATRIX other = (MATRIX) obj;
+        if (this.getScaleX() != other.getScaleX()) {
+            return false;
+        }
+        if (this.getScaleY() != other.getScaleY()) {
+            return false;
+        }
+        if (this.getRotateSkew0() != other.getRotateSkew0()) {
+            return false;
+        }
+        if (this.getRotateSkew1() != other.getRotateSkew1()) {
+            return false;
+        }
+        if (this.translateX != other.translateX) {
+            return false;
+        }
+        if (this.translateY != other.translateY) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
 }

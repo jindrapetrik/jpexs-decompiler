@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.Color;
@@ -41,6 +43,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private final Timeline timeLine;
 
+    public static Color motionTweenColor = new Color(0x59, 0xfe, 0x7c);
+    public static Color shapeTweenColor = new Color(0xd1, 0xac, 0xf1);
     public static Color frameColor = new Color(0xbd, 0xd8, 0xfc);
     public static Color emptyFrameColor = Color.white;
     public static Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
@@ -127,9 +131,26 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         for (int f = start_f; f <= end_f; f++) {
             for (int d = start_d; d <= end_d; d++) {
                 DepthState fl = timeLine.frames.get(f).layers.get(d);
+                boolean motionTween = fl == null ? false : fl.motionTween;
+
                 DepthState flNext = null;
                 if (f < max_f) {
                     flNext = timeLine.frames.get(f + 1).layers.get(d);
+                }
+                DepthState flPrev = null;
+                if (f > 0) {
+                    flPrev = timeLine.frames.get(f - 1).layers.get(d);
+                }
+
+                CharacterTag cht = fl == null ? null : timeLine.swf.characters.get(fl.characterId);
+                boolean shapeTween = cht != null && (cht instanceof MorphShapeTag);
+                boolean motionTweenStart = (!motionTween) && (flNext != null && flNext.motionTween);
+                boolean motionTweenEnd = (!motionTween) && (flPrev != null && flPrev.motionTween);
+                //boolean shapeTweenStart = shapeTween && (flPrev == null || flPrev.characterId != fl.characterId);
+                //boolean shapeTweenEnd = shapeTween && (flNext == null || flNext.characterId != fl.characterId);
+
+                if (motionTweenStart || motionTweenEnd) {
+                    motionTween = true;
                 }
                 boolean selected = false;
                 if (cursor != null) {
@@ -138,13 +159,76 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     }
                 }
                 if (selected) {
-                    if (!(fl != null && (flNext == null || flNext.key))) {
+                    //if (!(fl != null && (flNext == null || flNext.key))) {
                         g.setColor(selectedColor);
                         g.fillRect(f * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
-                    }
+                    //}
                 }
 
                 if (fl == null) {
+
+                    if (timeLine.depthMaxFrame.containsKey(d) && f < timeLine.depthMaxFrame.get(d)) {
+                        int draw_f = f;
+                        
+                        DepthState prev_ds = f<1?null:timeLine.frames.get(f-1).layers.get(d);
+                        
+                        
+                        if (f==0 || prev_ds!=null) {
+                            draw_f = f;
+                            keyfound[d - start_d] = true;
+                        } else if (!keyfound[d - start_d]) {
+                            for (; draw_f >= 0; draw_f--) {
+                                if (timeLine.frames.get(draw_f).layers.get(d) != null) {
+                                    if (timeLine.frames.get(draw_f).layers.get(d).characterId != -1) {
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            continue;
+                        }
+                        int num_frames = 1;
+                        for (int i = draw_f + 1; i < timeLine.frames.size(); i++) {
+                            if (timeLine.frames.get(i).layers.get(d) != null) {
+                                if (timeLine.frames.get(i).layers.get(d).characterId != -1) {
+                                    break;
+                                }
+                            }
+                            num_frames++;
+                        }
+                        g.setColor(emptyFrameColor);
+                        g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+                        g.setColor(borderColor);
+                        g.drawRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+
+                        
+                        if (selected) {
+                            g.setColor(selectedColor);
+                            g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+                        }
+                        
+                        g.setColor(keyColor);
+                        g.drawOval(draw_f * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT * 3 / 4 - TimelinePanel.FRAME_WIDTH / 2 / 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_WIDTH / 2);
+                    
+                        
+                        if (num_frames > 1) {
+                            if (cursor != null && cursor.y == d && cursor.x == f + num_frames - 1) {
+                                g.setColor(selectedColor);
+                                g.fillRect((f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
+                            }
+
+                            g.setColor(stopColor);
+                            g.fillRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
+                            g.setColor(stopBorderColor);
+                            g.drawRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
+
+                            g.setColor(borderLinesColor);
+                            for (int n = draw_f + 1; n < draw_f + num_frames; n++) {
+                                g.drawLine(n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + 1, n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + borderLinesLength);
+                                g.drawLine(n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT - 1, n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT - borderLinesLength);
+                            }
+                        }
+                    }
 
                     if (d == 0) {
                         if (timeLine.frames.get(f).action != null) {
@@ -190,6 +274,15 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     g.setColor(frameColor);
                     g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
 
+                    if (motionTween) {
+                        g.setColor(motionTweenColor);
+                        g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+                    }
+                    if (shapeTween) {
+                        g.setColor(shapeTweenColor);
+                        g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+                    }
+
                     if (selected) {
                         g.setColor(selectedColor);
                         g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
@@ -197,18 +290,30 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                     g.setColor(borderColor);
                     g.drawRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
+                    //}
+                    if ((motionTween || shapeTween)) {
+                        g.drawLine(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT * 3 / 4,
+                                draw_f * TimelinePanel.FRAME_WIDTH + num_frames * TimelinePanel.FRAME_WIDTH - TimelinePanel.FRAME_WIDTH / 2, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT * 3 / 4
+                        );
+                    }
                     g.setColor(keyColor);
                     g.fillOval(draw_f * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT * 3 / 4 - TimelinePanel.FRAME_WIDTH / 2 / 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_WIDTH / 2);
+                    if ((motionTween || shapeTween)) {
+                        g.fillOval((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT * 3 / 4 - TimelinePanel.FRAME_WIDTH / 2 / 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_WIDTH / 2);
+                    }
+
                     if (num_frames > 1) {
                         if (cursor != null && cursor.y == d && cursor.x == f + num_frames - 1) {
                             g.setColor(selectedColor);
                             g.fillRect((f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
                         }
-                        g.setColor(stopColor);
-                        g.fillRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
-                        g.setColor(stopBorderColor);
-                        g.drawRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
 
+                        if (!(motionTween || shapeTween)) {
+                            g.setColor(stopColor);
+                            g.fillRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
+                            g.setColor(stopBorderColor);
+                            g.drawRect((draw_f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 4, d * TimelinePanel.FRAME_HEIGHT + TimelinePanel.FRAME_HEIGHT / 2 - 2, TimelinePanel.FRAME_WIDTH / 2, TimelinePanel.FRAME_HEIGHT / 2);
+                        }
                         g.setColor(borderLinesColor);
                         for (int n = draw_f + 1; n < draw_f + num_frames; n++) {
                             g.drawLine(n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + 1, n * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT + borderLinesLength);

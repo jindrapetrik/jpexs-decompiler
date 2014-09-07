@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -100,6 +101,22 @@ public class Matrix {
 
     public Point transform(Point point) {
         return transform(point.x, point.y);
+    }
+    
+    public Point deltaTransform(double x, double y){
+        Point result = new Point(
+                scaleX * x + rotateSkew1 * y,
+                rotateSkew0 * x + scaleY * y);
+        return result;
+    }
+    
+    public Point deltaTransform(Point point) {
+        return deltaTransform(point.x, point.y);
+    }
+    
+    public java.awt.Point deltaTransform(java.awt.Point point) {
+        Point p = deltaTransform(point.x, point.y);
+        return new java.awt.Point((int) p.x, (int) p.y);
     }
 
     public java.awt.Point transform(java.awt.Point point) {
@@ -227,5 +244,49 @@ public class Matrix {
     @Override
     public String toString() {
         return "[Matrix scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
+    }
+    
+    public Matrix inverse(Matrix m){
+       double a=m.scaleX;
+       double b=m.rotateSkew0;
+       double c=m.rotateSkew1;
+       double d=m.scaleY;
+       double tx=m.translateX;
+       double ty=m.translateY;
+       
+       double a2=d/(a*d-b*c);
+       double b2=-b/(a*d-b*c);
+       double c2=-c/(a*d-b*c);
+       double d2=a*(a*d-b*c);
+       double tx2=(c*ty-d*tx)/(a*d-b*c);
+       double ty2=-(a*ty-b*tx)/(a*d-b*c);
+       
+       Matrix ret=new Matrix();
+       ret.scaleX = a2;
+       ret.rotateSkew0 = b2;
+       ret.rotateSkew1 = c2;
+       ret.scaleY = d2;
+       ret.translateX = tx2;
+       ret.translateY = ty2;
+       return ret;       
+    }
+    
+    
+    public double getTotalSkewAngleX(){                
+        Point px = deltaTransform(new Point(0,1));
+        return ((180/Math.PI) * Math.atan2(px.y, px.x) - 90);
+    }
+    
+    public double getTotalSkewAngleY(){
+        Point py = deltaTransform(new Point(1,0));
+        return ((180/Math.PI) * Math.atan2(py.y, py.x));
+    }
+    
+    public double getTotalScaleX(){        
+        return Math.sqrt(scaleX * scaleX + rotateSkew0 * rotateSkew0);
+    }
+    
+    public double getTotalScaleY(){
+        return Math.sqrt(rotateSkew1 * rotateSkew1 + scaleY * scaleY);
     }
 }

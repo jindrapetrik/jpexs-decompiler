@@ -30,7 +30,10 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.TweenDetector;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -50,6 +53,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -877,7 +881,8 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-
+        
+        
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
             try {
