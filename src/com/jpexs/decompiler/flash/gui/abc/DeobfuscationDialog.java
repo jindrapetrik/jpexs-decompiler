@@ -64,12 +64,12 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
         //lab1.setBounds(30, 0, getWidth() - 60, 25);
         lab1.setAlignmentX(0.5f);
         cp.add(lab1);
-        Hashtable labelTable = new Hashtable();
-        //labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+        //labelTable.put(LEVEL_NONE, new JLabel("None"));
 
-        labelTable.put(new Integer(LEVEL_REMOVE_DEAD_CODE), new JLabel(translate("deobfuscation.removedeadcode")));
-        labelTable.put(new Integer(LEVEL_REMOVE_TRAPS), new JLabel(translate("deobfuscation.removetraps")));
-        labelTable.put(new Integer(LEVEL_RESTORE_CONTROL_FLOW), new JLabel(translate("deobfuscation.restorecontrolflow")));
+        labelTable.put(LEVEL_REMOVE_DEAD_CODE, new JLabel(translate("deobfuscation.removedeadcode")));
+        labelTable.put(LEVEL_REMOVE_TRAPS, new JLabel(translate("deobfuscation.removetraps")));
+        labelTable.put(LEVEL_RESTORE_CONTROL_FLOW, new JLabel(translate("deobfuscation.restorecontrolflow")));
         codeProcessingLevel.setLabelTable(labelTable);
 
         codeProcessingLevel.setPaintLabels(true);

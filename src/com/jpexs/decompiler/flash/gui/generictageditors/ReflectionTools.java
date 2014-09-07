@@ -124,13 +124,13 @@ public class ReflectionTools {
 
     public static Object newInstanceOf(Class cls) throws InstantiationException, IllegalAccessException {
         if (cls == Integer.class || cls == int.class) {
-            return new Integer(0);
+            return 0;
         } else if (cls == Float.class || cls == float.class) {
-            return new Float(0.0f);
+            return 0.0f;
         } else if (cls == Double.class || cls == double.class) {
-            return new Double(0);
+            return (double) 0;
         } else if (cls == Long.class || cls == long.class) {
-            return new Long(0L);
+            return 0L;
         }
         if (cls.isInterface()) {
             return null;

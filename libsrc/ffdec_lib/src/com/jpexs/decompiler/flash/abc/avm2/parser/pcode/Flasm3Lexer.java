@@ -3183,7 +3183,7 @@ public final class Flasm3Lexer {
                     yybegin(PARAMETERS);
                     // length also includes the trailing quote
                     if (isMultiname) {
-                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
+                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
                     } else {
                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                     }
@@ -3222,7 +3222,7 @@ public final class Flasm3Lexer {
                 case 140:
                     break;
                 case 10: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
                 }
                 case 141:
                     break;
@@ -3288,7 +3288,7 @@ public final class Flasm3Lexer {
                 case 152:
                     break;
                 case 29: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                 }
                 case 153:
                     break;

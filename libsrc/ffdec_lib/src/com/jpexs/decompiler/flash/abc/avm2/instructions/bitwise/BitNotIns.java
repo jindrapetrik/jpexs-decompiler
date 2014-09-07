@@ -39,7 +39,7 @@ public class BitNotIns extends InstructionDefinition {
     @Override
     public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
         Long value = (Long) lda.operandStack.pop();
-        Long ret = Long.valueOf(-value.longValue());
+        Long ret = -value;
         lda.operandStack.push(ret);
     }
 

@@ -42,7 +42,7 @@ public class ModuloIns extends InstructionDefinition {
         Object o2 = lda.operandStack.pop();
 
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-            Long ret = Long.valueOf(((Long) o2).longValue() % ((Long) o1).longValue());
+            Long ret = ((Long) o2) % ((Long) o1);
             lda.operandStack.push(ret);
         } else {
             throw new RuntimeException("Cannot modulo");

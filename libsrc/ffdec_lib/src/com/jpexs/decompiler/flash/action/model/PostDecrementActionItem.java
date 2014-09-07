@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -70,7 +71,7 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public GraphTargetItem getValue() {
-        return new SubtractActionItem(null, object, new DirectValueActionItem(null, 0, new Long(1), null));
+        return new SubtractActionItem(null, object, new DirectValueActionItem(null, 0, 1L, null));
     }
 
     @Override

@@ -42,7 +42,7 @@ public class IncLocalIIns extends InstructionDefinition {
         int regId = ins.operands[0];
         output.add(new IncLocalAVM2Item(ins, regId));
         if (localRegs.containsKey(regId)) {
-            localRegs.put(regId, new AddAVM2Item(ins, localRegs.get(regId), new IntegerValueAVM2Item(ins, Long.valueOf(1))));
+            localRegs.put(regId, new AddAVM2Item(ins, localRegs.get(regId), new IntegerValueAVM2Item(ins, 1L)));
         } else {
             //localRegs.put(regIndex, new AddAVM2Item(ins, null, new IntegerValueAVM2Item(ins, new Long(1))));
         }

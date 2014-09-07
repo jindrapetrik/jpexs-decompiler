@@ -40,10 +40,10 @@ public class DecrementIIns extends InstructionDefinition {
     public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
         Object obj = lda.operandStack.pop();
         if (obj instanceof Long) {
-            Long obj2 = ((Long) obj).longValue() - 1;
+            Long obj2 = ((Long) obj) - 1;
             lda.operandStack.push(obj2);
         } else if (obj instanceof Double) {
-            Double obj2 = ((Double) obj).doubleValue() - 1;
+            Double obj2 = ((Double) obj) - 1;
             lda.operandStack.push(obj2);
         }
         if (obj instanceof String) {

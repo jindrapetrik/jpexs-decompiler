@@ -909,7 +909,7 @@ public final class MethodInfoLexer {
                 case 39:
                     break;
                 case 3: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
                 }
                 case 40:
                     break;
@@ -967,7 +967,7 @@ public final class MethodInfoLexer {
                 case 35: {
                     String s = yytext();
                     long ns = Long.parseLong(s.substring(3, s.length() - 2));
-                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, new Long(ns));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, ns);
                 }
                 case 51:
                     break;
@@ -980,7 +980,7 @@ public final class MethodInfoLexer {
                     yybegin(YYINITIAL);
                     // length also includes the trailing quote
                     if (isMultiname) {
-                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
+                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
                     } else {
                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                     }
@@ -1015,7 +1015,7 @@ public final class MethodInfoLexer {
                 case 58:
                     break;
                 case 12: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                 }
                 case 59:
                     break;

@@ -41,16 +41,16 @@ public class AddIns extends InstructionDefinition {
         Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-            Long ret = Long.valueOf(((Long) o1).longValue() + ((Long) o2).longValue());
+            Long ret = ((Long) o1) + ((Long) o2);
             lda.operandStack.push(ret);
         } else if ((o1 instanceof Double) && ((o2 instanceof Double))) {
-            Double ret = Double.valueOf(((Double) o1).doubleValue() + ((Double) o2).doubleValue());
+            Double ret = ((Double) o1) + ((Double) o2);
             lda.operandStack.push(ret);
         } else if ((o1 instanceof Long) && ((o2 instanceof Double))) {
-            Double ret = new Double(((Long) o1).longValue() + ((Double) o2).doubleValue());
+            Double ret = ((Long) o1) + ((Double) o2);
             lda.operandStack.push(ret);
         } else if ((o1 instanceof Double) && ((o2 instanceof Long))) {
-            Double ret = new Double(((Double) o1).doubleValue() + ((Long) o2).longValue());
+            Double ret = ((Double) o1) + ((Long) o2);
             lda.operandStack.push(ret);
         } else {
             String s = o1.toString() + o2.toString();

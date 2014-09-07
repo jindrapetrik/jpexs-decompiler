@@ -154,7 +154,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 case AVM2Code.OPT_CASE_OFFSETS:
                     s.add(new Long(operands[i]));
                     for (int j = i + 1; j < operands.length; j++) {
-                        s.add(new Long(offset + operands[j]));
+                        s.add(offset + operands[j]);
                     }
                     break;
                 default:

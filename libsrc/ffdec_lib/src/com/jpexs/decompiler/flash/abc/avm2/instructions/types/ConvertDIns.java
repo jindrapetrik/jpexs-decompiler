@@ -44,21 +44,21 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
         if (value == null) {
             ret = 0;
         } else if (value instanceof Boolean) {
-            if (((Boolean) value).booleanValue()) {
+            if ((Boolean) value) {
                 ret = 1;
             } else {
                 ret = 0;
             }
         } else if (value instanceof Long) {
-            ret = ((Long) value).longValue();
+            ret = (Long) value;
         } else if (value instanceof Double) {
-            ret = ((Double) value).doubleValue();
+            ret = (Double) value;
         } else if (value instanceof String) {
             ret = Double.parseDouble((String) value);
         } else {
             ret = 1; //must call toPrimitive
         }
-        lda.operandStack.push(Double.valueOf(ret));
+        lda.operandStack.push(ret);
     }
 
     @Override

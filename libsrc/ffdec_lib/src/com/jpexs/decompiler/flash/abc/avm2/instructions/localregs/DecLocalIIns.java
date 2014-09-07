@@ -43,10 +43,10 @@ public class DecLocalIIns extends InstructionDefinition {
         int locRegIndex = (int) ((Long) arguments.get(0)).longValue();
         Object obj = lda.localRegisters.get(locRegIndex);
         if (obj instanceof Long) {
-            Long obj2 = ((Long) obj).longValue() - 1;
+            Long obj2 = ((Long) obj) - 1;
             lda.localRegisters.put(locRegIndex, obj2);
         } else if (obj instanceof Double) {
-            Double obj2 = ((Double) obj).doubleValue() - 1;
+            Double obj2 = ((Double) obj) - 1;
             lda.localRegisters.put(locRegIndex, obj2);
         }
         if (obj instanceof String) {
@@ -62,7 +62,7 @@ public class DecLocalIIns extends InstructionDefinition {
         int regId = ins.operands[0];
         output.add(new DecLocalAVM2Item(ins, regId));
         if (localRegs.containsKey(regId)) {
-            localRegs.put(regId, new SubtractAVM2Item(ins, localRegs.get(regId), new IntegerValueAVM2Item(ins, Long.valueOf(1))));
+            localRegs.put(regId, new SubtractAVM2Item(ins, localRegs.get(regId), new IntegerValueAVM2Item(ins, 1L)));
         } else {
             //localRegs.put(regIndex, new SubtractAVM2Item(ins, new IntegerValueAVM2Item(ins, new Long(0)), new IntegerValueAVM2Item(ins, new Long(1))));
         }

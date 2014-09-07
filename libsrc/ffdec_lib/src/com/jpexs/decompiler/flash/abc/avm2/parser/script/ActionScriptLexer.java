@@ -1383,7 +1383,7 @@ public final class ActionScriptLexer {
                 case 172:
                     break;
                 case 13: {
-                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong((yytext())));
                 }
                 case 173:
                     break;
@@ -1603,7 +1603,7 @@ public final class ActionScriptLexer {
                 case 209:
                     break;
                 case 50: {
-                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new Double(Double.parseDouble((yytext()))));
+                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext())));
                 }
                 case 210:
                     break;
@@ -1670,7 +1670,7 @@ public final class ActionScriptLexer {
                 case 222:
                     break;
                 case 63: {
-                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext(), 8)));
+                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext(), 8));
                 }
                 case 223:
                     break;
@@ -1899,7 +1899,7 @@ public final class ActionScriptLexer {
                 case 260:
                     break;
                 case 101: {
-                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext().substring(2), 16)));
+                    return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext().substring(2), 16));
                 }
                 case 261:
                     break;

@@ -743,7 +743,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 globImp.addAll(impList);
                 constr.addAll(typeToActions(globImp, null));
             }
-            constr.add(new ActionPush(new Long(implementsStr.size())));
+            constr.add(new ActionPush((long) implementsStr.size()));
             constr.addAll(typeToActions(globalClassTypeStr, null));
             constr.add(new ActionImplementsOp());
         }

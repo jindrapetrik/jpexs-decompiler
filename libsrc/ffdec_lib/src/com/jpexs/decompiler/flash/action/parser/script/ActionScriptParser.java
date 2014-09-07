@@ -857,7 +857,7 @@ public class ActionScriptParser {
                     lockCenter = (expression(registerVars, inFunction, inMethod, true, variables));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        constrain = new DirectValueActionItem(null, 0, new Long(1), new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, 1L, new ArrayList<String>());
                         x1 = (expression(registerVars, inFunction, inMethod, true, variables));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
@@ -870,28 +870,28 @@ public class ActionScriptParser {
                                     y2 = (expression(registerVars, inFunction, inMethod, true, variables));
                                 } else {
                                     lexer.pushback(s);
-                                    y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                                    y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
                                 }
                             } else {
                                 lexer.pushback(s);
-                                x2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
-                                y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                                x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                                y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
                             }
                         } else {
                             lexer.pushback(s);
-                            x2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
-                            y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
-                            y1 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                            x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                            y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                            y1 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
 
                         }
                     } else {
                         lexer.pushback(s);
-                        constrain = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
                         //ret.add(new ActionPush(Boolean.FALSE));
                     }
                 } else {
-                    lockCenter = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
-                    constrain = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
+                    lockCenter = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                    constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
                     lexer.pushback(s);
                 }
                 expectedType(SymbolType.PARENT_CLOSE);

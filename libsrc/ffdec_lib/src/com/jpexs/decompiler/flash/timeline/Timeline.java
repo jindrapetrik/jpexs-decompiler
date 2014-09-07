@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -59,7 +58,7 @@ public class Timeline {
     public RECT displayRect;
     public int frameRate;
     public List<Tag> tags;
-    public Map<Integer,Integer> depthMaxFrame= new HashMap<Integer, Integer>();
+    public Map<Integer,Integer> depthMaxFrame = new HashMap<>();
 
     public int getMaxDepth() {
         int max_depth = 0;
