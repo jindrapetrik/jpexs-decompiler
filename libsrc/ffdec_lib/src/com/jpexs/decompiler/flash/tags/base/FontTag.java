@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -166,29 +167,33 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public void shiftGlyphIndices(int fontId, int startIndex) {
-        List<TEXTRECORD> textRecords = new ArrayList<>();
         for (Tag t : swf.tags) {
+            List<TEXTRECORD> textRecords = null;
             if (t instanceof DefineTextTag) {
-                textRecords.addAll(((DefineTextTag) t).textRecords);
+                textRecords = ((DefineTextTag) t).textRecords;
+            } else if (t instanceof DefineText2Tag) {
+                textRecords = ((DefineText2Tag) t).textRecords;
             }
-            if (t instanceof DefineText2Tag) {
-                textRecords.addAll(((DefineText2Tag) t).textRecords);
-            }
-        }
-        int curFontId = 0;
-        for (TEXTRECORD tr : textRecords) {
-            if (tr.styleFlagsHasFont) {
-                curFontId = tr.fontId;
-            }
-            if (curFontId != fontId) {
-                continue;
-            }
-            for (GLYPHENTRY en : tr.glyphEntries) {
-                if (en == null) { //Currently edited
-                    continue;
-                }
-                if (en.glyphIndex >= startIndex) {
-                    en.glyphIndex++;
+            
+            if (textRecords != null) {
+                int curFontId = 0;
+                for (TEXTRECORD tr : textRecords) {
+                    if (tr.styleFlagsHasFont) {
+                        curFontId = tr.fontId;
+                    }
+                    if (curFontId != fontId) {
+                        continue;
+                    }
+                    for (GLYPHENTRY en : tr.glyphEntries) {
+                        if (en == null) { //Currently edited
+                            continue;
+                        }
+                        if (en.glyphIndex >= startIndex) {
+                            en.glyphIndex++;
+                        }
+                    }
+                    
+                    t.setModified(true);
                 }
             }
         }
