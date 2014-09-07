@@ -59,7 +59,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private final ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
-    private final Cache<CachedDecompilation> cache = Cache.getInstance(true);
+    private final Cache<ScriptPack, CachedDecompilation> cache = Cache.getInstance(true);
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
 
