@@ -246,25 +246,27 @@ public class Matrix {
         return "[Matrix scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
     }
 
-    public Matrix inverse(Matrix m) {
-        double a = m.scaleX;
-        double b = m.rotateSkew0;
-        double c = m.rotateSkew1;
-        double d = m.scaleY;
-        double tx = m.translateX;
-        double ty = m.translateY;
+    public Matrix inverse() {
+        double a = scaleX;
+        double b = rotateSkew1;
+        double tx = translateX;
+        double c = rotateSkew0;
+        double d = scaleY;
+        double ty = translateY;
 
-        double a2 = d / (a * d - b * c);
-        double b2 = -b / (a * d - b * c);
-        double c2 = -c / (a * d - b * c);
-        double d2 = a * (a * d - b * c);
-        double tx2 = (c * ty - d * tx) / (a * d - b * c);
-        double ty2 = -(a * ty - b * tx) / (a * d - b * c);
+        double det = a * d - b * c;
+
+        double a2 = d / det;
+        double b2 = -b / det;
+        double tx2 = (b * ty - tx * d) / det;
+        double c2 = -c / det;
+        double d2 = a / det;
+        double ty2 = (tx * c - a * ty) / det;
 
         Matrix ret = new Matrix();
         ret.scaleX = a2;
-        ret.rotateSkew0 = b2;
-        ret.rotateSkew1 = c2;
+        ret.rotateSkew0 = c2;
+        ret.rotateSkew1 = b2;
         ret.scaleY = d2;
         ret.translateX = tx2;
         ret.translateY = ty2;
