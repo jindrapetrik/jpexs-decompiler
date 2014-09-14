@@ -77,7 +77,7 @@ public class Namespace {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        return getName(constants); //getPrefix(constants)+" "+getName(constants);
+        return getName(constants,false);
     }
 
     public String getNameWithKind(AVM2ConstantPool constants) {
@@ -97,18 +97,14 @@ public class Namespace {
         return kindStr;
     }
 
-    public String getName(AVM2ConstantPool constants) {
+    public String getName(AVM2ConstantPool constants, boolean raw) {
         if (name_index == 0) {
             return null;
         }
-        return Deobfuscation.printNamespace(constants.getString(name_index));
-    }
-
-    public boolean hasName(AVM2ConstantPool constants, String name) {
-        if (name == null) {
-            return name_index == 0;
+        if(raw){
+            return constants.getString(name_index);
         }
-        return name.equals(getName(constants));
+        return Deobfuscation.printNamespace(constants.getString(name_index));
     }
 
     public boolean hasName(String name, AVM2ConstantPool constants) {

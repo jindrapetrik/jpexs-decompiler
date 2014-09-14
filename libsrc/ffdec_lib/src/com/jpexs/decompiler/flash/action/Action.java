@@ -103,11 +103,13 @@ public class Action implements GraphSourceItem {
     private long address;
 
     public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
-        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
-        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in"};
+        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else",
+        "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
+        "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
+        "return", "super", "switch", "this", "throw",/*to*/ "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+        "with",
+        //syntactic keywords - can be used as identifiers, but that have special meaning in certain contexts
+        "each", "get", "set", "namespace", "#include", "include", "dynamic", "final", "native", "override", "static", "in"};
 
     public static boolean isReservedWord(String s) {
         if (s == null) {

@@ -91,7 +91,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (name.isEmpty()) {
             name = "*";
         }
-        String newimport = ns.getName(abc.constants);
+        String newimport = ns.getName(abc.constants,false);
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
@@ -163,7 +163,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (name.isEmpty()) {
             name = "*";
         }
-        String newimport = ns.getName(abc.constants);
+        String newimport = ns.getName(abc.constants,false);
         if (parseUsagesFromNS(abcTags, abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -321,7 +321,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     private List<String> getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
-        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
+        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants,false); //assume not null name
 
         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).name_index), packageName, fullyQualifiedNames);
 
@@ -360,7 +360,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         writer.startClass(class_info);
-        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
+        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants,false); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {

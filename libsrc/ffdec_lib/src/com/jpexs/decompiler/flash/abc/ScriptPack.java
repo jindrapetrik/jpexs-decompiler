@@ -74,7 +74,7 @@ public class ScriptPack implements TreeElementItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                packageName = ns.getName(abc.constants); //assume not null
+                packageName = ns.getName(abc.constants,false); //assume not null
             }
         }
         return packageName;
