@@ -647,11 +647,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return abcPanel;
     }
 
-    private ActionPanel getActionPanel() {
+    private void ensureActionPanel(){
         if (actionPanel == null) {
             actionPanel = new ActionPanel(this);
             displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
         }
+    }
+    
+    private ActionPanel getActionPanel() {
+        ensureActionPanel();
         return actionPanel;
     }
 
@@ -2331,6 +2335,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDPREVIEWPANEL);
             previewPanel.showBinaryPanel(binaryTag.binaryData);
         } else if (tagObj instanceof ASMSource) {
+            ensureActionPanel();
             showCard(CARDACTIONSCRIPTPANEL);
             getActionPanel().setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
