@@ -87,6 +87,7 @@ import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TryActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.WithActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.AndActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.BitAndActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.BitOrActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.BitXorActionItem;
@@ -101,6 +102,7 @@ import com.jpexs.decompiler.flash.action.model.operations.LtActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.ModuloActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.MultiplyActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.OrActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.RShiftActionItem;
@@ -1306,6 +1308,12 @@ public class ActionScriptParser {
                 break;
             case OR:
                 ret = new OrItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                break;
+            case FULLAND:
+                ret = new AndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                break;
+            case FULLOR:
+                ret = new OrActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;
             case MINUS:
                 ret = new SubtractActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
