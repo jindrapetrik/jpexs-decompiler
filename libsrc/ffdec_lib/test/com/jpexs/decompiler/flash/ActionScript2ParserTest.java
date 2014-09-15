@@ -16,13 +16,9 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.CompilationException;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
@@ -38,14 +34,12 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(false);
-        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
     private void parseAS2(String script) {
-        DoActionTag asm = getFirstActionTag();
         try {
             ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
-            asm.setActions(par.actionsFromString(script));
+            par.actionsFromString(script);
         } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script);
         }

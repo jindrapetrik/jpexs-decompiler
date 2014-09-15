@@ -17,19 +17,26 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -46,6 +53,180 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
+    
+    private String recompile(String str) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException{
+        ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
+        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        List<Action> actions = par.actionsFromString(str);        
+        byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
+        ActionList list = ActionListReader.readActionListTimeout(new ArrayList<DisassemblyListener>(), new SWFInputStream(swf,hex), SWF.DEFAULT_VERSION, 0, hex.length, "");                                    
+        Action.actionsToSource(getFirstActionTag(), list,"", writer);
+        return writer.toString();        
+    }
+    
+    
+    
+    @DataProvider(name = "provideBasicTrueExpressions")
+    public Object[][] provideBasicTrueExpressions() {
+        return new Object[][]{
+            {"1!=5"},{"5==5"},{"1<4"},{"5>4"},{"5*6==30"}
+        };
+    }
+    
+    @DataProvider(name = "provideBasicFalseExpressions")
+    public Object[][] provideBasicFalseExpressions() {
+        return new Object[][]{
+            {"1==5"},{"5!=5"},{"1>4"},{"5<4"},{"5*7==12"}
+        };
+    }
+    
+    /*
+    //TODO: use this to make better deobfuscator:
+    
+    
+    
+    @Test(dataProvider = "provideBasicTrueExpressions")
+    public void testRemoveBasicTrueExpressions(String expression) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException{
+        String res = recompile("if("+expression+"){"+
+                    "trace(\"OK\");"+
+                "} else {"+
+                    "trace(\"FAIL\");"+
+                "}");
+        if(res.contains("\"FAIL\"")){
+            fail("OnFalse clause was not removed:"+res);
+        }
+        if(!res.contains("\"OK\"")){
+            fail("OnTrue clause was removed:"+res);
+        }
+    }
+    
+    @Test(dataProvider = "provideBasicFalseExpressions")
+    public void testRemoveBasicFalseExpressions(String expression) throws Exception {
+        String res = recompile("if("+expression+"){"+
+                    "trace(\"FAIL\");"+
+                "} else {"+
+                    "trace(\"OK\");"+
+                "}");
+        if(res.contains("\"FAIL\"")){
+            fail("OnTrue clause was not removed:"+res);
+        }
+        if(!res.contains("\"OK\"")){
+            fail("OnFalse clause was removed:"+res);
+        }
+    }
+    
+    
+    @Test
+    public void testRemoveKnownVariables() throws Exception{
+        String res = recompile("var a = true; var b = false;"
+                + "if(a){"
+                    + "trace(\"OK1\");"
+                + "}else{"
+                    + "trace(\"FAIL1\");"
+                + "}"
+                + "if(b){"
+                    + "trace(\"FAIL2\");"
+                + "}else{"
+                    + "trace(\"OK2\");"
+                + "}");
+        if(!res.contains("\"OK1\"")){
+            fail("if true OnTrue removed");
+        }
+        if(!res.contains("\"OK2\"")){
+            fail("if false OnFalse removed");
+        }
+        if(res.contains("\"FAIL1\"")){
+            fail("if true OnFalse not removed");
+        }
+        if(res.contains("\"FAIL2\"")){
+            fail("if false OnTrue not removed");
+        }
+        if(res.contains("var ")){
+            fail("variables for obsucation not removed");
+        }
+        if(res.contains("if")){
+            fail("if clauses not removed");
+        }
+    }
+    
+    @Test
+    public void testNotRemoveParams() throws Exception {
+        String res = recompile("function tst(p1,p2){"
+                + "var a = 2;"
+                + "var b = 3 * a;"
+                + "if(b>1){"
+                    + "trace(\"OK1\");"
+                + "}else{"
+                +    "trace(\"FAIL1\");"
+                + "}"
+                + "var c = p1*5;"
+                + "if(c){"
+                    + "trace(\"OK2\");"
+                + "}else{"
+                    + "trace(\"OK3\");"
+                + "}"
+                + "}");
+        if(!res.contains("\"OK1\"")){
+            fail("basic if true onTrue removed");
+        }
+        if(res.contains("\"FAIL1\"")){
+            fail("basic if true onFalse not removed");
+        }
+        if(!res.contains("\"OK2\"")){
+            fail("if parameter onTrue removed");
+        }
+        if(!res.contains("\"OK3\"")){
+            fail("if parameter onFalse removed");
+        }
+    }
+    
+    @Test
+    public void testEvailExpressionAfterWhile() throws Exception {
+        String res = "var a = 5;"
+                + "while(true){"
+                    + "if(a==73){"
+                        + "a = 15;"
+                    + "}"
+                    + "if(a==1){"
+                        + "trace(\"FAIL1\");"
+                    + "}"
+                    + "if(a==5){"
+                        + "a=50;"
+                    + "}"
+                    + "if(a == 201){"
+                        + "break;"
+                    + "}"                
+                    + "a++;"
+                    + "if(a == 53){"
+                        + "a = a + 20;"
+                    + "}"
+                    + "if(a>500){"
+                        + "trace(\"FAIL2\");"
+                    + "}"
+                    + "if(a==16){"
+                        + "a = 200;"
+                    + "}"
+                + "}"
+                + ""
+                + "if(a == 201){"
+                    + "trace(\"OK\");"
+                + "}else{"
+                    + "trace(\"FAIL3\");"
+                + "}";
+        if(res.contains("\"FAIL1\"")){
+            fail("unreachable if onTrue not removed");
+        }
+        if(res.contains("\"FAIL2\"")){
+            fail("unreachable if onTrue 2 not removed");
+        }
+        if(res.contains("\"FAIL3\"")){
+            fail("unreachable if onTrue 3 not removed");
+        }
+        if(!res.contains("\"OK\"")){
+            fail("reachable of onTrue removed");
+        }
+    }
+    //*/
     @Test
     public void testRemoveJumpsToTheNextAction() {
         String actionsString = "ConstantPool \"a\" \"b\" \"c\"\n"
