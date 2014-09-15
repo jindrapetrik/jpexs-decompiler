@@ -23,7 +23,10 @@ import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -57,6 +60,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +83,10 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
+import jsyntaxpane.actions.ActionUtils;
 
 public class ActionPanel extends JPanel implements ActionListener, SearchListener<ActionSearchResult> {
 
@@ -141,41 +149,68 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
     public String getStringUnderCursor() {
         int pos = decompiledEditor.getCaretPosition();
-        Highlighting h = Highlighting.search(decompiledHilights, pos);
-        if (h != null) {
-            List<Action> list = lastCode;
-            Action lastIns = null;
-            int inspos = 0;
-            Action selIns = null;
-            for (Action ins : list) {
-                if (h.getPropertyLong("offset") == ins.getOffset()) {
-                    selIns = ins;
-                    break;
-                }
-                if (ins.getOffset() > h.getPropertyLong("offset")) {
-                    inspos = (int) (h.getPropertyLong("offset") - lastIns.getAddress());
-                    selIns = lastIns;
-                    break;
-                }
-                lastIns = ins;
-            }
-            if (selIns != null) {
-                if (selIns instanceof ActionPush) {
-                    ActionPush ap = (ActionPush) selIns;
-                    Object var = ap.values.get(inspos - 1);
-                    String identifier = null;
-                    if (var instanceof String) {
-                        identifier = (String) var;
-                    }
-                    if (var instanceof ConstantIndex) {
-                        identifier = ap.constantPool.get(((ConstantIndex) var).index);
-                    }
-                    return identifier;
-                }
-            }
 
+        SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(decompiledEditor);
+        if (sDoc != null) {
+            Token t = sDoc.getTokenAt(pos);
+            String ident=null;
+            //It should be identifier or obfuscated identifier
+            if (t != null && (t.type == TokenType.IDENTIFIER || t.type == TokenType.REGEX)) {                
+                CharSequence tData = t.getText(sDoc);
+                ident=tData.toString();
+                //We need to get unescaped identifier, so we use our Lexer
+                ActionScriptLexer lex=new ActionScriptLexer(new StringReader(ident));
+                try {
+                    ParsedSymbol symb=lex.lex();
+                    if(symb.type==SymbolType.IDENTIFIER){
+                        ident = (String)symb.value;
+                    }else{
+                        ident = null;
+                    }
+                } catch (IOException | ActionParseException ex) {
+                    ident=null;
+                }                   
+            } 
+            if(ident==null){
+                Highlighting h = Highlighting.search(decompiledHilights, pos);
+                if (h != null) {
+                    List<Action> list = lastCode;
+                    Action lastIns = null;
+                    int inspos = 0;
+                    Action selIns = null;
+                    for (Action ins : list) {
+                        if (h.getPropertyLong("offset") == ins.getOffset()) {
+                            selIns = ins;
+                            break;
+                        }
+                        if (ins.getOffset() > h.getPropertyLong("offset")) {
+                            inspos = (int) (h.getPropertyLong("offset") - lastIns.getAddress());
+                            selIns = lastIns;
+                            break;
+                        }
+                        lastIns = ins;
+                    }
+                    if (selIns != null) {
+                        if (selIns instanceof ActionPush) {
+                            ActionPush ap = (ActionPush) selIns;
+                            Object var = ap.values.get(inspos - 1);
+                            String identifier = null;
+                            if (var instanceof String) {
+                                identifier = (String) var;
+                            }
+                            if (var instanceof ConstantIndex) {
+                                identifier = ap.constantPool.get(((ConstantIndex) var).index);
+                            }
+                            return identifier;
+                        }
+                    }
+
+                }
+            }else{
+                return ident;
+            }
         }
-        return null;
+        return null;           
     }
 
     private CachedScript getCached(ASMSource pack) {
