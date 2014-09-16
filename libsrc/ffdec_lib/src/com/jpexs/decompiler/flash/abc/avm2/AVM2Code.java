@@ -1207,15 +1207,15 @@ public class AVM2Code implements Cloneable {
     private List<Integer> ignoredIns;
     boolean isCatched = false;
 
+    /**
+     * Test for killed register. CalcKilledStats must be called before
+     * @param regName
+     * @param start
+     * @param end
+     * @return 
+     */
     public boolean isKilled(int regName, int start, int end) {
-        for (int k = start; k <= end; k++) {
-            if (code.get(k).definition instanceof KillIns) {
-                if (code.get(k).operands[0] == regName) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return killedRegs.contains(regName);
     }
     private int toSourceCount = 0;
 
@@ -1231,8 +1231,27 @@ public class AVM2Code implements Cloneable {
         return localRegNames;
     }
 
-    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
-        for (int i = 0; i < output.size(); i++) {
+    private Set<Integer> killedRegs=new HashSet<Integer>();
+    
+    public void calcKilledStats(MethodBody body){
+        try {
+            HashMap<Integer,List<Integer>> vis=visitCode(body);
+            for(int k=0;k<code.size();k++){
+                if(vis.get(k).isEmpty()){
+                    continue;
+                }
+                if (code.get(k).definition instanceof KillIns) {
+                    killedRegs.add(code.get(k).operands[0]);
+                }
+            }
+            
+        } catch (InterruptedException ex) {
+            //ignored
+        }
+    }
+    
+    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {        
+         for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
                     SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);
@@ -1275,6 +1294,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
+        calcKilledStats(body);
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
