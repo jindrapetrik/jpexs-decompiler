@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="ffdec">
+    <property file="nbproject/nbjdk.properties"/>
+    <property location="${netbeans.user}/build.properties" name="user.properties.file"/>
+    <property file="${user.properties.file}"/>
+    <import file="jdk.xml"/>
+    <target depends="-jdk-init" name="build">
+        <ant inheritall="false" target="build"/>
+    </target>
+    <target depends="-jdk-init" name="clean">
+        <ant inheritall="false" target="clean"/>
+    </target>
+    <target depends="-jdk-init" name="javadoc">
+        <ant inheritall="false" target="javadoc"/>
+    </target>
+    <target depends="-jdk-init" name="run">
+        <ant inheritall="false" target="run"/>
+    </target>
+    <target depends="-jdk-init" name="test">
+        <ant inheritall="false" target="test"/>
+    </target>
+    <target depends="-jdk-init" name="profile-nb">
+        <ant antfile="nbproject/ide-targets.xml" inheritall="false" target="profile-nb"/>
+    </target>
+    <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="debug-nb">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="debug-nb"/>
+    </target>
+    <target depends="-jdk-init" name="run-selected-file-in-src">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="run-selected-file-in-src"/>
+    </target>
+    <target depends="-jdk-init" name="run-selected-file-in-test">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="run-selected-file-in-test"/>
+    </target>
+    <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="debug-selected-file-in-test">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="debug-selected-file-in-test"/>
+    </target>
+</project>

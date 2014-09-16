@@ -33,37 +33,49 @@
                     <location>libsrc/ffdec_lib/src</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
+                <source-folder>
+                    <label>libsrc\ffdec_lib\test</label>
+                    <type>java</type>
+                    <location>libsrc/ffdec_lib/test</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
             </folders>
             <ide-actions>
                 <action name="build">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>build</target>
                 </action>
                 <action name="clean">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>clean</target>
                 </action>
                 <action name="javadoc">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>javadoc</target>
                 </action>
                 <action name="run">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>run</target>
                 </action>
                 <action name="test">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>test</target>
                 </action>
                 <action name="rebuild">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>clean</target>
                     <target>build</target>
                 </action>
                 <action name="profile">
-                    <script>nbproject/ide-targets.xml</script>
+                    <script>nbproject/nbjdk.xml</script>
                     <target>profile-nb</target>
                 </action>
                 <action name="debug">
-                    <script>nbproject/ide-file-targets.xml</script>
+                    <script>nbproject/nbjdk.xml</script>
                     <target>debug-nb</target>
                 </action>
                 <action name="run.single">
-                    <script>nbproject/ide-file-targets.xml</script>
+                    <script>nbproject/nbjdk.xml</script>
                     <target>run-selected-file-in-src</target>
                     <context>
                         <property>run.class</property>
@@ -76,7 +88,7 @@
                     </context>
                 </action>
                 <action name="run.single">
-                    <script>nbproject/ide-file-targets.xml</script>
+                    <script>nbproject/nbjdk.xml</script>
                     <target>run-selected-file-in-test</target>
                     <context>
                         <property>run.class</property>
@@ -89,7 +101,7 @@
                     </context>
                 </action>
                 <action name="debug.single">
-                    <script>nbproject/ide-file-targets.xml</script>
+                    <script>nbproject/nbjdk.xml</script>
                     <target>debug-selected-file-in-test</target>
                     <context>
                         <property>debug.class</property>
@@ -141,6 +153,10 @@
                         <label>libsrc\ffdec_lib\src</label>
                         <location>libsrc/ffdec_lib/src</location>
                     </source-folder>
+                    <source-folder style="packages">
+                        <label>libsrc\ffdec_lib\test</label>
+                        <location>libsrc/ffdec_lib/test</location>
+                    </source-folder>
                     <source-file>
                         <location>build.xml</location>
                     </source-file>
@@ -182,6 +198,12 @@
             </compilation-unit>
             <compilation-unit>
                 <package-root>libsrc/ffdec_lib/src</package-root>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>libsrc/ffdec_lib/test</package-root>
+                <unit-tests/>
+                <classpath mode="compile">lib/ffdec_lib.jar;libsrc/ffdec_lib/src;libsrc/ffdec_lib/testlib/emma.jar;libsrc/ffdec_lib/testlib/emma_ant.jar;libsrc/ffdec_lib/testlib/testng-6.8.jar</classpath>
                 <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>
