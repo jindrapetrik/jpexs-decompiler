@@ -1214,8 +1214,16 @@ public class AVM2Code implements Cloneable {
      * @param end
      * @return 
      */
-    public boolean isKilled(int regName, int start, int end) {
-        return killedRegs.contains(regName);
+    public boolean isKilled(int regName, int start, int end) {   
+        if(!killedRegs.containsKey(regName)){
+            return false;
+        }
+        for(int ip:killedRegs.get(regName)){
+            if(ip>=start && ip<=end){
+                return true;
+            }
+        }
+        return false;
     }
     private int toSourceCount = 0;
 
@@ -1231,9 +1239,10 @@ public class AVM2Code implements Cloneable {
         return localRegNames;
     }
 
-    private Set<Integer> killedRegs=new HashSet<Integer>();
+    private Map<Integer,Set<Integer>> killedRegs=new HashMap<Integer,Set<Integer>>();
     
     public void calcKilledStats(MethodBody body){
+        killedRegs.clear();
         try {
             HashMap<Integer,List<Integer>> vis=visitCode(body);
             for(int k=0;k<code.size();k++){
@@ -1241,7 +1250,11 @@ public class AVM2Code implements Cloneable {
                     continue;
                 }
                 if (code.get(k).definition instanceof KillIns) {
-                    killedRegs.add(code.get(k).operands[0]);
+                    int regid = code.get(k).operands[0];
+                    if(!killedRegs.containsKey(regid)){
+                        killedRegs.put(regid, new HashSet<Integer>());
+                    }
+                    killedRegs.get(regid).add(k);
                 }
             }
             
@@ -1250,7 +1263,7 @@ public class AVM2Code implements Cloneable {
         }
     }
     
-    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {        
+    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
          for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
