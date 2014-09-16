@@ -231,8 +231,9 @@ public class Main {
 
         InputStream inputStream = sourceInfo.getInputStream();
         SWFBundle bundle = null;
+        FileInputStream fis = null;
         if (inputStream == null) {
-            inputStream = new BufferedInputStream(new FileInputStream(sourceInfo.getFile()));
+            inputStream = new BufferedInputStream(fis = new FileInputStream(sourceInfo.getFile()));
             bundle = sourceInfo.getBundle(false, SearchMode.ALL);
             logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
         } else if (inputStream instanceof SeekableInputStream
@@ -274,9 +275,9 @@ public class Main {
             result.add(swf);
         }
 
-        if (inputStream instanceof FileInputStream) {
+        if (fis != null) {
             logger.log(Level.INFO, "File loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
-            inputStream.close();
+            fis.close();
         } else {
             logger.log(Level.INFO, "Stream loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
         }
