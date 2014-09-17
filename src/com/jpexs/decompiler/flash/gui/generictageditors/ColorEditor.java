@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -29,12 +30,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.border.BevelBorder;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 /**
  *
@@ -160,9 +168,63 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         return field;
     }
 
+    private static Color noTransparencyColorChooser(Component component, String title, Color initialColor) throws Exception {
+        final JColorChooser pane = new JColorChooser(initialColor != null
+                ? initialColor : Color.white);
+
+        AbstractColorChooserPanel[] colorPanels = pane.getChooserPanels();
+        for (int i = 1; i < colorPanels.length; i++) {
+            AbstractColorChooserPanel cp = colorPanels[i];
+
+            Field f = cp.getClass().getDeclaredField("panel");
+            f.setAccessible(true);
+
+            Object colorPanel = f.get(cp);
+            Field f2 = colorPanel.getClass().getDeclaredField("spinners");
+            f2.setAccessible(true);
+            Object spinners = f2.get(colorPanel);
+
+            Object transpSlispinner = Array.get(spinners, 3);
+            if (i == colorPanels.length - 1) {
+                transpSlispinner = Array.get(spinners, 4);
+            }
+            Field f3 = transpSlispinner.getClass().getDeclaredField("slider");
+            f3.setAccessible(true);
+            JSlider slider = (JSlider) f3.get(transpSlispinner);
+            slider.setEnabled(false);
+            Field f4 = transpSlispinner.getClass().getDeclaredField("spinner");
+            f4.setAccessible(true);
+            JSpinner spinner = (JSpinner) f4.get(transpSlispinner);
+            spinner.setEnabled(false);
+        }
+        final Color[] col = new Color[]{initialColor};
+
+        JDialog dialog = JColorChooser.createDialog(component, title, true, pane, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                col[0] = pane.getColor();
+            }
+        }, null);
+
+        dialog.setVisible(true);
+        return col[0];
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), color);
+
+        Color newColor = null;
+        if (colorType == COLOR_TYPE_RGB) {
+            try {
+                newColor = noTransparencyColorChooser(null, AppStrings.translate("dialog.selectcolor.title"), color);
+            } catch (Exception ex) {
+                newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), color);
+            }
+        } else {
+            newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), color);
+        }
         if (newColor != null) {
             color = newColor;
             buttonChange.setBackground(color);
