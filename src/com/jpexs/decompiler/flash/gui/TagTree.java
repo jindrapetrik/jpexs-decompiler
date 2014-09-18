@@ -66,8 +66,10 @@ import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -77,6 +79,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -104,6 +107,7 @@ public class TagTree extends JTree implements ActionListener {
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
+    private static final String ACTION_OPEN_SWFINSIDE = "OPENSWFINSIDE";
 
     private final MainPanel mainPanel;
 
@@ -334,6 +338,11 @@ public class TagTree extends JTree implements ActionListener {
         final JMenu moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
         contextPopupMenu.add(moveTagMenu);
 
+        final JMenuItem openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
+        contextPopupMenu.add(openSWFInsideTagMenuItem);
+        openSWFInsideTagMenuItem.setActionCommand(ACTION_OPEN_SWFINSIDE);
+        openSWFInsideTagMenuItem.addActionListener(this);
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -364,6 +373,7 @@ public class TagTree extends JTree implements ActionListener {
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
+                    openSWFInsideTagMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
                         TreeNode treeNode = (TreeNode) paths[0].getLastPathComponent();
@@ -376,6 +386,19 @@ public class TagTree extends JTree implements ActionListener {
 
                         if (item instanceof DefineBinaryDataTag) {
                             replaceSelectionMenuItem.setVisible(true);
+                            DefineBinaryDataTag bin = (DefineBinaryDataTag) item;
+                            if (bin.binaryData.length > 8) {
+                                String signature = new String(bin.binaryData, 0, 3, Utf8Helper.charset);
+                                if (Arrays.asList(
+                                        "FWS", //Uncompressed Flash
+                                        "CWS", //ZLib compressed Flash
+                                        "ZWS", //LZMA compressed Flash
+                                        "GFX", //Uncompressed ScaleForm GFx
+                                        "CFX" //Compressed ScaleForm GFx
+                                ).contains(signature)) {
+                                    openSWFInsideTagMenuItem.setVisible(true);
+                                }
+                            }
                         }
 
                         if (item instanceof DefineSoundTag) {
@@ -429,23 +452,32 @@ public class TagTree extends JTree implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case ACTION_OPEN_SWFINSIDE:
+                Object itemo = getLastSelectedPathComponent();
+                if (itemo == null) {
+                    return;
+                }
+                if (itemo instanceof TagNode) {
+                    mainPanel.loadFromBinaryTag((TagNode) itemo);
+                }
+                break;
             case ACTION_RAW_EDIT: {
-                TreeItem item = getCurrentTreeItem();
-                if (item == null) {
+                TreeItem itemr = getCurrentTreeItem();
+                if (itemr == null) {
                     return;
                 }
 
-                mainPanel.showGenericTag((Tag) item);
+                mainPanel.showGenericTag((Tag) itemr);
             }
             break;
             case ACTION_JUMP_TO_CHARACTER: {
-                TreeItem item = getCurrentTreeItem();
-                if (item == null || !(item instanceof CharacterIdTag)) {
+                TreeItem itemj = getCurrentTreeItem();
+                if (itemj == null || !(itemj instanceof CharacterIdTag)) {
                     return;
                 }
 
-                CharacterIdTag characterIdTag = (CharacterIdTag) item;
-                mainPanel.setTagTreeSelectedNode(item.getSwf().characters.get(characterIdTag.getCharacterId()));
+                CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
+                mainPanel.setTagTreeSelectedNode(itemj.getSwf().characters.get(characterIdTag.getCharacterId()));
             }
             break;
             case ACTION_EXPAND_RECURSIVE: {

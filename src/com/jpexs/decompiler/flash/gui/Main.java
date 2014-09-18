@@ -78,6 +78,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -183,7 +184,7 @@ public class Main {
     }
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
-        working = true;
+        working = true;       
         View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
@@ -507,8 +508,8 @@ public class Main {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                if (Main.loadingDialog == null) {
-                    Main.loadingDialog = new LoadingDialog();
+                if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {                   
+                    Main.loadingDialog = new LoadingDialog(mainFrame==null?null:mainFrame.getWindow());
                 }
             }
         });

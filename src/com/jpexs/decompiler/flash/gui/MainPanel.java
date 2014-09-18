@@ -134,6 +134,7 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -163,6 +164,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -647,13 +649,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return abcPanel;
     }
 
-    private void ensureActionPanel(){
+    private void ensureActionPanel() {
         if (actionPanel == null) {
             actionPanel = new ActionPanel(this);
             displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
         }
     }
-    
+
     private ActionPanel getActionPanel() {
         ensureActionPanel();
         return actionPanel;
@@ -2221,6 +2223,40 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showCard(CARDDUMPVIEW);
     }
 
+    public void loadFromBinaryTag(final TagNode node) {
+        
+        if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {                   
+                    Main.loadingDialog = new LoadingDialog(mainFrame==null?null:mainFrame.getWindow());
+        }
+        Main.loadingDialog.setVisible(true);
+        Main.startWork(AppStrings.translate("work.reading.swf") + "...");                
+        new Thread(){
+
+            @Override
+            public void run() {                
+                try {            
+                    SWF bswf = new SWF(new ByteArrayInputStream(((DefineBinaryDataTag)node.getItem()).binaryData),new ProgressListener() {
+
+                        @Override
+                        public void progress(int p) {
+                            Main.loadingDialog.setPercent(p);                            
+                        }
+                    }, Configuration.parallelSpeedUp.get());
+                    bswf.fileTitle = "(SWF Data)";
+                    SWFNode snode = ((TagTreeModel) tagTree.getModel()).createSwfNode(bswf);
+                    snode.binaryData = (DefineBinaryDataTag) node.getItem();
+                    node.subNodes.add(snode);            
+                } catch (IOException | InterruptedException ex) {
+                    //ignore
+                }
+                Main.loadingDialog.setVisible(false);
+                Main.stopWork();
+            }
+            
+        }.start();
+        
+    }
+
     public void reload(boolean forceReload) {
         if (Configuration.dumpView.get()) {
             dumpViewReload(forceReload);
@@ -2333,7 +2369,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (tagObj instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) tagObj;
             showCard(CARDPREVIEWPANEL);
-            previewPanel.showBinaryPanel(binaryTag.binaryData);
+            previewPanel.showBinaryPanel(binaryTag.binaryData, (TagNode) treeNode);
         } else if (tagObj instanceof ASMSource) {
             ensureActionPanel();
             showCard(CARDACTIONSCRIPTPANEL);

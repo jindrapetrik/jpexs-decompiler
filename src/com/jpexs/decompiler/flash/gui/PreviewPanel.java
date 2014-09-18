@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -318,7 +319,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     private JPanel createBinaryCard() {
         JPanel binaryCard = new JPanel(new BorderLayout());
-        binaryPanel = new BinaryPanel();
+        binaryPanel = new BinaryPanel(mainPanel);
         binaryCard.add(binaryPanel, BorderLayout.CENTER);
         binaryCard.add(createBinaryButtonsPanel(), BorderLayout.SOUTH);
         return binaryCard;
@@ -424,14 +425,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     public void clear() {
         imagePanel.stop();
-        binaryPanel.setBinaryData(null);
+        binaryPanel.setBinaryData(null,null);
         genericTagPanel.clear();
         fontPanel.clear();
     }
 
-    public void showBinaryPanel(byte[] data) {
+    public void showBinaryPanel(byte[] data,TagNode node) {
         showCardLeft(BINARY_TAG_CARD);
-        binaryPanel.setBinaryData(data);
+        binaryPanel.setBinaryData(data,node);
         parametersPanel.setVisible(false);
     }
 

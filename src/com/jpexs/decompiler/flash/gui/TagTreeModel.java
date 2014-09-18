@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -92,7 +94,7 @@ public class TagTreeModel implements TreeModel {
         }
     }
 
-    private SWFNode createSwfNode(SWF swf) {
+    public SWFNode createSwfNode(SWF swf) {
         ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
         SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
         swfNode.list = createTagList(swf.tags, swf, swfNode, classTreeModel);
@@ -157,19 +159,7 @@ public class TagTreeModel implements TreeModel {
                     break;
                 case BINARY_DATA:
                     TagNode bt;
-                    binaryData.add(bt = new TagNode(t));
-
-                    DefineBinaryDataTag b = (DefineBinaryDataTag) t;
-
-                    try {
-                        SWF bswf = new SWF(new ByteArrayInputStream(b.binaryData), Configuration.parallelSpeedUp.get());
-                        bswf.fileTitle = "(SWF Data)";
-                        SWFNode snode = createSwfNode(bswf);
-                        snode.binaryData = b;
-                        bt.subNodes.add(snode);
-                    } catch (IOException | InterruptedException ex) {
-                        //ignore
-                    }
+                    binaryData.add(bt = new TagNode(t));                                                            
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {
