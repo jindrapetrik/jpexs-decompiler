@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -170,12 +172,16 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         return streamSoundType;
     }
 
-    public static void populateSoundStreamBlocks(List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
+    public static void populateSoundStreamBlocks(int containerId,List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
         boolean found = false;
         for (ContainerItem t : tags) {
             if (t == head) {
                 found = true;
+                ((SoundStreamHeadTypeTag)head).setVirtualCharacterId(containerId);
                 continue;
+            }
+            if (t instanceof Container) {
+                populateSoundStreamBlocks(((CharacterIdTag)t).getCharacterId(),((Container) t).getSubItems(), head, output);
             }
             if (!found) {
                 continue;
@@ -186,16 +192,13 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
             if (t instanceof SoundStreamHeadTypeTag) {
                 break;
             }
-            if (t instanceof Container) {
-                populateSoundStreamBlocks(((Container) t).getSubItems(), head, output);
-            }
         }
     }
 
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
         List<SoundStreamBlockTag> ret = new ArrayList<>();
-        populateSoundStreamBlocks(swf.tags, this, ret);
+        populateSoundStreamBlocks(0,swf.tags, this, ret);
         return ret;
 
     }
@@ -211,21 +214,17 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
     }
 
     @Override
-    public byte[] getRawSoundData() {
+    public List<byte[]> getRawSoundData() {
+        List<byte[]> ret = new ArrayList<byte[]>();
         List<SoundStreamBlockTag> blocks = getBlocks();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            for (SoundStreamBlockTag block : blocks) {
-                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                    baos.write(block.streamSoundData, 4, block.streamSoundData.length - 4);
-                } else {
-                    baos.write(block.streamSoundData);
-                }
+        for (SoundStreamBlockTag block : blocks) {
+            if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+                ret.add(Arrays.copyOfRange(block.streamSoundData, 4, block.streamSoundData.length));
+            } else {
+                ret.add(block.streamSoundData);
             }
-        } catch (IOException ex) {
-            return null;
         }
-        return baos.toByteArray();
+        return ret;
     }
 
     @Override

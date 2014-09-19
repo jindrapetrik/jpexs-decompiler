@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -20,6 +21,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -161,10 +163,12 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(SWFInputStream sis, OutputStream os) {
+    public boolean createWav(List<SWFInputStream> siss, OutputStream os) {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(sis, baos);
+        for(SWFInputStream sis:siss){
+            decode(sis, baos);
+        }
         try {
             createWavFromPcmData(os, samplingRate, true, stereo, baos.toByteArray());
             return true;

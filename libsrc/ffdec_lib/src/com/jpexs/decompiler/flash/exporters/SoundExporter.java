@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -118,12 +119,18 @@ public class SoundExporter {
         int nativeFormat = fmt.getNativeExportFormat();
 
         if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
-            fos.write(st.getRawSoundData());
+            List<byte[]> datas=st.getRawSoundData();
+            for(byte[] data:datas){
+                fos.write(data);
+            }
         } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
             if (st instanceof DefineSoundTag) {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
-                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
+                List<byte[]> datas=st.getRawSoundData();
+                for(byte[] data:datas){
+                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
+                }
             } else if (st instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) st;
                 FLVOutputStream flv = new FLVOutputStream(fos);
@@ -140,9 +147,13 @@ public class SoundExporter {
                 }
             }
         } else {
-            byte[] soundData = st.getRawSoundData();
+            List<byte[]> soundData = st.getRawSoundData();
             SWF swf = ((Tag) st).getSwf();
-            fmt.createWav(new SWFInputStream(swf, soundData), fos);
+            List<SWFInputStream> siss=new ArrayList<>();
+            for(byte[] data:soundData){
+                siss.add(new SWFInputStream(swf, data));
+            }
+            fmt.createWav(siss, fos);
         }
     }
 

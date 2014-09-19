@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -180,7 +182,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
         List<SoundStreamBlockTag> ret = new ArrayList<>();
-        SoundStreamHeadTag.populateSoundStreamBlocks(swf.tags, this, ret);
+        SoundStreamHeadTag.populateSoundStreamBlocks(0,swf.tags, this, ret);
         return ret;
 
     }
@@ -196,21 +198,17 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
     }
 
     @Override
-    public byte[] getRawSoundData() {
+    public List<byte[]> getRawSoundData() {
+        List<byte[]> ret = new ArrayList<byte[]>();
         List<SoundStreamBlockTag> blocks = getBlocks();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            for (SoundStreamBlockTag block : blocks) {
-                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                    baos.write(block.streamSoundData, 4, block.streamSoundData.length - 4);
-                } else {
-                    baos.write(block.streamSoundData);
-                }
+        for (SoundStreamBlockTag block : blocks) {
+            if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+                ret.add(Arrays.copyOfRange(block.streamSoundData, 4, block.streamSoundData.length));
+            } else {
+                ret.add(block.streamSoundData);
             }
-        } catch (IOException ex) {
-            return null;
         }
-        return baos.toByteArray();
+        return ret;
     }
 
     @Override

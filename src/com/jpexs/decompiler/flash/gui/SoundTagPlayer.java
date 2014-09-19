@@ -70,9 +70,13 @@ public class SoundTagPlayer implements MediaDisplay {
         this.tag = tag;
         this.loops = loops;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] soundData = tag.getRawSoundData();
+        List<byte[]> soundData = tag.getRawSoundData();
         SWF swf = ((Tag) tag).getSwf();
-        tag.getSoundFormat().createWav(new SWFInputStream(swf, soundData), baos);
+        List<SWFInputStream> siss=new ArrayList<>();
+        for(byte[] data:soundData){
+            siss.add(new SWFInputStream(swf,data));
+        }
+        tag.getSoundFormat().createWav(siss, baos);
         player = new SoundPlayer(new ByteArrayInputStream(baos.toByteArray()));
     }
 

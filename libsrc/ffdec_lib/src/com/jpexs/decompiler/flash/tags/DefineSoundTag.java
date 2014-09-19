@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -32,7 +33,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -303,11 +306,14 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     }
 
     @Override
-    public byte[] getRawSoundData() {
+    public List<byte[]> getRawSoundData() {
+        List<byte[]> ret=new ArrayList<byte[]>();
         if (soundFormat == SoundFormat.FORMAT_MP3) {
-            return Arrays.copyOfRange(soundData, 2, soundData.length);
+            ret.add(Arrays.copyOfRange(soundData, 2, soundData.length));
+            return ret;
         }
-        return soundData;
+        ret.add(soundData);
+        return ret;
     }
 
     @Override

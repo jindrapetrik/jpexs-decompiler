@@ -106,6 +106,17 @@ public class TagTreeModel implements TreeModel {
         return mainFrame.translate(key);
     }
 
+    
+    private List<TreeNode> getSoundStreams(DefineSpriteTag sprite){
+        List<TreeNode> ret=new ArrayList<>();
+        for(Tag t:sprite.subTags){
+            if(t instanceof SoundStreamHeadTypeTag){
+                ret.add(new TagNode(t));
+            }
+        }
+        return ret;
+    }
+    
     private List<TreeNode> createTagList(List<Tag> list, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
         boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
 
@@ -138,6 +149,7 @@ public class TagTreeModel implements TreeModel {
                     break;
                 case SPRITE:
                     sprites.add(new TagNode(t));
+                    sounds.addAll(getSoundStreams((DefineSpriteTag)t));
                     break;
                 case BUTTON:
                     buttons.add(new TagNode(t));

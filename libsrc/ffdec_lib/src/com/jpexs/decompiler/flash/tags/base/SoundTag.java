@@ -12,11 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  *
@@ -34,7 +36,7 @@ public interface SoundTag {
 
     public boolean getSoundType();
 
-    public byte[] getRawSoundData();
+    public List<byte[]> getRawSoundData();
 
     public int getSoundFormatId();
 
