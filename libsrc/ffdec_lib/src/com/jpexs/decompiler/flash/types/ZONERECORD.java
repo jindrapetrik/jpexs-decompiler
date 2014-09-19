@@ -12,14 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import java.io.Serializable;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
+ * Represents Zone record
  *
  * @author JPEXS
  */
