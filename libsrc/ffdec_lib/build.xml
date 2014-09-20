@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="FFDec Library" basedir="." default="build">
-    <description>Builds project FFDec Library</description>    
+    <description>Builds project FFDec Library</description>  
+    <!--
+    TODO: Figure out how to make versioning which (not) depends(?) on GUI
+    -->  
     <property name="VERSION" value="1.0.0" />
     <property name="VERSIONNUMBER" value="1.0.0" />
     <property name="BUILDER" value="jpexs" />

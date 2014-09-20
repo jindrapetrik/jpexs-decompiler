@@ -121,6 +121,11 @@
         </exec>
     </target>
     
+    <target name="library" depends="build_lib">
+        <mkdir dir="${RELEASESDIR}"/>
+        <copy file="${CORELIBPATH}" tofile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_lib.jar"/>
+    </target>
+    
     <target name="archive" depends="dist">
         <mkdir dir="${RELEASESDIR}"/>
         <zip destfile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
@@ -233,7 +238,7 @@
 
     </target>
 
-    <target name="release" depends="archive,installer,locales">        
+    <target name="release" depends="archive,installer,library,locales">        
 
     </target>
          
