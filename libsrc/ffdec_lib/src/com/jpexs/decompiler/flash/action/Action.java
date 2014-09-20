@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -54,7 +55,9 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -399,6 +402,23 @@ public class Action implements GraphSourceItem {
      * @param list List of actions
      * @param version SWF version
      * @param exportMode PCode or hex?
+     * @return source ASM
+     * 
+     */
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode) {
+        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        actionsToString(listeners, address, list, version, exportMode, writer);
+        return writer.toString();
+    }
+    
+    /**
+     * Converts list of actions to ASM source
+     *
+     * @param listeners
+     * @param address
+     * @param list List of actions
+     * @param version SWF version
+     * @param exportMode PCode or hex?
      * @param writer
      * @return GraphTextWriter
      */
@@ -677,6 +697,21 @@ public class Action implements GraphSourceItem {
      * @param asm
      * @param actions List of actions
      * @param path
+     * @return source
+     * @throws java.lang.InterruptedException
+     */
+    public static String actionsToSource(final ASMSource asm, final List<Action> actions, final String path) throws InterruptedException {
+        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        actionsToSource(asm, actions, path, writer);
+        return writer.toString();
+    }
+
+    /**
+     * Converts list of actions to ActionScript source code
+     *
+     * @param asm
+     * @param actions List of actions
+     * @param path
      * @param writer
      * @throws java.lang.InterruptedException
      */
@@ -685,12 +720,13 @@ public class Action implements GraphSourceItem {
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
         int timeout = Configuration.decompilationTimeoutSingleMethod.get();
+        final int version = asm == null ? SWF.DEFAULT_VERSION : asm.getSwf().version;
         try {
             tree = CancellableWorker.call(new Callable<List<GraphTargetItem>>() {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, asm.getSwf().version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
                     Graph.graphToString(tree, new NulWriter(), new LocalData());
                     return tree;
                 }
@@ -707,7 +743,9 @@ public class Action implements GraphSourceItem {
         }
         writer.continueMeasure();
 
-        asm.getActionSourcePrefix(writer);
+        if (asm != null) {
+            asm.getActionSourcePrefix(writer);
+        }
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
@@ -717,7 +755,9 @@ public class Action implements GraphSourceItem {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendErrorComment(writer, convertException);
         }
-        asm.getActionSourceSuffix(writer);
+        if (asm != null) {
+            asm.getActionSourceSuffix(writer);
+        }
     }
 
     /**

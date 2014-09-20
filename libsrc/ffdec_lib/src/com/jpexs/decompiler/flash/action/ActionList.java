@@ -186,4 +186,17 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    @Override
+    public String toString() {
+        return Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE);
+    }
+    
+    public String toSource() {
+        try {
+            return Action.actionsToSource(null, this, "");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }

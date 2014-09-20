@@ -60,7 +60,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         List<Action> actions = par.actionsFromString(str);        
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         ActionList list = ActionListReader.readActionListTimeout(new ArrayList<DisassemblyListener>(), new SWFInputStream(swf,hex), SWF.DEFAULT_VERSION, 0, hex.length, "");                                    
-        Action.actionsToSource(getFirstActionTag(), list,"", writer);
+        Action.actionsToSource(null, list, "", writer);
         return writer.toString();        
     }
     
@@ -80,12 +80,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         };
     }
     
-    /*
-    //TODO: use this to make better deobfuscator:
-    
-    
-    
-    @Test(dataProvider = "provideBasicTrueExpressions")
+    // todo: honfika @Test(dataProvider = "provideBasicTrueExpressions")
     public void testRemoveBasicTrueExpressions(String expression) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException{
         String res = recompile("if("+expression+"){"+
                     "trace(\"OK\");"+
@@ -100,7 +95,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         }
     }
     
-    @Test(dataProvider = "provideBasicFalseExpressions")
+    // todo: honfika @Test(dataProvider = "provideBasicFalseExpressions")
     public void testRemoveBasicFalseExpressions(String expression) throws Exception {
         String res = recompile("if("+expression+"){"+
                     "trace(\"FAIL\");"+
@@ -116,7 +111,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
     }
     
     
-    @Test
+    // todo: honfika @Test
     public void testRemoveKnownVariables() throws Exception{
         String res = recompile("var a = true; var b = false;"
                 + "if(a){"
@@ -149,7 +144,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         }
     }
     
-    @Test
+    // todo: honfika @Test
     public void testNotRemoveParams() throws Exception {
         String res = recompile("function tst(p1,p2){"
                 + "var a = 2;"
@@ -182,7 +177,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
     
     @Test
     public void testEvailExpressionAfterWhile() throws Exception {
-        String res = "var a = 5;"
+        String res = recompile("var a = 5;"
                 + "while(true){"
                     + "if(a==73){"
                         + "a = 15;"
@@ -212,7 +207,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
                     + "trace(\"OK\");"
                 + "}else{"
                     + "trace(\"FAIL3\");"
-                + "}";
+                + "}");
         if(res.contains("\"FAIL1\"")){
             fail("unreachable if onTrue not removed");
         }
@@ -226,7 +221,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
             fail("reachable of onTrue removed");
         }
     }
-    //*/
+
     @Test
     public void testRemoveJumpsToTheNextAction() {
         String actionsString = "ConstantPool \"a\" \"b\" \"c\"\n"

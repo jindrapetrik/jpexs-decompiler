@@ -49,11 +49,15 @@ import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
+import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
+import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
+import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
+import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
@@ -215,9 +219,10 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             return false;
         }
 
+        ActionConstantPool cPool = getConstantPool(actions);
         for (int i = 0; i < actions.size(); i++) {
             ExecutionResult result = new ExecutionResult();
-            executeActions(actions, i, actions.size() - 1, result, fakeFunctions);
+            executeActions(actions, i, actions.size() - 1, cPool, result, fakeFunctions);
 
             if (result.idx != -1) {
                 int newIstructionCount = 1; // jump
@@ -285,12 +290,26 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         return false;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result, Map<String, Object> fakeFunctions) {
+    private ActionConstantPool getConstantPool(ActionList actions) {
+        ActionConstantPool cPool = null;
+        for (Action action : actions) {
+            if (action instanceof ActionConstantPool) {
+                if (cPool != null) {
+                    // there are multiple constant pools
+                    return null;
+                }
+                cPool = (ActionConstantPool) action;
+            }
+        }
+        return cPool;
+    }
+    
+    private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack();
         int instructionsProcessed = 0;
-        ActionConstantPool constantPool = null;
+        ActionConstantPool lastConstantPool = null;
 
         try {
             while (true) {
@@ -311,7 +330,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                  }
                  System.out.println();*/
                 if (action instanceof ActionConstantPool) {
-                    constantPool = (ActionConstantPool) action;
+                    lastConstantPool = (ActionConstantPool) action;
                 }
 
                 if (action instanceof ActionDefineLocal) {
@@ -348,6 +367,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                         || action instanceof ActionPushDuplicate
                         || action instanceof ActionAdd
                         || action instanceof ActionAdd2
+                        || action instanceof ActionIncrement
+                        || action instanceof ActionDecrement
                         || action instanceof ActionSubtract
                         || action instanceof ActionModulo
                         || action instanceof ActionMultiply
@@ -361,6 +382,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                         || action instanceof ActionGetVariable
                         || action instanceof ActionSetVariable
                         || action instanceof ActionEquals
+                        || action instanceof ActionEquals2
+                        || action instanceof ActionGreater
                         || action instanceof ActionNot
                         || action instanceof ActionIf
                         || action instanceof ActionConstantPool
@@ -374,7 +397,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     ActionPush push = (ActionPush) action;
                     boolean ok = true;
                     for (Object value : push.values) {
-                        if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
+                        if ((constantPool == null && value instanceof ConstantIndex) || value instanceof RegisterNumber) {
                             ok = false;
                             break;
                         }
@@ -418,7 +441,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 if (/*localData.variables.size() == 1 && */stack.allItemsFixed() || action instanceof ActionEnd) {
                     result.idx = idx == actions.size() ? idx - 1 : idx;
                     result.instructionsProcessed = instructionsProcessed;
-                    result.constantPool = constantPool;
+                    result.constantPool = lastConstantPool;
                     result.variables.clear();
                     for (String variableName : localData.variables.keySet()) {
                         Object value = localData.variables.get(variableName).getResult();
@@ -458,7 +481,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     ExecutionResult result = new ExecutionResult();
                     List<Action> lastActions = actions.getContainerLastActions(action);
                     int lastActionIdx = actions.indexOf(lastActions.get(0));
-                    executeActions(actions, i + 1, lastActionIdx, result, null);
+                    executeActions(actions, i + 1, lastActionIdx, null, result, null);
                     if (result.resultValue != null) {
                         results.put(def.functionName, result.resultValue);
                         for (int j = i; j <= lastActionIdx; j++) {
