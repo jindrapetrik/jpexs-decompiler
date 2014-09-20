@@ -216,8 +216,8 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         }
         if(res.contains("\"FAIL3\"")){
             fail("unreachable if onTrue 3 not removed");
-        }
-        if(!res.contains("\"OK\"")){
+        }        
+        if(!res.contains("\"OK\"")){            
             fail("reachable of onTrue removed");
         }
     }
