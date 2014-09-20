@@ -153,25 +153,25 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(decompiledEditor);
         if (sDoc != null) {
             Token t = sDoc.getTokenAt(pos);
-            String ident=null;
+            String ident = null;
             //It should be identifier or obfuscated identifier
-            if (t != null && (t.type == TokenType.IDENTIFIER || t.type == TokenType.REGEX)) {                
+            if (t != null && (t.type == TokenType.IDENTIFIER || t.type == TokenType.REGEX)) {
                 CharSequence tData = t.getText(sDoc);
-                ident=tData.toString();
+                ident = tData.toString();
                 //We need to get unescaped identifier, so we use our Lexer
-                ActionScriptLexer lex=new ActionScriptLexer(new StringReader(ident));
+                ActionScriptLexer lex = new ActionScriptLexer(new StringReader(ident));
                 try {
-                    ParsedSymbol symb=lex.lex();
-                    if(symb.type==SymbolType.IDENTIFIER){
-                        ident = (String)symb.value;
-                    }else{
+                    ParsedSymbol symb = lex.lex();
+                    if (symb.type == SymbolType.IDENTIFIER) {
+                        ident = (String) symb.value;
+                    } else {
                         ident = null;
                     }
                 } catch (IOException | ActionParseException ex) {
-                    ident=null;
-                }                   
-            } 
-            if(ident==null){
+                    ident = null;
+                }
+            }
+            if (ident == null) {
                 Highlighting h = Highlighting.search(decompiledHilights, pos);
                 if (h != null) {
                     List<Action> list = lastCode;
@@ -206,11 +206,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     }
 
                 }
-            }else{
+            } else {
                 return ident;
             }
         }
-        return null;           
+        return null;
     }
 
     private CachedScript getCached(ASMSource pack) {

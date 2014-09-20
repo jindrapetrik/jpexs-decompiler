@@ -172,16 +172,16 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         return streamSoundType;
     }
 
-    public static void populateSoundStreamBlocks(int containerId,List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
+    public static void populateSoundStreamBlocks(int containerId, List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
         boolean found = false;
         for (ContainerItem t : tags) {
             if (t == head) {
                 found = true;
-                ((SoundStreamHeadTypeTag)head).setVirtualCharacterId(containerId);
+                ((SoundStreamHeadTypeTag) head).setVirtualCharacterId(containerId);
                 continue;
             }
             if (t instanceof Container) {
-                populateSoundStreamBlocks(((CharacterIdTag)t).getCharacterId(),((Container) t).getSubItems(), head, output);
+                populateSoundStreamBlocks(((CharacterIdTag) t).getCharacterId(), ((Container) t).getSubItems(), head, output);
             }
             if (!found) {
                 continue;
@@ -198,7 +198,7 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
         List<SoundStreamBlockTag> ret = new ArrayList<>();
-        populateSoundStreamBlocks(0,swf.tags, this, ret);
+        populateSoundStreamBlocks(0, swf.tags, this, ret);
         return ret;
 
     }
@@ -215,7 +215,7 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
 
     @Override
     public List<byte[]> getRawSoundData() {
-        List<byte[]> ret = new ArrayList<byte[]>();
+        List<byte[]> ret = new ArrayList<>();
         List<SoundStreamBlockTag> blocks = getBlocks();
         for (SoundStreamBlockTag block : blocks) {
             if (streamSoundCompression == SoundFormat.FORMAT_MP3) {

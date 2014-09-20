@@ -63,7 +63,7 @@ public abstract class Trait implements Serializable {
                     if (m.namespace_index == -1) {
                         break;
                     }
-                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants,true));
+                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true));
                     if (nsname == null) {
                         break;
                     }
@@ -85,7 +85,7 @@ public abstract class Trait implements Serializable {
             } else {
                 if (ns != null) {
                     if (ns.kind == Namespace.KIND_NAMESPACE) {
-                        nsname = ns.getName(abc.constants,true);
+                        nsname = ns.getName(abc.constants, true);
                     }
                 }
             }
@@ -132,7 +132,7 @@ public abstract class Trait implements Serializable {
     public GraphTextWriter toStringPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants,false);
+            String nsname = ns.getName(abc.constants, false);
             writer.appendNoHilight("package");
             if (!nsname.isEmpty()) {
                 writer.appendNoHilight(" " + nsname); //assume not null name
@@ -174,7 +174,7 @@ public abstract class Trait implements Serializable {
     public String getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
-        String packageName = ns.getName(abc.constants,false);
+        String packageName = ns.getName(abc.constants, false);
         String objectName = name.getName(abc.constants, new ArrayList<String>(), false);
         return packageName + "." + objectName; //assume not null name
     }

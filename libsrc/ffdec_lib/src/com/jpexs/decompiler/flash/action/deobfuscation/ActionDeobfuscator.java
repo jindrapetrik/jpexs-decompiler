@@ -28,12 +28,12 @@ import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
-import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -54,14 +54,13 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -80,7 +79,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ActionDeobfuscator implements SWFDecompilerListener {
+public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
     private final int executionLimit = 30000;
 
@@ -129,89 +128,6 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
-    }
-
-    private boolean removeUnreachableActions(ActionList actions) {
-        Set<Action> reachableActions = new HashSet<>();
-        Set<Action> processedActions = new HashSet<>();
-        reachableActions.add(actions.get(0));
-        boolean modified = true;
-        while (modified) {
-            modified = false;
-            for (int i = 0; i < actions.size(); i++) {
-                Action action = actions.get(i);
-                if (reachableActions.contains(action) && !processedActions.contains(action)) {
-                    if (!action.isExit() && !(action instanceof ActionJump) && i != actions.size() - 1) {
-                        Action next = actions.get(i + 1);
-                        if (!reachableActions.contains(next)) {
-                            reachableActions.add(next);
-                        }
-                    }
-
-                    if (action instanceof ActionJump) {
-                        ActionJump aJump = (ActionJump) action;
-                        long ref = aJump.getAddress() + aJump.getTotalActionLength() + aJump.getJumpOffset();
-                        Action target = actions.getByAddress(ref);
-                        if (target != null && !reachableActions.contains(target)) {
-                            reachableActions.add(target);
-                        }
-                    } else if (action instanceof ActionIf) {
-                        ActionIf aIf = (ActionIf) action;
-                        long ref = aIf.getAddress() + aIf.getTotalActionLength() + aIf.getJumpOffset();
-                        Action target = actions.getByAddress(ref);
-                        if (target != null && !reachableActions.contains(target)) {
-                            reachableActions.add(target);
-                        }
-                    } else if (action instanceof ActionStore) {
-                        ActionStore aStore = (ActionStore) action;
-                        int storeSize = aStore.getStoreSize();
-                        if (actions.size() > i + storeSize) {
-                            Action target = actions.get(i + storeSize);
-                            if (!reachableActions.contains(target)) {
-                                reachableActions.add(target);
-                            }
-                        }
-                    } else if (action instanceof GraphSourceItemContainer) {
-                        GraphSourceItemContainer container = (GraphSourceItemContainer) action;
-                        long ref = action.getAddress() + action.getTotalActionLength();
-                        for (Long size : container.getContainerSizes()) {
-                            ref += size;
-                            Action target = actions.getByAddress(ref);
-                            if (target != null && !reachableActions.contains(target)) {
-                                reachableActions.add(target);
-                            }
-                        }
-                    }
-
-                    processedActions.add(action);
-                    modified = true;
-                }
-            }
-        }
-
-        boolean result = false;
-        for (int i = 0; i < actions.size(); i++) {
-            if (!reachableActions.contains(actions.get(i))) {
-                actions.removeAction(i);
-                i--;
-                result = true;
-            }
-        }
-
-        return result;
-    }
-
-    private boolean removeZeroJumps(ActionList actions) {
-        boolean result = false;
-        for (int i = 0; i < actions.size(); i++) {
-            Action action = actions.get(i);
-            if (action instanceof ActionJump && ((ActionJump) action).getJumpOffset() == 0) {
-                actions.removeAction(i);
-                i--;
-                result = true;
-            }
-        }
-        return result;
     }
 
     private boolean removeObfuscationIfs(ActionList actions, Map<String, Object> fakeFunctions) {
@@ -303,7 +219,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         }
         return cPool;
     }
-    
+
     private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
@@ -383,6 +299,8 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                         || action instanceof ActionSetVariable
                         || action instanceof ActionEquals
                         || action instanceof ActionEquals2
+                        || action instanceof ActionLess
+                        || action instanceof ActionLess2
                         || action instanceof ActionGreater
                         || action instanceof ActionNot
                         || action instanceof ActionIf

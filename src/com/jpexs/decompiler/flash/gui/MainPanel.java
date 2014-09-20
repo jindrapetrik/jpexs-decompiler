@@ -2224,37 +2224,37 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void loadFromBinaryTag(final TagNode node) {
-        
-        if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {                   
-                    Main.loadingDialog = new LoadingDialog(mainFrame==null?null:mainFrame.getWindow());
+
+        if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {
+            Main.loadingDialog = new LoadingDialog(mainFrame == null ? null : mainFrame.getWindow());
         }
         Main.loadingDialog.setVisible(true);
-        Main.startWork(AppStrings.translate("work.reading.swf") + "...");                
-        new Thread(){
+        Main.startWork(AppStrings.translate("work.reading.swf") + "...");
+        new Thread() {
 
             @Override
-            public void run() {                
-                try {            
-                    SWF bswf = new SWF(new ByteArrayInputStream(((DefineBinaryDataTag)node.getItem()).binaryData),new ProgressListener() {
+            public void run() {
+                try {
+                    SWF bswf = new SWF(new ByteArrayInputStream(((DefineBinaryDataTag) node.getItem()).binaryData), new ProgressListener() {
 
                         @Override
                         public void progress(int p) {
-                            Main.loadingDialog.setPercent(p);                            
+                            Main.loadingDialog.setPercent(p);
                         }
                     }, Configuration.parallelSpeedUp.get());
                     bswf.fileTitle = "(SWF Data)";
                     SWFNode snode = ((TagTreeModel) tagTree.getModel()).createSwfNode(bswf);
                     snode.binaryData = (DefineBinaryDataTag) node.getItem();
-                    node.subNodes.add(snode);            
+                    node.subNodes.add(snode);
                 } catch (IOException | InterruptedException ex) {
                     //ignore
                 }
                 Main.loadingDialog.setVisible(false);
                 Main.stopWork();
             }
-            
+
         }.start();
-        
+
     }
 
     public void reload(boolean forceReload) {

@@ -122,7 +122,7 @@ public class NamespaceTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "-";
                 }
-                String val = abc.constants.getNamespace(rowIndex).getName(abc.constants,true);
+                String val = abc.constants.getNamespace(rowIndex).getName(abc.constants, true);
                 if (val == null) {
                     val = "-";
                 }

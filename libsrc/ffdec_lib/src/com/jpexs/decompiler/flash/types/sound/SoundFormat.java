@@ -166,7 +166,7 @@ public class SoundFormat {
     public boolean createWav(List<SWFInputStream> siss, OutputStream os) {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for(SWFInputStream sis:siss){
+        for (SWFInputStream sis : siss) {
             decode(sis, baos);
         }
         try {

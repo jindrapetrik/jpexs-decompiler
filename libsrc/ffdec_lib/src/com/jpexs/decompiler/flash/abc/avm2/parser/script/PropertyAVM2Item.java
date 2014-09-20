@@ -219,7 +219,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants,true), m.getName(a.constants, new ArrayList<String>(), true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants, true), m.getName(a.constants, new ArrayList<String>(), true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                                     objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
@@ -258,7 +258,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         for (int i = 0; i < openedNamespaces.size(); i++) {
                             int nsindex = openedNamespaces.get(i);
                             int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                            String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants,true);
+                            String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants, true);
                             int name_index = 0;
                             for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
                                 Multiname mname = abc.constants.constant_multiname.get(m);
@@ -328,7 +328,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             continue;
                                         }
                                         Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants,true).equals(nsname)) {
+                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants, true).equals(nsname)) {
                                             Reference<String> outName = new Reference<>("");
                                             Reference<String> outNs = new Reference<>("");
                                             Reference<String> outPropNs = new Reference<>("");

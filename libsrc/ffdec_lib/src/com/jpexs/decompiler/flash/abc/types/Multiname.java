@@ -157,7 +157,7 @@ public class Multiname {
         }
         int type = constants.getNamespace(index).kind;
         int name_index = constants.getNamespace(index).name_index;
-        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants,true);
+        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants, true);
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
             if (constants.getNamespace(n).kind == type && constants.getNamespace(n).name_index == name_index) {
@@ -272,7 +272,7 @@ public class Multiname {
         String ret = "";
         Namespace ns = getNamespace(constants);
         if (ns != null) {
-            String nsname = ns.getName(constants,raw);
+            String nsname = ns.getName(constants, raw);
             if (nsname != null && !nsname.isEmpty()) {
                 ret += nsname + ".";
             }

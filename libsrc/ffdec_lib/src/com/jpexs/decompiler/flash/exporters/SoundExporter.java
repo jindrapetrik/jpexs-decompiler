@@ -119,16 +119,16 @@ public class SoundExporter {
         int nativeFormat = fmt.getNativeExportFormat();
 
         if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
-            List<byte[]> datas=st.getRawSoundData();
-            for(byte[] data:datas){
+            List<byte[]> datas = st.getRawSoundData();
+            for (byte[] data : datas) {
                 fos.write(data);
             }
         } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
             if (st instanceof DefineSoundTag) {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
-                List<byte[]> datas=st.getRawSoundData();
-                for(byte[] data:datas){
+                List<byte[]> datas = st.getRawSoundData();
+                for (byte[] data : datas) {
                     flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
                 }
             } else if (st instanceof SoundStreamHeadTypeTag) {
@@ -149,8 +149,8 @@ public class SoundExporter {
         } else {
             List<byte[]> soundData = st.getRawSoundData();
             SWF swf = ((Tag) st).getSwf();
-            List<SWFInputStream> siss=new ArrayList<>();
-            for(byte[] data:soundData){
+            List<SWFInputStream> siss = new ArrayList<>();
+            for (byte[] data : soundData) {
                 siss.add(new SWFInputStream(swf, data));
             }
             fmt.createWav(siss, fos);

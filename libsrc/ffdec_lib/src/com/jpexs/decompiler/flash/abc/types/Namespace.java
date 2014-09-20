@@ -77,7 +77,7 @@ public class Namespace {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        return getName(constants,false);
+        return getName(constants, false);
     }
 
     public String getNameWithKind(AVM2ConstantPool constants) {
@@ -101,7 +101,7 @@ public class Namespace {
         if (name_index == 0) {
             return null;
         }
-        if(raw){
+        if (raw) {
             return constants.getString(name_index);
         }
         return Deobfuscation.printNamespace(constants.getString(name_index));

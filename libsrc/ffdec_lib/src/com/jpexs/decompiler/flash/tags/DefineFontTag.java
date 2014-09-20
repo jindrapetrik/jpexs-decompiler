@@ -37,7 +37,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class DefineFontTag extends FontTag {
-    
+
     @SWFType(BasicType.UI16)
     public int fontId;
     public List<SHAPE> glyphShapeTable;
@@ -46,22 +46,22 @@ public class DefineFontTag extends FontTag {
     @Internal
     private DefineFontInfo2Tag fontInfo2Tag = null;
     public static final int ID = 10;
-    
+
     @Override
     public boolean isSmall() {
         return false;
     }
-    
+
     @Override
     public double getGlyphAdvance(int glyphIndex) {
         return -1;
     }
-    
+
     @Override
     public int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
     }
-    
+
     private void ensureFontInfo() {
         if (fontInfoTag == null) {
             for (Tag t : swf.tags) {
@@ -80,7 +80,7 @@ public class DefineFontTag extends FontTag {
             }
         }
     }
-    
+
     @Override
     public char glyphToChar(int glyphIndex) {
         ensureFontInfo();
@@ -92,7 +92,7 @@ public class DefineFontTag extends FontTag {
             return '?';
         }
     }
-    
+
     @Override
     public int charToGlyph(char c) {
         ensureFontInfo();
@@ -102,7 +102,7 @@ public class DefineFontTag extends FontTag {
             return fontInfoTag.codeTable.indexOf((int) c);
         }
         return -1;
-        
+
     }
 
     /**
@@ -147,7 +147,7 @@ public class DefineFontTag extends FontTag {
         int firstOffset = sis.readUI16("firstOffset");
         int nGlyphs = firstOffset / 2;
         glyphShapeTable = new ArrayList<>();
-        
+
         for (int i = 1; i < nGlyphs; i++) {
             sis.readUI16("offset"); //offset
         }
@@ -155,22 +155,22 @@ public class DefineFontTag extends FontTag {
             glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
         }
     }
-    
+
     @Override
     public int getFontId() {
         return fontId;
     }
-    
+
     @Override
     public List<SHAPE> getGlyphShapeTable() {
         return glyphShapeTable;
     }
-    
+
     @Override
     public int getCharacterId() {
         return fontId;
     }
-    
+
     @Override
     public String getFontName() {
         ensureFontInfo();
@@ -182,7 +182,7 @@ public class DefineFontTag extends FontTag {
         }
         return null;
     }
-    
+
     @Override
     public boolean isBold() {
         if (fontInfo2Tag != null) {
@@ -193,7 +193,7 @@ public class DefineFontTag extends FontTag {
         }
         return false;
     }
-    
+
     @Override
     public boolean isItalic() {
         if (fontInfo2Tag != null) {
@@ -204,26 +204,26 @@ public class DefineFontTag extends FontTag {
         }
         return false;
     }
-    
+
     @Override
     public boolean isSmallEditable() {
         return false;
     }
-    
+
     @Override
     public boolean isBoldEditable() {
         return fontInfo2Tag != null || fontInfoTag != null;
     }
-    
+
     @Override
     public boolean isItalicEditable() {
         return fontInfo2Tag != null || fontInfoTag != null;
     }
-    
+
     @Override
     public void setSmall(boolean value) {
     }
-    
+
     @Override
     public void setBold(boolean value) {
         if (fontInfo2Tag != null) {
@@ -233,7 +233,7 @@ public class DefineFontTag extends FontTag {
             fontInfoTag.fontFlagsBold = value;
         }
     }
-    
+
     @Override
     public void setItalic(boolean value) {
         if (fontInfo2Tag != null) {
@@ -243,27 +243,27 @@ public class DefineFontTag extends FontTag {
             fontInfoTag.fontFlagsItalic = value;
         }
     }
-    
+
     @Override
     public int getAscent() {
         return -1;
     }
-    
+
     @Override
     public int getDescent() {
         return -1;
     }
-    
+
     @Override
     public int getLeading() {
         return -1;
     }
-    
+
     @Override
     public int getDivider() {
         return 1;
     }
-    
+
     @Override
     public void addCharacter(char character, String fontName) {
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, getFontStyle(), getDivider() * 1024, character);
@@ -297,10 +297,10 @@ public class DefineFontTag extends FontTag {
         } else {
             glyphShapeTable.set(pos, shp);
         }
-        
+
         setModified(true);
     }
-    
+
     @Override
     public String getCharacters(List<Tag> tags) {
         String ret = "";
@@ -317,7 +317,7 @@ public class DefineFontTag extends FontTag {
         }
         return ret;
     }
-    
+
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         return 0;
