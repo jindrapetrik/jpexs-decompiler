@@ -400,7 +400,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-replace")) {
             parseReplace(args);
         } else if (nextParam.equals("-as3compiler")) {
-            ActionScriptParser.compile(null /*?*/, args.remove(), args.remove());
+            ActionScriptParser.compile(null /*?*/, args.remove(), args.remove(),0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage();
