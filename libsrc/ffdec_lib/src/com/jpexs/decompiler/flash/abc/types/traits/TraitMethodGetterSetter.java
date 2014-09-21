@@ -33,7 +33,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public void delete(ABC abc, boolean d) {
-        abc.constants.constant_multiname.get(name_index).deleted = true;
+        abc.constants.constant_multiname.get(name_index).deleted = d;
         abc.method_info.get(method_info).delete(abc, d);
     }
 

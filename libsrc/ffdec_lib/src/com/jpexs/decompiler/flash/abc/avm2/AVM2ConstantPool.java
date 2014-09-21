@@ -297,7 +297,7 @@ public class AVM2ConstantPool {
                     if (mul.params.get(p) != val.params.get(p)) {
                         continue loopm;
                     }
-                }
+                }                
                 return m;
             }
         }

@@ -54,12 +54,17 @@ import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -562,16 +567,16 @@ public class ABC {
         }
         loadNamespaceMap();
         /*for(int i=0;i<script_count;i++){
-         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
-         GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
-         try {
-         bod.toString("script", ScriptExportMode.PCODE, false,i, 0, this, null, constants, method_info, new TranslateStack(), false, t ,new ArrayList<String>(), null);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+            MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
+            GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+            try {
+               bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
+            } catch (InterruptedException ex) {
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            System.out.println(""+t.toString());
          }
-         System.out.println(""+t.toString());
-         }
-         System.exit(0);*/
+         //System.exit(0);*/
 
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
@@ -1069,6 +1074,9 @@ public class ABC {
         for (ScriptInfo si : script_info) {
             removeClassFromTraits(si.traits, index);
         }
+        for (MethodBody b : bodies) {            
+            removeClassFromTraits(b.traits, index);
+        }
         instance_info.remove(index);
         class_info.remove(index);
     }
@@ -1119,6 +1127,7 @@ public class ABC {
                     }
                 }
             }
+            removeMethodFromTraits(b.traits, index);
         }
 
         for (int c = 0; c < instance_info.size(); c++) {
