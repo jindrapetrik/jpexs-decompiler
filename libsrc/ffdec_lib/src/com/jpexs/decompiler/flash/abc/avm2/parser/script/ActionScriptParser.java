@@ -2317,18 +2317,18 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public void addScriptFromTree(List<GraphTargetItem> items, boolean documentClass) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<GraphTargetItem> items, boolean documentClass, int classPos) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abc, otherABCs);
         List<AVM2Instruction> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
         localData.documentClass = documentClass;
-        abc.script_info.add(gen.generateScriptInfo(localData, items));
+        abc.script_info.add(gen.generateScriptInfo(localData, items,classPos));
     }
 
-    public void addScript(String s, boolean documentClass, String fileName) throws AVM2ParseException, IOException, CompilationException {
+    public void addScript(String s, boolean documentClass, String fileName, int classPos) throws AVM2ParseException, IOException, CompilationException {
         List<GraphTargetItem> traits = scriptTraitsFromString(s, fileName);
-        addScriptFromTree(traits, documentClass);
+        addScriptFromTree(traits, documentClass,classPos);
     }
 
     public ActionScriptParser(ABC abc, List<ABC> otherABCs) {
@@ -2348,22 +2348,22 @@ public class ActionScriptParser {
         }
     }
 
-    public static void compile(String src, ABC abc, List<ABC> otherABCs, boolean documentClass, String fileName) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
+    public static void compile(String src, ABC abc, List<ABC> otherABCs, boolean documentClass, String fileName, int classPos) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         List<ABC> parABCs = new ArrayList<>();
         initPlayer();
         parABCs.addAll(playerABCs);
         parABCs.addAll(otherABCs);
         ActionScriptParser parser = new ActionScriptParser(abc, parABCs);
-        parser.addScript(src, documentClass, fileName);
+        parser.addScript(src, documentClass, fileName,classPos);
     }
 
-    public static void compile(SWF swf, String src, String dst) {
+    public static void compile(SWF swf, String src, String dst, int classPos) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
             initPlayer();
             ABC abc = new ABC(swf);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
-            parser.addScript(new String(Helper.readFile(src), "UTF-8"), true, src);
+            parser.addScript(new String(Helper.readFile(src), "UTF-8"), true, src,classPos);
             abc.saveToStream(new FileOutputStream(new File(dst)));
         } catch (Exception ex) {
             Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);

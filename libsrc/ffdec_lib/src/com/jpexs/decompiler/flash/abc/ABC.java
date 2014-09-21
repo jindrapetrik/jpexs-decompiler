@@ -1059,6 +1059,42 @@ public class ABC {
         }
     }
 
+    
+    public void addClass(ClassInfo ci, InstanceInfo ii,int index){        
+        for (MethodBody b : bodies) {
+            for (AVM2Instruction ins : b.getCode().code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
+                        if (ins.operands[i] >= index) {
+                            ins.operands[i]++;
+                        }
+                    }
+                }
+            }
+        }
+        for (ScriptInfo si : script_info) {
+            addClassInTraits(si.traits, index);
+        }
+        for (MethodBody b : bodies) {            
+            addClassInTraits(b.traits, index);
+        }
+       instance_info.add(index,ii);
+       class_info.add(index,ci);
+    }
+    
+    private void addClassInTraits(Traits traits, int index) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                addClassInTraits(instance_info.get(tc.class_info).instance_traits, index);
+                addClassInTraits(class_info.get(tc.class_info).static_traits, index);
+                if (tc.class_info >= index) {
+                    tc.class_info++;
+                }
+            }
+        }
+    }
+    
     public void removeClass(int index) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {
@@ -1179,8 +1215,17 @@ public class ABC {
         }
         boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
 
-        script_info.get(oldIndex).delete(this, true);
-        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName);
+        
+        ScriptInfo si=script_info.get(oldIndex);
+        si.delete(this, true);
+        int newClassIndex = instance_info.size();
+        for(Trait t:si.traits.traits){
+            if(t instanceof TraitClass){
+                TraitClass tc=(TraitClass)t;
+                newClassIndex = tc.class_info+1;
+            }
+        }
+        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName,newClassIndex);
         //Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);

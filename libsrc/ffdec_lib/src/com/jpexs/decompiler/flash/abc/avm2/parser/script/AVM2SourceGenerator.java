@@ -1169,7 +1169,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abc;
     }
 
-    public void generateClass(List<String> importedClasses, List<AssignableAVM2Item> sinitVariables, boolean staticNeedsActivation, List<GraphTargetItem> staticInit, List<Integer> openedNamespaces, int namespace, int initScope, String pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) throws AVM2ParseException, CompilationException {
+    public void generateClass(List<String> importedClasses, List<AssignableAVM2Item> sinitVariables, boolean staticNeedsActivation, List<GraphTargetItem> staticInit, List<Integer> openedNamespaces, int namespace, int initScope, String pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems,Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         localData.currentClass = name;
         localData.pkg = pkg;
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -1180,12 +1180,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         instanceInfo.name_index = traitName(namespace, name);        
 
-        Trait[] it = generateTraitsPhase1(name, superName, false, localData, traitItems, instanceInfo.instance_traits);
-        Trait[] st = generateTraitsPhase1(name, superName, true, localData, traitItems, classInfo.static_traits);
+        Trait[] it = generateTraitsPhase1(name, superName, false, localData, traitItems, instanceInfo.instance_traits,class_index);
+        Trait[] st = generateTraitsPhase1(name, superName, true, localData, traitItems, classInfo.static_traits,class_index);
         generateTraitsPhase2(importedClasses, pkg, traitItems, it, openedNamespaces, localData);
         generateTraitsPhase2(importedClasses, pkg, traitItems, st, openedNamespaces, localData);
-        generateTraitsPhase3(initScope, isInterface, name, superName, false, localData, traitItems, instanceInfo.instance_traits, it, new HashMap<Trait, Integer>());
-        generateTraitsPhase3(initScope, isInterface, name, superName, true, localData, traitItems, classInfo.static_traits, st, new HashMap<Trait, Integer>());
+        generateTraitsPhase3(initScope, isInterface, name, superName, false, localData, traitItems, instanceInfo.instance_traits, it, new HashMap<Trait, Integer>(),class_index);
+        generateTraitsPhase3(initScope, isInterface, name, superName, true, localData, traitItems, classInfo.static_traits, st, new HashMap<Trait, Integer>(),class_index);
         int init = 0;
         if (constructor == null || isInterface) {
             instanceInfo.iinit_index = init = method(isInterface, new ArrayList<MethodBody>(), pkg, false, new ArrayList<AssignableAVM2Item>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
@@ -1272,7 +1272,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    public int generateClass(int namespace, ClassInfo ci, InstanceInfo ii, int initScope, String pkg, SourceGeneratorLocalData localData, AVM2Item cls) throws AVM2ParseException, CompilationException {
+    public int generateClass(int namespace, ClassInfo ci, InstanceInfo ii, int initScope, String pkg, SourceGeneratorLocalData localData, AVM2Item cls, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         /*ClassInfo ci = new ClassInfo();
          InstanceInfo ii = new InstanceInfo();
          abc.class_info.add(ci);
@@ -1280,7 +1280,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
          */
         if (cls instanceof ClassAVM2Item) {
             ClassAVM2Item cai = (ClassAVM2Item) cls;
-            generateClass(cai.importedClasses, cai.sinitVariables, cai.staticInitActivation, cai.staticInit, cai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, false, cai.className, cai.extendsOp == null ? "Object" : cai.extendsOp.toString(), cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
+            generateClass(cai.importedClasses, cai.sinitVariables, cai.staticInitActivation, cai.staticInit, cai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, false, cai.className, cai.extendsOp == null ? "Object" : cai.extendsOp.toString(), cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits,class_index);
             if (!cai.isDynamic) {
                 ii.flags |= InstanceInfo.CLASS_SEALED;
             }
@@ -1294,7 +1294,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
             ii.flags |= InstanceInfo.CLASS_INTERFACE;
             ii.flags |= InstanceInfo.CLASS_SEALED;
-            generateClass(iai.importedClasses, new ArrayList<AssignableAVM2Item>(), false, new ArrayList<GraphTargetItem>(), iai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, true, iai.name, null, null, iai.superInterfaces, null, iai.methods);
+            generateClass(iai.importedClasses, new ArrayList<AssignableAVM2Item>(), false, new ArrayList<GraphTargetItem>(), iai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, true, iai.name, null, null, iai.superInterfaces, null, iai.methods,class_index);
         }
 
         return abc.instance_info.size() - 1;
@@ -1907,7 +1907,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
-    public void generateTraitsPhase3(int methodInitScope, boolean isInterface, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Trait[] traits, Map<Trait, Integer> initScopes) throws AVM2ParseException, CompilationException {
+    public void generateTraitsPhase3(int methodInitScope, boolean isInterface, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Trait[] traits, Map<Trait, Integer> initScopes,Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         //Note: Names must be generated first before accesed in inner subs
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
@@ -1915,11 +1915,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             if (item instanceof InterfaceAVM2Item) {
-                generateClass(((InterfaceAVM2Item) item).namespace, abc.class_info.get(((TraitClass) traits[k]).class_info), abc.instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((InterfaceAVM2Item) item).pkg, localData, (InterfaceAVM2Item) item);
+                generateClass(((InterfaceAVM2Item) item).namespace, abc.class_info.get(((TraitClass) traits[k]).class_info), abc.instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((InterfaceAVM2Item) item).pkg, localData, (InterfaceAVM2Item) item,class_index);
             }
 
             if (item instanceof ClassAVM2Item) {
-                generateClass(((ClassAVM2Item) item).namespace, abc.class_info.get(((TraitClass) traits[k]).class_info), abc.instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((ClassAVM2Item) item).pkg, localData, (ClassAVM2Item) item);
+                generateClass(((ClassAVM2Item) item).namespace, abc.class_info.get(((TraitClass) traits[k]).class_info), abc.instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((ClassAVM2Item) item).pkg, localData, (ClassAVM2Item) item,class_index);
             }
             if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) item;
@@ -1934,7 +1934,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
-    public Trait[] generateTraitsPhase1(String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) throws AVM2ParseException, CompilationException {
+    public Trait[] generateTraitsPhase1(String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Reference<Integer> classIndex) throws AVM2ParseException, CompilationException {
         Trait[] traits = new Trait[items.size()];
         int slot_id = 1;
         int disp_id = 3; //1 and 2 are for constructor
@@ -1944,10 +1944,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = new TraitClass();
                 ClassInfo ci = new ClassInfo();
                 InstanceInfo ii = new InstanceInfo();
-                abc.class_info.add(ci);
-                abc.instance_info.add(ii);
+                /*abc.class_info.add(ci);
+                abc.instance_info.add(ii);*/
+                tc.class_info = classIndex.getVal();
+                abc.addClass(ci, ii, classIndex.getVal());
+                classIndex.setVal(classIndex.getVal()+1);
                 ii.flags |= InstanceInfo.CLASS_INTERFACE;
-                tc.class_info = abc.instance_info.size() - 1;
+                //tc.class_info = abc.instance_info.size() - 1;
                 tc.kindType = Trait.TRAIT_CLASS;
                 //tc.name_index = traitName(((InterfaceAVM2Item) item).namespace, ((InterfaceAVM2Item) item).name);
                 tc.slot_id = 0; //?
@@ -1958,10 +1961,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (item instanceof ClassAVM2Item) {
                 TraitClass tc = new TraitClass();
                 ClassInfo ci = new ClassInfo();
-                InstanceInfo instanceInfo = new InstanceInfo();
-                abc.class_info.add(ci);
-                abc.instance_info.add(instanceInfo);
-                tc.class_info = abc.instance_info.size() - 1;
+                InstanceInfo ii = new InstanceInfo();
+                /*abc.class_info.add(ci);
+                abc.instance_info.add(instanceInfo);*/
+                tc.class_info = classIndex.getVal();
+                abc.addClass(ci, ii, classIndex.getVal());
+                classIndex.setVal(classIndex.getVal()+1);
+                //tc.class_info = abc.instance_info.size() - 1;
 
                 /*instanceInfo.name_index = abc.constants.addMultiname(new Multiname(Multiname.QNAME, abc.constants.getStringId(((ClassAVM2Item) item).className, true),
                  abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg.packageName, true)), 0, true), 0, 0, new ArrayList<Integer>()));
@@ -2058,10 +2064,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return traits;
     }
 
-    public ScriptInfo generateScriptInfo(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws AVM2ParseException, CompilationException {
+    public ScriptInfo generateScriptInfo(SourceGeneratorLocalData localData, List<GraphTargetItem> commands, int classPos) throws AVM2ParseException, CompilationException {
+        Reference<Integer> class_index = new Reference<>(classPos);
         ScriptInfo si = new ScriptInfo();
         localData.currentScript = si;
-        Trait[] traitArr = generateTraitsPhase1(null, null, false, localData, commands, si.traits);
+        Trait[] traitArr = generateTraitsPhase1(null, null, false, localData, commands, si.traits,class_index);
         generateTraitsPhase2(new ArrayList<String>(), null/*FIXME*/, commands, traitArr, new ArrayList<Integer>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
@@ -2115,7 +2122,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;
         localData.pkg = null; //FIXME: pkg.packageName;
-        generateTraitsPhase3(1/*??*/, false, null, null, false, localData, commands, si.traits, traitArr, initScopes);
+        generateTraitsPhase3(1/*??*/, false, null, null, false, localData, commands, si.traits, traitArr, initScopes,class_index);
         return si;
     }
 

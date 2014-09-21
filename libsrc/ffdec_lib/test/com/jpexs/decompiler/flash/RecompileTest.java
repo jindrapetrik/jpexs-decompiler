@@ -147,7 +147,7 @@ public class RecompileTest {
                         en.getValue().toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
                         ABC nabc = new ABC(swf);
-                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as");
+                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as",abc.instance_info.size());
                     }
                 }
             } else {
