@@ -407,7 +407,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         continue;
                     }
                     if ((a.instance_info.get(c).getName(a.constants) != null && a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni)
-                            || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants,true), a.constants))) {
+                            || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants, true), a.constants))) {
                         String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, new ArrayList<String>(), true);
                         if (parts.get(0).equals(cname)) {
                             if (!subtypes.isEmpty() && parts.size() > 1) {

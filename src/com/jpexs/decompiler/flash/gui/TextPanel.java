@@ -51,7 +51,7 @@ public class TextPanel extends JPanel implements ActionListener {
         super(new BorderLayout());
 
         DefaultSyntaxKit.initKit();
-        
+
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);
         add(textSearchPanel, BorderLayout.NORTH);

@@ -2136,7 +2136,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     abc.constants.getMultinameId(
                             new Multiname(Multiname.QNAME,
                                     abc.constants.getStringId(superName.getName(a.constants, new ArrayList<String>(), true), true),
-                                    abc.constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.constants.getStringId(superName.getNamespace(a.constants).getName(a.constants,true), true)), 0, true), 0, 0, new ArrayList<Integer>()), true)
+                                    abc.constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.constants.getStringId(superName.getNamespace(a.constants).getName(a.constants, true), true)), 0, true), 0, 0, new ArrayList<Integer>()), true)
             );
         }
     }
@@ -2190,11 +2190,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         continue;
                     }
                     for (Trait t : ii.traits.traits) {
-                        if (eq(pkg, t.getName(abc).getNamespace(abc.constants).getName(abc.constants,true))) {
+                        if (eq(pkg, t.getName(abc).getNamespace(abc.constants).getName(abc.constants, true))) {
                             if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>(), true))) {
                                 outName.setVal(obj);
                                 outNs.setVal(pkg);
-                                outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants,true));
+                                outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants, true));
                                 outPropNsKind.setVal(t.getName(abc).getNamespace(abc.constants).kind);
                                 outPropNsIndex.setVal(abc.constants.getNamespaceSubIndex(t.getName(abc).namespace_index));
                                 outPropType.setVal(getTraitReturnType(abc, t));
@@ -2215,7 +2215,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 Multiname clsName = ii.getName(abc.constants);
                 if (obj.equals(clsName.getName(abc.constants, new ArrayList<String>(), true))) {
-                    if (eq(pkg, clsName.getNamespace(abc.constants).getName(abc.constants,true))) {
+                    if (eq(pkg, clsName.getNamespace(abc.constants).getName(abc.constants, true))) {
                         //class found
 
                         for (Trait t : ii.instance_traits.traits) {
@@ -2225,7 +2225,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>(), true))) {
                                 outName.setVal(obj);
                                 outNs.setVal(pkg);
-                                outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants,true));
+                                outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants, true));
                                 outPropNsKind.setVal(t.getName(abc).getNamespace(abc.constants).kind);
                                 outPropNsIndex.setVal(abc.constants.getNamespaceSubIndex(t.getName(abc).namespace_index));
                                 outPropType.setVal(getTraitReturnType(abc, t));
@@ -2245,7 +2245,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>(), true))) {
                                     outName.setVal(obj);
                                     outNs.setVal(pkg);
-                                    outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants,true));
+                                    outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants, true));
                                     outPropNsKind.setVal(t.getName(abc).getNamespace(abc.constants).kind);
                                     outPropNsIndex.setVal(abc.constants.getNamespaceSubIndex(t.getName(abc).namespace_index));
                                     outPropType.setVal(getTraitReturnType(abc, t));
@@ -2260,7 +2260,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                         Multiname superName = abc.constants.constant_multiname.get(ii.super_index);
                         if (superName != null) {
-                            return searchPrototypeChain(instanceOnly, abcs, superName.getNamespace(abc.constants).getName(abc.constants,true), superName.getName(abc.constants, new ArrayList<String>(), true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue);
+                            return searchPrototypeChain(instanceOnly, abcs, superName.getNamespace(abc.constants).getName(abc.constants, true), superName.getName(abc.constants, new ArrayList<String>(), true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue);
                         } else {
                             return false;
                         }
@@ -2274,7 +2274,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public static void parentNames(ABC abc, List<ABC> allABCs, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
         indices.add(name_index);
         names.add(abc.constants.constant_multiname.get(name_index).getName(abc.constants, new ArrayList<String>(), true));
-        namespaces.add(abc.constants.constant_multiname.get(name_index).getNamespace(abc.constants).getName(abc.constants,true));
+        namespaces.add(abc.constants.constant_multiname.get(name_index).getNamespace(abc.constants).getName(abc.constants, true));
         Multiname mname = abc.constants.constant_multiname.get(name_index);
 
         outABCs.add(abc);
@@ -2288,7 +2288,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 Multiname m = a.constants.constant_multiname.get(a.instance_info.get(i).name_index);
                 if (m.getName(a.constants, new ArrayList<String>(), true).equals(mname.getName(abc.constants, new ArrayList<String>(), true))) {
 
-                    if (m.getNamespace(a.constants).hasName(mname.getNamespace(abc.constants).getName(abc.constants,true),a.constants)) {
+                    if (m.getNamespace(a.constants).hasName(mname.getNamespace(abc.constants).getName(abc.constants, true), a.constants)) {
                         //Multiname superName = a.constants.constant_multiname.get(a.instance_info.get(i).super_index);
                         abcs.remove(a);
                         if (a.instance_info.get(i).super_index != 0) {
@@ -2392,7 +2392,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
             Multiname mname = abc.constants.constant_multiname.get(i);
             if (mname != null && name.equals(mname.getName(abc.constants, new ArrayList<String>(), true))) {
-                if (mname.getNamespace(abc.constants) != null && pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants,true))) {
+                if (mname.getNamespace(abc.constants) != null && pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants, true))) {
                     name_index = i;
                     break;
                 }

@@ -182,7 +182,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
         List<SoundStreamBlockTag> ret = new ArrayList<>();
-        SoundStreamHeadTag.populateSoundStreamBlocks(0,swf.tags, this, ret);
+        SoundStreamHeadTag.populateSoundStreamBlocks(0, swf.tags, this, ret);
         return ret;
 
     }
@@ -199,7 +199,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
 
     @Override
     public List<byte[]> getRawSoundData() {
-        List<byte[]> ret = new ArrayList<byte[]>();
+        List<byte[]> ret = new ArrayList<>();
         List<SoundStreamBlockTag> blocks = getBlocks();
         for (SoundStreamBlockTag block : blocks) {
             if (streamSoundCompression == SoundFormat.FORMAT_MP3) {

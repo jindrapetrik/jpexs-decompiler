@@ -80,7 +80,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         };
     }
     
-    // todo: honfika @Test(dataProvider = "provideBasicTrueExpressions")
+    @Test(dataProvider = "provideBasicTrueExpressions")
     public void testRemoveBasicTrueExpressions(String expression) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException{
         String res = recompile("if("+expression+"){"+
                     "trace(\"OK\");"+
@@ -88,14 +88,14 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
                     "trace(\"FAIL\");"+
                 "}");
         if(res.contains("\"FAIL\"")){
-            fail("OnFalse clause was not removed:"+res);
+            fail("OnFalse clause was not removed: " + res);
         }
         if(!res.contains("\"OK\"")){
-            fail("OnTrue clause was removed:"+res);
+            fail("OnTrue clause was removed: " + res);
         }
     }
     
-    // todo: honfika @Test(dataProvider = "provideBasicFalseExpressions")
+    @Test(dataProvider = "provideBasicFalseExpressions")
     public void testRemoveBasicFalseExpressions(String expression) throws Exception {
         String res = recompile("if("+expression+"){"+
                     "trace(\"FAIL\");"+

@@ -16,12 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
-import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
@@ -32,8 +27,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -51,7 +44,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
     private byte[] data;
     private JPanel swfInsidePanel;
     private TagNode node = null;
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
 
     public BinaryPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
@@ -65,7 +58,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
         add(bottomPanel, BorderLayout.SOUTH);
         addComponentListener(this);
         swfInsidePanel = new JPanel();
-        swfInsidePanel.setBackground(new Color(253,205,137));
+        swfInsidePanel.setBackground(new Color(253, 205, 137));
         swfInsidePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         swfInsidePanel.add(new JLabel(AppStrings.translate("binarydata.swfInside")));
         swfInsidePanel.setFocusable(true);
@@ -90,7 +83,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
             hexEditor.setData(data, null, null);
 
             if (node != null) {
-                if(node.subNodes.isEmpty() && data.length>8){
+                if (node.subNodes.isEmpty() && data.length > 8) {
                     try {
                         String signature = new String(data, 0, 3, Utf8Helper.charset);
                         if (Arrays.asList(
@@ -101,11 +94,11 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
                                 "CFX" //Compressed ScaleForm GFx
                         ).contains(signature)) {
                             swfInsidePanel.setVisible(true);
-                        }                        
+                        }
                     } catch (Exception ex) {
                         swfInsidePanel.setVisible(false);
                     }
-                }else{
+                } else {
                     swfInsidePanel.setVisible(false);
                 }
             } else {

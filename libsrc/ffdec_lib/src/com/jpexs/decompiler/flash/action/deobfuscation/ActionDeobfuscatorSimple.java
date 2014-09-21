@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -44,12 +45,15 @@ import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -69,6 +73,9 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
             return false;
         }
 
+        removeUnreachableActions(actions);
+        removeZeroJumps(actions);
+
         for (int i = 0; i < actions.size(); i++) {
             ExecutionResult result = new ExecutionResult();
             executeActions(actions, i, actions.size() - 1, result);
@@ -79,7 +86,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     newIstructionCount++;
                 }
 
-                if (newIstructionCount * 2 < result.instructionsProcessed) {
+                if (newIstructionCount + 1 < result.instructionsProcessed) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 
@@ -99,11 +106,106 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     jump.setAddress(prevAction.getAddress());
                     jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
                     actions.addAction(i++, jump);
+
+                    Action nextAction = actions.size() > i ? actions.get(i) : null;
+
+                    removeUnreachableActions(actions);
+                    removeZeroJumps(actions);
+
+                    if (nextAction != null) {
+                        int nextIdx = actions.indexOf(nextAction);
+                        if (nextIdx < i) {
+                            i = nextIdx;
+                        }
+                    }
                 }
             }
         }
 
         return false;
+    }
+
+    protected boolean removeUnreachableActions(ActionList actions) {
+        Set<Action> reachableActions = new HashSet<>();
+        Set<Action> processedActions = new HashSet<>();
+        reachableActions.add(actions.get(0));
+        boolean modified = true;
+        while (modified) {
+            modified = false;
+            for (int i = 0; i < actions.size(); i++) {
+                Action action = actions.get(i);
+                if (reachableActions.contains(action) && !processedActions.contains(action)) {
+                    if (!action.isExit() && !(action instanceof ActionJump) && i != actions.size() - 1) {
+                        Action next = actions.get(i + 1);
+                        if (!reachableActions.contains(next)) {
+                            reachableActions.add(next);
+                        }
+                    }
+
+                    if (action instanceof ActionJump) {
+                        ActionJump aJump = (ActionJump) action;
+                        long ref = aJump.getAddress() + aJump.getTotalActionLength() + aJump.getJumpOffset();
+                        Action target = actions.getByAddress(ref);
+                        if (target != null && !reachableActions.contains(target)) {
+                            reachableActions.add(target);
+                        }
+                    } else if (action instanceof ActionIf) {
+                        ActionIf aIf = (ActionIf) action;
+                        long ref = aIf.getAddress() + aIf.getTotalActionLength() + aIf.getJumpOffset();
+                        Action target = actions.getByAddress(ref);
+                        if (target != null && !reachableActions.contains(target)) {
+                            reachableActions.add(target);
+                        }
+                    } else if (action instanceof ActionStore) {
+                        ActionStore aStore = (ActionStore) action;
+                        int storeSize = aStore.getStoreSize();
+                        if (actions.size() > i + storeSize) {
+                            Action target = actions.get(i + storeSize);
+                            if (!reachableActions.contains(target)) {
+                                reachableActions.add(target);
+                            }
+                        }
+                    } else if (action instanceof GraphSourceItemContainer) {
+                        GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+                        long ref = action.getAddress() + action.getTotalActionLength();
+                        for (Long size : container.getContainerSizes()) {
+                            ref += size;
+                            Action target = actions.getByAddress(ref);
+                            if (target != null && !reachableActions.contains(target)) {
+                                reachableActions.add(target);
+                            }
+                        }
+                    }
+
+                    processedActions.add(action);
+                    modified = true;
+                }
+            }
+        }
+
+        boolean result = false;
+        for (int i = 0; i < actions.size(); i++) {
+            if (!reachableActions.contains(actions.get(i))) {
+                actions.removeAction(i);
+                i--;
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    protected boolean removeZeroJumps(ActionList actions) {
+        boolean result = false;
+        for (int i = 0; i < actions.size(); i++) {
+            Action action = actions.get(i);
+            if (action instanceof ActionJump && ((ActionJump) action).getJumpOffset() == 0) {
+                actions.removeAction(i);
+                i--;
+                result = true;
+            }
+        }
+        return result;
     }
 
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) {
@@ -146,7 +248,8 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                         || action instanceof ActionBitRShift
                         || action instanceof ActionEquals
                         || action instanceof ActionNot
-                        || action instanceof ActionIf)) {
+                        || action instanceof ActionIf
+                        || action instanceof ActionJump)) {
                     break;
                 }
 
@@ -165,6 +268,15 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 }
 
                 idx++;
+
+                if (action instanceof ActionJump) {
+                    ActionJump jump = (ActionJump) action;
+                    long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
+                    idx = actions.indexOf(actions.getByAddress(address));
+                    if (idx == -1) {
+                        throw new TranslateException("Jump target not found: " + address);
+                    }
+                }
 
                 if (action instanceof ActionIf) {
                     ActionIf aif = (ActionIf) action;

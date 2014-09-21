@@ -190,7 +190,7 @@ public class ActionList extends ArrayList<Action> {
     public String toString() {
         return Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE);
     }
-    
+
     public String toSource() {
         try {
             return Action.actionsToSource(null, this, "");

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # FFDec requires Oracle Java 7
 # Look for java in these directories
 LOOKUP_JRE_DIRS="/usr/lib/jvm/* /opt/java* /opt/jre*"

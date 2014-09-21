@@ -43,7 +43,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -174,7 +173,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
             } else if (t instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) t).textRecords;
             }
-            
+
             if (textRecords != null) {
                 int curFontId = 0;
                 for (TEXTRECORD tr : textRecords) {
@@ -192,7 +191,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
                             en.glyphIndex++;
                         }
                     }
-                    
+
                     t.setModified(true);
                 }
             }

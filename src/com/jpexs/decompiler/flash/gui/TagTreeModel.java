@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.ClassesListNode;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
@@ -26,7 +25,6 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFContainerNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -44,14 +42,10 @@ import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.HeaderNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -106,17 +100,16 @@ public class TagTreeModel implements TreeModel {
         return mainFrame.translate(key);
     }
 
-    
-    private List<TreeNode> getSoundStreams(DefineSpriteTag sprite){
-        List<TreeNode> ret=new ArrayList<>();
-        for(Tag t:sprite.subTags){
-            if(t instanceof SoundStreamHeadTypeTag){
+    private List<TreeNode> getSoundStreams(DefineSpriteTag sprite) {
+        List<TreeNode> ret = new ArrayList<>();
+        for (Tag t : sprite.subTags) {
+            if (t instanceof SoundStreamHeadTypeTag) {
                 ret.add(new TagNode(t));
             }
         }
         return ret;
     }
-    
+
     private List<TreeNode> createTagList(List<Tag> list, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
         boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
 
@@ -149,7 +142,7 @@ public class TagTreeModel implements TreeModel {
                     break;
                 case SPRITE:
                     sprites.add(new TagNode(t));
-                    sounds.addAll(getSoundStreams((DefineSpriteTag)t));
+                    sounds.addAll(getSoundStreams((DefineSpriteTag) t));
                     break;
                 case BUTTON:
                     buttons.add(new TagNode(t));
@@ -171,7 +164,7 @@ public class TagTreeModel implements TreeModel {
                     break;
                 case BINARY_DATA:
                     TagNode bt;
-                    binaryData.add(bt = new TagNode(t));                                                            
+                    binaryData.add(bt = new TagNode(t));
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {

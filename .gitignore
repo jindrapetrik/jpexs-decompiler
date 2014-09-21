@@ -33,6 +33,7 @@ hs_err_pid*.log
 /libsrc/ffdec_lib/dist/
 /libsrc/ffdec_lib/testdata/decompile/
 /libsrc/ffdec_lib/testdata/recompile/
+/libsrc/ffdec_lib/coverage.ec
 /libsrc/ffdec_lib/revision.txt
 /libsrc/jpproxy/nbproject/private/
 /libsrc/jpproxy/dist/

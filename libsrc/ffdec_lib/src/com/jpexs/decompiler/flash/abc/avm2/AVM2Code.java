@@ -1209,17 +1209,18 @@ public class AVM2Code implements Cloneable {
 
     /**
      * Test for killed register. CalcKilledStats must be called before
+     *
      * @param regName
      * @param start
      * @param end
-     * @return 
+     * @return
      */
-    public boolean isKilled(int regName, int start, int end) {   
-        if(!killedRegs.containsKey(regName)){
+    public boolean isKilled(int regName, int start, int end) {
+        if (!killedRegs.containsKey(regName)) {
             return false;
         }
-        for(int ip:killedRegs.get(regName)){
-            if(ip>=start && ip<=end){
+        for (int ip : killedRegs.get(regName)) {
+            if (ip >= start && ip <= end) {
                 return true;
             }
         }
@@ -1239,32 +1240,32 @@ public class AVM2Code implements Cloneable {
         return localRegNames;
     }
 
-    private Map<Integer,Set<Integer>> killedRegs=new HashMap<Integer,Set<Integer>>();
-    
-    public void calcKilledStats(MethodBody body){
+    private Map<Integer, Set<Integer>> killedRegs = new HashMap<>();
+
+    public void calcKilledStats(MethodBody body) {
         killedRegs.clear();
         try {
-            HashMap<Integer,List<Integer>> vis=visitCode(body);
-            for(int k=0;k<code.size();k++){
-                if(vis.get(k).isEmpty()){
+            HashMap<Integer, List<Integer>> vis = visitCode(body);
+            for (int k = 0; k < code.size(); k++) {
+                if (vis.get(k).isEmpty()) {
                     continue;
                 }
                 if (code.get(k).definition instanceof KillIns) {
                     int regid = code.get(k).operands[0];
-                    if(!killedRegs.containsKey(regid)){
+                    if (!killedRegs.containsKey(regid)) {
                         killedRegs.put(regid, new HashSet<Integer>());
                     }
                     killedRegs.get(regid).add(k);
                 }
             }
-            
+
         } catch (InterruptedException ex) {
             //ignored
         }
     }
-    
+
     public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
-         for (int i = 0; i < output.size(); i++) {
+        for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
                     SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);

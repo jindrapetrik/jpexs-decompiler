@@ -403,14 +403,14 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @return source ASM
-     * 
+     *
      */
     public static String actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode) {
         HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
         actionsToString(listeners, address, list, version, exportMode, writer);
         return writer.toString();
     }
-    
+
     /**
      * Converts list of actions to ASM source
      *

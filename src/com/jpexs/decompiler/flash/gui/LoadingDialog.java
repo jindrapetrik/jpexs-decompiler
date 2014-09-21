@@ -64,6 +64,8 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
 
     /**
      * Constructor
+     *
+     * @param owner
      */
     public LoadingDialog(Window owner) {
         super(owner);
