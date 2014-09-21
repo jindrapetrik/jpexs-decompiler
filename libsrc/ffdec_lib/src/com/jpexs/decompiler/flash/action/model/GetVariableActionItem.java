@@ -40,6 +40,13 @@ public class GetVariableActionItem extends ActionItem {
     private boolean computedVariableComputed = false;
 
     @Override
+    public String toString() {
+        return name.toString();
+    }
+
+    
+    
+    @Override
     public List<GraphTargetItem> getAllSubItems() {
         List<GraphTargetItem> ret = new ArrayList<>();
         ret.add(name);
