@@ -273,7 +273,7 @@ public class MethodBody implements Cloneable {
         abc.method_info.get(method_info).setFlagSetsdxns(stats.has_set_dxns);
         abc.method_info.get(method_info).setFlagNeed_activation(stats.has_activation);
         MethodInfo mi = abc.method_info.get(method_info);
-        int min_regs = mi.param_types.length + (hasThis ? 1 : 0) + (mi.flagNeed_rest() ? 1 : 0);
+        int min_regs = mi.param_types.length + 1 + (mi.flagNeed_rest() ? 1 : 0);
         if (max_regs < min_regs) {
             max_regs = min_regs;
         }
