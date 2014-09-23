@@ -1386,6 +1386,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.traitUsages = localData.traitUsages;
         newlocalData.currentScript = localData.currentScript;
         newlocalData.documentClass = localData.documentClass;
+        newlocalData.subMethod = subMethod;
         localData = newlocalData;
 
         localData.activationReg = 0;

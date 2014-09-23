@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -49,6 +50,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
     public boolean documentClass;
     public ScriptInfo currentScript;
+    public boolean subMethod = false;
 
     public String getFullClass() {
         return pkg == null || pkg.isEmpty() ? currentClass : pkg + "." + currentClass;
