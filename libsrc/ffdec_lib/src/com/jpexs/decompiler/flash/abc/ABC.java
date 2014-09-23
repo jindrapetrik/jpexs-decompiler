@@ -661,14 +661,14 @@ public class ABC {
             aos.writeTraits(si.traits);
         }
 
-        aos.writeU30(bodies.size());
+        aos.writeU30(bodies.size());        
         for (MethodBody mb : bodies) {
             aos.writeU30(mb.method_info);
             aos.writeU30(mb.max_stack);
             aos.writeU30(mb.max_regs);
             aos.writeU30(mb.init_scope_depth);
             aos.writeU30(mb.max_scope_depth);
-            byte[] codeBytes = mb.getCode().getBytes();
+            byte[] codeBytes = mb.getCode().getBytes();            
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
             aos.writeU30(mb.exceptions.length);
