@@ -784,62 +784,75 @@ public class AVM2Code implements Cloneable {
         return null;
     }
 
-    public AVM2Code(ABCInputStream ais) throws IOException {        
-        //Note: special jump handling like in AS1/2 is not needed as code must pass FlashPlayer verification
-        
+    public AVM2Code(ABCInputStream ais) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
         DumpInfo diParent = ais.dumpInfo;
-        try {
-            while (ais.available() > 0) {
-                DumpInfo di = ais.newDumpLevel("instruction", "instruction");
-                long startOffset = ais.getPosition();
-                int instructionCode = ais.read("instructionCode");
-                InstructionDefinition instr = instructionSetByCode[instructionCode];
-                if (di != null) {
-                    di.name = instr.instructionName;
-                }
-                if (instr != null) {
-                    int[] actualOperands = null;
-                    if (instructionCode == 0x1b) { //switch
-                        int firstOperand = ais.readS24("default_offset");
-                        int case_count = ais.readU30("case_count");
-                        actualOperands = new int[case_count + 3];
-                        actualOperands[0] = firstOperand;
-                        actualOperands[1] = case_count;
-                        for (int c = 0; c < case_count + 1; c++) {
-                            actualOperands[2 + c] = ais.readS24("operand");
-                        }
-                    } else {
-                        if (instr.operands.length > 0) {
-                            actualOperands = new int[instr.operands.length];
-                            for (int op = 0; op < instr.operands.length; op++) {
-                                switch (instr.operands[op] & 0xff00) {
-                                    case OPT_U30:
-                                        actualOperands[op] = ais.readU30("operand");
-                                        break;
-                                    case OPT_U8:
-                                        actualOperands[op] = ais.readU8("operand");
-                                        break;
-                                    case OPT_BYTE:
-                                        actualOperands[op] = (byte) ais.read("operand");
-                                        break;
-                                    case OPT_S24:
-                                        actualOperands[op] = ais.readS24("operand");
-                                        break;
+        List<Long> addresses = new ArrayList<>();
+        addresses.add(ais.getPosition());
+        while (!addresses.isEmpty()) {
+            long address = addresses.remove(0);
+            if (codeMap.containsKey(address)) {
+                continue;
+            }
+            try {
+                ais.seek(address);
+                while (ais.available() > 0) {
+                    DumpInfo di = ais.newDumpLevel("instruction", "instruction");
+                    long startOffset = ais.getPosition();
+                    int instructionCode = ais.read("instructionCode");
+                    InstructionDefinition instr = instructionSetByCode[instructionCode];
+                    if (di != null) {
+                        di.name = instr.instructionName;
+                    }
+                    if (instr != null) {
+                        int[] actualOperands = null;
+                        if (instructionCode == 0x1b) { //switch
+                            int firstOperand = ais.readS24("default_offset");
+                            int case_count = ais.readU30("case_count");
+                            actualOperands = new int[case_count + 3];
+                            actualOperands[0] = firstOperand;
+                            actualOperands[1] = case_count;
+                            for (int c = 0; c < case_count + 1; c++) {
+                                actualOperands[2 + c] = ais.readS24("actualOperand");
+                            }
+                        } else {
+                            if (instr.operands.length > 0) {
+                                actualOperands = new int[instr.operands.length];
+                                for (int op = 0; op < instr.operands.length; op++) {
+                                    switch (instr.operands[op] & 0xff00) {
+                                        case OPT_U30:
+                                            actualOperands[op] = ais.readU30("operand");
+                                            break;
+                                        case OPT_U8:
+                                            actualOperands[op] = ais.read("operand");
+                                            break;
+                                        case OPT_BYTE:
+                                            actualOperands[op] = (byte) ais.read("operand");
+                                            break;
+                                        case OPT_S24:
+                                            actualOperands[op] = ais.readS24("operand");
+                                            break;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    codeMap.put(startOffset, new AVM2Instruction(startOffset, instr, actualOperands));
-                    ais.endDumpLevel(instr.instructionCode);
-                } else {
-                    ais.endDumpLevel();
-                    break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
+                        if (instr instanceof IfTypeIns) {
+                            long target = ais.getPosition() + actualOperands[0];
+                            addresses.add(target);
+                        }
+                        codeMap.put(startOffset, new AVM2Instruction(startOffset, instr, actualOperands));
+                        ais.endDumpLevel(instr.instructionCode);
+                    } else {
+                        ais.endDumpLevel();
+                        break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
+                        //throw new UnknownInstructionCode(instructionCode);
+                    }
                 }
+            } catch (EndOfStreamException ex) {
+                // lookupswitch obfuscation, ignore
+                ais.endDumpLevelUntil(diParent);
             }
-        } catch (EndOfStreamException ex) {
-            ais.endDumpLevelUntil(diParent);
         }
 
         code.addAll(codeMap.values());
