@@ -189,8 +189,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             if (text.trim().startsWith("#hexdata")) {
                 byte[] data = Helper.getBytesFromHexaText(text);
                 MethodBody mb = abc.bodies.get(bodyIndex);
-                mb.codeBytes = data;
-                mb.setCode(null);
+                mb.setCodeBytes(data);
             } else {
                 AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
@@ -214,7 +213,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                         return true;
                     }
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
-                acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
+                //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
             }
             ((Tag) abc.parentTag).setModified(true);

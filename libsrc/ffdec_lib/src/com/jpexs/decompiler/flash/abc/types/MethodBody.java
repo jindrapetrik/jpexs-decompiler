@@ -54,13 +54,26 @@ public class MethodBody implements Cloneable {
     public int max_regs;
     public int init_scope_depth;
     public int max_scope_depth;
-    public byte[] codeBytes;
+    private byte[] codeBytes = new byte[0];
     private AVM2Code code;
     public ABCException[] exceptions = new ABCException[0];
     public Traits traits = new Traits();
     public transient List<GraphTargetItem> convertedItems;
     public transient Throwable convertException;
 
+    public synchronized void setCodeBytes(byte codeBytes[]){
+        this.codeBytes = codeBytes;
+        this.code = null;
+    }
+    
+    public synchronized byte[] getCodeBytes() {
+        if(code == null){
+            return codeBytes;
+        }else{
+            return code.getBytes();
+        }
+    }
+    
     public synchronized AVM2Code getCode() {
         if (code == null) {
             AVM2Code avm2Code;

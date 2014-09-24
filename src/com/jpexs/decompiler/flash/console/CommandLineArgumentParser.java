@@ -1458,8 +1458,7 @@ public class CommandLineArgumentParser {
         if (text.trim().startsWith("#hexdata")) {
             byte[] data = Helper.getBytesFromHexaText(text);
             MethodBody mb = abc.bodies.get(bodyIndex);
-            mb.codeBytes = data;
-            mb.setCode(null);
+            mb.setCodeBytes(data);
         } else {
             try {
                 AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
@@ -1484,7 +1483,7 @@ public class CommandLineArgumentParser {
                         return true;
                     }
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
-                acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
+                //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
             } catch (AVM2ParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));

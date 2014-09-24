@@ -545,7 +545,7 @@ public class ABC {
             mb.init_scope_depth = ais.readU30("init_scope_depth");
             mb.max_scope_depth = ais.readU30("max_scope_depth");
             int code_length = ais.readU30("code_length");
-            mb.codeBytes = ais.readBytes(code_length, "code");
+            mb.setCodeBytes(ais.readBytes(code_length, "code"));
             int ex_count = ais.readU30("ex_count");
             mb.exceptions = new ABCException[ex_count];
             for (int j = 0; j < ex_count; j++) {
@@ -668,7 +668,7 @@ public class ABC {
             aos.writeU30(mb.max_regs);
             aos.writeU30(mb.init_scope_depth);
             aos.writeU30(mb.max_scope_depth);
-            byte[] codeBytes = mb.getCode().getBytes();            
+            byte[] codeBytes = mb.getCodeBytes();           
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
             aos.writeU30(mb.exceptions.length);

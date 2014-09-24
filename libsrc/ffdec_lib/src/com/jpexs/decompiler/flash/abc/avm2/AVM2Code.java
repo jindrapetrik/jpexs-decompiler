@@ -788,10 +788,16 @@ public class AVM2Code implements Cloneable {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
-        addresses.add(ais.getPosition());
+        long startPos = ais.getPosition();
+        addresses.add(startPos);
+        
         while (!addresses.isEmpty()) {
             long address = addresses.remove(0);
             if (codeMap.containsKey(address)) {
+                continue;
+            }
+            if(address<startPos) //no jump outside block
+            {
                 continue;
             }
             try {
