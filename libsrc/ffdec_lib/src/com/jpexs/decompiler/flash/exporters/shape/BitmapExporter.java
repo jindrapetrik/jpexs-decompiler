@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -129,6 +130,10 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
+        MultipleGradientPaint.ColorSpaceType cstype = MultipleGradientPaint.ColorSpaceType.SRGB;
+        if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
+            cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
+        }
         matrix.translateX /= unitDivisor;
         matrix.translateY /= unitDivisor;
         matrix.scaleX /= unitDivisor;
@@ -163,7 +168,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 fillPathPaint = null;
-                fillPaint = new LinearGradientPaint(new java.awt.Point(-16384, 0), new java.awt.Point(16384, 0), ratiosArr, colorsArr, cm);
+                fillPaint = new LinearGradientPaint(new java.awt.Point(-16384, 0), new java.awt.Point(16384, 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
                 matrix.translateX -= deltaX;
                 matrix.translateY -= deltaY;
                 fillTransform = matrix.toTransform();
@@ -231,7 +236,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm);
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
                 matrix.translateX -= deltaX;
                 matrix.translateY -= deltaY;
                 fillTransform = matrix.toTransform();
