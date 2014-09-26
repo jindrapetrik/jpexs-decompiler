@@ -12,11 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.awt.Color;
+import java.awt.color.ColorSpace;
 import java.io.Serializable;
 
 /**
@@ -38,13 +41,13 @@ public class MORPHGRADIENT implements Serializable {
     @Internal
     public int numGradients;
 
-    public MORPHGRADRECORD[] gradientRecords;
+    public MORPHGRADRECORD[] gradientRecords;   
 
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
-        int r = (c1.red + (c2.red - c1.red) * ratio / 65535);
-        int g = (c1.green + (c2.green - c1.green) * ratio / 65535);
-        int b = (c1.blue + (c2.blue - c1.blue) * ratio / 65535);
-        int a = (c1.alpha + (c2.alpha - c1.alpha) * ratio / 65535);
+        int r = (int) (c1.red + (c2.red - c1.red) * ratio / 65535.0 + 0.5);
+        int g = (int) (c1.green + (c2.green - c1.green) * ratio / 65535.0 + 0.5);
+        int b = (int) (c1.blue + (c2.blue - c1.blue + 0.5) * ratio / 65535.0 + 0.5);
+        int a = (int) (c1.alpha + (c2.alpha - c1.alpha) * ratio / 65535.0f + 0.5);
         if (r > 255) {
             r = 255;
         }
