@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -24,8 +25,10 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 public class ShapeExportSettings {
 
     public ShapeExportMode mode;
+    public double zoom;
 
-    public ShapeExportSettings(ShapeExportMode mode) {
+    public ShapeExportSettings(ShapeExportMode mode, double zoom) {
         this.mode = mode;
+        this.zoom = zoom;
     }
 }

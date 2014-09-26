@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -51,8 +52,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     private final SWF swf;
     private final SVGExporter exporter;
 
-    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform) {
-        super(shape, endShape, colorTransform);
+    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+        super(shape, endShape, colorTransform, zoom);
         this.swf = swf;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
@@ -145,14 +146,14 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    matrix.rotateSkew0 /= SWF.unitDivisor;
-                    matrix.rotateSkew1 /= SWF.unitDivisor;
-                    matrix.scaleX /= SWF.unitDivisor;
-                    matrix.scaleY /= SWF.unitDivisor;
-                    matrixEnd.rotateSkew0 /= SWF.unitDivisor;
-                    matrixEnd.rotateSkew1 /= SWF.unitDivisor;
-                    matrixEnd.scaleX /= SWF.unitDivisor;
-                    matrixEnd.scaleY /= SWF.unitDivisor;
+                    matrix.rotateSkew0 *= zoom/SWF.unitDivisor;
+                    matrix.rotateSkew1 *= zoom/SWF.unitDivisor;
+                    matrix.scaleX *= zoom/SWF.unitDivisor;
+                    matrix.scaleY *= zoom/SWF.unitDivisor;
+                    matrixEnd.rotateSkew0 *= zoom/SWF.unitDivisor;
+                    matrixEnd.rotateSkew1 *= zoom/SWF.unitDivisor;
+                    matrixEnd.scaleX *= zoom/SWF.unitDivisor;
+                    matrixEnd.scaleY *= zoom/SWF.unitDivisor;
                     addMatrixAnimation(pattern, "patternTransform", matrix, matrixEnd);
                 }
                 Element imageElement = exporter.createElement("image");
@@ -168,8 +169,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     @Override
     public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= SWF.unitDivisor;
-        thicknessEnd /= SWF.unitDivisor;
+        thickness *= zoom/SWF.unitDivisor;
+        thicknessEnd *= zoom/SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
@@ -254,11 +255,11 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         final int animationLength = 2; // todo
         final String animationLengthStr = animationLength + "s";
 
-        element.setAttribute(attribute, matrix.getTransformationString(SWF.unitDivisor, 1));
+        element.setAttribute(attribute, matrix.getTransformationString(SWF.unitDivisor/zoom, 1));
 
         // QR decomposition
-        double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
-        double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
+        double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
+        double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);
         double a = matrix.scaleX;
         double b = matrix.rotateSkew0;
         double c = matrix.rotateSkew1;
@@ -270,8 +271,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         double scaleY = roundPixels400(det / r);
         double skewX = roundPixels400(Math.atan((a * c + b * d) / (r * r)) * 180 / Math.PI);
 
-        double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
-        double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
+        double translateXEnd = roundPixels400(matrixEnd.translateX * zoom / SWF.unitDivisor);
+        double translateYEnd = roundPixels400(matrixEnd.translateY * zoom / SWF.unitDivisor);
         a = matrixEnd.scaleX;
         b = matrixEnd.rotateSkew0;
         c = matrixEnd.rotateSkew1;
@@ -337,8 +338,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         /*
          // LDU decomposition
         
-         double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
-         double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
+         double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
+         double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);
          double a = matrix.scaleX;
          double b = matrix.rotateSkew0;
          double c = matrix.rotateSkew1;
@@ -349,8 +350,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
          double scaleY =  roundPixels400(det / a);
          double skewX = roundPixels400(Math.atan2(c, a) * 180 / Math.PI);
 
-         double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
-         double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
+         double translateXEnd = roundPixels400(matrixEnd.translateX * zoom / SWF.unitDivisor);
+         double translateYEnd = roundPixels400(matrixEnd.translateY * zoom / SWF.unitDivisor);
          a = matrixEnd.scaleX;
          b = matrixEnd.rotateSkew0;
          c = matrixEnd.rotateSkew1;

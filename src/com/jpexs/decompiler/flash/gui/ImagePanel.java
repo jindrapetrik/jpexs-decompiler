@@ -86,6 +86,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private final IconPanel iconPanel;
     private int time = 0;
     private int selectedDepth = -1;
+    public double zoom = 1.0;
 
     public void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -518,8 +519,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode());
+    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode())+"_"+zoom;
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -528,13 +529,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 if (rect == null) { //??? Why?
                     rect = new RECT(0, 0, 1, 1);
                 }
-                int width = rect.getWidth();
-                int height = rect.getHeight();
+                int width = (int)(rect.getWidth()*zoom);
+                int height = (int)(rect.getHeight()*zoom);
                 SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                         (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
+                m.scale(zoom);
                 drawable.getTimeline().toImage(frame, time, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
 
                 Graphics2D gg = (Graphics2D) image.getGraphics();
@@ -551,6 +553,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             DrawableTag dt = (DrawableTag) cht;
                             Shape outline = dt.getOutline(0, ds.time, ds.ratio, stateUnderCursor, mouseButton, new Matrix(ds.matrix));
                             Rectangle bounds = outline.getBounds();
+                            bounds.x *= zoom;
+                            bounds.y *= zoom;
+                            bounds.width *= zoom;
+                            bounds.height *= zoom;
                             bounds.x /= 20;
                             bounds.y /= 20;
                             bounds.width /= 20;
@@ -597,7 +603,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
         updatePos(lastMouseEvent, false);
-        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth);
+        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoom);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);

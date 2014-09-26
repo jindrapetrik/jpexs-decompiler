@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -335,15 +336,15 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, exporter, null, colorTransform);
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, exporter, null, colorTransform, zoom);
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, exporter, null, colorTransform);
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, exporter, null, colorTransform, zoom);
             shapeExporter.export();
         }
     }

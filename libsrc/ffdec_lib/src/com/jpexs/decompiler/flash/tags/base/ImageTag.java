@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -160,8 +161,8 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), exporter, null, colorTransform);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException {
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), exporter, null, colorTransform, zoom);
         shapeExporter.export();
     }
 

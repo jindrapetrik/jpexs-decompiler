@@ -1090,11 +1090,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
                     new ImageExportSettings(export.getValue(ImageExportMode.class))));
             ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
-                    new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
+                    new ShapeExportSettings(export.getValue(ShapeExportMode.class),export.getZoom())));
             ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
-                    new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
+                    new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class),export.getZoom())));
             ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
-                    new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
+                    new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom())));
             ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
                     new MovieExportSettings(export.getValue(MovieExportMode.class))));
             ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds,
@@ -1106,7 +1106,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
                 ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
-                        new FramesExportSettings(export.getValue(FramesExportMode.class))));
+                        new FramesExportSettings(export.getValue(FramesExportMode.class),export.getZoom())));
             }
             List<ABCContainerTag> abcList = swf.abcList;
             if (abcPanel != null) {
@@ -1675,11 +1675,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportImages(errorHandler, selFile + File.separator + "images",
                                         new ImageExportSettings(export.getValue(ImageExportMode.class)));
                                 swf.exportShapes(errorHandler, selFile + File.separator + "shapes",
-                                        new ShapeExportSettings(export.getValue(ShapeExportMode.class)));
+                                        new ShapeExportSettings(export.getValue(ShapeExportMode.class),export.getZoom()));
                                 swf.exportMorphShapes(errorHandler, selFile + File.separator + "morphshapes",
-                                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class)));
+                                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class),export.getZoom()));
                                 swf.exportTexts(errorHandler, selFile + File.separator + "texts",
-                                        new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get()));
+                                        new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(),export.getZoom()));
                                 swf.exportMovies(errorHandler, selFile + File.separator + "movies",
                                         new MovieExportSettings(export.getValue(MovieExportMode.class)));
                                 swf.exportSounds(errorHandler, selFile + File.separator + "sounds",
@@ -1689,11 +1689,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportFonts(errorHandler, selFile + File.separator + "fonts",
                                         new FontExportSettings(export.getValue(FontExportMode.class)));
                                 swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null,
-                                        new FramesExportSettings(export.getValue(FramesExportMode.class)));
+                                        new FramesExportSettings(export.getValue(FramesExportMode.class),export.getZoom()));
                                 for (CharacterTag c : swf.characters.values()) {
                                     if (c instanceof DefineSpriteTag) {
                                         swf.exportFrames(errorHandler, selFile + File.separator + "frames", c.getCharacterId(), null,
-                                                new FramesExportSettings(export.getValue(FramesExportMode.class)));
+                                                new FramesExportSettings(export.getValue(FramesExportMode.class),export.getZoom()));
                                     }
                                 }
                                 swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());

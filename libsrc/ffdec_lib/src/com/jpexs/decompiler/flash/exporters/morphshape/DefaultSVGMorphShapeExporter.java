@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -34,9 +35,11 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     protected String currentDrawCommand = "";
     protected String pathData;
     protected String pathDataEnd;
+    protected double zoom;
 
-    public DefaultSVGMorphShapeExporter(SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
+    public DefaultSVGMorphShapeExporter(SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double zoom) {
         super(shape, endShape, colorTransform);
+        this.zoom = zoom;
     }
 
     @Override
@@ -97,11 +100,11 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     public void moveTo(double x, double y, double x2, double y2) {
         currentDrawCommand = "";
         pathData += "M"
-                + roundPixels20(x / SWF.unitDivisor) + " "
-                + roundPixels20(y / SWF.unitDivisor) + " ";
+                + roundPixels20(x * zoom/ SWF.unitDivisor) + " "
+                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
         pathDataEnd += "M"
-                + roundPixels20(x2 / SWF.unitDivisor) + " "
-                + roundPixels20(y2 / SWF.unitDivisor) + " ";
+                + roundPixels20(x2 * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(y2 * zoom / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -111,10 +114,10 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
             pathData += "L";
             pathDataEnd += "L";
         }
-        pathData += roundPixels20(x / SWF.unitDivisor) + " "
-                + roundPixels20(y / SWF.unitDivisor) + " ";
-        pathDataEnd += roundPixels20(x2 / SWF.unitDivisor) + " "
-                + roundPixels20(y2 / SWF.unitDivisor) + " ";
+        pathData += roundPixels20(x * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
+        pathDataEnd += roundPixels20(x2 * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(y2 * zoom / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -124,14 +127,14 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
             pathData += "Q";
             pathDataEnd += "Q";
         }
-        pathData += roundPixels20(controlX / SWF.unitDivisor) + " "
-                + roundPixels20(controlY / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY / SWF.unitDivisor) + " ";
-        pathDataEnd += roundPixels20(controlX2 / SWF.unitDivisor) + " "
-                + roundPixels20(controlY2 / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX2 / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY2 / SWF.unitDivisor) + " ";
+        pathData += roundPixels20(controlX * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(controlY * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorX * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorY * zoom / SWF.unitDivisor) + " ";
+        pathDataEnd += roundPixels20(controlX2 * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(controlY2 * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorX2 * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorY2 * zoom / SWF.unitDivisor) + " ";
     }
 
     protected void finalizePath() {

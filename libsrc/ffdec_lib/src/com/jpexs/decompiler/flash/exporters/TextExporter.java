@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -71,7 +72,7 @@ public class TextExporter {
                             try (FileOutputStream fos = new FileOutputStream(file)) {
                                 ExportRectangle rect = new ExportRectangle(textTag.getRect(new HashSet<BoundedTag>()));
                                 SVGExporter exporter = new SVGExporter(rect);
-                                textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                         }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -33,9 +34,11 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected String currentDrawCommand = "";
     protected String pathData;
+    protected double zoom;
 
-    public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform) {
+    public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform, double zoom) {
         super(shape, colorTransform);
+        this.zoom = zoom;
     }
 
     @Override
@@ -96,8 +99,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     public void moveTo(double x, double y) {
         currentDrawCommand = "";
         pathData += "M"
-                + roundPixels20(x / SWF.unitDivisor) + " "
-                + roundPixels20(y / SWF.unitDivisor) + " ";
+                + roundPixels20(x * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -106,8 +109,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
             currentDrawCommand = DRAW_COMMAND_L;
             pathData += "L";
         }
-        pathData += roundPixels20(x / SWF.unitDivisor) + " "
-                + roundPixels20(y / SWF.unitDivisor) + " ";
+        pathData += roundPixels20(x * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -116,10 +119,10 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
             currentDrawCommand = DRAW_COMMAND_Q;
             pathData += "Q";
         }
-        pathData += roundPixels20(controlX / SWF.unitDivisor) + " "
-                + roundPixels20(controlY / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY / SWF.unitDivisor) + " ";
+        pathData += roundPixels20(controlX * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(controlY * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorX * zoom / SWF.unitDivisor) + " "
+                + roundPixels20(anchorY * zoom / SWF.unitDivisor) + " ";
     }
 
     protected void finalizePath() {

@@ -46,12 +46,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  *
@@ -101,8 +104,16 @@ public class ExportDialog extends AppDialog {
         FontExportMode.class,
         MorphShapeExportMode.class
     };
+    
+    Class[] zoomClasses = {
+        ShapeExportMode.class,
+        TextExportMode.class,
+        FramesExportMode.class,
+        MorphShapeExportMode.class
+    };
 
     private final JComboBox[] combos;
+    private JTextField zoomTextField = new JTextField();
 
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
@@ -113,6 +124,11 @@ public class ExportDialog extends AppDialog {
         }
         return null;
     }
+    
+    public double getZoom(){
+        return Double.parseDouble(zoomTextField.getText())/100;
+    }
+       
 
     private void saveConfig() {
         String cfg = "";
@@ -126,7 +142,8 @@ public class ExportDialog extends AppDialog {
             }
             cfg += key;
         }
-        Configuration.lastSelectedExportFormats.set(cfg);
+        Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()));
+        Configuration.lastSelectedExportFormats.set(cfg);        
     }
 
     public ExportDialog(List<Object> exportables) {
@@ -166,6 +183,7 @@ public class ExportDialog extends AppDialog {
         List<String> exportFormats = Arrays.asList(exportFormatsArr);
         int comboWidth = 200;
         int top = 10;
+        boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
             Object vals[] = c.getEnumConstants();
@@ -200,12 +218,30 @@ public class ExportDialog extends AppDialog {
             if (!exportableExists) {
                 continue;
             }
+            if(Arrays.asList(zoomClasses).contains(c)){
+                zoomable = true;
+            }
             JLabel lab = new JLabel(translate(optionNames[i]));
             lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
             comboPanel.add(lab);
             comboPanel.add(combos[i]);
             top += combos[i].getHeight();
         }
+        int zoomWidth = 50;
+        if(zoomable){
+            top+=2;
+            JLabel zlab = new JLabel(translate("zoom"));
+            zlab.setBounds(10, top+4, zlab.getPreferredSize().width, zlab.getPreferredSize().height);        
+            zoomTextField.setBounds(10 + labWidth + 10, top, zoomWidth, zoomTextField.getPreferredSize().height);
+            JLabel pctLabel = new JLabel(translate("zoom.percent"));
+            pctLabel.setBounds(10 + labWidth + 10 + zoomWidth + 5, top+4, 20, pctLabel.getPreferredSize().height);        
+        
+            comboPanel.add(zlab);
+            comboPanel.add(zoomTextField);
+            comboPanel.add(pctLabel);
+            top+=zoomTextField.getHeight();
+        }
+        
         Dimension dim = new Dimension(10 + labWidth + 10 + comboWidth + 10, top + 10);
         comboPanel.setMinimumSize(dim);
         comboPanel.setPreferredSize(dim);
@@ -216,7 +252,13 @@ public class ExportDialog extends AppDialog {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveConfig();
+                try{
+                    saveConfig();
+                }catch(NumberFormatException nfe){
+                    JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
+                    zoomTextField.requestFocusInWindow();
+                    return;
+                }
                 setVisible(false);
             }
         });
@@ -235,11 +277,15 @@ public class ExportDialog extends AppDialog {
 
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
-        //setSize(245, top + getInsets().top);
         View.centerScreen(this);
         View.setWindowIcon(this);
         getRootPane().setDefaultButton(okButton);
         setModal(true);
+        String pct = ""+Configuration.lastSelectedExportZoom.get()*100;
+        if(pct.endsWith(".0")){
+            pct = pct.substring(0,pct.length()-2);
+        }
+        zoomTextField.setText(pct);
     }
 
     @Override

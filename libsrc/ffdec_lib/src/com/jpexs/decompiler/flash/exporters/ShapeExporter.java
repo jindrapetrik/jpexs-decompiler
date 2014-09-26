@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -80,7 +81,6 @@ public class ShapeExporter {
                 }
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
-                final int fcharacterID = characterID;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -89,19 +89,24 @@ public class ShapeExporter {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     ExportRectangle rect = new ExportRectangle(st.getRect(new HashSet<BoundedTag>()));
+                                    rect.xMax*=settings.zoom;
+                                    rect.yMax*=settings.zoom;
+                                    rect.xMin*=settings.zoom;
+                                    rect.yMin*=settings.zoom;
                                     SVGExporter exporter = new SVGExporter(rect);
-                                    st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                    st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
                             case PNG:
                                 RECT rect = st.getRect(new HashSet<BoundedTag>());
-                                int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
-                                int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
+                                int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                                int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor);
                                 SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                                 img.fillTransparent();
                                 Matrix m = new Matrix();
                                 m.translate(-rect.Xmin, -rect.Ymin);
+                                m.scale(settings.zoom);
                                 st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
                                 ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
                                 break;
@@ -110,7 +115,7 @@ public class ShapeExporter {
                                     SHAPE shp = st.getShapes();
                                     int deltaX = -shp.getBounds().Xmin;
                                     int deltaY = -shp.getBounds().Ymin;
-                                    CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
+                                    CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor/settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                     cse.export();
                                     Set<Integer> needed = new HashSet<>();
                                     needed.add(st.getCharacterId());

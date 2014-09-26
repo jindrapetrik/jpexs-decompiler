@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -51,8 +52,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     private final SWF swf;
     private final SVGExporter exporter;
 
-    public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform) {
-        super(shape, colorTransform);
+    public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+        super(shape, colorTransform, zoom);
         this.swf = swf;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
@@ -143,7 +144,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    pattern.setAttribute("patternTransform", matrix.getTransformationString(SWF.unitDivisor, SWF.unitDivisor));
+                    pattern.setAttribute("patternTransform", matrix.getTransformationString(SWF.unitDivisor/zoom, SWF.unitDivisor/zoom));
                 }
                 Element imageElement = exporter.createElement("image");
                 imageElement.setAttribute("width", "" + width);
@@ -158,7 +159,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= SWF.unitDivisor;
+        thickness *= zoom/SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
@@ -253,7 +254,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            gradient.setAttribute("gradientTransform", matrix.getTransformationString(SWF.unitDivisor, 1));
+            gradient.setAttribute("gradientTransform", matrix.getTransformationString(SWF.unitDivisor/zoom, 1));
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];

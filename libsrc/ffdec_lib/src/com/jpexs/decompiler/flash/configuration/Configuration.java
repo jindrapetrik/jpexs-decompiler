@@ -333,6 +333,11 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> showMethodBodyId = null;
+    
+    @ConfigurationDefaultDouble(1.0)
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<Double> lastSelectedExportZoom = null;
+    
 
     public static final ConfigurationItem<String> pluginPath = null;
 
@@ -653,6 +658,10 @@ public class Configuration {
         ConfigurationDefaultString aString = field.getAnnotation(ConfigurationDefaultString.class);
         if (aString != null) {
             defaultValue = aString.value();
+        }
+        ConfigurationDefaultDouble aDouble = field.getAnnotation(ConfigurationDefaultDouble.class);
+        if (aDouble != null) {
+            defaultValue = aDouble.value();
         }
         return defaultValue;
     }

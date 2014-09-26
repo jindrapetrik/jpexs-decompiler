@@ -380,7 +380,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
         } else if (nextParam.equals("-export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom);
         } else if (nextParam.equals("-compress")) {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
@@ -779,7 +779,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom) {
         if (args.size() < 3) {
             badArguments();
         }
@@ -890,9 +890,9 @@ public class CommandLineArgumentParser {
                         System.out.println("Exporting images...");
                         new ImageExporter().exportImages(handler, outDir.getAbsolutePath() + File.separator + "images", extags, new ImageExportSettings(ImageExportMode.PNG_JPEG));
                         System.out.println("Exporting shapes...");
-                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", extags, new ShapeExportSettings(ShapeExportMode.SVG));
+                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", extags, new ShapeExportSettings(ShapeExportMode.SVG,zoom));
                         System.out.println("Exporting morphshapes...");
-                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + File.separator + "morphshapes", extags, new MorphShapeExportSettings(MorphShapeExportMode.SVG));
+                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + File.separator + "morphshapes", extags, new MorphShapeExportSettings(MorphShapeExportMode.SVG,zoom));
                         System.out.println("Exporting scripts...");
                         exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
                         System.out.println("Exporting movies...");
@@ -911,7 +911,7 @@ public class CommandLineArgumentParser {
                         if (singleTextFile == null) {
                             singleTextFile = Configuration.textExportSingleFile.get();
                         }
-                        new TextExporter().exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", extags, new TextExportSettings(allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN, singleTextFile));
+                        new TextExporter().exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", extags, new TextExportSettings(allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN, singleTextFile, zoom));
                     }
                     break;
                     case "image": {
@@ -921,12 +921,12 @@ public class CommandLineArgumentParser {
                     break;
                     case "shape": {
                         System.out.println("Exporting shapes...");
-                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class)));
+                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class),zoom));
                     }
                     break;
                     case "morphshape": {
                         System.out.println("Exporting morphshapes...");
-                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class)));
+                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class),zoom));
                     }
                     break;
                     case "script": {
@@ -965,7 +965,7 @@ public class CommandLineArgumentParser {
                             }
                         }
                         exfile.exportFrames(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, frames,
-                                new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class)));
+                                new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class),zoom));
                     }
                     break;
                     case "sound": {
@@ -987,7 +987,7 @@ public class CommandLineArgumentParser {
                             singleTextFile = Configuration.textExportSingleFile.get();
                         }
                         new TextExporter().exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), extags,
-                                new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile));
+                                new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom));
                     }
                     break;
                     case "fla": {
@@ -1270,11 +1270,11 @@ public class CommandLineArgumentParser {
                         }
                         System.out.print("Page " + page + "/" + totalPages + "...");
                         RECT displayRect = new RECT(ds.getTimeline().displayRect);
-                        displayRect.Xmax *= zoom;
-                        displayRect.Ymax *= zoom;
+                        //displayRect.Xmax *= zoom;
+                        //displayRect.Ymax *= zoom;
                         Matrix m = new Matrix();
-                        m.scale(zoom);
-                        BufferedImage img = SWF.frameToImageGet(ds.getTimeline(), 0, 0, null, 0, displayRect, m, new ColorTransform(), Color.white, false).getBufferedImage();
+                        //m.scale(zoom);
+                        BufferedImage img = SWF.frameToImageGet(ds.getTimeline(), 0, 0, null, 0, displayRect, m, new ColorTransform(), Color.white, false, zoom).getBufferedImage();
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();

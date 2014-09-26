@@ -365,7 +365,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         return ret;
     }
 
-    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
+    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
@@ -460,7 +460,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
                             exporter.endGroup();
                             chs.put(ch, charId);

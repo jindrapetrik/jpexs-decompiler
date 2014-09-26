@@ -516,8 +516,8 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-        staticTextToSVG(swf, textRecords, 2, exporter, getRect(new HashSet<BoundedTag>()), getTextMatrix(), colorTransform);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
+        staticTextToSVG(swf, textRecords, 2, exporter, getRect(new HashSet<BoundedTag>()), getTextMatrix(), colorTransform, zoom);
     }
 
     @Override

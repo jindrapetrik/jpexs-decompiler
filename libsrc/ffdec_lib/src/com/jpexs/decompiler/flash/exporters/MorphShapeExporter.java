@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -80,8 +81,12 @@ public class MorphShapeExporter {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     ExportRectangle rect = new ExportRectangle(mst.getRect(new HashSet<BoundedTag>()));
+                                    rect.xMax*=settings.zoom;
+                                    rect.yMax*=settings.zoom;
+                                    rect.xMin*=settings.zoom;
+                                    rect.yMin*=settings.zoom;
                                     SVGExporter exporter = new SVGExporter(rect);
-                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0,settings.zoom);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
