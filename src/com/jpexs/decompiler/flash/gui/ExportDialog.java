@@ -142,7 +142,7 @@ public class ExportDialog extends AppDialog {
             }
             cfg += key;
         }
-        Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()));
+        Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText())/100);
         Configuration.lastSelectedExportFormats.set(cfg);        
     }
 

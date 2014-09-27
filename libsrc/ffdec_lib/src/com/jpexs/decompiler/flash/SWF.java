@@ -2280,7 +2280,7 @@ public final class SWF implements TreeItem, Timelined {
         sb.append("\tswitch(frame){\r\n");
         int maxDepth = timeline.getMaxDepth();
         Stack<Integer> clipDepths = new Stack<>();
-        for (int frame = 0; frame < frames.size(); frame++) {
+        for (int frame:frames) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {
