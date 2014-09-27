@@ -44,6 +44,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Shape;
 
 /**
  *
@@ -66,6 +67,55 @@ public class BitmapExporter extends ShapeExporterBase {
     private Stroke defaultStroke;
     private double unitDivisor;
 
+    private class TransformedStroke implements Stroke {
+
+        /**
+         * To make this serializable without problems.
+         */
+        private static final long serialVersionUID = 1;
+
+        /**
+         * the AffineTransform used to transform the shape before stroking.
+         */
+        private AffineTransform transform;
+        /**
+         * The inverse of {@link #transform}, used to transform back after
+         * stroking.
+         */
+        private AffineTransform inverse;
+
+        /**
+         * Our base stroke.
+         */
+        private Stroke stroke;
+
+        /**
+         * Creates a TransformedStroke based on another Stroke and an
+         * AffineTransform.
+         */
+        public TransformedStroke(Stroke base, AffineTransform at)
+                throws NoninvertibleTransformException {
+            this.transform = new AffineTransform(at);
+            this.inverse = transform.createInverse();
+            this.stroke = base;
+        }
+
+        /**
+         * Strokes the given Shape with this stroke, creating an outline.
+         *
+         * This outline is distorted by our AffineTransform relative to the
+         * outline which would be given by the base stroke, but only in terms of
+         * scaling (i.e. thickness of the lines), as translation and rotation
+         * are undone after the stroking.
+         */
+        public Shape createStrokedShape(Shape s) {
+            Shape sTrans = transform.createTransformedShape(s);
+            Shape sTransStroked = stroke.createStrokedShape(sTrans);
+            Shape sStroked = inverse.createTransformedShape(sTransStroked);
+            return sStroked;
+        }
+    }
+
     public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
         exporter.exportTo(image, transformation);
@@ -79,7 +129,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private void exportTo(SerializableImage image, Matrix transformation) {
         this.image = image;
-        graphics = (Graphics2D) image.getGraphics();
+        graphics = (Graphics2D) image.getGraphics();        
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
         unitDivisor = 1;
@@ -311,10 +361,27 @@ public class BitmapExporter extends ShapeExporterBase {
                 joinStyle = BasicStroke.JOIN_ROUND;
                 break;
         }
+        switch(scaleMode){
+            case "VERTICAL":
+                thickness *= graphics.getTransform().getScaleY();
+                break;
+            case "HORIZONTAL":
+                thickness *= graphics.getTransform().getScaleX();
+                break;
+            case "NORMAL":
+                thickness *= Math.max(graphics.getTransform().getScaleX(), graphics.getTransform().getScaleY());
+                break;
+        }
         if (joinStyle == BasicStroke.JOIN_MITER) {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
+        }
+        //Do not scale strokes automatically:
+        try{
+            lineStroke = new TransformedStroke(lineStroke,graphics.getTransform());
+        }catch(NoninvertibleTransformException net){
+            //ignore
         }
     }
 
