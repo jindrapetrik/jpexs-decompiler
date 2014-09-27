@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -39,6 +40,10 @@ import com.jpexs.helpers.SerializableImage;
  */
 public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
+    protected static final String DRAW_COMMAND_M = "M";
+    protected static final String DRAW_COMMAND_L = "L";
+    protected static final String DRAW_COMMAND_Q = "Q";
+    protected String currentDrawCommand = "";
     protected double deltaX = 0;
     protected double deltaY = 0;
     protected String pathData = "";
@@ -262,8 +267,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     @Override
     public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= unitDivisor;
-        thicknessEnd /= unitDivisor;
+        thickness /= SWF.unitDivisor;
+        thicknessEnd /= SWF.unitDivisor;
+        strokeData += "\tvar scaleMode = \""+scaleMode+"\";\r\n";
         if (color != null) { //for gradient line fill
             strokeData += "\tctx.strokeStyle=" + useRatioColor(color, colorEnd) + ";\r\n";
         }
@@ -370,35 +376,43 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         preStrokeData += "\tlcanvas.height=canvas.height;\r\n";
         preStrokeData += "\tvar lctx = lcanvas.getContext(\"2d\");\r\n";
         preStrokeData += "\tenhanceContext(lctx);\r\n";
-        preStrokeData += "\tlctx.applyTransforms(ctx._matrices);\r\n";
+        preStrokeData += "\tlctx.applyTransforms(ctx._matrix);\r\n";
         preStrokeData += "\tctx = lctx;\r\n";
         strokeData = preStrokeData + strokeData;
     }
 
     @Override
     public void moveTo(double x, double y, double x2, double y2) {
+        currentDrawCommand = DRAW_COMMAND_M;
+        pathData += currentDrawCommand + " ";
         x += deltaX;
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += "\tctx.moveTo("
-                + useRatioPos(x, x2) + ","
-                + useRatioPos(y, y2) + ");\r\n";
+        pathData += Helper.doubleStr(x/unitDivisor) + " " + Helper.doubleStr(x2/unitDivisor) + " "
+                  + Helper.doubleStr(y/unitDivisor) + " " + Helper.doubleStr(y2/unitDivisor) + " ";
     }
 
     @Override
     public void lineTo(double x, double y, double x2, double y2) {
+        if (!currentDrawCommand.equals(DRAW_COMMAND_L)) {
+            currentDrawCommand = DRAW_COMMAND_L;
+            pathData += currentDrawCommand + " ";
+        }
         x += deltaX;
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += "\tctx.lineTo("
-                + useRatioPos(x, x2) + ","
-                + useRatioPos(y, y2) + ");\r\n";
+        pathData += Helper.doubleStr(x/unitDivisor) + " " + Helper.doubleStr(x2/unitDivisor) + " "
+                  + Helper.doubleStr(y/unitDivisor) + " " + Helper.doubleStr(y2/unitDivisor) + " ";
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY, double controlX2, double controlY2, double anchorX2, double anchorY2) {
+        if (!currentDrawCommand.equals(DRAW_COMMAND_Q)) {
+            currentDrawCommand = DRAW_COMMAND_Q;
+            pathData += currentDrawCommand + " ";
+        }
         controlX += deltaX;
         anchorX += deltaX;
         controlY += deltaY;
@@ -409,28 +423,29 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         controlY2 += deltaY;
         anchorY2 += deltaY;
 
-        pathData += "\tctx.quadraticCurveTo(" + useRatioPos(controlX, controlX2) + ","
-                + useRatioPos(controlY, controlY2) + ","
-                + useRatioPos(anchorX, anchorX2) + ","
-                + useRatioPos(anchorY, anchorY2) + ");\r\n";
+        pathData += Helper.doubleStr(controlX/unitDivisor) + " " + Helper.doubleStr(controlX2/unitDivisor) + " " +
+                    Helper.doubleStr(controlY/unitDivisor) + " " + Helper.doubleStr(controlY2/unitDivisor) + " " +
+                    Helper.doubleStr(anchorX/unitDivisor) + " " + Helper.doubleStr(anchorX2/unitDivisor) + " " +
+                    Helper.doubleStr(anchorY/unitDivisor) + " " + Helper.doubleStr(anchorY2/unitDivisor) + " ";
     }
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n";
+            String drawStroke = "\tdrawMorphPath(ctx,\"" + pathData.trim() + "\",ratio,true,scaleMode);\r\n";
+            String drawFill = "\tdrawMorphPath(ctx,\"" + pathData.trim() + "\",ratio,false);\r\n";;
+            pathData = "";
             if (lineFillData != null) {
                 String preLineFillData = "";
                 preLineFillData += "\tvar oldctx = ctx;\r\n";
                 preLineFillData += "\tctx.save();\r\n";
                 preLineFillData += strokeData;
-                preLineFillData += pathData;
-                preLineFillData += "\tctx.stroke();\r\n";
+                preLineFillData += drawStroke;
                 preLineFillData += "\tvar lfcanvas = document.createElement(\"canvas\");\r\n";
                 preLineFillData += "\tlfcanvas.width = canvas.width;\r\n";
                 preLineFillData += "\tlfcanvas.height = canvas.height;\r\n";
                 preLineFillData += "\tvar lfctx = lfcanvas.getContext(\"2d\");\r\n";
                 preLineFillData += "\tenhanceContext(lfctx);\r\n";
-                preLineFillData += "\tlfctx.applyTransforms(ctx._matrices);\r\n";
+                preLineFillData += "\tlfctx.applyTransforms(ctx._matrix);\r\n";
                 preLineFillData += "\tctx = lfctx;";
                 if (lineLastRadColor != null) {
                     preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n ctx.fill(\"evenodd\");\r\n";
@@ -479,12 +494,12 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 shapeData += pathData;
             } else {
                 if (!"".equals(fillData)) {
-                    pathData += "\tctx.fill(\"evenodd\");\r\n";
+                    pathData += drawFill + "\r\n\tctx.fill(\"evenodd\");\r\n";
                 }
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += "\tctx.stroke();\r\n";
+                shapeData += drawStroke+"\r\n"; //"\tctx.stroke();\r\n";
             } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }

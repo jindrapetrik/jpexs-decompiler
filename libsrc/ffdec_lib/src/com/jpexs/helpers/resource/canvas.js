@@ -771,17 +771,37 @@ BlendModes.blendCanvas = function(src, dst, result, modeIndex) {
 };
 
 
+function concatMatrix(m1,m2) {
+        var result= [1,0,0,1,0,0];
+        var scaleX = 0;
+        var rotateSkew0 = 1;
+        var rotateSkew1= 2;
+        var scaleY = 3;
+        var translateX = 4;
+        var translateY = 5;
+        
+        result[scaleX] = m2[scaleX] * m1[scaleX] + m2[rotateSkew1] * m1[rotateSkew0];
+        result[rotateSkew0] = m2[rotateSkew0] * m1[scaleX] + m2[scaleY] * m1[rotateSkew0];
+        result[rotateSkew1] = m2[scaleX] * m1[rotateSkew1] + m2[rotateSkew1] * m1[scaleY];
+        result[scaleY] = m2[rotateSkew0] * m1[rotateSkew1] + m2[scaleY] * m1[scaleY];
+        result[translateX] = m2[scaleX] * m1[translateX] + m2[rotateSkew1] * m1[translateY] + m2[translateX];
+        result[translateY] = m2[rotateSkew0] * m1[translateX] + m2[scaleY] * m1[translateY] + m2[translateY];
+
+        return result;
+    }
+
+
 var enhanceContext = function(context) {
     var m = [1, 0, 0, 1, 0, 0];
-    context._matrices = [m];
+    context._matrix = m;
 
     //the stack of saved matrices
-    context._savedMatrices = [[m]];
+    context._savedMatrices = [m]; //[[m]];
 
     var super_ = context.__proto__;
     context.__proto__ = ({
         save: function() {
-            this._savedMatrices.push(this._matrices.slice());
+            this._savedMatrices.push(this._matrix); //.slice()
             super_.save.call(this);
         },
         //if the stack of matrices we're managing doesn't have a saved matrix,
@@ -790,7 +810,7 @@ var enhanceContext = function(context) {
             if (this._savedMatrices.length == 0)
                 return;
             super_.restore.call(this);
-            this._matrices = this._savedMatrices.pop();
+            this._matrix = this._savedMatrices.pop();
         },
         scale: function(x, y) {
             super_.scale.call(this, x, y);
@@ -802,22 +822,24 @@ var enhanceContext = function(context) {
             super_.translate.call(this, x, y);
         },
         transform: function(a, b, c, d, e, f) {
-            this._matrices.push([a, b, c, d, e, f]);
+            this._matrix = concatMatrix(this._matrix,[a,b,c,d,e,f]);
             super_.transform.call(this, a, b, c, d, e, f);
         },
         setTransform: function(a, b, c, d, e, f) {
-            this._matrices = [];
-            this._matrices.push([a, b, c, d, e, f]);
+            this._matrix = [a, b, c, d, e, f];
             super_.setTransform.call(this, a, b, c, d, e, f);
         },
         resetTransform: function() {
             super_.resetTransform.call(this);
         },
         applyTransforms: function(m) {
-            this.setTransform(1, 0, 0, 1, 0, 0);
-            for (var i = 0; i < m.length; i++) {
-                this.transform(m[i][0], m[i][1], m[i][2], m[i][3], m[i][4], m[i][5]);
-            }
+            this.setTransform(m[0], m[1], m[2], m[3], m[4], m[5])
+        },  
+        applyTransformToPoint: function(p){
+            var ret = {};
+            ret.x = this._matrix[0]*p.x + this._matrix[1]*p.y + this._matrix[4];
+            ret.y = this._matrix[2]*p.x + this._matrix[3]*p.y + this._matrix[5];                
+            return ret;
         },
         __proto__: super_
     });
@@ -964,10 +986,116 @@ function stopDrag(e) {
 }
 
 
-function drawPath(ctx, p) {
-    ctx.beginPath();
+function drawMorphPath(ctx, p, ratio, doStroke, scaleMode){
     var parts = p.split(" ");
     var len = parts.length;
+    if(doStroke){
+        for (var i = 0; i < len; i++) {
+            switch(parts[i]){
+		case '':
+		  break;
+                case 'L':
+                case 'M':
+                case 'Q':
+                    break;
+                default:
+                    var k = ctx.applyTransformToPoint({x:parts[i],y:parts[i+2]}); parts[i] = k.x; parts[i+2] = k.y;
+                    k = ctx.applyTransformToPoint({x:parts[i+1],y:parts[i+3]}); parts[i+1] = k.x; parts[i+3] = k.y;
+                    i+=3;                  
+            }
+        }
+        
+        switch(scaleMode){
+            case "NONE":
+                break;
+            case "NORMAL":
+                ctx.lineWidth*=20*Math.max(ctx._matrix[0],ctx._matrix[3]);
+                break;
+            case "VERTICAL":
+                ctx.lineWidth*=20*ctx._matrix[3];
+                break;
+            case "HORIZONTAL":
+                ctx.lineWidth*=20*ctx._matrix[0];
+                break;
+        }
+        
+        ctx.save();        
+        ctx.setTransform(1,0,0,1,0,0);        
+    }    
+    ctx.beginPath();    
+    var drawCommand = "";
+    for (var i = 0; i < len; i++) {
+        switch (parts[i]) {
+            case 'L':
+            case 'M':
+            case 'Q':
+                drawCommand = parts[i];
+                break;
+            default:
+                switch (drawCommand) {
+                    case 'L':
+                        ctx.lineTo(useRatio(parts[i],parts[i+1],ratio), useRatio(parts[i + 2],parts[i + 3],ratio));
+                        i += 3;
+                        break;
+                    case 'M':
+                        ctx.moveTo(useRatio(parts[i],parts[i+1],ratio), useRatio(parts[i + 2],parts[i + 3],ratio));
+                        i += 3;
+                        break;
+                    case 'Q':
+                        ctx.quadraticCurveTo(useRatio(parts[i],parts[i+1],ratio),useRatio(parts[i+2],parts[i+3],ratio), 
+                                             useRatio(parts[i+4],parts[i+5],ratio),useRatio(parts[i+6],parts[i+7],ratio));
+                        i += 7;
+                        break;
+                }
+                break;
+        }
+    }
+    if(doStroke){
+        ctx.stroke();
+        ctx.restore();
+    }   
+}
+
+function useRatio(v1,v2,ratio){
+    return v1*1+(v2-v1)*ratio/65535;
+}
+
+function drawPath(ctx, p,  doStroke, scaleMode) {
+    var parts = p.split(" ");
+    var len = parts.length;
+    if(doStroke){
+        for (var i = 0; i < len; i++) {
+            switch(parts[i]){
+		case 'L':
+                case 'M':
+                case 'Q':
+                    break;
+                default:
+                    var k = ctx.applyTransformToPoint({x:parts[i],y:parts[i+1]});
+                    parts[i] = k.x;
+                    parts[i+1] = k.y;
+                    i++;                   
+            }
+        }
+        
+        switch(scaleMode){
+            case "NONE":
+                break;
+            case "NORMAL":
+                ctx.lineWidth*=20*Math.max(ctx._matrix[0],ctx._matrix[3]);
+                break;
+            case "VERTICAL":
+                ctx.lineWidth*=20*ctx._matrix[3];
+                break;
+            case "HORIZONTAL":
+                ctx.lineWidth*=20*ctx._matrix[0];
+                break;
+        }
+        
+        ctx.save();        
+        ctx.setTransform(1,0,0,1,0,0);        
+    }    
+    ctx.beginPath();    
     var drawCommand = "";
     for (var i = 0; i < len; i++) {
         switch (parts[i]) {
@@ -994,4 +1122,8 @@ function drawPath(ctx, p) {
                 break;
         }
     }
+    if(doStroke){
+        ctx.stroke();
+        ctx.restore();
+    }    
 }

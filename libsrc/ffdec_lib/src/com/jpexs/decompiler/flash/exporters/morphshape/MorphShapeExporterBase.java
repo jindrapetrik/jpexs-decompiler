@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -396,9 +397,9 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                             if (lineStyle2.noHScaleFlag && lineStyle2.noVScaleFlag) {
                                 scaleMode = "NONE";
                             } else if (lineStyle2.noHScaleFlag) {
-                                scaleMode = "HORIZONTAL";
-                            } else if (lineStyle2.noVScaleFlag) {
                                 scaleMode = "VERTICAL";
+                            } else if (lineStyle2.noVScaleFlag) {
+                                scaleMode = "HORIZONTAL";
                             }
                             pixelHintingFlag = lineStyle2.pixelHintingFlag;
                             startCapStyle = lineStyle2.startCapStyle;

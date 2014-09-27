@@ -286,7 +286,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= unitDivisor;
+        thickness /= SWF.unitDivisor;
+        strokeData += "\tvar scaleMode = \""+scaleMode+"\";\r\n";
 
         if (color != null) { //gradient lines have no color
             strokeData += "\tctx.strokeStyle=" + color(color) + ";\r\n";
@@ -374,7 +375,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         preStrokeData += "\tlcanvas.height=canvas.height;\r\n";
         preStrokeData += "\tvar lctx = lcanvas.getContext(\"2d\");\r\n";
         preStrokeData += "\tenhanceContext(lctx);\r\n";
-        preStrokeData += "\tlctx.applyTransforms(ctx._matrices);\r\n";
+        preStrokeData += "\tlctx.applyTransforms(ctx._matrix);\r\n";
         preStrokeData += "\tctx = lctx;\r\n";
         strokeData = preStrokeData + strokeData;
     }
@@ -419,21 +420,21 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "\tdrawPath(ctx,\"" + pathData + "\");\r\n";
-
+            String drawStroke = "\tdrawPath(ctx,\"" + pathData.trim() + "\",true,scaleMode);\r\n";
+            String drawFill = "\tdrawPath(ctx,\"" + pathData.trim() + "\",false);\r\n";;
+            pathData = "";
             if (lineFillData != null) {
                 String preLineFillData = "";
                 preLineFillData += "\tvar oldctx = ctx;\r\n";
                 preLineFillData += "\tctx.save();\r\n";
                 preLineFillData += strokeData;
-                preLineFillData += pathData;
-                preLineFillData += "\tctx.stroke();\r\n";
+                preLineFillData += drawStroke;
                 preLineFillData += "\tvar lfcanvas = document.createElement(\"canvas\");\r\n";
                 preLineFillData += "\tlfcanvas.width = canvas.width;\r\n";
                 preLineFillData += "\tlfcanvas.height=canvas.height;\r\n";
                 preLineFillData += "\tvar lfctx = lfcanvas.getContext(\"2d\");\r\n";
                 preLineFillData += "\tenhanceContext(lfctx);\r\n";
-                preLineFillData += "\tlfctx.applyTransforms(ctx._matrices);\r\n";
+                preLineFillData += "\tlfctx.applyTransforms(ctx._matrix);\r\n";
                 preLineFillData += "\tctx = lfctx;";
                 if (lineLastRadColor != null) {
                     preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
@@ -482,12 +483,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 shapeData += pathData;
             } else {
                 if (!"".equals(fillData)) {
-                    pathData += "\tctx.fill(\"evenodd\");\r\n";
+                    pathData += drawFill + "\tctx.fill(\"evenodd\");\r\n";
                 }
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += "\tctx.stroke();\r\n";
+                shapeData += drawStroke +"\r\n";
             } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }
