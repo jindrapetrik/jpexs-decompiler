@@ -53,6 +53,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +72,8 @@ import javax.swing.JPanel;
 public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+    static final String ACTION_ZOOMIN = "ZOOMIN";
+    static final String ACTION_ZOOMOUT = "ZOOMOUT";
 
     private Timelined timelined;
     private boolean stillFrame = false;
@@ -86,7 +89,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private final IconPanel iconPanel;
     private int time = 0;
     private int selectedDepth = -1;
-    public double zoom = 1.0;
+    private double zoom = 1.0;
+    private double realZoom = 1.0;
+    private JLabel percentLabel = new JLabel("100%");
+
+    public static final int ZOOM_DECADE_STEPS = 10;
+    public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
 
     public void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -316,6 +324,21 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         selectColorButton.addActionListener(this);
         selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
         selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
+
+        JButton zoomInButton = new JButton(View.getIcon("zoomin16"));
+        zoomInButton.addActionListener(this);
+        zoomInButton.setActionCommand(ACTION_ZOOMIN);
+        zoomInButton.setToolTipText(AppStrings.translate("button.zoomin.hint"));
+
+        JButton zoomOutButton = new JButton(View.getIcon("zoomout16"));
+        zoomOutButton.addActionListener(this);
+        zoomOutButton.setActionCommand(ACTION_ZOOMOUT);
+        zoomOutButton.setToolTipText(AppStrings.translate("button.zoomout.hint"));
+
+        buttonsPanel.add(percentLabel);
+        updateZoom();
+        buttonsPanel.add(zoomInButton);
+        buttonsPanel.add(zoomOutButton);
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -399,21 +422,52 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         });
     }
 
+    
+    private static double roundZoom(double realZoom,int mantisa){
+        double l10 = Math.log10(realZoom);
+        int lg = (int)(-Math.floor(l10)+mantisa-1);        
+        if(lg<0){
+            lg = 0;
+        }                          
+        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);        
+        return bd.doubleValue();       
+    }
+    
+    private void updateZoom() {
+        double pctzoom = roundZoom(realZoom*100, 3);
+        String r = "" + pctzoom;
+        zoom = pctzoom / 100.0;
+        if (r.endsWith(".0")) {
+            r = r.substring(0, r.length() - 2);
+        }
+        percentLabel.setText("" + r + "%");
+        drawFrame();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(ACTION_SELECT_BKCOLOR)) {
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
-                    if (newColor != null) {
-                        View.swfBackgroundColor = newColor;
-                        setBackground(newColor);
-                        repaint();
+        switch (e.getActionCommand()) {
+            case ACTION_SELECT_BKCOLOR:
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
+                        if (newColor != null) {
+                            View.swfBackgroundColor = newColor;
+                            setBackground(newColor);
+                            repaint();
+                        }
                     }
-                }
-            });
-
+                });
+                break;
+            case ACTION_ZOOMIN:
+                realZoom *= ZOOM_MULTIPLIER;
+                updateZoom();              
+                break;
+            case ACTION_ZOOMOUT:
+                realZoom /= ZOOM_MULTIPLIER;               
+                updateZoom();                
+                break;
         }
     }
 
@@ -520,7 +574,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode())+"_"+zoom;
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom;
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -529,13 +583,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 if (rect == null) { //??? Why?
                     rect = new RECT(0, 0, 1, 1);
                 }
-                int width = (int)(rect.getWidth()*zoom);
-                int height = (int)(rect.getHeight()*zoom);
+                int width = (int) (rect.getWidth() * zoom);
+                int height = (int) (rect.getHeight() * zoom);
                 SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                         (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
                 Matrix m = new Matrix();
-                m.translate(-rect.Xmin, -rect.Ymin);
+                m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
                 m.scale(zoom);
                 drawable.getTimeline().toImage(frame, time, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
 
@@ -654,8 +708,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         List<Shape> outlines = new ArrayList<>();
         Matrix m = new Matrix();
         RECT rect = timelined.getTimeline().displayRect;
-        m.translate(-rect.Xmin, -rect.Ymin);
-        m.scale(1);
+        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+        m.scale(zoom);
 
         timelined.getTimeline().getObjectsOutlines(frame, time, frame, stateUnderCursor, mouseButton, m, objs, outlines);
         for (int i = 0; i < outlines.size(); i++) {
