@@ -40,9 +40,16 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -51,6 +58,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -76,6 +84,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     static final String ACTION_ZOOMOUT = "ZOOMOUT";
     static final String ACTION_ZOOMFIT = "ZOOMFIT";
     static final String ACTION_ZOOMNONE = "ZOOMNONE";
+    static final String ACTION_SNAPSHOT = "SNAPSHOT";
 
     private Timelined timelined;
     private boolean stillFrame = false;
@@ -94,6 +103,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private double zoom = 1.0;
     private double realZoom = 1.0;
     private JLabel percentLabel = new JLabel("100%");
+    private JPanel zoomPanel;
 
     public static final int ZOOM_DECADE_STEPS = 10;
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
@@ -112,6 +122,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         private Rectangle rect = null;
         private List<DepthState> dss;
         private List<Shape> outlines;
+
+        public BufferedImage getLastImage() {
+            return img.getBufferedImage();
+        }
 
         public synchronized void setOutlines(List<DepthState> dss, List<Shape> outlines) {
             this.outlines = outlines;
@@ -347,13 +361,21 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         zoomNoneButton.setActionCommand(ACTION_ZOOMNONE);
         zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
 
-        buttonsPanel.add(percentLabel);
+        JButton snapshotButton = new JButton(View.getIcon("snapshot16"));
+        snapshotButton.addActionListener(this);
+        snapshotButton.setActionCommand(ACTION_SNAPSHOT);
+        snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
+
+        zoomPanel = new JPanel(new FlowLayout());
         updateZoom();
-        buttonsPanel.add(zoomInButton);
-        buttonsPanel.add(zoomOutButton);
-        buttonsPanel.add(zoomNoneButton);
-        buttonsPanel.add(zoomFitButton);
-        buttonsPanel.add(selectColorButton);
+        zoomPanel.add(percentLabel);        
+        zoomPanel.add(zoomInButton);
+        zoomPanel.add(zoomOutButton);
+        zoomPanel.add(zoomNoneButton);
+        zoomPanel.add(zoomFitButton);
+        zoomPanel.add(selectColorButton);
+        buttonsPanel.add(zoomPanel);
+        buttonsPanel.add(snapshotButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
         add(debugLabel, BorderLayout.NORTH);
@@ -457,6 +479,56 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         drawFrame();
     }
 
+    private void putImageToClipBoard(BufferedImage img) {
+        if (img == null) {
+            return;
+        }
+        TransferableImage trans = new TransferableImage(img);
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        c.setContents(trans, new ClipboardOwner() {
+            @Override
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
+    }
+
+    private class TransferableImage implements Transferable {
+
+        Image img;
+
+        public TransferableImage(Image img) {
+            this.img = img;
+        }
+
+        public Object getTransferData(DataFlavor flavor)
+                throws UnsupportedFlavorException, IOException {
+            if (flavor.equals(DataFlavor.imageFlavor) && img != null) {
+                return img;
+            } else {
+                throw new UnsupportedFlavorException(flavor);
+            }
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            DataFlavor[] flavors = new DataFlavor[1];
+            flavors[ 0] = DataFlavor.imageFlavor;
+            return flavors;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for (int i = 0; i < flavors.length; i++) {
+                if (flavor.equals(flavors[ i])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -488,6 +560,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             case ACTION_ZOOMFIT:
                 realZoom = zoomToFit();
                 updateZoom();
+                break;
+            case ACTION_SNAPSHOT:
+                putImageToClipBoard(iconPanel.getLastImage());
                 break;
         }
     }
@@ -528,6 +603,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         } catch (IOException ex) {
             Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+        zoomPanel.setVisible(false);
     }
 
     public synchronized void setTimelined(final Timelined drawable, final SWF swf, int frame) {
@@ -553,6 +629,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         time = 0;
         play();
+        zoomPanel.setVisible(true);
     }
 
     public void setImage(SerializableImage image) {
@@ -565,6 +642,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stillFrame = true;
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        zoomPanel.setVisible(false);
     }
 
     @Override
