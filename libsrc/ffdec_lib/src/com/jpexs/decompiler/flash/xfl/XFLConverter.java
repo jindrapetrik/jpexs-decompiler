@@ -2199,11 +2199,16 @@ public class XFLConverter {
         ret += "<layers>";
 
         ret += convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
-        ret += convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
+        String scriptLayer = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
+        int index = 0;
+        if(!scriptLayer.isEmpty()){
+            index++;
+        }
+        ret += scriptLayer;
 
         int layerCount = getLayerCount(timelineTags);
         Stack<Integer> parentLayers = new Stack<>();
-        int index = 0;
+        
         for (int d = layerCount; d >= 1; d--, index++) {
             for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {
