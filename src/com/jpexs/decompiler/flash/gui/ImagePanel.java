@@ -74,6 +74,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     static final String ACTION_ZOOMIN = "ZOOMIN";
     static final String ACTION_ZOOMOUT = "ZOOMOUT";
+    static final String ACTION_ZOOMFIT = "ZOOMFIT";
+    static final String ACTION_ZOOMNONE = "ZOOMNONE";
 
     private Timelined timelined;
     private boolean stillFrame = false;
@@ -335,10 +337,22 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         zoomOutButton.setActionCommand(ACTION_ZOOMOUT);
         zoomOutButton.setToolTipText(AppStrings.translate("button.zoomout.hint"));
 
+        JButton zoomFitButton = new JButton(View.getIcon("zoomfit16"));
+        zoomFitButton.addActionListener(this);
+        zoomFitButton.setActionCommand(ACTION_ZOOMFIT);
+        zoomFitButton.setToolTipText(AppStrings.translate("button.zoomfit.hint"));
+
+        JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
+        zoomNoneButton.addActionListener(this);
+        zoomNoneButton.setActionCommand(ACTION_ZOOMNONE);
+        zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
+
         buttonsPanel.add(percentLabel);
         updateZoom();
         buttonsPanel.add(zoomInButton);
         buttonsPanel.add(zoomOutButton);
+        buttonsPanel.add(zoomNoneButton);
+        buttonsPanel.add(zoomFitButton);
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -422,19 +436,18 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         });
     }
 
-    
-    private static double roundZoom(double realZoom,int mantisa){
+    private static double roundZoom(double realZoom, int mantisa) {
         double l10 = Math.log10(realZoom);
-        int lg = (int)(-Math.floor(l10)+mantisa-1);        
-        if(lg<0){
+        int lg = (int) (-Math.floor(l10) + mantisa - 1);
+        if (lg < 0) {
             lg = 0;
-        }                          
-        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);        
-        return bd.doubleValue();       
+        }
+        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);
+        return bd.doubleValue();
     }
-    
+
     private void updateZoom() {
-        double pctzoom = roundZoom(realZoom*100, 3);
+        double pctzoom = roundZoom(realZoom * 100, 3);
         String r = "" + pctzoom;
         zoom = pctzoom / 100.0;
         if (r.endsWith(".0")) {
@@ -462,13 +475,44 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 break;
             case ACTION_ZOOMIN:
                 realZoom *= ZOOM_MULTIPLIER;
-                updateZoom();              
+                updateZoom();
                 break;
             case ACTION_ZOOMOUT:
-                realZoom /= ZOOM_MULTIPLIER;               
-                updateZoom();                
+                realZoom /= ZOOM_MULTIPLIER;
+                updateZoom();
+                break;
+            case ACTION_ZOOMNONE:
+                realZoom = 1.0;
+                updateZoom();
+                break;
+            case ACTION_ZOOMFIT:
+                realZoom = zoomToFit();
+                updateZoom();
                 break;
         }
+    }
+
+    private double zoomToFit() {
+        if (timelined instanceof BoundedTag) {
+            RECT bounds = ((BoundedTag) timelined).getRect(new HashSet<BoundedTag>());
+            double w1 = bounds.getWidth() / SWF.unitDivisor;
+            double h1 = bounds.getHeight() / SWF.unitDivisor;
+
+            double w2 = getWidth();
+            double h2 = getHeight();
+
+            double w;
+            double h;
+            h = h1 * w2 / w1;
+            if (h > h2) {
+                w = w1 * h2 / h1;
+                h = h2;
+            } else {
+                w = w2;
+            }
+            return (double) w / (double) w1;
+        }
+        return 1;
     }
 
     public void setImage(byte[] data) {
@@ -627,12 +671,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         }
                     }
                 }
-                /*drawable.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, dss, os);
-                 
-                 //gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                 for(Shape s:os){
-                 gg.draw(SHAPERECORD.twipToPixelShape(s));
-                 }*/
 
                 img = image;
             }
