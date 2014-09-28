@@ -118,7 +118,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private final MainPanel mainPanel;
     private final JPanel viewerCards;
 
-    private PlayerControls flashControls;
     private final FlashPlayerPanel flashPanel;
     private File tempFile;
 
@@ -270,7 +269,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             JPanel flashPlayPanel = new JPanel(new BorderLayout());
             flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
 
-            JPanel bottomPanel = new JPanel(new BorderLayout());
+            /*JPanel bottomPanel = new JPanel(new BorderLayout());
             JPanel buttonsPanel = new JPanel(new FlowLayout());
             JButton selectColorButton = new JButton(View.getIcon("color16"));
             selectColorButton.addActionListener(mainPanel);
@@ -279,11 +278,11 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             buttonsPanel.add(selectColorButton);
             bottomPanel.add(buttonsPanel, BorderLayout.EAST);
 
-            flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);
+            flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
 
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(flashControls = new PlayerControls(flashPanel), BorderLayout.SOUTH);
+            flashPlayPanel2.add(new PlayerControls(flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());

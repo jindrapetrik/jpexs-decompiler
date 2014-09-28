@@ -17,20 +17,33 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -43,6 +56,12 @@ public class PlayerControls extends JPanel implements ActionListener {
 
     static final String ACTION_PAUSE = "PAUSE";
     static final String ACTION_STOP = "STOP";
+    static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+    static final String ACTION_ZOOMIN = "ZOOMIN";
+    static final String ACTION_ZOOMOUT = "ZOOMOUT";
+    static final String ACTION_ZOOMFIT = "ZOOMFIT";
+    static final String ACTION_ZOOMNONE = "ZOOMNONE";
+    static final String ACTION_SNAPSHOT = "SNAPSHOT";
 
     private final JButton pauseButton;
     private boolean paused = false;
@@ -53,17 +72,78 @@ public class PlayerControls extends JPanel implements ActionListener {
     private final JLabel totalTimeLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
-
+    
+    private JLabel percentLabel = new JLabel("100%");
+    private JPanel zoomPanel;    
+    private JPanel graphicControls;
+    private JPanel playbackControls;    
+    private double realZoom = 1.0;
+    
+    private JButton zoomFitButton;
+        
+    public static final int ZOOM_DECADE_STEPS = 10;
+    public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
+    
     public PlayerControls(MediaDisplay display) {
+        
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        graphicControls = new JPanel(new BorderLayout());
+        JPanel graphicButtonsPanel = new JPanel(new FlowLayout());
+        JButton selectColorButton = new JButton(View.getIcon("color16"));
+        selectColorButton.addActionListener(this);
+        selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
+        selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
+
+        JButton zoomInButton = new JButton(View.getIcon("zoomin16"));
+        zoomInButton.addActionListener(this);
+        zoomInButton.setActionCommand(ACTION_ZOOMIN);
+        zoomInButton.setToolTipText(AppStrings.translate("button.zoomin.hint"));
+
+        JButton zoomOutButton = new JButton(View.getIcon("zoomout16"));
+        zoomOutButton.addActionListener(this);
+        zoomOutButton.setActionCommand(ACTION_ZOOMOUT);
+        zoomOutButton.setToolTipText(AppStrings.translate("button.zoomout.hint"));
+
+        zoomFitButton = new JButton(View.getIcon("zoomfit16"));
+        zoomFitButton.addActionListener(this);
+        zoomFitButton.setActionCommand(ACTION_ZOOMFIT);
+        zoomFitButton.setToolTipText(AppStrings.translate("button.zoomfit.hint"));
+
+        JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
+        zoomNoneButton.addActionListener(this);
+        zoomNoneButton.setActionCommand(ACTION_ZOOMNONE);
+        zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
+
+        JButton snapshotButton = new JButton(View.getIcon("snapshot16"));
+        snapshotButton.addActionListener(this);
+        snapshotButton.setActionCommand(ACTION_SNAPSHOT);
+        snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
+        
+        zoomPanel = new JPanel(new FlowLayout());
+        //updateZoom();
+        zoomPanel.add(percentLabel);        
+        zoomPanel.add(zoomInButton);
+        zoomPanel.add(zoomOutButton);
+        zoomPanel.add(zoomNoneButton);
+        zoomPanel.add(zoomFitButton);
+        zoomPanel.add(selectColorButton);
+        graphicButtonsPanel.add(zoomPanel);
+        graphicButtonsPanel.add(snapshotButton);
+        graphicControls.add(graphicButtonsPanel,BorderLayout.EAST);
+        
+        add(graphicControls);
+        graphicControls.setVisible(display.screenAvailable());
+        
+        playbackControls = new JPanel();        
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
         timeLabel = new JLabel("00:00.00");
         totalTimeLabel = new JLabel("00:00.00");
         controlPanel.add(timeLabel, BorderLayout.WEST);
         controlPanel.add(totalTimeLabel, BorderLayout.EAST);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout());
+        playbackControls.setLayout(new BoxLayout(playbackControls, BoxLayout.Y_AXIS));
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
 
         pauseButton = new JButton(AppStrings.translate("preview.pause"), pauseIcon);
         pauseButton.setMargin(new Insets(0, 0, 0, 0));
@@ -93,8 +173,8 @@ public class PlayerControls extends JPanel implements ActionListener {
                 }
             }
         });
-        add(progress);
-        add(controlPanel);
+        playbackControls.add(progress);
+        playbackControls.add(controlPanel);
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -102,6 +182,7 @@ public class PlayerControls extends JPanel implements ActionListener {
                 update();
             }
         }, 100, 100);
+        add(playbackControls);
     }
 
     private String formatMs(long ms) {
@@ -133,7 +214,12 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         View.execInEventDispatch(new Runnable() {
             @Override
-            public void run() {
+            public void run() {        
+                double zoom = display.getZoom();
+                zoomFitButton.setVisible(zoom!=0.0);
+                percentLabel.setVisible(zoom!=0.0);
+                zoomPanel.setVisible(display.zoomAvailable());
+                graphicControls.setVisible(display.screenAvailable());
                 int totalFrames = display.getTotalFrames();
                 int currentFrame = display.getCurrentFrame();
                 int frameRate = display.getFrameRate();
@@ -149,11 +235,11 @@ public class PlayerControls extends JPanel implements ActionListener {
                     timeLabel.setText(formatMs((currentFrame * 1000) / frameRate));
                     totalTimeLabel.setText(formatMs(((totalFrames - 1) * 1000) / frameRate));
                 }
-                if (totalFrames <= 1 && isVisible()) {
-                    setVisible(false);
+                if (totalFrames <= 1 && playbackControls.isVisible()) {
+                    playbackControls.setVisible(false);
                 }
-                if (totalFrames > 1 && !isVisible()) {
-                    setVisible(true);
+                if (totalFrames > 1 && !playbackControls.isVisible()) {
+                    playbackControls.setVisible(true);
                 }
                 if (display.isPlaying() == paused) {
                     paused = !paused;
@@ -171,6 +257,27 @@ public class PlayerControls extends JPanel implements ActionListener {
 
     }
 
+    private static double roundZoom(double realZoom, int mantisa) {
+        double l10 = Math.log10(realZoom);
+        int lg = (int) (-Math.floor(l10) + mantisa - 1);
+        if (lg < 0) {
+            lg = 0;
+        }
+        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);
+        return bd.doubleValue();
+    }
+    
+    private void updateZoom() {
+        double pctzoom = roundZoom(realZoom * 100, 3);
+        String r = "" + pctzoom;
+        double zoom = pctzoom / 100.0;
+        if (r.endsWith(".0")) {
+            r = r.substring(0, r.length() - 2);
+        }
+        percentLabel.setText("" + r + "%");
+        display.zoom(zoom);
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -185,6 +292,88 @@ public class PlayerControls extends JPanel implements ActionListener {
                 display.pause();
                 display.rewind();
                 break;
+             case ACTION_SELECT_BKCOLOR:
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
+                        if (newColor != null) {
+                            View.swfBackgroundColor = newColor;
+                            display.setBackground(newColor);                            
+                        }
+                    }
+                });
+                break;
+            case ACTION_ZOOMIN:
+                realZoom *= ZOOM_MULTIPLIER;
+                updateZoom();
+                break;
+            case ACTION_ZOOMOUT:
+                realZoom /= ZOOM_MULTIPLIER;
+                updateZoom();
+                break;
+            case ACTION_ZOOMNONE:
+                realZoom = 1.0;
+                updateZoom();
+                break;
+            case ACTION_ZOOMFIT:
+                display.zoomToFit();
+                //updateZoom();
+                break;
+            case ACTION_SNAPSHOT:
+                putImageToClipBoard(display.printScreen());
+                break;
+        }                
+    }
+    
+    
+    private class TransferableImage implements Transferable {
+
+        Image img;
+
+        public TransferableImage(Image img) {
+            this.img = img;
         }
+
+        public Object getTransferData(DataFlavor flavor)
+                throws UnsupportedFlavorException, IOException {
+            if (flavor.equals(DataFlavor.imageFlavor) && img != null) {
+                return img;
+            } else {
+                throw new UnsupportedFlavorException(flavor);
+            }
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            DataFlavor[] flavors = new DataFlavor[1];
+            flavors[ 0] = DataFlavor.imageFlavor;
+            return flavors;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for (int i = 0; i < flavors.length; i++) {
+                if (flavor.equals(flavors[ i])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+    
+    private void putImageToClipBoard(BufferedImage img) {
+        if (img == null) {
+            return;
+        }
+        TransferableImage trans = new TransferableImage(img);
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        c.setContents(trans, new ClipboardOwner() {
+            @Override
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
     }
 }

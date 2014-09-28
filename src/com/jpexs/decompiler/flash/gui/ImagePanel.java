@@ -79,12 +79,7 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
-    static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-    static final String ACTION_ZOOMIN = "ZOOMIN";
-    static final String ACTION_ZOOMOUT = "ZOOMOUT";
-    static final String ACTION_ZOOMFIT = "ZOOMFIT";
-    static final String ACTION_ZOOMNONE = "ZOOMNONE";
-    static final String ACTION_SNAPSHOT = "SNAPSHOT";
+    
 
     private Timelined timelined;
     private boolean stillFrame = false;
@@ -101,12 +96,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private int time = 0;
     private int selectedDepth = -1;
     private double zoom = 1.0;
-    private double realZoom = 1.0;
-    private JLabel percentLabel = new JLabel("100%");
-    private JPanel zoomPanel;
-
-    public static final int ZOOM_DECADE_STEPS = 10;
-    public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
+    
 
     public void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -332,52 +322,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
         iconPanel = new IconPanel();
         //labelPan.add(label, new GridBagConstraints());
-        add(iconPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton selectColorButton = new JButton(View.getIcon("color16"));
-        selectColorButton.addActionListener(this);
-        selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
-        selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
-
-        JButton zoomInButton = new JButton(View.getIcon("zoomin16"));
-        zoomInButton.addActionListener(this);
-        zoomInButton.setActionCommand(ACTION_ZOOMIN);
-        zoomInButton.setToolTipText(AppStrings.translate("button.zoomin.hint"));
-
-        JButton zoomOutButton = new JButton(View.getIcon("zoomout16"));
-        zoomOutButton.addActionListener(this);
-        zoomOutButton.setActionCommand(ACTION_ZOOMOUT);
-        zoomOutButton.setToolTipText(AppStrings.translate("button.zoomout.hint"));
-
-        JButton zoomFitButton = new JButton(View.getIcon("zoomfit16"));
-        zoomFitButton.addActionListener(this);
-        zoomFitButton.setActionCommand(ACTION_ZOOMFIT);
-        zoomFitButton.setToolTipText(AppStrings.translate("button.zoomfit.hint"));
-
-        JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
-        zoomNoneButton.addActionListener(this);
-        zoomNoneButton.setActionCommand(ACTION_ZOOMNONE);
-        zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
-
-        JButton snapshotButton = new JButton(View.getIcon("snapshot16"));
-        snapshotButton.addActionListener(this);
-        snapshotButton.setActionCommand(ACTION_SNAPSHOT);
-        snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
-
-        zoomPanel = new JPanel(new FlowLayout());
-        updateZoom();
-        zoomPanel.add(percentLabel);        
-        zoomPanel.add(zoomInButton);
-        zoomPanel.add(zoomOutButton);
-        zoomPanel.add(zoomNoneButton);
-        zoomPanel.add(zoomFitButton);
-        zoomPanel.add(selectColorButton);
-        buttonsPanel.add(zoomPanel);
-        buttonsPanel.add(snapshotButton);
-        bottomPanel.add(buttonsPanel, BorderLayout.EAST);
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(iconPanel, BorderLayout.CENTER);      
         add(debugLabel, BorderLayout.NORTH);
         iconPanel.addMouseListener(new MouseAdapter() {
 
@@ -458,116 +403,27 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         });
     }
 
-    private static double roundZoom(double realZoom, int mantisa) {
-        double l10 = Math.log10(realZoom);
-        int lg = (int) (-Math.floor(l10) + mantisa - 1);
-        if (lg < 0) {
-            lg = 0;
-        }
-        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);
-        return bd.doubleValue();
-    }
-
-    private void updateZoom() {
-        double pctzoom = roundZoom(realZoom * 100, 3);
-        String r = "" + pctzoom;
-        zoom = pctzoom / 100.0;
-        if (r.endsWith(".0")) {
-            r = r.substring(0, r.length() - 2);
-        }
-        percentLabel.setText("" + r + "%");
+    @Override
+    public void zoom(double zoom){
+        this.zoom = zoom;
         drawFrame();
     }
-
-    private void putImageToClipBoard(BufferedImage img) {
-        if (img == null) {
-            return;
-        }
-        TransferableImage trans = new TransferableImage(img);
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        c.setContents(trans, new ClipboardOwner() {
-            @Override
-            public void lostOwnership(Clipboard clipboard, Transferable contents) {
-            }
-        });
-    }
-
-    private class TransferableImage implements Transferable {
-
-        Image img;
-
-        public TransferableImage(Image img) {
-            this.img = img;
-        }
-
-        public Object getTransferData(DataFlavor flavor)
-                throws UnsupportedFlavorException, IOException {
-            if (flavor.equals(DataFlavor.imageFlavor) && img != null) {
-                return img;
-            } else {
-                throw new UnsupportedFlavorException(flavor);
-            }
-        }
-
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            DataFlavor[] flavors = new DataFlavor[1];
-            flavors[ 0] = DataFlavor.imageFlavor;
-            return flavors;
-        }
-
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            DataFlavor[] flavors = getTransferDataFlavors();
-            for (int i = 0; i < flavors.length; i++) {
-                if (flavor.equals(flavors[ i])) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
+    
+  
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_SELECT_BKCOLOR:
-                View.execInEventDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
-                        if (newColor != null) {
-                            View.swfBackgroundColor = newColor;
-                            setBackground(newColor);
-                            repaint();
-                        }
-                    }
-                });
-                break;
-            case ACTION_ZOOMIN:
-                realZoom *= ZOOM_MULTIPLIER;
-                updateZoom();
-                break;
-            case ACTION_ZOOMOUT:
-                realZoom /= ZOOM_MULTIPLIER;
-                updateZoom();
-                break;
-            case ACTION_ZOOMNONE:
-                realZoom = 1.0;
-                updateZoom();
-                break;
-            case ACTION_ZOOMFIT:
-                realZoom = zoomToFit();
-                updateZoom();
-                break;
-            case ACTION_SNAPSHOT:
-                putImageToClipBoard(iconPanel.getLastImage());
-                break;
-        }
+        
     }
 
-    private double zoomToFit() {
+    @Override
+    public BufferedImage printScreen() {
+        return iconPanel.getLastImage();
+    }
+
+    
+    
+    public void zoomToFit() {
         if (timelined instanceof BoundedTag) {
             RECT bounds = ((BoundedTag) timelined).getRect(new HashSet<BoundedTag>());
             double w1 = bounds.getWidth() / SWF.unitDivisor;
@@ -585,9 +441,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             } else {
                 w = w2;
             }
-            return (double) w / (double) w1;
-        }
-        return 1;
+            zoom = (double) w / (double) w1;
+        }        
     }
 
     public void setImage(byte[] data) {
@@ -603,8 +458,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         } catch (IOException ex) {
             Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        zoomPanel.setVisible(false);
     }
+
+    @Override
+    public boolean zoomAvailable() {
+        return timelined!=null;
+    }
+    
+   
 
     public synchronized void setTimelined(final Timelined drawable, final SWF swf, int frame) {
         pause();
@@ -629,7 +490,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         time = 0;
         play();
-        zoomPanel.setVisible(true);
     }
 
     public void setImage(SerializableImage image) {
@@ -642,7 +502,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stillFrame = true;
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
-        zoomPanel.setVisible(false);
     }
 
     @Override
@@ -905,4 +764,16 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     public boolean isLoaded() {
         return loaded;
     }
+
+    @Override
+    public boolean screenAvailable() {
+        return true;
+    }
+
+    @Override
+    public double getZoom() {
+        return zoom;
+    }
+    
+    
 }

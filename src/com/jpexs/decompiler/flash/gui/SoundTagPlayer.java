@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.helpers.SoundPlayer;
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -191,6 +192,34 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
+    public boolean screenAvailable() {
+        return false;
+    }
+
+    @Override
+    public void zoom(double zoom) {
+        
+    }
+
+    @Override
+    public boolean zoomAvailable() {
+        return false;
+    }
+
+    @Override
+    public void zoomToFit() {
+    }
+
+    @Override
+    public double getZoom() {
+        return 0;
+    }
+    
+    
+
+    
+    
+    @Override
     public synchronized void gotoFrame(int frame) {
         pause();
         synchronized (playLock) {
@@ -215,5 +244,12 @@ public class SoundTagPlayer implements MediaDisplay {
     public boolean isLoaded() {
         return true;
     }
+
+    @Override
+    public BufferedImage printScreen() {
+        return null;
+    }
+    
+    
 
 }

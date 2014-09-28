@@ -15,7 +15,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure tmrWatchDogTimer(Sender: TObject);
   private
-    { Private declarations }
+      procedure NoRightClick(var Msg:TMsg; var handled:Boolean);
   public
     { Public declarations }
   end;
@@ -32,12 +32,15 @@ type
     flashFile: string;
     w:         integer;
     h:         integer;
-    bgColor:   TColor;
+    bgColor:   integer;
+    bgTColor: TColor;
+    zoom:     integer;
     procedure Execute; override;
     procedure displaySWF;
     procedure freeSWF;
     procedure setPos;
     procedure setBGColor;
+    procedure setZoom;
   end;
 
   TBuf = array[0..255] of byte;
@@ -48,11 +51,35 @@ var
   t:          TPipeThread;
   flaPreview: TMySWF;
   target:     HWND = 0;
+  clicked: integer = 0;
+  xpos : integer =  0;
+  ypos : integer = 0;
 
 implementation
 
 {$R *.dfm}
 
+
+
+procedure TfrmMain.NoRightClick(var Msg:TMsg; var handled:Boolean);
+begin
+  if((Msg.message = WM_LBUTTONDOWN) and (Msg.wParam  = MK_LBUTTON)) then
+   begin
+     clicked := 1;
+     xpos := LOWORD(Msg.lParam);
+     ypos := HIWORD(Msg.lParam);
+   end;
+
+  if((Msg.message = WM_RBUTTONDOWN) and (Msg.wParam  = MK_RBUTTON)) then
+   begin
+     clicked := 2;
+     xpos := LOWORD(Msg.lParam);
+     ypos := HIWORD(Msg.lParam);
+     handled := true;
+   end
+  else
+    handled := false;
+end;
 
 
 procedure TMySWF.CreateWnd;
@@ -135,7 +162,8 @@ end;
 
 procedure TPipeThread.setBGColor();
 begin
-  frmMain.Color := self.bgColor;
+  flaPreview.BackgroundColor := self.bgColor;
+  frmMain.Color := self.bgTColor;
 end;
 
 
@@ -147,7 +175,13 @@ begin
   flaPreview.Width := self.w;
   flaPreview.Height := self.h;
   flaPreview.CreateWnd;
-  //displaySWF();
+end;
+
+
+
+procedure TPipeThread.setZoom();
+begin
+  flaPreview.Zoom(self.zoom);
 end;
 
 procedure TPipeThread.Execute();
@@ -175,6 +209,8 @@ const
   CMD_CALL  = 11;
   CMD_GETVARIABLE = 12;
   CMD_SETVARIABLE = 13;
+  CMD_CHECKCLICK = 14;
+  CMD_ZOOM = 15;
 begin
 
   try
@@ -188,6 +224,31 @@ begin
           ReadPipe(pipe, buffer, 1);
           cmd := buffer[0];
           case cmd of
+
+            CMD_CHECKCLICK:
+            begin
+              buffer[0]:=clicked;
+              len := 1;
+              if clicked>0 then
+              begin
+                len := len + 4;
+                buffer[1] := (xpos shr 8) mod 256;
+                buffer[2] := xpos mod 256;
+                buffer[3] := (ypos shr 8) mod 256;
+                buffer[4] := ypos mod 256;
+              end;
+              clicked := 0;
+              xpos := 0;
+              ypos := 0;
+
+              WritePipe(pipe,buffer,len);
+            end;
+            CMD_ZOOM:
+            begin
+              ReadPipe(pipe, buffer, 2);
+              self.zoom := buffer[0] * 256 + buffer[1];
+              Synchronize(setZoom);
+            end;
             CMD_PLAY:
             begin
               ReadPipe(pipe, buffer, 1);
@@ -213,7 +274,8 @@ begin
             CMD_BGCOLOR:
             begin
               ReadPipe(pipe, buffer, 3);
-              self.bgColor := RGB(buffer[0], buffer[1], buffer[2]);
+              self.bgColor := (buffer[0] shl 16)+(buffer[1] shl 8)+(buffer[2]);
+              self.bgTColor := RGB(buffer[0],buffer[1],buffer[2]);
               Synchronize(setBGColor);
             end;
             CMD_CURRENT_FRAME:
@@ -426,9 +488,17 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   if (ParamCount >= 2) then
   begin
-    flaPreview := TMySWF.Create(frmMain);
-    flaPreview.AllowScriptAccess := 'always';
-    flaPreview.BackgroundColor := -1;
+    Application.OnMessage := NoRightClick;
+    try
+      flaPreview := TMySWF.Create(frmMain);
+      flaPreview.Scale := 'noscale';
+      flaPreview.WMode := 'direct';
+      flaPreview.Menu := false;
+      flaPreview.AllowScriptAccess := 'always';
+      flaPreview.BackgroundColor := -1;
+    except
+      Application.Terminate;
+    end;
   end;
 end;
 

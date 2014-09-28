@@ -1,13 +1,13 @@
 object frmMain: TfrmMain
-  Left = 300
-  Top = 617
-  Width = 1381
-  Height = 811
+  Left = 585
+  Top = 543
+  Width = 805
+  Height = 266
   Caption = 'FFDec Flash Player'
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   Icon.Data = {
@@ -646,8 +646,8 @@ object frmMain: TfrmMain
   OldCreateOrder = False
   OnActivate = FormActivate
   OnCreate = FormCreate
-  PixelsPerInch = 120
-  TextHeight = 16
+  PixelsPerInch = 96
+  TextHeight = 13
   object tmrWatchDog: TTimer
     OnTimer = tmrWatchDogTimer
     Left = 16

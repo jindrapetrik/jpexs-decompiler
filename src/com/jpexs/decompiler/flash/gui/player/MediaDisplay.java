@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -27,6 +28,8 @@ public interface MediaDisplay {
     public int getCurrentFrame();
 
     public int getTotalFrames();
+    
+    public void zoom(double zoom);
 
     public void pause();
 
@@ -43,4 +46,14 @@ public interface MediaDisplay {
     public int getFrameRate();
 
     public boolean isLoaded();
+    
+    public BufferedImage printScreen();
+    
+    public boolean screenAvailable();
+    
+    public boolean zoomAvailable();
+    
+    public void zoomToFit();
+    
+    public double getZoom();
 }
