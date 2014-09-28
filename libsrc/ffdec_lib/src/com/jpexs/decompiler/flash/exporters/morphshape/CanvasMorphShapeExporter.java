@@ -431,8 +431,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            String drawStroke = "\tdrawMorphPath(ctx,\"" + pathData.trim() + "\",ratio,true,scaleMode);\r\n";
-            String drawFill = "\tdrawMorphPath(ctx,\"" + pathData.trim() + "\",ratio,false);\r\n";;
+            shapeData+="\tvar pathData=\""+pathData.trim()+"\";\r\n";
+            String drawStroke = "\tdrawMorphPath(ctx,pathData,ratio,true,scaleMode);\r\n";
+            String drawFill = "\tdrawMorphPath(ctx,pathData,ratio,false);\r\n";;
             pathData = "";
             if (lineFillData != null) {
                 String preLineFillData = "";

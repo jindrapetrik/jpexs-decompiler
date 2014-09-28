@@ -420,8 +420,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            String drawStroke = "\tdrawPath(ctx,\"" + pathData.trim() + "\",true,scaleMode);\r\n";
-            String drawFill = "\tdrawPath(ctx,\"" + pathData.trim() + "\",false);\r\n";;
+            shapeData+="\tvar pathData=\""+pathData.trim()+"\";\r\n";
+            String drawStroke = "\tdrawPath(ctx,pathData,true,scaleMode);\r\n";
+            String drawFill = "\tdrawPath(ctx,pathData,false);\r\n";;
             pathData = "";
             if (lineFillData != null) {
                 String preLineFillData = "";
