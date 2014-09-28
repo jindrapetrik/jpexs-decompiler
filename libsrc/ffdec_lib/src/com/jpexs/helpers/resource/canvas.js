@@ -822,7 +822,7 @@ var enhanceContext = function(context) {
             super_.translate.call(this, x, y);
         },
         transform: function(a, b, c, d, e, f) {
-            this._matrix = concatMatrix(this._matrix,[a,b,c,d,e,f]);
+            this._matrix = concatMatrix([a,b,c,d,e,f],this._matrix);
             super_.transform.call(this, a, b, c, d, e, f);
         },
         setTransform: function(a, b, c, d, e, f) {
@@ -837,8 +837,8 @@ var enhanceContext = function(context) {
         },  
         applyTransformToPoint: function(p){
             var ret = {};
-            ret.x = this._matrix[0]*p.x + this._matrix[1]*p.y + this._matrix[4];
-            ret.y = this._matrix[2]*p.x + this._matrix[3]*p.y + this._matrix[5];                
+            ret.x = this._matrix[0]*p.x + this._matrix[2]*p.y + this._matrix[4];
+            ret.y = this._matrix[1]*p.x + this._matrix[3]*p.y + this._matrix[5];                
             return ret;
         },
         __proto__: super_
@@ -906,7 +906,7 @@ var place = function(obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, 
         var ncanvas = createCanvas(canvas.width, canvas.height);
         ctx = ncanvas.getContext("2d");
         enhanceContext(ctx);
-        ctx.applyTransforms(oldctx._matrices);
+        ctx.applyTransforms(oldctx._matrix);
     }
     if (blendMode > 1) {
         eval(obj + "(ctx,new cxform(0,0,0,0,255,255,255,255),frame,ratio,time);");
@@ -1021,7 +1021,7 @@ function drawMorphPath(ctx, p, ratio, doStroke, scaleMode){
         
         ctx.save();        
         ctx.setTransform(1,0,0,1,0,0);        
-    }    
+    }  
     ctx.beginPath();    
     var drawCommand = "";
     for (var i = 0; i < len; i++) {

@@ -252,7 +252,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
                 }
 
-                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");\r\n";
+                fillData += "\tvar fimg = ctrans.applyToImage(imageObj" + bitmapId + ");\r\n";
                 fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
@@ -473,6 +473,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 pathData += strokeData;
             }
             if (fillMatrix != null) {
+                pathData += drawFill;
                 if (lastRadColor != null) {
                     pathData += "\tctx.fillStyle=" + lastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
                 }

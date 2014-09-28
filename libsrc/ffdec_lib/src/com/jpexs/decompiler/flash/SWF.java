@@ -1389,7 +1389,7 @@ public final class SWF implements TreeItem, Timelined {
                 fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
             } else {
-                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
+                
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
                     String format = image.getImageFormat();
@@ -1408,10 +1408,11 @@ public final class SWF implements TreeItem, Timelined {
                     String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
                     fos.write(Utf8Helper.getBytes("var imageObj" + c + " = document.createElement(\"img\");\r\nimageObj" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
                 }
+                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
                 if (ch instanceof DrawableTag) {
                     fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
                 }
-                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));                
             }
         }
     }
@@ -2290,7 +2291,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n");
                     sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");
-                    sb.append("\t\t\tvar ms=o.ctx._matrices.slice();\r\n");
+                    sb.append("\t\t\tvar ms=o.ctx._matrix;\r\n");
                     sb.append("\t\t\to.ctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\to.ctx.globalCompositeOperation = \"source-over\";\r\n");
                     sb.append("\t\t\to.ctx.drawImage(canvas,0,0);\r\n");
@@ -2338,7 +2339,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");
                     sb.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(cctx);\r\n");
-                    sb.append("\t\t\tcctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tcctx.applyTransforms(ctx._matrix);\r\n");
                     sb.append("\t\t\tcanvas = ccanvas;\r\n");
                     sb.append("\t\t\tctx = cctx;\r\n");
                 }
@@ -2348,7 +2349,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
                     sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(fctx);\r\n");
-                    sb.append("\t\t\tfctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tfctx.applyTransforms(ctx._matrix);\r\n");
                     sb.append("\t\t\tctx = fctx;\r\n");
                 }
 
@@ -2474,7 +2475,7 @@ public final class SWF implements TreeItem, Timelined {
                         }
                     }
                     sb.append("\t\t\tctx = oldctx;\r\n");
-                    sb.append("\t\t\tvar ms=ctx._matrices;\r\n");
+                    sb.append("\t\t\tvar ms=ctx._matrix;\r\n");
                     sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
                     sb.append("\t\t\tctx.applyTransforms(ms);\r\n");
@@ -2485,7 +2486,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");
                     sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(nctx);\r\n");
-                    sb.append("\t\t\tnctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tnctx.applyTransforms(ctx._matrix);\r\n");
                     sb.append("\t\t\tctx = nctx;\r\n");
                 }
             }

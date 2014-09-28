@@ -464,6 +464,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 pathData += strokeData;
             }
             if (fillMatrix != null) {
+                pathData += drawFill;
                 if (lastRadColor != null) {
                     pathData += "\tctx.fillStyle=" + lastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
                 }
