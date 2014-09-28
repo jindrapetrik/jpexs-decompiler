@@ -53,7 +53,7 @@ Filters._unpremultiply = function(data) {
 };
 
 
-Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius) {
+Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius, maskType) {
     var index = 0;
     var newColors = [];
 
@@ -66,7 +66,7 @@ Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius) {
         for (var x = -radius * 4; x < w * 4; x += 4) {
             var oldPixel = x - radius * 4 - 4;
             if (oldPixel >= 0) {
-                if ((mask == null) || (mask[index + oldPixel + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[index + oldPixel + 3] > 0) || (maskType == 2 && mask[index + oldPixel + 3] < 255)) {
                     a -= pixels[index + oldPixel + 3];
                     r -= pixels[index + oldPixel];
                     g -= pixels[index + oldPixel + 1];
@@ -77,7 +77,7 @@ Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius) {
 
             var newPixel = x + radius * 4;
             if (newPixel < w * 4) {
-                if ((mask == null) || (mask[index + newPixel + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[index + newPixel + 3] > 0) || (maskType == 2 && mask[index + newPixel + 3] < 255)) {
                     a += pixels[index + newPixel + 3];
                     r += pixels[index + newPixel];
                     g += pixels[index + newPixel + 1];
@@ -87,7 +87,7 @@ Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius) {
             }
 
             if (x >= 0) {
-                if ((mask == null) || (mask[index + x + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[index + x + 3] > 0) || (maskType == 2 && mask[index + x + 3] < 255)) {
                     if (hits == 0) {
                         newColors[x] = 0;
                         newColors[x + 1] = 0;
@@ -119,7 +119,7 @@ Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius) {
     }
 };
 
-Filters._boxBlurVertical = function(pixels, mask, w, h, radius) {
+Filters._boxBlurVertical = function(pixels, mask, w, h, radius, maskType) {
     var newColors = [];
     var oldPixelOffset = -(radius + 1) * w * 4;
     var newPixelOffset = (radius) * w * 4;
@@ -134,7 +134,7 @@ Filters._boxBlurVertical = function(pixels, mask, w, h, radius) {
         for (var y = -radius; y < h; y++) {
             var oldPixel = y - radius - 1;
             if (oldPixel >= 0) {
-                if ((mask == null) || (mask[index + oldPixelOffset + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[index + oldPixelOffset + 3] > 0) || (maskType == 2 && mask[index + oldPixelOffset + 3] < 255)) {
                     a -= pixels[index + oldPixelOffset + 3];
                     r -= pixels[index + oldPixelOffset];
                     g -= pixels[index + oldPixelOffset + 1];
@@ -146,7 +146,7 @@ Filters._boxBlurVertical = function(pixels, mask, w, h, radius) {
 
             var newPixel = y + radius;
             if (newPixel < h) {
-                if ((mask == null) || (mask[index + newPixelOffset + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[index + newPixelOffset + 3] > 0) || (maskType == 2 && mask[index + newPixelOffset + 3] < 255)) {
                     a += pixels[index + newPixelOffset + 3];
                     r += pixels[index + newPixelOffset];
                     g += pixels[index + newPixelOffset + 1];
@@ -156,7 +156,7 @@ Filters._boxBlurVertical = function(pixels, mask, w, h, radius) {
             }
 
             if (y >= 0) {
-                if ((mask == null) || (mask[y * w * 4 + x + 3] > 0)) {
+                if ((maskType == 0) || (maskType == 1 && mask[y * w * 4 + x + 3] > 0) || (maskType == 2 && mask[y * w * 4 + x + 3] < 255)) {
                     if (hits == 0) {
                         newColors[4 * y] = 0;
                         newColors[4 * y + 1] = 0;
@@ -189,13 +189,13 @@ Filters._boxBlurVertical = function(pixels, mask, w, h, radius) {
 };
 
 
-Filters.blur = function(canvas, ctx, hRadius, vRadius, iterations, mask) {
+Filters.blur = function(canvas, ctx, hRadius, vRadius, iterations, mask, maskType) {
     var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var data = imgData.data;
     Filters._premultiply(data);
     for (var i = 0; i < iterations; i++) {
-        Filters._boxBlurHorizontal(data, mask, canvas.width, canvas.height, Math.floor(hRadius / 2));
-        Filters._boxBlurVertical(data, mask, canvas.width, canvas.height, Math.floor(vRadius / 2));
+        Filters._boxBlurHorizontal(data, mask, canvas.width, canvas.height, Math.floor(hRadius / 2),maskType);
+        Filters._boxBlurVertical(data, mask, canvas.width, canvas.height, Math.floor(vRadius / 2),maskType);
     }
 
     Filters._unpremultiply(data);
@@ -259,14 +259,7 @@ Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, c
     var angleRad = angle / 180 * Math.PI;
     var moveX = (distance * Math.cos(angleRad));
     var moveY = (distance * Math.sin(angleRad));
-    var srcPixels = src.getImageData(0, 0, width, height).data;
-    var revPixels = [];
-    for (var i = 0; i < srcPixels.length; i += 4) {
-        revPixels[i] = srcPixels[i];
-        revPixels[i + 1] = srcPixels[i + 1];
-        revPixels[i + 2] = srcPixels[i + 2];
-        revPixels[i + 3] = 255 - srcPixels[i + 3];
-    }
+    var srcPixels = src.getImageData(0, 0, width, height).data;    
     var shadow = [];
     for (var i = 0; i < srcPixels.length; i += 4) {
         var alpha = srcPixels[i + 3];
@@ -280,22 +273,22 @@ Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, c
 
     Filters._setRGB(retImg, 0, 0, width, height, shadow);
 
-    var mask = null;
+    var maskType = 0;
     if (type == Filters.INNER) {
-        mask = srcPixels;
+        maskType = 1;
     }
     if (type == Filters.OUTER) {
-        mask = revPixels;
+        maskType = 2;
     }
 
 
-    retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, mask);
+    retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, srcPixels, maskType);
     retImg = retCanvas.getContext("2d");
     shadow = retImg.getImageData(0, 0, width, height).data;
 
-    if (mask != null) {
-        for (var i = 0; i < mask.length; i += 4) {
-            if (mask[i + 3] == 0) {
+    if (maskType != 0) {
+        for (var i = 0; i < srcPixels.length; i += 4) {
+            if ((maskType == 1 && srcPixels[i + 3] == 0)||(maskType == 2 && srcPixels[i+3]==255)) {
                 shadow[i] = 0;
                 shadow[i + 1] = 0;
                 shadow[i + 2] = 0;
@@ -358,7 +351,7 @@ Filters.dropShadow = function(canvas, src, blurX, blurY, angle, distance, color,
     var retCanvas = createCanvas(canvas.width, canvas.height);
     Filters._setRGB(retCanvas.getContext("2d"), 0, 0, width, height, shadow);
     if (blurX > 0 || blurY > 0) {
-        retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, null);
+        retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, null,0);
     }
     shadow = retCanvas.getContext("2d").getImageData(0, 0, width, height).data;
 
@@ -394,14 +387,6 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
     var height = canvas.height;
     var retImg = createCanvas(width, height);
     var srcPixels = src.getImageData(0, 0, width, height).data;
-
-    var revPixels = [];
-    for (var i = 0; i < srcPixels.length; i += 4) {
-        revPixels[i] = srcPixels[i];
-        revPixels[i + 1] = srcPixels[i + 1];
-        revPixels[i + 2] = srcPixels[i + 2];
-        revPixels[i + 3] = 255 - srcPixels[i + 3];
-    }
 
     var gradient = createCanvas(512, 1);
     var gg = gradient.getContext("2d");
@@ -476,12 +461,12 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
             break;
     }
 
-    var mask = null;
+    var maskType = 0;
     if (type == Filters.INNER) {
-        mask = srcPixels;
+        maskType = 1;
     }
     if (type == Filters.OUTER) {
-        mask = revPixels;
+        maskType = 2;
     }
 
     var retc = retImg.getContext("2d");
@@ -490,7 +475,7 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
     retc.drawImage(shadowIm, 0, 0);
     retc.drawImage(hilightIm, 0, 0);
 
-    retImg = Filters.blur(retImg, retImg.getContext("2d"), blurX, blurY, iterations, mask);
+    retImg = Filters.blur(retImg, retImg.getContext("2d"), blurX, blurY, iterations, srcPixels,maskType);
     var ret = retImg.getContext("2d").getImageData(0, 0, width, height).data;
 
     for (var i = 0; i < srcPixels.length; i += 4) {
