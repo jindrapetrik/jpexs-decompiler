@@ -106,8 +106,9 @@ public class BitmapExporter extends ShapeExporterBase {
          * This outline is distorted by our AffineTransform relative to the
          * outline which would be given by the base stroke, but only in terms of
          * scaling (i.e. thickness of the lines), as translation and rotation
-         * are undone after the stro @Override king.
+         * are undone after the stroking.
          */
+        @Override
         public Shape createStrokedShape(Shape s) {
             Shape sTrans = transform.createTransformedShape(s);
             Shape sTransStroked = stroke.createStrokedShape(sTrans);
