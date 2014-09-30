@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -73,13 +72,13 @@ public class PlayerControls extends JPanel implements ActionListener {
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
     
-    private JLabel percentLabel = new JLabel("100%");
-    private JPanel zoomPanel;    
-    private JPanel graphicControls;
-    private JPanel playbackControls;    
+    private final JLabel percentLabel = new JLabel("100%");
+    private final JPanel zoomPanel;    
+    private final JPanel graphicControls;
+    private final JPanel playbackControls;    
     private double realZoom = 1.0;
     
-    private JButton zoomFitButton;
+    private final JButton zoomFitButton;
         
     public static final int ZOOM_DECADE_STEPS = 10;
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
@@ -335,6 +334,7 @@ public class PlayerControls extends JPanel implements ActionListener {
             this.img = img;
         }
 
+        @Override
         public Object getTransferData(DataFlavor flavor)
                 throws UnsupportedFlavorException, IOException {
             if (flavor.equals(DataFlavor.imageFlavor) && img != null) {

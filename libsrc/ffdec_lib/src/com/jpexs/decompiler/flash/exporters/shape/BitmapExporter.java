@@ -37,6 +37,7 @@ import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
@@ -44,7 +45,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.Shape;
 
 /**
  *
@@ -77,17 +77,17 @@ public class BitmapExporter extends ShapeExporterBase {
         /**
          * the AffineTransform used to transform the shape before stroking.
          */
-        private AffineTransform transform;
+        private final AffineTransform transform;
         /**
          * The inverse of {@link #transform}, used to transform back after
          * stroking.
          */
-        private AffineTransform inverse;
+        private final AffineTransform inverse;
 
         /**
          * Our base stroke.
          */
-        private Stroke stroke;
+        private final Stroke stroke;
 
         /**
          * Creates a TransformedStroke based on another Stroke and an
@@ -106,7 +106,8 @@ public class BitmapExporter extends ShapeExporterBase {
          * This outline is distorted by our AffineTransform relative to the
          * outline which would be given by the base stroke, but only in terms of
          * scaling (i.e. thickness of the lines), as translation and rotation
-         * are undone after the stroking.
+         * are undone after the stro        @Override
+king.
          */
         public Shape createStrokedShape(Shape s) {
             Shape sTrans = transform.createTransformedShape(s);

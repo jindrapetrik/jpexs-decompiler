@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.awt.Color;
-import java.awt.color.ColorSpace;
 import java.io.Serializable;
 
 /**
