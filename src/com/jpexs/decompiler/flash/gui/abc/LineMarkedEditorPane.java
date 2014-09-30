@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -31,7 +32,8 @@ import jsyntaxpane.actions.ActionUtils;
  */
 public class LineMarkedEditorPane extends UndoFixedEditorPane {
 
-    int lastLine = -1;
+    private static final int truncateLimit = 8192;
+    private int lastLine = -1;
 
     public int getLine() {
         return lastLine;
@@ -60,8 +62,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane {
     @Override
     public void setText(String t) {
         lastLine = -1;
-        if (Configuration.debugMode.get() && t.length() > 4192) {
-            t = t.substring(0, 4192);
+        if (Configuration.debugMode.get() && t.length() > truncateLimit) {
+            t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
         super.setText(t);
         setCaretPosition(0); //scroll to top
