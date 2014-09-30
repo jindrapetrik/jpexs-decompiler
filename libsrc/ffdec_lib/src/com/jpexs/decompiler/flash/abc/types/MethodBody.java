@@ -61,19 +61,19 @@ public class MethodBody implements Cloneable {
     public transient List<GraphTargetItem> convertedItems;
     public transient Throwable convertException;
 
-    public synchronized void setCodeBytes(byte codeBytes[]){
+    public synchronized void setCodeBytes(byte codeBytes[]) {
         this.codeBytes = codeBytes;
         this.code = null;
     }
-    
+
     public synchronized byte[] getCodeBytes() {
-        if(code == null){
+        if (code == null) {
             return codeBytes;
-        }else{
+        } else {
             return code.getBytes();
         }
     }
-    
+
     public synchronized AVM2Code getCode() {
         if (code == null) {
             AVM2Code avm2Code;

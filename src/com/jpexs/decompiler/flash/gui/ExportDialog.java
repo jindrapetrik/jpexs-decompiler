@@ -103,7 +103,7 @@ public class ExportDialog extends AppDialog {
         FontExportMode.class,
         MorphShapeExportMode.class
     };
-    
+
     Class[] zoomClasses = {
         ShapeExportMode.class,
         TextExportMode.class,
@@ -123,11 +123,10 @@ public class ExportDialog extends AppDialog {
         }
         return null;
     }
-    
-    public double getZoom(){
-        return Double.parseDouble(zoomTextField.getText())/100;
+
+    public double getZoom() {
+        return Double.parseDouble(zoomTextField.getText()) / 100;
     }
-       
 
     private void saveConfig() {
         String cfg = "";
@@ -141,8 +140,8 @@ public class ExportDialog extends AppDialog {
             }
             cfg += key;
         }
-        Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText())/100);
-        Configuration.lastSelectedExportFormats.set(cfg);        
+        Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
+        Configuration.lastSelectedExportFormats.set(cfg);
     }
 
     public ExportDialog(List<Object> exportables) {
@@ -217,7 +216,7 @@ public class ExportDialog extends AppDialog {
             if (!exportableExists) {
                 continue;
             }
-            if(Arrays.asList(zoomClasses).contains(c)){
+            if (Arrays.asList(zoomClasses).contains(c)) {
                 zoomable = true;
             }
             JLabel lab = new JLabel(translate(optionNames[i]));
@@ -227,20 +226,20 @@ public class ExportDialog extends AppDialog {
             top += combos[i].getHeight();
         }
         int zoomWidth = 50;
-        if(zoomable){
-            top+=2;
+        if (zoomable) {
+            top += 2;
             JLabel zlab = new JLabel(translate("zoom"));
-            zlab.setBounds(10, top+4, zlab.getPreferredSize().width, zlab.getPreferredSize().height);        
+            zlab.setBounds(10, top + 4, zlab.getPreferredSize().width, zlab.getPreferredSize().height);
             zoomTextField.setBounds(10 + labWidth + 10, top, zoomWidth, zoomTextField.getPreferredSize().height);
             JLabel pctLabel = new JLabel(translate("zoom.percent"));
-            pctLabel.setBounds(10 + labWidth + 10 + zoomWidth + 5, top+4, 20, pctLabel.getPreferredSize().height);        
-        
+            pctLabel.setBounds(10 + labWidth + 10 + zoomWidth + 5, top + 4, 20, pctLabel.getPreferredSize().height);
+
             comboPanel.add(zlab);
             comboPanel.add(zoomTextField);
             comboPanel.add(pctLabel);
-            top+=zoomTextField.getHeight();
+            top += zoomTextField.getHeight();
         }
-        
+
         Dimension dim = new Dimension(10 + labWidth + 10 + comboWidth + 10, top + 10);
         comboPanel.setMinimumSize(dim);
         comboPanel.setPreferredSize(dim);
@@ -251,10 +250,10 @@ public class ExportDialog extends AppDialog {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try{
+                try {
                     saveConfig();
-                }catch(NumberFormatException nfe){
-                    JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
+                } catch (NumberFormatException nfe) {
+                    JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     zoomTextField.requestFocusInWindow();
                     return;
                 }
@@ -280,9 +279,9 @@ public class ExportDialog extends AppDialog {
         View.setWindowIcon(this);
         getRootPane().setDefaultButton(okButton);
         setModal(true);
-        String pct = ""+Configuration.lastSelectedExportZoom.get()*100;
-        if(pct.endsWith(".0")){
-            pct = pct.substring(0,pct.length()-2);
+        String pct = "" + Configuration.lastSelectedExportZoom.get() * 100;
+        if (pct.endsWith(".0")) {
+            pct = pct.substring(0, pct.length() - 2);
         }
         zoomTextField.setText(pct);
     }

@@ -1329,7 +1329,7 @@ public final class SWF implements TreeItem, Timelined {
         BufferedImage img0 = images.next();
         out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
         try {
-            out.write(0,img0,1);        
+            out.write(0, img0, 1);
             while (images.hasNext()) {
                 out.write(0, images.next(), 1);
             }
@@ -1389,7 +1389,7 @@ public final class SWF implements TreeItem, Timelined {
                 fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
             } else {
-                
+
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
                     String format = image.getImageFormat();
@@ -1412,7 +1412,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (ch instanceof DrawableTag) {
                     fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
                 }
-                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));                
+                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
             }
         }
     }
@@ -1471,10 +1471,10 @@ public final class SWF implements TreeItem, Timelined {
                         File f = new File(foutdir + File.separator + frame + ".svg");
                         try (FileOutputStream fos = new FileOutputStream(f)) {
                             ExportRectangle rect = new ExportRectangle(ftim.displayRect);
-                            rect.xMax*=settings.zoom;
-                            rect.yMax*=settings.zoom;
-                            rect.xMin*=settings.zoom;
-                            rect.yMin*=settings.zoom;
+                            rect.xMax *= settings.zoom;
+                            rect.yMax *= settings.zoom;
+                            rect.xMin *= settings.zoom;
+                            rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect);
                             if (fbackgroundColor != null) {
                                 exporter.setBackGroundColor(fbackgroundColor);
@@ -1515,8 +1515,8 @@ public final class SWF implements TreeItem, Timelined {
 
                         fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin*settings.zoom / unitDivisor) + "," + (-ftim.displayRect.Ymin*settings.zoom / unitDivisor) + ");\r\n"));
-                        fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor/settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
+                        fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin * settings.zoom / unitDivisor) + "," + (-ftim.displayRect.Ymin * settings.zoom / unitDivisor) + ");\r\n"));
+                        fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
                         fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
@@ -1613,7 +1613,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (!hasNext()) {
                     return null;
                 }
-                return frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false,settings.zoom).getBufferedImage();
+                return frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
             }
         };
 
@@ -2281,7 +2281,7 @@ public final class SWF implements TreeItem, Timelined {
         sb.append("\tswitch(frame){\r\n");
         int maxDepth = timeline.getMaxDepth();
         Stack<Integer> clipDepths = new Stack<>();
-        for (int frame:frames) {
+        for (int frame : frames) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {
@@ -2591,7 +2591,7 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
-        String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode()+"_"+zoom;
+        String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode() + "_" + zoom;
         SerializableImage image;
         if (useCache) {
             image = getFromCache(key);
@@ -2605,8 +2605,8 @@ public final class SWF implements TreeItem, Timelined {
         }
 
         RECT rect = displayRect;
-        image = new SerializableImage((int) (rect.getWidth()*zoom / SWF.unitDivisor) + 1,
-                (int) (rect.getHeight()*zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+        image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
+                (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {
@@ -2637,7 +2637,7 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public static void frameToImage(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        double unzoom =  SWF.unitDivisor;
+        double unzoom = SWF.unitDivisor;
         if (timeline.frames.size() <= frame) {
             return;
         }
@@ -2723,8 +2723,8 @@ public final class SWF implements TreeItem, Timelined {
                     rect.yMax += deltaYMax * unzoom;
                 }
 
-                rect.xMin -= 1*unzoom;
-                rect.yMin -= 1*unzoom;
+                rect.xMin -= 1 * unzoom;
+                rect.yMin -= 1 * unzoom;
                 rect.xMin = Math.max(0, rect.xMin);
                 rect.yMin = Math.max(0, rect.yMin);
 

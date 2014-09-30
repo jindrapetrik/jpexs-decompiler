@@ -68,8 +68,6 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
-    
-
     private Timelined timelined;
     private boolean stillFrame = false;
     private Timer timer;
@@ -85,7 +83,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private int time = 0;
     private int selectedDepth = -1;
     private double zoom = 1.0;
-    
 
     public void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -311,7 +308,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
         iconPanel = new IconPanel();
         //labelPan.add(label, new GridBagConstraints());
-        add(iconPanel, BorderLayout.CENTER);      
+        add(iconPanel, BorderLayout.CENTER);
         add(debugLabel, BorderLayout.NORTH);
         iconPanel.addMouseListener(new MouseAdapter() {
 
@@ -393,16 +390,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     @Override
-    public void zoom(double zoom){
+    public void zoom(double zoom) {
         this.zoom = zoom;
         drawFrame();
     }
-    
-  
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+
     }
 
     @Override
@@ -410,8 +405,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         return iconPanel.getLastImage();
     }
 
-    
-    
     @Override
     public void zoomToFit() {
         if (timelined instanceof BoundedTag) {
@@ -432,7 +425,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 w = w2;
             }
             zoom = (double) w / (double) w1;
-        }        
+        }
     }
 
     public void setImage(byte[] data) {
@@ -452,10 +445,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     @Override
     public boolean zoomAvailable() {
-        return timelined!=null;
+        return timelined != null;
     }
-    
-   
 
     public synchronized void setTimelined(final Timelined drawable, final SWF swf, int frame) {
         pause();
@@ -764,6 +755,5 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     public double getZoom() {
         return zoom;
     }
-    
-    
+
 }

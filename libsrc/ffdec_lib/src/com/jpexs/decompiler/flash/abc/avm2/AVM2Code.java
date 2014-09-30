@@ -790,13 +790,13 @@ public class AVM2Code implements Cloneable {
         List<Long> addresses = new ArrayList<>();
         long startPos = ais.getPosition();
         addresses.add(startPos);
-        
+
         while (!addresses.isEmpty()) {
             long address = addresses.remove(0);
             if (codeMap.containsKey(address)) {
                 continue;
             }
-            if(address<startPos) //no jump outside block
+            if (address < startPos) //no jump outside block
             {
                 continue;
             }

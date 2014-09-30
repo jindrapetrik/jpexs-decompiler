@@ -44,8 +44,6 @@ public class GetVariableActionItem extends ActionItem {
         return name.toString();
     }
 
-    
-    
     @Override
     public List<GraphTargetItem> getAllSubItems() {
         List<GraphTargetItem> ret = new ArrayList<>();

@@ -2198,24 +2198,24 @@ public class XFLConverter {
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
 
-        String labelsLayer = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);        
+        String labelsLayer = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
         ret += labelsLayer;
         String scriptLayer = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
         ret += scriptLayer;
-        
+
         int index = 0;
-        
-        if(!labelsLayer.isEmpty()){
+
+        if (!labelsLayer.isEmpty()) {
             index++;
         }
-        
-        if(!scriptLayer.isEmpty()){
+
+        if (!scriptLayer.isEmpty()) {
             index++;
-        }                
+        }
 
         int layerCount = getLayerCount(timelineTags);
         Stack<Integer> parentLayers = new Stack<>();
-        
+
         for (int d = layerCount; d >= 1; d--, index++) {
             for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {

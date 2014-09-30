@@ -71,22 +71,22 @@ public class PlayerControls extends JPanel implements ActionListener {
     private final JLabel totalTimeLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
-    
+
     private final JLabel percentLabel = new JLabel("100%");
-    private final JPanel zoomPanel;    
+    private final JPanel zoomPanel;
     private final JPanel graphicControls;
-    private final JPanel playbackControls;    
+    private final JPanel playbackControls;
     private double realZoom = 1.0;
-    
+
     private final JButton zoomFitButton;
-        
+
     public static final int ZOOM_DECADE_STEPS = 10;
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
-    
+
     public PlayerControls(MediaDisplay display) {
-        
+
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
+
         graphicControls = new JPanel(new BorderLayout());
         JPanel graphicButtonsPanel = new JPanel(new FlowLayout());
         JButton selectColorButton = new JButton(View.getIcon("color16"));
@@ -118,10 +118,10 @@ public class PlayerControls extends JPanel implements ActionListener {
         snapshotButton.addActionListener(this);
         snapshotButton.setActionCommand(ACTION_SNAPSHOT);
         snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
-        
+
         zoomPanel = new JPanel(new FlowLayout());
         //updateZoom();
-        zoomPanel.add(percentLabel);        
+        zoomPanel.add(percentLabel);
         zoomPanel.add(zoomInButton);
         zoomPanel.add(zoomOutButton);
         zoomPanel.add(zoomNoneButton);
@@ -129,12 +129,12 @@ public class PlayerControls extends JPanel implements ActionListener {
         zoomPanel.add(selectColorButton);
         graphicButtonsPanel.add(zoomPanel);
         graphicButtonsPanel.add(snapshotButton);
-        graphicControls.add(graphicButtonsPanel,BorderLayout.EAST);
-        
+        graphicControls.add(graphicButtonsPanel, BorderLayout.EAST);
+
         add(graphicControls);
         graphicControls.setVisible(display.screenAvailable());
-        
-        playbackControls = new JPanel();        
+
+        playbackControls = new JPanel();
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
         timeLabel = new JLabel("00:00.00");
@@ -213,10 +213,10 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         View.execInEventDispatch(new Runnable() {
             @Override
-            public void run() {        
+            public void run() {
                 double zoom = display.getZoom();
-                zoomFitButton.setVisible(zoom!=0.0);
-                percentLabel.setVisible(zoom!=0.0);
+                zoomFitButton.setVisible(zoom != 0.0);
+                percentLabel.setVisible(zoom != 0.0);
                 zoomPanel.setVisible(display.zoomAvailable());
                 graphicControls.setVisible(display.screenAvailable());
                 int totalFrames = display.getTotalFrames();
@@ -265,7 +265,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);
         return bd.doubleValue();
     }
-    
+
     private void updateZoom() {
         double pctzoom = roundZoom(realZoom * 100, 3);
         String r = "" + pctzoom;
@@ -276,7 +276,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         percentLabel.setText("" + r + "%");
         display.zoom(zoom);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -291,14 +291,14 @@ public class PlayerControls extends JPanel implements ActionListener {
                 display.pause();
                 display.rewind();
                 break;
-             case ACTION_SELECT_BKCOLOR:
+            case ACTION_SELECT_BKCOLOR:
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
                         Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
                         if (newColor != null) {
                             View.swfBackgroundColor = newColor;
-                            display.setBackground(newColor);                            
+                            display.setBackground(newColor);
                         }
                     }
                 });
@@ -322,10 +322,9 @@ public class PlayerControls extends JPanel implements ActionListener {
             case ACTION_SNAPSHOT:
                 putImageToClipBoard(display.printScreen());
                 break;
-        }                
+        }
     }
-    
-    
+
     private class TransferableImage implements Transferable {
 
         Image img;
@@ -363,7 +362,7 @@ public class PlayerControls extends JPanel implements ActionListener {
             return false;
         }
     }
-    
+
     private void putImageToClipBoard(BufferedImage img) {
         if (img == null) {
             return;

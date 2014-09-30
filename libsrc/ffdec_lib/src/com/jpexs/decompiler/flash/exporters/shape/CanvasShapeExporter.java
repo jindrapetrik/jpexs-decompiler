@@ -287,7 +287,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
         thickness /= SWF.unitDivisor;
-        strokeData += "\tvar scaleMode = \""+scaleMode+"\";\r\n";
+        strokeData += "\tvar scaleMode = \"" + scaleMode + "\";\r\n";
 
         if (color != null) { //gradient lines have no color
             strokeData += "\tctx.strokeStyle=" + color(color) + ";\r\n";
@@ -420,7 +420,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            shapeData+="\tvar pathData=\""+pathData.trim()+"\";\r\n";
+            shapeData += "\tvar pathData=\"" + pathData.trim() + "\";\r\n";
             String drawStroke = "\tdrawPath(ctx,pathData,true,scaleMode);\r\n";
             String drawFill = "\tdrawPath(ctx,pathData,false);\r\n";;
             pathData = "";
@@ -490,7 +490,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += drawStroke +"\r\n";
+                shapeData += drawStroke + "\r\n";
             } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }

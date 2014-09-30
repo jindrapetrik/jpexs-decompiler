@@ -400,7 +400,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-replace")) {
             parseReplace(args);
         } else if (nextParam.equals("-as3compiler")) {
-            ActionScriptParser.compile(null /*?*/, args.remove(), args.remove(),0);
+            ActionScriptParser.compile(null /*?*/, args.remove(), args.remove(), 0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage();
@@ -890,9 +890,9 @@ public class CommandLineArgumentParser {
                         System.out.println("Exporting images...");
                         new ImageExporter().exportImages(handler, outDir.getAbsolutePath() + File.separator + "images", extags, new ImageExportSettings(ImageExportMode.PNG_JPEG));
                         System.out.println("Exporting shapes...");
-                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", extags, new ShapeExportSettings(ShapeExportMode.SVG,zoom));
+                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", extags, new ShapeExportSettings(ShapeExportMode.SVG, zoom));
                         System.out.println("Exporting morphshapes...");
-                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + File.separator + "morphshapes", extags, new MorphShapeExportSettings(MorphShapeExportMode.SVG,zoom));
+                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + File.separator + "morphshapes", extags, new MorphShapeExportSettings(MorphShapeExportMode.SVG, zoom));
                         System.out.println("Exporting scripts...");
                         exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
                         System.out.println("Exporting movies...");
@@ -921,12 +921,12 @@ public class CommandLineArgumentParser {
                     break;
                     case "shape": {
                         System.out.println("Exporting shapes...");
-                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class),zoom));
+                        new ShapeExporter().exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom));
                     }
                     break;
                     case "morphshape": {
                         System.out.println("Exporting morphshapes...");
-                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class),zoom));
+                        new MorphShapeExporter().exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom));
                     }
                     break;
                     case "script": {
@@ -965,7 +965,7 @@ public class CommandLineArgumentParser {
                             }
                         }
                         exfile.exportFrames(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, frames,
-                                new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class),zoom));
+                                new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom));
                     }
                     break;
                     case "sound": {

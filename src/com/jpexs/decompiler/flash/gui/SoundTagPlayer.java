@@ -198,7 +198,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public void zoom(double zoom) {
-        
+
     }
 
     @Override
@@ -214,11 +214,7 @@ public class SoundTagPlayer implements MediaDisplay {
     public double getZoom() {
         return 0;
     }
-    
-    
 
-    
-    
     @Override
     public synchronized void gotoFrame(int frame) {
         pause();
@@ -249,7 +245,5 @@ public class SoundTagPlayer implements MediaDisplay {
     public BufferedImage printScreen() {
         return null;
     }
-    
-    
 
 }

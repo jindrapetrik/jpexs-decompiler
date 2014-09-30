@@ -562,14 +562,14 @@ public class ABC {
         }
         loadNamespaceMap();
         /*for(int i=0;i<script_count;i++){
-            MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
-            GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
-            try {
-               bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
-            } catch (InterruptedException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            System.out.println(""+t.toString());
+         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
+         GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+         try {
+         bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
+         } catch (InterruptedException ex) {
+         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         System.out.println(""+t.toString());
          }
          //System.exit(0);*/
 
@@ -656,14 +656,14 @@ public class ABC {
             aos.writeTraits(si.traits);
         }
 
-        aos.writeU30(bodies.size());        
+        aos.writeU30(bodies.size());
         for (MethodBody mb : bodies) {
             aos.writeU30(mb.method_info);
             aos.writeU30(mb.max_stack);
             aos.writeU30(mb.max_regs);
             aos.writeU30(mb.init_scope_depth);
             aos.writeU30(mb.max_scope_depth);
-            byte[] codeBytes = mb.getCodeBytes();           
+            byte[] codeBytes = mb.getCodeBytes();
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
             aos.writeU30(mb.exceptions.length);
@@ -1054,8 +1054,7 @@ public class ABC {
         }
     }
 
-    
-    public void addClass(ClassInfo ci, InstanceInfo ii,int index){        
+    public void addClass(ClassInfo ci, InstanceInfo ii, int index) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
@@ -1070,13 +1069,13 @@ public class ABC {
         for (ScriptInfo si : script_info) {
             addClassInTraits(si.traits, index);
         }
-        for (MethodBody b : bodies) {            
+        for (MethodBody b : bodies) {
             addClassInTraits(b.traits, index);
         }
-       instance_info.add(index,ii);
-       class_info.add(index,ci);
+        instance_info.add(index, ii);
+        class_info.add(index, ci);
     }
-    
+
     private void addClassInTraits(Traits traits, int index) {
         for (Trait t : traits.traits) {
             if (t instanceof TraitClass) {
@@ -1089,7 +1088,7 @@ public class ABC {
             }
         }
     }
-    
+
     public void removeClass(int index) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {
@@ -1105,7 +1104,7 @@ public class ABC {
         for (ScriptInfo si : script_info) {
             removeClassFromTraits(si.traits, index);
         }
-        for (MethodBody b : bodies) {            
+        for (MethodBody b : bodies) {
             removeClassFromTraits(b.traits, index);
         }
         instance_info.remove(index);
@@ -1210,17 +1209,16 @@ public class ABC {
         }
         boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
 
-        
-        ScriptInfo si=script_info.get(oldIndex);
+        ScriptInfo si = script_info.get(oldIndex);
         si.delete(this, true);
         int newClassIndex = instance_info.size();
-        for(Trait t:si.traits.traits){
-            if(t instanceof TraitClass){
-                TraitClass tc=(TraitClass)t;
-                newClassIndex = tc.class_info+1;
+        for (Trait t : si.traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                newClassIndex = tc.class_info + 1;
             }
         }
-        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName,newClassIndex);
+        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName, newClassIndex);
         //Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);

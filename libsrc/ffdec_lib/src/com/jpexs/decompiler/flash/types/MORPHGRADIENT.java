@@ -39,7 +39,7 @@ public class MORPHGRADIENT implements Serializable {
     @Internal
     public int numGradients;
 
-    public MORPHGRADRECORD[] gradientRecords;   
+    public MORPHGRADRECORD[] gradientRecords;
 
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
         int r = (int) (c1.red + (c2.red - c1.red) * ratio / 65535.0 + 0.5);

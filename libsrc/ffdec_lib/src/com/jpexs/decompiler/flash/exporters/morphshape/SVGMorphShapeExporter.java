@@ -146,14 +146,14 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    matrix.rotateSkew0 *= zoom/SWF.unitDivisor;
-                    matrix.rotateSkew1 *= zoom/SWF.unitDivisor;
-                    matrix.scaleX *= zoom/SWF.unitDivisor;
-                    matrix.scaleY *= zoom/SWF.unitDivisor;
-                    matrixEnd.rotateSkew0 *= zoom/SWF.unitDivisor;
-                    matrixEnd.rotateSkew1 *= zoom/SWF.unitDivisor;
-                    matrixEnd.scaleX *= zoom/SWF.unitDivisor;
-                    matrixEnd.scaleY *= zoom/SWF.unitDivisor;
+                    matrix.rotateSkew0 *= zoom / SWF.unitDivisor;
+                    matrix.rotateSkew1 *= zoom / SWF.unitDivisor;
+                    matrix.scaleX *= zoom / SWF.unitDivisor;
+                    matrix.scaleY *= zoom / SWF.unitDivisor;
+                    matrixEnd.rotateSkew0 *= zoom / SWF.unitDivisor;
+                    matrixEnd.rotateSkew1 *= zoom / SWF.unitDivisor;
+                    matrixEnd.scaleX *= zoom / SWF.unitDivisor;
+                    matrixEnd.scaleY *= zoom / SWF.unitDivisor;
                     addMatrixAnimation(pattern, "patternTransform", matrix, matrixEnd);
                 }
                 Element imageElement = exporter.createElement("image");
@@ -169,8 +169,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     @Override
     public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness *= zoom/SWF.unitDivisor;
-        thicknessEnd *= zoom/SWF.unitDivisor;
+        thickness *= zoom / SWF.unitDivisor;
+        thicknessEnd *= zoom / SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
@@ -255,7 +255,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         final int animationLength = 2; // todo
         final String animationLengthStr = animationLength + "s";
 
-        element.setAttribute(attribute, matrix.getTransformationString(SWF.unitDivisor/zoom, 1));
+        element.setAttribute(attribute, matrix.getTransformationString(SWF.unitDivisor / zoom, 1));
 
         // QR decomposition
         double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);

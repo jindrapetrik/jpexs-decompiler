@@ -89,10 +89,10 @@ public class ShapeExporter {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     ExportRectangle rect = new ExportRectangle(st.getRect(new HashSet<BoundedTag>()));
-                                    rect.xMax*=settings.zoom;
-                                    rect.yMax*=settings.zoom;
-                                    rect.xMin*=settings.zoom;
-                                    rect.yMin*=settings.zoom;
+                                    rect.xMax *= settings.zoom;
+                                    rect.yMax *= settings.zoom;
+                                    rect.xMin *= settings.zoom;
+                                    rect.yMin *= settings.zoom;
                                     SVGExporter exporter = new SVGExporter(rect);
                                     st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
@@ -115,7 +115,7 @@ public class ShapeExporter {
                                     SHAPE shp = st.getShapes();
                                     int deltaX = -shp.getBounds().Xmin;
                                     int deltaY = -shp.getBounds().Ymin;
-                                    CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor/settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
+                                    CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                     cse.export();
                                     Set<Integer> needed = new HashSet<>();
                                     needed.add(st.getCharacterId());

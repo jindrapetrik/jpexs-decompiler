@@ -269,16 +269,15 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
 
             /*JPanel bottomPanel = new JPanel(new BorderLayout());
-            JPanel buttonsPanel = new JPanel(new FlowLayout());
-            JButton selectColorButton = new JButton(View.getIcon("color16"));
-            selectColorButton.addActionListener(mainPanel);
-            selectColorButton.setActionCommand(MainPanel.ACTION_SELECT_BKCOLOR);
-            selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
-            buttonsPanel.add(selectColorButton);
-            bottomPanel.add(buttonsPanel, BorderLayout.EAST);
+             JPanel buttonsPanel = new JPanel(new FlowLayout());
+             JButton selectColorButton = new JButton(View.getIcon("color16"));
+             selectColorButton.addActionListener(mainPanel);
+             selectColorButton.setActionCommand(MainPanel.ACTION_SELECT_BKCOLOR);
+             selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
+             buttonsPanel.add(selectColorButton);
+             bottomPanel.add(buttonsPanel, BorderLayout.EAST);
 
-            flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
-
+             flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
             flashPlayPanel2.add(new PlayerControls(flashPanel), BorderLayout.SOUTH);

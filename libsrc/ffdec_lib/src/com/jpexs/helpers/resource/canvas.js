@@ -194,8 +194,8 @@ Filters.blur = function(canvas, ctx, hRadius, vRadius, iterations, mask, maskTyp
     var data = imgData.data;
     Filters._premultiply(data);
     for (var i = 0; i < iterations; i++) {
-        Filters._boxBlurHorizontal(data, mask, canvas.width, canvas.height, Math.floor(hRadius / 2),maskType);
-        Filters._boxBlurVertical(data, mask, canvas.width, canvas.height, Math.floor(vRadius / 2),maskType);
+        Filters._boxBlurHorizontal(data, mask, canvas.width, canvas.height, Math.floor(hRadius / 2), maskType);
+        Filters._boxBlurVertical(data, mask, canvas.width, canvas.height, Math.floor(vRadius / 2), maskType);
     }
 
     Filters._unpremultiply(data);
@@ -259,7 +259,7 @@ Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, c
     var angleRad = angle / 180 * Math.PI;
     var moveX = (distance * Math.cos(angleRad));
     var moveY = (distance * Math.sin(angleRad));
-    var srcPixels = src.getImageData(0, 0, width, height).data;    
+    var srcPixels = src.getImageData(0, 0, width, height).data;
     var shadow = [];
     for (var i = 0; i < srcPixels.length; i += 4) {
         var alpha = srcPixels[i + 3];
@@ -288,7 +288,7 @@ Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, c
 
     if (maskType != 0) {
         for (var i = 0; i < srcPixels.length; i += 4) {
-            if ((maskType == 1 && srcPixels[i + 3] == 0)||(maskType == 2 && srcPixels[i+3]==255)) {
+            if ((maskType == 1 && srcPixels[i + 3] == 0) || (maskType == 2 && srcPixels[i + 3] == 255)) {
                 shadow[i] = 0;
                 shadow[i + 1] = 0;
                 shadow[i + 2] = 0;
@@ -351,7 +351,7 @@ Filters.dropShadow = function(canvas, src, blurX, blurY, angle, distance, color,
     var retCanvas = createCanvas(canvas.width, canvas.height);
     Filters._setRGB(retCanvas.getContext("2d"), 0, 0, width, height, shadow);
     if (blurX > 0 || blurY > 0) {
-        retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, null,0);
+        retCanvas = Filters.blur(retCanvas, retCanvas.getContext("2d"), blurX, blurY, iterations, null, 0);
     }
     shadow = retCanvas.getContext("2d").getImageData(0, 0, width, height).data;
 
@@ -475,7 +475,7 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
     retc.drawImage(shadowIm, 0, 0);
     retc.drawImage(hilightIm, 0, 0);
 
-    retImg = Filters.blur(retImg, retImg.getContext("2d"), blurX, blurY, iterations, srcPixels,maskType);
+    retImg = Filters.blur(retImg, retImg.getContext("2d"), blurX, blurY, iterations, srcPixels, maskType);
     var ret = retImg.getContext("2d").getImageData(0, 0, width, height).data;
 
     for (var i = 0; i < srcPixels.length; i += 4) {
@@ -756,24 +756,24 @@ BlendModes.blendCanvas = function(src, dst, result, modeIndex) {
 };
 
 
-function concatMatrix(m1,m2) {
-        var result= [1,0,0,1,0,0];
-        var scaleX = 0;
-        var rotateSkew0 = 1;
-        var rotateSkew1= 2;
-        var scaleY = 3;
-        var translateX = 4;
-        var translateY = 5;
-        
-        result[scaleX] = m2[scaleX] * m1[scaleX] + m2[rotateSkew1] * m1[rotateSkew0];
-        result[rotateSkew0] = m2[rotateSkew0] * m1[scaleX] + m2[scaleY] * m1[rotateSkew0];
-        result[rotateSkew1] = m2[scaleX] * m1[rotateSkew1] + m2[rotateSkew1] * m1[scaleY];
-        result[scaleY] = m2[rotateSkew0] * m1[rotateSkew1] + m2[scaleY] * m1[scaleY];
-        result[translateX] = m2[scaleX] * m1[translateX] + m2[rotateSkew1] * m1[translateY] + m2[translateX];
-        result[translateY] = m2[rotateSkew0] * m1[translateX] + m2[scaleY] * m1[translateY] + m2[translateY];
+function concatMatrix(m1, m2) {
+    var result = [1, 0, 0, 1, 0, 0];
+    var scaleX = 0;
+    var rotateSkew0 = 1;
+    var rotateSkew1 = 2;
+    var scaleY = 3;
+    var translateX = 4;
+    var translateY = 5;
 
-        return result;
-    }
+    result[scaleX] = m2[scaleX] * m1[scaleX] + m2[rotateSkew1] * m1[rotateSkew0];
+    result[rotateSkew0] = m2[rotateSkew0] * m1[scaleX] + m2[scaleY] * m1[rotateSkew0];
+    result[rotateSkew1] = m2[scaleX] * m1[rotateSkew1] + m2[rotateSkew1] * m1[scaleY];
+    result[scaleY] = m2[rotateSkew0] * m1[rotateSkew1] + m2[scaleY] * m1[scaleY];
+    result[translateX] = m2[scaleX] * m1[translateX] + m2[rotateSkew1] * m1[translateY] + m2[translateX];
+    result[translateY] = m2[rotateSkew0] * m1[translateX] + m2[scaleY] * m1[translateY] + m2[translateY];
+
+    return result;
+}
 
 
 var enhanceContext = function(context) {
@@ -807,7 +807,7 @@ var enhanceContext = function(context) {
             super_.translate.call(this, x, y);
         },
         transform: function(a, b, c, d, e, f) {
-            this._matrix = concatMatrix([a,b,c,d,e,f],this._matrix);
+            this._matrix = concatMatrix([a, b, c, d, e, f], this._matrix);
             super_.transform.call(this, a, b, c, d, e, f);
         },
         setTransform: function(a, b, c, d, e, f) {
@@ -819,11 +819,11 @@ var enhanceContext = function(context) {
         },
         applyTransforms: function(m) {
             this.setTransform(m[0], m[1], m[2], m[3], m[4], m[5])
-        },  
-        applyTransformToPoint: function(p){
+        },
+        applyTransformToPoint: function(p) {
             var ret = {};
-            ret.x = this._matrix[0]*p.x + this._matrix[2]*p.y + this._matrix[4];
-            ret.y = this._matrix[1]*p.x + this._matrix[3]*p.y + this._matrix[5];                
+            ret.x = this._matrix[0] * p.x + this._matrix[2] * p.y + this._matrix[4];
+            ret.y = this._matrix[1] * p.x + this._matrix[3] * p.y + this._matrix[5];
             return ret;
         },
         __proto__: super_
@@ -971,43 +971,47 @@ function stopDrag(e) {
 }
 
 
-function drawMorphPath(ctx, p, ratio, doStroke, scaleMode){
+function drawMorphPath(ctx, p, ratio, doStroke, scaleMode) {
     var parts = p.split(" ");
     var len = parts.length;
-    if(doStroke){
+    if (doStroke) {
         for (var i = 0; i < len; i++) {
-            switch(parts[i]){
-		case '':
-		  break;
+            switch (parts[i]) {
+                case '':
+                    break;
                 case 'L':
                 case 'M':
                 case 'Q':
                     break;
                 default:
-                    var k = ctx.applyTransformToPoint({x:parts[i],y:parts[i+2]}); parts[i] = k.x; parts[i+2] = k.y;
-                    k = ctx.applyTransformToPoint({x:parts[i+1],y:parts[i+3]}); parts[i+1] = k.x; parts[i+3] = k.y;
-                    i+=3;                  
+                    var k = ctx.applyTransformToPoint({x: parts[i], y: parts[i + 2]});
+                    parts[i] = k.x;
+                    parts[i + 2] = k.y;
+                    k = ctx.applyTransformToPoint({x: parts[i + 1], y: parts[i + 3]});
+                    parts[i + 1] = k.x;
+                    parts[i + 3] = k.y;
+                    i += 3;
             }
         }
-        
-        switch(scaleMode){
+
+        switch (scaleMode) {
             case "NONE":
                 break;
             case "NORMAL":
-                ctx.lineWidth*=20*Math.max(ctx._matrix[0],ctx._matrix[3]);
+                ctx.lineWidth *= 20 * Math.max(ctx._matrix[0], ctx._matrix[3]);
                 break;
             case "VERTICAL":
-                ctx.lineWidth*=20*ctx._matrix[3];
+                ctx.lineWidth *= 20 * ctx._matrix[3];
                 break;
             case "HORIZONTAL":
-                ctx.lineWidth*=20*ctx._matrix[0];
+                ctx.lineWidth *= 20 * ctx._matrix[0];
                 break;
         }
-        
-        ctx.save();        
-        ctx.setTransform(1,0,0,1,0,0);        
-    }  
-    ctx.beginPath();    
+
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    ctx.beginPath();
     var drawCommand = "";
     for (var i = 0; i < len; i++) {
         switch (parts[i]) {
@@ -1019,68 +1023,68 @@ function drawMorphPath(ctx, p, ratio, doStroke, scaleMode){
             default:
                 switch (drawCommand) {
                     case 'L':
-                        ctx.lineTo(useRatio(parts[i],parts[i+1],ratio), useRatio(parts[i + 2],parts[i + 3],ratio));
+                        ctx.lineTo(useRatio(parts[i], parts[i + 1], ratio), useRatio(parts[i + 2], parts[i + 3], ratio));
                         i += 3;
                         break;
                     case 'M':
-                        ctx.moveTo(useRatio(parts[i],parts[i+1],ratio), useRatio(parts[i + 2],parts[i + 3],ratio));
+                        ctx.moveTo(useRatio(parts[i], parts[i + 1], ratio), useRatio(parts[i + 2], parts[i + 3], ratio));
                         i += 3;
                         break;
                     case 'Q':
-                        ctx.quadraticCurveTo(useRatio(parts[i],parts[i+1],ratio),useRatio(parts[i+2],parts[i+3],ratio), 
-                                             useRatio(parts[i+4],parts[i+5],ratio),useRatio(parts[i+6],parts[i+7],ratio));
+                        ctx.quadraticCurveTo(useRatio(parts[i], parts[i + 1], ratio), useRatio(parts[i + 2], parts[i + 3], ratio),
+                                useRatio(parts[i + 4], parts[i + 5], ratio), useRatio(parts[i + 6], parts[i + 7], ratio));
                         i += 7;
                         break;
                 }
                 break;
         }
     }
-    if(doStroke){
+    if (doStroke) {
         ctx.stroke();
         ctx.restore();
-    }   
+    }
 }
 
-function useRatio(v1,v2,ratio){
-    return v1*1+(v2-v1)*ratio/65535;
+function useRatio(v1, v2, ratio) {
+    return v1 * 1 + (v2 - v1) * ratio / 65535;
 }
 
-function drawPath(ctx, p,  doStroke, scaleMode) {
+function drawPath(ctx, p, doStroke, scaleMode) {
     var parts = p.split(" ");
     var len = parts.length;
-    if(doStroke){
+    if (doStroke) {
         for (var i = 0; i < len; i++) {
-            switch(parts[i]){
-		case 'L':
+            switch (parts[i]) {
+                case 'L':
                 case 'M':
                 case 'Q':
                     break;
                 default:
-                    var k = ctx.applyTransformToPoint({x:parts[i],y:parts[i+1]});
+                    var k = ctx.applyTransformToPoint({x: parts[i], y: parts[i + 1]});
                     parts[i] = k.x;
-                    parts[i+1] = k.y;
-                    i++;                   
+                    parts[i + 1] = k.y;
+                    i++;
             }
         }
-        
-        switch(scaleMode){
+
+        switch (scaleMode) {
             case "NONE":
                 break;
             case "NORMAL":
-                ctx.lineWidth*=20*Math.max(ctx._matrix[0],ctx._matrix[3]);
+                ctx.lineWidth *= 20 * Math.max(ctx._matrix[0], ctx._matrix[3]);
                 break;
             case "VERTICAL":
-                ctx.lineWidth*=20*ctx._matrix[3];
+                ctx.lineWidth *= 20 * ctx._matrix[3];
                 break;
             case "HORIZONTAL":
-                ctx.lineWidth*=20*ctx._matrix[0];
+                ctx.lineWidth *= 20 * ctx._matrix[0];
                 break;
         }
-        
-        ctx.save();        
-        ctx.setTransform(1,0,0,1,0,0);        
-    }    
-    ctx.beginPath();    
+
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    ctx.beginPath();
     var drawCommand = "";
     for (var i = 0; i < len; i++) {
         switch (parts[i]) {
@@ -1107,8 +1111,8 @@ function drawPath(ctx, p,  doStroke, scaleMode) {
                 break;
         }
     }
-    if(doStroke){
+    if (doStroke) {
         ctx.stroke();
         ctx.restore();
-    }    
+    }
 }

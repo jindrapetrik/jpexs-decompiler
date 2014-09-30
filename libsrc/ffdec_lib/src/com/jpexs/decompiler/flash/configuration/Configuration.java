@@ -333,11 +333,10 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> showMethodBodyId = null;
-    
+
     @ConfigurationDefaultDouble(1.0)
     @ConfigurationName("export.zoom")
     public static final ConfigurationItem<Double> lastSelectedExportZoom = null;
-    
 
     public static final ConfigurationItem<String> pluginPath = null;
 

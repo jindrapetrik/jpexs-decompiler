@@ -106,8 +106,7 @@ public class BitmapExporter extends ShapeExporterBase {
          * This outline is distorted by our AffineTransform relative to the
          * outline which would be given by the base stroke, but only in terms of
          * scaling (i.e. thickness of the lines), as translation and rotation
-         * are undone after the stro        @Override
-king.
+         * are undone after the stro @Override king.
          */
         public Shape createStrokedShape(Shape s) {
             Shape sTrans = transform.createTransformedShape(s);
@@ -130,7 +129,7 @@ king.
 
     private void exportTo(SerializableImage image, Matrix transformation) {
         this.image = image;
-        graphics = (Graphics2D) image.getGraphics();        
+        graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
         unitDivisor = 1;
@@ -362,7 +361,7 @@ king.
                 joinStyle = BasicStroke.JOIN_ROUND;
                 break;
         }
-        switch(scaleMode){
+        switch (scaleMode) {
             case "VERTICAL":
                 thickness *= graphics.getTransform().getScaleY();
                 break;
@@ -379,9 +378,9 @@ king.
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
         //Do not scale strokes automatically:
-        try{
-            lineStroke = new TransformedStroke(lineStroke,graphics.getTransform());
-        }catch(NoninvertibleTransformException net){
+        try {
+            lineStroke = new TransformedStroke(lineStroke, graphics.getTransform());
+        } catch (NoninvertibleTransformException net) {
             //ignore
         }
     }

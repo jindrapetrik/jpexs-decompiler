@@ -269,7 +269,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         finalizePath();
         thickness /= SWF.unitDivisor;
         thicknessEnd /= SWF.unitDivisor;
-        strokeData += "\tvar scaleMode = \""+scaleMode+"\";\r\n";
+        strokeData += "\tvar scaleMode = \"" + scaleMode + "\";\r\n";
         if (color != null) { //for gradient line fill
             strokeData += "\tctx.strokeStyle=" + useRatioColor(color, colorEnd) + ";\r\n";
         }
@@ -389,8 +389,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += Helper.doubleStr(x/unitDivisor) + " " + Helper.doubleStr(x2/unitDivisor) + " "
-                  + Helper.doubleStr(y/unitDivisor) + " " + Helper.doubleStr(y2/unitDivisor) + " ";
+        pathData += Helper.doubleStr(x / unitDivisor) + " " + Helper.doubleStr(x2 / unitDivisor) + " "
+                + Helper.doubleStr(y / unitDivisor) + " " + Helper.doubleStr(y2 / unitDivisor) + " ";
     }
 
     @Override
@@ -403,8 +403,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += Helper.doubleStr(x/unitDivisor) + " " + Helper.doubleStr(x2/unitDivisor) + " "
-                  + Helper.doubleStr(y/unitDivisor) + " " + Helper.doubleStr(y2/unitDivisor) + " ";
+        pathData += Helper.doubleStr(x / unitDivisor) + " " + Helper.doubleStr(x2 / unitDivisor) + " "
+                + Helper.doubleStr(y / unitDivisor) + " " + Helper.doubleStr(y2 / unitDivisor) + " ";
     }
 
     @Override
@@ -423,15 +423,15 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         controlY2 += deltaY;
         anchorY2 += deltaY;
 
-        pathData += Helper.doubleStr(controlX/unitDivisor) + " " + Helper.doubleStr(controlX2/unitDivisor) + " " +
-                    Helper.doubleStr(controlY/unitDivisor) + " " + Helper.doubleStr(controlY2/unitDivisor) + " " +
-                    Helper.doubleStr(anchorX/unitDivisor) + " " + Helper.doubleStr(anchorX2/unitDivisor) + " " +
-                    Helper.doubleStr(anchorY/unitDivisor) + " " + Helper.doubleStr(anchorY2/unitDivisor) + " ";
+        pathData += Helper.doubleStr(controlX / unitDivisor) + " " + Helper.doubleStr(controlX2 / unitDivisor) + " "
+                + Helper.doubleStr(controlY / unitDivisor) + " " + Helper.doubleStr(controlY2 / unitDivisor) + " "
+                + Helper.doubleStr(anchorX / unitDivisor) + " " + Helper.doubleStr(anchorX2 / unitDivisor) + " "
+                + Helper.doubleStr(anchorY / unitDivisor) + " " + Helper.doubleStr(anchorY2 / unitDivisor) + " ";
     }
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            shapeData+="\tvar pathData=\""+pathData.trim()+"\";\r\n";
+            shapeData += "\tvar pathData=\"" + pathData.trim() + "\";\r\n";
             String drawStroke = "\tdrawMorphPath(ctx,pathData,ratio,true,scaleMode);\r\n";
             String drawFill = "\tdrawMorphPath(ctx,pathData,ratio,false);\r\n";;
             pathData = "";
@@ -501,7 +501,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += drawStroke+"\r\n"; //"\tctx.stroke();\r\n";
+                shapeData += drawStroke + "\r\n"; //"\tctx.stroke();\r\n";
             } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }

@@ -144,7 +144,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    pattern.setAttribute("patternTransform", matrix.getTransformationString(SWF.unitDivisor/zoom, SWF.unitDivisor/zoom));
+                    pattern.setAttribute("patternTransform", matrix.getTransformationString(SWF.unitDivisor / zoom, SWF.unitDivisor / zoom));
                 }
                 Element imageElement = exporter.createElement("image");
                 imageElement.setAttribute("width", "" + width);
@@ -159,7 +159,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness *= zoom/SWF.unitDivisor;
+        thickness *= zoom / SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
@@ -254,7 +254,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            gradient.setAttribute("gradientTransform", matrix.getTransformationString(SWF.unitDivisor/zoom, 1));
+            gradient.setAttribute("gradientTransform", matrix.getTransformationString(SWF.unitDivisor / zoom, 1));
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];

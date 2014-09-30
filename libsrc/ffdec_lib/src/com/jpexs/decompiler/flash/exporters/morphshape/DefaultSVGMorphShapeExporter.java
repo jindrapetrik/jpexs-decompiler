@@ -100,7 +100,7 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     public void moveTo(double x, double y, double x2, double y2) {
         currentDrawCommand = "";
         pathData += "M"
-                + roundPixels20(x * zoom/ SWF.unitDivisor) + " "
+                + roundPixels20(x * zoom / SWF.unitDivisor) + " "
                 + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
         pathDataEnd += "M"
                 + roundPixels20(x2 * zoom / SWF.unitDivisor) + " "

@@ -81,12 +81,12 @@ public class MorphShapeExporter {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     ExportRectangle rect = new ExportRectangle(mst.getRect(new HashSet<BoundedTag>()));
-                                    rect.xMax*=settings.zoom;
-                                    rect.yMax*=settings.zoom;
-                                    rect.xMin*=settings.zoom;
-                                    rect.yMin*=settings.zoom;
+                                    rect.xMax *= settings.zoom;
+                                    rect.yMax *= settings.zoom;
+                                    rect.xMin *= settings.zoom;
+                                    rect.yMin *= settings.zoom;
                                     SVGExporter exporter = new SVGExporter(rect);
-                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0,settings.zoom);
+                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;

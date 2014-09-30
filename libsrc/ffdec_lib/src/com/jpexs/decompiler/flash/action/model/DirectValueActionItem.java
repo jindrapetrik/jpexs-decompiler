@@ -257,8 +257,7 @@ public class DirectValueActionItem extends ActionItem {
 
     @Override
     public String toString() {
-        return ""+getResult();
+        return "" + getResult();
     }
-    
-    
+
 }

@@ -84,13 +84,13 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     private static final int CMD_SETVARIABLE = 13;
     private static final int CMD_CHECKCLICK = 14;
     private static final int CMD_ZOOM = 15;
-    
+
     private static final int PIPE_TIMEOUT_MS = 1000;
     private int frameRate;
     public boolean specialPlayback = false;
     private boolean specialPlaying = false;
     private JPopupMenu rightClickMenu = null;
-    
+
     private Timer rightClickTimer;
 
     @Override
@@ -102,8 +102,6 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public boolean zoomAvailable() {
         return true;
     }
-    
-    
 
     @Override
     public void zoomToFit() {
@@ -115,37 +113,31 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         return 0;
     }
 
-    
-    
-    
-    
-    
-    
-    private synchronized int checkClick(Point ret) throws IOException{
-        if(pipe!=null){
+    private synchronized int checkClick(Point ret) throws IOException {
+        if (pipe != null) {
             writeToPipe(new byte[]{CMD_CHECKCLICK});
             byte res[] = new byte[1];
             readFromPipe(res);
             int button = res[0];
-            if(button>0){
+            if (button > 0) {
                 res = new byte[4];
                 readFromPipe(res);
                 ret.x = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
-                ret.y = ((res[2] & 0xff) << 8) + (res[3] & 0xff);                
+                ret.y = ((res[2] & 0xff) << 8) + (res[3] & 0xff);
             }
             return button;
         }
         return 0;
     }
-    
+
     private double zoom = 1.0;
-    
+
     @Override
-    public synchronized void zoom(double zoom){
-        if(pipe!=null){
+    public synchronized void zoom(double zoom) {
+        if (pipe != null) {
             try {
-                long zoomint = Math.round(100/(zoom/this.zoom));
-                if(zoom==1.0){
+                long zoomint = Math.round(100 / (zoom / this.zoom));
+                if (zoom == 1.0) {
                     zoomint = 0;
                 }
                 this.zoom = zoom;
@@ -156,7 +148,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             }
         }
     }
-    
+
     public synchronized String getVariable(String name) throws IOException {
         if (pipe != null) {
             writeToPipe(new byte[]{CMD_GETVARIABLE});
@@ -261,21 +253,21 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public synchronized void setBackground(Color color) {
         try {
             writeToPipe(new byte[]{CMD_BGCOLOR});
-            writeToPipe(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});            
-        } catch (IOException ex) {            
+            writeToPipe(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
+        } catch (IOException ex) {
         }
-        
+
     }
 
-    public void setRightClickMenu(JPopupMenu menu){
+    public void setRightClickMenu(JPopupMenu menu) {
         rightClickMenu = menu;
     }
-    
+
     public FlashPlayerPanel(Component frame) {
         if (!Platform.isWindows()) {
             throw new FlashUnsupportedException();
         }
-        this.frame = frame;              
+        this.frame = frame;
         //this.add(rightClickMenu);
         addComponentListener(new ComponentListener() {
             @Override
@@ -349,7 +341,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     public synchronized void stopSWF() {
-        if(rightClickTimer!=null){
+        if (rightClickTimer != null) {
             rightClickTimer.cancel();
             rightClickTimer = null;
         }
@@ -362,17 +354,15 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     @Override
-    public BufferedImage printScreen() {       
+    public BufferedImage printScreen() {
         Point screenloc = getLocationOnScreen();
-        try {        
+        try {
             return new Robot().createScreenCapture(new Rectangle(screenloc.x, screenloc.y, getWidth(), getHeight()));
         } catch (AWTException ex) {
             return null;
         }
     }
 
-    
-    
     public synchronized void displaySWF(String flash, Color bgColor, int frameRate) {
         try {
             zoom = 1.0;
@@ -395,8 +385,8 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             if (specialPlayback) {
                 play();
             }
-            if(rightClickTimer!=null){
-                rightClickTimer.cancel();                
+            if (rightClickTimer != null) {
+                rightClickTimer.cancel();
             }
             rightClickTimer = new Timer();
             rightClickTimer.schedule(new TimerTask() {
@@ -410,30 +400,30 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
                             @Override
                             public void run() {
-                                if(rightClickMenu!=null){
-                                    if(button == 2){                                     
+                                if (rightClickMenu != null) {
+                                    if (button == 2) {
                                         ShadowPopupFactory.uninstall();
                                         rightClickMenu.show(FlashPlayerPanel.this, pt.x, pt.y);
                                         ShadowPopupFactory.install();
                                     }
-                                    if(button == 1){
+                                    if (button == 1) {
                                         rightClickMenu.setVisible(false);
                                     }
                                 }
                             }
-                        });                        
+                        });
                     } catch (IOException ex) {
                         //ignore
                     }
                 }
-            }, 100,100);
+            }, 100, 100);
         } catch (IOException ex) {
         }
     }
 
     @Override
     public void close() throws IOException {
-        if(rightClickTimer!=null){
+        if (rightClickTimer != null) {
             rightClickTimer.cancel();
             rightClickTimer = null;
         }
