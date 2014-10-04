@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
@@ -66,9 +65,11 @@ public class RecompileTest {
     @Test(dataProvider = "provideFiles")
     public void testRecompile(String filename) {
         try {
-            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
-            Configuration.debugCopy.set(true);
-            swf.saveTo(new ByteArrayOutputStream());
+            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + filename)){
+                Configuration.debugCopy.set(true);
+                SWF swf = new SWF(new BufferedInputStream(fis), false);
+                swf.saveTo(new ByteArrayOutputStream());
+            }
         } catch (IOException | InterruptedException ex) {
             fail();
         } catch (NotSameException ex) {
@@ -80,7 +81,7 @@ public class RecompileTest {
         for (TreeNode node : nodeList) {
             if (node.subNodes.isEmpty()) {
                 TreeItem item = node.getItem();
-                if ((item instanceof ASMSource) && (node.export)) {
+                if (item instanceof ASMSource) {
                     try {
                         ASMSource asm = ((ASMSource) item);
                         HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
@@ -155,7 +156,6 @@ public class RecompileTest {
                 list2.addAll(swf.tags);
                 List<TreeNode> list = SWF.createASTagList(list2, null);
 
-                TagNode.setExport(list, true);
                 testAS2DirectEditingOneRecursive(swf.version, list);
             }
         } catch (Exception ex) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -61,6 +62,8 @@ public class DefineTextTag extends TextTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
+    private final int glyphBits;
+    private final int advanceBits;
     public RECT textBounds;
     public MATRIX textMatrix;
     public List<TEXTRECORD> textRecords;
@@ -437,6 +440,8 @@ public class DefineTextTag extends TextTag {
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
         this.textRecords = textRecords;
+        this.glyphBits = 0;
+        this.advanceBits = 0;
     }
 
     /**
@@ -463,6 +468,11 @@ public class DefineTextTag extends TextTag {
                 }
             }
 
+            if (Configuration.debugCopy.get()) {
+                glyphBits = Math.max(glyphBits, this.glyphBits);
+                advanceBits = Math.max(advanceBits, this.advanceBits);
+            }
+            
             sos.writeUI8(glyphBits);
             sos.writeUI8(advanceBits);
             for (TEXTRECORD tr : textRecords) {
@@ -487,8 +497,8 @@ public class DefineTextTag extends TextTag {
         characterID = sis.readUI16("characterID");
         textBounds = sis.readRECT("textBounds");
         textMatrix = sis.readMatrix("textMatrix");
-        int glyphBits = sis.readUI8("glyphBits");
-        int advanceBits = sis.readUI8("advanceBits");
+        glyphBits = sis.readUI8("glyphBits");
+        advanceBits = sis.readUI8("advanceBits");
         textRecords = new ArrayList<>();
         TEXTRECORD tr;
         while ((tr = sis.readTEXTRECORD(false, glyphBits, advanceBits, "record")) != null) {

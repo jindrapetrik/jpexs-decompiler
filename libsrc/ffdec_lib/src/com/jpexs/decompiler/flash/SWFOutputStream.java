@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -398,6 +400,11 @@ public class SWFOutputStream extends OutputStream {
         nBits = enlargeBitCountS(nBits, xMax);
         nBits = enlargeBitCountS(nBits, yMin);
         nBits = enlargeBitCountS(nBits, yMax);
+        
+        if (Configuration.debugCopy.get()) {
+            nBits = Math.max(nBits, value.nbits);
+        }
+        
         writeUB(5, nBits);
         writeSB(nBits, xMin);
         writeSB(nBits, xMax);
@@ -454,7 +461,7 @@ public class SWFOutputStream extends OutputStream {
      * @param v Signed value
      * @return Number of bits
      */
-    public static int getNeededBitsS(int v) {
+    private static int getNeededBitsS(int v) {
         int counter = 32;
         int mask = 0x80000000;
         final int val = (v < 0) ? -v : v;
@@ -525,6 +532,9 @@ public class SWFOutputStream extends OutputStream {
     }
 
     public static int enlargeBitCountS(int currentBitCount, int value) {
+        if (value == 0) {
+            return currentBitCount;
+        }
         int neededNew = getNeededBitsS(value);
         if (neededNew > currentBitCount) {
             return neededNew;
@@ -533,6 +543,9 @@ public class SWFOutputStream extends OutputStream {
     }
 
     public static int enlargeBitCountU(int currentBitCount, int value) {
+        if (value == 0) {
+            return currentBitCount;
+        }
         int neededNew = getNeededBitsU(value);
         if (neededNew > currentBitCount) {
             return neededNew;
@@ -552,6 +565,11 @@ public class SWFOutputStream extends OutputStream {
             int nBits = 0;
             nBits = enlargeBitCountS(nBits, value.scaleX);
             nBits = enlargeBitCountS(nBits, value.scaleY);
+
+            if (Configuration.debugCopy.get()) {
+                nBits = Math.max(nBits, value.nScaleBits);
+            }
+        
             writeUB(5, nBits);
             writeSB(nBits, value.scaleX);
             writeSB(nBits, value.scaleY);
@@ -561,6 +579,11 @@ public class SWFOutputStream extends OutputStream {
             int nBits = 0;
             nBits = enlargeBitCountS(nBits, value.rotateSkew0);
             nBits = enlargeBitCountS(nBits, value.rotateSkew1);
+
+            if (Configuration.debugCopy.get()) {
+                nBits = Math.max(nBits, value.nRotateBits);
+            }
+        
             writeUB(5, nBits);
             writeSB(nBits, value.rotateSkew0);
             writeSB(nBits, value.rotateSkew1);
@@ -568,6 +591,10 @@ public class SWFOutputStream extends OutputStream {
         int NTranslateBits = 0;
         NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
         NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateY);
+
+        if (Configuration.debugCopy.get()) {
+            NTranslateBits = Math.max(NTranslateBits, value.nTranslateBits);
+        }
 
         writeUB(5, NTranslateBits);
 
@@ -597,6 +624,11 @@ public class SWFOutputStream extends OutputStream {
             Nbits = enlargeBitCountS(Nbits, value.greenAddTerm);
             Nbits = enlargeBitCountS(Nbits, value.blueAddTerm);
         }
+        
+        if (Configuration.debugCopy.get()) {
+            Nbits = Math.max(Nbits, value.nbits);
+        }
+        
         writeUB(4, Nbits);
         if (value.hasMultTerms) {
             writeSB(Nbits, value.redMultTerm);
@@ -633,6 +665,11 @@ public class SWFOutputStream extends OutputStream {
             Nbits = enlargeBitCountS(Nbits, value.blueAddTerm);
             Nbits = enlargeBitCountS(Nbits, value.alphaAddTerm);
         }
+
+        if (Configuration.debugCopy.get()) {
+            Nbits = Math.max(Nbits, value.nbits);
+        }
+        
         writeUB(4, Nbits);
         if (value.hasMultTerms) {
             writeSB(Nbits, value.redMultTerm);
