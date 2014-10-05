@@ -530,7 +530,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     Timelined parent = fn.getParent();
                     List<Tag> subs = parent.getTimeline().tags;
                     List<Integer> doneCharacters = new ArrayList<>();
-                    int frameCnt = 1;
+                    int frameCnt = 0;
                     for (ContainerItem item : subs) {
                         if (item instanceof ShowFrameTag) {
                             frameCnt++;

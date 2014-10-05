@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.treenodes;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -51,39 +52,30 @@ public class TagNode extends ContainerNode {
         return (Tag) item;
     }
 
-    public static void setExport(List<TreeNode> nodeList, boolean export) {
-        for (TreeNode node : nodeList) {
-            node.export = export;
-            setExport(node.subNodes, export);
-        }
-    }
-
     public static int getTagCountRecursive(List<TreeNode> nodeList) {
         int count = 0;
 
         for (TreeNode node : nodeList) {
-            if (node.subNodes.isEmpty()) {
-                if ((node.item instanceof ASMSource) && (node.export)) {
-                    count += 1;
-                }
-            } else {
+            if (node.item instanceof ASMSource) {
+                count += 1;
+            }
+            if (!node.subNodes.isEmpty()) {
                 count += getTagCountRecursive(node.subNodes);
             }
-
         }
 
         return count;
     }
 
-    public static List<File> exportNodeAS(final AbortRetryIgnoreHandler handler, final List<TreeNode> nodeList, final String outdir, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(final AbortRetryIgnoreHandler handler, final List<TreeNode> nodesList, final List<TreeNode> nodesToExport, final String outdir, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
                 @Override
                 public List<File> call() throws Exception {
                     AtomicInteger cnt = new AtomicInteger(1);
-                    int totalCount = TagNode.getTagCountRecursive(nodeList);
-                    return exportNodeAS(handler, nodeList, outdir, exportMode, cnt, totalCount, ev);
+                    int totalCount = TagNode.getTagCountRecursive(nodesToExport);
+                    return exportNodeAS(handler, nodesList, nodesToExport, false, outdir, exportMode, cnt, totalCount, ev);
                 }
             }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
@@ -92,14 +84,14 @@ public class TagNode extends ContainerNode {
         return new ArrayList<>();
     }
 
-    private static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TreeNode> nodeList, String outdir, ScriptExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
+    private static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TreeNode> nodesList, List<TreeNode> nodesToExport, boolean exportAll, String outdir, ScriptExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
         List<String> existingNames = new ArrayList<>();
-        for (TreeNode node : nodeList) {
+        for (TreeNode node : nodesList) {
             String name = "";
             if (node.item instanceof Exportable) {
                 name = Helper.makeFileName(((Exportable) node.item).getExportFileName());
@@ -113,76 +105,76 @@ public class TagNode extends ContainerNode {
                 name = baseName + "_" + i;
             }
             existingNames.add(name);
-            if (node.subNodes.isEmpty()) {
-                if ((node.item instanceof ASMSource) && (node.export)) {
-                    boolean retry;
-                    do {
-                        retry = false;
-                        try {
-                            int currentIndex = index.getAndIncrement();
+            boolean exportNode = nodesToExport.contains(node);
+            if (node.item instanceof ASMSource && (exportAll || exportNode)) {
+                boolean retry;
+                do {
+                    retry = false;
+                    try {
+                        int currentIndex = index.getAndIncrement();
 
-                            if (!dir.exists()) {
-                                if (!dir.mkdirs()) {
-                                    if (!dir.exists()) {
-                                        throw new IOException("Cannot create directory " + outdir);
-                                    }
-                                }
-                            }
-
-                            String f = outdir + name + ".as";
-                            if (ev != null) {
-                                ev.handleEvent("exporting", "Exporting " + currentIndex + "/" + count + " " + f);
-                            }
-
-                            long startTime = System.currentTimeMillis();
-
-                            File file = new File(f);
-                            ASMSource asm = ((ASMSource) node.item);
-                            try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
-                                if (exportMode == ScriptExportMode.HEX) {
-                                    asm.getActionSourcePrefix(writer);
-                                    asm.getActionBytesAsHex(writer);
-                                    asm.getActionSourceSuffix(writer);
-                                } else if (exportMode != ScriptExportMode.AS) {
-                                    asm.getActionSourcePrefix(writer);
-                                    asm.getASMSource(exportMode, writer, null);
-                                    asm.getActionSourceSuffix(writer);
-                                } else {
-                                    List<Action> as = asm.getActions();
-                                    Action.setActionsAddresses(as, 0);
-                                    Action.actionsToSource(asm, as, ""/*FIXME*/, writer);
-                                }
-                            }
-
-                            long stopTime = System.currentTimeMillis();
-
-                            if (ev != null) {
-                                long time = stopTime - startTime;
-                                ev.handleEvent("exported", "Exported " + currentIndex + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
-                            }
-
-                            ret.add(file);
-                        } catch (InterruptedException ex) {
-                        } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-                            Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error in file: " + name + ".as", ex);
-                            if (handler != null) {
-                                int action = handler.getNewInstance().handle(ex);
-                                switch (action) {
-                                    case AbortRetryIgnoreHandler.ABORT:
-                                        throw ex;
-                                    case AbortRetryIgnoreHandler.RETRY:
-                                        retry = true;
-                                        break;
-                                    case AbortRetryIgnoreHandler.IGNORE:
-                                        retry = false;
-                                        break;
+                        if (!dir.exists()) {
+                            if (!dir.mkdirs()) {
+                                if (!dir.exists()) {
+                                    throw new IOException("Cannot create directory " + outdir);
                                 }
                             }
                         }
-                    } while (retry);
-                }
-            } else {
-                ret.addAll(exportNodeAS(handler, node.subNodes, outdir + name, exportMode, index, count, ev));
+
+                        String f = outdir + name + ".as";
+                        if (ev != null) {
+                            ev.handleEvent("exporting", "Exporting " + currentIndex + "/" + count + " " + f);
+                        }
+
+                        long startTime = System.currentTimeMillis();
+
+                        File file = new File(f);
+                        ASMSource asm = ((ASMSource) node.item);
+                        try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
+                            if (exportMode == ScriptExportMode.HEX) {
+                                asm.getActionSourcePrefix(writer);
+                                asm.getActionBytesAsHex(writer);
+                                asm.getActionSourceSuffix(writer);
+                            } else if (exportMode != ScriptExportMode.AS) {
+                                asm.getActionSourcePrefix(writer);
+                                asm.getASMSource(exportMode, writer, null);
+                                asm.getActionSourceSuffix(writer);
+                            } else {
+                                List<Action> as = asm.getActions();
+                                Action.setActionsAddresses(as, 0);
+                                Action.actionsToSource(asm, as, ""/*FIXME*/, writer);
+                            }
+                        }
+
+                        long stopTime = System.currentTimeMillis();
+
+                        if (ev != null) {
+                            long time = stopTime - startTime;
+                            ev.handleEvent("exported", "Exported " + currentIndex + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
+                        }
+
+                        ret.add(file);
+                    } catch (InterruptedException ex) {
+                    } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+                        Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error in file: " + name + ".as", ex);
+                        if (handler != null) {
+                            int action = handler.getNewInstance().handle(ex);
+                            switch (action) {
+                                case AbortRetryIgnoreHandler.ABORT:
+                                    throw ex;
+                                case AbortRetryIgnoreHandler.RETRY:
+                                    retry = true;
+                                    break;
+                                case AbortRetryIgnoreHandler.IGNORE:
+                                    retry = false;
+                                    break;
+                            }
+                        }
+                    }
+                } while (retry);
+            }
+            if (!node.subNodes.isEmpty()) {
+                ret.addAll(exportNodeAS(handler, node.subNodes, nodesToExport, exportAll || exportNode, outdir + name, exportMode, index, count, ev));
             }
 
         }

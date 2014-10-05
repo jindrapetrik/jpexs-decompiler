@@ -938,12 +938,11 @@ public final class SWF implements TreeItem, Timelined {
         list2.addAll(tags);
         List<TreeNode> list = createASTagList(list2, this);
 
-        TagNode.setExport(list, true);
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(handler, list, outdir, exportMode, evl));
+        ret.addAll(TagNode.exportNodeAS(handler, list, list, outdir, exportMode, evl));
         return ret;
     }
 
@@ -1036,38 +1035,31 @@ public final class SWF implements TreeItem, Timelined {
 
     public static List<TreeNode> createASTagList(List<? extends ContainerItem> list, Timelined parent) {
         List<TreeNode> ret = new ArrayList<>();
-        int frame = 1;
+        int frame = 0;
         List<TreeNode> frames = new ArrayList<>();
 
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
         for (ContainerItem t : list) {
-            if (t instanceof ExportAssetsTag) {
-                exportAssetsTags.add((ExportAssetsTag) t);
-            }
             TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
                 // do not add PlaceObjects (+etc) to script nodes
                 FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null, true);
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
-                    if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {
-                        if (!(ret.get(r).getItem() instanceof DefineButtonTag)) {
-                            if (!(ret.get(r).getItem() instanceof DefineButton2Tag)) {
-                                if (!(ret.get(r).getItem() instanceof DoInitActionTag)) {
-                                    if (!(ret.get(r).getItem() instanceof AS2PackageNodeItem)) {
-                                        tti.subNodes.add(ret.get(r));
-                                        ret.remove(r);
-                                    }
-                                }
-                            }
-                        }
+                    TreeNode node = ret.get(r);
+                    TreeItem item = node.getItem(); 
+                    if (!(item instanceof DefineSpriteTag 
+                            || item instanceof DefineButtonTag
+                            || item instanceof DefineButton2Tag
+                            || item instanceof DoInitActionTag
+                            || item instanceof AS2PackageNodeItem)) {
+                        tti.subNodes.add(node);
+                        ret.remove(r);
                     }
                 }
                 frame++;
                 frames.add(tti);
             } else if (t instanceof ASMSource) {
                 ContainerNode tti = new ContainerNode(t);
-                //ret.add(tti);
                 addNode = tti;
             } else if (t instanceof Container) {
                 if (((Container) t).getItemCount() > 0) {
@@ -1078,7 +1070,6 @@ public final class SWF implements TreeItem, Timelined {
                     Timelined timelined = t instanceof Timelined ? (Timelined) t : null;
                     tti.subNodes = createASTagList(subItems, timelined);
                     addNode = tti;
-                    //ret.add(tti);
                 }
             }
             if (addNode != null) {
@@ -1088,24 +1079,15 @@ public final class SWF implements TreeItem, Timelined {
                     if (path == null) {
                         path = "";
                     }
-                    String[] pathParts;
-                    if (path.contains(".")) {
-                        pathParts = path.split("\\.");
-                    } else {
-                        pathParts = new String[]{path};
-                    }
+                    String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{ path };
                     List<TreeNode> items = ret;
-                    int pos = 0;
-                    TreeNode selNode = null;
-                    do {
-                        if (pos == pathParts.length - 1) {
-                            break;
-                        }
-                        selNode = null;
+                    for (int pos = 0; pos < pathParts.length - 1; pos++) {
+                        String pathPart = pathParts[pos];
+                        TreeNode selNode = null;
                         for (TreeNode node : items) {
                             if (node.getItem() instanceof AS2PackageNodeItem) {
                                 AS2PackageNodeItem pkg = (AS2PackageNodeItem) node.getItem();
-                                if (pkg.packageName.equals(pathParts[pos])) {
+                                if (pkg.packageName.equals(pathPart)) {
                                     selNode = node;
                                     break;
                                 }
@@ -1114,8 +1096,8 @@ public final class SWF implements TreeItem, Timelined {
                         int pkgCount = 0;
                         for (; pkgCount < items.size(); pkgCount++) {
                             if (items.get(pkgCount).getItem() instanceof AS3PackageNodeItem) {
-                                AS2PackageNodeItem pkg = (AS2PackageNodeItem) items.get(pkgCount).getItem();
-                                if (pkg.packageName.compareTo(pathParts[pos]) > 0) {
+                                AS3PackageNodeItem pkg = (AS3PackageNodeItem) items.get(pkgCount).getItem();
+                                if (pkg.packageName.compareTo(pathPart) > 0) {
                                     break;
                                 }
                             } else {
@@ -1123,16 +1105,14 @@ public final class SWF implements TreeItem, Timelined {
                             }
                         }
                         if (selNode == null) {
-                            items.add(pkgCount, selNode = new AS2PackageNode(new AS2PackageNodeItem(pathParts[pos], t.getSwf())));
+                            items.add(pkgCount, selNode = new AS2PackageNode(new AS2PackageNodeItem(pathPart, t.getSwf())));
                         }
                         pos++;
-                        if (selNode != null) {
-                            items = selNode.subNodes;
-                        }
-
-                    } while (selNode != null);
+                        items = selNode.subNodes;
+                    }
 
                     int clsCount = 0;
+                    String addNodeName = addNode.getItem().getClass().getName() + "_" + pathParts[pathParts.length - 1];
                     for (; clsCount < items.size(); clsCount++) {
                         if (items.get(clsCount).getItem() instanceof CharacterIdTag) {
                             CharacterIdTag ct = (CharacterIdTag) items.get(clsCount).getItem();
@@ -1143,7 +1123,7 @@ public final class SWF implements TreeItem, Timelined {
                             if (expName.contains(".")) {
                                 expName = expName.substring(expName.lastIndexOf('.') + 1);
                             }
-                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNode.getItem().getClass().getName() + "_" + pathParts[pos]) > 0) {
+                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNodeName) > 0) {
                                 break;
                             }
                         }
@@ -1157,25 +1137,15 @@ public final class SWF implements TreeItem, Timelined {
         }
         ret.addAll(frames);
         for (int i = ret.size() - 1; i >= 0; i--) {
-            if (ret.get(i).getItem() instanceof DefineSpriteTag) {
-                ((DefineSpriteTag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
-            }
-            if (ret.get(i).getItem() instanceof DefineButtonTag) {
-                ((DefineButtonTag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
-            }
-            if (ret.get(i).getItem() instanceof DefineButton2Tag) {
-                ((DefineButton2Tag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
-            }
-            /*if (ret.get(i).tag instanceof DoInitActionTag) {
-             //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-             }*/
-            if (ret.get(i).getItem() instanceof ASMSource) {
-                ASMSource ass = (ASMSource) ret.get(i).getItem();
+            TreeNode node = ret.get(i);
+            TreeItem item = node.getItem(); 
+            if (item instanceof ASMSource) {
+                ASMSource ass = (ASMSource) item;
                 if (ass.containsSource()) {
                     continue;
                 }
             }
-            if (ret.get(i).subNodes.isEmpty()) {
+            if (node.subNodes.isEmpty()) {
                 ret.remove(i);
             }
         }

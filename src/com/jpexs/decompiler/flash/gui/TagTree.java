@@ -499,7 +499,7 @@ public class TagTree extends JTree implements ActionListener {
                         tagsToRemove.add((Tag) tag);
                     } else if (tag instanceof FrameNodeItem) {
                         FrameNodeItem frameNode = (FrameNodeItem) tag;
-                        Frame frame = frameNode.getParent().getTimeline().frames.get(frameNode.getFrame() - 1);
+                        Frame frame = frameNode.getParent().getTimeline().frames.get(frameNode.getFrame());
                         if (frame.showFrameTag != null) {
                             tagsToRemove.add(frame.showFrameTag);
                         } else {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -48,7 +49,7 @@ public class FrameNodeItem implements TreeItem {
 
     @Override
     public String toString() {
-        return "frame " + frame;
+        return "frame " + (frame + 1);
     }
 
     public int getFrame() {

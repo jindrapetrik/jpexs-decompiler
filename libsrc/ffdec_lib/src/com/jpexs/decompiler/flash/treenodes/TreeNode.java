@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.treenodes;
 
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -28,7 +29,6 @@ import java.util.logging.Logger;
 public abstract class TreeNode {
 
     protected TreeItem item;
-    public boolean export = false;
     public List<TreeNode> subNodes;
 
     public TreeNode(TreeItem item) {
@@ -50,14 +50,5 @@ public abstract class TreeNode {
             return null;
         }
         return item.toString();
-    }
-
-    public List<TreeNode> getAllSubs() {
-        List<TreeNode> ret = new ArrayList<>();
-        ret.addAll(subNodes);
-        for (TreeNode n : subNodes) {
-            ret.addAll(n.getAllSubs());
-        }
-        return ret;
     }
 }

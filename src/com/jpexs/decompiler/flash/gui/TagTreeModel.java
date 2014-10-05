@@ -89,9 +89,7 @@ public class TagTreeModel implements TreeModel {
     }
 
     public SWFNode createSwfNode(SWF swf) {
-        ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
-        SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
-        swfNode.list = createTagList(swf.tags, swf, swfNode, classTreeModel);
+        SWFNode swfNode = createTagList(swf.tags, swf);
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
     }
@@ -110,10 +108,13 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TreeNode> createTagList(List<Tag> list, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
+    private SWFNode createTagList(List<Tag> list, SWF swf) {
+        ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
+        SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
+
         boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
 
-        List<TreeNode> ret = new ArrayList<>();
+        List<TreeNode> nodeList = new ArrayList<>();
         List<TreeNode> frames = new ArrayList<>();
         List<TreeNode> shapes = new ArrayList<>();
         List<TreeNode> morphShapes = new ArrayList<>();
@@ -176,7 +177,7 @@ public class TagTreeModel implements TreeModel {
 
         Timeline timeline = swf.getTimeline();
         for (int i = 0; i < timeline.getFrameCount(); i++) {
-            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, swf, true), timeline.frames.get(i).innerTags, false));
+            frames.add(new FrameNode(new FrameNodeItem(swf, i, swf, true), timeline.frames.get(i).innerTags, false));
         }
 
         for (int i = 0; i < sounds.size(); i++) {
@@ -239,50 +240,51 @@ public class TagTreeModel implements TreeModel {
         }
         swfNode.scriptsNode = actionScriptNode;
 
-        ret.add(new HeaderNode(new HeaderItem(swf, AppStrings.translate("node.header"))));
+        nodeList.add(new HeaderNode(new HeaderItem(swf, AppStrings.translate("node.header"))));
 
         if (!shapesNode.subNodes.isEmpty()) {
-            ret.add(shapesNode);
+            nodeList.add(shapesNode);
         }
         if (!morphShapesNode.subNodes.isEmpty()) {
-            ret.add(morphShapesNode);
+            nodeList.add(morphShapesNode);
         }
         if (!spritesNode.subNodes.isEmpty()) {
-            ret.add(spritesNode);
+            nodeList.add(spritesNode);
         }
         if (!textsNode.subNodes.isEmpty()) {
-            ret.add(textsNode);
+            nodeList.add(textsNode);
         }
         if (!imagesNode.subNodes.isEmpty()) {
-            ret.add(imagesNode);
+            nodeList.add(imagesNode);
         }
         if (!moviesNode.subNodes.isEmpty()) {
-            ret.add(moviesNode);
+            nodeList.add(moviesNode);
         }
         if (!soundsNode.subNodes.isEmpty()) {
-            ret.add(soundsNode);
+            nodeList.add(soundsNode);
         }
         if (!buttonsNode.subNodes.isEmpty()) {
-            ret.add(buttonsNode);
+            nodeList.add(buttonsNode);
         }
         if (!fontsNode.subNodes.isEmpty()) {
-            ret.add(fontsNode);
+            nodeList.add(fontsNode);
         }
         if (!binaryDataNode.subNodes.isEmpty()) {
-            ret.add(binaryDataNode);
+            nodeList.add(binaryDataNode);
         }
         if (!framesNode.subNodes.isEmpty()) {
-            ret.add(framesNode);
+            nodeList.add(framesNode);
         }
         if (!otherNode.subNodes.isEmpty()) {
-            ret.add(otherNode);
+            nodeList.add(otherNode);
         }
 
         if ((!actionScriptNode.subNodes.isEmpty()) || hasAbc) {
-            ret.add(actionScriptNode);
+            nodeList.add(actionScriptNode);
         }
 
-        return ret;
+        swfNode.list = nodeList;
+        return swfNode;
     }
 
     private List<TreeNode> createSubTagList(List<Tag> list, Timelined parent, SWF swf, List<Tag> actionScriptTags) {
@@ -305,7 +307,7 @@ public class TagTreeModel implements TreeModel {
 
         Timeline timeline = ((Timelined) parent).getTimeline();
         for (int i = 0; i < timeline.getFrameCount(); i++) {
-            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
+            frames.add(new FrameNode(new FrameNodeItem(swf, i, parent, true), timeline.frames.get(i).innerTags, false));
         }
 
         ret.addAll(frames);

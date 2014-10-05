@@ -12,16 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -34,11 +31,7 @@ public abstract class CharacterIdTag extends Tag {
     }
 
     public abstract int getCharacterId();
-    /**
-     * List of ExportAssetsTag used for converting to String
-     */
-    @Internal
-    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
+
     protected String exportName;
 
     public void setExportName(String exportName) {

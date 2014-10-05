@@ -1060,7 +1060,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                         FrameNodeItem fni = (FrameNodeItem) d.getItem();
                         Timelined parent = fni.getParent();
-                        int frame = fni.getFrame() - 1; //Fix to zero based
+                        int frame = fni.getFrame();
                         int parentId = 0;
                         if (parent instanceof CharacterTag) {
                             parentId = ((CharacterTag) parent).getCharacterId();
@@ -1109,25 +1109,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom())));
             }
             List<ABCContainerTag> abcList = swf.abcList;
-            if (abcPanel != null) {
+            if (swf.isAS3) {
                 for (int i = 0; i < as3scripts.size(); i++) {
                     ScriptPack tls = as3scripts.get(i);
                     Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
                     ret.add(tls.export(selFile, abcList, scriptMode, Configuration.parallelSpeedUp.get()));
                 }
             } else {
-                List<TreeNode> allNodes = new ArrayList<>();
-                List<TreeNode> allAs12Scripts = new ArrayList<>();
-
-                if (abcPanel == null) {
-                    allAs12Scripts = getASTreeNodes(tagTree);
-                }
-                for (TreeNode asn : allAs12Scripts) {
-                    allNodes.add(asn);
-                    TagNode.setExport(allNodes, false);
-                    TagNode.setExport(as12scripts, true);
-                    ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, scriptMode, null));
-                }
+                TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
+                List<TreeNode> scriptNodeList = new ArrayList<>(1);
+                scriptNodeList.add(ttm.getSwfNode(swf).scriptsNode);
+                ret.addAll(TagNode.exportNodeAS(handler, scriptNodeList, as12scripts, selFile, scriptMode, null));
             }
         }
         return ret;
@@ -2417,7 +2409,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 totalFrameCount = parentSprite.frameCount;
                 timelined = parentSprite;
             }
-            previewPanel.showImagePanel(timelined, swf, fn.getFrame() - 1);
+            previewPanel.showImagePanel(timelined, swf, fn.getFrame());
         } else if ((tagObj instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDPREVIEWPANEL);
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
