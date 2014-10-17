@@ -240,8 +240,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 parseImportsUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
             }
             if (nss != null) {
-                if (nss.namespaces.length == 1) {
-                    parseImportsUsagesFromNS(abcTags, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
+                for (int n : nss.namespaces) {
+                    parseImportsUsagesFromNS(abcTags, abc, imports, uses, n, ignorePackage, nss.namespaces.length > 1 ? "" : name);
                 }
             }
         }
