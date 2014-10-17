@@ -117,26 +117,31 @@
             <export>
                 <type>folder</type>
                 <location>build</location>
+                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>javadoc</location>
+                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>reports</location>
+                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>locales</location>
+                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>build/test</location>
+                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <view>

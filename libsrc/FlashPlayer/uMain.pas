@@ -35,12 +35,16 @@ type
     bgColor:   integer;
     bgTColor: TColor;
     zoom:     integer;
+    scalemode: integer;
+    quality: integer;
     procedure Execute; override;
     procedure displaySWF;
     procedure freeSWF;
     procedure setPos;
     procedure setBGColor;
     procedure setZoom;
+    procedure setQuality;
+    procedure setScalemode;
   end;
 
   TBuf = array[0..255] of byte;
@@ -184,6 +188,16 @@ begin
   flaPreview.Zoom(self.zoom);
 end;
 
+procedure TPipeThread.setQuality();
+begin
+  flaPreview.Quality := self.quality;
+end;
+
+procedure TPipeThread.setScalemode();
+begin
+  flaPreview.ScaleMode := self.scalemode;
+end;
+
 procedure TPipeThread.Execute();
 var
   pipe: cardinal;
@@ -211,6 +225,8 @@ const
   CMD_SETVARIABLE = 13;
   CMD_CHECKCLICK = 14;
   CMD_ZOOM = 15;
+  CMD_SET_QUALITY = 16;
+  CMD_SET_SCALEMODE = 17;
 begin
 
   try
@@ -224,7 +240,18 @@ begin
           ReadPipe(pipe, buffer, 1);
           cmd := buffer[0];
           case cmd of
-
+            CMD_SET_QUALITY:
+            begin
+              ReadPipe(pipe, buffer, 1);
+              self.quality := buffer[0];
+              Synchronize(setQuality);
+            end;
+            CMD_SET_SCALEMODE:
+            begin
+              ReadPipe(pipe, buffer, 1);
+              self.scalemode := buffer[0];
+              Synchronize(setScalemode);
+            end;
             CMD_CHECKCLICK:
             begin
               buffer[0]:=clicked;

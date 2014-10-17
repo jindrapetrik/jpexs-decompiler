@@ -1,9 +1,9 @@
 object frmMain: TfrmMain
   Left = 585
   Top = 543
-  Width = 805
-  Height = 266
   Caption = 'FFDec Flash Player'
+  ClientHeight = 227
+  ClientWidth = 789
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
