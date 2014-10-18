@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.google.typography.font.sfntly.Font;
@@ -173,10 +174,7 @@ public class FontExporter {
             char c = t.glyphToChar(i);
             if (contours.isEmpty()) {
                 continue;
-            }
-            if (c == '.') {
-                continue;
-            }
+            }            
             final FGlyph g = f.addGlyph(c);
             double adv = t.getGlyphAdvance(i);
             if (adv != -1) {
