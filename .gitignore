@@ -5,6 +5,7 @@
 *.chg.*
 *.rej
 *.conflict~
+*.identcache
 /build/
 /reports/
 /installer.cfg
