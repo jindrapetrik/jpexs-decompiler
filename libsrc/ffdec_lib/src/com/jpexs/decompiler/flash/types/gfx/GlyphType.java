@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.RECT;
@@ -60,7 +61,7 @@ public class GlyphType implements Serializable {
         contours = contoursList.toArray(new ContourType[contoursList.size()]);
     }
 
-    public GlyphType(GFxInputStream sis) throws IOException {
+    public GlyphType(GFxInputStream sis, long fontOffset) throws IOException {
         boundingBox = new int[4];
         for (int i = 0; i < 4; i++) {
             boundingBox[i] = sis.readSI15("boundingBox");
@@ -69,7 +70,7 @@ public class GlyphType implements Serializable {
         contours = new ContourType[numContours];
         for (int i = 0; i < numContours; i++) {
             sis.newDumpLevel("contourType", "ContourType");
-            contours[i] = new ContourType(sis);
+            contours[i] = new ContourType(sis, fontOffset);
             sis.endDumpLevel();
         }
     }

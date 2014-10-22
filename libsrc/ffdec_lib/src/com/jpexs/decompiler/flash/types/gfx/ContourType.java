@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
@@ -38,7 +39,7 @@ public class ContourType implements Serializable {
 
     public ContourType(List<SHAPERECORD> records) {
         int i = 0;
-        int divider = 20;
+        int divider = 1;
         for (; i < records.size(); i++) {
             if (records.get(i) instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) records.get(i);
@@ -69,20 +70,23 @@ public class ContourType implements Serializable {
         edges = edgesList.toArray(new EdgeType[edgesList.size()]);
     }
 
-    public ContourType(GFxInputStream sis) throws IOException {
+    public ContourType(GFxInputStream sis,long fontOffset) throws IOException {
         moveToX = sis.readSI15("moveToX");
         moveToY = sis.readSI15("moveToY");
         long numEdgesRef = sis.readUI30("numEdgesRef");
         isReference = (numEdgesRef & 1) == 1;
         numEdgesRef >>= 1;
         long oldPos = sis.getPos();
+        int numEdges;
         if (isReference) {
-            sis.setPos(numEdgesRef);
-            numEdgesRef = sis.readUI30("numEdgesRef");
-            numEdgesRef >>= 1;
+            long referencePos = numEdgesRef;
+            sis.setPos(fontOffset+referencePos);
+            numEdges = (int)(sis.readUI30("numEdges") >> 1);
+        }else{
+            numEdges = (int)numEdgesRef;
         }
 
-        edges = new EdgeType[(int) numEdgesRef];
+        edges = new EdgeType[(int) numEdges];
         for (int i = 0; i < edges.length; i++) {
             sis.newDumpLevel("edgeType", "EdgeType");
             edges[i] = new EdgeType(sis);

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -73,10 +74,10 @@ public class FontType implements Serializable {
         for (int i = 0; i < glyphInfo.size(); i++) {
             sis.setPos(glyphInfo.get(i).globalOffset + offset);
             sis.newDumpLevel("glyphType", "GlyphType");
-            glyphs.add(new GlyphType(sis));
+            glyphs.add(new GlyphType(sis,offset));
             sis.endDumpLevel();
         }
-
+        
         sis.setPos(pos);
     }
 

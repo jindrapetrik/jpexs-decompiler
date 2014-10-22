@@ -149,7 +149,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         FontType font = fonts.get(0);
 
         double d = 1; //1024/font.nominalSize;
-        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(cfont, fontStyle, (int) (SWF.unitDivisor * font.nominalSize * d), character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(cfont, fontStyle, (int) (font.nominalSize * d), character);
 
         int code = (int) character;
         int pos = -1;
