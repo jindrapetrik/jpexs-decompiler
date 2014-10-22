@@ -1916,7 +1916,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
                         return false;
                     }
-                    font.addCharacter(character, fontName);
+                    font.addCharacter(character, f);
                     return true;
 
                 }
@@ -2269,7 +2269,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         TreeItem tagObj = treeNode.getItem();
 
         if (flashPanel != null) {
-            flashPanel.specialPlayback = false;
+            //flashPanel.specialPlayback = false;
         }
         previewPanel.clear();
         if (soundThread != null) {

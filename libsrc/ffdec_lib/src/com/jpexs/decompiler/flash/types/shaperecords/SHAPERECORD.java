@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -233,13 +234,17 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     public static SHAPE systemFontCharacterToSHAPE(final String fontName, final int fontStyle, int fontSize, char character) {
+        return fontCharacterToSHAPE(new Font(FontTag.getFontNameWithFallback(fontName),Font.PLAIN,10), fontStyle, fontSize, character);
+    }
+    
+    public static SHAPE fontCharacterToSHAPE(final Font font, final int fontStyle, int fontSize, char character) {
         int multiplier = 1;
         if (fontSize > 1024) {
             multiplier = fontSize / 1024;
             fontSize = 1024;
         }
         List<SHAPERECORD> retList = new ArrayList<>();
-        Font f = new Font(FontTag.getFontNameWithFallback(fontName), fontStyle, fontSize);
+        Font f = font.deriveFont(fontStyle, fontSize); 
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double[] points = new double[6];

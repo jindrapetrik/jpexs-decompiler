@@ -95,7 +95,7 @@ public class DefineFont3Tag extends FontTag {
     @Override
     public double getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout && glyphIndex != -1) {
-            return fontAdvanceTable.get(glyphIndex) / SWF.unitDivisor;
+            return fontAdvanceTable.get(glyphIndex);
         } else {
             return -1;
         }
@@ -334,7 +334,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getDivider() {
+    public double getDivider() {
         return 20;
     }
 
@@ -363,7 +363,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public void addCharacter(char character, String fontName) {
+    public void addCharacter(char character, Font font) {
 
         //Font Align Zones will be removed as adding new character zones is not supported:-(
         for (int i = 0; i < swf.tags.size(); i++) {
@@ -377,7 +377,7 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         int fontStyle = getFontStyle();
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, getDivider() * 1024, character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, fontStyle, (int)Math.round(getDivider() * 1024), character);
         int code = (int) character;
         int pos = -1;
         boolean exists = false;
@@ -433,6 +433,13 @@ public class DefineFont3Tag extends FontTag {
         return fontFlagsHasLayout;
     }
 
+    @Override
+    public RECT getGlyphBounds(int glyphIndex) {
+        return fontBoundsTable.get(glyphIndex);
+    }
+
+    
+    
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {

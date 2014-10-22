@@ -260,7 +260,7 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = fontSize * (style.font == null ? 1 : style.font.getDivider());
+                                        style.fontHeight = (int)Math.round(fontSize * (style.font == null ? 1 : style.font.getDivider()));
                                         style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes
@@ -824,7 +824,7 @@ public class DefineEditTextTag extends TextTag {
                             kerningAdjustment = font.getGlyphKerningAdjustment(ge.glyphIndex, font.charToGlyph(nextChar));
                             kerningAdjustment /= font.getDivider();
                         }
-                        advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                        advance = (int) Math.round(Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                     } else {
                         String fontName = FontTag.defaultFontName;
                         int fontStyle = font == null ? 0 : font.getFontStyle();

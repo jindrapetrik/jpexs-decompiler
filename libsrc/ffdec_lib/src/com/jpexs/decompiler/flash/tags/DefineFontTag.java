@@ -20,11 +20,13 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
+import java.awt.Font;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -260,13 +262,13 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int getDivider() {
+    public double getDivider() {
         return 1;
     }
 
     @Override
-    public void addCharacter(char character, String fontName) {
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, getFontStyle(), getDivider() * 1024, character);
+    public void addCharacter(char character, Font font) {
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, getFontStyle(), (int)Math.round(getDivider() * 1024), character);
         List<Integer> codeTable = new ArrayList<>();
         ensureFontInfo();
         if (fontInfoTag != null) {
@@ -322,4 +324,5 @@ public class DefineFontTag extends FontTag {
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         return 0;
     }
+    
 }

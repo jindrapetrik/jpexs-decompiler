@@ -22,18 +22,29 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
+import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
+import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.gfx.FontType;
+import com.jpexs.decompiler.flash.types.gfx.GlyphInfoType;
+import com.jpexs.decompiler.flash.types.gfx.GlyphType;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -43,11 +54,15 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -65,7 +80,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract List<SHAPE> getGlyphShapeTable();
 
-    public abstract void addCharacter(char character, String fontName);
+    public abstract void addCharacter(char character, Font font);
 
     public abstract char glyphToChar(int glyphIndex);
 
@@ -97,7 +112,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract void setItalic(boolean value);
 
-    public abstract int getDivider();
+    public abstract double getDivider();
 
     public abstract int getAscent();
 
@@ -337,5 +352,17 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         }
         sb.append("\t}\r\n");
         return sb.toString();
+    }
+    
+    
+    
+
+       
+    public RECT getGlyphBounds(int glyphIndex) {
+        return getGlyphShapeTable().get(glyphIndex).getBounds();
+    }           
+    
+    public FontTag toClassicFont() {
+        return this;
     }
 }

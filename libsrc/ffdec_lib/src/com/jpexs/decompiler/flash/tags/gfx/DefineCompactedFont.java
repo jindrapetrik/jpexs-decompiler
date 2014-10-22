@@ -144,10 +144,12 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public void addCharacter(char character, String fontName) {
+    public void addCharacter(char character, Font cfont) {
         int fontStyle = getFontStyle();
         FontType font = fonts.get(0);
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, (int) (SWF.unitDivisor * font.nominalSize), character);
+
+        double d = 1; //1024/font.nominalSize;
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(cfont, fontStyle, (int) (SWF.unitDivisor * font.nominalSize * d), character);
 
         int code = (int) character;
         int pos = -1;
@@ -169,7 +171,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             shiftGlyphIndices(fontId, pos);
         }
 
-        Font fnt = new Font(fontName, fontStyle, font.nominalSize);
+        Font fnt = cfont.deriveFont(fontStyle, Math.round(font.nominalSize * d));
         int advance = (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX());
         if (!exists) {
             font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
@@ -278,7 +280,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public int getDivider() {
+    public double getDivider() {
         return 1;
     }
 
@@ -307,17 +309,13 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         return ret;
     }
 
-    private int resizemultiplier() {
-        FontType ft = fonts.get(0);
-        return (int) Math.round(1024.0 / ft.nominalSize);
+    @Override
+    public RECT getGlyphBounds(int glyphIndex) {
+        GlyphType gt = fonts.get(0).glyphs.get(glyphIndex);
+        return new RECT(resize(gt.boundingBox[0]), resize(gt.boundingBox[1]), resize(gt.boundingBox[2]), resize(gt.boundingBox[3]));
     }
 
-    private int resize(int val) {
-        int ret = val * resizemultiplier();
-        return ret;
-    }
-
-    private SHAPE resize(SHAPE shp) {
+    public SHAPE resizeShape(SHAPE shp) {
         SHAPE ret = new SHAPE();
         ret.numFillBits = 1;
         ret.numLineBits = 0;
@@ -350,36 +348,39 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         return ret;
     }
 
+    protected int resize(double val) {
+        FontType ft = fonts.get(0);
+        return (int) Math.round(val * 1024.0 / ft.nominalSize);
+    }
+
+    @Override
     public FontTag toClassicFont() {
         try {
             DefineFont2Tag ret = new DefineFont2Tag(swf);
-            ret.fontId = fontId;
+            ret.fontId = getFontId();
             ret.fontFlagsBold = isBold();
             ret.fontFlagsItalic = isItalic();
             ret.fontFlagsWideOffsets = true;
             ret.fontFlagsWideCodes = true;
             ret.fontFlagsHasLayout = true;
-            FontType ft = fonts.get(0);
-            ret.fontAscent = resize(ft.ascent);
-            ret.fontDescent = resize(ft.descent);
-            ret.fontLeading = resize(ft.leading);
+            ret.fontAscent = (getAscent());
+            ret.fontDescent = (getDescent());
+            ret.fontLeading = (getLeading());
             ret.fontAdvanceTable = new ArrayList<>();
             ret.fontBoundsTable = new ArrayList<>();
             ret.codeTable = new ArrayList<>();
             ret.glyphShapeTable = new ArrayList<>();
-            ret.numGlyphs = ft.glyphInfo.size();
-            SHAPE shpA = SHAPERECORD.systemFontCharacterToSHAPE("Times New Roman", 0, getDivider() * 1024, 'A');
-            for (GlyphInfoType gi : ft.glyphInfo) {
-                ret.fontAdvanceTable.add(resize(gi.advanceX));
-                ret.codeTable.add(gi.glyphCode);
-            }
+            List<SHAPE> shp = getGlyphShapeTable();
+            ret.numGlyphs = shp.size();
+            for (int g = 0; g < shp.size(); g++) {
+                ret.fontAdvanceTable.add(resize(getGlyphAdvance(g)));
+                ret.codeTable.add((int) glyphToChar(g));
 
-            for (GlyphType gt : ft.glyphs) {
-                SHAPE shpX = resize(gt.toSHAPE());
-                ret.glyphShapeTable.add(shpX); //
-                ret.fontBoundsTable.add(new RECT(resize(gt.boundingBox[0]), resize(gt.boundingBox[1]), resize(gt.boundingBox[2]), resize(gt.boundingBox[3])));
+                SHAPE shpX = resizeShape(shp.get(g));
+                ret.glyphShapeTable.add(shpX);
+                ret.fontBoundsTable.add(getGlyphBounds(g));
             }
-            ret.fontName = ft.fontName;
+            ret.fontName = getFontName();
             ret.languageCode = new LANGCODE(1);
             ret.fontKerningTable = new KERNINGRECORD[0];/*new KERNINGRECORD[ft.kerning.size()];
              for(int i=0;i<ft.kerning.size();i++){

@@ -781,7 +781,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
                         new ShowFrameTag(swf).writeTag(sos2);
                         if (flashPanel != null) {
-                            flashPanel.specialPlayback = true;
+                            //flashPanel.specialPlayback = true;
                         }
                     } else if (tagObj instanceof DefineVideoStreamTag) {
 

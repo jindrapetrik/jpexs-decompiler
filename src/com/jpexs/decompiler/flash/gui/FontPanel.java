@@ -23,13 +23,25 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.Helper;
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.font.FontRenderContext;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -86,14 +98,14 @@ public class FontPanel extends javax.swing.JPanel {
         return mainPanel.translate(key);
     }
 
-    private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
+    private void fontAddChars(FontTag ft, Set<Integer> selChars, Font font) {
         FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
         SWF swf = ft.getSwf();
         String oldchars = f.getCharacters(swf.tags);
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) == -1) {
-                Font font = new Font(selFont, f.getFontStyle(), 1024);
+                font = font.deriveFont(f.getFontStyle(), 1024);
                 if (!font.canDisplay(c)) {
                     View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
@@ -129,7 +141,7 @@ public class FontPanel extends javax.swing.JPanel {
                     continue;
                 }
             }
-            f.addCharacter(c, fontSelection.getSelectedItem().toString());
+            f.addCharacter(c, font);
             oldchars += c;
         }
 
@@ -233,6 +245,7 @@ public class FontPanel extends javax.swing.JPanel {
         buttonSave = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
         buttonPreviewFont = new javax.swing.JButton();
+        importTTFButton = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -494,11 +507,21 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
+        importTTFButton.setText("Import TTF");
+        importTTFButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importTTFButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 463, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(importTTFButton)
+                .addContainerGap(387, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
@@ -536,7 +559,10 @@ public class FontPanel extends javax.swing.JPanel {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 415, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(341, Short.MAX_VALUE)
+                .addComponent(importTTFButton)
+                .addGap(85, 85, 85))
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
@@ -588,25 +614,26 @@ public class FontPanel extends javax.swing.JPanel {
             for (int c = 0; c < newchars.length(); c++) {
                 selChars.add(newchars.codePointAt(c));
             }
-            fontAddChars((FontTag) item, selChars, fontSelection.getSelectedItem().toString());
+            fontAddChars((FontTag) item, selChars, new Font(fontSelection.getSelectedItem().toString(),Font.PLAIN,12));
             fontAddCharactersField.setText("");
             mainPanel.reload(true);
         }
     }//GEN-LAST:event_fontAddCharsButtonActionPerformed
-
+    
+    
     private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
-            FontTag fontTag = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), fontTag.getFontStyle());
-            if (fed.display()) {
+            FontTag ft = (FontTag) item;
+            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ft.getFontStyle());
+                if (fed.display()) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
-                    String selFont = fed.getSelectedFont();
-                    fontSelection.setSelectedItem(selFont);
-                    fontAddChars(fontTag, selChars, selFont);
-                    fontAddCharactersField.setText("");
-                    mainPanel.reload(true);
+                String selFont = fed.getSelectedFont();
+                fontSelection.setSelectedItem(selFont);
+                fontAddChars(ft, selChars, new Font(selFont,Font.PLAIN,10));
+                fontAddCharactersField.setText("");
+                mainPanel.reload(true);
                 }
             }
         }
@@ -651,6 +678,59 @@ public class FontPanel extends javax.swing.JPanel {
         jPanel1.updateUI();
     }//GEN-LAST:event_formComponentResized
 
+    private void importTTFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTTFButtonActionPerformed
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof FontTag) {
+            FontTag ft = (FontTag) item;       
+            
+            
+            JFileChooser fc = new JFileChooser();     
+        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));        
+        FileFilter ttfFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".ttf")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return "TTF files";
+            }
+        };
+        fc.setFileFilter(ttfFilter);       
+
+        fc.setAcceptAllFileFilterUsed(false);
+        JFrame fr = new JFrame();
+        View.setWindowIcon(fr);
+        int returnVal = fc.showOpenDialog(fr);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());            
+            File selfile = Helper.fixDialogFile(fc.getSelectedFile());            
+            Set<Integer> selChars = new HashSet<>();            
+            try {
+                Font f = Font.createFont(Font.TRUETYPE_FONT, selfile);
+                int required[] = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
+                loopi:for(char i=0;i<Character.MAX_VALUE;i++){
+                   for(int r:required){
+                       if(r==i){
+                           continue loopi;
+                       }
+                   }
+                   if(f.canDisplay((int)i)){
+                       selChars.add((int)i);                
+                   } 
+                }
+                fontAddChars(ft,selChars, f);
+                mainPanel.reload(true);
+            } catch (FontFormatException ex) {
+                JOptionPane.showMessageDialog(mainPanel, "Invalid TTF font");
+            } catch (IOException ex) {
+                Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }                                     
+        }
+    }//GEN-LAST:event_importTTFButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonEdit;
@@ -670,6 +750,7 @@ public class FontPanel extends javax.swing.JPanel {
     private javax.swing.JLabel fontLeadingLabel;
     private javax.swing.JLabel fontNameLabel;
     private javax.swing.JComboBox fontSelection;
+    private javax.swing.JButton importTTFButton;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

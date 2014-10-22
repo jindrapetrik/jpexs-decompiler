@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -108,9 +109,12 @@ public class FontExporter {
         return new byte[0];
     }
 
-    public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
+    public void exportFont(FontTag ft, FontExportMode mode, File file) throws IOException {
+        final FontTag t = ft.toClassicFont();
         List<SHAPE> shapes = t.getGlyphShapeTable();
 
+        final double divider = t.getDivider();
+        
         File ttfFile = file;
 
         if (mode == FontExportMode.WOFF) {
@@ -122,9 +126,10 @@ public class FontExporter {
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
-        f.setVersion("1.0");
-        f.setAscender(t.getAscent() / t.getDivider());
-        f.setDescender(t.getDescent() / t.getDivider());
+        f.setVersion("1.0");        
+        
+        f.setAscender(Math.round(t.getAscent() / divider));
+        f.setDescender(Math.round(t.getDescent() / divider));
 
         for (int i = 0; i < shapes.size(); i++) {
             SHAPE s = shapes.get(i);
@@ -132,11 +137,11 @@ public class FontExporter {
             PathExporter seb = new PathExporter(s, new ColorTransform()) {
 
                 private double transformX(double x) {
-                    return Math.ceil((double) (x / t.getDivider()));
+                    return Math.ceil((double) (x / divider));
                 }
 
                 private double transformY(double y) {
-                    return -Math.ceil((double) (y / t.getDivider()));
+                    return -Math.ceil((double) (y / divider));
                 }
 
                 List<FPoint> path = new ArrayList<>();
@@ -178,9 +183,9 @@ public class FontExporter {
             final FGlyph g = f.addGlyph(c);
             double adv = t.getGlyphAdvance(i);
             if (adv != -1) {
-                g.setAdvanceWidth((int) adv);
+                g.setAdvanceWidth((int) Math.round(adv / divider));
             } else {
-                g.setAdvanceWidth(t.getGlyphWidth(i) / t.getDivider() + 100);
+                g.setAdvanceWidth((int)Math.round(t.getGlyphWidth(i) / divider + 100));
             }
             for (FPoint[] cnt : contours) {
                 if (cnt.length == 0) {
