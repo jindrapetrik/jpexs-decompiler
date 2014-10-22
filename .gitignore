@@ -39,3 +39,5 @@ hs_err_pid*.log
 /libsrc/jpproxy/dist/
 /libsrc/jpproxy/build/
 /libsrc/LZMA/nbproject/private/
+/libsrc/ttf/nbproject/private/
+/libsrc/ttf/build/
