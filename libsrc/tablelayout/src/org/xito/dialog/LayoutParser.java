@@ -162,10 +162,10 @@ public class LayoutParser {
 
         //default to 100% relative
         if (width == 0) {
-            width = 1.0f;
+            width = TableLayout.PREFERRED; //TableLayout.PERCENT_100;
         }
         if (height == 0) {
-            height = 1.0f;
+            height = TableLayout.PREFERRED; //TableLayout.PERCENT_100;
         }
         layout.setWidth(width);
         layout.setHeight(height);
@@ -387,7 +387,13 @@ public class LayoutParser {
     private float getFloat(String s) {
         try {
             if (s.endsWith("%")) {
-                return percentFormat.parse(s).floatValue();
+                //JPEXS modified
+                float p = percentFormat.parse(s).floatValue();
+                if(p == 1)
+                {
+                    return TableLayout.PERCENT_100;
+                }
+                return p;
             }
             else {
                 return Float.parseFloat(s);
@@ -444,7 +450,7 @@ public class LayoutParser {
             return TableLayout.PREFERRED;
         }
         if (s.equals("100%")) {
-            s = "99.9999%";
+            return TableLayout.PERCENT_100;
         }
         try {
             if (s.endsWith("%")) {

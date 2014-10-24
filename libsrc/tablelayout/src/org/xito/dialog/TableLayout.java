@@ -97,16 +97,17 @@ import javax.swing.*;
  * Tip: In order to help test layouts in a browser set the table border="1".
  * </p>
  * @author Deane Richan
+ * Modified by JPEXS
  */
 public class TableLayout implements LayoutManager2 {
 
-    public final static int PREFERRED = -1;
+    public final static int PREFERRED = -1;    
     public final static int LEFT = SwingConstants.LEFT;
     public final static int RIGHT = SwingConstants.RIGHT;
     public final static int CENTER = SwingConstants.CENTER;
     public final static int TOP = SwingConstants.TOP;
     public final static int BOTTOM = SwingConstants.BOTTOM;
-    public final static int FULL = 999;
+    public final static int FULL = -2;
     public final static int NORTH_WEST = SwingConstants.NORTH_WEST;
     public final static int NORTH = SwingConstants.NORTH;
     public final static int NORTH_EAST = SwingConstants.NORTH_EAST;
@@ -202,6 +203,15 @@ public class TableLayout implements LayoutManager2 {
         }
     }
 
+    
+    private float fix100(float v)
+    {
+        if(v==PERCENT_100){
+            return 1;
+        }
+        return v;
+    }
+    
     /**
      * Copy settings from a layout to this layout
      */
@@ -447,6 +457,7 @@ public class TableLayout implements LayoutManager2 {
      * Lays out the specified container.
      * @param parent the container to be laid out 
      */
+    @Override
     public void layoutContainer(Container parent) {
 
         if (rows.size() == 0) {
@@ -524,11 +535,7 @@ public class TableLayout implements LayoutManager2 {
 
         //TODO this max and min calc has a problem of messing up alignment need to rewrite
         //Apply Max or Min Width
-        //if(v<col.getMinimumWidth()) v = col.getMinimumWidth();
-        //if(v>col.getMaximumWidth()) v = col.getMaximumWidth();
-
-        //if(h<col.component.getMinimumSize().max_height) h = col.component.getMinimumSize().max_height;
-        //if(h>col.component.getMaximumSize().max_height) h = col.component.getMaximumSize().max_height;
+        
 
         //Compute Table level Padding
         if (padding != null) {
@@ -578,7 +585,7 @@ public class TableLayout implements LayoutManager2 {
                 h = ph;
             }
         }
-
+        
         col.component.setLocation(x, y);
         col.component.setSize(w, h);
     }
@@ -796,11 +803,11 @@ public class TableLayout implements LayoutManager2 {
         int thei = target.getHeight() - is.top - is.bottom;
         
         //min_width
-        if (width > 1) {
+        if (isFixedValue(width)) {
             dim.width = (int) width;
         }
         else {
-            dim.width = (int) (width * twid);
+            dim.width = (int) (fix100(width) * twid);
         }
 
         if (dim.width < minWidth) {
@@ -809,11 +816,11 @@ public class TableLayout implements LayoutManager2 {
         if (dim.width > maxWidth) {
             dim.width = maxWidth;        //max_height
         }
-        if (height > 1) {
+        if (isFixedValue(height)) {
             dim.height = (int) height;
         }
         else {
-            dim.height = (int) (height * thei);
+            dim.height = (int) (fix100(height) * thei);
         }
 
         if (dim.height < minHeight) {
@@ -907,13 +914,17 @@ public class TableLayout implements LayoutManager2 {
     private boolean isPreferredValue(float v) {
         return (v == PREFERRED);
     }
+    
+    private boolean isFullValue(float v){
+        return v == FULL;
+    }
 
     private boolean isRelativeValue(float v) {
         return (v > 0 && v < 1.0);
     }
 
     private boolean isFixedValue(float v) {
-        return (v >= 1.0);
+        return (v == 0 || v >= 1.0);
     }
 
     /**
@@ -930,6 +941,7 @@ public class TableLayout implements LayoutManager2 {
 
         int[] maxHeights = new int[rows.size()];
         int[] preferredHeights = new int[rows.size()];
+        int twocnt=0;
         for (int r = 0; r < rows.size(); r++) {
 
             Row row = getRow(r);
@@ -953,7 +965,8 @@ public class TableLayout implements LayoutManager2 {
             //use the rows preferred height to determine
             else {
 
-                rowH[r] = row.getPreferredHeight();
+                twocnt++;
+                rowH[r] = height==TableLayout.PREFERRED?row.getPreferredHeight():FULL;
                 preferredHeights[r] = (int)rowH[r];
 
                 maxHeights[r] = (int)row.getMaximumHeight();
@@ -991,7 +1004,7 @@ public class TableLayout implements LayoutManager2 {
         //add up all the fixed heights
         int fixedHeight = 0;
         for (int r = 0; r < rowH.length; r++) {
-            if (!isRelativeValue(rowH[r])) {
+            if (isFixedValue(rowH[r])) {
                 fixedHeight += (int) rowH[r];
             }
         }
@@ -1011,21 +1024,36 @@ public class TableLayout implements LayoutManager2 {
                     rowH[r] = totalPercentage / rowH[r];
                 }
             }
+            totalPercentage = 1.0f;
         }
+        float remPercentage = 1.0f - totalPercentage;
+        
 
         int remainingHeight = totalHeight - fixedHeight;
+        
+        
+        
+        
+        int rh = remainingHeight;
         //convert the relative widths to fixed widths
         for (int r = 0; r < rowH.length; r++) {
             if (isRelativeValue(rowH[r])) {
-                int requestedHeight = (int) (remainingHeight * rowH[r]);
-                if (requestedHeight < remainingHeight) {
+                int requestedHeight = (int) (remainingHeight * fix100(rowH[r]));
+                if (requestedHeight < rh) {
                     rowH[r] = requestedHeight;
-                    remainingHeight -= requestedHeight;
+                    rh -= requestedHeight;
                 }
                 else {
-                    rowH[r] = remainingHeight;
-                    remainingHeight = 0;
+                    rowH[r] = rh;
+                    rh = 0;
                 }
+            }
+        }
+        
+        float remPrefSize = remPercentage*remainingHeight;
+        for (int r = 0; r < rowH.length; r++) {
+            if(rowH[r] == FULL){
+                rowH[r] = remPrefSize/twocnt;
             }
         }
 
@@ -1054,6 +1082,7 @@ public class TableLayout implements LayoutManager2 {
 
         int[] maxWidths = new int[colW.length];
         int[] preferredWidths = new int[colW.length];
+        int twoCnt = 0;
         for (int c = 0; c < colW.length; c++) {
             for (int r = 0; r < rows.size(); r++) {
                 Row row = getRow(r);
@@ -1086,7 +1115,7 @@ public class TableLayout implements LayoutManager2 {
                         colW[c] = pw;
                     }
                 }                //The preferred min_width must be fixed
-                else if (!isRelativeValue(colW[c]) && colW[c] < pw) {
+                else if (isFixedValue(colW[c]) && colW[c] < pw) {
                     colW[c] = pw;
                     if (preferredWidths[c] < pw) {
                         preferredWidths[c] = (int) pw;
@@ -1095,6 +1124,25 @@ public class TableLayout implements LayoutManager2 {
                 else if (isRelativeValue(colW[c]) && preferredWidths[c] < col.getComponentPreferredWidth()) {
                     preferredWidths[c] = col.getComponentPreferredWidth();
                 }
+                else
+                {
+                    //JPEXS added
+                    twoCnt++;
+                    if(width!=TableLayout.PREFERRED)
+                    {
+                        colW[c] = FULL;
+                        preferredWidths[c] = 0;
+                    }
+                }                
+            }
+        }
+        
+        //JPEXS added:
+        int remWidth = totalWidth-total(preferredWidths);
+        for(int c=0;c<colW.length; c++){
+            if(colW[c]==FULL)
+            {
+                colW[c] = remWidth/twoCnt;
             }
         }
 
@@ -1142,7 +1190,7 @@ public class TableLayout implements LayoutManager2 {
         for (int c = 0; c < colW.length; c++) {
             if (isRelativeValue(colW[c])) {
                 //if relative min_width is .9999 then they really mean 100%
-                int requestedWidth = (int) (remainingWidth * (colW[c] == PERCENT_100 ? 1.0 : colW[c]));
+                int requestedWidth = (int) (remainingWidth * fix100(colW[c]));
                 if (requestedWidth < remainingWidth) {
                     colW[c] = requestedWidth;
                 }
@@ -1218,7 +1266,7 @@ public class TableLayout implements LayoutManager2 {
             else if (colW[i] > 0 && colW[i] < 1 && remainingW > 0) {
                 //calc relative min_width
                 int w = 0;
-                if (colW[i] > PERCENT_100) {
+                if (isFixedValue(colW[i])) {
                     w = (int) (totalWidth - fixedWidth);
                 }
                 else {
