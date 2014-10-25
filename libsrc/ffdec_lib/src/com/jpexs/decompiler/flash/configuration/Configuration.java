@@ -452,7 +452,7 @@ public class Configuration {
         recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
     }
 
-    public static Map<String, String> getFontPairs() {
+    public static Map<String, String> getFontIdToFamilyMap() {
         String fonts = fontPairing.get();
         if (fonts == null) {
             return new HashMap<>();
@@ -467,19 +467,39 @@ public class Configuration {
         }
         return result;
     }
+    
+    public static Map<String, String> getFontIdToFaceMap() {
+        String fonts = fontPairing.get();
+        if (fonts == null) {
+            return new HashMap<>();
+        }
 
-    public static void addFontPair(String fileName, int fontId, String fontName, String systemFontName) {
+        Map<String, String> result = new HashMap<>();
+        for (String pair : fonts.split("::")) {
+            if (!pair.isEmpty()) {
+                String[] splittedPair = pair.split("=");
+                result.put(splittedPair[0], splittedPair.length<3?"":splittedPair[2]);
+            }
+        }
+        return result;
+    }
+
+    public static void addFontPair(String fileName, int fontId, String fontName, String installedFontFamily, String installedFontFace) {
         String key = fileName + "_" + fontId + "_" + fontName;
-        Map<String, String> fontPairs = getFontPairs();
-        fontPairs.put(key, systemFontName);
-        fontPairs.put(fontName, systemFontName);
+        Map<String, String> fontPairs = getFontIdToFamilyMap();
+        fontPairs.put(key, installedFontFamily);
+        fontPairs.put(fontName, installedFontFamily);
+        
+        Map<String,String> facePairs = getFontIdToFaceMap();
+        facePairs.put(key, installedFontFace);
+        facePairs.put(fontName, installedFontFace);
         StringBuilder sb = new StringBuilder();
         int i = 0;
         for (Entry<String, String> pair : fontPairs.entrySet()) {
             if (i != 0) {
                 sb.append("::");
             }
-            sb.append(pair.getKey()).append("=").append(pair.getValue());
+            sb.append(pair.getKey()).append("=").append(pair.getValue()).append("=").append(facePairs.containsKey(pair.getKey())?facePairs.get(pair.getKey()):"");
             i++;
         }
         fontPairing.set(sb.toString());

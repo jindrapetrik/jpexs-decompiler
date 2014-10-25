@@ -120,9 +120,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int getLeading();
 
-    public static String[] fontNamesArray;
-
-    public static List<String> fontNames;
+    public static Map<String,Map<String,Font>> installedFonts;    
 
     public static String defaultFontName;
 
@@ -168,7 +166,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public String getSystemFontName() {
-        Map<String, String> fontPairs = Configuration.getFontPairs();
+        Map<String, String> fontPairs = Configuration.getFontIdToFamilyMap();
         String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontName();
         if (fontPairs.containsKey(key)) {
             return fontPairs.get(key);
@@ -224,51 +222,52 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public static void reload() {
-        fontNamesArray = FontHelper.getInstalledFontFamilyNames();
-        fontNames = Arrays.asList(fontNamesArray);
-        if (fontNames.contains("Times New Roman")) {
+        installedFonts = FontHelper.getInstalledFonts();
+
+        if (installedFonts.containsKey("Times New Roman")) {
             defaultFontName = "Times New Roman";
-        } else if (fontNames.contains("Arial")) {
+        } else if (installedFonts.containsKey("Arial")) {
             defaultFontName = "Arial";
         } else {
-            defaultFontName = fontNames.get(0);
+            defaultFontName = installedFonts.keySet().iterator().next();
         }
     }
 
     public static String getFontNameWithFallback(String fontName) {
-        if (fontNames.contains(fontName)) {
+        if (installedFonts.containsKey(fontName)) {
             return fontName;
         }
-        if (fontNames.contains("Times New Roman")) {
+        if (installedFonts.containsKey("Times New Roman")) {
             return "Times New Roman";
         }
-        if (fontNames.contains("Arial")) {
+        if (installedFonts.containsKey("Arial")) {
             return "Arial";
         }
-        //Fallback to DIALOG
-        return "Dialog";
+
+        //First font
+        return installedFonts.keySet().iterator().next();
     }
 
-    public static String isFontInstalled(String fontName) {
-        if (fontNames.contains(fontName)) {
-            return fontName;
+    public static String isFontFamilyInstalled(String fontFamily) {
+        if (installedFonts.containsKey(fontFamily)) {
+            return fontFamily;
         }
-        if (fontName.contains("_")) {
-            String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
-            if (fontNames.contains(beforeUnderscore)) {
+        if (fontFamily.contains("_")) {
+            String beforeUnderscore = fontFamily.substring(0, fontFamily.indexOf('_'));
+            if (installedFonts.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;
             }
         }
         return null;
     }
 
-    public static String findInstalledFontName(String fontName) {
-        if (fontNames.contains(fontName)) {
-            return fontName;
+    public static String findInstalledFontFamily(String fontFamily) {
+        if (installedFonts.containsKey(fontFamily)) {
+            return fontFamily;
         }
-        if (fontName.contains("_")) {
-            String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
-            if (fontNames.contains(beforeUnderscore)) {
+        if (fontFamily.contains("_")) {
+            String beforeUnderscore = fontFamily.substring(0, fontFamily.indexOf('_'));
+            if (installedFonts.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;
             }
         }

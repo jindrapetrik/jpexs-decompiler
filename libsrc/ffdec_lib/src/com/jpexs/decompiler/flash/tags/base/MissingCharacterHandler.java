@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import java.awt.Font;
+import java.util.Map;
 
 /**
  *
@@ -26,10 +27,22 @@ public class MissingCharacterHandler {
 
     public boolean handle(FontTag font, char character) {
         String fontName = font.getFontName();
-        if (!FontTag.fontNames.contains(fontName)) {
+        if (!FontTag.installedFonts.containsKey(fontName)) {
             return false;
         }
-        Font f = new Font(fontName, font.getFontStyle(), 18);
+        Map<String, Font> faces = FontTag.installedFonts.get(fontName);
+
+        Font f = null;
+        for (String face : faces.keySet()) {
+            Font ff = faces.get(face);
+            if (ff.isBold() == font.isBold() && ff.isItalic() == font.isItalic()) {
+                f = ff;
+                break;
+            }
+        }
+        if (f == null) {
+            f = faces.get(faces.keySet().iterator().next());
+        }
         if (!f.canDisplay(character)) {
             return false;
         }

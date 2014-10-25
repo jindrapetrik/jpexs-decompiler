@@ -1954,7 +1954,7 @@ public class XFLConverter {
                 }
                 int fontStyle = font.getFontStyle();
                 String installedFont;
-                if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
                     fontName = new Font(installedFont, fontStyle, 10).getPSName();
                 }
                 String embedRanges = "";
@@ -2458,7 +2458,7 @@ public class XFLConverter {
                         fontStyle = font.getFontStyle();
                     }
                     String installedFont;
-                    if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                    if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
                         psFontName = new Font(installedFont, fontStyle, 10).getPSName();
                     } else {
                         psFontName = fontName;
@@ -2616,7 +2616,7 @@ public class XFLConverter {
                         size = det.fontHeight;
                         fontFace = fontName;
                         String installedFont = null;
-                        if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                        if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
                             fontName = installedFont;
                             fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
                         }
@@ -3355,7 +3355,7 @@ public class XFLConverter {
                                         fontName = ft.getFontName();
                                     }
                                     String installedFont;
-                                    if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                                    if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
                                         fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
                                     } else {
                                         fontFace = fontName;

@@ -18,30 +18,37 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Helper;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.font.FontRenderContext;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
+import layout.TableLayout;
 
 /**
  *
@@ -70,8 +77,12 @@ public class FontPanel extends javax.swing.JPanel {
         fontTag = null;
     }
 
-    private ComboBoxModel<String> getModel() {
-        return new DefaultComboBoxModel<>(FontTag.fontNamesArray);
+    private ComboBoxModel<String> getFamilyModel() {
+        return new DefaultComboBoxModel<>(new Vector<String>(new TreeSet<String>(FontTag.installedFonts.keySet())));
+    }
+
+    private ComboBoxModel<String> getNameModel(String family) {
+        return new DefaultComboBoxModel<>(new Vector<String>(FontTag.installedFonts.get(family).keySet()));
     }
 
     private void setEditable(boolean editable) {
@@ -119,7 +130,7 @@ public class FontPanel extends javax.swing.JPanel {
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) > -1) {
-                int opt = 0; //yes
+                int opt; //yes
                 if (!(yestoall || notoall)) {
                     opt = View.showOptionDialog(null, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
                     if (opt == 2) {
@@ -133,6 +144,8 @@ public class FontPanel extends javax.swing.JPanel {
                     opt = 0; //yes                
                 } else if (notoall) {
                     opt = 1; //no
+                } else {
+                    opt = 1;
                 }
 
                 if (opt == 1) {
@@ -185,35 +198,59 @@ public class FontPanel extends javax.swing.JPanel {
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
+        setAllowSave(false);
         String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontName();
-        if (swf.sourceFontsMap.containsKey(ft.getFontId())) {
-            fontSelection.setSelectedItem(swf.sourceFontsMap.get(ft.getFontId()));
-        } else if (Configuration.getFontPairs().containsKey(key)) {
-            fontSelection.setSelectedItem(Configuration.getFontPairs().get(key));
-        } else if (Configuration.getFontPairs().containsKey(ft.getFontName())) {
-            fontSelection.setSelectedItem(Configuration.getFontPairs().get(ft.getFontName()));
+        if (swf.sourceFontFamiliesMap.containsKey(ft.getFontId())) {
+            fontFamilyNameSelection.setSelectedItem(swf.sourceFontFamiliesMap.get(ft.getFontId()));
+        } else if (Configuration.getFontIdToFamilyMap().containsKey(key)) {
+            fontFamilyNameSelection.setSelectedItem(Configuration.getFontIdToFamilyMap().get(key));
+        } else if (Configuration.getFontIdToFamilyMap().containsKey(ft.getFontName())) {
+            fontFamilyNameSelection.setSelectedItem(Configuration.getFontIdToFamilyMap().get(ft.getFontName()));
         } else {
-            fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName()));
+            fontFamilyNameSelection.setSelectedItem(FontTag.findInstalledFontFamily(ft.getFontName()));
         }
+
+        if (swf.sourceFontFacesMap.containsKey(ft.getFontId())) {
+            fontFaceSelection.setSelectedItem(swf.sourceFontFacesMap.get(ft.getFontId()));
+        } else if (Configuration.getFontIdToFaceMap().containsKey(key)) {
+            fontFaceSelection.setSelectedItem(Configuration.getFontIdToFaceMap().get(key));
+        } else if (Configuration.getFontIdToFaceMap().containsKey(ft.getFontName())) {
+            fontFaceSelection.setSelectedItem(Configuration.getFontIdToFaceMap().get(ft.getFontName()));
+        } else {
+            java.util.Map<String, Font> faces = FontTag.installedFonts.get(fontFamilyNameSelection.getSelectedItem().toString());
+            boolean found = false;
+            for (String face : faces.keySet()) {
+                Font f = faces.get(face);
+                if (f.isBold() == ft.isBold() && f.isItalic() == ft.isItalic()) {
+                    found = true;
+                    fontFaceSelection.setSelectedItem(face);
+                    break;
+                }
+            }
+            if (!found) {
+                fontFaceSelection.setSelectedItem("");
+            }
+        }
+        setAllowSave(true);
         setEditable(false);
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+    private static void addTableSpaces(TableLayout tl, double size) {
+        int cols = tl.getNumColumn();
+        int rows = tl.getNumRow();
+        for (int x = 0; x <= cols; x++) {
+            tl.insertColumn(x * 2, size);
+        }
+        for (int y = 0; y <= rows; y++) {
+            tl.insertRow(y * 2, size);
+        }
+    }
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+    private void initComponents() {
+
+        addCharsPanel = new javax.swing.JPanel();
+        fontParamsPanel = new javax.swing.JPanel();
         fontNameLabel = new javax.swing.JLabel();
-        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         javax.swing.JScrollPane fontDisplayNameScrollPane = new javax.swing.JScrollPane();
         fontDisplayNameTextArea = new javax.swing.JTextArea();
         javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
@@ -232,58 +269,44 @@ public class FontPanel extends javax.swing.JPanel {
         javax.swing.JLabel jLabel9 = new javax.swing.JLabel();
         fontCharactersScrollPane = new javax.swing.JScrollPane();
         fontCharactersTextArea = new javax.swing.JTextArea();
-        javax.swing.JLabel jLabel10 = new javax.swing.JLabel();
+        javax.swing.JLabel fontCharsAddLabel = new javax.swing.JLabel();
         fontAddCharactersField = new javax.swing.JTextField();
         fontAddCharsButton = new javax.swing.JButton();
         updateTextsCheckBox = new javax.swing.JCheckBox();
-        jLabel11 = new javax.swing.JLabel();
-        fontSelection = new javax.swing.JComboBox();
+        fontSourceLabel = new javax.swing.JLabel();
+        fontFamilyNameSelection = new javax.swing.JComboBox<>();
+        fontFaceSelection = new javax.swing.JComboBox<>();
         fontEmbedButton = new javax.swing.JButton();
         buttonEdit = new javax.swing.JButton();
         buttonSave = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
         buttonPreviewFont = new javax.swing.JButton();
-        importTTFButton = new javax.swing.JButton();
-
         addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 formComponentResized(evt);
             }
         });
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        TableLayout tlFontParamsPanel;
+        fontParamsPanel.setLayout(tlFontParamsPanel = new TableLayout(new double[][]{
+            {TableLayout.PREFERRED, TableLayout.FILL},
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,}
+        }));
 
-        jPanel1.setLayout(new java.awt.GridBagLayout());
+        JLabel fontNameLabLabel = new JLabel();
+        fontNameLabLabel.setText(AppStrings.translate("font.name")); // NOI18N
+        fontParamsPanel.add(fontNameLabLabel, "0,0,R");
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/MainFrame"); // NOI18N
-        jLabel1.setText(bundle.getString("font.name")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel1, gridBagConstraints);
-
-        fontNameLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        fontNameLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
         fontNameLabel.setMaximumSize(new java.awt.Dimension(250, 14));
         fontNameLabel.setMinimumSize(new java.awt.Dimension(250, 14));
         fontNameLabel.setPreferredSize(new java.awt.Dimension(250, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontNameLabel, gridBagConstraints);
+        fontParamsPanel.add(fontNameLabel, "1,0");
 
-        jLabel2.setText(bundle.getString("fontName.name")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel2, gridBagConstraints);
+        JLabel fontNameNameLabLabel = new JLabel();
+        fontNameNameLabLabel.setText(AppStrings.translate("fontName.name")); // NOI18N        
+        fontParamsPanel.add(fontNameNameLabLabel, "0,1,R");
 
         fontDisplayNameScrollPane.setBorder(null);
         fontDisplayNameScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -293,27 +316,16 @@ public class FontPanel extends javax.swing.JPanel {
         fontDisplayNameTextArea.setColumns(20);
         fontDisplayNameTextArea.setFont(new JLabel().getFont());
         fontDisplayNameTextArea.setLineWrap(true);
-        fontDisplayNameTextArea.setText(bundle.getString("value.unknown")); // NOI18N
+        fontDisplayNameTextArea.setText(AppStrings.translate("value.unknown")); // NOI18N
         fontDisplayNameTextArea.setWrapStyleWord(true);
         fontDisplayNameTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontDisplayNameTextArea.setOpaque(false);
         fontDisplayNameScrollPane.setViewportView(fontDisplayNameTextArea);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontDisplayNameScrollPane, gridBagConstraints);
+        fontParamsPanel.add(fontDisplayNameScrollPane, "1,1");
 
-        jLabel3.setText(bundle.getString("fontName.copyright")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel3, gridBagConstraints);
+        jLabel3.setText(AppStrings.translate("fontName.copyright")); // NOI18N
+        fontParamsPanel.add(jLabel3, "0,2,R");
 
         fontCopyrightScrollPane.setBorder(null);
         fontCopyrightScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -323,107 +335,48 @@ public class FontPanel extends javax.swing.JPanel {
         fontCopyrightTextArea.setColumns(20);
         fontCopyrightTextArea.setFont(new JLabel().getFont());
         fontCopyrightTextArea.setLineWrap(true);
-        fontCopyrightTextArea.setText(bundle.getString("value.unknown")); // NOI18N
+        fontCopyrightTextArea.setText(AppStrings.translate("value.unknown")); // NOI18N
         fontCopyrightTextArea.setWrapStyleWord(true);
         fontCopyrightTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontCopyrightTextArea.setOpaque(false);
         fontCopyrightScrollPane.setViewportView(fontCopyrightTextArea);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontCopyrightScrollPane, gridBagConstraints);
+        fontParamsPanel.add(fontCopyrightScrollPane, "1,2");
 
-        jLabel4.setText(bundle.getString("font.isbold")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel4, gridBagConstraints);
+        jLabel4.setText(AppStrings.translate("font.isbold")); // NOI18N       
+        fontParamsPanel.add(jLabel4, "0,3,R");
 
         fontIsBoldCheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontIsBoldCheckBox, gridBagConstraints);
 
-        jLabel5.setText(bundle.getString("font.isitalic")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel5, gridBagConstraints);
+        fontParamsPanel.add(fontIsBoldCheckBox, "1,3");
+
+        jLabel5.setText(AppStrings.translate("font.isitalic")); // NOI18N
+
+        fontParamsPanel.add(jLabel5, "0,4,R");
 
         fontIsItalicCheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontIsItalicCheckBox, gridBagConstraints);
+        fontParamsPanel.add(fontIsItalicCheckBox, "1,4");
 
-        jLabel6.setText(bundle.getString("font.ascent")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel6, gridBagConstraints);
+        jLabel6.setText(AppStrings.translate("font.ascent")); // NOI18N
+        fontParamsPanel.add(jLabel6, "0,5,R");
 
-        fontAscentLabel.setText(bundle.getString("value.unknown")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontAscentLabel, gridBagConstraints);
+        fontAscentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontParamsPanel.add(fontAscentLabel, "1,5");
 
-        jLabel7.setText(bundle.getString("font.descent")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel7, gridBagConstraints);
+        jLabel7.setText(AppStrings.translate("font.descent")); // NOI18N        
+        fontParamsPanel.add(jLabel7, "0,6,R");
 
-        fontDescentLabel.setText(bundle.getString("value.unknown")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontDescentLabel, gridBagConstraints);
+        fontDescentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontParamsPanel.add(fontDescentLabel, "1,6");
 
-        jLabel8.setText(bundle.getString("font.leading")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel8, gridBagConstraints);
+        jLabel8.setText(AppStrings.translate("font.leading")); // NOI18N
+        fontParamsPanel.add(jLabel8, "0,7,R");
 
-        fontLeadingLabel.setText(bundle.getString("value.unknown")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontLeadingLabel, gridBagConstraints);
+        fontLeadingLabel.setText(AppStrings.translate("value.unknown")); // NOI18N        
+        fontParamsPanel.add(fontLeadingLabel, "1,7");
 
-        jLabel9.setText(bundle.getString("font.characters")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jLabel9, gridBagConstraints);
+        jLabel9.setText(AppStrings.translate("font.characters")); // NOI18N        
+        fontParamsPanel.add(jLabel9, "0,8,R");
 
         fontCharactersScrollPane.setBorder(null);
         fontCharactersScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -437,173 +390,128 @@ public class FontPanel extends javax.swing.JPanel {
         fontCharactersTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontCharactersTextArea.setOpaque(false);
         fontCharactersScrollPane.setViewportView(fontCharactersTextArea);
+        fontParamsPanel.add(fontCharactersScrollPane, "1,8");
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        jPanel1.add(fontCharactersScrollPane, gridBagConstraints);
+        fontCharsAddLabel.setText(AppStrings.translate("font.characters.add")); // NOI18N
 
-        jLabel10.setText(bundle.getString("font.characters.add")); // NOI18N
-
-        fontAddCharsButton.setText(bundle.getString("button.ok")); // NOI18N
+        fontAddCharsButton.setText(AppStrings.translate("button.ok")); // NOI18N
         fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fontAddCharsButtonActionPerformed(evt);
             }
         });
 
-        updateTextsCheckBox.setText(bundle.getString("font.updateTexts")); // NOI18N
+        updateTextsCheckBox.setText(AppStrings.translate("font.updateTexts")); // NOI18N
 
-        jLabel11.setText(bundle.getString("font.source")); // NOI18N
+        fontSourceLabel.setText(AppStrings.translate("font.source")); // NOI18N
 
-        fontSelection.setModel(getModel());
-        fontSelection.setSelectedItem(FontTag.defaultFontName);
-        fontSelection.addItemListener(new java.awt.event.ItemListener() {
+        fontFamilyNameSelection.setModel(getFamilyModel());
+        fontFamilyNameSelection.setSelectedItem(FontTag.defaultFontName);
+        fontFaceSelection.setModel(getNameModel((String) fontFamilyNameSelection.getSelectedItem()));
+        fontFamilyNameSelection.addItemListener(new java.awt.event.ItemListener() {
+            @Override
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                fontSelectionItemStateChanged(evt);
+                fontFamilySelectionItemStateChanged();
             }
         });
 
-        fontEmbedButton.setText(bundle.getString("button.font.embed")); // NOI18N
+        fontFaceSelection.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent evt) {
+                fontFaceSelectionItemStateChanged();
+            }
+        });
+
+        fontEmbedButton.setText(AppStrings.translate("button.font.embed")); // NOI18N
         fontEmbedButton.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fontEmbedButtonActionPerformed(evt);
             }
         });
 
         buttonEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/edit16.png"))); // NOI18N
-        buttonEdit.setText(bundle.getString("button.edit")); // NOI18N
+        buttonEdit.setText(AppStrings.translate("button.edit")); // NOI18N
         buttonEdit.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonEditActionPerformed(evt);
             }
         });
 
         buttonSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/save16.png"))); // NOI18N
-        buttonSave.setText(bundle.getString("button.save")); // NOI18N
+        buttonSave.setText(AppStrings.translate("button.save")); // NOI18N
         buttonSave.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSaveActionPerformed(evt);
             }
         });
 
         buttonCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/cancel16.png"))); // NOI18N
-        buttonCancel.setText(bundle.getString("button.cancel")); // NOI18N
+        buttonCancel.setText(AppStrings.translate("button.cancel")); // NOI18N
         buttonCancel.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonCancelActionPerformed(evt);
             }
         });
 
-        buttonPreviewFont.setText(bundle.getString("button.preview")); // NOI18N
+        buttonPreviewFont.setText(AppStrings.translate("button.preview")); // NOI18N
         buttonPreviewFont.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonPreviewFontActionPerformed(evt);
             }
         });
 
-        importTTFButton.setText("Import TTF");
-        importTTFButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importTTFButtonActionPerformed(evt);
-            }
-        });
+        TableLayout tlAddCharsPanel;
+        addCharsPanel.setLayout(tlAddCharsPanel = new TableLayout(new double[][]{
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED},
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
+        }));
+        addCharsPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(importTTFButton)
-                .addContainerGap(387, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel11)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(fontSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel10)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(fontEmbedButton))
-                            .addGap(0, 0, Short.MAX_VALUE))
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addGap(0, 0, Short.MAX_VALUE)
-                            .addComponent(buttonEdit)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(buttonSave)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(buttonCancel)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(fontAddCharsButton)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(updateTextsCheckBox))
-                                .addComponent(buttonPreviewFont))
-                            .addGap(315, 315, 315)))
-                    .addContainerGap()))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(341, Short.MAX_VALUE)
-                .addComponent(importTTFButton)
-                .addGap(85, 85, 85))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(fontAddCharsButton)
-                        .addComponent(updateTextsCheckBox))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel11)
-                        .addComponent(fontSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(buttonPreviewFont)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(fontEmbedButton)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(buttonEdit)
-                        .addComponent(buttonSave)
-                        .addComponent(buttonCancel))
-                    .addContainerGap()))
-        );
+        addCharsPanel.add(fontCharsAddLabel, "0,0,R");
+        addCharsPanel.add(fontAddCharactersField, "1,0,2,0");
+        addCharsPanel.add(fontAddCharsButton, "3,0");
+        addCharsPanel.add(fontEmbedButton, "4,0");
 
-        jScrollPane1.setViewportView(jPanel2);
+        addCharsPanel.add(fontSourceLabel, "0,1,R");
+        addCharsPanel.add(fontFamilyNameSelection, "1,1");
+        addCharsPanel.add(fontFaceSelection, "2,1");
+        addCharsPanel.add(buttonPreviewFont, "3,1");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
-        );
-    }// </editor-fold>//GEN-END:initComponents
+        addCharsPanel.add(updateTextsCheckBox, "0,2,2,2");
 
-    private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontAddCharsButtonActionPerformed
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(buttonEdit);
+        buttonsPanel.add(buttonSave);
+        buttonsPanel.add(buttonCancel);
+
+        TableLayout tlAll;
+        setLayout(tlAll = new TableLayout(new double[][]{
+            {TableLayout.FILL},
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
+        }));
+
+        add(fontParamsPanel, "0,0");
+        add(buttonsPanel, "0,1");
+        add(addCharsPanel, "0,2");
+
+        addTableSpaces(tlAddCharsPanel, 10);
+        addTableSpaces(tlFontParamsPanel, 10);
+        addTableSpaces(tlAll, 10);
+
+    }
+
+    private void labsize(JLabel lab) {
+        lab.setPreferredSize(new Dimension(lab.getFontMetrics(lab.getFont()).stringWidth(lab.getText()) + 30, lab.getPreferredSize().height));
+        lab.setMinimumSize(lab.getPreferredSize());
+    }
+
+    private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {
         String newchars = fontAddCharactersField.getText();
 
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
@@ -612,47 +520,69 @@ public class FontPanel extends javax.swing.JPanel {
             for (int c = 0; c < newchars.length(); c++) {
                 selChars.add(newchars.codePointAt(c));
             }
-            fontAddChars((FontTag) item, selChars, new Font(fontSelection.getSelectedItem().toString(),Font.PLAIN,12));
+            fontAddChars((FontTag) item, selChars, FontTag.installedFonts.get(fontFamilyNameSelection.getSelectedItem().toString()).get(fontFaceSelection.getSelectedItem().toString()));
             fontAddCharactersField.setText("");
             mainPanel.reload(true);
         }
-    }//GEN-LAST:event_fontAddCharsButtonActionPerformed
-    
-    
-    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
+    }
+
+    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ft.getFontStyle());
-                if (fed.display()) {
+            FontEmbedDialog fed = new FontEmbedDialog(fontFamilyNameSelection.getSelectedItem().toString(), fontFaceSelection.getSelectedItem().toString(), fontAddCharactersField.getText());
+            if (fed.display()) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
-                String selFont = fed.getSelectedFont();
-                fontSelection.setSelectedItem(selFont);
-                fontAddChars(ft, selChars, new Font(selFont,Font.PLAIN,10));
-                fontAddCharactersField.setText("");
-                mainPanel.reload(true);
+                    Font selFont = fed.getSelectedFont();
+                    updateTextsCheckBox.setSelected(fed.hasUpdateTexts());
+                    fontFamilyNameSelection.setSelectedItem(selFont.getName());
+                    fontFaceSelection.setSelectedItem(FontHelper.getFontFace(selFont));
+                    fontAddChars(ft, selChars, selFont);
+                    fontAddCharactersField.setText("");
+                    mainPanel.reload(true);
                 }
             }
         }
-    }//GEN-LAST:event_fontEmbedButtonActionPerformed
+    }
 
-    private void fontSelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fontSelectionItemStateChanged
+    private boolean allowSave = true;
+
+    private synchronized void setAllowSave(boolean v) {
+        allowSave = v;
+    }
+
+    private synchronized void savePair() {
+        if (!allowSave) {
+            return;
+        }
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag f = (FontTag) item;
             SWF swf = f.getSwf();
-            String selectedSystemFont = (String) fontSelection.getSelectedItem();
-            swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);
-            Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedSystemFont);
+            String selectedFamily = (String) fontFamilyNameSelection.getSelectedItem();
+            String selectedFace = (String) fontFaceSelection.getSelectedItem();
+            swf.sourceFontFamiliesMap.put(f.getFontId(), selectedFamily);
+            swf.sourceFontFacesMap.put(f.getFontId(), selectedFace);
+            Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedFamily, selectedFace);
         }
-    }//GEN-LAST:event_fontSelectionItemStateChanged
+    }
 
-    private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEditActionPerformed
+    private void fontFamilySelectionItemStateChanged() {
+
+        savePair();
+        fontFaceSelection.setModel(getNameModel((String) fontFamilyNameSelection.getSelectedItem()));
+    }
+
+    private void fontFaceSelectionItemStateChanged() {
+        savePair();
+    }
+
+    private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {
         setEditable(true);
-    }//GEN-LAST:event_buttonEditActionPerformed
+    }
 
-    private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveActionPerformed
+    private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {
         if (fontTag.isBoldEditable()) {
             fontTag.setBold(fontIsBoldCheckBox.isSelected());
         }
@@ -660,76 +590,76 @@ public class FontPanel extends javax.swing.JPanel {
             fontTag.setItalic(fontIsItalicCheckBox.isSelected());
         }
         setEditable(false);
-    }//GEN-LAST:event_buttonSaveActionPerformed
+    }
 
-    private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
+    private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {
         showFontTag(fontTag);
         setEditable(false);
-    }//GEN-LAST:event_buttonCancelActionPerformed
+    }
 
-    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPreviewFontActionPerformed
-        String selectedSystemFont = (String) fontSelection.getSelectedItem();
-        new FontPreviewDialog(null, true, new Font(selectedSystemFont, fontTag.getFontStyle(), 1024)).setVisible(true);
-    }//GEN-LAST:event_buttonPreviewFontActionPerformed
+    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {
+        String familyName = (String) fontFamilyNameSelection.getSelectedItem();
+        String face = (String) fontFaceSelection.getSelectedItem();
+        new FontPreviewDialog(null, true, FontTag.installedFonts.get(familyName).get(face)).setVisible(true);
+    }
 
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        jPanel1.updateUI();
-    }//GEN-LAST:event_formComponentResized
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {
+        fontParamsPanel.updateUI();
+    }
 
-    private void importTTFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTTFButtonActionPerformed
+    private void importTTFButtonActionPerformed(java.awt.event.ActionEvent evt) {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
-            FontTag ft = (FontTag) item;       
-            
-            
-            JFileChooser fc = new JFileChooser();     
-        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));        
-        FileFilter ttfFilter = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".ttf")) || (f.isDirectory());
-            }
+            FontTag ft = (FontTag) item;
 
-            @Override
-            public String getDescription() {
-                return "TTF files";
-            }
-        };
-        fc.setFileFilter(ttfFilter);       
-
-        fc.setAcceptAllFileFilterUsed(false);
-        JFrame fr = new JFrame();
-        View.setWindowIcon(fr);
-        int returnVal = fc.showOpenDialog(fr);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());            
-            File selfile = Helper.fixDialogFile(fc.getSelectedFile());            
-            Set<Integer> selChars = new HashSet<>();            
-            try {
-                Font f = Font.createFont(Font.TRUETYPE_FONT, selfile);
-                int required[] = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
-                loopi:for(char i=0;i<Character.MAX_VALUE;i++){
-                   for(int r:required){
-                       if(r==i){
-                           continue loopi;
-                       }
-                   }
-                   if(f.canDisplay((int)i)){
-                       selChars.add((int)i);                
-                   } 
+            JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+            FileFilter ttfFilter = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return (f.getName().toLowerCase().endsWith(".ttf")) || (f.isDirectory());
                 }
-                fontAddChars(ft,selChars, f);
-                mainPanel.reload(true);
-            } catch (FontFormatException ex) {
-                JOptionPane.showMessageDialog(mainPanel, "Invalid TTF font");
-            } catch (IOException ex) {
-                Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }                                     
-        }
-    }//GEN-LAST:event_importTTFButtonActionPerformed
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+                @Override
+                public String getDescription() {
+                    return "TTF files";
+                }
+            };
+            fc.setFileFilter(ttfFilter);
+
+            fc.setAcceptAllFileFilterUsed(false);
+            JFrame fr = new JFrame();
+            View.setWindowIcon(fr);
+            int returnVal = fc.showOpenDialog(fr);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                Set<Integer> selChars = new HashSet<>();
+                try {
+                    Font f = Font.createFont(Font.TRUETYPE_FONT, selfile);
+                    int required[] = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
+                    loopi:
+                    for (char i = 0; i < Character.MAX_VALUE; i++) {
+                        for (int r : required) {
+                            if (r == i) {
+                                continue loopi;
+                            }
+                        }
+                        if (f.canDisplay((int) i)) {
+                            selChars.add((int) i);
+                        }
+                    }
+                    fontAddChars(ft, selChars, f);
+                    mainPanel.reload(true);
+                } catch (FontFormatException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, "Invalid TTF font");
+                } catch (IOException ex) {
+                    Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonEdit;
     private javax.swing.JButton buttonPreviewFont;
@@ -747,12 +677,11 @@ public class FontPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox fontIsItalicCheckBox;
     private javax.swing.JLabel fontLeadingLabel;
     private javax.swing.JLabel fontNameLabel;
-    private javax.swing.JComboBox fontSelection;
-    private javax.swing.JButton importTTFButton;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JComboBox<String> fontFamilyNameSelection;
+    private javax.swing.JComboBox<String> fontFaceSelection;
+    private javax.swing.JLabel fontSourceLabel;
+    private javax.swing.JPanel fontParamsPanel;
+    private javax.swing.JPanel addCharsPanel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JCheckBox updateTextsCheckBox;
-    // End of variables declaration//GEN-END:variables
 }

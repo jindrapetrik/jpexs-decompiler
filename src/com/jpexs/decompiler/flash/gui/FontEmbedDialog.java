@@ -16,30 +16,44 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
+import com.jpexs.helpers.Helper;
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -49,27 +63,38 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private static final String ACTION_OK = "OK";
     private static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_LOAD_FROM_DISK = "LOAD_FROM_DISK";
 
     private static final int SAMPLE_MAX_LENGTH = 50;
 
-    private final JComboBox<String> sourceFont;
+    private final JComboBox<String> familyNamesSelection;
+    private final JComboBox<String> faceSelection;
     private final JCheckBox[] rangeCheckboxes;
     private final String rangeNames[];
     private final JLabel[] rangeSamples;
     private final JTextField individualCharsField;
     private boolean result = false;
-    private JLabel individialSample;
-    private final int style;
+    private JLabel individialSample;    
+    private Font customFont;
+    private final JCheckBox allCheckbox;
+    private final JCheckBox updateTextsCheckbox;
 
-    public String getSelectedFont() {
-        return sourceFont.getSelectedItem().toString();
+    public Font getSelectedFont() {
+        if (ttfFileRadio.isSelected() && customFont != null) {
+            return customFont;
+        }
+        return FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).get(faceSelection.getSelectedItem().toString());       
     }
 
+    public boolean hasUpdateTexts(){
+        return updateTextsCheckbox.isSelected();
+    }
+    
     public Set<Integer> getSelectedChars() {
         Set<Integer> chars = new TreeSet<>();
-        Font f = new Font(getSelectedFont(), style, new JLabel().getFont().getSize());
-        for (int i = 0; i < rangeCheckboxes.length; i++) {
-            if (rangeCheckboxes[i].isSelected()) {
+        Font f = getSelectedFont();
+        if(allCheckbox.isSelected()){
+            for (int i = 0; i < rangeCheckboxes.length; i++) {
                 int codes[] = CharacterRanges.rangeCodes(i);
                 for (int c : codes) {
                     if (f.canDisplay(c)) {
@@ -77,40 +102,135 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
                     }
                 }
             }
-        }
-        String indStr = individualCharsField.getText();
-        for (int i = 0; i < indStr.length(); i++) {
-            if (f.canDisplay(indStr.codePointAt(i))) {
-                chars.add(indStr.codePointAt(i));
+        }else{
+            for (int i = 0; i < rangeCheckboxes.length; i++) {
+                if (rangeCheckboxes[i].isSelected()) {
+                    int codes[] = CharacterRanges.rangeCodes(i);
+                    for (int c : codes) {
+                        if (f.canDisplay(c)) {
+                            chars.add(c);
+                        }
+                    }
+                }
+            }
+            String indStr = individualCharsField.getText();
+            for (int i = 0; i < indStr.length(); i++) {
+                if (f.canDisplay(indStr.codePointAt(i))) {
+                    chars.add(indStr.codePointAt(i));
+                }
             }
         }
         return chars;
     }
 
-    public FontEmbedDialog(String selectedFont, String selectedChars, int style) {
+    private JRadioButton ttfFileRadio;
+    private JRadioButton installedRadio;
+
+    private void updateFaceSelection(){
+        faceSelection.setModel( new DefaultComboBoxModel<>(new Vector<String>(FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).keySet())));
+    }
+    
+    public FontEmbedDialog(String selectedFamily, String selectedFace, String selectedChars) {
         setSize(900, 600);
-        this.style = style;
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
 
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
 
+        JPanel selFontPanel = new JPanel(new FlowLayout());
+
+        installedRadio = new JRadioButton(translate("installed"));
+        ttfFileRadio = new JRadioButton(translate("ttffile.noselection"));
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(installedRadio);
+        bg.add(ttfFileRadio);
+
+        installedRadio.setSelected(true);
+
         individialSample = new JLabel();
-        sourceFont = new JComboBox<>(new Vector<>(FontTag.fontNames));
-        sourceFont.setSelectedItem(selectedFont);
-        cnt.add(sourceFont);
+        familyNamesSelection = new JComboBox<>(new Vector<String>(new TreeSet<String>(FontTag.installedFonts.keySet())));        
+        familyNamesSelection.setSelectedItem(selectedFamily);       
+        faceSelection = new JComboBox<>();
+        updateFaceSelection();
+        faceSelection.setSelectedItem(selectedFace);
+        JButton loadFromDiskButton = new JButton(View.getIcon("open16"));
+        loadFromDiskButton.setToolTipText(translate("button.loadfont"));
+        loadFromDiskButton.addActionListener(this);
+        loadFromDiskButton.setActionCommand(ACTION_LOAD_FROM_DISK);
+        selFontPanel.add(installedRadio);
+        selFontPanel.add(familyNamesSelection);
+        selFontPanel.add(faceSelection);
+        selFontPanel.add(ttfFileRadio);
+        selFontPanel.add(loadFromDiskButton);
+
+        installedRadio.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    updateCheckboxes();
+                }
+            }
+        });
+
+        ttfFileRadio.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    if (ttfFileRadio.isSelected()) {
+                        if (customFont == null) {
+                            if (loadFromDisk()) {
+                                updateCheckboxes();
+                            } else {
+                                installedRadio.setSelected(true);
+                            }
+                        } else {
+                            updateCheckboxes();
+                        }
+                    }
+                }
+            }
+        });
+
+        cnt.add(selFontPanel);
         JPanel rangesPanel = new JPanel();
         rangesPanel.setLayout(new BoxLayout(rangesPanel, BoxLayout.Y_AXIS));
-        int rc = CharacterRanges.rangeCount();
+        final int rc = CharacterRanges.rangeCount();
         rangeCheckboxes = new JCheckBox[rc];
         rangeSamples = new JLabel[rc];
         rangeNames = new String[rc];
+        allCheckbox = new JCheckBox(translate("allcharacters"));
+        allCheckbox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED){
+                     for (int i = 0; i < rc; i++) {
+                         rangeCheckboxes[i].setEnabled(false);
+                     }
+                     individualCharsField.setEnabled(false);
+                }else if(e.getStateChange() == ItemEvent.DESELECTED){
+                    for (int i = 0; i < rc; i++) {
+                         rangeCheckboxes[i].setEnabled(true);
+                    }
+                    individualCharsField.setEnabled(true);
+                }
+            }
+        });
+        JPanel rangeRowPanel = new JPanel();
+        rangeRowPanel.setLayout(new BorderLayout());
+        rangeRowPanel.add(allCheckbox,BorderLayout.WEST);        
+        rangeRowPanel.setAlignmentX(0);
+        rangesPanel.add(rangeRowPanel);
+        
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
             rangeSamples[i] = new JLabel("");
             rangeCheckboxes[i] = new JCheckBox(rangeNames[i]);
-            JPanel rangeRowPanel = new JPanel();
+            rangeRowPanel = new JPanel();
             rangeRowPanel.setLayout(new BoxLayout(rangeRowPanel, BoxLayout.X_AXIS));
             rangeRowPanel.add(rangeCheckboxes[i]);
             rangeRowPanel.add(Box.createHorizontalGlue());
@@ -127,8 +247,18 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         individualCharsField.setPreferredSize(new Dimension(100, individualCharsField.getPreferredSize().height));
         individialSample = new JLabel();
         specialPanel.add(individualCharsField);
+        
+        updateTextsCheckbox = new JCheckBox(AppStrings.translate("font.updateTexts"));
+        
+        JPanel utPanel = new JPanel(new FlowLayout());
+        utPanel.add(updateTextsCheckbox);
         cnt.add(specialPanel);
         cnt.add(individialSample);
+        cnt.add(utPanel);
+        
+        
+        
+        
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
@@ -145,7 +275,15 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         setModalityType(ModalityType.APPLICATION_MODAL);
         individualCharsField.setText(selectedChars);
         getRootPane().setDefaultButton(okButton);
-        sourceFont.addItemListener(new ItemListener() {
+        familyNamesSelection.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                updateFaceSelection();
+                updateCheckboxes();                
+            }
+        });
+        faceSelection.addItemListener(new ItemListener() {
+
             @Override
             public void itemStateChanged(ItemEvent e) {
                 updateCheckboxes();
@@ -162,7 +300,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private void updateIndividual() {
         String chars = individualCharsField.getText();
-        Font f = new Font(getSelectedFont(), style, new JLabel().getFont().getSize());
+        Font f = getSelectedFont();
         String visibleChars = "";
         for (int i = 0; i < chars.length(); i++) {
             if (f.canDisplay(chars.codePointAt(i))) {
@@ -173,9 +311,10 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     }
 
     private void updateCheckboxes() {
-        String fontStr = sourceFont.getSelectedItem().toString();
-        Font f = new Font(fontStr, style, new JLabel().getFont().getSize());
+        Font f = getSelectedFont().deriveFont(12f);
         int rc = CharacterRanges.rangeCount();
+        
+        Set<Integer> allChars=new HashSet<>();
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
             int codes[] = CharacterRanges.rangeCodes(i);
@@ -183,6 +322,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             String sample = "";
             for (int c = 0; c < codes.length; c++) {
                 if (f.canDisplay(codes[c])) {
+                    allChars.add(codes[c]);
                     if (avail < SAMPLE_MAX_LENGTH) {
                         sample += "" + (char) codes[c];
                     }
@@ -193,6 +333,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             rangeSamples[i].setFont(f);
             rangeCheckboxes[i].setText(translate("range.description").replace("%available%", "" + avail).replace("%name%", rangeNames[i]).replace("%total%", "" + codes.length));
         }
+        allCheckbox.setText(translate("allcharacters").replace("%available%", ""+allChars.size()));        
         individialSample.setFont(f);
         updateIndividual();
     }
@@ -208,7 +349,50 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
                 result = false;
                 setVisible(false);
                 break;
+            case ACTION_LOAD_FROM_DISK:
+                if (customFont != null) {
+                    if (loadFromDisk()) {
+                        updateCheckboxes();
+                    }
+                }
+                ttfFileRadio.setSelected(true);
+                break;
         }
+    }
+
+    private boolean loadFromDisk() {
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+        FileFilter ttfFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".ttf")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.ttf");
+            }
+        };
+        fc.setFileFilter(ttfFilter);
+        fc.setAcceptAllFileFilterUsed(true);
+        JFrame f = new JFrame();
+        View.setWindowIcon(f);
+        int returnVal = fc.showOpenDialog(f);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+            File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+            try {
+                customFont = Font.createFont(Font.TRUETYPE_FONT, selfile);
+                ttfFileRadio.setText(translate("ttffile.selection").replace("%fontname%", customFont.getName()).replace("%filename%", selfile.getName()));
+                return true;
+            } catch (FontFormatException ex) {
+                JOptionPane.showMessageDialog(this, translate("error.invalidfontfile"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, translate("error.cannotreadfontfile"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return false;
     }
 
     public boolean display() {

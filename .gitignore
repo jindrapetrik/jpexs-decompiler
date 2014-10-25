@@ -42,3 +42,6 @@ hs_err_pid*.log
 /libsrc/LZMA/nbproject/private/
 /libsrc/ttf/nbproject/private/
 /libsrc/ttf/build/
+/libsrc/tablelayout/nbproject/private/
+/libsrc/tablelayout/build/
+/libsrc/tablelayout/dist/

@@ -162,7 +162,6 @@ public class Fontastic {
      */
     public void buildFont() throws FileNotFoundException {
         // Create TTF file with doubletype
-        m_engine.getTypeface().addRequiredGlyphs();
         //m_engine.fireAction();
         //m_engine.addDefaultGlyphs();
 
@@ -202,7 +201,7 @@ public class Fontastic {
             }
             glyphFile.saveGlyphFile();
         }
-
+        m_engine.getTypeface().addRequiredGlyphs();        
         m_engine.buildTrueType(false);
 
         // End TTF creation

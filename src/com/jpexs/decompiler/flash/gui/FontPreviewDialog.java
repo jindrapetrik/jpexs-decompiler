@@ -48,13 +48,13 @@ public class FontPreviewDialog extends AppDialog {
         initComponents();
         View.setWindowIcon(this);
 
-        labelSample12.setFont(font.deriveFont(Font.PLAIN, 12));
-        labelSample18.setFont(font.deriveFont(Font.PLAIN, 18));
-        labelSample24.setFont(font.deriveFont(Font.PLAIN, 24));
-        labelSample36.setFont(font.deriveFont(Font.PLAIN, 36));
-        labelSample48.setFont(font.deriveFont(Font.PLAIN, 48));
-        labelSample60.setFont(font.deriveFont(Font.PLAIN, 60));
-        labelSample72.setFont(font.deriveFont(Font.PLAIN, 72));
+        labelSample12.setFont(font.deriveFont(12f));
+        labelSample18.setFont(font.deriveFont(18f));
+        labelSample24.setFont(font.deriveFont(24f));
+        labelSample36.setFont(font.deriveFont(36f));
+        labelSample48.setFont(font.deriveFont(48f));
+        labelSample60.setFont(font.deriveFont(60f));
+        labelSample72.setFont(font.deriveFont(72f));
         comboBoxSampleTexts.setSelectedIndex(Configuration.guiFontPreviewSampleText.get(0));
         if (Configuration.guiFontPreviewWidth.hasValue()) {
             int width = Configuration.guiFontPreviewWidth.get();

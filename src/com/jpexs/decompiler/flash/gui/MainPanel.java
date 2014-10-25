@@ -1906,11 +1906,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (textTag.setFormattedText(new MissingCharacterHandler() {
                 @Override
                 public boolean handle(FontTag font, char character) {
-                    String fontName = font.getSwf().sourceFontsMap.get(font.getFontId());
+                    String fontName = font.getSwf().sourceFontFamiliesMap.get(font.getFontId());
                     if (fontName == null) {
                         fontName = font.getFontName();
                     }
-                    fontName = FontTag.findInstalledFontName(fontName);
+                    fontName = FontTag.findInstalledFontFamily(fontName);
                     Font f = new Font(fontName, font.getFontStyle(), 18);
                     if (!f.canDisplay(character)) {
                         View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
