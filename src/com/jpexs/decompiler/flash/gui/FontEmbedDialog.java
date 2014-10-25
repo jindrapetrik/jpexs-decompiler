@@ -74,7 +74,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     private final JLabel[] rangeSamples;
     private final JTextField individualCharsField;
     private boolean result = false;
-    private JLabel individialSample;    
+    private JLabel individialSample;
     private Font customFont;
     private final JCheckBox allCheckbox;
     private final JCheckBox updateTextsCheckbox;
@@ -83,17 +83,17 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         if (ttfFileRadio.isSelected() && customFont != null) {
             return customFont;
         }
-        return FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).get(faceSelection.getSelectedItem().toString());       
+        return FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).get(faceSelection.getSelectedItem().toString());
     }
 
-    public boolean hasUpdateTexts(){
+    public boolean hasUpdateTexts() {
         return updateTextsCheckbox.isSelected();
     }
-    
+
     public Set<Integer> getSelectedChars() {
         Set<Integer> chars = new TreeSet<>();
         Font f = getSelectedFont();
-        if(allCheckbox.isSelected()){
+        if (allCheckbox.isSelected()) {
             for (int i = 0; i < rangeCheckboxes.length; i++) {
                 int codes[] = CharacterRanges.rangeCodes(i);
                 for (int c : codes) {
@@ -102,7 +102,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
                     }
                 }
             }
-        }else{
+        } else {
             for (int i = 0; i < rangeCheckboxes.length; i++) {
                 if (rangeCheckboxes[i].isSelected()) {
                     int codes[] = CharacterRanges.rangeCodes(i);
@@ -126,10 +126,10 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     private JRadioButton ttfFileRadio;
     private JRadioButton installedRadio;
 
-    private void updateFaceSelection(){
-        faceSelection.setModel( new DefaultComboBoxModel<>(new Vector<String>(FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).keySet())));
+    private void updateFaceSelection() {
+        faceSelection.setModel(new DefaultComboBoxModel<>(new Vector<String>(FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).keySet())));
     }
-    
+
     public FontEmbedDialog(String selectedFamily, String selectedFace, String selectedChars) {
         setSize(900, 600);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -150,8 +150,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         installedRadio.setSelected(true);
 
         individialSample = new JLabel();
-        familyNamesSelection = new JComboBox<>(new Vector<String>(new TreeSet<String>(FontTag.installedFonts.keySet())));        
-        familyNamesSelection.setSelectedItem(selectedFamily);       
+        familyNamesSelection = new JComboBox<>(new Vector<String>(new TreeSet<String>(FontTag.installedFonts.keySet())));
+        familyNamesSelection.setSelectedItem(selectedFamily);
         faceSelection = new JComboBox<>();
         updateFaceSelection();
         faceSelection.setSelectedItem(selectedFace);
@@ -207,14 +207,14 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED){
-                     for (int i = 0; i < rc; i++) {
-                         rangeCheckboxes[i].setEnabled(false);
-                     }
-                     individualCharsField.setEnabled(false);
-                }else if(e.getStateChange() == ItemEvent.DESELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     for (int i = 0; i < rc; i++) {
-                         rangeCheckboxes[i].setEnabled(true);
+                        rangeCheckboxes[i].setEnabled(false);
+                    }
+                    individualCharsField.setEnabled(false);
+                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    for (int i = 0; i < rc; i++) {
+                        rangeCheckboxes[i].setEnabled(true);
                     }
                     individualCharsField.setEnabled(true);
                 }
@@ -222,10 +222,10 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         });
         JPanel rangeRowPanel = new JPanel();
         rangeRowPanel.setLayout(new BorderLayout());
-        rangeRowPanel.add(allCheckbox,BorderLayout.WEST);        
+        rangeRowPanel.add(allCheckbox, BorderLayout.WEST);
         rangeRowPanel.setAlignmentX(0);
         rangesPanel.add(rangeRowPanel);
-        
+
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
             rangeSamples[i] = new JLabel("");
@@ -247,18 +247,14 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         individualCharsField.setPreferredSize(new Dimension(100, individualCharsField.getPreferredSize().height));
         individialSample = new JLabel();
         specialPanel.add(individualCharsField);
-        
+
         updateTextsCheckbox = new JCheckBox(AppStrings.translate("font.updateTexts"));
-        
+
         JPanel utPanel = new JPanel(new FlowLayout());
         utPanel.add(updateTextsCheckbox);
         cnt.add(specialPanel);
         cnt.add(individialSample);
         cnt.add(utPanel);
-        
-        
-        
-        
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
@@ -279,7 +275,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 updateFaceSelection();
-                updateCheckboxes();                
+                updateCheckboxes();
             }
         });
         faceSelection.addItemListener(new ItemListener() {
@@ -313,8 +309,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     private void updateCheckboxes() {
         Font f = getSelectedFont().deriveFont(12f);
         int rc = CharacterRanges.rangeCount();
-        
-        Set<Integer> allChars=new HashSet<>();
+
+        Set<Integer> allChars = new HashSet<>();
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
             int codes[] = CharacterRanges.rangeCodes(i);
@@ -333,7 +329,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             rangeSamples[i].setFont(f);
             rangeCheckboxes[i].setText(translate("range.description").replace("%available%", "" + avail).replace("%name%", rangeNames[i]).replace("%total%", "" + codes.length));
         }
-        allCheckbox.setText(translate("allcharacters").replace("%available%", ""+allChars.size()));        
+        allCheckbox.setText(translate("allcharacters").replace("%available%", "" + allChars.size()));
         individialSample.setFont(f);
         updateIndividual();
     }

@@ -1047,8 +1047,8 @@ public final class SWF implements TreeItem, Timelined {
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     TreeNode node = ret.get(r);
-                    TreeItem item = node.getItem(); 
-                    if (!(item instanceof DefineSpriteTag 
+                    TreeItem item = node.getItem();
+                    if (!(item instanceof DefineSpriteTag
                             || item instanceof DefineButtonTag
                             || item instanceof DefineButton2Tag
                             || item instanceof DoInitActionTag
@@ -1080,7 +1080,7 @@ public final class SWF implements TreeItem, Timelined {
                     if (path == null) {
                         path = "";
                     }
-                    String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{ path };
+                    String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
                     List<TreeNode> items = ret;
                     for (int pos = 0; pos < pathParts.length - 1; pos++) {
                         String pathPart = pathParts[pos];
@@ -1139,7 +1139,7 @@ public final class SWF implements TreeItem, Timelined {
         ret.addAll(frames);
         for (int i = ret.size() - 1; i >= 0; i--) {
             TreeNode node = ret.get(i);
-            TreeItem item = node.getItem(); 
+            TreeItem item = node.getItem();
             if (item instanceof ASMSource) {
                 ASMSource ass = (ASMSource) item;
                 if (ass.containsSource()) {

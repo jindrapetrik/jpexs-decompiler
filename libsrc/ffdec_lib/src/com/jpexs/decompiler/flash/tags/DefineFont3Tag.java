@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -377,7 +376,7 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         int fontStyle = getFontStyle();
-        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, fontStyle, (int)Math.round(getDivider() * 1024), character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, fontStyle, (int) Math.round(getDivider() * 1024), character);
         int code = (int) character;
         int pos = -1;
         boolean exists = false;
@@ -438,8 +437,6 @@ public class DefineFont3Tag extends FontTag {
         return fontBoundsTable.get(glyphIndex);
     }
 
-    
-    
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {

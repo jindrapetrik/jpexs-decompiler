@@ -70,7 +70,7 @@ public class ContourType implements Serializable {
         edges = edgesList.toArray(new EdgeType[edgesList.size()]);
     }
 
-    public ContourType(GFxInputStream sis,long fontOffset) throws IOException {
+    public ContourType(GFxInputStream sis, long fontOffset) throws IOException {
         moveToX = sis.readSI15("moveToX");
         moveToY = sis.readSI15("moveToY");
         long numEdgesRef = sis.readUI30("numEdgesRef");
@@ -80,10 +80,10 @@ public class ContourType implements Serializable {
         int numEdges;
         if (isReference) {
             long referencePos = numEdgesRef;
-            sis.setPos(fontOffset+referencePos);
-            numEdges = (int)(sis.readUI30("numEdges") >> 1);
-        }else{
-            numEdges = (int)numEdgesRef;
+            sis.setPos(fontOffset + referencePos);
+            numEdges = (int) (sis.readUI30("numEdges") >> 1);
+        } else {
+            numEdges = (int) numEdgesRef;
         }
 
         edges = new EdgeType[(int) numEdges];

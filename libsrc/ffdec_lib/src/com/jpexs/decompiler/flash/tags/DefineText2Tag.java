@@ -460,7 +460,7 @@ public class DefineText2Tag extends TextTag {
                 glyphBits = Math.max(glyphBits, this.glyphBits);
                 advanceBits = Math.max(advanceBits, this.advanceBits);
             }
-            
+
             sos.writeUI8(glyphBits);
             sos.writeUI8(advanceBits);
             for (TEXTRECORD tr : textRecords) {

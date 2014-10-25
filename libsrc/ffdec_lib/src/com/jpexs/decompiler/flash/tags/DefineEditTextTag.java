@@ -260,7 +260,7 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int)Math.round(fontSize * (style.font == null ? 1 : style.font.getDivider()));
+                                        style.fontHeight = (int) Math.round(fontSize * (style.font == null ? 1 : style.font.getDivider()));
                                         style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes

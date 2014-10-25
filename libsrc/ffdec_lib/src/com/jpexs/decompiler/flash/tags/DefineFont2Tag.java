@@ -102,9 +102,6 @@ public class DefineFont2Tag extends FontTag {
         return fontBoundsTable.get(glyphIndex);
     }
 
-    
-    
-    
     @Override
     public double getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout) {
@@ -380,7 +377,7 @@ public class DefineFont2Tag extends FontTag {
     public void addCharacter(char character, Font font) {
         int fontStyle = getFontStyle();
 
-        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, fontStyle, (int)Math.round(getDivider() * 1024), character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, fontStyle, (int) Math.round(getDivider() * 1024), character);
 
         int code = (int) character;
         int pos = -1;

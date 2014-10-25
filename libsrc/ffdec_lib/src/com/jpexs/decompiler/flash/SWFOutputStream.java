@@ -400,11 +400,11 @@ public class SWFOutputStream extends OutputStream {
         nBits = enlargeBitCountS(nBits, xMax);
         nBits = enlargeBitCountS(nBits, yMin);
         nBits = enlargeBitCountS(nBits, yMax);
-        
+
         if (Configuration.debugCopy.get()) {
             nBits = Math.max(nBits, value.nbits);
         }
-        
+
         writeUB(5, nBits);
         writeSB(nBits, xMin);
         writeSB(nBits, xMax);
@@ -569,7 +569,7 @@ public class SWFOutputStream extends OutputStream {
             if (Configuration.debugCopy.get()) {
                 nBits = Math.max(nBits, value.nScaleBits);
             }
-        
+
             writeUB(5, nBits);
             writeSB(nBits, value.scaleX);
             writeSB(nBits, value.scaleY);
@@ -583,7 +583,7 @@ public class SWFOutputStream extends OutputStream {
             if (Configuration.debugCopy.get()) {
                 nBits = Math.max(nBits, value.nRotateBits);
             }
-        
+
             writeUB(5, nBits);
             writeSB(nBits, value.rotateSkew0);
             writeSB(nBits, value.rotateSkew1);
@@ -624,11 +624,11 @@ public class SWFOutputStream extends OutputStream {
             Nbits = enlargeBitCountS(Nbits, value.greenAddTerm);
             Nbits = enlargeBitCountS(Nbits, value.blueAddTerm);
         }
-        
+
         if (Configuration.debugCopy.get()) {
             Nbits = Math.max(Nbits, value.nbits);
         }
-        
+
         writeUB(4, Nbits);
         if (value.hasMultTerms) {
             writeSB(Nbits, value.redMultTerm);
@@ -669,7 +669,7 @@ public class SWFOutputStream extends OutputStream {
         if (Configuration.debugCopy.get()) {
             Nbits = Math.max(Nbits, value.nbits);
         }
-        
+
         writeUB(4, Nbits);
         if (value.hasMultTerms) {
             writeSB(Nbits, value.redMultTerm);

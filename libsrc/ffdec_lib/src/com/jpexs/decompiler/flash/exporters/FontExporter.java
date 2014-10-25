@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -114,7 +113,7 @@ public class FontExporter {
         List<SHAPE> shapes = t.getGlyphShapeTable();
 
         final double divider = t.getDivider();
-        
+
         File ttfFile = file;
 
         if (mode == FontExportMode.WOFF) {
@@ -126,8 +125,8 @@ public class FontExporter {
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
-        f.setVersion("1.0");        
-        
+        f.setVersion("1.0");
+
         f.setAscender(Math.round(t.getAscent() / divider));
         f.setDescender(Math.round(t.getDescent() / divider));
 
@@ -179,13 +178,13 @@ public class FontExporter {
             char c = t.glyphToChar(i);
             if (contours.isEmpty()) {
                 continue;
-            }            
+            }
             final FGlyph g = f.addGlyph(c);
             double adv = t.getGlyphAdvance(i);
             if (adv != -1) {
                 g.setAdvanceWidth((int) Math.round(adv / divider));
             } else {
-                g.setAdvanceWidth((int)Math.round(t.getGlyphWidth(i) / divider + 100));
+                g.setAdvanceWidth((int) Math.round(t.getGlyphWidth(i) / divider + 100));
             }
             for (FPoint[] cnt : contours) {
                 if (cnt.length == 0) {

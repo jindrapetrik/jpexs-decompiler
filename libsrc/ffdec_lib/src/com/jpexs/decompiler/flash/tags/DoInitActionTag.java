@@ -205,7 +205,6 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         return pathParts[pathParts.length - 1];
     }
 
-
     @Override
     public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
         return writer;

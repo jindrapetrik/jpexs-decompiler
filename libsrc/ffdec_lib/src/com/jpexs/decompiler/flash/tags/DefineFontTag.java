@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -268,7 +267,7 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public void addCharacter(char character, Font font) {
-        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, getFontStyle(), (int)Math.round(getDivider() * 1024), character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, getFontStyle(), (int) Math.round(getDivider() * 1024), character);
         List<Integer> codeTable = new ArrayList<>();
         ensureFontInfo();
         if (fontInfoTag != null) {
@@ -324,5 +323,5 @@ public class DefineFontTag extends FontTag {
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         return 0;
     }
-    
+
 }

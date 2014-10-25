@@ -74,10 +74,10 @@ public class FontType implements Serializable {
         for (int i = 0; i < glyphInfo.size(); i++) {
             sis.setPos(glyphInfo.get(i).globalOffset + offset);
             sis.newDumpLevel("glyphType", "GlyphType");
-            glyphs.add(new GlyphType(sis,offset));
+            glyphs.add(new GlyphType(sis, offset));
             sis.endDumpLevel();
         }
-        
+
         sis.setPos(pos);
     }
 

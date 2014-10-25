@@ -467,7 +467,7 @@ public class Configuration {
         }
         return result;
     }
-    
+
     public static Map<String, String> getFontIdToFaceMap() {
         String fonts = fontPairing.get();
         if (fonts == null) {
@@ -478,7 +478,7 @@ public class Configuration {
         for (String pair : fonts.split("::")) {
             if (!pair.isEmpty()) {
                 String[] splittedPair = pair.split("=");
-                result.put(splittedPair[0], splittedPair.length<3?"":splittedPair[2]);
+                result.put(splittedPair[0], splittedPair.length < 3 ? "" : splittedPair[2]);
             }
         }
         return result;
@@ -489,8 +489,8 @@ public class Configuration {
         Map<String, String> fontPairs = getFontIdToFamilyMap();
         fontPairs.put(key, installedFontFamily);
         fontPairs.put(fontName, installedFontFamily);
-        
-        Map<String,String> facePairs = getFontIdToFaceMap();
+
+        Map<String, String> facePairs = getFontIdToFaceMap();
         facePairs.put(key, installedFontFace);
         facePairs.put(fontName, installedFontFace);
         StringBuilder sb = new StringBuilder();
@@ -499,7 +499,7 @@ public class Configuration {
             if (i != 0) {
                 sb.append("::");
             }
-            sb.append(pair.getKey()).append("=").append(pair.getValue()).append("=").append(facePairs.containsKey(pair.getKey())?facePairs.get(pair.getKey()):"");
+            sb.append(pair.getKey()).append("=").append(pair.getValue()).append("=").append(facePairs.containsKey(pair.getKey()) ? facePairs.get(pair.getKey()) : "");
             i++;
         }
         fontPairing.set(sb.toString());
