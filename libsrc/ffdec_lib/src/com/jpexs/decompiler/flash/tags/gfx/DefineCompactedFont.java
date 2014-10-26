@@ -205,7 +205,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public double getGlyphAdvance(int glyphIndex) {
-        return fonts.get(0).glyphInfo.get(glyphIndex).advanceX;
+        return resize(fonts.get(0).glyphInfo.get(glyphIndex).advanceX);
     }
 
     @Override
@@ -214,7 +214,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         int char2 = glyphToChar(nextGlyphIndex);
         for (KerningPairType kp : fonts.get(0).kerning) {
             if (kp.char1 == char1 && kp.char2 == char2) {
-                return kp.advance;
+                return resize(kp.advance);
             }
         }
         return 0;
@@ -222,7 +222,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return getGlyphShapeTable().get(glyphIndex).getBounds().getWidth();
+        return resize(getGlyphShapeTable().get(glyphIndex).getBounds().getWidth());
     }
 
     @Override
@@ -382,14 +382,16 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             }
             ret.fontName = getFontNameIntag();
             ret.languageCode = new LANGCODE(1);
-            ret.fontKerningTable = new KERNINGRECORD[0];/*new KERNINGRECORD[ft.kerning.size()];
-             for(int i=0;i<ft.kerning.size();i++){
-             KERNINGRECORD kr=new KERNINGRECORD();
-             kr.fontKerningAdjustment = resize(ft.kerning.get(i).advance);
-             kr.fontKerningCode1 = ft.kerning.get(i).char1;
-             kr.fontKerningCode2 = ft.kerning.get(i).char2;
-             ret.fontKerningTable[i] = kr;
-             }*/
+            ret.fontKerningTable = new ArrayList<>();
+
+            FontType ft = fonts.get(0);
+            for (int i = 0; i < ft.kerning.size(); i++) {
+                KERNINGRECORD kr = new KERNINGRECORD();
+                kr.fontKerningAdjustment = resize(ft.kerning.get(i).advance);
+                kr.fontKerningCode1 = ft.kerning.get(i).char1;
+                kr.fontKerningCode2 = ft.kerning.get(i).char2;
+                ret.fontKerningTable.add(kr);
+             }
 
             return ret;
         } catch (IOException ex) {
@@ -397,4 +399,11 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         }
         return null;
     }
+
+    @Override
+    public boolean hasLayout() {
+        return true;
+    }
+    
+    
 }

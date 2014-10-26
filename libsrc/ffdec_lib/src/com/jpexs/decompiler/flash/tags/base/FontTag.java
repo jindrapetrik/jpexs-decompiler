@@ -368,5 +368,5 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public FontTag toClassicFont() {
         return this;
-    }
+    }    
 }

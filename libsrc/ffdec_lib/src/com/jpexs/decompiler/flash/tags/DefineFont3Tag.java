@@ -78,7 +78,7 @@ public class DefineFont3Tag extends FontTag {
 
     public List<Integer> fontAdvanceTable;
     public List<RECT> fontBoundsTable;
-    public KERNINGRECORD[] fontKerningTable;
+    public List<KERNINGRECORD> fontKerningTable;
     public static final int ID = 75;
 
     @Override
@@ -168,9 +168,9 @@ public class DefineFont3Tag extends FontTag {
                 fontBoundsTable.add(sis.readRECT("rect"));
             }
             int kerningCount = sis.readUI16("kerningCount");
-            fontKerningTable = new KERNINGRECORD[kerningCount];
+            fontKerningTable = new ArrayList<KERNINGRECORD>();
             for (int i = 0; i < kerningCount; i++) {
-                fontKerningTable[i] = sis.readKERNINGRECORD(fontFlagsWideCodes, "record");
+                fontKerningTable.add(sis.readKERNINGRECORD(fontFlagsWideCodes, "record"));
             }
         }
     }
@@ -256,9 +256,9 @@ public class DefineFont3Tag extends FontTag {
                 for (int i = 0; i < numGlyphs; i++) {
                     sos.writeRECT(fontBoundsTable.get(i));
                 }
-                sos.writeUI16(fontKerningTable.length);
-                for (int k = 0; k < fontKerningTable.length; k++) {
-                    sos.writeKERNINGRECORD(fontKerningTable[k], fontFlagsWideCodes);
+                sos.writeUI16(fontKerningTable.size());
+                for (int k = 0; k < fontKerningTable.size(); k++) {
+                    sos.writeKERNINGRECORD(fontKerningTable.get(k), fontFlagsWideCodes);
                 }
             }
 
