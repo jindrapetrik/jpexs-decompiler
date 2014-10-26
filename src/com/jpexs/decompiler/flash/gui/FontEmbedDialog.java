@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -37,11 +36,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -67,8 +64,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private static final int SAMPLE_MAX_LENGTH = 50;
 
-    private final JComboBox<String> familyNamesSelection;
-    private final JComboBox<String> faceSelection;
+    private final JComboBox<FontFamily> familyNamesSelection;
+    private final JComboBox<FontFace> faceSelection;
     private final JCheckBox[] rangeCheckboxes;
     private final String rangeNames[];
     private final JLabel[] rangeSamples;
@@ -83,7 +80,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         if (ttfFileRadio.isSelected() && customFont != null) {
             return customFont;
         }
-        return FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).get(faceSelection.getSelectedItem().toString());
+        return ((FontFace)faceSelection.getSelectedItem()).font;
     }
 
     public boolean hasUpdateTexts() {
@@ -126,11 +123,11 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     private JRadioButton ttfFileRadio;
     private JRadioButton installedRadio;
 
-    private void updateFaceSelection() {
-        faceSelection.setModel(new DefaultComboBoxModel<>(new Vector<String>(FontTag.installedFonts.get(familyNamesSelection.getSelectedItem().toString()).keySet())));
+    private void updateFaceSelection() {        
+        faceSelection.setModel(FontPanel.getFaceModel((FontFamily)familyNamesSelection.getSelectedItem()));
     }
 
-    public FontEmbedDialog(String selectedFamily, String selectedFace, String selectedChars) {
+    public FontEmbedDialog(FontFace selectedFace, String selectedChars) {
         setSize(900, 600);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
@@ -150,8 +147,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         installedRadio.setSelected(true);
 
         individialSample = new JLabel();
-        familyNamesSelection = new JComboBox<>(new Vector<String>(new TreeSet<String>(FontTag.installedFonts.keySet())));
-        familyNamesSelection.setSelectedItem(selectedFamily);
+        familyNamesSelection = new JComboBox<>(FontPanel.getFamilyModel());      
+        familyNamesSelection.setSelectedItem(new FontFamily(selectedFace.font));
         faceSelection = new JComboBox<>();
         updateFaceSelection();
         faceSelection.setSelectedItem(selectedFace);

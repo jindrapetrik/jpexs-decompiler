@@ -296,7 +296,7 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
-    public String getFontName() {
+    public String getFontNameIntag() {
         String ret = fontName;
         if (ret.contains("" + (char) 0)) {
             ret = ret.substring(0, ret.indexOf(0));

@@ -117,7 +117,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public String getFontName() {
+    public String getFontNameIntag() {
         String ret = "";
         for (int i = 0; i < fonts.size(); i++) {
             if (i > 0) {
@@ -380,7 +380,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
                 ret.glyphShapeTable.add(shpX);
                 ret.fontBoundsTable.add(getGlyphBounds(g));
             }
-            ret.fontName = getFontName();
+            ret.fontName = getFontNameIntag();
             ret.languageCode = new LANGCODE(1);
             ret.fontKerningTable = new KERNINGRECORD[0];/*new KERNINGRECORD[ft.kerning.size()];
              for(int i=0;i<ft.kerning.size();i++){

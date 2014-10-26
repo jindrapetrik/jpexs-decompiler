@@ -271,8 +271,7 @@ public final class SWF implements TreeItem, Timelined {
     public Map<Integer, CharacterTag> characters = new HashMap<>();
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;
-    public Map<Integer, String> sourceFontFamiliesMap = new HashMap<>();
-    public Map<Integer, String> sourceFontFacesMap = new HashMap<>();
+    public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
     public static final double unitDivisor = 20;
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
 

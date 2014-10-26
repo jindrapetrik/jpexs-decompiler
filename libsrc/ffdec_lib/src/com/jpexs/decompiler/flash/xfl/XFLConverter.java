@@ -1950,7 +1950,7 @@ public class XFLConverter {
                     }
                 }
                 if (fontName == null) {
-                    fontName = font.getFontName();
+                    fontName = font.getFontNameIntag();
                 }
                 int fontStyle = font.getFontStyle();
                 String installedFont;
@@ -2451,7 +2451,7 @@ public class XFLConverter {
                         }
                     }
                     if ((fontName == null) && (font != null)) {
-                        fontName = font.getFontName();
+                        fontName = font.getFontNameIntag();
                     }
                     int fontStyle = 0;
                     if (font != null) {
@@ -2609,7 +2609,7 @@ public class XFLConverter {
                     }
                     if (ft != null) {
                         if (fontName == null) {
-                            fontName = ft.getFontName();
+                            fontName = ft.getFontNameIntag();
                         }
                         italic = ft.isItalic();
                         bold = ft.isBold();
@@ -3261,7 +3261,7 @@ public class XFLConverter {
                 }
                 if (ft != null) {
                     if (fontName == null) {
-                        fontName = ft.getFontName();
+                        fontName = ft.getFontNameIntag();
                     }
                     italic = ft.isItalic();
                     bold = ft.isBold();
@@ -3343,7 +3343,7 @@ public class XFLConverter {
                             if (tag instanceof FontTag) {
                                 FontTag ft = (FontTag) tag;
                                 String fontName = null;
-                                if (f.equals(ft.getFontName())) {
+                                if (f.equals(ft.getFontNameIntag())) {
                                     for (Tag u : tags) {
                                         if (u instanceof DefineFontNameTag) {
                                             if (((DefineFontNameTag) u).fontId == ft.getFontId()) {
@@ -3352,7 +3352,7 @@ public class XFLConverter {
                                         }
                                     }
                                     if (fontName == null) {
-                                        fontName = ft.getFontName();
+                                        fontName = ft.getFontNameIntag();
                                     }
                                     String installedFont;
                                     if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {

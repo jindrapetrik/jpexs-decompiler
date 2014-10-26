@@ -120,7 +120,7 @@ public class FontExporter {
             ttfFile = File.createTempFile("ffdec_export", ".ttf");
         }
 
-        Fontastic f = new Fontastic(t.getFontName(), ttfFile);
+        Fontastic f = new Fontastic(t.getFontNameIntag(), ttfFile);
         String cop = t.getCopyright();
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);

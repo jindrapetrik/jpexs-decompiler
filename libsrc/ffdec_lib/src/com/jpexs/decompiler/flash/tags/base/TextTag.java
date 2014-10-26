@@ -143,7 +143,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 glyphs = font.getGlyphShapeTable();
 
                 if (!font.hasLayout()) {
-                    String fontName = FontTag.getFontNameWithFallback(font.getFontName());
+                    String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
                     aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
                     fontMetrics = graphics.getFontMetrics(aFont);
                     LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
@@ -417,7 +417,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
                 Element textElement = exporter.createElement("text");
                 textElement.setAttribute("font-size", Double.toString(rat * 1024));
-                textElement.setAttribute("font-family", font.getFontName());
+                textElement.setAttribute("font-family", font.getFontNameIntag());
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setTextContent(text.toString());
@@ -432,7 +432,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.WOFF;
-                exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
+                exporter.addStyle(font.getFontNameIntag(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
 
                 if (hasOffset) {
                     exporter.endGroup();
@@ -458,7 +458,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                         }
 
                         if (charId == null) {
-                            charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
+                            charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
                             SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
                             shapeExporter.export();

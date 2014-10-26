@@ -173,7 +173,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public String getFontName() {
+    public String getFontNameIntag() {
         ensureFontInfo();
         if (fontInfo2Tag != null) {
             return fontInfo2Tag.fontName;

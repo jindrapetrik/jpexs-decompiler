@@ -43,6 +43,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int getGlyphWidth(int glyphIndex);
 
-    public abstract String getFontName();
+    public abstract String getFontNameIntag();
 
     public abstract boolean isSmall();
 
@@ -103,8 +104,25 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public abstract int getDescent();
 
     public abstract int getLeading();
+        
+    public String getFontName(){
+        DefineFontNameTag fontNameTag = getFontNameTag();        
+        if(fontNameTag == null){
+            return getFontNameIntag();
+        }
+        return fontNameTag.fontName;
+    }
+    
+    public String getFontCopyright(){
+        DefineFontNameTag fontNameTag = getFontNameTag();
+        if(fontNameTag == null){
+            return "";
+        }
+        return fontNameTag.fontCopyright;
+    }
 
-    public static Map<String, Map<String, Font>> installedFonts;
+    public static Map<String, Map<String, Font>> installedFontsByFamily;
+    public static Map<String,Font> installedFontsByName;
 
     public static String defaultFontName;
 
@@ -142,7 +160,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         if (className != null) {
             nameAppend = ": " + className;
         }
-        String fontName = getFontName();
+        String fontName = getFontNameIntag();
         if (fontName != null) {
             nameAppend = ": " + fontName;
         }
@@ -150,12 +168,12 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public String getSystemFontName() {
-        Map<String, String> fontPairs = Configuration.getFontIdToFamilyMap();
-        String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontName();
+        Map<String, String> fontPairs = Configuration.getFontToNameMap();
+        String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontNameIntag();
         if (fontPairs.containsKey(key)) {
             return fontPairs.get(key);
         }
-        key = getFontName();
+        key = getFontNameIntag();
         if (fontPairs.containsKey(key)) {
             return fontPairs.get(key);
         }
@@ -206,52 +224,59 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public static void reload() {
-        installedFonts = FontHelper.getInstalledFonts();
-
-        if (installedFonts.containsKey("Times New Roman")) {
+        installedFontsByFamily = FontHelper.getInstalledFonts();
+        installedFontsByName = new HashMap<>();
+        
+        for(String fam:installedFontsByFamily.keySet()){
+            for(String nam:installedFontsByFamily.get(fam).keySet()){
+                installedFontsByName.put(nam, installedFontsByFamily.get(fam).get(nam));
+            }
+        }
+        
+        if (installedFontsByFamily.containsKey("Times New Roman")) {
             defaultFontName = "Times New Roman";
-        } else if (installedFonts.containsKey("Arial")) {
+        } else if (installedFontsByFamily.containsKey("Arial")) {
             defaultFontName = "Arial";
         } else {
-            defaultFontName = installedFonts.keySet().iterator().next();
+            defaultFontName = installedFontsByFamily.keySet().iterator().next();
         }
     }
 
     public static String getFontNameWithFallback(String fontName) {
-        if (installedFonts.containsKey(fontName)) {
+        if (installedFontsByFamily.containsKey(fontName)) {
             return fontName;
         }
-        if (installedFonts.containsKey("Times New Roman")) {
+        if (installedFontsByFamily.containsKey("Times New Roman")) {
             return "Times New Roman";
         }
-        if (installedFonts.containsKey("Arial")) {
+        if (installedFontsByFamily.containsKey("Arial")) {
             return "Arial";
         }
 
         //First font
-        return installedFonts.keySet().iterator().next();
+        return installedFontsByFamily.keySet().iterator().next();
     }
 
     public static String isFontFamilyInstalled(String fontFamily) {
-        if (installedFonts.containsKey(fontFamily)) {
+        if (installedFontsByFamily.containsKey(fontFamily)) {
             return fontFamily;
         }
         if (fontFamily.contains("_")) {
             String beforeUnderscore = fontFamily.substring(0, fontFamily.indexOf('_'));
-            if (installedFonts.containsKey(beforeUnderscore)) {
+            if (installedFontsByFamily.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;
             }
         }
         return null;
     }
 
-    public static String findInstalledFontFamily(String fontFamily) {
-        if (installedFonts.containsKey(fontFamily)) {
-            return fontFamily;
+    public static String findInstalledFontName(String fontName) {
+        if (installedFontsByName.containsKey(fontName)) {
+            return fontName;
         }
-        if (fontFamily.contains("_")) {
-            String beforeUnderscore = fontFamily.substring(0, fontFamily.indexOf('_'));
-            if (installedFonts.containsKey(beforeUnderscore)) {
+        if (fontName.contains("_")) {
+            String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
+            if (installedFontsByName.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;
             }
         }
@@ -294,7 +319,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public String getCharacterExportFileName() {
-        return super.getCharacterExportFileName() + "_" + getFontName();
+        return super.getCharacterExportFileName() + "_" + getFontNameIntag();
     }
 
     public DefineFontNameTag getFontNameTag() {

@@ -26,11 +26,11 @@ import java.util.Map;
 public class MissingCharacterHandler {
 
     public boolean handle(FontTag font, char character) {
-        String fontName = font.getFontName();
-        if (!FontTag.installedFonts.containsKey(fontName)) {
+        String fontName = font.getFontNameIntag();
+        if (!FontTag.installedFontsByFamily.containsKey(fontName)) {
             return false;
         }
-        Map<String, Font> faces = FontTag.installedFonts.get(fontName);
+        Map<String, Font> faces = FontTag.installedFontsByFamily.get(fontName);
 
         Font f = null;
         for (String face : faces.keySet()) {
