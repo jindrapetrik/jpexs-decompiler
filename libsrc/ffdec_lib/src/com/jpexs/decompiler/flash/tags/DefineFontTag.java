@@ -267,7 +267,7 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public void addCharacter(char character, Font font) {
-        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, getFontStyle(), (int) Math.round(getDivider() * 1024), character);
+        SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
         List<Integer> codeTable = new ArrayList<>();
         ensureFontInfo();
         if (fontInfoTag != null) {

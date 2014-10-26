@@ -225,26 +225,26 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
     public abstract boolean isMove();
 
-    public static List<SHAPE> systemFontCharactersToSHAPES(String fontName, int fontStyle, int fontSize, String characters) {
+    public static List<SHAPE> systemFontCharactersToSHAPES(Font font, int fontSize, String characters) {
         List<SHAPE> ret = new ArrayList<>();
         for (int i = 0; i < characters.length(); i++) {
-            ret.add(systemFontCharacterToSHAPE(fontName, fontStyle, fontSize, characters.charAt(i)));
+            ret.add(systemFontCharacterToSHAPE(font, fontSize, characters.charAt(i)));
         }
         return ret;
     }
 
-    public static SHAPE systemFontCharacterToSHAPE(final String fontName, final int fontStyle, int fontSize, char character) {
-        return fontCharacterToSHAPE(new Font(FontTag.getFontNameWithFallback(fontName), Font.PLAIN, 10), fontStyle, fontSize, character);
+    public static SHAPE systemFontCharacterToSHAPE(Font font, int fontSize, char character) {
+        return fontCharacterToSHAPE(font,fontSize, character);
     }
 
-    public static SHAPE fontCharacterToSHAPE(final Font font, final int fontStyle, int fontSize, char character) {
+    public static SHAPE fontCharacterToSHAPE(final Font font, float fontSize, char character) {
         int multiplier = 1;
         if (fontSize > 1024) {
-            multiplier = fontSize / 1024;
+            multiplier = (int)(fontSize / 1024);
             fontSize = 1024;
         }
         List<SHAPERECORD> retList = new ArrayList<>();
-        Font f = font.deriveFont(fontStyle, fontSize);
+        Font f = font.deriveFont(fontSize);
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double[] points = new double[6];
