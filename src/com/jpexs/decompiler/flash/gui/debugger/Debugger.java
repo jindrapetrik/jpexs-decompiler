@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.gui.debugger;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,12 +55,17 @@ public class Debugger {
         {
             int len = is.read();
                         if (len == -1) {
-                            return "";
+                            throw new EOFException();
                         }
                         byte buf[] = new byte[len];
-                        is.read(buf);
-                        return new String(buf, "UTF-8");
-                        
+                        for(int i=0;i<len;i++){
+                            int rd = is.read();
+                            if(rd == -1){
+                                throw new EOFException();
+                            }
+                            buf[i] = (byte)rd;
+                        }                                                
+                        return new String(buf, "UTF-8");                        
         }
         @Override
         public void run() {
@@ -92,8 +98,8 @@ public class Debugger {
                             l.onMessage(clientName, ret);
                         }
                     }
-                }
-
+                }            
+                
             } catch (IOException ex) {
                 //ignore
             }
