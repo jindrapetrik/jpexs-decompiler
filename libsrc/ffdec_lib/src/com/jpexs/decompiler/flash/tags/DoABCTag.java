@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -92,4 +94,12 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     public int compareTo(ABCContainerTag o) {
         return 0;
     }
+
+    @Override
+    public void setSwf(SWF swf) {
+        super.setSwf(swf);
+        abc.swf = swf;
+    }
+    
+    
 }

@@ -1087,7 +1087,7 @@ public class Main {
         } else {
             cls = "\\." + Pattern.quote(cls);
         }
-        return tested.matches(Pattern.quote(DEBUGGER_PACKAGE) + "\\.pkg[a-f0-9]+" + cls);
+        return tested.matches(Pattern.quote(DEBUGGER_PACKAGE) + "(\\.pkg[a-f0-9]+)?" + cls);
     }
 
     private static String byteArrayToHex(byte[] a) {
@@ -1144,13 +1144,18 @@ public class Main {
             Random rnd = new Random();
             byte rb[] = new byte[16];
             rnd.nextBytes(rb);
-            String rhex = byteArrayToHex(rb);
+            String rhex = byteArrayToHex(rb);            
             try {
                 //load debug swf
                 SWF debugSWF = new SWF(Main.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/gui/debugger/debug.swf"), false);
 
                 ABCContainerTag firstAbc = swf.abcList.get(0);
-                String newdebuggerpkg = DEBUGGER_PACKAGE + ".pkg" + rhex;
+                String newdebuggerpkg = DEBUGGER_PACKAGE;
+                
+                if(Configuration.randomDebuggerPackage.get()){
+                    newdebuggerpkg += ".pkg"+rhex;
+                }
+                
                 //add debug ABC tags to main SWF
                 for (ABCContainerTag ds : debugSWF.abcList) {
                     ABC a = ds.getABC();
@@ -1173,7 +1178,8 @@ public class Main {
                     ((Tag) ds).setModified(true);
                 }
 
-            } catch (Exception ex) {
+            } catch (Exception ex) {                
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error while attaching debugger", ex);
                 //ignore
             }
 

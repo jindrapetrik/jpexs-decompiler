@@ -119,7 +119,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public ABC abc;
     public SWF swf;
     public JComboBox<ABCContainerTag> abcComboBox;
-    public ABCContainerTag listIndex = null;
     public DecompiledEditorPane decompiledTextArea;
     public JScrollPane decompiledScrollPane;
     public JSplitPane splitPane;
@@ -311,32 +310,19 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         this.swf = null;
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
-        abcComboBox.setModel(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()));
         navigator.clearABC();
     }
 
     public void setSwf(SWF swf) {
         if (this.swf != swf) {
             this.swf = swf;
-            listIndex = null;
-            switchAbc(swf.abcList.get(0)); // todo honika: do we need this?
-            abcComboBox.setModel(new ABCComboBoxModel(swf.abcList));
             if (swf.abcList.size() > 0) {
                 this.abc = swf.abcList.get(0).getABC();
-            }
-
-            navigator.setABC(swf.abcList, abc);
+            }            
+            navigator.setABC(swf.abcList, abc);            
         }
     }
-
-    public void switchAbc(ABCContainerTag index) {
-        listIndex = index;
-
-        if (index != null) {
-            this.abc = index.getABC();
-        }
-        updateConstList();
-    }
+   
 
     public void initSplits() {
         //splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
@@ -472,11 +458,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
         decompiledTextArea.addMouseMotionListener(cch);
-
-        JPanel pan2 = new JPanel();
-        pan2.setLayout(new BorderLayout());
-        pan2.add((abcComboBox = new JComboBox<>(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
-
+        
         navigator = new TraitsList(this);
 
         navPanel = new JPanel(new BorderLayout());
@@ -499,7 +481,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
-        abcComboBox.addItemListener(this);
         add(splitPane, BorderLayout.CENTER);
 
         JPanel panConstants = new JPanel();
@@ -630,21 +611,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     }
 
     public void reload() {
-        switchAbc(listIndex);
+        lastDecompiled = "";
         decompiledTextArea.clearScriptCache();
         decompiledTextArea.reloadClass();
         detailPanel.methodTraitPanel.methodCodePanel.clear();
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() == abcComboBox) {
-            int index = ((JComboBox) e.getSource()).getSelectedIndex();
-            if (index == -1) {
-                return;
-            }
-            switchAbc(swf.abcList.get(index - 1));
-        }
+    public void itemStateChanged(ItemEvent e) {        
         if (e.getSource() == constantTypeList) {
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {

@@ -345,6 +345,10 @@ public class Configuration {
     @ConfigurationCategory("script")    
     public static final ConfigurationItem<Integer> debuggerPort = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")  
+    public static final ConfigurationItem<Boolean> randomDebuggerPackage = null;
+    
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> displayDebuggerInfo = null;
     

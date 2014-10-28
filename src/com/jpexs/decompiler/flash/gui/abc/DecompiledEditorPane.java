@@ -512,7 +512,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void reloadClass() {
         int ci = classIndex;
-        uncache(script);
+        uncache(script);        
         if ((script != null) && (abc != null)) {
             setScript(script, abcList);
         }
