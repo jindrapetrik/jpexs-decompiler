@@ -44,6 +44,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -221,7 +223,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         } catch (InterruptedException ex) {
         } catch (AVM2ParseException ex) {
             View.showMessageDialog(this, (ex.text + " on line " + ex.line));
-            selectLine((int) ex.line);
+            gotoLine((int) ex.line);
+            markError();
             return false;
         }
         return true;
@@ -279,29 +282,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(lineStart);
         //requestFocus();
     }
-
-    public void selectLine(int line) {
-        String text = getText();
-        int lineCnt = 1;
-        int lineStart = 0;
-        int lineEnd = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') {
-                lineCnt++;
-                if (lineCnt == line) {
-                    lineStart = i;
-                }
-                if (lineCnt == line + 1) {
-                    lineEnd = i;
-                }
-            }
-        }
-        if (lineCnt == -1) {
-            lineEnd = text.length() - 1;
-        }
-        select(lineStart, lineEnd);
-        requestFocus();
-    }
+    
 
     public Highlighting getSelectedSpecial() {
         return Highlighting.search(specialHilights, getCaretPosition());

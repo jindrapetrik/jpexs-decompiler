@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -869,9 +870,26 @@ public class ASM3Parser {
                                         throw new AVM2ParseException("Case count expected", lexer.yyline());
                                     }
                                     break;
+                                case AVM2Code.OPT_BYTE:
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                        long val = (long) (Long) parsedOperand.value;
+                                        if (val < Byte.MIN_VALUE || val > Byte.MAX_VALUE) {
+                                            throw new AVM2ParseException("Byte value expected (" + Byte.MIN_VALUE + " to " + Byte.MAX_VALUE + "). Use pushshort or pushint to push larger values", lexer.yyline());
+                                        }
+                                        operandsList.add((int) val);
+                                    } else {
+                                        throw new AVM2ParseException("Integer expected", lexer.yyline());
+                                    }
+                                    break;
                                 default:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        operandsList.add((int) (long) (Long) parsedOperand.value);
+                                        long val = (long) (Long) parsedOperand.value;
+                                        if (def instanceof PushShortIns) {
+                                            if (val < Short.MIN_VALUE || val > Short.MAX_VALUE) {
+                                                throw new AVM2ParseException("Short value expected (" + Short.MIN_VALUE + " to " + Short.MAX_VALUE + "). Use pushint to push larger values", lexer.yyline());
+                                            }
+                                        }
+                                        operandsList.add((int) val);
                                     } else {
                                         throw new AVM2ParseException("Integer expected", lexer.yyline());
                                     }
