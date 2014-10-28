@@ -193,7 +193,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
     @ConfigurationDefaultInt(1)
     public static final ConfigurationItem<Integer> lastRenameType = null;
-
+        
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastSaveDir = null;
 
@@ -351,6 +351,9 @@ public class Configuration {
     
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> displayDebuggerInfo = null;
+    
+    @ConfigurationDefaultString("debugConsole")
+    public static final ConfigurationItem<String> lastDebuggerReplaceFunction = null;
     
     private enum OSId {
 

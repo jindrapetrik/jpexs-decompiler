@@ -699,11 +699,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Main.debuggerShowLog();
                 break;
             case ACTION_DEBUGGER_REPLACE_TRACE:
-                ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame);
+                ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame,Configuration.lastDebuggerReplaceFunction.get());
                 rtd.setVisible(true);
-                if(rtd.getResult()!=null){
-                    Main.replaceTraceCalls(rtd.getResult());
+                if(rtd.getValue()!=null){
+                    Main.replaceTraceCalls(rtd.getValue());
                     mainFrame.panel.refreshDecompiled();
+                    Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
                 }
                 break;
             case ACTION_RELOAD:
