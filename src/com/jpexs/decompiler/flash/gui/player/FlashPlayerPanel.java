@@ -17,7 +17,10 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.javactivex.ActiveX;
+import com.jpexs.javactivex.ActiveXEvent;
+import com.jpexs.javactivex.ActiveXEventListener;
 import com.jpexs.javactivex.example.controls.flash.ShockwaveFlash;
 import com.sun.jna.Platform;
 import java.awt.AWTException;
@@ -30,6 +33,8 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -107,6 +112,35 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             throw new FlashUnsupportedException();
         }
         flash = ActiveX.createObject(ShockwaveFlash.class, this);
+        flash.setAllowScriptAccess("always");
+        flash.setAllowNetworking("all");
+        flash.addFlashCallListener(new ActiveXEventListener() {
+
+            @Override
+            public void onEvent(ActiveXEvent axe) {
+                String req = (String) axe.args.get("request");
+                Matcher m = Pattern.compile("<invoke name=\"([^\"]+)\" returntype=\"xml\"><arguments><string>(.*)</string></arguments></invoke>").matcher(req);
+                if (m.matches()) {
+                    String funname = m.group(1);
+                    String msg = m.group(2);
+                    if (funname.equals("alert") || funname.equals("console.log")) {
+                        if (Main.debugDialog != null) {
+                            Main.debugDialog.log(funname + ":" + msg);
+                        }
+                    }
+                }
+            }
+        });
+        flash.addFSCommandListener(new ActiveXEventListener() {
+
+            @Override
+            public void onEvent(ActiveXEvent axe) {
+                System.out.println("Event:" + axe.name);
+                for (String k : axe.args.keySet()) {
+                    System.out.println(k + "=" + axe.args.get(k));
+                }
+            }
+        });
     }
 
     public synchronized void stopSWF() {

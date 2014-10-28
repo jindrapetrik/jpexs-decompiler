@@ -17,6 +17,7 @@
         <include name="**/?*.mid"/>
         <include name="**/?*.wav"/>
         <include name="**/?*.js"/>
+        <include name="**/?*.swf"/>
     </patternset>
 
     <path id="emma.lib">

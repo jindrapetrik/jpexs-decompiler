@@ -385,7 +385,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    private void uncache(ScriptPack pack) {
+    public void uncache(ScriptPack pack) {
         cache.remove(pack);
     }
 

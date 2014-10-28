@@ -1,0 +1,206 @@
+<flash_profiles>
+<flash_profile version="1.0" name="Default" current="true">
+  <PublishFormatProperties enabled="true">
+    <defaultNames>0</defaultNames>
+    <flash>1</flash>
+    <projectorWin>0</projectorWin>
+    <projectorMac>0</projectorMac>
+    <html>0</html>
+    <gif>0</gif>
+    <jpeg>0</jpeg>
+    <png>0</png>
+    <qt>0</qt>
+    <rnwk>0</rnwk>
+    <swc>0</swc>
+    <flashDefaultName>0</flashDefaultName>
+    <projectorWinDefaultName>1</projectorWinDefaultName>
+    <projectorMacDefaultName>1</projectorMacDefaultName>
+    <htmlDefaultName>1</htmlDefaultName>
+    <gifDefaultName>1</gifDefaultName>
+    <jpegDefaultName>1</jpegDefaultName>
+    <pngDefaultName>1</pngDefaultName>
+    <qtDefaultName>1</qtDefaultName>
+    <rnwkDefaultName>1</rnwkDefaultName>
+    <swcDefaultName>1</swcDefaultName>
+    <flashFileName>../../src/com/jpexs/decompiler/flash/gui/debugger/debug.swf</flashFileName>
+    <projectorWinFileName>debug.exe</projectorWinFileName>
+    <projectorMacFileName>debug.app</projectorMacFileName>
+    <htmlFileName>debug.html</htmlFileName>
+    <gifFileName>debug.gif</gifFileName>
+    <jpegFileName>debug.jpg</jpegFileName>
+    <pngFileName>debug.png</pngFileName>
+    <qtFileName>debug.mov</qtFileName>
+    <rnwkFileName>debug.smil</rnwkFileName>
+    <swcFileName>debug.swc</swcFileName>
+  </PublishFormatProperties>
+  <PublishHtmlProperties enabled="true">
+    <VersionDetectionIfAvailable>0</VersionDetectionIfAvailable>
+    <VersionInfo>11,4,0,0;11,3,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;</VersionInfo>
+    <UsingDefaultContentFilename>1</UsingDefaultContentFilename>
+    <UsingDefaultAlternateFilename>1</UsingDefaultAlternateFilename>
+    <ContentFilename>debug_content.html</ContentFilename>
+    <AlternateFilename>debug_alternate.html</AlternateFilename>
+    <UsingOwnAlternateFile>0</UsingOwnAlternateFile>
+    <OwnAlternateFilename></OwnAlternateFilename>
+    <Width>550</Width>
+    <Height>400</Height>
+    <Align>0</Align>
+    <Units>0</Units>
+    <Loop>1</Loop>
+    <StartPaused>0</StartPaused>
+    <Scale>0</Scale>
+    <HorizontalAlignment>1</HorizontalAlignment>
+    <VerticalAlignment>1</VerticalAlignment>
+    <Quality>4</Quality>
+    <DeblockingFilter>0</DeblockingFilter>
+    <WindowMode>0</WindowMode>
+    <DisplayMenu>1</DisplayMenu>
+    <DeviceFont>0</DeviceFont>
+    <TemplateFileName>C:\Users\Jindra\AppData\Local\Adobe\Flash CS6\en_US\Configuration\HTML\Default.html</TemplateFileName>
+    <showTagWarnMsg>1</showTagWarnMsg>
+  </PublishHtmlProperties>
+  <PublishFlashProperties enabled="true">
+    <TopDown></TopDown>
+    <FireFox></FireFox>
+    <Report>0</Report>
+    <Protect>0</Protect>
+    <OmitTraceActions>0</OmitTraceActions>
+    <Quality>80</Quality>
+    <DeblockingFilter>0</DeblockingFilter>
+    <StreamFormat>0</StreamFormat>
+    <StreamCompress>7</StreamCompress>
+    <EventFormat>0</EventFormat>
+    <EventCompress>7</EventCompress>
+    <OverrideSounds>0</OverrideSounds>
+    <Version>17</Version>
+    <ExternalPlayer>FlashPlayer11.4</ExternalPlayer>
+    <ActionScriptVersion>3</ActionScriptVersion>
+    <PackageExportFrame>1</PackageExportFrame>
+    <PackagePaths></PackagePaths>
+    <AS3PackagePaths>.</AS3PackagePaths>
+    <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>
+    <DebuggingPermitted>0</DebuggingPermitted>
+    <DebuggingPassword></DebuggingPassword>
+    <CompressMovie>1</CompressMovie>
+    <CompressionType>0</CompressionType>
+    <InvisibleLayer>1</InvisibleLayer>
+    <DeviceSound>0</DeviceSound>
+    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>
+    <EventUse8kSampleRate>0</EventUse8kSampleRate>
+    <UseNetwork>0</UseNetwork>
+    <DocumentClass>com.jpexs.decompiler.flash.debugger.DebugMain</DocumentClass>
+    <AS3Strict>2</AS3Strict>
+    <AS3Coach>4</AS3Coach>
+    <AS3AutoDeclare>4096</AS3AutoDeclare>
+    <AS3Dialect>AS3</AS3Dialect>
+    <AS3ExportFrame>1</AS3ExportFrame>
+    <AS3Optimize>1</AS3Optimize>
+    <ExportSwc>0</ExportSwc>
+    <ScriptStuckDelay>15</ScriptStuckDelay>
+    <IncludeXMP>1</IncludeXMP>
+    <HardwareAcceleration>0</HardwareAcceleration>
+    <AS3Flags>4102</AS3Flags>
+    <DefaultLibraryLinkage>rsl</DefaultLibraryLinkage>
+    <RSLPreloaderMethod>wrap</RSLPreloaderMethod>
+    <RSLPreloaderSWF>$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf</RSLPreloaderSWF>
+    <LibraryPath>
+      <library-path-entry>
+        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>
+        <linkage>merge</linkage>
+      </library-path-entry>
+      <library-path-entry>
+        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>
+        <linkage usesDefault="true">rsl</linkage>
+        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>
+        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>
+        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>
+      </library-path-entry>
+    </LibraryPath>
+    <LibraryVersions>
+      <library-version>
+        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>
+        <feature name="tlfText" majorVersion="2" minorVersion="0" build="232"/>
+        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>
+        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>
+        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>
+      </library-version>
+    </LibraryVersions>
+  </PublishFlashProperties>
+  <PublishJpegProperties enabled="true">
+    <Width>550</Width>
+    <Height>400</Height>
+    <Progressive>0</Progressive>
+    <DPI>4718592</DPI>
+    <Size>0</Size>
+    <Quality>80</Quality>
+    <MatchMovieDim>1</MatchMovieDim>
+  </PublishJpegProperties>
+  <PublishRNWKProperties enabled="true">
+    <exportFlash>1</exportFlash>
+    <flashBitRate>0</flashBitRate>
+    <exportAudio>1</exportAudio>
+    <audioFormat>0</audioFormat>
+    <singleRateAudio>0</singleRateAudio>
+    <realVideoRate>100000</realVideoRate>
+    <speed28K>1</speed28K>
+    <speed56K>1</speed56K>
+    <speedSingleISDN>0</speedSingleISDN>
+    <speedDualISDN>0</speedDualISDN>
+    <speedCorporateLAN>0</speedCorporateLAN>
+    <speed256K>0</speed256K>
+    <speed384K>0</speed384K>
+    <speed512K>0</speed512K>
+    <exportSMIL>1</exportSMIL>
+  </PublishRNWKProperties>
+  <PublishGifProperties enabled="true">
+    <Width>550</Width>
+    <Height>400</Height>
+    <Animated>0</Animated>
+    <MatchMovieDim>1</MatchMovieDim>
+    <Loop>1</Loop>
+    <LoopCount>0</LoopCount>
+    <OptimizeColors>1</OptimizeColors>
+    <Interlace>0</Interlace>
+    <Smooth>1</Smooth>
+    <DitherSolids>0</DitherSolids>
+    <RemoveGradients>0</RemoveGradients>
+    <TransparentOption></TransparentOption>
+    <TransparentAlpha>128</TransparentAlpha>
+    <DitherOption></DitherOption>
+    <PaletteOption></PaletteOption>
+    <MaxColors>255</MaxColors>
+    <PaletteName></PaletteName>
+  </PublishGifProperties>
+  <PublishPNGProperties enabled="true">
+    <Width>550</Width>
+    <Height>400</Height>
+    <OptimizeColors>1</OptimizeColors>
+    <Interlace>0</Interlace>
+    <Transparent>0</Transparent>
+    <Smooth>1</Smooth>
+    <DitherSolids>0</DitherSolids>
+    <RemoveGradients>0</RemoveGradients>
+    <MatchMovieDim>1</MatchMovieDim>
+    <DitherOption></DitherOption>
+    <FilterOption></FilterOption>
+    <PaletteOption></PaletteOption>
+    <BitDepth>24-bit with Alpha</BitDepth>
+    <MaxColors>255</MaxColors>
+    <PaletteName></PaletteName>
+  </PublishPNGProperties>
+  <PublishQTProperties enabled="true">
+    <Width>550</Width>
+    <Height>400</Height>
+    <MatchMovieDim>1</MatchMovieDim>
+    <UseQTSoundCompression>0</UseQTSoundCompression>
+    <AlphaOption></AlphaOption>
+    <LayerOption></LayerOption>
+    <QTSndSettings>00000000</QTSndSettings>
+    <ControllerOption>0</ControllerOption>
+    <Looping>0</Looping>
+    <PausedAtStart>0</PausedAtStart>
+    <PlayEveryFrame>0</PlayEveryFrame>
+    <Flatten>1</Flatten>
+  </PublishQTProperties>
+</flash_profile>
+</flash_profiles>

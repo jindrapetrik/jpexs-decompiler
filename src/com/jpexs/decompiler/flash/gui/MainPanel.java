@@ -1892,12 +1892,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void refreshDecompiled() {
+    public void refreshDecompiled() {        
         clearCache();
         if (abcPanel != null) {
             abcPanel.reload();
         }
-        reload(true);
+        reload(true);                
         updateClassesList();
     }
 

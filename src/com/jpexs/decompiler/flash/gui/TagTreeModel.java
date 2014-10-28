@@ -333,7 +333,7 @@ public class TagTreeModel implements TreeModel {
             if (n instanceof TreeElement) {
                 TreeElement te = (TreeElement) n;
                 TreeElementItem it = te.getItem();
-                if (obj == it) {
+                if (obj.equals(it)) {
                     return newPath;
                 }
             }
@@ -346,7 +346,7 @@ public class TagTreeModel implements TreeModel {
                     return newPath;
                 }
             } else {
-                if (n.getItem() == obj) {
+                if (obj.equals(n.getItem())) {
                     return newPath;
                 }
             }

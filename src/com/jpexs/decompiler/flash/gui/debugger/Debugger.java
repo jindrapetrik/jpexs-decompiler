@@ -1,0 +1,181 @@
+package com.jpexs.decompiler.flash.gui.debugger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class Debugger {
+
+    private static Set<DebugListener> listeners = new HashSet<>();
+
+    public synchronized void addMessageListener(DebugListener l) {
+        listeners.add(l);
+    }
+
+    public synchronized void removeMessageListener(DebugListener l) {
+        listeners.remove(l);
+    }
+
+    private static class DebugHandler extends Thread {
+
+        Socket s;
+        int serverPort;
+        static int maxid = 0;
+        int id;
+        public boolean finished = false;
+
+        public DebugHandler(int serverPort, Socket s) {
+            this.s = s;
+            id = maxid++;
+            this.serverPort = serverPort;
+        }
+
+        public void cancel() {
+            try {
+                s.close();
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
+
+        private String readString(InputStream is) throws IOException
+        {
+            int len = is.read();
+                        if (len == -1) {
+                            return "";
+                        }
+                        byte buf[] = new byte[len];
+                        is.read(buf);
+                        return new String(buf, "UTF-8");
+                        
+        }
+        @Override
+        public void run() {
+            String clientName = ""+id;
+            try (InputStream is = s.getInputStream()) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                int c;
+                do {
+                    c = is.read();
+                    if (c != 0) {
+                        baos.write(c);
+                    }
+
+                } while (c > 0);
+                String ret = baos.toString("UTF-8");
+
+                if (ret.equals("<policy-file-request/>")) {
+                    try (OutputStream os = s.getOutputStream()) {
+                        os.write(("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"" + serverPort + "\" /></cross-domain-policy>").getBytes("UTF-8"));
+                    }
+                } else {
+                    String name = readString(is);
+                    if(!name.equals("")){
+                        clientName = name;
+                    }
+                    while (true) {
+                        ret = readString(is);
+                        for (DebugListener l : listeners) {
+                            l.onMessage(clientName, ret);
+                        }
+                    }
+                }
+
+            } catch (IOException ex) {
+                //ignore
+            }
+            try {
+                s.close();
+            } catch (IOException ex) {
+                //ignore
+            }
+            finished = true;
+            for (DebugListener l : listeners) {
+                l.onFinish(clientName);
+            }
+        }
+
+    }
+
+    private static class DebugServerThread extends Thread {
+
+        private final int port;
+        private ServerSocket ss;
+        private final Map<Integer, DebugHandler> handlers = new WeakHashMap<>();
+
+        public DebugServerThread(int port) {
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {               
+                ss = new ServerSocket(port,50,InetAddress.getByName("localhost"));
+                ss.setReuseAddress(true);                
+                while (true) {
+                    Socket s = ss.accept();
+                    if (s != null) {
+                        DebugHandler h = new DebugHandler(port, s);
+                        handlers.put(h.id, h);
+                        h.start();
+                    }
+                }
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
+
+    }
+
+    private int port;
+
+    public Debugger(int port) {
+        this.port = port;
+    }
+
+    private DebugServerThread server = null;
+
+    public synchronized void start() {
+        if (server == null) {
+            server = new DebugServerThread(port);
+            server.start();
+        }
+    }
+
+    public synchronized boolean isRunning() {
+        return server != null;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public synchronized void stop() {
+        if (server != null) {
+            try {
+                server.ss.close();
+            } catch (IOException ex) {
+                //ignore
+            }
+            for (DebugHandler h : server.handlers.values()) {
+                h.cancel();
+            }
+            server.handlers.clear();
+            server = null;
+        }
+    }
+
+}

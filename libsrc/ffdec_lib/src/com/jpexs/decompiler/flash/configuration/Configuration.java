@@ -340,6 +340,14 @@ public class Configuration {
 
     public static final ConfigurationItem<String> pluginPath = null;
 
+    
+    @ConfigurationDefaultInt(55556)
+    @ConfigurationCategory("script")    
+    public static final ConfigurationItem<Integer> debuggerPort = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> displayDebuggerInfo = null;
+    
     private enum OSId {
 
         WINDOWS, OSX, UNIX

@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -197,4 +198,35 @@ public class ScriptPack implements TreeElementItem {
         }
         return file;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.abc);
+        hash = 79 * hash + this.scriptIndex;
+        hash = 79 * hash + Objects.hashCode(this.path);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ScriptPack other = (ScriptPack) obj;
+        if (!Objects.equals(this.abc, other.abc)) {
+            return false;
+        }
+        if (this.scriptIndex != other.scriptIndex) {
+            return false;
+        }
+        if (!Objects.equals(this.path, other.path)) {
+            return false;
+        }
+        return true;
+    }
+
 }

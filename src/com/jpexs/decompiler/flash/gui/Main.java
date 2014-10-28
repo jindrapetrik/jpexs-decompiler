@@ -23,12 +23,22 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.Version;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
+import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.helpers.Cache;
@@ -70,6 +80,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -106,6 +117,39 @@ public class Main {
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
     private static final Logger logger = Logger.getLogger(Main.class.getName());
+    private static Debugger debugger;
+    public static DebugLogDialog debugDialog;
+    public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
+
+    private static ABCContainerTag getDebuggerABCTag(SWF swf) {
+        for (ABCContainerTag ac : swf.abcList) {
+            ABC a = ac.getABC();
+            for (MyEntry<ClassPath, ScriptPack> m : a.getScriptPacks()) {
+                if (isDebuggerClass(m.getKey().packageStr, null)) {
+                    return ac;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getDebuggerPackage(SWF swf) {
+        ABCContainerTag ac = getDebuggerABCTag(swf);
+        if (ac == null) {
+            return null;
+        }
+        ABC a = ac.getABC();
+        for (MyEntry<ClassPath, ScriptPack> m : a.getScriptPacks()) {
+            if (isDebuggerClass(m.getKey().packageStr, null)) {
+                return m.getKey().packageStr;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasDebugger(SWF swf) {
+        return getDebuggerABCTag(swf) != null;
+    }
 
     public static void ensureMainFrame() {
         if (mainFrame == null) {
@@ -448,6 +492,10 @@ public class Main {
     }
 
     public static void reloadApp() {
+        if (debugDialog != null) {
+            debugDialog.setVisible(false);
+            debugDialog = null;
+        }
         if (loadingDialog != null) {
             loadingDialog.setVisible(false);
             loadingDialog = null;
@@ -878,7 +926,7 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-       
+
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
             try {
@@ -1028,6 +1076,124 @@ public class Main {
 
     public static void advancedSettings() {
         (new AdvancedSettingsDialog()).setVisible(true);
+    }
+
+    private static boolean isDebuggerClass(String tested, String cls) {
+        if (tested == null) {
+            return false;
+        }
+        if (cls == null) {
+            cls = "";
+        } else {
+            cls = "\\." + Pattern.quote(cls);
+        }
+        return tested.matches(Pattern.quote(DEBUGGER_PACKAGE) + "\\.pkg[a-f0-9]+" + cls);
+    }
+
+    private static String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for (byte b : a) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        return sb.toString();
+    }
+
+    public static void replaceTraceCalls(String fname) {
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        if (hasDebugger(swf)) {
+            String debuggerPkg = getDebuggerPackage(swf);
+            //change trace to fname
+            for (ABCContainerTag ct : swf.abcList) {
+                ABC a = ct.getABC();
+                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
+                    Multiname m = a.constants.constant_multiname.get(i);
+                    if ("trace".equals(m.getNameWithNamespace(a.constants, true))) {
+                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
+                        m.name_index = a.constants.getStringId(fname, true);
+                        ((Tag) ct).setModified(true);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void switchDebugger() {
+        int port = Configuration.debuggerPort.get();
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        ABCContainerTag found = getDebuggerABCTag(swf);
+        if (found != null) {
+            swf.tags.remove((Tag) found);
+            swf.abcList.remove(found);
+
+            //Change all debugger calls to normal trace
+            for (ABCContainerTag ct : swf.abcList) {
+                ABC a = ct.getABC();
+                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
+                    Multiname m = a.constants.constant_multiname.get(i);
+                    if (isDebuggerClass(m.getNameWithNamespace(a.constants, true), "debugTrace")
+                            || isDebuggerClass(m.getNameWithNamespace(a.constants, true), "debugAlert")
+                            || isDebuggerClass(m.getNameWithNamespace(a.constants, true), "debugSocket")
+                            || isDebuggerClass(m.getNameWithNamespace(a.constants, true), "debugConsole")) {
+                        m.name_index = a.constants.getStringId("trace", true);
+                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId("", true)), 0, true);
+                        ((Tag) ct).setModified(true);
+                    }
+                }
+            }
+        } else {
+            Random rnd = new Random();
+            byte rb[] = new byte[16];
+            rnd.nextBytes(rb);
+            String rhex = byteArrayToHex(rb);
+            try {
+                //load debug swf
+                SWF debugSWF = new SWF(Main.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/gui/debugger/debug.swf"), false);
+
+                ABCContainerTag firstAbc = swf.abcList.get(0);
+                String newdebuggerpkg = DEBUGGER_PACKAGE + ".pkg" + rhex;
+                //add debug ABC tags to main SWF
+                for (ABCContainerTag ds : debugSWF.abcList) {
+                    ABC a = ds.getABC();
+                    //Append random hex to Debugger package name
+                    for (int i = 1; i < a.constants.constant_namespace.size(); i++) {
+                        if (a.constants.constant_namespace.get(i).hasName(DEBUGGER_PACKAGE, a.constants)) {
+                            a.constants.constant_namespace.get(i).name_index = a.constants.getStringId(newdebuggerpkg, true);
+                        }
+                    }
+                    //Set debugger port to actually set port
+                    for (int i = 0; i < a.constants.constant_int.size(); i++) {
+                        if (a.constants.constant_int.get(i) == 123456L) {
+                            a.constants.constant_int.set(i, (long) port);
+                        }
+                    }
+                    //Add to target SWF
+                    ((Tag) ds).setSwf(swf);
+                    swf.tags.add(swf.tags.indexOf(firstAbc), (Tag) ds);
+                    swf.abcList.add(swf.abcList.indexOf(firstAbc), ds);
+                    ((Tag) ds).setModified(true);
+                }
+
+            } catch (Exception ex) {
+                //ignore
+            }
+
+        }
+        initDebugger();
+    }
+
+    private static void initDebugger() {
+        if (debugger == null) {
+            debugger = new Debugger(Configuration.debuggerPort.get());
+            debugger.start();
+        }
+    }
+
+    public static void debuggerShowLog() {
+        initDebugger();
+        if (debugDialog == null) {
+            debugDialog = new DebugLogDialog(debugger);
+        }
+        debugDialog.setVisible(true);
     }
 
     public static void autoCheckForUpdates() {

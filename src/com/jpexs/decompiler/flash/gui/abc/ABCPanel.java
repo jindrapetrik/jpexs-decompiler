@@ -119,7 +119,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public ABC abc;
     public SWF swf;
     public JComboBox<ABCContainerTag> abcComboBox;
-    public int listIndex = -1;
+    public ABCContainerTag listIndex = null;
     public DecompiledEditorPane decompiledTextArea;
     public JScrollPane decompiledScrollPane;
     public JSplitPane splitPane;
@@ -318,8 +318,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public void setSwf(SWF swf) {
         if (this.swf != swf) {
             this.swf = swf;
-            listIndex = -1;
-            switchAbc(0); // todo honika: do we need this?
+            listIndex = null;
+            switchAbc(swf.abcList.get(0)); // todo honika: do we need this?
             abcComboBox.setModel(new ABCComboBoxModel(swf.abcList));
             if (swf.abcList.size() > 0) {
                 this.abc = swf.abcList.get(0).getABC();
@@ -329,11 +329,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         }
     }
 
-    public void switchAbc(int index) {
+    public void switchAbc(ABCContainerTag index) {
         listIndex = index;
 
-        if (index != -1) {
-            this.abc = swf.abcList.get(index).getABC();
+        if (index != null) {
+            this.abc = index.getABC();
         }
         updateConstList();
     }
@@ -643,7 +643,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (index == -1) {
                 return;
             }
-            switchAbc(index - 1);
+            switchAbc(swf.abcList.get(index - 1));
         }
         if (e.getSource() == constantTypeList) {
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
@@ -775,15 +775,23 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             case ACTION_SAVE_DECOMPILED:
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
                 int oldIndex = pack.scriptIndex;
-
+                decompiledTextArea.uncache(pack);
+                
+                
                 try {
+                    String oldSp = null;
+                    List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
+                    if (!packs.isEmpty()) {
+                        oldSp = packs.get(0).getKey().toString();                        
+                    }
+                    
                     String as = decompiledTextArea.getText();
                     abc.replaceSciptPack(pack, as);
                     lastDecompiled = as;
                     mainPanel.updateClassesList();
-                    List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
-                    if (!packs.isEmpty()) {
-                        hilightScript(swf, packs.get(0).getKey().toString());
+                    
+                    if(oldSp!=null){
+                        hilightScript(swf, oldSp);
                     }
                     //decompiledTextArea.setClassIndex(-1);
                     //navigator.setClassIndex(-1, oldIndex);

@@ -1,0 +1,34 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 537" majorVersion="12" buildNumber="537" gridSnapTo="true" snapAlign="false" objectsSnapTo="false" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1631" publishTime="1414397031"/>
+          <PublishItem publishSize="1625" publishTime="1414396836"/>
+          <PublishItem publishSize="1620" publishTime="1414395905"/>
+          <PublishItem publishSize="560" publishTime="1414395873"/>
+          <PublishItem publishSize="559" publishTime="1414395847"/>
+          <PublishItem publishSize="559" publishTime="1414395804"/>
+          <PublishItem publishSize="1587" publishTime="1414395524"/>
+          <PublishItem publishSize="1647" publishTime="1414395264"/>
+          <PublishItem publishSize="1668" publishTime="1414394172"/>
+          <PublishItem publishSize="864" publishTime="1414335994"/>
+          <PublishItem publishSize="533" publishTime="1414335971"/>
+          <PublishItem publishSize="533" publishTime="1414335959"/>
+          <PublishItem publishSize="533" publishTime="1414335918"/>
+          <PublishItem publishSize="533" publishTime="1414335903"/>
+          <PublishItem publishSize="533" publishTime="1414335885"/>
+          <PublishItem publishSize="533" publishTime="1414335821"/>
+     </publishHistory>
+</DOMDocument>
