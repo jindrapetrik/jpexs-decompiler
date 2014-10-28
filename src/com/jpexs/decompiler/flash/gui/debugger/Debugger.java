@@ -51,25 +51,31 @@ public class Debugger {
             }
         }
 
-        private String readString(InputStream is) throws IOException
-        {
+        private String readString(InputStream is) throws IOException {
             int len = is.read();
-                        if (len == -1) {
-                            throw new EOFException();
-                        }
-                        byte buf[] = new byte[len];
-                        for(int i=0;i<len;i++){
-                            int rd = is.read();
-                            if(rd == -1){
-                                throw new EOFException();
-                            }
-                            buf[i] = (byte)rd;
-                        }                                                
-                        return new String(buf, "UTF-8");                        
+            if (len == -1) {
+                throw new EOFException();
+            }
+            int len2 = is.read();
+            if (len2 == -1) {
+                throw new EOFException();
+            }
+            len = (len << 8) + len2;
+
+            byte buf[] = new byte[len];
+            for (int i = 0; i < len; i++) {
+                int rd = is.read();
+                if (rd == -1) {
+                    throw new EOFException();
+                }
+                buf[i] = (byte) rd;
+            }
+            return new String(buf, "UTF-8");
         }
+
         @Override
         public void run() {
-            String clientName = ""+id;
+            String clientName = "" + id;
             try (InputStream is = s.getInputStream()) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -89,7 +95,7 @@ public class Debugger {
                     }
                 } else {
                     String name = readString(is);
-                    if(!name.equals("")){
+                    if (!name.equals("")) {
                         clientName = name;
                     }
                     while (true) {
@@ -98,8 +104,8 @@ public class Debugger {
                             l.onMessage(clientName, ret);
                         }
                     }
-                }            
-                
+                }
+
             } catch (IOException ex) {
                 //ignore
             }
@@ -128,9 +134,9 @@ public class Debugger {
 
         @Override
         public void run() {
-            try {               
-                ss = new ServerSocket(port,50,InetAddress.getByName("localhost"));
-                ss.setReuseAddress(true);                
+            try {
+                ss = new ServerSocket(port, 50, InetAddress.getByName("localhost"));
+                ss.setReuseAddress(true);
                 while (true) {
                     Socket s = ss.accept();
                     if (s != null) {

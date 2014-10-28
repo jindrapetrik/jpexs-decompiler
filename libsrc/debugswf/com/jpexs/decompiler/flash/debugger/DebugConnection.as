@@ -26,7 +26,8 @@
 		private static function writeString(msg){
 			var b:ByteArray = new ByteArray();			
    			b.writeUTFBytes(msg);						
-			s.writeByte(b.length);
+			s.writeByte((b.length>>8) & 0xff);
+			s.writeByte(b.length & 0xff);
 			s.writeBytes(b,0,b.length);						
 		}
 		
