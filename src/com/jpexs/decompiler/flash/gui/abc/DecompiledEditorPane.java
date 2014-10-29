@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -220,12 +221,24 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         caretUpdate(null);
         reset = false;
     }
-
-    public int getMultinameUnderCursor() {
-        int pos = getCaretPosition();
+    public int getMultinameUnderMouseCursor(Point pt) {        
+        return getMultinameAtPos(viewToModel(pt));        
+    }
+    
+    public int getMultinameUnderCaret() {
+        return getMultinameAtPos(getCaretPosition());        
+    }
+    
+    public int getMultinameAtPos(int pos) {   
+        Highlighting tm = Highlighting.search(methodHighlights, pos);
+        if (tm == null) {
+            return -1;
+        }
+        int mi = (int)(long)tm.getPropertyLong("index");
+        int bi = abc.findBodyIndex(mi);
         Highlighting h = Highlighting.search(highlights, pos);
         if (h != null) {
-            List<AVM2Instruction> list = abc.bodies.get(abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()).getCode().code;
+            List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
             AVM2Instruction lastIns = null;
             long inspos = 0;
             AVM2Instruction selIns = null;

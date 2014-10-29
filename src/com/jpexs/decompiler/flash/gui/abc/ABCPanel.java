@@ -109,8 +109,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.Token;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
@@ -362,6 +364,24 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
+        
+        decompiledTextArea.setLinkHandler(new LinkHandler() {
+
+            @Override
+            public boolean isLink(Token token) {
+                return isDeclaration(token.start);
+            }
+
+            @Override
+            public void handleLink(Token token) {
+                gotoDeclaration(token.start);
+            }
+
+            @Override
+            public Highlighter.HighlightPainter linkPainter() {
+                return decompiledTextArea.linkPainter();
+            }
+        });
 
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
@@ -439,7 +459,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
+                int multinameIndex = decompiledTextArea.getMultinameUnderCaret();
                 if (multinameIndex > -1) {
                     UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, false);
                     usageFrame.setVisible(true);
@@ -450,7 +470,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gotoDeclaration();
+                gotoDeclaration(decompiledTextArea.getCaretPosition());
             }
         }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
 
@@ -518,8 +538,36 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
 
-    private void gotoDeclaration() {
-        int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
+    private boolean isDeclaration(int pos) {
+        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
+        if (multinameIndex > -1) {
+            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
+
+            Multiname m = abc.constants.constant_multiname.get(multinameIndex);
+            //search other ABC tags if this is not private multiname
+            if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+                for (ABCContainerTag at : swf.abcList) {
+                    ABC a = at.getABC();
+                    if (a == abc) {
+                        continue;
+                    }
+                    int mid = a.constants.getMultinameId(m, false);
+                    if (mid > 0) {
+                        usages.addAll(a.findMultinameDefinition(swf.abcList, mid));
+                    }
+                }
+            }
+
+            //more than one? display list
+            if (!usages.isEmpty()) {
+                return true;
+            } 
+        }
+        return false;
+    }
+    
+    private void gotoDeclaration(int pos) {
+        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
             List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
 
@@ -556,7 +604,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == 17 && !decompiledTextArea.isEditable()) {
                 ctrlDown = true;
-                decompiledTextArea.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                //decompiledTextArea.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         }
 
@@ -564,7 +612,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         public void keyReleased(KeyEvent e) {
             if (e.getKeyCode() == 17) {
                 ctrlDown = false;
-                decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+                //decompiledTextArea.setCursor(Cursor.getDefaultCursor());
             }
         }
 
@@ -572,8 +620,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         public void mouseClicked(MouseEvent e) {
             if (ctrlDown && e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !decompiledTextArea.isEditable()) {
                 ctrlDown = false;
-                decompiledTextArea.setCursor(Cursor.getDefaultCursor());
-                gotoDeclaration();
+                //decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+                //gotoDeclaration();
             }
         }
 
