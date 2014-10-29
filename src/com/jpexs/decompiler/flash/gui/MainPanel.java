@@ -1327,7 +1327,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
         if (swf.fileAttributes != null && swf.fileAttributes.actionScript3) {
-            final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCursor();
+            final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret();
             final List<ABCContainerTag> abcList = swf.abcList;
             if (multiName > 0) {
                 new CancellableWorker() {
