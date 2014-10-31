@@ -277,6 +277,10 @@
             <arg value="${website.upload.url}" />                
 
             <arg value="-field" />
+            <arg value="mode" />
+            <arg value="commandline" />
+            
+            <arg value="-field" />
             <arg value="set_username" />
             <arg value="${website.username}" />
 
