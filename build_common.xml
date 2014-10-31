@@ -130,7 +130,7 @@
     
     <target name="archive" depends="dist">
         <mkdir dir="${RELEASESDIR}"/>
-        <property name="zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" />
+        <property  name="zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" />
         <zip destfile="${zip.file}" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
         </zip>
@@ -249,13 +249,17 @@
         
     </target>
     
-    <target name="nightly">
+    <target name="-nightly-flag-set" >
         <property name="NIGHTLY" value="true" />                                 
-        <antcall target="all" />      
+       
+   </target>
+    
+    <target name="nightly" depends="-nightly-flag-set,all">
+           
     </target>
     
-    <target name="nighlty-upload" depends="nightly,-upload">
-        
+    <target name="nightly-upload" depends="nightly,-upload">
+       
     </target>
     
     <target name="all-upload" depends="all,-upload">
