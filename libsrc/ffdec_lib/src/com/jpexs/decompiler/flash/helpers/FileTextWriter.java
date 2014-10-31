@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
@@ -20,6 +21,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +59,14 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
         writeToFile(str);
         return this;
     }
+
+    @Override
+    public GraphTextWriter appendWithData(String str, Map<String, String> data) {
+        writeToFile(str);
+        return this;
+    }
+    
+    
 
     @Override
     public FileTextWriter append(String str, long offset) {

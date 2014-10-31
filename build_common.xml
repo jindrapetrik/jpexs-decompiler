@@ -19,7 +19,7 @@
         <include name="**/?*.js"/>
         <include name="**/?*.swf"/>
     </patternset>
-
+    
     <path id="emma.lib">
         <pathelement location="${TESTLIBDIR}/emma.jar"/>
         <pathelement location="${TESTLIBDIR}/emma_ant.jar"/>
@@ -116,6 +116,7 @@
     </condition>
     
     <target name="installer" depends="dist" if="is_windows">
+        <property name="exe.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_setup.exe"/>
         <echo message="#define MyAppVersion &quot;${VERSION}${VERSIONSUFFIX}&quot;" file="${INSTALLERCONFIG}" />
         <exec dir="${basedir}" executable="${INNOSETUPPATH}\iscc.exe">
             <arg file="${INSTALLERPROJECT}" />
@@ -129,7 +130,8 @@
     
     <target name="archive" depends="dist">
         <mkdir dir="${RELEASESDIR}"/>
-        <zip destfile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
+        <property name="zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" />
+        <zip destfile="${zip.file}" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
         </zip>
     </target>
@@ -252,6 +254,54 @@
         <antcall target="all" />      
     </target>
     
+    <target name="nighlty-upload" depends="nightly,-upload">
+        
+    </target>
+    
+    <target name="all-upload" depends="all,-upload">
+        
+    </target>
+    
+    
+    <target name="-upload-fail" unless="upload.config.exists">
+        <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
+    </target>
+    
+    <target name="-upload-do" if="upload.config.exists">
+        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
+        <java jar="uploader.jar" fork="true" failonerror="true">    
+            <arg value="${website.upload.url}" />                
+
+            <arg value="-field" />
+            <arg value="set_username" />
+            <arg value="${website.username}" />
+
+            <arg value="-field" />
+            <arg value="set_password" />            
+            <arg value="${website.password}" />            
+
+            <arg value="-file" />
+            <arg value="fileExe" />
+            <arg value="${exe.file}" />
+
+            <arg value="-file" />
+            <arg value="fileZip" />
+            <arg value="${zip.file}" />
+
+            <arg value="-file" />
+            <arg value="fileLang" />
+            <arg value="${lang.file}" />
+        </java>
+    </target>
+    
+    
+    <target name="-upload-check-config">
+        <available file="jpexs_website.properties" property="upload.config.exists"/>
+    </target>
+    
+    <target name="-upload" depends="-upload-check-config,-upload-do,-upload-fail">        
+               
+    </target>    
     
     <target name="dist" depends="build,exe">
         <copy todir="${DISTRIBUTIONDIR}">
@@ -289,7 +339,8 @@
             -------------------------------------------------------------------            
             Please follow instructions on http://www.free-decompiler.com/flash/translations.html
 </echo>
-        <zip destfile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_lang.zip" basedir="${LOCALESTARGETDIR}"/>
+        <property name="lang.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_lang.zip" />
+        <zip destfile="${lang.file}" basedir="${LOCALESTARGETDIR}"/>
     </target>
     
     <target name="-nightly-suffix" if="NIGHTLY">        

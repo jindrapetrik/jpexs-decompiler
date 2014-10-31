@@ -59,5 +59,7 @@
     
     <property name="RUNPARAMS" value=""/>
     
+    <property name="website.upload.url" value="https://www.free-decompiler.com/flash/release.html?action=release" />
+    
     <import file="${basedir}/build_common.xml"/>
 </project>

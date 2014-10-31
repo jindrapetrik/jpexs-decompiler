@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -46,8 +47,10 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (assignment instanceof SetLocalAVM2Item) {
+        if (assignment instanceof SetLocalAVM2Item) {            
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
+            srcData.put("regIndex",""+lti.regIndex);
+            srcData.put("declaration", "true");
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
                 coerType = ((CoerceAVM2Item) lti.value).typeObj;
@@ -64,6 +67,8 @@ public class DeclarationAVM2Item extends AVM2Item {
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
+            srcData.put("slotName",""+ssti.getNameAsStr(localData));
+            srcData.put("declaration", "true");
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");

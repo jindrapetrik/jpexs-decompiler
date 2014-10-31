@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import java.util.Map;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -26,5 +28,6 @@ public class GraphSourceItemPosition {
 
     public GraphSourceItem graphSourceItem;
     public int position;
+    public Map<String,String> data;
 
 }

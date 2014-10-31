@@ -73,6 +73,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        writer.startMethod(method_info);
         toStringHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         if (abc.instance_info.get(classIndex).isInterface()) {
             writer.appendNoHilight(";");
@@ -86,11 +87,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             writer.appendNoHilight("}");
         }
         writer.newLine();
+        writer.endMethod();
         return writer;
     }
 
     @Override
     public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        writer.startMethod(method_info);
         convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         if (!abc.instance_info.get(classIndex).isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
@@ -98,6 +101,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
                 abc.bodies.get(bodyIndex).convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, null, true);
             }
         }
+        writer.endMethod();
     }
 
     @Override

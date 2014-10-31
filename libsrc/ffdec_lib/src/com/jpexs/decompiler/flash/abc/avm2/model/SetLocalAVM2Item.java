@@ -43,6 +43,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         super(instruction, PRECEDENCE_ASSIGMENT);
         this.regIndex = regIndex;
         this.value = value;
+        srcData.put("regIndex", ""+regIndex);        
     }
 
     @Override

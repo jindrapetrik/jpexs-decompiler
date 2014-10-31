@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -103,10 +105,26 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
+    public NulWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+        stringAdded = true;
+        return this;
+    }
+    
+    
+
+    @Override
     public NulWriter append(String str) {
         stringAdded = true;
         return this;
     }
+
+    @Override
+    public GraphTextWriter appendWithData(String str, Map<String, String> data) {
+        stringAdded = true;
+        return this;
+    }
+    
+    
 
     @Override
     public NulWriter append(String str, long offset) {

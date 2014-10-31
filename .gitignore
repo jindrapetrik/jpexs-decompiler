@@ -45,3 +45,7 @@ hs_err_pid*.log
 /libsrc/tablelayout/nbproject/private/
 /libsrc/tablelayout/build/
 /libsrc/tablelayout/dist/
+/libsrc/uploader/nbproject/private/
+/libsrc/uploader/build/
+/libsrc/uploader/dist/
+jpexs_website.properties

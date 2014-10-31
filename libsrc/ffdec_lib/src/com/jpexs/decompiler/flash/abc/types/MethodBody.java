@@ -204,23 +204,23 @@ public class MethodBody implements Cloneable {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
-                writer.startMethod(this.method_info);
+                //writer.startMethod(this.method_info);
                 writer.appendNoHilight("//" + AppResources.translate("decompilation.skipped")).newLine();
-                writer.endMethod();
+                //writer.endMethod();
                 return writer;
             }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
 
             if (convertException == null) {
                 HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
-                writer.startMethod(this.method_info);
+                //writer.startMethod(this.method_info);
                 if (Configuration.showMethodBodyId.get()) {
                     writer.appendNoHilight("// method body id: ");
                     writer.appendNoHilight(abc.findBodyIndex(this.method_info));
                     writer.newLine();
                 }
                 Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
-                writer.endMethod();
+                //writer.endMethod();
             } else if (convertException instanceof TimeoutException) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
                 Helper.appendTimeoutComment(writer, timeout);

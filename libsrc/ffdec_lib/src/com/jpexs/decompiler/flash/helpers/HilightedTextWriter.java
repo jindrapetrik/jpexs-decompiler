@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -68,13 +69,15 @@ public class HilightedTextWriter extends GraphTextWriter {
      *
      * @param src
      * @param pos Offset of instruction
+     * @param data
      * @return HilightedTextWriter
      */
     @Override
-    public HilightedTextWriter startOffset(GraphSourceItem src, int pos) {
+    public HilightedTextWriter startOffset(GraphSourceItem src, int pos, Map<String,String> data) {
         GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
         itemPos.graphSourceItem = src;
         itemPos.position = pos;
+        itemPos.data = data;
         offsets.add(itemPos);
         return this;
     }
@@ -146,25 +149,42 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     @Override
     public HilightedTextWriter hilightSpecial(String text, String type, int index) {
-        Map<String, String> data = new HashMap<>();
-        data.put("subtype", type);
-        data.put("index", Long.toString(index));
-        start(data, HilightType.SPECIAL);
+        return hilightSpecial(text, type, index, new HashMap<String, String>());
+    }
+
+    @Override
+    public HilightedTextWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+        Map<String, String> ndata = new HashMap<>();
+        ndata.putAll(data);
+        ndata.put("subtype", type);
+        ndata.put("index", Long.toString(index));        
+        start(ndata, HilightType.SPECIAL);
         appendNoHilight(text);
         return end(HilightType.SPECIAL);
     }
 
+    
+    
+    
+
     @Override
     public HilightedTextWriter append(String str) {
+        return appendWithData(str, new HashMap<String, String>());
+    }
+    
+    @Override
+    public HilightedTextWriter appendWithData(String str, Map<String,String> data) {
         Highlighting h = null;
         if (!offsets.empty()) {
             GraphSourceItemPosition itemPos = offsets.peek();
             GraphSourceItem src = itemPos.graphSourceItem;
             int pos = itemPos.position;
             if (src != null && hilight) {
-                Map<String, String> data = new HashMap<>();
-                data.put("offset", Long.toString(src.getOffset() + pos + 1));
-                h = new Highlighting(sb.length() - newLineCount, data, HilightType.OFFSET, str);
+                Map<String,String> ndata=new HashMap<>();
+                ndata.putAll(itemPos.data);
+                ndata.putAll(data);
+                ndata.put("offset", Long.toString(src.getOffset() + pos + 1));
+                h = new Highlighting(sb.length() - newLineCount, ndata, HilightType.OFFSET, str);
                 instructionHilights.add(h);
             }
         }

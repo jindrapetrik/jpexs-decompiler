@@ -56,6 +56,7 @@ public class LocalRegAVM2Item extends AVM2Item {
             }
         }
         this.computedValue = computedValue;
+        srcData.put("regIndex", ""+regIndex);
     }
 
     @Override

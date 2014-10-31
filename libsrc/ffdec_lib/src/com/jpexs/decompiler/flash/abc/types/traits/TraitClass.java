@@ -458,9 +458,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (!classInitializerIsEmpty) {
                 writer.newLine();
                 writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size() + 1);
+                writer.startMethod(abc.class_info.get(class_info).cinit_index);
                 writer.appendNoHilight("{").newLine();
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false) + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
                 writer.appendNoHilight("}").newLine();
+                writer.endMethod();
                 writer.endTrait();
             }
         } else {
@@ -486,6 +488,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
             writer.newLine();
             writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size());
+            writer.startMethod(abc.instance_info.get(class_info).iinit_index);
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
             writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/, false));
@@ -501,6 +504,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false) + ".initializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
             }
             writer.endBlock().newLine();
+            writer.endMethod();
             writer.endTrait();
         }
 

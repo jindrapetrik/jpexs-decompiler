@@ -12,12 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers.hilight;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightType;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +55,12 @@ public class Highlighting implements Serializable {
         }
     }
 
+    public Map<String, String> getProperties() {
+        return new HashMap<>(properties);
+    }
+
+    
+    
     public String getPropertyString(String key) {
         return properties.get(key);
     }
@@ -63,23 +72,39 @@ public class Highlighting implements Serializable {
     public static Highlighting search(List<Highlighting> list, String property, String value) {
         return search(list, -1, property, value, -1, -1);
     }
+    
+    public static Highlighting search(List<Highlighting> list, Map<String,String> properties) { 
+        return search(list, -1, properties, -1, -1);
+    }
 
     public static Highlighting search(List<Highlighting> list, String property, String value, int from, int to) {
         return search(list, -1, property, value, from, to);
     }
-
+    
+    public static Highlighting search(List<Highlighting> list, Map<String,String> properties, int from, int to) {
+        return search(list, -1, properties, from, to);
+    }
+    
     public static Highlighting search(List<Highlighting> list, long pos, String property, String value, long from, long to) {
+        Map<String,String> map= new HashMap<>();
+        map.put(property, value);
+        return search(list, pos, map, from, to);
+    }
+    public static Highlighting search(List<Highlighting> list, long pos, Map<String,String> properties, long from, long to) {
         Highlighting ret = null;
-        for (Highlighting h : list) {
-            if (property != null) {
-                String v = h.getPropertyString(property);
-                if (v == null) {
-                    if (value != null) {
-                        continue;
-                    }
-                } else {
-                    if (!v.equals(value)) {
-                        continue;
+        looph:for (Highlighting h : list) {
+            for(String property:properties.keySet()){                
+                if (property != null) {
+                    String v = h.getPropertyString(property);
+                    String value = properties.get(property);
+                    if (v == null) {
+                        if (value != null) {
+                            continue looph;
+                        }
+                    } else {
+                        if (!v.equals(value)) {
+                            continue looph;
+                        }
                     }
                 }
             }
@@ -107,6 +132,44 @@ public class Highlighting implements Serializable {
             if (ret != null) {
                 System.out.println("Highlight found: " + ret.hilightedText);
             }
+        }
+
+        return ret;
+    }
+
+    public static List<Highlighting> searchAll(List<Highlighting> list, long pos, String property, String value, long from, long to) {
+        List<Highlighting> ret = new ArrayList<>();
+        for (Highlighting h : list) {
+            if (property != null) {
+                String v = h.getPropertyString(property);
+                if (v == null) {
+                    if (value != null) {
+                        continue;
+                    }
+                } else {
+                    if (!v.equals(value)) {
+                        continue;
+                    }
+                }
+            }
+            if (from > -1) {
+                if (h.startPos < from) {
+                    continue;
+                }
+            }
+            if (to > -1) {
+                if (h.startPos > to) {
+                    continue;
+                }
+            }
+            if (pos == -1 ||(pos >= h.startPos && (pos < h.startPos + h.len))) {
+                //if (ret == null || h.startPos > ret.startPos) { //get the closest one
+                    ret.add(h);
+                //}
+            }
+            //if (pos == -1) {
+             //   return ret;
+            //}
         }
 
         return ret;

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -23,8 +24,10 @@ import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,6 +59,7 @@ public abstract class GraphTargetItem implements Serializable {
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
     public GraphTargetItem value;
+    protected Map<String,String> srcData = new HashMap<String, String>();
 
     public GraphPart getFirstPart() {
         if (value == null) {
@@ -88,7 +92,7 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos);
+        writer.startOffset(src, pos, srcData);
         appendTo(writer, localData);
         if (needsSemicolon()) {
             writer.append(";");
@@ -107,7 +111,7 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos);
+        writer.startOffset(src, pos, srcData);
         appendTo(writer, localData);
         writer.endOffset();
         return writer;
@@ -152,7 +156,7 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos);
+        writer.startOffset(src, pos, srcData);
         appendToNoQuotes(writer, localData);
         writer.endOffset();
         return writer;
@@ -175,7 +179,7 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos);
+        writer.startOffset(src, pos, srcData);
         appendTo(writer, localData);
         if (needsNewLine()) {
             writer.newLine();

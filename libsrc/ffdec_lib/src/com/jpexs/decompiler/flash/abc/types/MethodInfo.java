@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MethodInfo {
 
@@ -271,16 +272,22 @@ public class MethodInfo {
         if (body != null) {
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
         }
+        Map<String,String> pdata;
+        
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
+            pdata=new HashMap<>();
+            pdata.put("declaration", "true");
+            pdata.put("regIndex", ""+(i+1));            
             if (!localRegNames.isEmpty()) {
-                writer.appendNoHilight(Deobfuscation.printIdentifier(localRegNames.get(i + 1)));
+                pdata.put("slotName", localRegNames.get(i + 1)); //assuming it is a slot
+                writer.hilightSpecial(Deobfuscation.printIdentifier(localRegNames.get(i + 1)),"paramname",i,pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                writer.appendNoHilight(Deobfuscation.printIdentifier(constants.getString(paramNames[i])));
+                writer.hilightSpecial(Deobfuscation.printIdentifier(constants.getString(paramNames[i])),"paramname",i,pdata);
             } else {
-                writer.appendNoHilight("param" + (i + 1));
+                writer.hilightSpecial("param" + (i + 1),"paramname",i,pdata);
             }
             writer.appendNoHilight(":");
             if (param_types[i] == 0) {
@@ -307,7 +314,10 @@ public class MethodInfo {
             } else {
                 restAdd += "rest";
             }
-            writer.hilightSpecial(restAdd, "flag.NEED_REST");
+            pdata=new HashMap<>();
+            pdata.put("declaration", "true");
+            pdata.put("regIndex", ""+(param_types.length + 1));            
+            writer.hilightSpecial(restAdd, "flag.NEED_REST",0,pdata);
         }
         return writer;
     }

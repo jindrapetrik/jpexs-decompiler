@@ -369,7 +369,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
             @Override
             public boolean isLink(Token token) {
-                return isDeclaration(token.start);
+                return hasDeclaration(token.start);
             }
 
             @Override
@@ -538,7 +538,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
 
-    private boolean isDeclaration(int pos) {
+    private boolean hasDeclaration(int pos) {
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
             List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
@@ -562,6 +562,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (!usages.isEmpty()) {
                 return true;
             } 
+        }else{
+            return decompiledTextArea.getLocalDeclarationOfPos(pos)!=-1;
         }
         return false;
     }
@@ -592,6 +594,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 usageFrame.setVisible(true);
             } else if (!usages.isEmpty()) { //one
                 UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
+            }
+        }else{
+            int dpos=decompiledTextArea.getLocalDeclarationOfPos(pos);
+            if(dpos>-1){
+                decompiledTextArea.setCaretPosition(dpos);
             }
         }
     }

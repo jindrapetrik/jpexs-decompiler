@@ -12,10 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -46,9 +49,10 @@ public abstract class GraphTextWriter {
      *
      * @param src
      * @param pos Offset of instruction
+     * @param data
      * @return GraphTextWriter
      */
-    public GraphTextWriter startOffset(GraphSourceItem src, int pos) {
+    public GraphTextWriter startOffset(GraphSourceItem src, int pos, Map<String,String> data) {
         return this;
     }
 
@@ -99,10 +103,14 @@ public abstract class GraphTextWriter {
     }
 
     public GraphTextWriter hilightSpecial(String text, String type) {
-        return this;
+        return hilightSpecial(text, type, 0);
     }
 
     public GraphTextWriter hilightSpecial(String text, String type, int index) {
+        return hilightSpecial(text, type, 0, new HashMap<String, String>());
+    }
+    
+    public GraphTextWriter hilightSpecial(String text, String type, int index, Map<String,String> data) {
         return this;
     }
 
@@ -110,6 +118,8 @@ public abstract class GraphTextWriter {
         return "";
     }
 
+    public abstract GraphTextWriter appendWithData(String str, Map<String,String> data);
+    
     public abstract GraphTextWriter append(String str);
 
     public abstract GraphTextWriter append(String str, long offset);
