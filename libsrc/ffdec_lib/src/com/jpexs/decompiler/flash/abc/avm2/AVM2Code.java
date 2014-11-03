@@ -1242,9 +1242,6 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
                     String v = abc.constants.getString(ins.operands[1]);
-                    if (!Deobfuscation.isValidName(v)) { //ignore obfuscated names
-                        return new HashMap<>();
-                    }
                     //Same name already exists, it may be wrong names inserted by obfuscator
                     if (localRegNames.values().contains(v)) {
                         return new HashMap<>();
