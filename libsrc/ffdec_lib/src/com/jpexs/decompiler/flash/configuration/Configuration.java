@@ -355,6 +355,10 @@ public class Configuration {
     @ConfigurationDefaultString("debugConsole")
     public static final ConfigurationItem<String> lastDebuggerReplaceFunction = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> getLocalNamesFromDebugInfo = null;    
+    
     private enum OSId {
 
         WINDOWS, OSX, UNIX

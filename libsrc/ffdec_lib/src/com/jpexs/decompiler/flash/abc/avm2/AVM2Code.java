@@ -214,6 +214,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.action.Deobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -1234,15 +1235,26 @@ public class AVM2Code implements Cloneable {
     }
     private int toSourceCount = 0;
 
-    public HashMap<Integer, String> getLocalRegNamesFromDebug(ABC abc) {
-        HashMap<Integer, String> localRegNames = new HashMap<>();
+    public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc) {
+        Map<Integer, String> localRegNames = new HashMap<>();
+
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
-                    localRegNames.put(ins.operands[2] + 1, abc.constants.getString(ins.operands[1]));
+                    String v = abc.constants.getString(ins.operands[1]);
+                    if (!Deobfuscation.isValidName(v)) { //ignore obfuscated names
+                        return new HashMap<>();
+                    }
+                    //Same name already exists, it may be wrong names inserted by obfuscator
+                    if (localRegNames.values().contains(v)) {
+                        return new HashMap<>();
+                    }
+                    localRegNames.put(ins.operands[2] + 1, v);
                 }
             }
         }
+
+        //TODO: Make this immune to using existing multinames (?)
         return localRegNames;
     }
 

@@ -268,8 +268,8 @@ public class MethodInfo {
     }
 
     public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
-        HashMap<Integer, String> localRegNames = new HashMap<>();
-        if (body != null) {
+        Map<Integer, String> localRegNames = new HashMap<>();
+        if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {            
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
         }
         Map<String,String> pdata;

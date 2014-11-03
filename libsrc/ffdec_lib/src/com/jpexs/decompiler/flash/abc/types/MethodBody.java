@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -151,9 +152,11 @@ public class MethodBody implements Cloneable {
             pos++;
         }
 
-        HashMap<Integer, String> debugRegNames = getCode().getLocalRegNamesFromDebug(abc);
-        for (int k : debugRegNames.keySet()) {
-            ret.put(k, debugRegNames.get(k));
+        if (Configuration.getLocalNamesFromDebugInfo.get()) {
+            Map<Integer, String> debugRegNames = getCode().getLocalRegNamesFromDebug(abc);
+            for (int k : debugRegNames.keySet()) {
+                ret.put(k, debugRegNames.get(k));
+            }
         }
         return ret;
     }
