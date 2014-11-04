@@ -1890,6 +1890,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (dumpInfo != null) {
             setDumpTreeSelectedNode(dumpInfo);
         }
+        
+        reload(true);
     }
 
     public void refreshDecompiled() {
