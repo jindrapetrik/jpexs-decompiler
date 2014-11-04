@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -525,7 +524,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public void setScript(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
-        abcPanel.scriptNameLabel.setText(scriptLeaf.getPath().toString());
+        abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
         int scriptIndex = scriptLeaf.scriptIndex;
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;

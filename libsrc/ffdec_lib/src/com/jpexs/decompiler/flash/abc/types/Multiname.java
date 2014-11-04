@@ -44,7 +44,7 @@ public class Multiname {
     public List<Integer> params; //for TypeName
     public boolean deleted;
 
-    public boolean validType() {
+    private boolean validType() {
         boolean cnt = false;
         for (int i = 0; i < multinameKinds.length; i++) {
             if (multinameKinds[i] == kind) {

@@ -326,7 +326,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
+        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
 
         ColorTransform clrTrans = null;
         for (Tag t : swf.tags) {
@@ -336,10 +336,10 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             }
         }
         int maxDepth = 0;
-        Frame frameUp = new Frame(timeline);
-        Frame frameDown = new Frame(timeline);
-        Frame frameOver = new Frame(timeline);
-        Frame frameHit = new Frame(timeline);
+        Frame frameUp = new Frame(timeline, 0);
+        Frame frameDown = new Frame(timeline, 0);
+        Frame frameOver = new Frame(timeline, 0);
+        Frame frameHit = new Frame(timeline, 0);
         for (BUTTONRECORD r : this.characters) {
 
             DepthState layer = new DepthState(swf, null);
@@ -366,26 +366,21 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             }
 
         }
-        timeline.frames.add(frameUp);
+        timeline.getFrames().add(frameUp);
         if (frameOver.layers.isEmpty()) {
             frameOver = frameUp;
         }
-        timeline.frames.add(frameOver);
+        timeline.getFrames().add(frameOver);
         if (frameDown.layers.isEmpty()) {
             frameDown = frameOver;
         }
-        timeline.frames.add(frameDown);
+        timeline.getFrames().add(frameDown);
         if (frameHit.layers.isEmpty()) {
             frameHit = frameUp;
         }
-        timeline.frames.add(frameHit);
+        timeline.getFrames().add(frameHit);
 
         return timeline;
-    }
-
-    @Override
-    public void resetTimeline() {
-        timeline = null;
     }
 
     @Override

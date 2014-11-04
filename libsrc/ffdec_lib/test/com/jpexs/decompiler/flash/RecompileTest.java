@@ -31,9 +31,6 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
 import java.io.BufferedInputStream;
@@ -44,6 +41,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -77,54 +75,12 @@ public class RecompileTest {
         }
     }
 
-    private void testAS2DirectEditingOneRecursive(int swfVersion, List<TreeNode> nodeList) {
-        for (TreeNode node : nodeList) {
-            if (node.subNodes.isEmpty()) {
-                TreeItem item = node.getItem();
-                if (item instanceof ASMSource) {
-                    try {
-                        ASMSource asm = ((ASMSource) item);
-                        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
-                        String as = writer.toString();
-                        as = asm.removePrefixAndSuffix(as);
-                        ActionScriptParser par = new ActionScriptParser(swfVersion);
-                        try {
-                            asm.setActions(par.actionsFromString(as));
-                        } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
-                        }
-                        writer = new HilightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
-                        String as2 = writer.toString();
-                        as2 = asm.removePrefixAndSuffix(as2);
-                        try {
-                            asm.setActions(par.actionsFromString(as2));
-                        } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
-                        }
-                        writer = new HilightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
-                        String as3 = writer.toString();
-                        as3 = asm.removePrefixAndSuffix(as3);
-                        if (!as3.equals(as2)) {
-                            fail("ActionScript is different: " + item.getSwf().getShortFileName() + "/" + item.toString());
-                        }
-                    } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-                    }
-                }
-            } else {
-                testAS2DirectEditingOneRecursive(swfVersion, node.subNodes);
-            }
-        }
-    }
-
     @Test(dataProvider = "provideFiles")
     public void testDirectEditing(String filename) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
         Configuration.autoDeobfuscate.set(false);
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
-            if ((swf.fileAttributes != null && swf.fileAttributes.actionScript3) || (swf.fileAttributes == null && swf.isAS3)) {
+            if (swf.isAS3) {
                 boolean dotest = false;
                 List<ABC> allAbcs = new ArrayList<>();
                 for (ABCContainerTag ct : swf.abcList) {
@@ -148,15 +104,43 @@ public class RecompileTest {
                         en.getValue().toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
                         ABC nabc = new ABC(swf);
-                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as",abc.instance_info.size());
+                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
                     }
                 }
             } else {
-                List<ContainerItem> list2 = new ArrayList<>();
-                list2.addAll(swf.tags);
-                List<TreeNode> list = SWF.createASTagList(list2, null);
+                Map<String, ASMSource> asms = swf.getASMs();
 
-                testAS2DirectEditingOneRecursive(swf.version, list);
+                for (ASMSource asm : asms.values()) {
+                    try {
+                        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        String as = writer.toString();
+                        as = asm.removePrefixAndSuffix(as);
+                        ActionScriptParser par = new ActionScriptParser(swf.version);
+                        try {
+                            asm.setActions(par.actionsFromString(as));
+                        } catch (ActionParseException | CompilationException ex) {
+                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                        }
+                        writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        String as2 = writer.toString();
+                        as2 = asm.removePrefixAndSuffix(as2);
+                        try {
+                            asm.setActions(par.actionsFromString(as2));
+                        } catch (ActionParseException | CompilationException ex) {
+                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                        }
+                        writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        String as3 = writer.toString();
+                        as3 = asm.removePrefixAndSuffix(as3);
+                        if (!as3.equals(as2)) {
+                            fail("ActionScript is different: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                        }
+                    } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+                    }
+                }
             }
         } catch (Exception ex) {
             System.out.println("FAIL");

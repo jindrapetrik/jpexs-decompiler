@@ -14,49 +14,36 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.treeitems;
+package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class FrameNodeItem implements TreeItem {
+public class FrameScript implements TreeItem {
 
     private final SWF swf;
-    private final int frame;
-    private final Timelined parent;
-    private final boolean display;
+    private final Frame frame;
 
-    public FrameNodeItem(SWF swf, int frame, Timelined parent, boolean display) {
-
+    public FrameScript(SWF swf, Frame frame) {
         this.swf = swf;
         this.frame = frame;
-        this.parent = parent;
-        this.display = display;
     }
-
+    
+    public Frame getFrame() {
+        return frame;
+    }
+    
     @Override
     public SWF getSwf() {
         return swf;
     }
 
-    public boolean isDisplayed() {
-        return display;
-    }
-
     @Override
     public String toString() {
-        return "frame " + (frame + 1);
-    }
-
-    public int getFrame() {
-        return frame;
-    }
-
-    public Timelined getParent() {
-        return parent;
+        return frame.toString();
     }
 }

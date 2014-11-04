@@ -45,7 +45,6 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
-import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
@@ -55,10 +54,11 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -156,10 +156,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            TreeNode scriptsNode = ttm.getSwfNode(mainPanel.getCurrentSwf()).scriptsNode;
+            TreeItem scriptsNode = ttm.getScriptsNode(mainPanel.getCurrentSwf());
             final List<ABCPanelSearchResult> found = new ArrayList<>();
-            if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
-                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+            if (scriptsNode instanceof ClassesListTreeModel) {
+                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
                 List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
                 final Pattern pat = regexp
                         ? Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0)
@@ -689,9 +689,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public void hilightScript(SWF swf, String name) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreeNode scriptsNode = ttm.getSwfNode(swf).scriptsNode;
-        if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
-            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+        TreeItem scriptsNode = ttm.getScriptsNode(swf);
+        if (scriptsNode instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
                 if (item.getKey().toString().equals(name)) {

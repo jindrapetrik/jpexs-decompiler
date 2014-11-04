@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
-import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -862,14 +861,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 if (swf != null) {
-                    SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
                     boolean saved = false;
-                    if (snode.binaryData != null) {
+                    if (swf.binaryData != null) {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         try {
                             swf.saveTo(baos);
-                            snode.binaryData.binaryData = baos.toByteArray();
-                            snode.binaryData.setModified(true);
+                            swf.binaryData.binaryData = baos.toByteArray();
+                            swf.binaryData.setModified(true);
                             saved = true;
                         } catch (IOException ex) {
                             Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);

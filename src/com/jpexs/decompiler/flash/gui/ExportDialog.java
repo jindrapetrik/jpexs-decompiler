@@ -30,14 +30,15 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
-import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -83,9 +84,9 @@ public class ExportDialog extends AppDialog {
         {ImageTag.class},
         {DefineVideoStreamTag.class},
         {SoundTag.class},
-        {TreeNode.class, ScriptPack.class},
+        {ASMSource.class, ScriptPack.class},
         {DefineBinaryDataTag.class},
-        {FrameNodeItem.class},
+        {Frame.class},
         {FontTag.class},
         {MorphShapeTag.class}
     };
@@ -144,7 +145,7 @@ public class ExportDialog extends AppDialog {
         Configuration.lastSelectedExportFormats.set(cfg);
     }
 
-    public ExportDialog(List<Object> exportables) {
+    public ExportDialog(List<TreeItem> exportables) {
         setTitle(translate("dialog.title"));
         addWindowListener(new WindowAdapter() {
             @Override
@@ -205,7 +206,7 @@ public class ExportDialog extends AppDialog {
             if (exportables == null) {
                 exportableExists = true;
             } else {
-                for (Object e : exportables) {
+                for (TreeItem e : exportables) {
                     for (int j = 0; j < objClasses[i].length; j++) {
                         if (objClasses[i][j].isInstance(e)) {
                             exportableExists = true;

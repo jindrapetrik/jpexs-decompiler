@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
  */
 public class Debugger {
 
-    private static Set<DebugListener> listeners = new HashSet<>();
+    private static final Set<DebugListener> listeners = new HashSet<>();
 
     public synchronized void addMessageListener(DebugListener l) {
         listeners.add(l);
@@ -95,7 +95,7 @@ public class Debugger {
                     }
                 } else {
                     String name = readString(is);
-                    if (!name.equals("")) {
+                    if (!name.isEmpty()) {
                         clientName = name;
                     }
                     while (true) {
@@ -152,7 +152,7 @@ public class Debugger {
 
     }
 
-    private int port;
+    private final int port;
 
     public Debugger(int port) {
         this.port = port;

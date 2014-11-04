@@ -14,35 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
+package com.jpexs.decompiler.flash.gui.tagtree;
+
+import com.jpexs.decompiler.flash.treeitems.FolderItem;
 
 /**
  *
  * @author JPEXS
  */
-public enum TreeNodeType {
+public class TagTreeRoot extends FolderItem {
 
-    UNKNOWN,
-    FLASH,
-    FONT,
-    TEXT,
-    IMAGE,
-    SHAPE,
-    MORPH_SHAPE,
-    SPRITE,
-    BUTTON,
-    AS,
-    PACKAGE,
-    FRAME,
-    SHOW_FRAME,
-    MOVIE,
-    SOUND,
-    BINARY_DATA,
-    OTHER_TAG,
-    FOLDER,
-    FOLDER_OPEN,
-    BUNDLE_ZIP,
-    BUNDLE_SWC,
-    BUNDLE_BINARY,
-    HEADER,
+    public static final String FOLDER_ROOT = "root";
+
+    public TagTreeRoot() {
+        super("root", FOLDER_ROOT, null, null);
+    }
 }

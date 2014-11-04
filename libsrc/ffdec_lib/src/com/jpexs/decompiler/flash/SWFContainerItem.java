@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
+ *  Copyright (C) 2014 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -12,24 +12,16 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
-package com.jpexs.decompiler.flash.treenodes;
+ * License along with this library.
+ */
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class ContainerNode extends TreeNode {
-
-    public ContainerNode(ContainerItem item) {
-        super(item);
-    }
-
-    @Override
-    public ContainerItem getItem() {
-        return (ContainerItem) item;
-    }
-
+public interface SWFContainerItem extends TreeItem {
+    
 }

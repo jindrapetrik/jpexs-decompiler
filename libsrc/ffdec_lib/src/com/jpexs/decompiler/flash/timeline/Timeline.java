@@ -19,11 +19,13 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -52,15 +54,59 @@ import java.util.Stack;
  */
 public class Timeline {
 
-    public List<Frame> frames = new ArrayList<>();
     public int id;
     public SWF swf;
     public RECT displayRect;
     public int frameRate;
+    public Timelined timelined;
+    public Tag parentTag;
     public List<Tag> tags;
-    public Map<Integer, Integer> depthMaxFrame = new HashMap<>();
 
-    public int getMaxDepth() {
+    private final List<Frame> frames = new ArrayList<>();
+    private final Map<Integer, Integer> depthMaxFrame = new HashMap<>();
+    private final List<ASMSource> asmSources = new ArrayList<>();
+    private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
+    private AS2Package as2RootPackage;
+    private final List<Tag> otherTags = new ArrayList<>();
+    private boolean initialized = false;
+
+    private void ensureInitialized() {
+        if (!initialized) {
+            initialize();
+        }
+    }
+    
+    public List<Frame> getFrames() {
+        ensureInitialized();
+        return frames;
+    }
+    
+    public AS2Package getAS2RootPackage() {
+        ensureInitialized();
+        return as2RootPackage;
+    }
+    
+    public Map<Integer, Integer> getDepthMaxFrame() {
+        ensureInitialized();
+        return depthMaxFrame;
+    }
+    
+    public void reset() {
+        initialized = false;
+        frames.clear();
+        depthMaxFrame.clear();
+        asmSources.clear();
+        actionFrames.clear();
+        otherTags.clear();
+        as2RootPackage = new AS2Package(null, null, swf);
+    }
+    
+    public final int getMaxDepth() {
+        ensureInitialized();
+        return getMaxDepthInternal();
+    }
+    
+    public final int getMaxDepthInternal() {
         int max_depth = 0;
         for (Frame f : frames) {
             for (int depth : f.layers.keySet()) {
@@ -76,39 +122,49 @@ public class Timeline {
     }
 
     public int getFrameCount() {
-        return frames.size();
+        return getFrames().size();
+    }
+    
+    public int getFrameForAction(ASMSource asm) {
+        Integer frame = actionFrames.get(asm);
+        if (frame == null) {
+            return -1;
+        }
+        
+        return frame;
     }
 
     public Timeline(SWF swf) {
-        this(swf, swf.tags, 0, swf.displayRect);
+        this(swf, null, swf.tags, 0, swf.displayRect);
     }
 
-    public Timeline(SWF swf, List<Tag> tags, int id, RECT displayRect) {
+    public Timeline(SWF swf, Tag parentTag, List<Tag> tags, int id, RECT displayRect) {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
+        this.timelined = parentTag == null ? swf : (Timelined) parentTag;
+        this.parentTag = parentTag;
         this.tags = tags;
-        Frame frame = new Frame(this);
+        as2RootPackage = new AS2Package(null, null, swf);
+    }
+    
+    private void initialize() {
+        int frameIdx = 0;
+        Frame frame = new Frame(this, frameIdx++);
         boolean tagAdded = false;
         for (Tag t : tags) {
+            tagAdded = true;
             if (ShowFrameTag.isNestedTagType(t.getId())) {
                 frame.innerTags.add(t);
-                tagAdded = true;
             }
             if (t instanceof StartSoundTag) {
                 frame.sounds.add(((StartSoundTag) t).soundId);
-                tagAdded = true;
-            }
-            if (t instanceof StartSound2Tag) {
+            } else if (t instanceof StartSound2Tag) {
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
-                tagAdded = true;
-            }
-            if (t instanceof SetBackgroundColorTag) {
+            } else if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
-                tagAdded = true;
-            }
-            if (t instanceof PlaceObjectTypeTag) {
+            } else if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
                 if (!frame.layers.containsKey(depth)) {
@@ -168,30 +224,30 @@ public class Timeline {
                     fl.clipDepth = po.getClipDepth();
                 }
                 fl.key = true;
-                tagAdded = true;
-            }
-            if (t instanceof RemoveTag) {
+            } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
-                tagAdded = true;
-            }
-            if (t instanceof DoActionTag) {
-                frame.action = (DoActionTag) t;
-                tagAdded = true;
-            }
-            if (t instanceof ShowFrameTag) {
+            } else if (t instanceof DoActionTag) {
+                frame.actions.add((DoActionTag) t);
+                actionFrames.put((DoActionTag) t, frame.frame);
+            } else if (t instanceof ShowFrameTag) {
                 frame.showFrameTag = (ShowFrameTag) t;
                 frames.add(frame);
-                frame = new Frame(frame);
+                frame = new Frame(frame, frameIdx++);
                 tagAdded = false;
+            } else if (t instanceof ASMSource) {
+                asmSources.add((ASMSource) t);
+            } else {
+                otherTags.add(t);
             }
         }
         if (tagAdded) {
             frames.add(frame);
         }
+        
         detectTweens();
-        for (int d = 1; d <= getMaxDepth(); d++) {
+        for (int d = 1; d <= getMaxDepthInternal(); d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
                     depthMaxFrame.put(d, f + 1);
@@ -199,6 +255,10 @@ public class Timeline {
                 }
             }
         }
+        
+        createASPackages();
+        
+        initialized = true;
     }
 
     private boolean compare(int a, int b, int c, int tolerance) {
@@ -206,7 +266,7 @@ public class Timeline {
     }
 
     private void detectTweens() {
-        for (int d = 1; d <= getMaxDepth(); d++) {
+        for (int d = 1; d <= getMaxDepthInternal(); d++) {
             int characterId = -1;
             int len = 0;
             for (int f = 0; f <= frames.size(); f++) {
@@ -237,6 +297,33 @@ public class Timeline {
         }
     }
 
+    private void createASPackages() {
+        for (ASMSource asm : asmSources) {
+            if (asm instanceof DoInitActionTag) {
+                DoInitActionTag initAction = (DoInitActionTag) asm;
+                String path = initAction.getExportName();
+                if (path == null || path.isEmpty()) {
+                    path = initAction.getExportFileName();
+                }
+                               
+                String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
+                AS2Package pkg = as2RootPackage;
+                for (int pos = 0; pos < pathParts.length - 1; pos++) {
+                    String pathPart = pathParts[pos];
+                    AS2Package subPkg = pkg.subPackages.get(pathPart);
+                    if (subPkg == null) {
+                        subPkg = new AS2Package(pathPart, pkg, swf);
+                        pkg.subPackages.put(pathPart, subPkg);
+                    }
+                    
+                    pkg = subPkg;
+                }
+                
+                pkg.scripts.put(pathParts[pathParts.length - 1], asm);
+            }
+        }
+    }
+    
     public void getNeededCharacters(Set<Integer> usedCharacters) {
         for (int i = 0; i < getFrameCount(); i++) {
             getNeededCharacters(i, usedCharacters);
@@ -244,13 +331,13 @@ public class Timeline {
     }
 
     public void getNeededCharacters(List<Integer> frames, Set<Integer> usedCharacters) {
-        for (int frame = 0; frame < frames.size(); frame++) {
+        for (int frame = 0; frame < getFrameCount(); frame++) {
             getNeededCharacters(frame, usedCharacters);
         }
     }
 
     public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
-        Frame frameObj = frames.get(frame);
+        Frame frameObj = getFrames().get(frame);
         for (int depth : frameObj.layers.keySet()) {
             DepthState layer = frameObj.layers.get(depth);
             if (layer.characterId != -1) {
@@ -285,10 +372,10 @@ public class Timeline {
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
-        Frame fr = this.frames.get(frame);
+        Frame fr = getFrames().get(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
-        int maxDepth = this.getMaxDepth();
+        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
@@ -317,9 +404,9 @@ public class Timeline {
     }
 
     public void getObjectsOutlines(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
-        Frame fr = this.frames.get(frame);
+        Frame fr = getFrames().get(frame);
         Stack<Clip> clips = new Stack<>();
-        int maxDepth = this.getMaxDepth();
+        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
@@ -386,10 +473,10 @@ public class Timeline {
     }
 
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        Frame fr = this.frames.get(frame);
+        Frame fr = getFrames().get(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
-        int maxDepth = this.getMaxDepth();
+        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
@@ -448,7 +535,7 @@ public class Timeline {
     }
 
     public boolean isSingleFrame() {
-        for (int i = 0; i < frames.size(); i++) {
+        for (int i = 0; i < getFrameCount(); i++) {
             if (!isSingleFrame(i)) {
                 return false;
             }
@@ -458,7 +545,7 @@ public class Timeline {
 
     private boolean isSingleFrame(int frame) {
         Frame frameObj = frames.get(frame);
-        int maxDepth = this.getMaxDepth();
+        int maxDepth = getMaxDepthInternal();
         for (int i = 1; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;

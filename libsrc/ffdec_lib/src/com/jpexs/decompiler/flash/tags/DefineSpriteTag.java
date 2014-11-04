@@ -84,14 +84,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
-            timeline = new Timeline(swf, subTags, spriteId, getRect(new HashSet<BoundedTag>()));
+            timeline = new Timeline(swf, this, subTags, spriteId, getRect(new HashSet<BoundedTag>()));
         }
         return timeline;
-    }
-
-    @Override
-    public void resetTimeline() {
-        timeline = null;
     }
 
     @Override

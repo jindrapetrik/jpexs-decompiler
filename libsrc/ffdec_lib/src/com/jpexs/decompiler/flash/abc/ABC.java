@@ -1207,7 +1207,7 @@ public class ABC {
                 }
             }
         }
-        boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
+        boolean isDocumentClass = documentClass.equals(pack.getClassPath().toString());
 
         ScriptInfo si = script_info.get(oldIndex);
         si.delete(this, true);

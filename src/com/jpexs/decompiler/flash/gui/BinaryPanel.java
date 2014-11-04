@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
-import com.jpexs.decompiler.flash.treenodes.TagNode;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -43,7 +43,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
     public HexView hexEditor = new HexView();
     private byte[] data;
     private JPanel swfInsidePanel;
-    private TagNode node = null;
+    private DefineBinaryDataTag binaryDataTag = null;
     private final MainPanel mainPanel;
 
     public BinaryPanel(final MainPanel mainPanel) {
@@ -67,7 +67,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                mainPanel.loadFromBinaryTag(node);
+                mainPanel.loadFromBinaryTag(binaryDataTag);
                 swfInsidePanel.setVisible(false);
             }
 
@@ -76,14 +76,15 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
         swfInsidePanel.setVisible(false);
     }
 
-    public void setBinaryData(byte[] data, TagNode node) {
-        this.node = node;
+    public void setBinaryData(byte[] data, DefineBinaryDataTag binaryDataTag) {
+        this.binaryDataTag = binaryDataTag;
         this.data = data;
         if (data != null) {
             hexEditor.setData(data, null, null);
 
-            if (node != null) {
-                if (node.subNodes.isEmpty() && data.length > 8) {
+            boolean binaryIsSwf = false;
+            if (binaryDataTag != null) {
+                if (binaryDataTag.innerSwf == null && data.length > 8) {
                     try {
                         String signature = new String(data, 0, 3, Utf8Helper.charset);
                         if (Arrays.asList(
@@ -93,18 +94,14 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
                                 "GFX", //Uncompressed ScaleForm GFx
                                 "CFX" //Compressed ScaleForm GFx
                         ).contains(signature)) {
-                            swfInsidePanel.setVisible(true);
+                            binaryIsSwf = true;
                         }
                     } catch (Exception ex) {
-                        swfInsidePanel.setVisible(false);
                     }
-                } else {
-                    swfInsidePanel.setVisible(false);
                 }
-            } else {
-                swfInsidePanel.setVisible(false);
             }
-
+            
+            swfInsidePanel.setVisible(binaryIsSwf);
         } else {
             hexEditor.setData(new byte[0], null, null);
             swfInsidePanel.setVisible(false);
@@ -115,7 +112,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        setBinaryData(data, node);
+        setBinaryData(data, binaryDataTag);
     }
 
     @Override

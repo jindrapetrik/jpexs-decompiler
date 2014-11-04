@@ -41,5 +41,4 @@ public class HeaderItem implements TreeItem {
     public String toString() {
         return name;
     }
-
 }

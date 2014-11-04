@@ -32,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.regex.Pattern;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -40,18 +39,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.View;
-import javax.swing.text.html.HTMLEditorKit;
 import jsyntaxpane.SyntaxDocument;
-import jsyntaxpane.SyntaxStyle;
-import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.Token;
 import jsyntaxpane.actions.ActionUtils;
-import jsyntaxpane.components.Markers;
 
 /**
  *

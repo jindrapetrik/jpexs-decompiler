@@ -26,15 +26,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ListModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -44,10 +39,10 @@ import javax.swing.text.Document;
  */
 public class DebugLogDialog extends AppDialog implements ActionListener {
 
-    private JTextArea logTextArea = new JTextArea();
+    private final JTextArea logTextArea = new JTextArea();
     private final String ACTION_CLOSE = "CLOSE";
     private final String ACTION_CLEAR = "CLEAR";
-    private Debugger debug;
+    private final Debugger debug;
     
     public DebugLogDialog(Debugger debug) {
         setSize(800, 600);         

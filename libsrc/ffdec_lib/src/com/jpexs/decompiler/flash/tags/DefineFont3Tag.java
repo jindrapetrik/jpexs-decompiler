@@ -168,7 +168,7 @@ public class DefineFont3Tag extends FontTag {
                 fontBoundsTable.add(sis.readRECT("rect"));
             }
             int kerningCount = sis.readUI16("kerningCount");
-            fontKerningTable = new ArrayList<KERNINGRECORD>();
+            fontKerningTable = new ArrayList<>();
             for (int i = 0; i < kerningCount; i++) {
                 fontKerningTable.add(sis.readKERNINGRECORD(fontFlagsWideCodes, "record"));
             }

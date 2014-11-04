@@ -81,7 +81,7 @@ public class FontPanel extends javax.swing.JPanel {
         for(Font f:FontTag.installedFontsByName.values()){
             famSet.add(new FontFamily(f));
         }
-        return new DefaultComboBoxModel<>(new Vector<FontFamily>(famSet));
+        return new DefaultComboBoxModel<>(new Vector<>(famSet));
     }
 
     public static ComboBoxModel<FontFace> getFaceModel(FontFamily family) {        
@@ -91,7 +91,7 @@ public class FontPanel extends javax.swing.JPanel {
             faceSet.add(new FontFace(f));
         }
         
-        return new DefaultComboBoxModel<>(new Vector<FontFace>(faceSet));
+        return new DefaultComboBoxModel<>(new Vector<>(faceSet));
     }
 
     private void setEditable(boolean editable) {
@@ -385,6 +385,7 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontAddCharsButton.setText(AppStrings.translate("button.ok")); // NOI18N
         fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fontAddCharsButtonActionPerformed(evt);
             }

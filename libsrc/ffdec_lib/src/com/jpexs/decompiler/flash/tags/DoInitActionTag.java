@@ -179,7 +179,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public String getExportFileName() {
         String expName = getExportName();
         if ((expName == null) || expName.isEmpty()) {
-            return super.toString();
+            return super.getExportFileName();
         }
         String[] pathParts;
         if (expName.contains(".")) {
@@ -229,5 +229,4 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public Tag getSourceTag() {
         return this;
     }
-
 }
