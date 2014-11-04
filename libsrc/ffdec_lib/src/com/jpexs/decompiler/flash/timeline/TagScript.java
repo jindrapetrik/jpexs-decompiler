@@ -12,31 +12,39 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
-package com.jpexs.decompiler.flash.treeitems;
+ * License along with this library.
+ */
+package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class StringItem implements TreeItem {
+public class TagScript implements TreeItem {
+    
+    private final SWF swf;
+    private final Tag tag;
+    private final List<TreeItem> frames;
 
-    public SWF swf;
-    private final String str;
-    private final String name;
-
-    public StringItem(String str, String name, SWF swf) {
+    public TagScript(SWF swf, Tag tag, List<TreeItem> frames) {
         this.swf = swf;
-        this.str = str;
-        this.name = name;
+        this.tag = tag;
+        this.frames = frames;
     }
-
-    public String getName() {
-        return name;
+    
+    public Tag getTag() {
+        return tag;
     }
-
+    
+    public List<TreeItem> getFrames() {
+        return frames;
+    }
+    
     @Override
     public SWF getSwf() {
         return swf;
@@ -44,6 +52,6 @@ public class StringItem implements TreeItem {
 
     @Override
     public String toString() {
-        return str;
+        return tag.toString();
     }
 }

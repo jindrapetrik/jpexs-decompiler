@@ -14,41 +14,40 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.util.ArrayList;
+import com.jpexs.decompiler.flash.SWF;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class TreeNode {
+public class FolderItem implements TreeItem {
 
-    protected TreeItem item;
-    public List<TreeNode> subNodes;
+    public SWF swf;
+    private final String str;
+    private final String name;
+    public final List<TreeItem> subItems;
 
-    public TreeNode(TreeItem item) {
-        if (item == null) {
-            throw new Error("TreeItem should not be null.");
-        }
-        this.item = item;
-        this.subNodes = new ArrayList<>();
+    public FolderItem(String str, String name, SWF swf, List<TreeItem> subItems) {
+        this.swf = swf;
+        this.str = str;
+        this.name = name;
+        this.subItems = subItems;
     }
 
-    public TreeItem getItem() {
-        return item;
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public SWF getSwf() {
+        return swf;
     }
 
     @Override
     public String toString() {
-        if (item == null) {
-            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Tree item is null");
-            return null;
-        }
-        return item.toString();
+        return str;
     }
 }

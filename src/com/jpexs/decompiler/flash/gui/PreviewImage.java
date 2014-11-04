@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -173,10 +173,10 @@ public class PreviewImage extends JPanel {
         int height = 0;
         SerializableImage imgSrc = null;
         Matrix m = new Matrix();
-        if (treeItem instanceof FrameNodeItem) {
-            FrameNodeItem fn = (FrameNodeItem) treeItem;
+        if (treeItem instanceof Frame) {
+            Frame fn = (Frame) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame(), 0, null, 0, rect, new Matrix(), new ColorTransform(), null, true, 1.0);
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, 0, null, 0, rect, new Matrix(), new ColorTransform(), null, true, 1.0);
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof ImageTag) {

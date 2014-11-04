@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
+import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ScriptPack implements TreeElementItem {
+public class ScriptPack extends AS3ClassTreeItem {
 
     public final ABC abc;
     public final int scriptIndex;
@@ -58,11 +58,12 @@ public class ScriptPack implements TreeElementItem {
         return abc.swf;
     }
 
-    public ClassPath getPath() {
+    public ClassPath getClassPath() {
         return path;
     }
 
     public ScriptPack(ClassPath path, ABC abc, int scriptIndex, List<Integer> traitIndices) {
+        super(path.className, path.toString());
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;
@@ -178,7 +179,7 @@ public class ScriptPack implements TreeElementItem {
     public File export(String directory, List<ABCContainerTag> abcList, ScriptExportMode exportMode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
-        File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
+        File outDir = new File(directory + File.separatorChar + "scripts" + File.separatorChar + makeDirPath(packageName));
         if (!outDir.exists()) {
             if (!outDir.mkdirs()) {
                 if (!outDir.exists()) {

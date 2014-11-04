@@ -45,7 +45,6 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
-import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
@@ -55,10 +54,11 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -156,10 +156,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            TreeNode scriptsNode = ttm.getSwfNode(mainPanel.getCurrentSwf()).scriptsNode;
+            TreeItem scriptsNode = ttm.getScriptsNode(mainPanel.getCurrentSwf());
             final List<ABCPanelSearchResult> found = new ArrayList<>();
-            if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
-                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+            if (scriptsNode instanceof ClassesListTreeModel) {
+                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
                 List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
                 final Pattern pat = regexp
                         ? Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0)
@@ -320,11 +320,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             this.swf = swf;
             if (swf.abcList.size() > 0) {
                 this.abc = swf.abcList.get(0).getABC();
-            }            
-            navigator.setABC(swf.abcList, abc);            
+            }
+            navigator.setABC(swf.abcList, abc);
         }
     }
-   
 
     public void initSplits() {
         //splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
@@ -364,7 +363,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
-        
+
         decompiledTextArea.setLinkHandler(new LinkHandler() {
 
             @Override
@@ -478,7 +477,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
         decompiledTextArea.addMouseMotionListener(cch);
-        
+
         navigator = new TraitsList(this);
 
         navPanel = new JPanel(new BorderLayout());
@@ -561,13 +560,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             //more than one? display list
             if (!usages.isEmpty()) {
                 return true;
-            } 
-        }else{
-            return decompiledTextArea.getLocalDeclarationOfPos(pos)!=-1;
+            }
+        } else {
+            return decompiledTextArea.getLocalDeclarationOfPos(pos) != -1;
         }
         return false;
     }
-    
+
     private void gotoDeclaration(int pos) {
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
@@ -595,9 +594,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             } else if (!usages.isEmpty()) { //one
                 UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
             }
-        }else{
-            int dpos=decompiledTextArea.getLocalDeclarationOfPos(pos);
-            if(dpos>-1){
+        } else {
+            int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos);
+            if (dpos > -1) {
                 decompiledTextArea.setCaretPosition(dpos);
             }
         }
@@ -673,7 +672,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {        
+    public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == constantTypeList) {
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {
@@ -689,9 +688,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public void hilightScript(SWF swf, String name) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreeNode scriptsNode = ttm.getSwfNode(swf).scriptsNode;
-        if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
-            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+        TreeItem scriptsNode = ttm.getScriptsNode(swf);
+        if (scriptsNode instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
                 if (item.getKey().toString().equals(name)) {
@@ -805,21 +804,20 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
                 int oldIndex = pack.scriptIndex;
                 decompiledTextArea.uncache(pack);
-                
-                
+
                 try {
                     String oldSp = null;
                     List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
                     if (!packs.isEmpty()) {
-                        oldSp = packs.get(0).getKey().toString();                        
+                        oldSp = packs.get(0).getKey().toString();
                     }
-                    
+
                     String as = decompiledTextArea.getText();
                     abc.replaceSciptPack(pack, as);
                     lastDecompiled = as;
                     mainPanel.updateClassesList();
-                    
-                    if(oldSp!=null){
+
+                    if (oldSp != null) {
                         hilightScript(swf, oldSp);
                     }
                     //decompiledTextArea.setClassIndex(-1);
@@ -831,12 +829,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (CompilationException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException | InterruptedException ex) {
                     //ignore                    
                 }

@@ -376,7 +376,7 @@ public class View {
 
     public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageTyp, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
 
-        JLabel warLabel = new JLabel("<html>"+message.replace("\r\n", "<br>")+"</html>");
+        JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
         final JPanel warPanel = new JPanel(new BorderLayout());
         warPanel.add(warLabel, BorderLayout.CENTER);
         JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
@@ -408,7 +408,7 @@ public class View {
         JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
 
         if (showAgainConfig != null) {
-            JLabel warLabel = new JLabel("<html>"+message.replace("\r\n", "<br>")+"</html>");
+            JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
             final JPanel warPanel = new JPanel(new BorderLayout());
             warPanel.add(warLabel, BorderLayout.CENTER);
             donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
@@ -418,7 +418,7 @@ public class View {
                 return;
             }
         }
-        final Object fmsg=msg;
+        final Object fmsg = msg;
 
         execInEventDispatch(new Runnable() {
             @Override

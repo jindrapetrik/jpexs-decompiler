@@ -39,9 +39,9 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
-import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -714,7 +714,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             String newText = lastDecompiled;
             setDecompiledText(newText);
             if (lastLine > -1) {
-                decompiledEditor.gotoLine(lastLine + prefLines + 1);                
+                decompiledEditor.gotoLine(lastLine + prefLines + 1);
             }
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);
@@ -777,7 +777,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 } catch (ActionParseException ex) {
                     editor.gotoLine((int) ex.line);
                     editor.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;
             case ACTION_EDIT_DECOMPILED:

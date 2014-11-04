@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
@@ -51,10 +52,9 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -427,9 +427,9 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         fontPanel.clear();
     }
 
-    public void showBinaryPanel(byte[] data, TagNode node) {
+    public void showBinaryPanel(byte[] data, DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
-        binaryPanel.setBinaryData(data, node);
+        binaryPanel.setBinaryData(data, binaryDataTag);
         parametersPanel.setVisible(false);
     }
 
@@ -470,10 +470,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
             }
 
-            if (tagObj instanceof FrameNodeItem) {
-                FrameNodeItem fn = (FrameNodeItem) tagObj;
+            if (tagObj instanceof Frame) {
+                Frame fn = (Frame) tagObj;
                 swf = fn.getSwf();
-                if (fn.getParent() == swf) {
+                if (fn.timeline.timelined == swf) {
                     for (Tag t : swf.tags) {
                         if (t instanceof SetBackgroundColorTag) {
                             backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
@@ -525,10 +525,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                  */
                 new SetBackgroundColorTag(swf, new RGB(backgroundColor)).writeTag(sos2);
 
-                if (tagObj instanceof FrameNodeItem) {
-                    FrameNodeItem fn = (FrameNodeItem) tagObj;
-                    Timelined parent = fn.getParent();
-                    List<Tag> subs = parent.getTimeline().tags;
+                if (tagObj instanceof Frame) {
+                    Frame fn = (Frame) tagObj;
+                    Timelined parent = fn.timeline.timelined;
+                    List<Tag> subs = fn.timeline.tags;
                     List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 0;
                     for (ContainerItem item : subs) {
@@ -536,7 +536,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             frameCnt++;
                             continue;
                         }
-                        if (frameCnt > fn.getFrame()) {
+                        if (frameCnt > fn.frame) {
                             break;
                         }
 
@@ -878,7 +878,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 SWF.clearImageCache();
                 Tag tag = genericTagPanel.getTag();
                 tag.getSwf().updateCharacters();
-                tag.getTimelined().resetTimeline();
+                tag.getTimelined().getTimeline().reset();
                 mainPanel.refreshTree();
                 mainPanel.setTagTreeSelectedNode(tag);
                 editButton.setVisible(true);

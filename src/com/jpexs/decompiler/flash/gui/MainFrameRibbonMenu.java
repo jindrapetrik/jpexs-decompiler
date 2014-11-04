@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
-import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -392,43 +391,38 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     }
 
     private RibbonTask createToolsRibbonTask() {
-        
-        
+
         JRibbonBand debuggerBand = new JRibbonBand(translate("menu.debugger"), null);
         debuggerBand.setResizePolicies(getResizePolicies(debuggerBand));
-        
-        debuggerSwitchCommandButton = new JCommandToggleButton(translate("menu.debugger.switch"),View.getResizableIcon("debugger32"));
+
+        debuggerSwitchCommandButton = new JCommandToggleButton(translate("menu.debugger.switch"), View.getResizableIcon("debugger32"));
         assignListener(debuggerSwitchCommandButton, ACTION_DEBUGGER_SWITCH);
-        
+
         //debuggerDetachCommandButton = new JCommandButton("Detach debugger",View.getResizableIcon("debuggerremove16"));
         //assignListener(debuggerDetachCommandButton, ACTION_DEBUGGER_DETACH);
-        
         debuggerReplaceTraceCommandButton = new JCommandButton(translate("menu.debugger.replacetrace"), View.getResizableIcon("debuggerreplace16"));
         assignListener(debuggerReplaceTraceCommandButton, ACTION_DEBUGGER_REPLACE_TRACE);
-        
+
         debuggerLogCommandButton = new JCommandButton(translate("menu.debugger.showlog"), View.getResizableIcon("debuggerlog16"));
         assignListener(debuggerLogCommandButton, ACTION_DEBUGGER_LOG);
-        
+
         debuggerSwitchGroup = new CommandToggleButtonGroup();
         debuggerSwitchGroup.add(debuggerSwitchCommandButton);
-        
-        debuggerSwitchCommandButton.setEnabled(false);
-        
-        debuggerReplaceTraceCommandButton.setEnabled(false);
-        
-        debuggerBand.addCommandButton(debuggerSwitchCommandButton, RibbonElementPriority.TOP);
-        debuggerBand.addCommandButton(debuggerReplaceTraceCommandButton, RibbonElementPriority.MEDIUM);        
-        debuggerBand.addCommandButton(debuggerLogCommandButton, RibbonElementPriority.MEDIUM);
-        
-        
-        
-        //----------------------------------------- TOOLS -----------------------------------
 
+        debuggerSwitchCommandButton.setEnabled(false);
+
+        debuggerReplaceTraceCommandButton.setEnabled(false);
+
+        debuggerBand.addCommandButton(debuggerSwitchCommandButton, RibbonElementPriority.TOP);
+        debuggerBand.addCommandButton(debuggerReplaceTraceCommandButton, RibbonElementPriority.MEDIUM);
+        debuggerBand.addCommandButton(debuggerLogCommandButton, RibbonElementPriority.MEDIUM);
+
+        //----------------------------------------- TOOLS -----------------------------------
         JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
         toolsBand.setResizePolicies(getResizePolicies(toolsBand));
 
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
-        assignListener(searchCommandButton, ACTION_SEARCH);              
+        assignListener(searchCommandButton, ACTION_SEARCH);
 
         timeLineToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
         assignListener(timeLineToggleButton, ACTION_TIMELINE);
@@ -636,7 +630,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         boolean swfLoaded = swf != null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
         boolean hasDebugger = hasAbc && Main.hasDebugger(swf);
-        
+
         exportAllMenu.setEnabled(swfLoaded);
         exportFlaMenu.setEnabled(swfLoaded);
         exportSelMenu.setEnabled(swfLoaded);
@@ -668,7 +662,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         //debuggerSwitchCommandButton.
         //debuggerDetachCommandButton.setEnabled(hasDebugger);
         debuggerReplaceTraceCommandButton.setEnabled(hasAbc && hasDebugger);
-        
+
     }
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
@@ -684,24 +678,24 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case ACTION_DEBUGGER_SWITCH:                
-                if(debuggerSwitchGroup.getSelected()==null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"),JOptionPane.OK_CANCEL_OPTION,JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo,JOptionPane.OK_OPTION)==JOptionPane.OK_OPTION){
-                    Main.switchDebugger();                              
-                    mainFrame.panel.refreshDecompiled();                    
-                }else{
-                    if(debuggerSwitchGroup.getSelected()==debuggerSwitchCommandButton){
+            case ACTION_DEBUGGER_SWITCH:
+                if (debuggerSwitchGroup.getSelected() == null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+                    Main.switchDebugger();
+                    mainFrame.panel.refreshDecompiled();
+                } else {
+                    if (debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton) {
                         debuggerSwitchGroup.setSelected(debuggerSwitchCommandButton, false);
                     }
                 }
-                debuggerReplaceTraceCommandButton.setEnabled(debuggerSwitchGroup.getSelected()==debuggerSwitchCommandButton);
-                break;      
+                debuggerReplaceTraceCommandButton.setEnabled(debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton);
+                break;
             case ACTION_DEBUGGER_LOG:
                 Main.debuggerShowLog();
                 break;
             case ACTION_DEBUGGER_REPLACE_TRACE:
-                ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame,Configuration.lastDebuggerReplaceFunction.get());
+                ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame, Configuration.lastDebuggerReplaceFunction.get());
                 rtd.setVisible(true);
-                if(rtd.getValue()!=null){
+                if (rtd.getValue() != null) {
                     Main.replaceTraceCalls(rtd.getValue());
                     mainFrame.panel.refreshDecompiled();
                     Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
@@ -862,14 +856,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 if (swf != null) {
-                    SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
                     boolean saved = false;
-                    if (snode.binaryData != null) {
+                    if (swf.binaryData != null) {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         try {
                             swf.saveTo(baos);
-                            snode.binaryData.binaryData = baos.toByteArray();
-                            snode.binaryData.setModified(true);
+                            swf.binaryData.binaryData = baos.toByteArray();
+                            swf.binaryData.setModified(true);
                             saved = true;
                         } catch (IOException ex) {
                             Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);

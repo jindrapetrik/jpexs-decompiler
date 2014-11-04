@@ -80,7 +80,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         if (ttfFileRadio.isSelected() && customFont != null) {
             return customFont;
         }
-        return ((FontFace)faceSelection.getSelectedItem()).font;
+        return ((FontFace) faceSelection.getSelectedItem()).font;
     }
 
     public boolean hasUpdateTexts() {
@@ -123,8 +123,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     private JRadioButton ttfFileRadio;
     private JRadioButton installedRadio;
 
-    private void updateFaceSelection() {        
-        faceSelection.setModel(FontPanel.getFaceModel((FontFamily)familyNamesSelection.getSelectedItem()));
+    private void updateFaceSelection() {
+        faceSelection.setModel(FontPanel.getFaceModel((FontFamily) familyNamesSelection.getSelectedItem()));
     }
 
     public FontEmbedDialog(FontFace selectedFace, String selectedChars) {
@@ -147,7 +147,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         installedRadio.setSelected(true);
 
         individialSample = new JLabel();
-        familyNamesSelection = new JComboBox<>(FontPanel.getFamilyModel());      
+        familyNamesSelection = new JComboBox<>(FontPanel.getFamilyModel());
         familyNamesSelection.setSelectedItem(new FontFamily(selectedFace.font));
         faceSelection = new JComboBox<>();
         updateFaceSelection();

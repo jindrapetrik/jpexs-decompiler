@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +29,7 @@ import java.util.ListIterator;
  *
  * @author JPEXS
  */
-public class SWFList implements List<SWF>, TreeItem {
+public class SWFList implements List<SWF>, SWFContainerItem {
 
     public String name;
     public boolean isBundle;
@@ -39,6 +41,11 @@ public class SWFList implements List<SWF>, TreeItem {
         throw new UnsupportedOperationException("Not supported.");
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+    
     @Override
     public Iterator<SWF> iterator() {
         return swfs.iterator();

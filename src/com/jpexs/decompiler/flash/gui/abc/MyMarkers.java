@@ -47,12 +47,13 @@ public class MyMarkers {
             Highlighter.HighlightPainter hMarker = hilites[i].getPainter();
             if (marker == null || hMarker.equals(marker)) {
                 hilite.removeHighlight(hilites[i]);
-            }            
+            }
         }
     }
 
     /**
      * Remove all the markers from an JEditorPane
+     *
      * @param editorPane
      */
     public static void removeMarkers(JTextComponent editorPane) {
@@ -61,6 +62,7 @@ public class MyMarkers {
 
     /**
      * add highlights for the given Token on the given pane
+     *
      * @param pane
      * @param token
      * @param marker
@@ -71,6 +73,7 @@ public class MyMarkers {
 
     /**
      * add highlights for the given region on the given pane
+     *
      * @param pane
      * @param start
      * @param end
@@ -82,45 +85,44 @@ public class MyMarkers {
             int selStart = pane.getSelectionStart();
             int selEnd = pane.getSelectionEnd();
             // if there is no selection or selection does not overlap
-            if(selStart == selEnd || end < selStart || start > selStart) {
+            if (selStart == selEnd || end < selStart || start > selStart) {
                 hiliter.addHighlight(start, end, marker);
                 return;
             }
             // selection starts within the highlight, highlight before slection
-            if(selStart > start && selStart < end ) {
+            if (selStart > start && selStart < end) {
                 hiliter.addHighlight(start, selStart, marker);
             }
             // selection ends within the highlight, highlight remaining
-            if(selEnd > start && selEnd < end ) {
+            if (selEnd > start && selEnd < end) {
                 hiliter.addHighlight(selEnd, end, marker);
             }
 
         } catch (BadLocationException ex) {
-            
+
         }
     }
 
     /**
      * Mark all text in the document that matches the given pattern
+     *
      * @param pane control to use
      * @param pattern pattern to match
      * @param marker marker to use for highlighting
      */
     public static void markAll(JTextComponent pane, Pattern pattern, Highlighter.HighlightPainter marker) {
         SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(pane);
-        if(sDoc  == null || pattern == null) {
+        if (sDoc == null || pattern == null) {
             return;
         }
         Matcher matcher = sDoc.getMatcher(pattern);
-		// we may not have any matcher (due to undo or something, so don't do anything.
-		if(matcher==null) {
-			return;
-		}
-        while(matcher.find()) {
+        // we may not have any matcher (due to undo or something, so don't do anything.
+        if (matcher == null) {
+            return;
+        }
+        while (matcher.find()) {
             markText(pane, matcher.start(), matcher.end(), marker);
         }
     }
-    
-
 
 }

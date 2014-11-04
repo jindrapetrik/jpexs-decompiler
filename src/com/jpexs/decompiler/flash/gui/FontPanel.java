@@ -77,21 +77,21 @@ public class FontPanel extends javax.swing.JPanel {
     }
 
     public static ComboBoxModel<FontFamily> getFamilyModel() {
-        Set<FontFamily> famSet=new TreeSet<>();
-        for(Font f:FontTag.installedFontsByName.values()){
+        Set<FontFamily> famSet = new TreeSet<>();
+        for (Font f : FontTag.installedFontsByName.values()) {
             famSet.add(new FontFamily(f));
         }
-        return new DefaultComboBoxModel<>(new Vector<FontFamily>(famSet));
+        return new DefaultComboBoxModel<>(new Vector<>(famSet));
     }
 
-    public static ComboBoxModel<FontFace> getFaceModel(FontFamily family) {        
-        
-        Set<FontFace> faceSet=new TreeSet<>();
-        for(Font f:FontTag.installedFontsByFamily.get(family.familyEn).values()){
+    public static ComboBoxModel<FontFace> getFaceModel(FontFamily family) {
+
+        Set<FontFace> faceSet = new TreeSet<>();
+        for (Font f : FontTag.installedFontsByFamily.get(family.familyEn).values()) {
             faceSet.add(new FontFace(f));
         }
-        
-        return new DefaultComboBoxModel<>(new Vector<FontFace>(faceSet));
+
+        return new DefaultComboBoxModel<>(new Vector<>(faceSet));
     }
 
     private void setEditable(boolean editable) {
@@ -183,7 +183,7 @@ public class FontPanel extends javax.swing.JPanel {
 
     public void showFontTag(FontTag ft) {
         SWF swf = ft.getSwf();
-        fontTag = ft;        
+        fontTag = ft;
         fontNameIntagLabel.setText(ft.getFontNameIntag());
         fontNameTextArea.setText(ft.getFontName());
         fontCopyrightTextArea.setText(ft.getFontCopyright());
@@ -197,9 +197,9 @@ public class FontPanel extends javax.swing.JPanel {
         fontCharactersTextArea.setText(chars);
         setAllowSave(false);
         String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontName();
-        
+
         String selectedFont = "";
-        
+
         if (swf.sourceFontNamesMap.containsKey(ft.getFontId())) {
             selectedFont = swf.sourceFontNamesMap.get(ft.getFontId());
         } else if (Configuration.getFontToNameMap().containsKey(key)) {
@@ -209,17 +209,16 @@ public class FontPanel extends javax.swing.JPanel {
         } else {
             selectedFont = FontTag.findInstalledFontName(ft.getFontName());
         }
-        
+
         Font selFont = FontTag.installedFontsByName.get(selectedFont);
-        if(selFont == null){
+        if (selFont == null) {
             selectedFont = FontTag.findInstalledFontName(ft.getFontName());
             selFont = FontTag.installedFontsByName.get(selectedFont);
         }
-        
+
         fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
         fontFaceSelection.setSelectedItem(new FontFace(selFont));
-        
-                
+
         setAllowSave(true);
         setEditable(false);
     }
@@ -385,6 +384,7 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontAddCharsButton.setText(AppStrings.translate("button.ok")); // NOI18N
         fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fontAddCharsButtonActionPerformed(evt);
             }
@@ -396,7 +396,7 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontFamilyNameSelection.setModel(getFamilyModel());
         fontFamilyNameSelection.setSelectedItem(FontTag.defaultFontName);
-        fontFaceSelection.setModel(getFaceModel((FontFamily)fontFamilyNameSelection.getSelectedItem()));
+        fontFaceSelection.setModel(getFaceModel((FontFamily) fontFamilyNameSelection.getSelectedItem()));
         fontFamilyNameSelection.addItemListener(new java.awt.event.ItemListener() {
             @Override
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -509,7 +509,7 @@ public class FontPanel extends javax.swing.JPanel {
             for (int c = 0; c < newchars.length(); c++) {
                 selChars.add(newchars.codePointAt(c));
             }
-            fontAddChars((FontTag) item, selChars, ((FontFace)fontFaceSelection.getSelectedItem()).font);
+            fontAddChars((FontTag) item, selChars, ((FontFace) fontFaceSelection.getSelectedItem()).font);
             fontAddCharactersField.setText("");
             mainPanel.reload(true);
         }
@@ -519,7 +519,7 @@ public class FontPanel extends javax.swing.JPanel {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog((FontFace)fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
+            FontEmbedDialog fed = new FontEmbedDialog((FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
             if (fed.display()) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
@@ -548,8 +548,8 @@ public class FontPanel extends javax.swing.JPanel {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag f = (FontTag) item;
-            SWF swf = f.getSwf();           
-            String selectedName = ((FontFace)fontFaceSelection.getSelectedItem()).font.getFontName(Locale.ENGLISH);
+            SWF swf = f.getSwf();
+            String selectedName = ((FontFace) fontFaceSelection.getSelectedItem()).font.getFontName(Locale.ENGLISH);
             swf.sourceFontNamesMap.put(f.getFontId(), selectedName);
             Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedName);
         }
@@ -558,7 +558,7 @@ public class FontPanel extends javax.swing.JPanel {
     private void fontFamilySelectionItemStateChanged() {
 
         savePair();
-        fontFaceSelection.setModel(getFaceModel((FontFamily)fontFamilyNameSelection.getSelectedItem()));
+        fontFaceSelection.setModel(getFaceModel((FontFamily) fontFamilyNameSelection.getSelectedItem()));
     }
 
     private void fontFaceSelectionItemStateChanged() {
@@ -584,8 +584,8 @@ public class FontPanel extends javax.swing.JPanel {
         setEditable(false);
     }
 
-    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {        
-        new FontPreviewDialog(null, true, ((FontFace)fontFaceSelection.getSelectedItem()).font).setVisible(true);
+    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {
+        new FontPreviewDialog(null, true, ((FontFace) fontFaceSelection.getSelectedItem()).font).setVisible(true);
     }
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {
@@ -669,5 +669,5 @@ public class FontPanel extends javax.swing.JPanel {
     private javax.swing.JPanel addCharsPanel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JCheckBox updateTextsCheckBox;
-       
+
 }

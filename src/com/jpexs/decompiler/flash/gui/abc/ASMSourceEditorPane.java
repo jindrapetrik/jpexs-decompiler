@@ -44,8 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -282,7 +280,6 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(lineStart);
         //requestFocus();
     }
-    
 
     public Highlighting getSelectedSpecial() {
         return Highlighting.search(specialHilights, getCaretPosition());

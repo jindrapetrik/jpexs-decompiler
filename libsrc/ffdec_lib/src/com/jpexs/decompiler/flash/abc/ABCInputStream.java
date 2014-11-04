@@ -245,7 +245,7 @@ public class ABCInputStream implements AutoCloseable {
         return is.available();
     }
 
-    private final long readLong() throws IOException {
+    private long readLong() throws IOException {
         byte[] readBuffer = safeRead(8);
         return (((long) readBuffer[7] << 56)
                 + ((long) (readBuffer[6] & 255) << 48)

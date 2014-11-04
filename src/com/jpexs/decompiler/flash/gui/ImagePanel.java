@@ -282,7 +282,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private void showSelectedName() {
         if (selectedDepth > -1 && frame > -1) {
-            DepthState ds = timelined.getTimeline().frames.get(frame).layers.get(selectedDepth);
+            DepthState ds = timelined.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
             if (ds != null) {
                 CharacterTag cht = timelined.getTimeline().swf.characters.get(ds.characterId);
                 if (cht != null) {
@@ -464,7 +464,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         loaded = true;
 
-        if (drawable.getTimeline().frames.isEmpty()) {
+        if (drawable.getTimeline().getFrames().isEmpty()) {
             iconPanel.setImg(null);
             iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
             return;
@@ -498,7 +498,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (stillFrame) {
             return 0;
         }
-        return timelined.getTimeline().frames.size();
+        return timelined.getTimeline().getFrameCount();
     }
 
     @Override
@@ -520,7 +520,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private void nextFrame() {
         drawFrame();
-        int newframe = (frame + 1) % timelined.getTimeline().frames.size();
+        int newframe = (frame + 1) % timelined.getTimeline().getFrameCount();
         if (stillFrame) {
             newframe = frame;
         }
@@ -561,7 +561,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
                 List<DepthState> dss = new ArrayList<>();
                 List<Shape> os = new ArrayList<>();
-                DepthState ds = drawable.getTimeline().frames.get(frame).layers.get(selectedDepth);
+                DepthState ds = drawable.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
                 if (ds != null) {
                     CharacterTag cht = swf.characters.get(ds.characterId);
                     if (cht != null) {
@@ -604,7 +604,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             return;
         }
         Timeline timeline = timelined.getTimeline();
-        if (frame >= timeline.frames.size()) {
+        if (frame >= timeline.getFrameCount()) {
             return;
         }
 
@@ -692,7 +692,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 @Override
                 public void run() {
                     Timeline timeline = timelined.getTimeline();
-                    if (timeline.frames.size() <= 1 && timeline.isSingleFrame()) {
+                    if (timeline.getFrameCount() <= 1 && timeline.isSingleFrame()) {
                         if (first) {
                             drawFrame();
                             first = false;
@@ -721,7 +721,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (stillFrame) {
             return false;
         }
-        return (timelined.getTimeline().frames.size() <= 1) || (timer != null);
+        return (timelined.getTimeline().getFrameCount() <= 1) || (timer != null);
     }
 
     @Override

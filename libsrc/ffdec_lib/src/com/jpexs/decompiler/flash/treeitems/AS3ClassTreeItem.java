@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -14,23 +14,32 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.treenodes;
-
-import com.jpexs.decompiler.flash.treeitems.HeaderItem;
+package com.jpexs.decompiler.flash.treeitems;
 
 /**
  *
  * @author JPEXS
  */
-public class HeaderNode extends TreeNode {
+public abstract class AS3ClassTreeItem implements TreeItem {
+    
+    private final String name;
+    private final String path;
 
-    public HeaderNode(HeaderItem item) {
-        super(item);
+    public AS3ClassTreeItem(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     @Override
-    public HeaderItem getItem() {
-        return (HeaderItem) item;
+    public String toString() {
+        return name;
     }
-
 }

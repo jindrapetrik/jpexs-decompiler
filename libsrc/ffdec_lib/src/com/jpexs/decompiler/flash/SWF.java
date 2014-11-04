@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
@@ -82,8 +83,7 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
@@ -117,16 +117,7 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.SvgClip;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
-import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
-import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.treenodes.AS2PackageNode;
-import com.jpexs.decompiler.flash.treenodes.ContainerNode;
-import com.jpexs.decompiler.flash.treenodes.FrameNode;
-import com.jpexs.decompiler.flash.treenodes.TagNode;
-import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -212,7 +203,7 @@ import org.monte.media.avi.AVIWriter;
  *
  * @author JPEXS
  */
-public final class SWF implements TreeItem, Timelined {
+public final class SWF implements SWFContainerItem, Timelined {
 
     /**
      * Default version of SWF file format
@@ -278,6 +269,7 @@ public final class SWF implements TreeItem, Timelined {
     private Timeline timeline;
 
     public DumpInfoSwfNode dumpInfo;
+    public DefineBinaryDataTag binaryData;
 
     public void updateCharacters() {
         characters.clear();
@@ -285,10 +277,8 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public void resetTimelines(Timelined timelined) {
-        timelined.resetTimeline();
-        List<Tag> tags = timelined.getTimeline().tags;
-        for (int i = 0; i < tags.size(); i++) {
-            Tag t = tags.get(i);
+        timelined.getTimeline().reset();
+        for (Tag t : timelined.getTimeline().tags) {
             if (t instanceof Timelined) {
                 resetTimelines((Timelined) t);
             }
@@ -342,11 +332,6 @@ public final class SWF implements TreeItem, Timelined {
             timeline = new Timeline(this);
         }
         return timeline;
-    }
-
-    @Override
-    public void resetTimeline() {
-        timeline = null;
     }
 
     /**
@@ -619,7 +604,7 @@ public final class SWF implements TreeItem, Timelined {
 
         ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
         getABCTags(objs, newAbcList);
-        isAS3 = !newAbcList.isEmpty();
+        isAS3 = (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !newAbcList.isEmpty());
         abcList = newAbcList;
     }
 
@@ -649,8 +634,10 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof ExportAssetsTag) {
                 ExportAssetsTag eat = (ExportAssetsTag) t;
                 for (int i = 0; i < eat.tags.size(); i++) {
-                    if ((!exportNames.containsKey(eat.tags.get(i))) && (!exportNames.containsValue(eat.names.get(i)))) {
-                        exportNames.put(eat.tags.get(i), eat.names.get(i));
+                    Integer tagId = eat.tags.get(i);
+                    String name = eat.names.get(i);
+                    if ((!exportNames.containsKey(tagId)) && (!exportNames.containsValue(name))) {
+                        exportNames.put(tagId, name);
                     }
                 }
             }
@@ -821,19 +808,10 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public boolean exportAS3Class(String className, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
-        List<ABCContainerTag> abcTags = new ArrayList<>();
-
-        for (Tag t : tags) {
-            if (t instanceof ABCContainerTag) {
-                ABCContainerTag cnt = (ABCContainerTag) t;
-                abcTags.add(cnt);
-            }
-        }
-
         boolean exported = false;
 
-        for (int i = 0; i < abcTags.size(); i++) {
-            ABC abc = abcTags.get(i).getABC();
+        for (int i = 0; i < abcList.size(); i++) {
+            ABC abc = abcList.get(i).getABC();
             List<ScriptPack> scrs = abc.findScriptPacksByPath(className);
             for (int j = 0; j < scrs.size(); j++) {
                 ScriptPack scr = scrs.get(j);
@@ -841,10 +819,10 @@ public final class SWF implements TreeItem, Timelined {
                 if (scrs.size() > 1) {
                     cnt = "script " + (j + 1) + "/" + scrs.size() + " ";
                 }
-                String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
+                String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcList.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("exporting", exStr);
-                scr.export(outdir, abcTags, exportMode, parallel);
-                exStr = "Exported " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
+                scr.export(outdir, abcList, exportMode, parallel);
+                exStr = "Exported " + "tag " + (i + 1) + "/" + abcList.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("exported", exStr);
                 exported = true;
             }
@@ -868,11 +846,8 @@ public final class SWF implements TreeItem, Timelined {
 
     public List<MyEntry<ClassPath, ScriptPack>> getAS3Packs() {
         List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
-        for (Tag t : tags) {
-            if (t instanceof ABCContainerTag) {
-                ABCContainerTag abcTag = (ABCContainerTag) t;
-                packs.addAll(abcTag.getABC().getScriptPacks());
-            }
+        for (ABCContainerTag abcTag : abcList) {
+            packs.addAll(abcTag.getABC().getScriptPacks());
         }
         return uniqueAS3Packs(packs);
     }
@@ -932,28 +907,20 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
+    private List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
-        List<ContainerItem> list2 = new ArrayList<>();
-        list2.addAll(tags);
-        List<TreeNode> list = createASTagList(list2, this);
+        Map<String, ASMSource> asms = getASMs();
 
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(handler, list, list, outdir, exportMode, evl));
+        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, asms.values(), exportMode, evl));
         return ret;
     }
 
-    public List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportMode exportMode, final boolean parallel) {
+    private List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportMode exportMode, final boolean parallel) {
         final AtomicInteger cnt = new AtomicInteger(1);
-        final List<ABCContainerTag> abcTags = new ArrayList<>();
-        for (Tag t : tags) {
-            if (t instanceof ABCContainerTag) {
-                abcTags.add((ABCContainerTag) t);
-            }
-        }
 
         final List<File> ret = new ArrayList<>();
         final List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
@@ -964,7 +931,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcTags, exportMode, parallel);
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcList, exportMode, parallel);
                             ret.add(task.call());
                         }
                         return null;
@@ -979,7 +946,7 @@ public final class SWF implements TreeItem, Timelined {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcTags, exportMode, parallel));
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcList, exportMode, parallel));
                 futureResults.add(future);
             }
 
@@ -1009,7 +976,6 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
-        boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
             @Override
@@ -1019,13 +985,8 @@ public final class SWF implements TreeItem, Timelined {
                 }
             }
         };
-        for (Tag t : tags) {
-            if (t instanceof ABCContainerTag) {
-                asV3Found = true;
-            }
-        }
 
-        if (asV3Found) {
+        if (isAS3) {
             ret.addAll(exportActionScript3(handler, outdir, exportMode, parallel));
         } else {
             ret.addAll(exportActionScript2(handler, outdir, exportMode, parallel, evl));
@@ -1033,160 +994,30 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static List<TreeNode> createASTagList(List<? extends ContainerItem> list, Timelined parent) {
-        List<TreeNode> ret = new ArrayList<>();
-        int frame = 0;
-        List<TreeNode> frames = new ArrayList<>();
-
-        for (ContainerItem t : list) {
-            TreeNode addNode = null;
-            if (t instanceof ShowFrameTag) {
-                // do not add PlaceObjects (+etc) to script nodes
-                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null, true);
-
-                for (int r = ret.size() - 1; r >= 0; r--) {
-                    TreeNode node = ret.get(r);
-                    TreeItem item = node.getItem();
-                    if (!(item instanceof DefineSpriteTag
-                            || item instanceof DefineButtonTag
-                            || item instanceof DefineButton2Tag
-                            || item instanceof DoInitActionTag
-                            || item instanceof AS2PackageNodeItem)) {
-                        tti.subNodes.add(node);
-                        ret.remove(r);
-                    }
-                }
-                frame++;
-                frames.add(tti);
-            } else if (t instanceof ASMSource) {
-                ContainerNode tti = new ContainerNode(t);
-                addNode = tti;
-            } else if (t instanceof Container) {
-                if (((Container) t).getItemCount() > 0) {
-
-                    ContainerNode tti = new ContainerNode(t);
-                    List<ContainerItem> subItems = ((Container) t).getSubItems();
-
-                    Timelined timelined = t instanceof Timelined ? (Timelined) t : null;
-                    tti.subNodes = createASTagList(subItems, timelined);
-                    addNode = tti;
-                }
-            }
-            if (addNode != null) {
-                if (addNode.getItem() instanceof CharacterIdTag) {
-                    CharacterIdTag cit = (CharacterIdTag) addNode.getItem();
-                    String path = cit.getExportName();
-                    if (path == null) {
-                        path = "";
-                    }
-                    String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
-                    List<TreeNode> items = ret;
-                    for (int pos = 0; pos < pathParts.length - 1; pos++) {
-                        String pathPart = pathParts[pos];
-                        TreeNode selNode = null;
-                        for (TreeNode node : items) {
-                            if (node.getItem() instanceof AS2PackageNodeItem) {
-                                AS2PackageNodeItem pkg = (AS2PackageNodeItem) node.getItem();
-                                if (pkg.packageName.equals(pathPart)) {
-                                    selNode = node;
-                                    break;
-                                }
-                            }
-                        }
-                        int pkgCount = 0;
-                        for (; pkgCount < items.size(); pkgCount++) {
-                            if (items.get(pkgCount).getItem() instanceof AS3PackageNodeItem) {
-                                AS3PackageNodeItem pkg = (AS3PackageNodeItem) items.get(pkgCount).getItem();
-                                if (pkg.packageName.compareTo(pathPart) > 0) {
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        if (selNode == null) {
-                            items.add(pkgCount, selNode = new AS2PackageNode(new AS2PackageNodeItem(pathPart, t.getSwf())));
-                        }
-                        pos++;
-                        items = selNode.subNodes;
-                    }
-
-                    int clsCount = 0;
-                    String addNodeName = addNode.getItem().getClass().getName() + "_" + pathParts[pathParts.length - 1];
-                    for (; clsCount < items.size(); clsCount++) {
-                        if (items.get(clsCount).getItem() instanceof CharacterIdTag) {
-                            CharacterIdTag ct = (CharacterIdTag) items.get(clsCount).getItem();
-                            String expName = ct.getExportName();
-                            if (expName == null) {
-                                expName = "";
-                            }
-                            if (expName.contains(".")) {
-                                expName = expName.substring(expName.lastIndexOf('.') + 1);
-                            }
-                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNodeName) > 0) {
-                                break;
-                            }
-                        }
-                    }
-                    items.add(clsCount, addNode);
-                } else {
-                    ret.add(addNode);
-                }
-            }
-
-        }
-        ret.addAll(frames);
-        for (int i = ret.size() - 1; i >= 0; i--) {
-            TreeNode node = ret.get(i);
-            TreeItem item = node.getItem();
-            if (item instanceof ASMSource) {
-                ASMSource ass = (ASMSource) item;
-                if (ass.containsSource()) {
-                    continue;
-                }
-            }
-            if (node.subNodes.isEmpty()) {
-                ret.remove(i);
-            }
-        }
-        return ret;
-    }
-
     public Map<String, ASMSource> getASMs() {
-        List<TreeNode> list = createASTagList(tags, this);
-        Map<String, ASMSource> asms = new HashMap<>();
-        getASMs("", list, asms);
-        return asms;
+        Map<String, ASMSource> asms2 = new HashMap<>();
+        getASMs("", tags, asms2);
+        return asms2;
     }
 
-    private static void getASMs(String path, List<TreeNode> nodes, Map<String, ASMSource> result) {
-        for (TreeNode n : nodes) {
-            String subPath = path + "/" + n.toString();
-            if (n.getItem() instanceof ASMSource) {
-                //cacheScript((ASMSource) n.tag);
+    private static void getASMs(String path, List<? extends ContainerItem> items, Map<String, ASMSource> asms) {
+        for (ContainerItem item : items) {
+            String subPath = path + "/" + item.toString();
+            if (item instanceof ASMSource) {
                 String npath = subPath;
                 int ppos = 1;
-                while (result.containsKey(npath)) {
+                while (asms.containsKey(npath)) {
                     ppos++;
                     npath = subPath + "[" + ppos + "]";
                 }
-                result.put(npath, (ASMSource) n.getItem());
+                asms.put(npath, (ASMSource) item);
             }
-
-            getASMs(subPath, n.subNodes, result);
+            if (item instanceof Container) {
+                getASMs(subPath, ((Container) item).getSubItems(), asms);
+            }
         }
     }
-
-    public static void getTagsFromTreeNodes(List<TreeNode> treeNodes, List<Tag> result) {
-        for (TreeNode treeNode : treeNodes) {
-            TreeItem treeItem = treeNode.getItem();
-            if (treeItem instanceof Tag) {
-                result.add((Tag) treeItem);
-            }
-            getTagsFromTreeNodes(treeNode.subNodes, result);
-        }
-    }
-
+    
     private final HashSet<EventListener> listeners = new HashSet<>();
 
     public final void addEventListener(EventListener listener) {
@@ -1401,7 +1232,7 @@ public final class SWF implements TreeItem, Timelined {
             path = File.separator + Helper.makeFileName(characters.get(containerId).getExportFileName());
         }
         if (frames == null) {
-            int frameCnt = tim.frames.size();
+            int frameCnt = tim.getFrames().size();
             frames = new ArrayList<>();
             for (int i = 0; i < frameCnt; i++) {
                 frames.add(i);
@@ -2253,7 +2084,7 @@ public final class SWF implements TreeItem, Timelined {
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
-            Frame frameObj = timeline.frames.get(frame);
+            Frame frameObj = timeline.getFrames().get(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {
                 while (!clipDepths.isEmpty() && clipDepths.peek() <= i) {
                     clipDepths.pop();
@@ -2467,10 +2298,10 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public static void frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        if (timeline.frames.size() <= frame) {
+        if (timeline.getFrames().size() <= frame) {
             return;
         }
-        Frame frameObj = timeline.frames.get(frame);
+        Frame frameObj = timeline.getFrames().get(frame);
         List<SvgClip> clips = new ArrayList<>();
         List<String> prevClips = new ArrayList<>();
 
@@ -2570,7 +2401,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
 
-        if (timeline.frames.isEmpty()) {
+        if (timeline.getFrames().isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
 
@@ -2595,7 +2426,7 @@ public final class SWF implements TreeItem, Timelined {
 
     public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, DepthState stateUnderCursor, int mouseButton, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform, double zoom) {
         RECT rect = displayRect;
-        for (int f = 0; f < timeline.frames.size(); f++) {
+        for (int f = 0; f < timeline.getFrames().size(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             image.fillTransparent();
@@ -2608,10 +2439,10 @@ public final class SWF implements TreeItem, Timelined {
 
     public static void frameToImage(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         double unzoom = SWF.unitDivisor;
-        if (timeline.frames.size() <= frame) {
+        if (timeline.getFrames().size() <= frame) {
             return;
         }
-        Frame frameObj = timeline.frames.get(frame);
+        Frame frameObj = timeline.getFrames().get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(frameObj.backgroundColor.toColor());
         g.fill(new Rectangle(image.getWidth(), image.getHeight()));
@@ -2958,7 +2789,7 @@ public final class SWF implements TreeItem, Timelined {
                 tags = this.tags;
             }
             tags.remove(t);
-            timelined.resetTimeline();
+            timelined.getTimeline().reset();
         } else {
             // timeline should be always the swf here
             if (removeDependencies) {
@@ -2970,5 +2801,10 @@ public final class SWF implements TreeItem, Timelined {
         resetTimelines(timelined);
         updateCharacters();
         clearImageCache();
+    }
+
+    @Override
+    public String toString() {
+        return getShortFileName();
     }
 }

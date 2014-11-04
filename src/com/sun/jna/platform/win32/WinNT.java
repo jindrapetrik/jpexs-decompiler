@@ -804,7 +804,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
         }
 
         @Override
-        public void setPointer(Pointer p) {
+        public final void setPointer(Pointer p) {
             if (immutable) {
                 throw new UnsupportedOperationException("immutable reference");
             }
