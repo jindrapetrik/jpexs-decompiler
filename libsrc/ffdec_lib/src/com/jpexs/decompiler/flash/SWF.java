@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -1507,7 +1507,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueActionItem, ConstantPool> allStrings = new HashMap<>();
     private final HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
-    private final Deobfuscation deobfuscation = new Deobfuscation();
+    private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
@@ -1724,7 +1724,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (tag instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) tag;
                 for (int i = 0; i < sc.names.length; i++) {
-                    String newname = deobfuscation.deobfuscateNameWithPackage(sc.names[i], deobfuscated, renameType, deobfuscated);
+                    String newname = deobfuscation.deobfuscateNameWithPackage(true,sc.names[i], deobfuscated, renameType, deobfuscated);
                     if (newname != null) {
                         sc.names[i] = newname;
                     }
@@ -1732,7 +1732,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 sc.setModified(true);
             }
         }
-        deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, new HashMap<String, String>());
+        deobfuscation.deobfuscateInstanceNames(true,deobfuscated, renameType, tags, new HashMap<String, String>());
         return deobfuscated.size();
     }
 
@@ -1824,7 +1824,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 if (fun.calculatedFunctionName instanceof DirectValueActionItem) {
                                     DirectValueActionItem dvf = (DirectValueActionItem) fun.calculatedFunctionName;
                                     String fname = dvf.toStringNoH(null);
-                                    String changed = deobfuscation.deobfuscateName(fname, false, "method", deobfuscated, renameType, selected);
+                                    String changed = deobfuscation.deobfuscateName(false,fname, false, "method", deobfuscated, renameType, selected);
                                     if (changed != null) {
                                         deobfuscated.put(fname, changed);
                                     }
@@ -1843,7 +1843,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                             if (gti instanceof DirectValueActionItem) {
                                 DirectValueActionItem dvf = (DirectValueActionItem) gti;
                                 String vname = dvf.toStringNoH(null);
-                                String changed = deobfuscation.deobfuscateName(vname, false, "attribute", deobfuscated, renameType, selected);
+                                String changed = deobfuscation.deobfuscateName(false,vname, false, "attribute", deobfuscated, renameType, selected);
                                 if (changed != null) {
                                     deobfuscated.put(vname, changed);
                                 }
@@ -1876,7 +1876,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscation.deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
+                            String changedNameStr2 = deobfuscation.deobfuscateName(false,changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1900,7 +1900,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscation.deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
+                            String changedNameStr2 = deobfuscation.deobfuscateName(false,changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1922,7 +1922,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
-                String changed = deobfuscation.deobfuscateName(f.functionName, false, "function", deobfuscated, renameType, selected);
+                String changed = deobfuscation.deobfuscateName(false,f.functionName, false, "function", deobfuscated, renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                     ret++;
@@ -1933,7 +1933,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
-                String changed = deobfuscation.deobfuscateName(f.functionName, false, "function", deobfuscated, renameType, selected);
+                String changed = deobfuscation.deobfuscateName(false,f.functionName, false, "function", deobfuscated, renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                     ret++;
@@ -1956,7 +1956,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             vc++;
             String name = it.getKey().toStringNoH(it.getValue());
-            String changed = deobfuscation.deobfuscateName(name, false, usageTypes.get(it.getKey()), deobfuscated, renameType, selected);
+            String changed = deobfuscation.deobfuscateName(false,name, false, usageTypes.get(it.getKey()), deobfuscated, renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
                 String h = System.identityHashCode(it.getKey()) + "_" + name;
@@ -1994,7 +1994,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             src.setActions(actionsMap.get(src));
             src.setModified();
         }
-        deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, selected);
+        deobfuscation.deobfuscateInstanceNames(false,deobfuscated, renameType, tags, selected);
         return ret;
     }
 

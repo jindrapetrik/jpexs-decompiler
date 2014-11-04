@@ -12,13 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -82,15 +83,15 @@ public class FunctionActionItem extends ActionItem {
         if (calculatedFunctionName != null) {
             writer.append(" ");
             String fname = calculatedFunctionName.toStringNoQuotes(localData);
-            if (!Deobfuscation.isValidName(fname)) {
-                writer.append(Deobfuscation.makeObfuscatedIdentifier(fname));
+            if (!IdentifiersDeobfuscation.isValidName(false,fname)) {
+                writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(fname));
             } else {
                 calculatedFunctionName.appendToNoQuotes(writer, localData);
             }
         } else if (!functionName.isEmpty()) {
             writer.append(" ");
-            if (!Deobfuscation.isValidName(functionName)) {
-                writer.append(Deobfuscation.makeObfuscatedIdentifier(functionName));
+            if (!IdentifiersDeobfuscation.isValidName(false,functionName)) {
+                writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(functionName));
             } else {
                 writer.append(functionName);
             }
@@ -106,8 +107,8 @@ public class FunctionActionItem extends ActionItem {
             if (pname == null || pname.isEmpty()) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
-            if (!Deobfuscation.isValidName(pname)) {
-                writer.append(Deobfuscation.makeObfuscatedIdentifier(pname));
+            if (!IdentifiersDeobfuscation.isValidName(false,pname)) {
+                writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(pname));
             }
             writer.append(pname);
         }

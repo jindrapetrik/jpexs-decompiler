@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
@@ -283,9 +283,9 @@ public class MethodInfo {
             pdata.put("regIndex", ""+(i+1));            
             if (!localRegNames.isEmpty()) {
                 pdata.put("slotName", localRegNames.get(i + 1)); //assuming it is a slot
-                writer.hilightSpecial(Deobfuscation.printIdentifier(localRegNames.get(i + 1)),"paramname",i,pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(i + 1)),"paramname",i,pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                writer.hilightSpecial(Deobfuscation.printIdentifier(constants.getString(paramNames[i])),"paramname",i,pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,constants.getString(paramNames[i])),"paramname",i,pdata);
             } else {
                 writer.hilightSpecial("param" + (i + 1),"paramname",i,pdata);
             }

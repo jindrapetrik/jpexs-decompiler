@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -73,7 +73,7 @@ public class CallMethodActionItem extends ActionItem {
                 scriptObject.toString(writer, localData);
             }
             writer.append(".");
-            writer.append(Deobfuscation.printIdentifier(methodName.toStringNoQuotes(localData)));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false,methodName.toStringNoQuotes(localData)));
         } else {
             scriptObject.toString(writer, localData);
         }

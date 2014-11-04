@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -264,7 +264,7 @@ public class Multiname {
             if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
                 return getNameWithNamespace(constants, raw);
             }
-            return (isAttribute() ? "@" : "") + (raw ? name : Deobfuscation.printIdentifier(name));
+            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true,name));
         }
     }
 
