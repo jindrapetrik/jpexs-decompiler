@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -355,6 +356,16 @@ public class TagTreeModel implements TreeModel {
     public TreeItem getRoot() {
         return root;
     }
+    
+    private List<TreeItem> getSwfFolders(SWF swf) {
+        List<TreeItem> ret = swfFolders.get(swf);
+        if (ret == null) {
+            createTagList(swf);
+            ret = swfFolders.get(swf);
+        }
+        
+        return ret;
+    }
 
     @Override
     public TreeItem getChild(Object parent, int index) {
@@ -364,13 +375,15 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof SWFBundle) {
             return ((SWFList) parentNode).swfs.get(index);
         } else if (parentNode instanceof SWF) {
-            return swfFolders.get((SWF) parentNode).get(index);
+            return getSwfFolders((SWF) parentNode).get(index);
         } else if (parentNode instanceof FolderItem) {
             return ((FolderItem) parentNode).subItems.get(index);
         } else if (parentNode instanceof Frame) {
             return ((Frame) parentNode).innerTags.get(index);
         } else if (parentNode instanceof DefineSpriteTag) {
             return ((DefineSpriteTag) parentNode).getTimeline().getFrames().get(index);
+        } else if (parentNode instanceof DefineBinaryDataTag) {
+            return ((DefineBinaryDataTag) parentNode).innerSwf;
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChild(index);
         } else if (parentNode instanceof FrameScript) {
@@ -395,7 +408,7 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof SWFBundle) {
             return ((SWFList) parentNode).swfs.size();
         } else if (parentNode instanceof SWF) {
-            return swfFolders.get((SWF) parentNode).size();
+            return getSwfFolders((SWF) parentNode).size();
         } else if (parentNode instanceof HeaderItem) {
             return 0;
         } else if (parentNode instanceof FolderItem) {
@@ -404,6 +417,8 @@ public class TagTreeModel implements TreeModel {
             return ((Frame) parentNode).innerTags.size();
         } else if (parentNode instanceof DefineSpriteTag) {
             return ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
+        } else if (parentNode instanceof DefineBinaryDataTag) {
+            return ((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1;
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChildCount();
         } else if (parentNode instanceof FrameScript) {
@@ -438,13 +453,15 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof SWFBundle) {
             return ((SWFList) parentNode).swfs.indexOf(childNode);
         } else if (parentNode instanceof SWF) {
-            return swfFolders.get((SWF) parentNode).indexOf(childNode);
+            return getSwfFolders((SWF) parentNode).indexOf(childNode);
         } else if (parentNode instanceof FolderItem) {
             return ((FolderItem) parentNode).subItems.indexOf(childNode);
         } else if (parentNode instanceof Frame) {
             return ((Frame) parentNode).innerTags.indexOf(childNode);
         } else if (parentNode instanceof DefineSpriteTag) {
             return ((Frame) parentNode).frame;
+        } else if (parentNode instanceof DefineBinaryDataTag) {
+            return 0; // binary data tag can have only 1 child
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getIndexOfChild(childNode);
         } else if (parentNode instanceof FrameScript) {
