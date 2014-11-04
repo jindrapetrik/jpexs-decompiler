@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action;
+package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class Deobfuscation {
+public class IdentifiersDeobfuscation {
 
     private final Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
@@ -44,7 +44,48 @@ public class Deobfuscation {
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
-    private String fooString(HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
+    //http://help.adobe.com/en_US/AS2LCR/Flash_10.0/help.html?content=00000477.html
+    public static final String[] reservedWordsAS2= {
+        //is "add" really a keyword? documentation says yes, but I can create "add" variable in CS6...
+        //"add",
+        "and","break","case","catch","class","continue","default","delete","do","dynamic","else",
+        "eq","extends","false","finally","for","function","ge","get","gt","if","ifFrameLoaded","implements",
+        "import","in","instanceof","interface","intrinsic","le",
+        //is "it" really a keyword? documentation says yes, but I can create "it" variable in CS6...
+        //"it",
+        "ne","new","not","null","on","onClipEvent",
+        "or","private","public","return","set","static","super","switch","tellTarget","this","throw","try",
+        "typeof","undefined","var","void","while","with"
+    };
+    
+    //http://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/syntax.html
+    public static final String[] reservedWordsAS3 = {
+        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else",
+        "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
+        "interface", "internal", "is", "new", "null", "package", "private", "protected", "public",
+        "return", "super", "switch", "this", "throw",
+        //is "to" really a keyword? documentation says yes, but I can create "to" variable...
+        // "to",   
+        "true", "try", "typeof", "use", "var",
+        "void","while","with"
+    };
+    //syntactic keywords - can be used as identifiers, but that have special meaning in certain contexts
+    public static final String[] syntacticKeywordsAS3= {"each", "get", "set", "namespace", "include", "dynamic", "final", "native", "override", "static"};
+
+    public static boolean isReservedWord(String s,boolean as3) {
+        if (s == null) {
+            return false;
+        }
+        String reservedWords[] = as3?reservedWordsAS3:reservedWordsAS2;
+        for (String rw : reservedWords) {
+            if (rw.equals(s.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private String fooString(boolean as3,HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
         String ret;
         loopfoo:
@@ -69,7 +110,7 @@ public class Deobfuscation {
                 rndSize += 1;
                 continue loopfoo;
             }
-            if (Action.isReservedWord(ret)) {
+            if (isReservedWord(ret,as3)) {
                 exists = true;
                 rndSize += 1;
                 continue;
@@ -83,16 +124,16 @@ public class Deobfuscation {
         return ret;
     }
 
-    public void deobfuscateInstanceNames(HashMap<String, String> namesMap, RenameType renameType, List<Tag> tags, Map<String, String> selected) {
+    public void deobfuscateInstanceNames(boolean as3,HashMap<String, String> namesMap, RenameType renameType, List<Tag> tags, Map<String, String> selected) {
         for (Tag t : tags) {
             if (t instanceof DefineSpriteTag) {
-                deobfuscateInstanceNames(namesMap, renameType, ((DefineSpriteTag) t).subTags, selected);
+                deobfuscateInstanceNames(as3,namesMap, renameType, ((DefineSpriteTag) t).subTags, selected);
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 String name = po.getInstanceName();
                 if (name != null) {
-                    String changedName = deobfuscateName(name, false, "instance", namesMap, renameType, selected);
+                    String changedName = deobfuscateName(as3,name, false, "instance", namesMap, renameType, selected);
                     if (changedName != null) {
                         po.setInstanceName(changedName);
                         ((Tag) po).setModified(true);
@@ -100,7 +141,7 @@ public class Deobfuscation {
                 }
                 String className = po.getClassName();
                 if (className != null) {
-                    String changedClassName = deobfuscateNameWithPackage(className, namesMap, renameType, selected);
+                    String changedClassName = deobfuscateNameWithPackage(as3,className, namesMap, renameType, selected);
                     if (changedClassName != null) {
                         po.setClassName(changedClassName);
                         ((Tag) po).setModified(true);
@@ -110,7 +151,7 @@ public class Deobfuscation {
         }
     }
 
-    public String deobfuscatePackage(String pkg, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public String deobfuscatePackage(boolean as3,String pkg, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
         if (namesMap.containsKey(pkg)) {
             return namesMap.get(pkg);
         }
@@ -126,7 +167,7 @@ public class Deobfuscation {
             if (p > 0) {
                 ret += ".";
             }
-            String partChanged = deobfuscateName(parts[p], false, "package", namesMap, renameType, selected);
+            String partChanged = deobfuscateName(as3,parts[p], false, "package", namesMap, renameType, selected);
             if (partChanged != null) {
                 ret += partChanged;
                 isChanged = true;
@@ -141,7 +182,7 @@ public class Deobfuscation {
         return null;
     }
 
-    public String deobfuscateNameWithPackage(String n, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public String deobfuscateNameWithPackage(boolean as3,String n, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
         String pkg = null;
         String name = "";
         if (n.contains(".")) {
@@ -152,13 +193,13 @@ public class Deobfuscation {
         }
         boolean changed = false;
         if ((pkg != null) && (!pkg.isEmpty())) {
-            String changedPkg = deobfuscatePackage(pkg, namesMap, renameType, selected);
+            String changedPkg = deobfuscatePackage(as3,pkg, namesMap, renameType, selected);
             if (changedPkg != null) {
                 changed = true;
                 pkg = changedPkg;
             }
         }
-        String changedName = deobfuscateName(name, true, "class", namesMap, renameType, selected);
+        String changedName = deobfuscateName(as3,name, true, "class", namesMap, renameType, selected);
         if (changedName != null) {
             changed = true;
             name = changedName;
@@ -175,7 +216,7 @@ public class Deobfuscation {
         return null;
     }
 
-    public static boolean isValidName(String s, String... exceptions) {
+    public static boolean isValidName(boolean as3,String s, String... exceptions) {
         boolean isValid = true;
 
         for (String e : exceptions) {
@@ -184,7 +225,7 @@ public class Deobfuscation {
             }
         }
 
-        if (Action.isReservedWord(s)) {
+        if (isReservedWord(s,as3)) {
             isValid = false;
         }
 
@@ -206,7 +247,7 @@ public class Deobfuscation {
         return isValid;
     }
 
-    public String deobfuscateName(String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public String deobfuscateName(boolean as3,String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
         boolean isValid = true;
         if (usageType == null) {
             usageType = "name";
@@ -218,7 +259,7 @@ public class Deobfuscation {
             }
         }
 
-        isValid = isValidName(s);
+        isValid = isValidName(as3,s);
         if (!isValid) {
             if (namesMap.containsKey(s)) {
                 return namesMap.get(s);
@@ -240,7 +281,7 @@ public class Deobfuscation {
                     } while (found);
                     typeCounts.put(usageType, cnt);
                 } else if (renameType == RenameType.RANDOMWORD) {
-                    ret = fooString(namesMap, s, firstUppercase, DEFAULT_FOO_SIZE);
+                    ret = fooString(as3,namesMap, s, firstUppercase, DEFAULT_FOO_SIZE);
                 }
                 namesMap.put(s, ret);
                 return ret;
@@ -263,14 +304,14 @@ public class Deobfuscation {
      * words)
      * @return
      */
-    public static String printIdentifier(String s, String... validExceptions) {
+    public static String printIdentifier(boolean as3, String s, String... validExceptions) {
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
             return s;
         }
         if (nameCache.containsKey(s)) {
             return nameCache.get(s);
         }
-        if (isValidName(s, validExceptions)) {
+        if (isValidName(as3, s, validExceptions)) {
             nameCache.put(s, s);
             return s;
         }
@@ -279,7 +320,7 @@ public class Deobfuscation {
         return ret;
     }
 
-    public static String printNamespace(String pkg, String... validNameExceptions) {
+    public static String printNamespace(boolean as3,String pkg, String... validNameExceptions) {
         if (nameCache.containsKey(pkg)) {
             return nameCache.get(pkg);
         }
@@ -298,7 +339,7 @@ public class Deobfuscation {
             if (i > 0) {
                 ret += ".";
             }
-            ret += printIdentifier(parts[i], validNameExceptions);
+            ret += printIdentifier(as3,parts[i], validNameExceptions);
         }
         nameCache.put(pkg, ret);
         return ret;

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 
 public class Namespace {
 
@@ -104,7 +104,7 @@ public class Namespace {
         if (raw) {
             return constants.getString(name_index);
         }
-        return Deobfuscation.printNamespace(constants.getString(name_index));
+        return IdentifiersDeobfuscation.printNamespace(true,constants.getString(name_index));
     }
 
     public boolean hasName(String name, AVM2ConstantPool constants) {

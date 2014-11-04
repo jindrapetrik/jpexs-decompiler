@@ -12,11 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -49,7 +50,7 @@ public class GetMemberActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
-        if ((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem) memberName).isString()) || (!Deobfuscation.isValidName(((DirectValueActionItem) memberName).toStringNoQuotes(localData)))) {
+        if ((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem) memberName).isString()) || (!IdentifiersDeobfuscation.isValidName(false,((DirectValueActionItem) memberName).toStringNoQuotes(localData)))) {
             writer.append("[");
             memberName.toString(writer, localData);
             return writer.append("]");

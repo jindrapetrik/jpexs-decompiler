@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -98,7 +98,7 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
         if (localRegNames.containsKey(reg)) {
-            return Deobfuscation.printIdentifier(localRegNames.get(reg));
+            return IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(reg));
         } else {
             if (reg == 0) {
                 return "this";

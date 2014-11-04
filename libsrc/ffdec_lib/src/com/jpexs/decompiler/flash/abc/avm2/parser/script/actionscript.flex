@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.io.StringReader;
 %unicode
 %char
 %type ParsedSymbol
-%throws ParseException
+%throws AVM2ParseException
 
 %{
 
@@ -93,7 +93,7 @@ import java.io.StringReader;
         informListenersPushBack(symb);
     }
     ParsedSymbol last;
-    public ParsedSymbol lex() throws java.io.IOException, ParseException{
+    public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException{
         ParsedSymbol ret=null;
         if(!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();
@@ -212,7 +212,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "while"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.WHILE,yytext()); }
   "else"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.ELSE,yytext()); }
   "for"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FOR,yytext()); }
-  "each"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.EACH,yytext()); }
+  "each"                         { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.EACH,yytext()); }
   "in"                           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IN,yytext()); }
   "if"                           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IF,yytext()); }
   "return"                       { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.RETURN,yytext()); }
@@ -224,23 +224,23 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "finally"                      { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FINALLY,yytext()); }
   "while"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.WHILE,yytext()); }
   "with"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.WITH,yytext()); }
-  "dynamic"                      { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.DYNAMIC,yytext()); }
+  "dynamic"                      { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.DYNAMIC,yytext()); }
   "internal"                     { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.INTERNAL,yytext()); }
-  "override"                     { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.OVERRIDE,yytext()); }
+  "override"                     { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.OVERRIDE,yytext()); }
   "private"                      { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PRIVATE,yytext()); }
   "protected"                    { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PROTECTED,yytext()); }
   "public"                       { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PUBLIC,yytext()); }
-  "static"                       { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.STATIC,yytext()); }
+  "static"                       { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.STATIC,yytext()); }
   "class"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CLASS,yytext()); }
   "const"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CONST,yytext()); }
   "extends"                      { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.EXTENDS,yytext()); }
   "function"                     { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FUNCTION,yytext()); }
-  "get"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.GET,yytext()); }
+  "get"                          { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.GET,yytext()); }
   "implements"                   { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IMPLEMENTS,yytext()); }
   "interface"                    { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.INTERFACE,yytext()); }
-  "namespace"                    { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.NAMESPACE,yytext()); }
+  "namespace"                    { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.NAMESPACE,yytext()); }
   "package"                      { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PACKAGE,yytext()); }
-  "set"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.SET,yytext()); }
+  "set"                          { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.SET,yytext()); }
   "var"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.VAR,yytext()); }
   "import"                       { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IMPORT,yytext()); }
   "use"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.USE,yytext()); }
@@ -251,8 +251,8 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "undefined"                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.UNDEFINED,yytext()); }
   "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.INFINITY,yytext()); }
   "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NAN,yytext()); }
-  "final"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FINAL,yytext()); }
-  
+  "final"                        { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.FINAL,yytext()); }
+  "native"                       { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.NATIVE,yytext()); }
 
   /* operators */
 
@@ -584,7 +584,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
+  \\.                            { throw new AVM2ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 
@@ -611,7 +611,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
+  \\.                            { throw new AVM2ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 
@@ -639,7 +639,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
+  \\.                            { throw new AVM2ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 

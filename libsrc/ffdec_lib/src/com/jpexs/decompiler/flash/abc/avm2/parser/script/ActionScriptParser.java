@@ -260,7 +260,7 @@ public class ActionScriptParser {
                 s = lex();
             } else {
                 s = lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                 String propName = s.value.toString();
                 GraphTargetItem propItem = null;
                 s = lex();
@@ -274,7 +274,7 @@ public class ActionScriptParser {
                         expectedType(SymbolType.BRACKET_CLOSE);
                         propName = null;
                     } else {
-                        expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                         propName = s.value.toString();
                         propItem = null;
                     }
@@ -300,7 +300,7 @@ public class ActionScriptParser {
             name += "@";
             s = lex();
         }
-        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
+        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
         name += s.value.toString();
         s = lex();
         boolean attrBracket = false;
@@ -313,7 +313,7 @@ public class ActionScriptParser {
                 s = lex();
                 if (s.type == SymbolType.MULTIPLY) {
                     name += s.value.toString();
-                } else if (s.type == SymbolType.IDENTIFIER) {
+                } else if (s.group == SymbolGroup.IDENTIFIER) {
                     name += s.value.toString();
                 } else {
                     if (s.type != SymbolType.BRACKET_OPEN) {
@@ -323,7 +323,7 @@ public class ActionScriptParser {
                     continue;
                 }
             } else {
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.NAMESPACE);
+                expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE);
                 name += s.value.toString();
             }
             s = lex();
@@ -338,7 +338,7 @@ public class ActionScriptParser {
                 nsname = name;
             }
             s = lex();
-            if (s.type == SymbolType.IDENTIFIER) {
+            if (s.group == SymbolGroup.IDENTIFIER) {
                 nsprop = s.value.toString();
             } else if (s.type == SymbolType.BRACKET_OPEN) {
                 nspropItem = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
@@ -350,27 +350,7 @@ public class ActionScriptParser {
                 name = null;
             }
             s = lex();
-        }
-        /*
-         List<GraphTargetItem> params = new ArrayList<>();
-         if (s.type == SymbolType.TYPENAME) {
-         s = lex();
-         do {
-         String p = "";
-         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-         p = s.value.toString();
-         s = lex();
-         while (s.type == SymbolType.DOT) {
-         s = lex();
-         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-         name += "." + s.value.toString();
-         s = lex();
-         }
-         params.add(p);
-         } while (s.type == SymbolType.COMMA);
-         expected(s, lexer.yyline(), SymbolType.GREATER_THAN);
-         s = lex();
-         }*/
+        }      
 
         GraphTargetItem ret = null;
         if (name != null) {
@@ -478,7 +458,7 @@ public class ActionScriptParser {
                 hasRest = true;
                 s = lex();
             }
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
 
             paramNames.add(s.value.toString());
             s = lex();
@@ -580,7 +560,7 @@ public class ActionScriptParser {
                     s = lex();
                 }
 
-                while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.IDENTIFIER)) {
+                while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER)) {
                     if (s.type == SymbolType.FINAL) {
                         if (isFinal) {
                             throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -607,7 +587,7 @@ public class ActionScriptParser {
                             throw new AVM2ParseException("Only one static keyword allowed", lexer.yyline());
                         }
                         isStatic = true;
-                    } else if (s.type == SymbolType.IDENTIFIER) {
+                    } else if (s.group == SymbolGroup.IDENTIFIER) {
                         customAccess = s.value.toString();
                         namespace = -2;
                     } else {
@@ -666,7 +646,7 @@ public class ActionScriptParser {
 
                     //GraphTargetItem classTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String classTypeStr = s.value.toString();
                     GraphTargetItem extendsTypeStr = null;
                     s = lex();
@@ -704,7 +684,7 @@ public class ActionScriptParser {
                     }
                     //GraphTargetItem interfaceTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String intTypeStr = s.value.toString();
                     s = lex();
                     List<GraphTargetItem> intExtendsTypeStrs = new ArrayList<>();
@@ -744,7 +724,7 @@ public class ActionScriptParser {
                         s = lex();
                     }
 
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String fname = s.value.toString();
                     if (classNameStr != null && fname.equals(classNameStr)) { //constructor
                         if (isStatic) {
@@ -803,7 +783,7 @@ public class ActionScriptParser {
                         throw new AVM2ParseException("Interface cannot have namespace fields", lexer.yyline());
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String nname = s.value.toString();
                     String nval = "";
                     s = lex();
@@ -840,7 +820,7 @@ public class ActionScriptParser {
                     }
 
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String vcname = s.value.toString();
                     s = lex();
                     GraphTargetItem type = null;
@@ -1194,7 +1174,7 @@ public class ActionScriptParser {
         }
         String loopLabel = null;
 
-        if (s.type == SymbolType.IDENTIFIER) {
+        if (s.group == SymbolGroup.IDENTIFIER) {
             ParsedSymbol sc = lex();
             if (sc.type == SymbolType.COLON) {
                 loopLabel = s.value.toString();
@@ -1206,7 +1186,7 @@ public class ActionScriptParser {
 
         if (s.type == SymbolType.DEFAULT) {
             ParsedSymbol sx = lex();
-            if (sx.type != SymbolType.IDENTIFIER) {
+            if (sx.group != SymbolGroup.IDENTIFIER) {
                 lexer.pushback(sx);
             } else {
                 if (!sx.value.equals("xml")) {
@@ -1266,13 +1246,13 @@ public class ActionScriptParser {
                  break;*/
                 case FUNCTION:
                     s = lexer.lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
                     ret = (function(pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, s.value.toString(), false, variables));
                     break;
                 case VAR:
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String varIdentifier = s.value.toString();
                     s = lex();
                     GraphTargetItem type;
@@ -1480,7 +1460,7 @@ public class ActionScriptParser {
                     if (loops.isEmpty()) {
                         throw new AVM2ParseException("No loop to break", lexer.yyline());
                     }
-                    if (s.type == SymbolType.IDENTIFIER) {
+                    if (s.group == SymbolGroup.IDENTIFIER) {
                         String breakLabel = s.value.toString();
                         for (Loop l : loops) {
                             if (breakLabel.equals(loopLabels.get(l))) {
@@ -1503,7 +1483,7 @@ public class ActionScriptParser {
                     if (loops.isEmpty()) {
                         throw new AVM2ParseException("No loop to continue", lexer.yyline());
                     }
-                    if (s.type == SymbolType.IDENTIFIER) {
+                    if (s.group == SymbolGroup.IDENTIFIER) {
                         String continueLabel = s.value.toString();
                         for (Loop l : loops) {
                             if (l.id < 0) { //negative id marks switch => no continue
@@ -1553,7 +1533,7 @@ public class ActionScriptParser {
                     while (s.type == SymbolType.CATCH) {
                         expectedType(SymbolType.PARENT_OPEN);
                         s = lex();
-                        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
+                        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
 
                         String enamestr = s.value.toString();
                         expectedType(SymbolType.COLON);
@@ -1696,7 +1676,7 @@ public class ActionScriptParser {
                     break;
                 case DESCENDANTS:
                     ParsedSymbol d = lex();
-                    expected(d, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.MULTIPLY);
+                    expected(d, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.MULTIPLY);
                     ret = new GetDescendantsAVM2Item(expr, d.type == SymbolType.MULTIPLY ? null : d.value.toString(), openedNamespaces);
                     allowRemainder = true;
                     break;
@@ -2054,7 +2034,7 @@ public class ActionScriptParser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING);
 
                     GraphTargetItem n = new StringAVM2Item(null, s.value.toString());
 //expression(thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
@@ -2082,7 +2062,7 @@ public class ActionScriptParser {
             case FUNCTION:
                 s = lexer.lex();
                 String fname = "";
-                if (s.isType(SymbolType.IDENTIFIER)) {
+                if (s.isType(SymbolGroup.IDENTIFIER)) {
                     fname = s.value.toString();
                 } else {
                     lexer.pushback(s);
@@ -2146,7 +2126,7 @@ public class ActionScriptParser {
                 if (s.type == SymbolType.FUNCTION) {
                     s = lexer.lex();
                     String ffname = "";
-                    if (s.isType(SymbolType.IDENTIFIER)) {
+                    if (s.isType(SymbolGroup.IDENTIFIER)) {
                         ffname = s.value.toString();
                     } else {
                         lexer.pushback(s);
@@ -2221,14 +2201,14 @@ public class ActionScriptParser {
         String name = "";
         ParsedSymbol s = lex();
         if (s.type != SymbolType.CURLY_OPEN) {
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
             name = s.value.toString();
             s = lex();
         }
         while (s.type != SymbolType.CURLY_OPEN) {
             expected(s, lexer.yyline(), SymbolType.DOT);
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
             name += "." + s.value.toString();
             s = lex();
         }
@@ -2241,7 +2221,7 @@ public class ActionScriptParser {
             String impName = null;
             boolean all = false;
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
             impName = s.value.toString();
             s = lex();
             while (s.type == SymbolType.DOT) {
@@ -2256,7 +2236,7 @@ public class ActionScriptParser {
                     s = lex();
                     break;
                 }
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
 
                 impName = s.value.toString();
                 s = lex();

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.Deobfuscation;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -76,8 +76,8 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("var ");
 
-        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!Deobfuscation.isValidName(((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
-            writer.append(Deobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
+        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false,((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+            writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
         } else {
             stripQuotes(name, localData, writer);
         }
