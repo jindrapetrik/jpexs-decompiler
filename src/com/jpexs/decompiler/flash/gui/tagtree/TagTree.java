@@ -189,10 +189,10 @@ public class TagTree extends JTree implements ActionListener {
 
     public static TreeNodeType getTreeNodeType(TreeItem t) {
 
-        if (t instanceof TagScript){
+        if (t instanceof TagScript) {
             t = ((TagScript) t).getTag();
         }
-        
+
         if (t instanceof HeaderItem) {
             return TreeNodeType.HEADER;
         }
@@ -247,7 +247,7 @@ public class TagTree extends JTree implements ActionListener {
         if (t instanceof AS3Package) {
             return TreeNodeType.PACKAGE;
         }
-        if ((t instanceof Frame) 
+        if ((t instanceof Frame)
                 || (t instanceof FrameScript)) {
             return TreeNodeType.FRAME;
         }

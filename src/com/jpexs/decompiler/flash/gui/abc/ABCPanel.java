@@ -320,11 +320,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             this.swf = swf;
             if (swf.abcList.size() > 0) {
                 this.abc = swf.abcList.get(0).getABC();
-            }            
-            navigator.setABC(swf.abcList, abc);            
+            }
+            navigator.setABC(swf.abcList, abc);
         }
     }
-   
 
     public void initSplits() {
         //splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
@@ -364,7 +363,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
-        
+
         decompiledTextArea.setLinkHandler(new LinkHandler() {
 
             @Override
@@ -478,7 +477,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
         decompiledTextArea.addMouseMotionListener(cch);
-        
+
         navigator = new TraitsList(this);
 
         navPanel = new JPanel(new BorderLayout());
@@ -561,13 +560,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             //more than one? display list
             if (!usages.isEmpty()) {
                 return true;
-            } 
-        }else{
-            return decompiledTextArea.getLocalDeclarationOfPos(pos)!=-1;
+            }
+        } else {
+            return decompiledTextArea.getLocalDeclarationOfPos(pos) != -1;
         }
         return false;
     }
-    
+
     private void gotoDeclaration(int pos) {
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
@@ -595,9 +594,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             } else if (!usages.isEmpty()) { //one
                 UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
             }
-        }else{
-            int dpos=decompiledTextArea.getLocalDeclarationOfPos(pos);
-            if(dpos>-1){
+        } else {
+            int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos);
+            if (dpos > -1) {
                 decompiledTextArea.setCaretPosition(dpos);
             }
         }
@@ -673,7 +672,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {        
+    public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == constantTypeList) {
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {
@@ -805,21 +804,20 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
                 int oldIndex = pack.scriptIndex;
                 decompiledTextArea.uncache(pack);
-                
-                
+
                 try {
                     String oldSp = null;
                     List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
                     if (!packs.isEmpty()) {
-                        oldSp = packs.get(0).getKey().toString();                        
+                        oldSp = packs.get(0).getKey().toString();
                     }
-                    
+
                     String as = decompiledTextArea.getText();
                     abc.replaceSciptPack(pack, as);
                     lastDecompiled = as;
                     mainPanel.updateClassesList();
-                    
-                    if(oldSp!=null){
+
+                    if (oldSp != null) {
                         hilightScript(swf, oldSp);
                     }
                     //decompiledTextArea.setClassIndex(-1);
@@ -831,12 +829,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (CompilationException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException | InterruptedException ex) {
                     //ignore                    
                 }

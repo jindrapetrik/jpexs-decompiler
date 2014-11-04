@@ -280,7 +280,6 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(lineStart);
         //requestFocus();
     }
-    
 
     public Highlighting getSelectedSpecial() {
         return Highlighting.search(specialHilights, getCaretPosition());

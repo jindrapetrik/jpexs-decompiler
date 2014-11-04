@@ -84,7 +84,7 @@ public class TagTreeModel implements TreeModel {
                 this.swfs.add(swf);
                 createTagList(swf);
             }
-        }        
+        }
     }
 
     private String translate(String key) {
@@ -247,7 +247,7 @@ public class TagTreeModel implements TreeModel {
                             hasInnerFrames = true;
                         }
                     }
-                    
+
                     if (!hasInnerFrames) {
                         if (tag instanceof Container) {
                             for (ContainerItem item : ((Container) tag).getSubItems()) {
@@ -257,7 +257,7 @@ public class TagTreeModel implements TreeModel {
                             }
                         }
                     }
-                    
+
                     if (!tagSubNodes.isEmpty()) {
                         TagScript ts = new TagScript(swf, tag, tagSubNodes);
                         if (hasInnerFrames) {
@@ -268,7 +268,7 @@ public class TagTreeModel implements TreeModel {
                     }
                 }
             }
-            
+
             subNodes.addAll(subFrames);
 
             for (Frame frame : timeline.getFrames()) {
@@ -277,13 +277,13 @@ public class TagTreeModel implements TreeModel {
                     subNodes.add(frameScript);
                 }
             }
-            
+
             if (subNodes.size() > 0) {
                 TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);
                 nodeList.add(actionScriptNode);
             }
         }
-        
+
         swfFolders.put(swf, nodeList);
     }
 
@@ -291,7 +291,7 @@ public class TagTreeModel implements TreeModel {
         int childCount = getChildCount(swf);
         for (int i = 0; i < childCount; i++) {
             TreeItem child = getChild(swf, i);
-            if (child instanceof ClassesListTreeModel){
+            if (child instanceof ClassesListTreeModel) {
                 return child;
             } else if (child instanceof FolderItem) {
                 FolderItem folder = (FolderItem) child;
@@ -303,7 +303,7 @@ public class TagTreeModel implements TreeModel {
 
         return null;
     }
-    
+
     private List<TreeItem> searchTag(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
         int cnt = getChildCount(parent);
@@ -356,14 +356,14 @@ public class TagTreeModel implements TreeModel {
     public TreeItem getRoot() {
         return root;
     }
-    
+
     private List<TreeItem> getSwfFolders(SWF swf) {
         List<TreeItem> ret = swfFolders.get(swf);
         if (ret == null) {
             createTagList(swf);
             ret = swfFolders.get(swf);
         }
-        
+
         return ret;
     }
 

@@ -114,7 +114,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
 
         List<Highlighting> allh = new ArrayList<>();
-        for (Highlighting h : traitHighlights) {            
+        for (Highlighting h : traitHighlights) {
             if (h.getPropertyString("index").equals("" + lastTraitIndex)) {
                 for (Highlighting sh : specialHighlights) {
                     if (sh.startPos >= h.startPos && (sh.startPos + sh.len < h.startPos + h.len)) {
@@ -222,59 +222,59 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         caretUpdate(null);
         reset = false;
     }
-    public int getMultinameUnderMouseCursor(Point pt) {        
-        return getMultinameAtPos(viewToModel(pt));        
+
+    public int getMultinameUnderMouseCursor(Point pt) {
+        return getMultinameAtPos(viewToModel(pt));
     }
-    
+
     public int getMultinameUnderCaret() {
-        return getMultinameAtPos(getCaretPosition());        
+        return getMultinameAtPos(getCaretPosition());
     }
-    
+
     public int getLocalDeclarationOfPos(int pos) {
-        Highlighting sh=Highlighting.search(specialHighlights,pos);
-        Highlighting h=Highlighting.search(highlights,pos);
+        Highlighting sh = Highlighting.search(specialHighlights, pos);
+        Highlighting h = Highlighting.search(highlights, pos);
         Highlighting tm = Highlighting.search(methodHighlights, pos);
         if (tm == null) {
             return -1;
         }
-        List<Highlighting> tms= Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);
-        if(h==null){
+        List<Highlighting> tms = Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);
+        if (h == null) {
             return -1;
         }
         //is it already declaration?
-        if("true".equals(h.getPropertyString("declaration")) || (sh!=null && "true".equals(sh.getPropertyString("declaration")))){
+        if ("true".equals(h.getPropertyString("declaration")) || (sh != null && "true".equals(sh.getPropertyString("declaration")))) {
             return -1; //no jump
         }
-        
-        Map<String,String> search=h.getProperties();
+
+        Map<String, String> search = h.getProperties();
         search.remove("index");
         search.remove("subtype");
         search.remove("offset");
-        if(search.isEmpty()){
+        if (search.isEmpty()) {
             return -1;
         }
-        search.put("declaration", "true");        
-        
-        for(Highlighting tm1:tms)
-        {
-            Highlighting rh= Highlighting.search(highlights, search, tm1.startPos, tm1.startPos+tm1.len);
-            if(rh==null){
-                rh=Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos+tm1.len);
+        search.put("declaration", "true");
+
+        for (Highlighting tm1 : tms) {
+            Highlighting rh = Highlighting.search(highlights, search, tm1.startPos, tm1.startPos + tm1.len);
+            if (rh == null) {
+                rh = Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos + tm1.len);
             }
-            if(rh!=null){
+            if (rh != null) {
                 return rh.startPos;
             }
         }
-        
+
         return -1;
     }
-    
-    public int getMultinameAtPos(int pos) {   
+
+    public int getMultinameAtPos(int pos) {
         Highlighting tm = Highlighting.search(methodHighlights, pos);
         if (tm == null) {
             return -1;
         }
-        int mi = (int)(long)tm.getPropertyLong("index");
+        int mi = (int) (long) tm.getPropertyLong("index");
         int bi = abc.findBodyIndex(mi);
         Highlighting h = Highlighting.search(highlights, pos);
         if (h != null) {
@@ -565,7 +565,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void reloadClass() {
         int ci = classIndex;
-        uncache(script);        
+        uncache(script);
         if ((script != null) && (abc != null)) {
             setScript(script, abcList);
         }

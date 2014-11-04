@@ -100,7 +100,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
                     }
                 }
             }
-            
+
             swfInsidePanel.setVisible(binaryIsSwf);
         } else {
             hexEditor.setData(new byte[0], null, null);

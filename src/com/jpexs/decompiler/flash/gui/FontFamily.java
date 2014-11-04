@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Font;
@@ -25,45 +24,46 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public class FontFamily implements Comparable<FontFamily>{
-     public String familyEn;
-        public String family;
+public class FontFamily implements Comparable<FontFamily> {
 
-        public FontFamily(Font font){
-            this(font.getFamily(Locale.ENGLISH),font.getFamily());
-        }
-        
-        public FontFamily(String familyEn, String family) {
-            this.familyEn = familyEn;
-            this.family = family;
-        }
+    public String familyEn;
+    public String family;
 
-        @Override
-        public String toString() {
-            return family;
-        }
+    public FontFamily(Font font) {
+        this(font.getFamily(Locale.ENGLISH), font.getFamily());
+    }
 
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 89 * hash + Objects.hashCode(this.familyEn);
-            return hash;
-        }
+    public FontFamily(String familyEn, String family) {
+        this.familyEn = familyEn;
+        this.family = family;
+    }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final FontFamily other = (FontFamily) obj;
-            if (!Objects.equals(this.familyEn, other.familyEn)) {
-                return false;
-            }
-            return true;
+    @Override
+    public String toString() {
+        return family;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.familyEn);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FontFamily other = (FontFamily) obj;
+        if (!Objects.equals(this.familyEn, other.familyEn)) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public int compareTo(FontFamily o) {

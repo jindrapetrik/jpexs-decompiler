@@ -24,7 +24,10 @@ import jsyntaxpane.Token;
  * @author JPEXS
  */
 public interface LinkHandler {
+
     public boolean isLink(Token token);
+
     public void handleLink(Token token);
+
     public Highlighter.HighlightPainter linkPainter();
 }

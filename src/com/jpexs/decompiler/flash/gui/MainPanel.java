@@ -1909,7 +1909,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
                     if (fontName == null) {
                         fontName = font.getFontName();
-                    }                    
+                    }
                     Font f = FontTag.installedFontsByName.get(fontName);
                     if (f == null || !f.canDisplay(character)) {
                         View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2261,7 +2261,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         oldItem = treeItem;
-        
+
         // show the preview of the tag when the user clicks to the tagname inside the scripts node, too
         // this is a little bit inconsistent, beacuse the frames (FrameScript) are not shown
         if (treeItem instanceof TagScript) {

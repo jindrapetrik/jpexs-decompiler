@@ -714,7 +714,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             String newText = lastDecompiled;
             setDecompiledText(newText);
             if (lastLine > -1) {
-                decompiledEditor.gotoLine(lastLine + prefLines + 1);                
+                decompiledEditor.gotoLine(lastLine + prefLines + 1);
             }
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);
@@ -777,7 +777,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 } catch (ActionParseException ex) {
                     editor.gotoLine((int) ex.line);
                     editor.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;
             case ACTION_EDIT_DECOMPILED:

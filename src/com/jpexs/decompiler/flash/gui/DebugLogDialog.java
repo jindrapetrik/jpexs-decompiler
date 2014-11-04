@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
@@ -43,52 +42,52 @@ public class DebugLogDialog extends AppDialog implements ActionListener {
     private final String ACTION_CLOSE = "CLOSE";
     private final String ACTION_CLEAR = "CLEAR";
     private final Debugger debug;
-    
+
     public DebugLogDialog(Debugger debug) {
-        setSize(800, 600);         
-        this.debug = debug;            
+        setSize(800, 600);
+        this.debug = debug;
         setTitle(translate("dialog.title"));
         logTextArea.setBackground(Color.white);
         logTextArea.setEditable(false);
         JScrollPane spane = new JScrollPane(logTextArea);
-        spane.setPreferredSize(new Dimension(800,500));
-        
+        spane.setPreferredSize(new Dimension(800, 500));
+
         debug.addMessageListener(new DebugListener() {
 
             @Override
             public void onMessage(String clientId, String msg) {
-                log(translate("msg.header").replace("%clientid%", clientId)+msg);
+                log(translate("msg.header").replace("%clientid%", clientId) + msg);
             }
 
             @Override
             public void onFinish(String clientId) {
-                
+
             }
         });
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(spane,BorderLayout.CENTER);
-        
+        cnt.add(spane, BorderLayout.CENTER);
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton clearButton = new JButton(translate("button.clear"));
         clearButton.setActionCommand(ACTION_CLEAR);
         clearButton.addActionListener(this);
-        
+
         JButton closeButton = new JButton(translate("button.close"));
         closeButton.setActionCommand(ACTION_CLOSE);
         closeButton.addActionListener(this);
-        
+
         buttonsPanel.add(clearButton);
         buttonsPanel.add(closeButton);
-        cnt.add(buttonsPanel,BorderLayout.SOUTH);        
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
         View.setWindowIcon(this);
         View.centerScreen(this);
     }
-    
-    public void log(String msg){
+
+    public void log(String msg) {
         Document d = logTextArea.getDocument();
         try {
-            d.insertString(d.getLength(), msg+"\r\n", null);
+            d.insertString(d.getLength(), msg + "\r\n", null);
         } catch (BadLocationException ex) {
             //ignore
         }
@@ -96,7 +95,7 @@ public class DebugLogDialog extends AppDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch(e.getActionCommand()){
+        switch (e.getActionCommand()) {
             case ACTION_CLEAR:
                 logTextArea.setText("");
                 break;
@@ -105,5 +104,5 @@ public class DebugLogDialog extends AppDialog implements ActionListener {
                 break;
         }
     }
-    
+
 }

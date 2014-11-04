@@ -80,12 +80,12 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                     continue;
                 }
             }
-        
+
             AS3Package pkg = ensurePackage(item.getKey().packageStr);
             pkg.scripts.put(item.getKey().className, item.getValue());
         }
     }
-    
+
     private AS3Package ensurePackage(String packageStr) {
         StringTokenizer st = new StringTokenizer(packageStr, ".");
         AS3Package parent = root;
@@ -96,17 +96,17 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 pkg = new AS3Package(pathElement, swf);
                 parent.subPackages.put(pathElement, pkg);
             }
-            
+
             parent = pkg;
         }
-        
+
         return parent;
     }
 
     public ScriptPack getElementByClassIndex(int classIndex) {
         return getElementByClassIndexRecursive(root, classIndex);
     }
-    
+
     private ScriptPack getElementByClassIndexRecursive(AS3Package item, int classIndex) {
         for (AS3Package pkg : item.subPackages.values()) {
             ScriptPack result = getElementByClassIndexRecursive(pkg, classIndex);
@@ -114,7 +114,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 return result;
             }
         }
-        
+
         for (ScriptPack sc : item.scripts.values()) {
             for (Trait t : sc.abc.script_info.get(sc.scriptIndex).traits.traits) {
                 if (t instanceof TraitClass) {
@@ -124,7 +124,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -145,7 +145,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         if (parentItem instanceof ScriptPack) {
             return 0;
         }
-        
+
         AS3Package pkg = (AS3Package) parentItem;
         return pkg.getChildCount();
     }

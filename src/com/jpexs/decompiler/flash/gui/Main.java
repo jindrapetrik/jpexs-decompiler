@@ -1143,18 +1143,18 @@ public class Main {
             Random rnd = new Random();
             byte rb[] = new byte[16];
             rnd.nextBytes(rb);
-            String rhex = byteArrayToHex(rb);            
+            String rhex = byteArrayToHex(rb);
             try {
                 //load debug swf
                 SWF debugSWF = new SWF(Main.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/gui/debugger/debug.swf"), false);
 
                 ABCContainerTag firstAbc = swf.abcList.get(0);
                 String newdebuggerpkg = DEBUGGER_PACKAGE;
-                
-                if(Configuration.randomDebuggerPackage.get()){
-                    newdebuggerpkg += ".pkg"+rhex;
+
+                if (Configuration.randomDebuggerPackage.get()) {
+                    newdebuggerpkg += ".pkg" + rhex;
                 }
-                
+
                 //add debug ABC tags to main SWF
                 for (ABCContainerTag ds : debugSWF.abcList) {
                     ABC a = ds.getABC();
@@ -1177,7 +1177,7 @@ public class Main {
                     ((Tag) ds).setModified(true);
                 }
 
-            } catch (Exception ex) {                
+            } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error while attaching debugger", ex);
                 //ignore
             }

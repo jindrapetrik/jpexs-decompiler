@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Container;
@@ -33,19 +32,18 @@ import javax.swing.JRadioButton;
  * @author JPEXS
  */
 public class ReplaceTraceDialog extends AppDialog {
-    
+
     private JRadioButton debugAlertRadio;
     private JRadioButton debugConsoleRadio;
     private JRadioButton debugSocketRadio;
 
     private String value = null;
 
-    
-    private void setValue(String val){
-        if(val == null){
+    private void setValue(String val) {
+        if (val == null) {
             return;
         }
-        switch(val){
+        switch (val) {
             case "debugAlert":
                 debugAlertRadio.setSelected(true);
                 break;
@@ -55,17 +53,17 @@ public class ReplaceTraceDialog extends AppDialog {
             case "debugSocket":
                 debugSocketRadio.setSelected(true);
                 break;
-        }           
+        }
     }
-    
+
     public String getValue() {
         return value;
     }
-    
-    public ReplaceTraceDialog(Window owner,String defaultVal) {
-        super(owner);        
+
+    public ReplaceTraceDialog(Window owner, String defaultVal) {
+        super(owner);
         setTitle(translate("dialog.title"));
-        Container cnt=getContentPane();
+        Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
         debugAlertRadio = new JRadioButton(translate("function.debugAlert"));
         debugAlertRadio.setAlignmentX(0);
@@ -73,39 +71,37 @@ public class ReplaceTraceDialog extends AppDialog {
         debugConsoleRadio.setAlignmentX(0);
         debugSocketRadio = new JRadioButton(translate("function.debugSocket"));
         debugSocketRadio.setAlignmentX(0);
-        
+
         debugAlertRadio.setSelected(true);
-        
+
         ButtonGroup bg = new ButtonGroup();
         bg.add(debugAlertRadio);
         bg.add(debugConsoleRadio);
         bg.add(debugSocketRadio);
-        
-        
-        
+
         cnt.add(debugAlertRadio);
         cnt.add(debugConsoleRadio);
         cnt.add(debugSocketRadio);
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton okButton=new JButton(AppStrings.translate("button.ok"));
+        JButton okButton = new JButton(AppStrings.translate("button.ok"));
         okButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(debugAlertRadio.isSelected()){
+                if (debugAlertRadio.isSelected()) {
                     value = "debugAlert";
                 }
-                if(debugConsoleRadio.isSelected()){
+                if (debugConsoleRadio.isSelected()) {
                     value = "debugConsole";
                 }
-                if(debugSocketRadio.isSelected()){
+                if (debugSocketRadio.isSelected()) {
                     value = "debugSocket";
                 }
                 setVisible(false);
             }
         });
-        JButton cancelButton=new JButton(AppStrings.translate("button.cancel"));
+        JButton cancelButton = new JButton(AppStrings.translate("button.cancel"));
         cancelButton.addActionListener(new ActionListener() {
 
             @Override
@@ -115,7 +111,7 @@ public class ReplaceTraceDialog extends AppDialog {
             }
         });
         buttonsPanel.add(okButton);
-        buttonsPanel.add(cancelButton);      
+        buttonsPanel.add(cancelButton);
         buttonsPanel.setAlignmentX(0);
         add(buttonsPanel);
         setModalityType(DEFAULT_MODALITY_TYPE);
@@ -124,5 +120,5 @@ public class ReplaceTraceDialog extends AppDialog {
         View.centerScreen(this);
         setValue(defaultVal);
     }
-    
+
 }

@@ -204,14 +204,14 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                     }
                     repaint();
 
-                } 
-            }else {
-                    lastUnderlined = null;
-                    MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
-                    setCursor(Cursor.getDefaultCursor());
-                    repaint();
                 }
-            
+            } else {
+                lastUnderlined = null;
+                MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
+                setCursor(Cursor.getDefaultCursor());
+                repaint();
+            }
+
         }
 
         @Override
@@ -291,7 +291,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
 
         @Override
-        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {            
+        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
             try {
                 // --- determine locations ---
                 TextUI mapper = c.getUI();
@@ -318,7 +318,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         @Override
         public Shape paintLayer(Graphics g, int offs0, int offs1,
                 Shape bounds, JTextComponent c, View view) {
-            
+
             g.setColor(c.getSelectionColor());
 
             Rectangle r;
@@ -350,7 +350,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 r.width = Math.max(r.width, 1);
 
                 paint(g, offs0, offs1, r, c);
-                
+
             }
 
             return r;
