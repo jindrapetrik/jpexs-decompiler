@@ -55,6 +55,12 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     }
 
     @Override
+    public GraphTextWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+        writeToFile(text);
+        return this;
+    }
+
+    @Override
     public FileTextWriter append(String str) {
         writeToFile(str);
         return this;
