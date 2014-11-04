@@ -161,7 +161,8 @@ public class TagTreeModel implements TreeModel {
         }
 
         Timeline timeline = swf.getTimeline();
-        for (int i = 0; i < timeline.getFrameCount(); i++) {
+        int frameCount = timeline.getFrameCount();
+        for (int i = 0; i < frameCount; i++) {
             frames.add(timeline.getFrames().get(i));
         }
 

@@ -73,6 +73,7 @@ public class Timeline {
     private void ensureInitialized() {
         if (!initialized) {
             initialize();
+            initialized = true;
         }
     }
     
@@ -246,8 +247,11 @@ public class Timeline {
             frames.add(frame);
         }
         
-        detectTweens();
-        for (int d = 1; d <= getMaxDepthInternal(); d++) {
+        // todo: enable again after TweenDetector.detectRanges implemented
+        //detectTweens();
+        
+        int maxDepth = getMaxDepthInternal();
+        for (int d = 1; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
                     depthMaxFrame.put(d, f + 1);
@@ -266,7 +270,8 @@ public class Timeline {
     }
 
     private void detectTweens() {
-        for (int d = 1; d <= getMaxDepthInternal(); d++) {
+        int maxDepth = getMaxDepthInternal();
+        for (int d = 1; d <= maxDepth; d++) {
             int characterId = -1;
             int len = 0;
             for (int f = 0; f <= frames.size(); f++) {
@@ -282,10 +287,10 @@ public class Timeline {
                         }
                         List<TweenRange> ranges = TweenDetector.detectRanges(matrices);
                         for (TweenRange r : ranges) {
-                            System.out.println("" + r);
                             for (int t = r.startPosition; t <= r.endPosition; t++) {
-                                frames.get(f - len + t).layers.get(d).motionTween = true;
-                                frames.get(f - len + t).layers.get(d).key = false;
+                                DepthState layer = frames.get(f - len + t).layers.get(d);
+                                layer.motionTween = true;
+                                layer.key = false;
                             }
                             frames.get(r.startPosition).layers.get(d).key = true;
                         }
