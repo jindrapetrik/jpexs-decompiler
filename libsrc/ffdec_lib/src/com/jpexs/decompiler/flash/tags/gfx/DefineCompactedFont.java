@@ -355,49 +355,44 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public FontTag toClassicFont() {
-        try {
-            DefineFont2Tag ret = new DefineFont2Tag(swf);
-            ret.fontId = getFontId();
-            ret.fontFlagsBold = isBold();
-            ret.fontFlagsItalic = isItalic();
-            ret.fontFlagsWideOffsets = true;
-            ret.fontFlagsWideCodes = true;
-            ret.fontFlagsHasLayout = true;
-            ret.fontAscent = (getAscent());
-            ret.fontDescent = (getDescent());
-            ret.fontLeading = (getLeading());
-            ret.fontAdvanceTable = new ArrayList<>();
-            ret.fontBoundsTable = new ArrayList<>();
-            ret.codeTable = new ArrayList<>();
-            ret.glyphShapeTable = new ArrayList<>();
-            List<SHAPE> shp = getGlyphShapeTable();
-            ret.numGlyphs = shp.size();
-            for (int g = 0; g < shp.size(); g++) {
-                ret.fontAdvanceTable.add(resize(getGlyphAdvance(g)));
-                ret.codeTable.add((int) glyphToChar(g));
+        DefineFont2Tag ret = new DefineFont2Tag(swf);
+        ret.fontId = getFontId();
+        ret.fontFlagsBold = isBold();
+        ret.fontFlagsItalic = isItalic();
+        ret.fontFlagsWideOffsets = true;
+        ret.fontFlagsWideCodes = true;
+        ret.fontFlagsHasLayout = true;
+        ret.fontAscent = (getAscent());
+        ret.fontDescent = (getDescent());
+        ret.fontLeading = (getLeading());
+        ret.fontAdvanceTable = new ArrayList<>();
+        ret.fontBoundsTable = new ArrayList<>();
+        ret.codeTable = new ArrayList<>();
+        ret.glyphShapeTable = new ArrayList<>();
+        List<SHAPE> shp = getGlyphShapeTable();
+        ret.numGlyphs = shp.size();
+        for (int g = 0; g < shp.size(); g++) {
+            ret.fontAdvanceTable.add(resize(getGlyphAdvance(g)));
+            ret.codeTable.add((int) glyphToChar(g));
 
-                SHAPE shpX = resizeShape(shp.get(g));
-                ret.glyphShapeTable.add(shpX);
-                ret.fontBoundsTable.add(getGlyphBounds(g));
-            }
-            ret.fontName = getFontNameIntag();
-            ret.languageCode = new LANGCODE(1);
-            ret.fontKerningTable = new ArrayList<>();
-
-            FontType ft = fonts.get(0);
-            for (int i = 0; i < ft.kerning.size(); i++) {
-                KERNINGRECORD kr = new KERNINGRECORD();
-                kr.fontKerningAdjustment = resize(ft.kerning.get(i).advance);
-                kr.fontKerningCode1 = ft.kerning.get(i).char1;
-                kr.fontKerningCode2 = ft.kerning.get(i).char2;
-                ret.fontKerningTable.add(kr);
-             }
-
-            return ret;
-        } catch (IOException ex) {
-            Logger.getLogger(DefineCompactedFont.class.getName()).log(Level.SEVERE, null, ex);
+            SHAPE shpX = resizeShape(shp.get(g));
+            ret.glyphShapeTable.add(shpX);
+            ret.fontBoundsTable.add(getGlyphBounds(g));
         }
-        return null;
+        ret.fontName = getFontNameIntag();
+        ret.languageCode = new LANGCODE(1);
+        ret.fontKerningTable = new ArrayList<>();
+
+        FontType ft = fonts.get(0);
+        for (int i = 0; i < ft.kerning.size(); i++) {
+            KERNINGRECORD kr = new KERNINGRECORD();
+            kr.fontKerningAdjustment = resize(ft.kerning.get(i).advance);
+            kr.fontKerningCode1 = ft.kerning.get(i).char1;
+            kr.fontKerningCode2 = ft.kerning.get(i).char2;
+            ret.fontKerningTable.add(kr);
+         }
+
+        return ret;
     }
 
     @Override

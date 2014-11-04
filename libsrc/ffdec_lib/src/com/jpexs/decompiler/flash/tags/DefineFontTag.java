@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -135,6 +136,14 @@ public class DefineFontTag extends FontTag {
         return baos.toByteArray();
     }
 
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineFontTag(SWF swf) {
+        super(swf, ID, "DefineFont", null);
+    }
+    
     /**
      * Constructor
      *

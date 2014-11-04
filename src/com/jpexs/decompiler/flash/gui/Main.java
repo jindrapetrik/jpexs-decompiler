@@ -292,6 +292,7 @@ public class Main {
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
             result.isBundle = true;
+            result.bundleClass = bundle.getClass();
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();

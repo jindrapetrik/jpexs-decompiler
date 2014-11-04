@@ -191,7 +191,7 @@ public class DefineFont2Tag extends FontTag {
         return baos.toByteArray();
     }
 
-    public DefineFont2Tag(SWF swf) throws IOException {
+    public DefineFont2Tag(SWF swf) {
         super(swf, ID, "DefineFont2", null);
     }
 

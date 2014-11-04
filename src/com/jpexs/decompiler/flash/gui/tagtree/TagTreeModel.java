@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -53,16 +52,16 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
+    public static final String FOLDER_SHAPES = "shapes";
+    public static final String FOLDER_MORPHSHAPES = "morphshapes";
+    public static final String FOLDER_SPRITES = "sprites";
     public static final String FOLDER_TEXTS = "texts";
     public static final String FOLDER_IMAGES = "images";
     public static final String FOLDER_MOVIES = "movies";
     public static final String FOLDER_SOUNDS = "sounds";
-    public static final String FOLDER_BINARY_DATA = "binaryData";
-    public static final String FOLDER_FONTS = "fonts";
-    public static final String FOLDER_SPRITES = "sprites";
-    public static final String FOLDER_SHAPES = "shapes";
-    public static final String FOLDER_MORPHSHAPES = "morphshapes";
     public static final String FOLDER_BUTTONS = "buttons";
+    public static final String FOLDER_FONTS = "fonts";
+    public static final String FOLDER_BINARY_DATA = "binaryData";
     public static final String FOLDER_FRAMES = "frames";
     public static final String FOLDER_OTHERS = "others";
     public static final String FOLDER_SCRIPTS = "scripts";
@@ -176,7 +175,7 @@ public class TagTreeModel implements TreeModel {
             }
         }
 
-        nodeList.add(new HeaderItem(swf, AppStrings.translate("node.header")));
+        nodeList.add(new HeaderItem(swf, translate("node.header")));
 
         if (!shapes.isEmpty()) {
             FolderItem shapesNode = new FolderItem(translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
@@ -373,7 +372,7 @@ public class TagTreeModel implements TreeModel {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
             return swfs.get(index);
-        } else if (parentNode instanceof SWFBundle) {
+        } else if (parentNode instanceof SWFList) {
             return ((SWFList) parentNode).swfs.get(index);
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode).get(index);
@@ -406,7 +405,7 @@ public class TagTreeModel implements TreeModel {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
             return swfs.size();
-        } else if (parentNode instanceof SWFBundle) {
+        } else if (parentNode instanceof SWFList) {
             return ((SWFList) parentNode).swfs.size();
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode).size();
@@ -451,7 +450,7 @@ public class TagTreeModel implements TreeModel {
         TreeItem childNode = (TreeItem) child;
         if (parentNode == root) {
             return swfs.indexOf(childNode);
-        } else if (parentNode instanceof SWFBundle) {
+        } else if (parentNode instanceof SWFList) {
             return ((SWFList) parentNode).swfs.indexOf(childNode);
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode).indexOf(childNode);

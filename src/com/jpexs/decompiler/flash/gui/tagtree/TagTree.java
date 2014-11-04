@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
+import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.ZippedSWFBundle;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
@@ -53,10 +55,14 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -78,9 +84,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -106,6 +115,7 @@ public class TagTree extends JTree implements ActionListener {
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
+    private static final String ACTION_ADD_TAG = "ADDTAG";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
     private static final String ACTION_OPEN_SWFINSIDE = "OPENSWFINSIDE";
 
@@ -204,57 +214,36 @@ public class TagTree extends JTree implements ActionListener {
                 || (t instanceof DefineCompactedFont)) {
             return TreeNodeType.FONT;
         }
-        if ((t instanceof DefineTextTag)
-                || (t instanceof DefineText2Tag)
-                || (t instanceof DefineEditTextTag)) {
+
+        // DefineText, DefineText2, DefineEditTextTag
+        if (t instanceof TextTag) {
             return TreeNodeType.TEXT;
         }
 
-        if ((t instanceof DefineBitsTag)
-                || (t instanceof DefineBitsJPEG2Tag)
-                || (t instanceof DefineBitsJPEG3Tag)
-                || (t instanceof DefineBitsJPEG4Tag)
-                || (t instanceof DefineBitsLosslessTag)
-                || (t instanceof DefineBitsLossless2Tag)) {
+        // DefineBits, DefineBitsJPEG2, DefineBitsJPEG3, DefineBitsJPEG4, DefineBitsLossless, DefineBitsLossless2
+        if (t instanceof ImageTag) {
             return TreeNodeType.IMAGE;
         }
-        if ((t instanceof DefineShapeTag)
-                || (t instanceof DefineShape2Tag)
-                || (t instanceof DefineShape3Tag)
-                || (t instanceof DefineShape4Tag)) {
+        
+        // DefineShape, DefineShape2, DefineShape3, DefineShape4
+        if (t instanceof ShapeTag) {
             return TreeNodeType.SHAPE;
         }
 
-        if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
+        // DefineMorphShape, DefineMorphShape2
+        if (t instanceof MorphShapeTag) {
             return TreeNodeType.MORPH_SHAPE;
         }
 
         if (t instanceof DefineSpriteTag) {
             return TreeNodeType.SPRITE;
         }
-        if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
+        
+        // DefineButton, DefineButton2
+        if (t instanceof ButtonTag) {
             return TreeNodeType.BUTTON;
         }
-        if (t instanceof ASMSource) {
-            return TreeNodeType.AS;
-        }
-        if (t instanceof ScriptPack) {
-            return TreeNodeType.AS;
-        }
-        if (t instanceof AS2Package) {
-            return TreeNodeType.PACKAGE;
-        }
-        if (t instanceof AS3Package) {
-            return TreeNodeType.PACKAGE;
-        }
-        if ((t instanceof Frame)
-                || (t instanceof FrameScript)) {
-            return TreeNodeType.FRAME;
-        }
-        if (t instanceof ShowFrameTag) {
-            return TreeNodeType.SHOW_FRAME;
-        }
-
+        
         if (t instanceof DefineVideoStreamTag) {
             return TreeNodeType.MOVIE;
         }
@@ -267,17 +256,41 @@ public class TagTree extends JTree implements ActionListener {
             return TreeNodeType.BINARY_DATA;
         }
 
+        if (t instanceof ASMSource) {
+            return TreeNodeType.AS;
+        }
+        
+        if (t instanceof ScriptPack) {
+            return TreeNodeType.AS;
+        }
+        
+        if (t instanceof AS2Package) {
+            return TreeNodeType.PACKAGE;
+        }
+        
+        if (t instanceof AS3Package) {
+            return TreeNodeType.PACKAGE;
+        }
+        
+        if ((t instanceof Frame)
+                || (t instanceof FrameScript)) {
+            return TreeNodeType.FRAME;
+        }
+        
+        if (t instanceof ShowFrameTag) {
+            return TreeNodeType.SHOW_FRAME;
+        }
+
         if (t instanceof SWF) {
             return TreeNodeType.FLASH;
         }
 
         if (t instanceof SWFList) {
             SWFList slist = (SWFList) t;
-            if (slist.name != null) {
-                if (slist.name.toLowerCase().endsWith(".zip")) {
+            if (slist.bundleClass != null) {
+                if (slist.bundleClass == ZippedSWFBundle.class) {
                     return TreeNodeType.BUNDLE_ZIP;
-                }
-                if (slist.name.toLowerCase().endsWith(".swc")) {
+                } else if (slist.bundleClass == SWC.class) {
                     return TreeNodeType.BUNDLE_SWC;
                 } else {
                     return TreeNodeType.BUNDLE_BINARY;
@@ -296,6 +309,50 @@ public class TagTree extends JTree implements ActionListener {
         return TreeNodeType.FOLDER;
     }
 
+    public List<Class> getTreeItemClasses(String folderName) {
+        List<Class> ret = null;
+        switch (folderName) {
+            case TagTreeModel.FOLDER_SHAPES:
+                ret = Arrays.asList((Class) DefineShapeTag.class, DefineShape2Tag.class, DefineShape3Tag.class, DefineShape4Tag.class);
+                break;
+            case TagTreeModel.FOLDER_MORPHSHAPES:
+                ret = Arrays.asList((Class) DefineMorphShapeTag.class, DefineMorphShape2Tag.class);
+                break;
+            case TagTreeModel.FOLDER_SPRITES:
+                ret = Arrays.asList((Class) DefineSpriteTag.class);
+                break;
+            case TagTreeModel.FOLDER_TEXTS:
+                ret = Arrays.asList((Class) DefineTextTag.class, DefineText2Tag.class, DefineEditTextTag.class);
+                break;
+            case TagTreeModel.FOLDER_IMAGES:
+                ret = Arrays.asList((Class) DefineBitsTag.class, DefineBitsJPEG2Tag.class, DefineBitsJPEG3Tag.class, DefineBitsJPEG4Tag.class, DefineBitsLosslessTag.class, DefineBitsLossless2Tag.class);
+                break;
+            case TagTreeModel.FOLDER_MOVIES:
+                ret = Arrays.asList((Class) DefineVideoStreamTag.class);
+                break;
+            case TagTreeModel.FOLDER_SOUNDS:
+                ret = Arrays.asList((Class) DefineSoundTag.class, SoundStreamHeadTag.class, SoundStreamHead2Tag.class);
+                break;
+            case TagTreeModel.FOLDER_BUTTONS:
+                ret = Arrays.asList((Class) DefineButtonTag.class, DefineButton2Tag.class);
+                break;
+            case TagTreeModel.FOLDER_FONTS:
+                ret = Arrays.asList((Class) DefineFontTag.class, DefineFont2Tag.class, DefineFont3Tag.class, DefineFont4Tag.class, DefineCompactedFont.class);
+                break;
+            case TagTreeModel.FOLDER_BINARY_DATA:
+                ret = Arrays.asList((Class) DefineBinaryDataTag.class);
+                break;
+            case TagTreeModel.FOLDER_FRAMES:
+                ret = new ArrayList<>();
+                break;
+            case TagTreeModel.FOLDER_OTHERS:
+                ret = new ArrayList<>();
+                break;
+        }
+        
+        return ret;
+    }
+    
     public void createContextMenu(final List<SWFList> swfs) {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
 
@@ -341,6 +398,9 @@ public class TagTree extends JTree implements ActionListener {
         closeSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(closeSelectionMenuItem);
 
+        final JMenu addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
+        contextPopupMenu.add(addTagMenu);
+
         final JMenu moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
         contextPopupMenu.add(moveTagMenu);
 
@@ -376,6 +436,7 @@ public class TagTree extends JTree implements ActionListener {
                     replaceSelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
+                    addTagMenu.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
                     openSWFInsideTagMenuItem.setVisible(false);
 
@@ -411,6 +472,31 @@ public class TagTree extends JTree implements ActionListener {
                             closeSelectionMenuItem.setVisible(true);
                         }
 
+                        if (item instanceof FolderItem) {
+                            final FolderItem folderItem = (FolderItem) item;
+                            List<Class> allowedTagTypes = getTreeItemClasses(folderItem.getName());
+                            addTagMenu.removeAll();
+                            for (final Class cl : allowedTagTypes) {
+                                JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+                                tagItem.addActionListener(new ActionListener() {
+
+                                    @Override
+                                    @SuppressWarnings("unchecked")
+                                    public void actionPerformed(ActionEvent ae) {
+                                        try {
+                                            SWF swf = folderItem.getSwf();
+                                            swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[] {swf}));
+                                            mainPanel.refreshTree();
+                                        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+                                            Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                });
+                                addTagMenu.add(tagItem);
+                            }
+                            addTagMenu.setVisible(true);
+                        }
+                        
                         if (item instanceof Tag && swfs.size() > 1) {
                             final Tag tag = (Tag) item;
                             moveTagMenu.removeAll();
@@ -620,7 +706,7 @@ public class TagTree extends JTree implements ActionListener {
                 ret.add(d);
             }
             if (d instanceof ScriptPack) {
-                ret.add((ScriptPack) d);
+                ret.add(d);
             }
         }
         return ret;

@@ -33,6 +33,7 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     public String name;
     public boolean isBundle;
+    public Class bundleClass;
     public SWFSourceInfo sourceInfo;
     public List<SWF> swfs = new ArrayList<>();
 
