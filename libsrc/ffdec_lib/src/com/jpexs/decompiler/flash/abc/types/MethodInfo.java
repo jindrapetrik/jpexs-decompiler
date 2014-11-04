@@ -323,7 +323,9 @@ public class MethodInfo {
     }
 
     public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
-        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, false), "returns");
+        String rname = constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, true);
+        rname = IdentifiersDeobfuscation.printIdentifier(true,rname,"void");
+        return writer.hilightSpecial(ret_type == 0 ? "*" : rname, "returns");
     }
 
     public void setBody(MethodBody body) {
