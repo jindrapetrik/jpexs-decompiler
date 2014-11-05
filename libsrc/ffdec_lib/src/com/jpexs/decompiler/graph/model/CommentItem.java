@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -41,6 +42,9 @@ public class CommentItem extends GraphTargetItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("/* ");
         for (int i = 0; i < commentLines.length; i++) {
+            if(commentLines[i]==null){
+                continue;
+            }
             writer.append(commentLines[i]);
             if (i != commentLines.length - 1) {
                 writer.newLine();

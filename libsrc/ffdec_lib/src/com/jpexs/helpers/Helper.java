@@ -59,6 +59,8 @@ import java.util.regex.Pattern;
 public class Helper {
 
     public static String newLine = System.getProperty("line.separator");
+    public static String decompilationErrorAdd = null;
+
 
     /**
      * Converts array of int values to string
@@ -807,6 +809,9 @@ public class Helper {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.obfuscated")).newLine();
+        if(decompilationErrorAdd!=null){
+            writer.appendNoHilight(" * ").appendNoHilight(decompilationErrorAdd).newLine();
+        }
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.errorType")).
                 appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
         writer.appendNoHilight(" */").newLine();

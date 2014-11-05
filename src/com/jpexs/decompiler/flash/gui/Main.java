@@ -919,6 +919,8 @@ public class Main {
         UIManager.put("ColorChooser.swatchesNameText", AppStrings.translate("ColorChooser.swatchesNameText"));
         UIManager.put("ColorChooser.swatchesRecentText", AppStrings.translate("ColorChooser.swatchesRecentText"));
         UIManager.put("ColorChooser.sampleText", AppStrings.translate("ColorChooser.sampleText"));
+        
+        Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get()?"deobfuscation.comment.failed":"deobfuscation.comment.tryenable");
     }
 
     /**

@@ -1314,6 +1314,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void autoDeobfuscateChanged() {
+        Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get()?"deobfuscation.comment.failed":"deobfuscation.comment.tryenable");    
         clearCache();
         if (abcPanel != null) {
             abcPanel.reload();
