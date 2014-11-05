@@ -100,6 +100,8 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      */
     public DefineButton2Tag(SWF swf) {
         super(swf, ID, "DefineButton2", null);
+        buttonId = swf.getNextCharacterId();
+        characters = new ArrayList<>();
     }
 
     /**

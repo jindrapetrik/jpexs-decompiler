@@ -709,6 +709,7 @@ public class DefineEditTextTag extends TextTag {
         super(swf, ID, "DefineEditText", null);
         characterID = swf.getNextCharacterId();
         bounds = new RECT();
+        variableName = "";
     }
 
     /**

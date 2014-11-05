@@ -104,6 +104,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      */
     public DefineVideoStreamTag(SWF swf) {
         super(swf, ID, "DefineVideoStream", null);
+        characterID = swf.getNextCharacterId();
     }
 
     /**

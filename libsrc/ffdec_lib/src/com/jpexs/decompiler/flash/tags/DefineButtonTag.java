@@ -100,6 +100,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      */
     public DefineButtonTag(SWF swf) {
         super(swf, ID, "DefineButton", null);
+        buttonId = swf.getNextCharacterId();
+        characters = new ArrayList<>();
+        actionBytes = new ByteArrayRange(new byte[0]);
     }
 
     /**

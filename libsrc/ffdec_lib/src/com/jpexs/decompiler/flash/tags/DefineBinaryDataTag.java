@@ -71,6 +71,7 @@ public class DefineBinaryDataTag extends CharacterTag {
      */
     public DefineBinaryDataTag(SWF swf) {
         super(swf, ID, "DefineBinaryData", null);
+        tag = swf.getNextCharacterId();
     }
 
     public DefineBinaryDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
