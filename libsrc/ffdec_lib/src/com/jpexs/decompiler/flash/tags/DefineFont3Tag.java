@@ -118,6 +118,7 @@ public class DefineFont3Tag extends FontTag {
     public DefineFont3Tag(SWF swf) {
         super(swf, ID, "DefineFont3", null);
         fontId = swf.getNextCharacterId();
+        languageCode = new LANGCODE();
         fontName = "New font";
         glyphShapeTable = new ArrayList<>();
         codeTable = new ArrayList<>();

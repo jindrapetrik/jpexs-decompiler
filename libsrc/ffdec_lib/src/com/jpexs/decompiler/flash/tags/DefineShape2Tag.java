@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -69,6 +71,17 @@ public class DefineShape2Tag extends ShapeTag {
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         return shapeBounds;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineShape2Tag(SWF swf) {
+        super(swf, ID, "DefineShape2", null);
+        shapeId = swf.getNextCharacterId();
+        shapeBounds = new RECT();
+        shapes = new SHAPEWITHSTYLE();
     }
 
     public DefineShape2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

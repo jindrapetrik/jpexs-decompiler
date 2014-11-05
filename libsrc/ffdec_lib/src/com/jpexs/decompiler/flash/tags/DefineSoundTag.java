@@ -98,6 +98,14 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DefineSoundTag(SWF swf) {
+        super(swf, ID, "DefineSound", null);
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data

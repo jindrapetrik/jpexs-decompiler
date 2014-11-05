@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
@@ -179,6 +181,17 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
         }
         decompressed = true;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineBitsLosslessTag(SWF swf) {
+        super(swf, ID, "DefineBitsLossless", null);
+        characterID = swf.getNextCharacterId();
+        bitmapWidth = 1;
+        bitmapHeight = 1;
     }
 
     public DefineBitsLosslessTag(SWFInputStream sis, ByteArrayRange data) throws IOException {

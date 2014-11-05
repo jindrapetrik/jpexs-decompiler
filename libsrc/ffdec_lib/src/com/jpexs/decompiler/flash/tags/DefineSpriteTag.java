@@ -190,6 +190,16 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DefineSpriteTag(SWF swf) {
+        super(swf, ID, "DefineSprite", null);
+        spriteId = swf.getNextCharacterId();
+        subTags = new ArrayList<>();
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data

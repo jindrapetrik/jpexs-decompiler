@@ -65,6 +65,14 @@ public class DefineBinaryDataTag extends CharacterTag {
         return baos.toByteArray();
     }
 
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineBinaryDataTag(SWF swf) {
+        super(swf, ID, "DefineBinaryData", null);
+    }
+
     public DefineBinaryDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBinaryData", data);
         tag = sis.readUI16("tag");

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -123,6 +124,15 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineMorphShapeTag(SWF swf) {
+        super(swf, ID, "DefineMorphShape", null);
+        characterId = swf.getNextCharacterId();
     }
 
     /**

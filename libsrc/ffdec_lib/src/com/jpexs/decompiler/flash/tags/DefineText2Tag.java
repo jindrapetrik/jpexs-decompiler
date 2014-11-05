@@ -180,7 +180,7 @@ public class DefineText2Tag extends TextTag {
         try {
             TextLexer lexer = new TextLexer(new StringReader(formattedText));
             ParsedSymbol s = null;
-            textRecords = new ArrayList<>();
+            List<TEXTRECORD> textRecords = new ArrayList<>();
             RGBA colorA = null;
             int fontId = -1;
             int textHeight = -1;
@@ -471,6 +471,18 @@ public class DefineText2Tag extends TextTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineText2Tag(SWF swf) {
+        super(swf, ID, "DefineText2", null);
+        characterID = swf.getNextCharacterId();
+        textBounds = new RECT();
+        glyphBits = 0;
+        advanceBits = 0;
     }
 
     /**
