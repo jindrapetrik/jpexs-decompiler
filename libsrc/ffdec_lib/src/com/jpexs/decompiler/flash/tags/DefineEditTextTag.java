@@ -703,6 +703,17 @@ public class DefineEditTextTag extends TextTag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DefineEditTextTag(SWF swf) {
+        super(swf, ID, "DefineEditText", null);
+        characterID = swf.getNextCharacterId();
+        bounds = new RECT();
+        variableName = "";
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data

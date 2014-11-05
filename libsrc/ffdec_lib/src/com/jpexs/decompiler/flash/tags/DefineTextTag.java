@@ -434,6 +434,19 @@ public class DefineTextTag extends TextTag {
         return characterID;
     }
 
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineTextTag(SWF swf) {
+        super(swf, ID, "DefineText", null);
+        characterID = swf.getNextCharacterId();
+        textBounds = new RECT();
+        textMatrix = new MATRIX();
+        glyphBits = 0;
+        advanceBits = 0;
+    }
+
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
         super(swf, ID, "DefineText", null);
         this.characterID = characterID;

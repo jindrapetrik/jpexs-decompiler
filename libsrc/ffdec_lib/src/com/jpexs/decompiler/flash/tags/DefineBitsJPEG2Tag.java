@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -66,6 +67,16 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
         }
         return null;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineBitsJPEG2Tag(SWF swf) {
+        super(swf, ID, "DefineBitsJPEG2", null);
+        characterID = swf.getNextCharacterId();
+        imageData = new byte[0];
     }
 
     public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

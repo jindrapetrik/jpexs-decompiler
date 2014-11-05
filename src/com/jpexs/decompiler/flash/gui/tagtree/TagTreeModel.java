@@ -68,10 +68,12 @@ public class TagTreeModel implements TreeModel {
     private final TagTreeRoot root = new TagTreeRoot();
     private final List<SWFContainerItem> swfs;
     private final Map<SWF, List<TreeItem>> swfFolders;
+    private final boolean addAllFolders;
 
-    public TagTreeModel(List<SWFList> swfs) {
+    public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
         this.swfs = new ArrayList<>();
         this.swfFolders = new HashMap<>();
+        this.addAllFolders = addAllFolders;
         for (SWFList swfList : swfs) {
             if (swfList.isBundle) {
                 this.swfs.add(swfList);
@@ -177,43 +179,43 @@ public class TagTreeModel implements TreeModel {
 
         nodeList.add(new HeaderItem(swf, translate("node.header")));
 
-        if (!shapes.isEmpty()) {
+        if (addAllFolders || !shapes.isEmpty()) {
             FolderItem shapesNode = new FolderItem(translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
             nodeList.add(shapesNode);
         }
-        if (!morphShapes.isEmpty()) {
+        if (addAllFolders || !morphShapes.isEmpty()) {
             FolderItem morphShapesNode = new FolderItem(translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf, morphShapes);
             nodeList.add(morphShapesNode);
         }
-        if (!sprites.isEmpty()) {
+        if (addAllFolders || !sprites.isEmpty()) {
             FolderItem spritesNode = new FolderItem(translate("node.sprites"), FOLDER_SPRITES, swf, sprites);
             nodeList.add(spritesNode);
         }
-        if (!texts.isEmpty()) {
+        if (addAllFolders || !texts.isEmpty()) {
             FolderItem textsNode = new FolderItem(translate("node.texts"), FOLDER_TEXTS, swf, texts);
             nodeList.add(textsNode);
         }
-        if (!images.isEmpty()) {
+        if (addAllFolders || !images.isEmpty()) {
             FolderItem imagesNode = new FolderItem(translate("node.images"), FOLDER_IMAGES, swf, images);
             nodeList.add(imagesNode);
         }
-        if (!movies.isEmpty()) {
+        if (addAllFolders || !movies.isEmpty()) {
             FolderItem moviesNode = new FolderItem(translate("node.movies"), FOLDER_MOVIES, swf, movies);
             nodeList.add(moviesNode);
         }
-        if (!sounds.isEmpty()) {
+        if (addAllFolders || !sounds.isEmpty()) {
             FolderItem soundsNode = new FolderItem(translate("node.sounds"), FOLDER_SOUNDS, swf, sounds);
             nodeList.add(soundsNode);
         }
-        if (!buttons.isEmpty()) {
+        if (addAllFolders || !buttons.isEmpty()) {
             FolderItem buttonsNode = new FolderItem(translate("node.buttons"), FOLDER_BUTTONS, swf, buttons);
             nodeList.add(buttonsNode);
         }
-        if (!fonts.isEmpty()) {
+        if (addAllFolders || !fonts.isEmpty()) {
             FolderItem fontsNode = new FolderItem(translate("node.fonts"), FOLDER_FONTS, swf, fonts);
             nodeList.add(fontsNode);
         }
-        if (!binaryData.isEmpty()) {
+        if (addAllFolders || !binaryData.isEmpty()) {
             FolderItem binaryDataNode = new FolderItem(translate("node.binaryData"), FOLDER_BINARY_DATA, swf, binaryData);
             nodeList.add(binaryDataNode);
         }

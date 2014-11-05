@@ -49,14 +49,14 @@ import java.util.Stack;
         return yyline+1;
     }
 
-    private Stack<ConditionToken> pushedBack=new Stack<ConditionToken>();
+    private Stack<ConditionToken> pushedBack = new Stack<ConditionToken>();
 
     public void pushback(ConditionToken symb) {
         pushedBack.push(symb);
     }
 
     public ConditionToken lex() throws java.io.IOException, ParseException{
-        ConditionToken ret=null;
+        ConditionToken ret = null;
         if(!pushedBack.isEmpty()){
             ret = pushedBack.pop();
         }else{
@@ -73,13 +73,13 @@ Field = [A-Za-z0-9_\.]+
 
 <YYINITIAL> {
   {Field}                        {
-                                    return new ConditionToken(ConditionTokenType.FIELD,yytext());
+                                    return new ConditionToken(ConditionTokenType.FIELD, yytext());
                                  }  
-   "||" | "|"                    {  return new ConditionToken(ConditionTokenType.OR,yytext()); }     
-   "&&" | "," | "&"              {  return new ConditionToken(ConditionTokenType.AND,yytext()); } 
-   "!"                           {  return new ConditionToken(ConditionTokenType.NOT,yytext()); } 
-   "("                           {  return new ConditionToken(ConditionTokenType.PARENT_OPEN,yytext()); }
-   ")"                           {  return new ConditionToken(ConditionTokenType.PARENT_CLOSE,yytext()); }
+   "||" | "|"                    {  return new ConditionToken(ConditionTokenType.OR, yytext()); }     
+   "&&" | "," | "&"              {  return new ConditionToken(ConditionTokenType.AND, yytext()); } 
+   "!"                           {  return new ConditionToken(ConditionTokenType.NOT, yytext()); } 
+   "("                           {  return new ConditionToken(ConditionTokenType.PARENT_OPEN, yytext()); }
+   ")"                           {  return new ConditionToken(ConditionTokenType.PARENT_CLOSE, yytext()); }
    .                             { }
  <<EOF>>                         {return null;}
 }

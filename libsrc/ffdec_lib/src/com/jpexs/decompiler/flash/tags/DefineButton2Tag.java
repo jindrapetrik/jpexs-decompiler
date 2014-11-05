@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -91,6 +92,16 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     @Override
     public List<BUTTONRECORD> getRecords() {
         return characters;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineButton2Tag(SWF swf) {
+        super(swf, ID, "DefineButton2", null);
+        buttonId = swf.getNextCharacterId();
+        characters = new ArrayList<>();
     }
 
     /**

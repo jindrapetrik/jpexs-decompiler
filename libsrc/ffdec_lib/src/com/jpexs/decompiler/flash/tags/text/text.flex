@@ -31,9 +31,9 @@ package com.jpexs.decompiler.flash.tags.text;
 
 %{
 
-  StringBuffer string = null;
-    boolean finish=false;
-    String parameterName=null;
+    StringBuffer string = null;
+    boolean finish = false;
+    String parameterName = null;
 
 
     /**
@@ -65,28 +65,28 @@ Divider = [ \r\n]+
 <YYINITIAL> {
   "["                            {
                                     yybegin(PARAMETER);
-                                    if(string!=null){
-                                        String ret=string.toString();
+                                    if(string != null){
+                                        String ret = string.toString();
                                         string = null;
                                         return new ParsedSymbol(SymbolType.TEXT,ret.toString());
                                     }
                                  }
   /* escape sequences */
-  "\\["                          { if(string==null) string=new StringBuffer(); string.append( '[' ); }
-  "\\]"                          { if(string==null) string=new StringBuffer(); string.append( ']' ); }
-  "\\b"                          { if(string==null) string=new StringBuffer(); string.append( '\b' ); }
-  "\\t"                          { if(string==null) string=new StringBuffer(); string.append( '\t' ); }
-  "\\n"                          { if(string==null) string=new StringBuffer(); string.append( '\n' ); }
-  "\\f"                          { if(string==null) string=new StringBuffer(); string.append( '\f' ); }
-  "\\r"                          { if(string==null) string=new StringBuffer(); string.append( '\r' ); }
-  "\\\""                         { if(string==null) string=new StringBuffer(); string.append( '\"' ); }
-  "\\'"                          { if(string==null) string=new StringBuffer(); string.append( '\'' ); }
-  "\\\\"                         { if(string==null) string=new StringBuffer(); string.append( '\\' ); }
+  "\\["                          { if (string == null) string = new StringBuffer(); string.append( '[' ); }
+  "\\]"                          { if (string == null) string = new StringBuffer(); string.append( ']' ); }
+  "\\b"                          { if (string == null) string = new StringBuffer(); string.append( '\b' ); }
+  "\\t"                          { if (string == null) string = new StringBuffer(); string.append( '\t' ); }
+  "\\n"                          { if (string == null) string = new StringBuffer(); string.append( '\n' ); }
+  "\\f"                          { if (string == null) string = new StringBuffer(); string.append( '\f' ); }
+  "\\r"                          { if (string == null) string = new StringBuffer(); string.append( '\r' ); }
+  "\\\""                         { if (string == null) string = new StringBuffer(); string.append( '\"' ); }
+  "\\'"                          { if (string == null) string = new StringBuffer(); string.append( '\'' ); }
+  "\\\\"                         { if (string == null) string = new StringBuffer(); string.append( '\\' ); }
 
   /* error cases */
   \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }   
-  .                              { if(string==null) string=new StringBuffer(); string.append( yytext() ); }
- <<EOF>>                         { if(finish){return null;}else{finish=true; return new ParsedSymbol(SymbolType.TEXT,string==null?null:string.toString());}}
+  .                              { if (string == null) string = new StringBuffer(); string.append( yytext() ); }
+ <<EOF>>                         { if (finish) {return null;} else {finish=true; return new ParsedSymbol(SymbolType.TEXT, string == null ? null : string.toString());}}
 }
 
 <PARAMETER> {
@@ -104,7 +104,7 @@ Divider = [ \r\n]+
     {Divider}                          {}
     {Value}                      {  
                                     yybegin(PARAMETER);                                    
-                                    return new ParsedSymbol(SymbolType.PARAMETER,new Object[]{parameterName,yytext()});
+                                    return new ParsedSymbol(SymbolType.PARAMETER, new Object[] {parameterName, yytext()});
                                  }
     "]"                          {
                                     yybegin(YYINITIAL);

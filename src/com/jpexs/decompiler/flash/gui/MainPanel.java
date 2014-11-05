@@ -596,7 +596,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         for (SWF swf : newSwfs) {
 
-            tagTree.setModel(new TagTreeModel(swfs));
+            tagTree.setModel(new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
             dumpTree.setModel(new DumpTreeModel(swfs));
 
             if (swf.isAS3) {
@@ -1882,7 +1882,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
         DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
-        View.refreshTree(tagTree, new TagTreeModel(swfs));
+        View.refreshTree(tagTree, new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
         View.refreshTree(dumpTree, new DumpTreeModel(swfs));
         if (treeItem != null) {
             setTagTreeSelectedNode(treeItem);
@@ -1890,7 +1890,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (dumpInfo != null) {
             setDumpTreeSelectedNode(dumpInfo);
         }
-        
+
         reload(true);
     }
 

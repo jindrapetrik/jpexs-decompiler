@@ -46,8 +46,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -81,6 +79,17 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineCompactedFont(SWF swf) {
+        super(swf, ID, "DefineCompactedFont", null);
+        fontId = swf.getNextCharacterId();
+        fonts = new ArrayList<>();
+        shapeCache = new ArrayList<>();
     }
 
     /**

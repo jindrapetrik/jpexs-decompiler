@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -127,6 +128,14 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public SoundStreamHeadTag(SWF swf) {
+        super(swf, ID, "SoundStreamHead", null);
     }
 
     /**

@@ -191,8 +191,17 @@ public class DefineFont2Tag extends FontTag {
         return baos.toByteArray();
     }
 
+    /**
+     * Constructor
+     * @param swf
+     */
     public DefineFont2Tag(SWF swf) {
         super(swf, ID, "DefineFont2", null);
+        fontId = swf.getNextCharacterId();
+        languageCode = new LANGCODE();
+        fontName = "New font";
+        glyphShapeTable = new ArrayList<>();
+        codeTable = new ArrayList<>();
     }
 
     /**
