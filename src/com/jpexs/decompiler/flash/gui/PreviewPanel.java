@@ -653,8 +653,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             tr.glyphEntries[0].glyphAdvance = 0;
                             tr.glyphEntries[0].glyphIndex = f;
                             rec.add(tr);
-                            mat.translateX = x * width / cols;
-                            mat.translateY = y * height / rows;
+                            mat.translateX = swf.displayRect.Xmin + x * width / cols;
+                            mat.translateY = swf.displayRect.Ymin + y * height / rows;
                             new DefineTextTag(swf, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec).writeTag(sos2);
                             new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null).writeTag(sos2);
                             x++;
