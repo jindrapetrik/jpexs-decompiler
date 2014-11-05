@@ -488,7 +488,9 @@ public class TagTree extends JTree implements ActionListener {
                                         public void actionPerformed(ActionEvent ae) {
                                             try {
                                                 SWF swf = folderItem.getSwf();
-                                                swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf}));
+                                                Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+                                                t.setTimelined(swf);
+                                                swf.tags.add(t);
                                                 swf.updateCharacters();
                                                 mainPanel.refreshTree();
                                             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
