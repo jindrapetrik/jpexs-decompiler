@@ -241,7 +241,7 @@
 
     </target>
 
-    <target name="release" depends="archive,installer,library,locales">        
+    <target name="release" depends="library,archive,installer,locales">        
 
     </target>
          
