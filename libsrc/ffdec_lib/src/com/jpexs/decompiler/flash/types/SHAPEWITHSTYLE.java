@@ -12,12 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -47,5 +50,21 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
             modified |= r.removeCharacter(characterId);
         }
         return modified;
+    }
+    
+    public static SHAPEWITHSTYLE createEmpty(int shapeNum) {
+        SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
+        ret.shapeRecords = new ArrayList<>();
+        ret.shapeRecords.add(new EndShapeRecord());
+        ret.fillStyles = new FILLSTYLEARRAY();
+        ret.fillStyles.fillStyles = new FILLSTYLE[0];
+        ret.lineStyles = new LINESTYLEARRAY();
+        if ((shapeNum == 1 || shapeNum == 2 || shapeNum == 3)) {
+            ret.lineStyles.lineStyles = new LINESTYLE[0];
+        } else if (shapeNum == 4) {
+            ret.lineStyles.lineStyles = new LINESTYLE2[0];
+        }
+        
+        return ret;
     }
 }

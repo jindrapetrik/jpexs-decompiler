@@ -88,6 +88,9 @@ public class DefineShape4Tag extends ShapeTag {
     public DefineShape4Tag(SWF swf) {
         super(swf, ID, "DefineShape4", null);
         shapeId = swf.getNextCharacterId();
+        shapeBounds = new RECT();
+        edgeBounds = new RECT();
+        shapes = SHAPEWITHSTYLE.createEmpty(4);
     }
 
     public DefineShape4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

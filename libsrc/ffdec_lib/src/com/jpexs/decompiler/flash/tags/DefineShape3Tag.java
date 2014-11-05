@@ -81,6 +81,7 @@ public class DefineShape3Tag extends ShapeTag {
         super(swf, ID, "DefineShape3", null);
         shapeId = swf.getNextCharacterId();
         shapeBounds = new RECT();
+        shapes = SHAPEWITHSTYLE.createEmpty(3);
     }
 
     public DefineShape3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

@@ -481,6 +481,7 @@ public class DefineText2Tag extends TextTag {
         super(swf, ID, "DefineText2", null);
         characterID = swf.getNextCharacterId();
         textBounds = new RECT();
+        textMatrix = new MATRIX();
         textRecords = new ArrayList<>();
         glyphBits = 0;
         advanceBits = 0;

@@ -443,6 +443,7 @@ public class DefineTextTag extends TextTag {
         characterID = swf.getNextCharacterId();
         textBounds = new RECT();
         textMatrix = new MATRIX();
+        textRecords = new ArrayList<>();
         glyphBits = 0;
         advanceBits = 0;
     }

@@ -115,7 +115,6 @@ public class TagTree extends JTree implements ActionListener {
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
-    private static final String ACTION_ADD_TAG = "ADDTAG";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
     private static final String ACTION_OPEN_SWFINSIDE = "OPENSWFINSIDE";
 
@@ -309,7 +308,7 @@ public class TagTree extends JTree implements ActionListener {
         return TreeNodeType.FOLDER;
     }
 
-    public List<Class> getTreeItemClasses(String folderName) {
+    public List<Class> getTreeItemClasses(String folderName, boolean gfx) {
         List<Class> ret = null;
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
@@ -337,7 +336,10 @@ public class TagTree extends JTree implements ActionListener {
                 ret = Arrays.asList((Class) DefineButtonTag.class, DefineButton2Tag.class);
                 break;
             case TagTreeModel.FOLDER_FONTS:
-                ret = Arrays.asList((Class) DefineFontTag.class, DefineFont2Tag.class, DefineFont3Tag.class, DefineFont4Tag.class, DefineCompactedFont.class);
+                ret = Arrays.asList((Class) DefineFontTag.class, DefineFont2Tag.class, DefineFont3Tag.class, DefineFont4Tag.class);
+                if (gfx) {
+                    ret.add(DefineCompactedFont.class);
+                }
                 break;
             case TagTreeModel.FOLDER_BINARY_DATA:
                 ret = Arrays.asList((Class) DefineBinaryDataTag.class);
@@ -474,28 +476,30 @@ public class TagTree extends JTree implements ActionListener {
 
                         if (item instanceof FolderItem) {
                             final FolderItem folderItem = (FolderItem) item;
-                            List<Class> allowedTagTypes = getTreeItemClasses(folderItem.getName());
+                            List<Class> allowedTagTypes = getTreeItemClasses(folderItem.getName(), item.getSwf().gfx);
                             addTagMenu.removeAll();
-                            for (final Class cl : allowedTagTypes) {
-                                JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
-                                tagItem.addActionListener(new ActionListener() {
+                            if (allowedTagTypes != null) {
+                                for (final Class cl : allowedTagTypes) {
+                                    JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+                                    tagItem.addActionListener(new ActionListener() {
 
-                                    @Override
-                                    @SuppressWarnings("unchecked")
-                                    public void actionPerformed(ActionEvent ae) {
-                                        try {
-                                            SWF swf = folderItem.getSwf();
-                                            swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf}));
-                                            swf.updateCharacters();
-                                            mainPanel.refreshTree();
-                                        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-                                            Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                                        @Override
+                                        @SuppressWarnings("unchecked")
+                                        public void actionPerformed(ActionEvent ae) {
+                                            try {
+                                                SWF swf = folderItem.getSwf();
+                                                swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf}));
+                                                swf.updateCharacters();
+                                                mainPanel.refreshTree();
+                                            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+                                                Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
                                         }
-                                    }
-                                });
-                                addTagMenu.add(tagItem);
+                                    });
+                                    addTagMenu.add(tagItem);
+                                }
+                                addTagMenu.setVisible(true);
                             }
-                            addTagMenu.setVisible(true);
                         }
 
                         if (item instanceof Tag && swfs.size() > 1) {

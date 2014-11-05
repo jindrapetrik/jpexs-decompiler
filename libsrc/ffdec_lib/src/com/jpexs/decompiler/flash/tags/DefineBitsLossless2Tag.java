@@ -36,6 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
 
@@ -69,11 +71,30 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         return characterID;
     }
 
+    private byte[] createEmptyImage() {
+        try {
+            ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
+            bitmapData.bitmapPixelData = new ARGB[1];
+            bitmapData.bitmapPixelData[0] = new ARGB();
+            bitmapData.bitmapPixelData[0].alpha = 0xff;
+            ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
+            sos.writeALPHABITMAPDATA(bitmapData, FORMAT_32BIT_ARGB, 1, 1);
+            ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
+            SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
+            sos2.writeBytesZlib(bitmapDataOS.toByteArray());
+            return zlibOS.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsLossless2Tag.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
     @Override
     public void setImage(byte[] data) throws IOException {
         SerializableImage image = new SerializableImage(ImageIO.read(new ByteArrayInputStream(data)));
         ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
-        bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
+        bitmapFormat = FORMAT_32BIT_ARGB;
         bitmapWidth = image.getWidth();
         bitmapHeight = image.getHeight();
         bitmapData.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];
@@ -116,8 +137,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public DefineBitsLossless2Tag(SWF swf) {
         super(swf, ID, "DefineBitsLossless2", null);
         characterID = swf.getNextCharacterId();
+        bitmapFormat = DefineBitsLossless2Tag.FORMAT_32BIT_ARGB;
         bitmapWidth = 1;
         bitmapHeight = 1;
+        zlibBitmapData = createEmptyImage();
     }
 
     public DefineBitsLossless2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

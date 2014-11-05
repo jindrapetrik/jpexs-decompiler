@@ -41,6 +41,13 @@ public class FontType implements Serializable {
     public List<GlyphInfoType> glyphInfo;
     public List<KerningPairType> kerning;
 
+    public FontType() {
+        fontName = "New font";
+        glyphInfo = new ArrayList<>();
+        kerning = new ArrayList<>();
+        glyphs = new ArrayList<>();
+    }
+    
     public FontType(GFxInputStream sis) throws IOException {
         long offset = sis.getPos();
         fontName = sis.readString("fontName");

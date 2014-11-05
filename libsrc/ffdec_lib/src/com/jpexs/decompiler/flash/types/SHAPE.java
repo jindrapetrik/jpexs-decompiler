@@ -12,17 +12,20 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -66,5 +69,12 @@ public class SHAPE implements NeedsCharacters, Serializable {
         }
 
         return area;
+    }
+
+    public static SHAPE createEmpty(int shapeNum) {
+        SHAPE ret = new SHAPE();
+        ret.shapeRecords = new ArrayList<>();
+        ret.shapeRecords.add(new EndShapeRecord());
+        return ret;
     }
 }

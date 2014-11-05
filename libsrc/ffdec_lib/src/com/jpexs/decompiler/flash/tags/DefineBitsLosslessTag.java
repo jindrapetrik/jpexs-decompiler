@@ -38,6 +38,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
 
@@ -72,6 +74,25 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     private boolean decompressed = false;
 
     public static final int ID = 20;
+
+    private byte[] createEmptyImage() {
+        try {
+            BITMAPDATA bitmapData = new BITMAPDATA();
+            bitmapData.bitmapPixelDataPix24 = new PIX24[1];
+            bitmapData.bitmapPixelDataPix24[0] = new PIX24();
+            bitmapData.bitmapPixelDataPix24[0].reserved = 0xff;
+            ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
+            sos.writeBITMAPDATA(bitmapData, FORMAT_24BIT_RGB, 1, 1);
+            ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
+            SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
+            sos2.writeBytesZlib(bitmapDataOS.toByteArray());
+            return zlibOS.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsLosslessTag.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 
     @Override
     public void setImage(byte[] data) throws IOException {
@@ -190,8 +211,10 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     public DefineBitsLosslessTag(SWF swf) {
         super(swf, ID, "DefineBitsLossless", null);
         characterID = swf.getNextCharacterId();
+        bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
         bitmapWidth = 1;
         bitmapHeight = 1;
+        zlibBitmapData = createEmptyImage();
     }
 
     public DefineBitsLosslessTag(SWFInputStream sis, ByteArrayRange data) throws IOException {

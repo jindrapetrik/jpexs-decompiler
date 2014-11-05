@@ -88,8 +88,12 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public DefineCompactedFont(SWF swf) {
         super(swf, ID, "DefineCompactedFont", null);
         fontId = swf.getNextCharacterId();
+
         fonts = new ArrayList<>();
-        shapeCache = new ArrayList<>();
+        FontType ft = new FontType();
+        fonts.add(ft);
+        
+        rebuildShapeCache();
     }
 
     /**

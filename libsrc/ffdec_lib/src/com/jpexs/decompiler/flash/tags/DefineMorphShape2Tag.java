@@ -33,7 +33,9 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -155,6 +157,16 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     public DefineMorphShape2Tag(SWF swf) {
         super(swf, ID, "DefineMorphShape2", null);
         characterId = swf.getNextCharacterId();
+        startBounds = new RECT();
+        endBounds = new RECT();
+        startEdgeBounds = new RECT();
+        endEdgeBounds = new RECT();
+        startEdges = SHAPE.createEmpty(2);
+        endEdges = SHAPE.createEmpty(2);
+        morphFillStyles = new MORPHFILLSTYLEARRAY();
+        morphFillStyles.fillStyles = new MORPHFILLSTYLE[0];
+        morphLineStyles = new MORPHLINESTYLEARRAY();
+        morphLineStyles.lineStyles2 = new MORPHLINESTYLE2[0];
     }
 
     /**

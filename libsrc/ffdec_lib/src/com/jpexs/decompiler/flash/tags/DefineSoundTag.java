@@ -103,6 +103,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public DefineSoundTag(SWF swf) {
         super(swf, ID, "DefineSound", null);
         soundId = swf.getNextCharacterId();
+        soundData = new byte[] {0};
     }
 
     /**
