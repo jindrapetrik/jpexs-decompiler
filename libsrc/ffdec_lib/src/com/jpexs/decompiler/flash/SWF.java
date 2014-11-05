@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -276,6 +275,17 @@ public final class SWF implements SWFContainerItem, Timelined {
         parseCharacters(new ArrayList<ContainerItem>(tags));
     }
 
+    public int getNextCharacterId() {
+        int max = -1;
+        for (int characterId : characters.keySet()) {
+            if (characterId > max) {
+                max = characterId;
+            }
+        }
+        
+        return max + 1;
+    }
+        
     public void resetTimelines(Timelined timelined) {
         timelined.getTimeline().reset();
         for (Tag t : timelined.getTimeline().tags) {

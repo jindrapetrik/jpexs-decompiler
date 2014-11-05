@@ -17,8 +17,8 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 %{
 
   StringBuffer string = new StringBuffer();
-  boolean isMultiname=false;
-  long multinameId=0;
+  boolean isMultiname = false;
+  long multinameId = 0;
 
 
     /**
@@ -80,15 +80,15 @@ StringCharacter = [^\r\n\"\\]
   /* whitespace */
   {WhiteSpace}                   {  }  
   {Multiname}\"                   {
-                                    isMultiname=true;
-                                    String s=yytext();
-                                    multinameId=Long.parseLong(s.substring(2,s.length()-2));
+                                    isMultiname = true;
+                                    String s = yytext();
+                                    multinameId = Long.parseLong(s.substring(2,s.length()-2));
                                     yybegin(STRING);
                                     string.setLength(0);
                                   }
   /* string literal */
   \"                             {
-                                    isMultiname=false;
+                                    isMultiname = false;
                                     yybegin(STRING);
                                     string.setLength(0);
                                  }
@@ -112,16 +112,16 @@ StringCharacter = [^\r\n\"\\]
   static               {return new ParsedSymbol(ParsedSymbol.TYPE_STATIC);}
   explicit               {return new ParsedSymbol(ParsedSymbol.TYPE_EXPLICIT);}
   {Namespace}           {
-                                    String s=yytext();
-                                    long ns=Long.parseLong(s.substring(3,s.length()-2));
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE,new Long(ns));
+                                    String s = yytext();
+                                    long ns = Long.parseLong(s.substring(3, s.length()-2));
+                                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, new Long(ns));
                                   }
   true                  {return new ParsedSymbol(ParsedSymbol.TYPE_TRUE);}
   false                  {return new ParsedSymbol(ParsedSymbol.TYPE_FALSE);}
   null                  {return new ParsedSymbol(ParsedSymbol.TYPE_NULL);}
   undefined                  {return new ParsedSymbol(ParsedSymbol.TYPE_UNDEFINED);}
 {Identifier}            {
-                        return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER,yytext());  }
+                        return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
 }
 
 <STRING> {
@@ -129,9 +129,9 @@ StringCharacter = [^\r\n\"\\]
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
                                      if(isMultiname){
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME,new Long(multinameId));
+                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
                                      }else{
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_STRING,string.toString());
+                                        return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                                      }
                                  }
 
@@ -150,8 +150,8 @@ StringCharacter = [^\r\n\"\\]
                         				   string.append( val ); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }
-  {LineTerminator}               { throw new ParseException("Unterminated string at end of line",yyline+1); }
+  \\.                            { throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
+  {LineTerminator}               { throw new ParseException("Unterminated string at end of line", yyline + 1); }
 
 }
 

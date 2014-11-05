@@ -105,12 +105,12 @@ Constant= constant{PositiveNumberLiteral}
 
   {Label}                        {
                                     String s=yytext();
-                                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_LABEL,s.substring(0,s.length()-1));
+                                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
                                 }
 
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
-                                        return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INSTRUCTION_NAME,yytext());
+                                        return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
                                       }
   {EndOfBlock}                        {  return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_END); }
 }
@@ -127,7 +127,7 @@ Constant= constant{PositiveNumberLiteral}
   {NumberLiteral}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
   {FloatLiteral}                 { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
   {LineTerminator}      {yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOL); }
-  {Comment}             {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMENT,yytext().substring(1));}
+  {Comment}             {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
   {StartOfBlock}                        {  yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_START); }
   {True}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
   {False}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
@@ -137,7 +137,7 @@ Constant= constant{PositiveNumberLiteral}
   {Register}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER,new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
   {Constant}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT,new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
 
-  {Identifier}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_IDENTIFIER,yytext());  }
+  {Identifier}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_IDENTIFIER, yytext());  }
       
 }
 
@@ -145,7 +145,7 @@ Constant= constant{PositiveNumberLiteral}
   \"                             {
                                      yybegin(PARAMETERS);
                                      // length also includes the trailing quote
-                                     return new ASMParsedSymbol(ASMParsedSymbol.TYPE_STRING,string.toString());
+                                     return new ASMParsedSymbol(ASMParsedSymbol.TYPE_STRING, string.toString());
                                  }
 
   {StringCharacter}+             { string.append( yytext() ); }
@@ -163,8 +163,8 @@ Constant= constant{PositiveNumberLiteral}
                         				   string.append( val ); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }
-  {LineTerminator}               { throw new ParseException("Unterminated string at end of line",yyline+1); }
+  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"", yyline + 1); }
+  {LineTerminator}               { throw new ParseException("Unterminated string at end of line", yyline + 1); }
 
 }
 

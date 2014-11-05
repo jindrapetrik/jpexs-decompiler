@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;

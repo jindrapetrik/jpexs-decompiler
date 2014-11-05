@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -44,6 +46,16 @@ public class DefineFont4Tag extends CharacterTag {
     @Override
     public int getCharacterId() {
         return fontID;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineFont4Tag(SWF swf) {
+        super(swf, ID, "DefineFont4", null);
+        fontID = swf.getNextCharacterId();
+        fontName = "New font";
     }
 
     public DefineFont4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

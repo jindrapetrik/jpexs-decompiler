@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -108,6 +109,18 @@ public class DefineFont3Tag extends FontTag {
     @Override
     public int charToGlyph(char c) {
         return codeTable.indexOf((int) c);
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineFont3Tag(SWF swf) {
+        super(swf, ID, "DefineFont3", null);
+        fontId = swf.getNextCharacterId();
+        fontName = "New font";
+        glyphShapeTable = new ArrayList<>();
+        codeTable = new ArrayList<>();
     }
 
     public DefineFont3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

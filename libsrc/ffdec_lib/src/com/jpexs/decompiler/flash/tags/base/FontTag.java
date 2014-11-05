@@ -274,7 +274,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         if (installedFontsByName.containsKey(fontName)) {
             return fontName;
         }
-        if (fontName.contains("_")) {
+        if (fontName != null && fontName.contains("_")) {
             String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
             if (installedFontsByName.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;

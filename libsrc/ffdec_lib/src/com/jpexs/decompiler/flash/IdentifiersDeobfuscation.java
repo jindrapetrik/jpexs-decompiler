@@ -299,6 +299,7 @@ public class IdentifiersDeobfuscation {
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
      *
+     * @param as3 Is ActionScript3
      * @param s Identifier
      * @param validExceptions Exceptions which are valid (e.g. some reserved
      * words)

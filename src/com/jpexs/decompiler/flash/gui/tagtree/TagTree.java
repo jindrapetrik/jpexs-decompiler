@@ -224,7 +224,7 @@ public class TagTree extends JTree implements ActionListener {
         if (t instanceof ImageTag) {
             return TreeNodeType.IMAGE;
         }
-        
+
         // DefineShape, DefineShape2, DefineShape3, DefineShape4
         if (t instanceof ShapeTag) {
             return TreeNodeType.SHAPE;
@@ -238,12 +238,12 @@ public class TagTree extends JTree implements ActionListener {
         if (t instanceof DefineSpriteTag) {
             return TreeNodeType.SPRITE;
         }
-        
+
         // DefineButton, DefineButton2
         if (t instanceof ButtonTag) {
             return TreeNodeType.BUTTON;
         }
-        
+
         if (t instanceof DefineVideoStreamTag) {
             return TreeNodeType.MOVIE;
         }
@@ -259,24 +259,24 @@ public class TagTree extends JTree implements ActionListener {
         if (t instanceof ASMSource) {
             return TreeNodeType.AS;
         }
-        
+
         if (t instanceof ScriptPack) {
             return TreeNodeType.AS;
         }
-        
+
         if (t instanceof AS2Package) {
             return TreeNodeType.PACKAGE;
         }
-        
+
         if (t instanceof AS3Package) {
             return TreeNodeType.PACKAGE;
         }
-        
+
         if ((t instanceof Frame)
                 || (t instanceof FrameScript)) {
             return TreeNodeType.FRAME;
         }
-        
+
         if (t instanceof ShowFrameTag) {
             return TreeNodeType.SHOW_FRAME;
         }
@@ -349,10 +349,10 @@ public class TagTree extends JTree implements ActionListener {
                 ret = new ArrayList<>();
                 break;
         }
-        
+
         return ret;
     }
-    
+
     public void createContextMenu(final List<SWFList> swfs) {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
 
@@ -485,7 +485,8 @@ public class TagTree extends JTree implements ActionListener {
                                     public void actionPerformed(ActionEvent ae) {
                                         try {
                                             SWF swf = folderItem.getSwf();
-                                            swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[] {swf}));
+                                            swf.tags.add((Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf}));
+                                            swf.updateCharacters();
                                             mainPanel.refreshTree();
                                         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
                                             Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
@@ -496,7 +497,7 @@ public class TagTree extends JTree implements ActionListener {
                             }
                             addTagMenu.setVisible(true);
                         }
-                        
+
                         if (item instanceof Tag && swfs.size() > 1) {
                             final Tag tag = (Tag) item;
                             moveTagMenu.removeAll();
