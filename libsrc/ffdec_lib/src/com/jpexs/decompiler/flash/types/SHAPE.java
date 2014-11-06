@@ -41,6 +41,8 @@ public class SHAPE implements NeedsCharacters, Serializable {
     public int numLineBits;
     public List<SHAPERECORD> shapeRecords;
 
+    private Shape cachedOutline;
+    
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
         for (SHAPERECORD r : shapeRecords) {
@@ -62,12 +64,17 @@ public class SHAPE implements NeedsCharacters, Serializable {
     }
 
     public Shape getOutline() {
+        if (cachedOutline != null) {
+            return cachedOutline;
+        }
+        
         List<GeneralPath> paths = PathExporter.export(this);
         Area area = new Area();
         for (GeneralPath path : paths) {
             area.add(new Area(path));
         }
 
+        cachedOutline = area;
         return area;
     }
 

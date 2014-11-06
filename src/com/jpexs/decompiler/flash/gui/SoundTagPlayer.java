@@ -207,7 +207,8 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
-    public void zoomToFit() {
+    public double getZoomToFit() {
+        return 1;
     }
 
     @Override

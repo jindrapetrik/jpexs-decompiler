@@ -768,10 +768,12 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel();
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if (count > 0) {
         byte[] buf = new byte[4096];
-        int c = 0;
-        while ((c = dis.read(buf)) > 0) {
-            baos.write(buf, 0, c);
+            int c = 0;
+            while ((c = dis.read(buf)) > 0) {
+                baos.write(buf, 0, c);
+            }
         }
         return baos.toByteArray();
     }
