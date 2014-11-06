@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -95,6 +96,15 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public PlaceObjectTag(SWF swf) {
+        super(swf, ID, "PlaceObject", null);
+        matrix = new MATRIX();
     }
 
     /**

@@ -181,12 +181,12 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         return streamSoundType;
     }
 
-    public static void populateSoundStreamBlocks(int containerId, List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
+    public static void populateSoundStreamBlocks(int containerId, List<? extends ContainerItem> tags, SoundStreamHeadTypeTag head, List<SoundStreamBlockTag> output) {
         boolean found = false;
         for (ContainerItem t : tags) {
             if (t == head) {
                 found = true;
-                ((SoundStreamHeadTypeTag) head).setVirtualCharacterId(containerId);
+                head.setVirtualCharacterId(containerId);
                 continue;
             }
             if (t instanceof Container) {

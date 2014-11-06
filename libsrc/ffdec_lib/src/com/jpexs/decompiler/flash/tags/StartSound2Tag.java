@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
@@ -44,11 +46,23 @@ public class StartSound2Tag extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeString(soundClassName);
+            sos.writeSOUNDINFO(soundInfo);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public StartSound2Tag(SWF swf) {
+        super(swf, ID, "StartSound2", null);
+        soundClassName = "NewSoundClass";
+        soundInfo = new SOUNDINFO();
     }
 
     /**

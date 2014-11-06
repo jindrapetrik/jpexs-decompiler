@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
@@ -34,6 +36,15 @@ public class FrameLabelTag extends Tag {
 
     public boolean isNamedAnchor() {
         return namedAnchor;
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public FrameLabelTag(SWF swf) {
+        super(swf, ID, "FrameLabel", null);
+        name = "New frame label";
     }
 
     public FrameLabelTag(SWFInputStream sis, ByteArrayRange data) throws IOException {

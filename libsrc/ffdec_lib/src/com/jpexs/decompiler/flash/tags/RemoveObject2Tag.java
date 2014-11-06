@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
@@ -30,6 +32,14 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
     @SWFType(BasicType.UI16)
     public int depth;
     public static final int ID = 28;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public RemoveObject2Tag(SWF swf) {
+        super(swf, ID, "RemoveObject2", null);
+    }
 
     public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "RemoveObject2", data);

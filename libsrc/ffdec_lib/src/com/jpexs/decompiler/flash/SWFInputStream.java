@@ -201,7 +201,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
-import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -1365,7 +1365,7 @@ public class SWFInputStream implements AutoCloseable {
                     if (swf.gfx) {   //GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
                         switch (tag.getId()) {
                             case 1000:
-                                ret = new ExporterInfoTag(sis, data);
+                                ret = new ExporterInfo(sis, data);
                                 break;
                             case 1001:
                                 ret = new DefineExternalImage(sis, data);
