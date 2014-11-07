@@ -128,9 +128,12 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -163,6 +166,28 @@ public class TagTree extends JTree implements ActionListener {
 
     public class TagTreeCellRenderer extends DefaultTreeCellRenderer {
 
+        private Font plainFont;
+        
+        private Font boldFont;
+        
+        private Map<TreeNodeType, Icon> icons;
+        
+        public TagTreeCellRenderer() {
+            setUI(new BasicLabelUI());
+            setOpaque(false);
+            //setBackground(Color.green);
+            setBackgroundNonSelectionColor(Color.white);
+            //setBackgroundSelectionColor(Color.ORANGE);
+
+            icons = new HashMap<>();
+            for (TreeNodeType treeNodeType : TreeNodeType.values()) {
+                if (treeNodeType != TreeNodeType.UNKNOWN && treeNodeType != TreeNodeType.SHOW_FRAME) {
+                    String tagTypeStr = treeNodeType.toString().toLowerCase().replace("_", "");
+                    icons.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
+                }
+            }
+        }
+        
         @Override
         public Component getTreeCellRendererComponent(
                 JTree tree,
@@ -179,44 +204,34 @@ public class TagTree extends JTree implements ActionListener {
                     hasFocus);
             TreeItem val = (TreeItem) value;
             TreeNodeType type = getTreeNodeType(val);
-            if (type != null) {
-                if (type == TreeNodeType.FOLDER && expanded) {
-                    type = TreeNodeType.FOLDER_OPEN;
-                }
-                String itemName = type.toString();
-                if (type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) {
-                    if (val instanceof FolderItem) {
-                        FolderItem si = (FolderItem) val;
-                        if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
-                            itemName = "folder" + si.getName();
-                        }
-                    }
-                }
-                String tagTypeStr = itemName.toLowerCase().replace("_", "");
-                setIcon(View.getIcon(tagTypeStr + "16"));
+            
+            if (type == TreeNodeType.FOLDER && expanded) {
+                type = TreeNodeType.FOLDER_OPEN;
             }
 
-            Font font = getFont();
-            boolean isModified = false;
-            if (val instanceof Tag) {
-                Tag tag = (Tag) val;
-                if (tag.isModified()) {
-                    isModified = true;
+            if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
+                FolderItem si = (FolderItem) val;
+                if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
+                    String itemName = "folder" + si.getName();
+                    setIcon(View.getIcon(itemName.toLowerCase() + "16"));
                 }
-            }
-
-            if (isModified) {
-                font = font.deriveFont(Font.BOLD);
             } else {
-                font = font.deriveFont(Font.PLAIN);
+                setIcon(icons.get(type));
             }
-            setFont(font);
 
-            setUI(new BasicLabelUI());
-            setOpaque(false);
-            //setBackground(Color.green);
-            setBackgroundNonSelectionColor(Color.white);
-            //setBackgroundSelectionColor(Color.ORANGE);
+            boolean isModified = val instanceof Tag && ((Tag) val).isModified();
+            if (isModified) {
+                if (boldFont == null) {
+                    Font font = getFont();
+                    boldFont = font.deriveFont(Font.BOLD);
+                }
+            } else {
+                if (plainFont == null) {
+                    Font font = getFont();
+                    plainFont = font.deriveFont(Font.PLAIN);
+                }
+            }
+            setFont(isModified ? boldFont : plainFont);
 
             return this;
         }
