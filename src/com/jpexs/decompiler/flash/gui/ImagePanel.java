@@ -426,7 +426,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             }
             return (double) w / (double) w1;
         }
-        
+
         return 1;
     }
 

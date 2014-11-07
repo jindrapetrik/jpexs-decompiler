@@ -389,14 +389,14 @@ public class TagTree extends JTree implements ActionListener {
                 ret = new ArrayList<>();
                 break;
             case TagTreeModel.FOLDER_OTHERS:
-                ret = Arrays.asList(CSMTextSettingsTag.ID, DebugIDTag.ID, DefineButtonCxformTag.ID, DefineButtonSoundTag.ID, 
-                    DefineFontAlignZonesTag.ID, DefineFontInfoTag.ID, DefineFontInfo2Tag.ID, DefineFontNameTag.ID, 
-                    DefineScalingGridTag.ID, DefineSceneAndFrameLabelDataTag.ID, 
-                    DoABCDefineTag.ID, DoABCTag.ID, DoActionTag.ID, DoInitActionTag.ID,
-                    EnableDebuggerTag.ID, EnableDebugger2Tag.ID, EnableTelemetryTag.ID,
-                    ExportAssetsTag.ID, FileAttributesTag.ID, ImportAssetsTag.ID, ImportAssets2Tag.ID,
-                    JPEGTablesTag.ID, MetadataTag.ID, ProductInfoTag.ID, ProtectTag.ID, ScriptLimitsTag.ID,
-                    SetBackgroundColorTag.ID, SetTabIndexTag.ID, SymbolClassTag.ID);
+                ret = Arrays.asList(CSMTextSettingsTag.ID, DebugIDTag.ID, DefineButtonCxformTag.ID, DefineButtonSoundTag.ID,
+                        DefineFontAlignZonesTag.ID, DefineFontInfoTag.ID, DefineFontInfo2Tag.ID, DefineFontNameTag.ID,
+                        DefineScalingGridTag.ID, DefineSceneAndFrameLabelDataTag.ID,
+                        DoABCDefineTag.ID, DoABCTag.ID, DoActionTag.ID, DoInitActionTag.ID,
+                        EnableDebuggerTag.ID, EnableDebugger2Tag.ID, EnableTelemetryTag.ID,
+                        ExportAssetsTag.ID, FileAttributesTag.ID, ImportAssetsTag.ID, ImportAssets2Tag.ID,
+                        JPEGTablesTag.ID, MetadataTag.ID, ProductInfoTag.ID, ProtectTag.ID, ScriptLimitsTag.ID,
+                        SetBackgroundColorTag.ID, SetTabIndexTag.ID, SymbolClassTag.ID);
                 break;
         }
 
@@ -409,7 +409,7 @@ public class TagTree extends JTree implements ActionListener {
                 StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
                 SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
     }
-    
+
     JMenuItem expandRecursiveMenuItem;
     JMenuItem removeMenuItem;
     JMenuItem removeWithDependenciesMenuItem;
@@ -592,15 +592,15 @@ public class TagTree extends JTree implements ActionListener {
                         try {
                             SWF swf = item.getSwf();
                             Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
-                            boolean isDefineSprite = item instanceof DefineSpriteTag; 
-                            Timelined timelined  = isDefineSprite ? (DefineSpriteTag) item : swf;
+                            boolean isDefineSprite = item instanceof DefineSpriteTag;
+                            Timelined timelined = isDefineSprite ? (DefineSpriteTag) item : swf;
                             t.setTimelined(timelined);
-	                    if (isDefineSprite) {
-	                        ((DefineSpriteTag) item).subTags.add(t);
-	                    } else {
-	                        swf.tags.add(t);
-	                    }
-	                    timelined.getTimeline().reset();
+                            if (isDefineSprite) {
+                                ((DefineSpriteTag) item).subTags.add(t);
+                            } else {
+                                swf.tags.add(t);
+                            }
+                            timelined.getTimeline().reset();
                             swf.updateCharacters();
                             mainPanel.refreshTree();
                         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {

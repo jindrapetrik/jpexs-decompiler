@@ -62,86 +62,83 @@ public class FolderPreviewPanel extends JPanel {
     private static final ExecutorService executor;
     private List<TreeItem> items;
     private int selectedIndex = -1;
-   
-    public Map<Integer,TreeItem> selectedItems = new HashMap<>();
-    
-    private Cache<Integer,SerializableImage> cachedPreviews;
-    private static final int PREVIEW_SIZE = 150;    
+
+    public Map<Integer, TreeItem> selectedItems = new HashMap<>();
+
+    private Cache<Integer, SerializableImage> cachedPreviews;
+    private static final int PREVIEW_SIZE = 150;
     private static final int BORDER_SIZE = 5;
-    private static final int LABEL_HEIGHT=20;
-    private static final int CELL_HEIGHT = 2*BORDER_SIZE + PREVIEW_SIZE + LABEL_HEIGHT;
-    private static final int CELL_WIDTH = 2*BORDER_SIZE + PREVIEW_SIZE;
-    private static final SerializableImage noImage = new SerializableImage(PREVIEW_SIZE,PREVIEW_SIZE,BufferedImage.TYPE_INT_ARGB);
-    static{
+    private static final int LABEL_HEIGHT = 20;
+    private static final int CELL_HEIGHT = 2 * BORDER_SIZE + PREVIEW_SIZE + LABEL_HEIGHT;
+    private static final int CELL_WIDTH = 2 * BORDER_SIZE + PREVIEW_SIZE;
+    private static final SerializableImage noImage = new SerializableImage(PREVIEW_SIZE, PREVIEW_SIZE, BufferedImage.TYPE_INT_ARGB);
+
+    static {
         noImage.fillTransparent();
         executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
     }
-    
-    
+
     public FolderPreviewPanel(final MainPanel mainPanel, List<TreeItem> items) {
         this.items = items;
         cachedPreviews = Cache.getInstance(false);
-        
+
         addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() >1){
-                    if(selectedIndex>-1){
+                if (e.getClickCount() > 1) {
+                    if (selectedIndex > -1) {
                         mainPanel.setTagTreeSelectedNode(FolderPreviewPanel.this.items.get(selectedIndex));
                     }
                 }
             }
 
-            
-            
             @Override
             public void mousePressed(MouseEvent e) {
                 int width = getWidth();
-        
+
                 int cols = width / CELL_WIDTH;
-                int rows = (int)Math.ceil(FolderPreviewPanel.this.items.size() / (float)cols);
+                int rows = (int) Math.ceil(FolderPreviewPanel.this.items.size() / (float) cols);
                 int x = e.getX() / CELL_WIDTH;
                 int y = e.getY() / CELL_HEIGHT;
-                int index=y*cols+x;
-                if(index>=FolderPreviewPanel.this.items.size()){
+                int index = y * cols + x;
+                if (index >= FolderPreviewPanel.this.items.size()) {
                     return;
-                }                    
-                
-                
-                if(e.getButton() == MouseEvent.BUTTON1 || selectedItems.isEmpty()){
-                if(!e.isControlDown()){
-                    selectedItems.clear();
                 }
-                int oldSelectedIndex = selectedIndex;
-                selectedIndex = index;
-                                
-                if(e.isShiftDown() && oldSelectedIndex>-1){
-                    int minindex=Math.min(selectedIndex, oldSelectedIndex);
-                    int maxindex=Math.max(selectedIndex, oldSelectedIndex);
-                    for(int i=minindex;i<=maxindex;i++){
-                        selectedItems.put(i, FolderPreviewPanel.this.items.get(i));
+
+                if (e.getButton() == MouseEvent.BUTTON1 || selectedItems.isEmpty()) {
+                    if (!e.isControlDown()) {
+                        selectedItems.clear();
                     }
-                    selectedIndex = oldSelectedIndex;
-                }else{
-                    TreeItem ti=FolderPreviewPanel.this.items.get(index);
-                    if(!selectedItems.containsKey(selectedIndex)){
-                        selectedItems.put(selectedIndex,ti);
-                    }else{
-                        selectedItems.remove(selectedIndex);
-                        selectedIndex = -1;
+                    int oldSelectedIndex = selectedIndex;
+                    selectedIndex = index;
+
+                    if (e.isShiftDown() && oldSelectedIndex > -1) {
+                        int minindex = Math.min(selectedIndex, oldSelectedIndex);
+                        int maxindex = Math.max(selectedIndex, oldSelectedIndex);
+                        for (int i = minindex; i <= maxindex; i++) {
+                            selectedItems.put(i, FolderPreviewPanel.this.items.get(i));
+                        }
+                        selectedIndex = oldSelectedIndex;
+                    } else {
+                        TreeItem ti = FolderPreviewPanel.this.items.get(index);
+                        if (!selectedItems.containsKey(selectedIndex)) {
+                            selectedItems.put(selectedIndex, ti);
+                        } else {
+                            selectedItems.remove(selectedIndex);
+                            selectedIndex = -1;
+                        }
                     }
                 }
-                }
-                
-                if(e.getButton() == MouseEvent.BUTTON3){                                        
+
+                if (e.getButton() == MouseEvent.BUTTON3) {
                     mainPanel.tagTree.updateContextMenu(mainPanel.tagTree.swfs, new ArrayList<>(selectedItems.values()));
-                    mainPanel.tagTree.contextPopupMenu.show(FolderPreviewPanel.this, e.getX(),e.getY());
+                    mainPanel.tagTree.contextPopupMenu.show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
-           
-});
+
+        });
     }
 
     public synchronized void setItems(List<TreeItem> items) {
@@ -152,76 +149,71 @@ public class FolderPreviewPanel extends JPanel {
         selectedItems.clear();
         selectedIndex = -1;
     }
-  
 
     @Override
     public Dimension getPreferredSize() {
-        int width = getParent().getSize().width-20;
+        int width = getParent().getSize().width - 20;
         int cols = width / CELL_WIDTH;
-        int rows = (int)Math.ceil(items.size() / (float)cols);
-        int height = rows*CELL_HEIGHT;
-        return (new Dimension(width,height));   
+        int rows = (int) Math.ceil(items.size() / (float) cols);
+        int height = rows * CELL_HEIGHT;
+        return (new Dimension(width, height));
     }
-    
-    
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         Rectangle r = getVisibleRect();
         int width = getWidth();
-        
+
         int cols = width / CELL_WIDTH;
-        int rows = (int)Math.ceil(items.size() / (float)cols);
-        int height = rows*CELL_HEIGHT;
-        
-        int start_y = r.y / CELL_HEIGHT; 
+        int rows = (int) Math.ceil(items.size() / (float) cols);
+        int height = rows * CELL_HEIGHT;
+
+        int start_y = r.y / CELL_HEIGHT;
         JLabel l = new JLabel();
         Font f = l.getFont().deriveFont(AffineTransform.getScaleInstance(0.8, 0.8));
-        int finish_y = (int)Math.ceil((r.y + r.height) / (float)CELL_HEIGHT);
-               g.setColor(Color.black);
-        for(int y=start_y;y<=finish_y;y++){
-            for(int x=0;x<cols;x++){
+        int finish_y = (int) Math.ceil((r.y + r.height) / (float) CELL_HEIGHT);
+        g.setColor(Color.black);
+        for (int y = start_y; y <= finish_y; y++) {
+            for (int x = 0; x < cols; x++) {
                 int index = y * cols + x;
-                if(index<items.size()){
-                    
-                     g.setColor(new Color(0xd9,0xe8,0xfb));
-                    if(selectedItems.containsKey(index)){
-                        g.setColor(new Color(0xfe,0xca,0x81));
+                if (index < items.size()) {
+
+                    g.setColor(new Color(0xd9, 0xe8, 0xfb));
+                    if (selectedItems.containsKey(index)) {
+                        g.setColor(new Color(0xfe, 0xca, 0x81));
                     }
-                    g.fillRect(x*CELL_WIDTH,y*CELL_HEIGHT, CELL_WIDTH,CELL_HEIGHT);
-                    if(cachedPreviews.contains(index)){
-                        BufferedImage img=cachedPreviews.get(index).getBufferedImage();
-                        g.drawImage(img, x*CELL_WIDTH+BORDER_SIZE+PREVIEW_SIZE/2-img.getWidth()/2, y*CELL_HEIGHT+BORDER_SIZE+PREVIEW_SIZE/2-img.getHeight()/2, null);
-                    }else{
+                    g.fillRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
+                    if (cachedPreviews.contains(index)) {
+                        BufferedImage img = cachedPreviews.get(index).getBufferedImage();
+                        g.drawImage(img, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getHeight() / 2, null);
+                    } else {
                         cachedPreviews.put(index, noImage);
-                        renderImageTask(index,items.get(index));
+                        renderImageTask(index, items.get(index));
                     }
-                     String s;
-                     TreeItem treeItem = items.get(index);
-                        if (treeItem instanceof Tag) {
-                            s = ((Tag) treeItem).getTagName();
-                            if (treeItem instanceof CharacterTag) {
-                                s = s + " (" + ((CharacterTag) treeItem).getCharacterId() + ")";
-                            }
-                        } else {
-                            s = treeItem.toString();
-                        }                       
+                    String s;
+                    TreeItem treeItem = items.get(index);
+                    if (treeItem instanceof Tag) {
+                        s = ((Tag) treeItem).getTagName();
+                        if (treeItem instanceof CharacterTag) {
+                            s = s + " (" + ((CharacterTag) treeItem).getCharacterId() + ")";
+                        }
+                    } else {
+                        s = treeItem.toString();
+                    }
                     g.setFont(f);
                     g.setColor(Color.black);
-                    g.drawLine( x*CELL_WIDTH,y*CELL_HEIGHT+BORDER_SIZE+PREVIEW_SIZE, x*CELL_WIDTH+CELL_WIDTH, y*CELL_HEIGHT+BORDER_SIZE+PREVIEW_SIZE);
-                    g.drawString(s, x*CELL_WIDTH+BORDER_SIZE,y*CELL_HEIGHT+BORDER_SIZE+PREVIEW_SIZE+LABEL_HEIGHT);                    
-                    g.drawRect(x*CELL_WIDTH,y*CELL_HEIGHT, CELL_WIDTH,CELL_HEIGHT);
+                    g.drawLine(x * CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE, x * CELL_WIDTH + CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE);
+                    g.drawString(s, x * CELL_WIDTH + BORDER_SIZE, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE + LABEL_HEIGHT);
+                    g.drawRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                 }
             }
         }
-        
-        
-        setSize(new Dimension(width,height));        
-    }           
-    
-    
-    private synchronized void renderImageTask(final int index,final TreeItem treeItem) {        
+
+        setSize(new Dimension(width, height));
+    }
+
+    private synchronized void renderImageTask(final int index, final TreeItem treeItem) {
         executor.submit(new Callable<Void>() {
 
             @Override
@@ -241,7 +233,7 @@ public class FolderPreviewPanel extends JPanel {
         });
 
     }
-    
+
     private SerializableImage renderImage(SWF swf, TreeItem treeItem) {
 
         int width = 0;

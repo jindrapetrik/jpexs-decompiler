@@ -107,7 +107,7 @@ public class TagIdClassMap {
     private static final Map<Integer, Class> tagIdClassMap = new HashMap<>();
 
     private static final Map<Class, Integer> classTagIdMap = new HashMap<>();
-    
+
     static {
         addTag(CSMTextSettingsTag.ID, CSMTextSettingsTag.class);
         addTag(DebugIDTag.ID, DebugIDTag.class);
@@ -189,12 +189,12 @@ public class TagIdClassMap {
         addTag(ExporterInfo.ID, ExporterInfo.class);
         addTag(FontTextureInfo.ID, FontTextureInfo.class);
     }
-    
+
     private static void addTag(int tagId, Class cl) {
         tagIdClassMap.put(tagId, cl);
         classTagIdMap.put(cl, tagId);
     }
-    
+
     public static Class getClassByTagId(int tagId) {
         return tagIdClassMap.get(tagId);
     }

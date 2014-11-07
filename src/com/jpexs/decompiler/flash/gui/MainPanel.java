@@ -352,7 +352,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
-        folderPreviewPanel = new FolderPreviewPanel(this,new ArrayList<TreeItem>());
+        folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<TreeItem>());
         folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
@@ -989,7 +989,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty()?tagTree.getAllSelected(tagTree):new ArrayList<>(folderPreviewPanel.selectedItems.values());
+        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected(tagTree) : new ArrayList<>(folderPreviewPanel.selectedItems.values());
 
         List<SWF> allSwfs = new ArrayList<>();
         for (SWFList swfList : swfs) {
@@ -1316,7 +1316,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void autoDeobfuscateChanged() {
-        Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get()?"deobfuscation.comment.failed":"deobfuscation.comment.tryenable");    
+        Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
         clearCache();
         if (abcPanel != null) {
             abcPanel.reload();
@@ -2460,8 +2460,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.showTextPanel(textTag);
     }
 
-    
-    
     private void showFolderPreview(TreeItem treeNode) {
         List<TreeItem> folderPreviewItems = new ArrayList<>();
         FolderItem item = (FolderItem) treeNode;
