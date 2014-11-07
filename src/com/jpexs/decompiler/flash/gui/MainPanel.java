@@ -2610,6 +2610,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 return new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
             }
+
+            @Override
+            public int hashCode() {
+                return tag.hashCode();
+            }
         };
     }
 }

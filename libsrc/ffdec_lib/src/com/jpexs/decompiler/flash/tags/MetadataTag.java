@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
@@ -28,6 +30,15 @@ public class MetadataTag extends Tag {
     @Multiline
     public String xmlMetadata;
     public static final int ID = 77;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public MetadataTag(SWF swf) {
+        super(swf, ID, "Metadata", null);
+        xmlMetadata = "";
+    }
 
     public MetadataTag(SWFInputStream sis, ByteArrayRange data) {
         super(sis.getSwf(), ID, "Metadata", data);

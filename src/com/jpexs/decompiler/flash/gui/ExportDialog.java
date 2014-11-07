@@ -159,12 +159,11 @@ public class ExportDialog extends AppDialog {
         cnt.setLayout(new BorderLayout());
         JPanel comboPanel = new JPanel(null);
         combos = new JComboBox[optionNames.length];
-        JLabel[] labels = new JLabel[optionNames.length];
         int labWidth = 0;
         for (int i = 0; i < optionNames.length; i++) {
-            labels[i] = new JLabel(optionNames[i]);
-            if (labels[i].getPreferredSize().width > labWidth) {
-                labWidth = labels[i].getPreferredSize().width;
+            JLabel label = new JLabel(optionNames[i]);
+            if (label.getPreferredSize().width > labWidth) {
+                labWidth = label.getPreferredSize().width;
             }
         }
         String exportFormatsStr = Configuration.lastSelectedExportFormats.get();

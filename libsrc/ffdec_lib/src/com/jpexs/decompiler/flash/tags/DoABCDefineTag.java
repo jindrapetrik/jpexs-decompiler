@@ -67,6 +67,16 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DoABCDefineTag(SWF swf) {
+        super(swf, ID, "DoABCDefine", null);
+        name = "New DoABC";
+        abc = new ABC(swf);
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data

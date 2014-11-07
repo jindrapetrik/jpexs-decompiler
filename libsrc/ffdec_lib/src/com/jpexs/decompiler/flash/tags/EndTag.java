@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -40,6 +41,14 @@ public class EndTag extends Tag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public EndTag(SWF swf) {
+        super(swf, ID, "End", null);
+    }
+
+    /**
+     * Constructor
      *
      * @param swf
      * @param data
@@ -48,9 +57,5 @@ public class EndTag extends Tag {
     public EndTag(SWF swf, ByteArrayRange data) throws IOException {
         super(swf, ID, "End", data);
 
-    }
-
-    public EndTag(SWF swf) {
-        super(swf, ID, "End", null);
     }
 }

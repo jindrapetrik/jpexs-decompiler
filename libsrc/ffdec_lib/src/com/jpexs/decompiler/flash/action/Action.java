@@ -713,7 +713,7 @@ public class Action implements GraphSourceItem {
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex);
+            logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -728,10 +728,10 @@ public class Action implements GraphSourceItem {
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, convertException);
+            logger.log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendTimeoutComment(writer, timeout);
         } else {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, convertException);
+            logger.log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendErrorComment(writer, convertException);
         }
         if (asm != null) {
@@ -871,7 +871,7 @@ public class Action implements GraphSourceItem {
                     try {
                         out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
-                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex2);
+                        logger.log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
                             Helper.freeMem();
                         }
@@ -1004,7 +1004,7 @@ public class Action implements GraphSourceItem {
                 try {
                     action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
-                    Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ese);
+                    logger.log(Level.SEVERE, "Decompilation error in: " + path, ese);
                     output.add(new UnsupportedActionItem(action, "Empty stack"));
                 }
 

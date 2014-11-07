@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -40,7 +41,7 @@ public class MemoryInputStream extends SeekableInputStream {
     public MemoryInputStream(byte[] buffer, int startPos, int maxLength) throws IOException {
         this.buffer = buffer;
         this.startPos = startPos;
-        if (startPos >= buffer.length) {
+        if (startPos > buffer.length) {
             throw new IOException("Invalid startPos");
         }
         this.maxLength = maxLength;

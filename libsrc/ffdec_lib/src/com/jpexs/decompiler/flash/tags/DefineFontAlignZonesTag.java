@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -41,6 +43,15 @@ public class DefineFontAlignZonesTag extends Tag {
     @SWFArray(value = "zone", countField = "glyphCount")
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineFontAlignZonesTag(SWF swf) {
+        super(swf, ID, "DefineFontAlignZones", null);
+        zoneTable = new ArrayList<>();
+    }
 
     public DefineFontAlignZonesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFontAlignZones", data);

@@ -53,7 +53,7 @@ public interface MediaDisplay {
 
     public boolean zoomAvailable();
 
-    public void zoomToFit();
+    public double getZoomToFit();
 
     public double getZoom();
 }

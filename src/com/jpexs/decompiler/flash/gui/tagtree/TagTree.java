@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -33,14 +35,22 @@ import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontAlignZonesTag;
+import com.jpexs.decompiler.flash.tags.DefineFontInfo2Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontInfoTag;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
+import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -50,10 +60,40 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
+import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
+import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
+import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
+import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.ProductInfoTag;
+import com.jpexs.decompiler.flash.tags.ProtectTag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
+import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -69,6 +109,7 @@ import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
@@ -308,66 +349,69 @@ public class TagTree extends JTree implements ActionListener {
         return TreeNodeType.FOLDER;
     }
 
-    public List<Class> getTreeItemClasses(String folderName, boolean gfx) {
-        List<Class> ret = null;
+    public List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
+        List<Integer> ret = null;
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
-                ret = Arrays.asList((Class) DefineShapeTag.class, DefineShape2Tag.class, DefineShape3Tag.class, DefineShape4Tag.class);
+                ret = Arrays.asList(DefineShapeTag.ID, DefineShape2Tag.ID, DefineShape3Tag.ID, DefineShape4Tag.ID);
                 break;
             case TagTreeModel.FOLDER_MORPHSHAPES:
-                ret = Arrays.asList((Class) DefineMorphShapeTag.class, DefineMorphShape2Tag.class);
+                ret = Arrays.asList(DefineMorphShapeTag.ID, DefineMorphShape2Tag.ID);
                 break;
             case TagTreeModel.FOLDER_SPRITES:
-                ret = Arrays.asList((Class) DefineSpriteTag.class);
+                ret = Arrays.asList(DefineSpriteTag.ID);
                 break;
             case TagTreeModel.FOLDER_TEXTS:
-                ret = Arrays.asList((Class) DefineTextTag.class, DefineText2Tag.class, DefineEditTextTag.class);
+                ret = Arrays.asList(DefineTextTag.ID, DefineText2Tag.ID, DefineEditTextTag.ID);
                 break;
             case TagTreeModel.FOLDER_IMAGES:
-                ret = Arrays.asList((Class) DefineBitsTag.class, DefineBitsJPEG2Tag.class, DefineBitsJPEG3Tag.class, DefineBitsJPEG4Tag.class, DefineBitsLosslessTag.class, DefineBitsLossless2Tag.class);
+                ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
                 break;
             case TagTreeModel.FOLDER_MOVIES:
-                ret = Arrays.asList((Class) DefineVideoStreamTag.class);
+                ret = Arrays.asList(DefineVideoStreamTag.ID);
                 break;
             case TagTreeModel.FOLDER_SOUNDS:
-                ret = Arrays.asList((Class) DefineSoundTag.class, SoundStreamHeadTag.class, SoundStreamHead2Tag.class);
+                ret = Arrays.asList(DefineSoundTag.ID);
                 break;
             case TagTreeModel.FOLDER_BUTTONS:
-                ret = Arrays.asList((Class) DefineButtonTag.class, DefineButton2Tag.class);
+                ret = Arrays.asList(DefineButtonTag.ID, DefineButton2Tag.ID);
                 break;
             case TagTreeModel.FOLDER_FONTS:
-                ret = Arrays.asList((Class) DefineFontTag.class, DefineFont2Tag.class, DefineFont3Tag.class, DefineFont4Tag.class);
+                ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID);
                 if (gfx) {
-                    ret.add(DefineCompactedFont.class);
+                    ret.add(DefineCompactedFont.ID);
                 }
                 break;
             case TagTreeModel.FOLDER_BINARY_DATA:
-                ret = Arrays.asList((Class) DefineBinaryDataTag.class);
+                ret = Arrays.asList(DefineBinaryDataTag.ID);
                 break;
             case TagTreeModel.FOLDER_FRAMES:
                 ret = new ArrayList<>();
                 break;
             case TagTreeModel.FOLDER_OTHERS:
-                ret = new ArrayList<>();
+                ret = Arrays.asList(CSMTextSettingsTag.ID, DebugIDTag.ID, DefineButtonCxformTag.ID, DefineButtonSoundTag.ID, 
+                    DefineFontAlignZonesTag.ID, DefineFontInfoTag.ID, DefineFontInfo2Tag.ID, DefineFontNameTag.ID, 
+                    DefineScalingGridTag.ID, DefineSceneAndFrameLabelDataTag.ID, 
+                    DoABCDefineTag.ID, DoABCTag.ID, DoActionTag.ID, DoInitActionTag.ID,
+                    EnableDebuggerTag.ID, EnableDebugger2Tag.ID, EnableTelemetryTag.ID,
+                    ExportAssetsTag.ID, FileAttributesTag.ID, ImportAssetsTag.ID, ImportAssets2Tag.ID,
+                    JPEGTablesTag.ID, MetadataTag.ID, ProductInfoTag.ID, ProtectTag.ID, ScriptLimitsTag.ID,
+                    SetBackgroundColorTag.ID, SetTabIndexTag.ID, SymbolClassTag.ID);
                 break;
         }
 
         return ret;
     }
 
-    JMenuItem expandRecursiveMenuItem;
-    JMenuItem removeMenuItem;
-    JMenuItem removeWithDependenciesMenuItem;
-    JMenuItem exportSelectionMenuItem;
-    JMenuItem replaceSelectionMenuItem;
-    JMenuItem rawEditMenuItem;
-    JMenuItem jumpToCharacterMenuItem;
-    JMenuItem closeSelectionMenuItem;
-    JMenu addTagMenu;
-    JMenu moveTagMenu;
-    JMenuItem openSWFInsideTagMenuItem;
-    public JPopupMenu contextPopupMenu;
-    public List<SWFList> swfs;
+    public List<Integer> getSpriteNestedTagIds() {
+        return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
+                RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
+                StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
+                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
+    }
+    
+    public void createContextMenu(final List<SWFList> swfs) {
+        final JPopupMenu contextPopupMenu = new JPopupMenu();
 
     public void createContextMenu(final List<SWFList> swfs) {
         this.swfs = swfs;
@@ -457,6 +501,108 @@ public class TagTree extends JTree implements ActionListener {
                     openSWFInsideTagMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
+                        final TreeItem item = (TreeItem) paths[0].getLastPathComponent();
+
+                        if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
+                            replaceSelectionMenuItem.setVisible(true);
+                        }
+
+                        if (item instanceof DefineBinaryDataTag) {
+                            replaceSelectionMenuItem.setVisible(true);
+                            DefineBinaryDataTag bin = (DefineBinaryDataTag) item;
+                            if (bin.binaryData.length > 8) {
+                                String signature = new String(bin.binaryData, 0, 3, Utf8Helper.charset);
+                                if (Arrays.asList(
+                                        "FWS", //Uncompressed Flash
+                                        "CWS", //ZLib compressed Flash
+                                        "ZWS", //LZMA compressed Flash
+                                        "GFX", //Uncompressed ScaleForm GFx
+                                        "CFX" //Compressed ScaleForm GFx
+                                ).contains(signature)) {
+                                    openSWFInsideTagMenuItem.setVisible(true);
+                                }
+                            }
+                        }
+
+                        if (item instanceof DefineSoundTag) {
+                            replaceSelectionMenuItem.setVisible(true);
+                        }
+
+                        if (item instanceof SWF) {
+                            closeSelectionMenuItem.setVisible(true);
+                        }
+
+                        List<Integer> allowedTagTypes = null;
+                        if (item instanceof FolderItem) {
+                            allowedTagTypes = getSwfFolderItemNestedTagIds(((FolderItem) item).getName(), item.getSwf().gfx);
+                        } else if (item instanceof DefineSpriteTag) {
+                            allowedTagTypes = getSpriteNestedTagIds();
+                        }
+     
+                        addTagMenu.removeAll();
+                        if (allowedTagTypes != null) {
+                            for (Integer tagId : allowedTagTypes) {
+                                final Class cl = TagIdClassMap.getClassByTagId(tagId);
+                                JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+                                tagItem.addActionListener(new ActionListener() {
+
+                                    @Override
+                                    @SuppressWarnings("unchecked")
+                                    public void actionPerformed(ActionEvent ae) {
+                                        try {
+                                            SWF swf = item.getSwf();
+                                            Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+                                            boolean isDefineSprite = item instanceof DefineSpriteTag; 
+                                            Timelined timelined  = isDefineSprite ? (DefineSpriteTag) item : swf;
+                                            t.setTimelined(timelined);
+                                            if (isDefineSprite) {
+                                                ((DefineSpriteTag) item).subTags.add(t);
+                                            } else {
+                                                swf.tags.add(t);
+                                            }
+                                            timelined.getTimeline().reset();
+                                            swf.updateCharacters();
+                                            mainPanel.refreshTree();
+                                        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+                                            Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                });
+                                addTagMenu.add(tagItem);
+                            }
+                            addTagMenu.setVisible(true);
+                        }
+
+                        if (item instanceof Tag && swfs.size() > 1) {
+                            final Tag tag = (Tag) item;
+                            moveTagMenu.removeAll();
+                            for (SWFList targetSwfList : swfs) {
+                                for (final SWF targetSwf : targetSwfList) {
+                                    if (targetSwf != tag.getSwf()) {
+                                        JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
+                                        swfItem.addActionListener(new ActionListener() {
+
+                                            @Override
+                                            public void actionPerformed(ActionEvent ae) {
+                                                tag.getSwf().tags.remove(tag);
+                                                tag.setSwf(targetSwf);
+                                                targetSwf.tags.add(tag);
+                                                mainPanel.refreshTree();
+                                            }
+                                        });
+                                        moveTagMenu.add(swfItem);
+                                    }
+                                }
+                            }
+                            moveTagMenu.setVisible(true);
+                        }
+
+                        TreeModel model = getModel();
+                        expandRecursiveMenuItem.setVisible(model.getChildCount(item) > 0);
+
+                        jumpToCharacterMenuItem.setVisible(item instanceof CharacterIdTag && !(item instanceof CharacterTag));
+
+                        rawEditMenuItem.setVisible(item instanceof Tag);
                         TreeItem item = (TreeItem) paths[0].getLastPathComponent();
                         List<TreeItem> li = new ArrayList<>();
                         li.add(item);

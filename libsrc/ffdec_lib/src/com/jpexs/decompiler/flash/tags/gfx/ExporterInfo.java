@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -30,7 +31,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ExporterInfoTag extends Tag {
+public class ExporterInfo extends Tag {
 
     public static final int ID = 1000;
     //Version (1.10 will be encoded as 0x10A)
@@ -87,7 +88,7 @@ public class ExporterInfoTag extends Tag {
      * @param data
      * @throws IOException
      */
-    public ExporterInfoTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public ExporterInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "ExporterInfo", data);
         this.version = sis.readUI16("version");
         if (this.version >= 0x10a) {

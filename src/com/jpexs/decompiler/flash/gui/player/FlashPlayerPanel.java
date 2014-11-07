@@ -58,8 +58,9 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     @Override
-    public void zoomToFit() {
+    public double getZoomToFit() {
         //TODO
+        return 1;
     }
 
     @Override

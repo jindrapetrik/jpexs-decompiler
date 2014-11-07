@@ -316,8 +316,8 @@ public class PlayerControls extends JPanel implements ActionListener {
                 updateZoom();
                 break;
             case ACTION_ZOOMFIT:
-                display.zoomToFit();
-                //updateZoom();
+                realZoom = display.getZoomToFit();
+                updateZoom();
                 break;
             case ACTION_SNAPSHOT:
                 putImageToClipBoard(display.printScreen());

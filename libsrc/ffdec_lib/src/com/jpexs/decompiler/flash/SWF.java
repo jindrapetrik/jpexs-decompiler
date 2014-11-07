@@ -285,7 +285,36 @@ public final class SWF implements SWFContainerItem, Timelined {
         
         return max + 1;
     }
-        
+
+    public void fixCharactersOrder(boolean checkAll) {
+        Set<Integer> addedCharacterIds = new HashSet<>();
+        Set<CharacterTag> movedTags = new HashSet<>();
+        for (int i = 0; i < tags.size(); i++) {
+            Tag tag = tags.get(i);
+            if (checkAll || tag.isModified()) {
+                Set<Integer> needed = new HashSet<>();
+                tag.getNeededCharacters(needed);
+                for (Integer id : needed) {
+                    if (!addedCharacterIds.contains(id)) {
+                        CharacterTag neededCharacter = characters.get(id);
+                        if (movedTags.contains(neededCharacter)) {
+                            logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
+                            return;
+                        }
+
+                        // move the needed character to the current position
+                        tags.remove(neededCharacter);
+                        tags.add(i, neededCharacter);
+                        movedTags.add(neededCharacter);
+                    }
+                }
+            }
+            if (tag instanceof CharacterTag) {
+                addedCharacterIds.add(((CharacterTag) tag).getCharacterId());
+            }
+        }
+    }
+    
     public void resetTimelines(Timelined timelined) {
         timelined.getTimeline().reset();
         for (Tag t : timelined.getTimeline().tags) {
@@ -402,6 +431,8 @@ public final class SWF implements SWFContainerItem, Timelined {
      */
     public void saveTo(OutputStream os, SWFCompression compression) throws IOException {
         try {
+            fixCharactersOrder(false);
+            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             SWFOutputStream sos = new SWFOutputStream(baos, version);
             sos.writeRECT(displayRect);

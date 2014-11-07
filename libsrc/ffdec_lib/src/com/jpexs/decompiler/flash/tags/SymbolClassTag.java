@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -33,6 +35,16 @@ public class SymbolClassTag extends Tag {
     @SWFArray(value = "name", countField = "numSymbols")
     public String[] names;
     public static final int ID = 76;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public SymbolClassTag(SWF swf) {
+        super(swf, ID, "SymbolClass", null);
+        tags = new int[0];
+        names = new String[0];
+    }
 
     public SymbolClassTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "SymbolClass", data);

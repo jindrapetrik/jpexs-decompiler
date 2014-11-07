@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -44,6 +45,10 @@ public class FileAttributesTag extends Tag {
     public int reserved3;
     public static final int ID = 69;
 
+    /**
+     * Constructor
+     * @param swf
+     */
     public FileAttributesTag(SWF swf) {
         super(swf, ID, "FileAttributes", null);
     }

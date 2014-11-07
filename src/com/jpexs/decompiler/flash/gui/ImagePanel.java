@@ -406,7 +406,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     @Override
-    public void zoomToFit() {
+    public double getZoomToFit() {
         if (timelined instanceof BoundedTag) {
             RECT bounds = ((BoundedTag) timelined).getRect(new HashSet<BoundedTag>());
             double w1 = bounds.getWidth() / SWF.unitDivisor;
@@ -424,8 +424,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             } else {
                 w = w2;
             }
-            zoom = (double) w / (double) w1;
+            return (double) w / (double) w1;
         }
+        
+        return 1;
     }
 
     public void setImage(byte[] data) {
@@ -592,7 +594,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
                 img = image;
             }
-            if (drawable.getTimeline().isSingleFrame()) {
+            if (drawable.getTimeline().isSingleFrame(frame)) {
                 SWF.putToCache(key, img);
             }
         }

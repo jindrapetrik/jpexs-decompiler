@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
-import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -216,7 +216,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
                             DefineExternalStreamSound.ID,
                             DefineGradientMap.ID,
                             DefineSubImage.ID,
-                            ExporterInfoTag.ID,
+                            ExporterInfo.ID,
                             FontTextureInfo.ID);
                     knownTagIds = tagIds;
                 }

@@ -50,6 +50,14 @@ public class DoActionTag extends Tag implements ASMSource {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DoActionTag(SWF swf) {
+        super(swf, ID, "DoAction", null);
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data
