@@ -548,7 +548,7 @@ public class Timeline {
         return true;
     }
 
-    private boolean isSingleFrame(int frame) {
+    public boolean isSingleFrame(int frame) {
         Frame frameObj = frames.get(frame);
         int maxDepth = getMaxDepthInternal();
         for (int i = 1; i <= maxDepth; i++) {

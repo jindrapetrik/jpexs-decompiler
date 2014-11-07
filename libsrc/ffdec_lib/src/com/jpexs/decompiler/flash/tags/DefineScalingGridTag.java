@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -34,6 +36,15 @@ public class DefineScalingGridTag extends Tag {
     public int characterId;
     public RECT splitter;
     public static final int ID = 78;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DefineScalingGridTag(SWF swf) {
+        super(swf, ID, "DefineScalingGrid", null);
+        splitter = new RECT();
+    }
 
     public DefineScalingGridTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineScalingGrid", data);

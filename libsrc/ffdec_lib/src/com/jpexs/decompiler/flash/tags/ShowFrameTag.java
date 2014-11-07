@@ -50,20 +50,20 @@ public class ShowFrameTag extends Tag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public ShowFrameTag(SWF swf) {
+        super(swf, ID, "ShowFrame", null);
+    }
+
+    /**
+     * Constructor
      *
      * @param swf
      * @param data
      */
     public ShowFrameTag(SWF swf, ByteArrayRange data) {
         super(swf, ID, "ShowFrame", data);
-    }
-
-    /**
-     * Constructor
-     * @param swf
-     */
-    public ShowFrameTag(SWF swf) {
-        super(swf, ID, "ShowFrame", null);
     }
 
     /**

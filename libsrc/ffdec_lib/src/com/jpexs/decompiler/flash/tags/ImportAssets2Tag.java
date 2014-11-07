@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
@@ -54,6 +56,16 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     @SWFArray(value = "name", countField = "count")
     public List<String> names;
     public static final int ID = 71;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public ImportAssets2Tag(SWF swf) {
+        super(swf, ID, "ImportAssets2", null);
+        url = "";
+        tags = new ArrayList<>();
+    }
 
     /**
      * Constructor

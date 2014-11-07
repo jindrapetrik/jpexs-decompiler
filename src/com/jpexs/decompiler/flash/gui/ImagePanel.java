@@ -594,7 +594,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
                 img = image;
             }
-            if (drawable.getTimeline().isSingleFrame()) {
+            if (drawable.getTimeline().isSingleFrame(frame)) {
                 SWF.putToCache(key, img);
             }
         }

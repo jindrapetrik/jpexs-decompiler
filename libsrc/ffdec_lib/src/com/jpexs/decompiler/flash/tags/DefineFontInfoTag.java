@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -88,6 +90,16 @@ public class DefineFontInfoTag extends Tag {
 
     /**
      * Constructor
+     * @param swf
+     */
+    public DefineFontInfoTag(SWF swf) {
+        super(swf, ID, "DefineFontInfo", null);
+        fontName = "New Font Info Name";
+        codeTable = new ArrayList<>();
+    }
+
+    /**
+     * Constructor
      *
      * @param sis
      * @param data
@@ -110,12 +122,12 @@ public class DefineFontInfoTag extends Tag {
         fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
         fontFlagsWideCodes = sis.readUB(1, "fontFlagsWideCodes") == 1;
         codeTable = new ArrayList<>();
-        do {
+        while (sis.available() > 0) {
             if (fontFlagsWideCodes) {
                 codeTable.add(sis.readUI16("code"));
             } else {
                 codeTable.add(sis.readUI8("code"));
             }
-        } while (sis.available() > 0);
+        }
     }
 }

@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -62,6 +64,15 @@ public class EnableTelemetryTag extends Tag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public EnableTelemetryTag(SWF swf) {
+        super(swf, ID, "EnableTelemetry", null);
+        passwordHash = new byte[32];
     }
 
     /**

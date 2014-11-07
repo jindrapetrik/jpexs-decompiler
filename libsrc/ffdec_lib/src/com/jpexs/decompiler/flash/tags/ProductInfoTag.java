@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -43,6 +45,14 @@ public class ProductInfoTag extends Tag {
     @SWFType(BasicType.UI32)
     public long compilationDateHigh;
     public static final int ID = 41;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public ProductInfoTag(SWF swf) {
+        super(swf, ID, "ProductInfo", null);
+    }
 
     public ProductInfoTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "ProductInfo", data);

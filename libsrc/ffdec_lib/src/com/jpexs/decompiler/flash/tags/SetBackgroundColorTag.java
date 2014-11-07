@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,6 +28,15 @@ public class SetBackgroundColorTag extends Tag {
 
     public RGB backgroundColor;
     public static final int ID = 9;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public SetBackgroundColorTag(SWF swf) {
+        super(swf, ID, "SetBackgroundColor", null);
+        backgroundColor = new RGB();
+    }
 
     public SetBackgroundColorTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "SetBackgroundColor", data);

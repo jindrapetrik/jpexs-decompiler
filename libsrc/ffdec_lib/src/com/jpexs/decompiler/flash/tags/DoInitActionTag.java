@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -52,6 +53,14 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     @Internal
     public ByteArrayRange actionBytes;
     public static final int ID = 59;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public DoInitActionTag(SWF swf) {
+        super(swf, ID, "DoInitAction", null);
+    }
 
     /**
      * Constructor

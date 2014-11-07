@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -28,6 +30,15 @@ public class JPEGTablesTag extends Tag {
     public static final int ID = 8;
     @Internal
     public byte[] jpegData;
+
+    /**
+     * Constructor
+     * @param swf
+     */
+    public JPEGTablesTag(SWF swf) {
+        super(swf, ID, "JPEGTables", null);
+        jpegData = new byte[0];
+    }
 
     public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "JPEGTables", data);
