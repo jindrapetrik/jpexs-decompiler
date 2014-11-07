@@ -294,6 +294,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (checkAll || tag.isModified()) {
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharacters(needed);
+                boolean moved = false; 
                 for (Integer id : needed) {
                     if (!addedCharacterIds.contains(id)) {
                         CharacterTag neededCharacter = characters.get(id);
@@ -306,7 +307,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                         tags.remove(neededCharacter);
                         tags.add(i, neededCharacter);
                         movedTags.add(neededCharacter);
+                        moved = true;
                     }
+                }
+                
+                if (moved) {
+                    i--;
+                    continue;
                 }
             }
             if (tag instanceof CharacterTag) {
