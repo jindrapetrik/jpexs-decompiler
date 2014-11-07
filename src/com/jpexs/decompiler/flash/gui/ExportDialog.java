@@ -71,7 +71,7 @@ public class ExportDialog extends AppDialog {
         TagTreeModel.FOLDER_IMAGES,
         TagTreeModel.FOLDER_MOVIES,
         TagTreeModel.FOLDER_SOUNDS,
-        TagTreeModel.FOLDER_SPRITES,
+        TagTreeModel.FOLDER_SCRIPTS,
         TagTreeModel.FOLDER_BINARY_DATA,
         TagTreeModel.FOLDER_FRAMES,
         TagTreeModel.FOLDER_FONTS,

@@ -355,58 +355,72 @@ public class TagTree extends JTree implements ActionListener {
         return ret;
     }
 
-    public void createContextMenu(final List<SWFList> swfs) {
-        final JPopupMenu contextPopupMenu = new JPopupMenu();
+    JMenuItem expandRecursiveMenuItem;
+    JMenuItem removeMenuItem;
+    JMenuItem removeWithDependenciesMenuItem;
+    JMenuItem exportSelectionMenuItem;
+    JMenuItem replaceSelectionMenuItem;
+    JMenuItem rawEditMenuItem;
+    JMenuItem jumpToCharacterMenuItem;
+    JMenuItem closeSelectionMenuItem;
+    JMenu addTagMenu;
+    JMenu moveTagMenu;
+    JMenuItem openSWFInsideTagMenuItem;
+    public JPopupMenu contextPopupMenu;
+    public List<SWFList> swfs;
 
-        final JMenuItem expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
+    public void createContextMenu(final List<SWFList> swfs) {
+        this.swfs = swfs;
+        contextPopupMenu = new JPopupMenu();
+        expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this);
         expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
         contextPopupMenu.add(expandRecursiveMenuItem);
 
-        final JMenuItem removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
+        removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
         contextPopupMenu.add(removeMenuItem);
 
-        final JMenuItem removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies"));
+        removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies"));
         removeWithDependenciesMenuItem.addActionListener(this);
         removeWithDependenciesMenuItem.setActionCommand(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
         contextPopupMenu.add(removeWithDependenciesMenuItem);
 
-        final JMenuItem exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
+        exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
         exportSelectionMenuItem.addActionListener(mainPanel);
         contextPopupMenu.add(exportSelectionMenuItem);
 
-        final JMenuItem replaceSelectionMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
+        replaceSelectionMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
         replaceSelectionMenuItem.setActionCommand(MainPanel.ACTION_REPLACE);
         replaceSelectionMenuItem.addActionListener(mainPanel);
         contextPopupMenu.add(replaceSelectionMenuItem);
 
-        final JMenuItem rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
+        rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.setActionCommand(ACTION_RAW_EDIT);
         rawEditMenuItem.addActionListener(this);
         rawEditMenuItem.setVisible(false);
         contextPopupMenu.add(rawEditMenuItem);
 
-        final JMenuItem jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
+        jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.setActionCommand(ACTION_JUMP_TO_CHARACTER);
         jumpToCharacterMenuItem.addActionListener(this);
         jumpToCharacterMenuItem.setVisible(false);
         contextPopupMenu.add(jumpToCharacterMenuItem);
 
-        final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
+        closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(closeSelectionMenuItem);
 
-        final JMenu addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
+        addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
         contextPopupMenu.add(addTagMenu);
 
-        final JMenu moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
+        moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
         contextPopupMenu.add(moveTagMenu);
 
-        final JMenuItem openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
+        openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         contextPopupMenu.add(openSWFInsideTagMenuItem);
         openSWFInsideTagMenuItem.setActionCommand(ACTION_OPEN_SWFINSIDE);
         openSWFInsideTagMenuItem.addActionListener(this);
@@ -444,96 +458,9 @@ public class TagTree extends JTree implements ActionListener {
 
                     if (paths.length == 1) {
                         TreeItem item = (TreeItem) paths[0].getLastPathComponent();
-
-                        if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
-                            replaceSelectionMenuItem.setVisible(true);
-                        }
-
-                        if (item instanceof DefineBinaryDataTag) {
-                            replaceSelectionMenuItem.setVisible(true);
-                            DefineBinaryDataTag bin = (DefineBinaryDataTag) item;
-                            if (bin.binaryData.length > 8) {
-                                String signature = new String(bin.binaryData, 0, 3, Utf8Helper.charset);
-                                if (Arrays.asList(
-                                        "FWS", //Uncompressed Flash
-                                        "CWS", //ZLib compressed Flash
-                                        "ZWS", //LZMA compressed Flash
-                                        "GFX", //Uncompressed ScaleForm GFx
-                                        "CFX" //Compressed ScaleForm GFx
-                                ).contains(signature)) {
-                                    openSWFInsideTagMenuItem.setVisible(true);
-                                }
-                            }
-                        }
-
-                        if (item instanceof DefineSoundTag) {
-                            replaceSelectionMenuItem.setVisible(true);
-                        }
-
-                        if (item instanceof SWF) {
-                            closeSelectionMenuItem.setVisible(true);
-                        }
-
-                        if (item instanceof FolderItem) {
-                            final FolderItem folderItem = (FolderItem) item;
-                            List<Class> allowedTagTypes = getTreeItemClasses(folderItem.getName(), item.getSwf().gfx);
-                            addTagMenu.removeAll();
-                            if (allowedTagTypes != null) {
-                                for (final Class cl : allowedTagTypes) {
-                                    JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
-                                    tagItem.addActionListener(new ActionListener() {
-
-                                        @Override
-                                        @SuppressWarnings("unchecked")
-                                        public void actionPerformed(ActionEvent ae) {
-                                            try {
-                                                SWF swf = folderItem.getSwf();
-                                                Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
-                                                t.setTimelined(swf);
-                                                swf.tags.add(t);
-                                                swf.updateCharacters();
-                                                mainPanel.refreshTree();
-                                            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-                                                Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
-                                            }
-                                        }
-                                    });
-                                    addTagMenu.add(tagItem);
-                                }
-                                addTagMenu.setVisible(true);
-                            }
-                        }
-
-                        if (item instanceof Tag && swfs.size() > 1) {
-                            final Tag tag = (Tag) item;
-                            moveTagMenu.removeAll();
-                            for (SWFList targetSwfList : swfs) {
-                                for (final SWF targetSwf : targetSwfList) {
-                                    if (targetSwf != tag.getSwf()) {
-                                        JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
-                                        swfItem.addActionListener(new ActionListener() {
-
-                                            @Override
-                                            public void actionPerformed(ActionEvent ae) {
-                                                tag.getSwf().tags.remove(tag);
-                                                tag.setSwf(targetSwf);
-                                                targetSwf.tags.add(tag);
-                                                mainPanel.refreshTree();
-                                            }
-                                        });
-                                        moveTagMenu.add(swfItem);
-                                    }
-                                }
-                            }
-                            moveTagMenu.setVisible(true);
-                        }
-
-                        TreeModel model = getModel();
-                        expandRecursiveMenuItem.setVisible(model.getChildCount(item) > 0);
-
-                        jumpToCharacterMenuItem.setVisible(item instanceof CharacterIdTag && !(item instanceof CharacterTag));
-
-                        rawEditMenuItem.setVisible(item instanceof Tag);
+                        List<TreeItem> li = new ArrayList<>();
+                        li.add(item);
+                        updateContextMenu(swfs, li);
                     }
 
                     removeMenuItem.setVisible(allSelectedIsTagOrFrame);
@@ -542,6 +469,114 @@ public class TagTree extends JTree implements ActionListener {
                 }
             }
         });
+    }
+
+    public void updateContextMenu(final List<SWFList> swfs, List<TreeItem> items) {
+
+        replaceSelectionMenuItem.setVisible(false);
+        closeSelectionMenuItem.setVisible(false);
+        moveTagMenu.setVisible(false);
+        addTagMenu.setVisible(false);
+        expandRecursiveMenuItem.setVisible(false);
+        openSWFInsideTagMenuItem.setVisible(false);
+        removeMenuItem.setVisible(true);
+        for (TreeItem t : items) {
+            if (!((t instanceof Tag) || (t instanceof Frame))) {
+                removeMenuItem.setVisible(false);
+            }
+        }
+        exportSelectionMenuItem.setEnabled(!items.isEmpty() && !getSelection(items.get(0).getSwf(), items).isEmpty());
+
+        TreeItem item = items.get(0);
+        if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
+            replaceSelectionMenuItem.setVisible(true);
+        }
+
+        if (item instanceof DefineBinaryDataTag) {
+            replaceSelectionMenuItem.setVisible(true);
+            DefineBinaryDataTag bin = (DefineBinaryDataTag) item;
+            if (bin.binaryData.length > 8) {
+                String signature = new String(bin.binaryData, 0, 3, Utf8Helper.charset);
+                if (Arrays.asList(
+                        "FWS", //Uncompressed Flash
+                        "CWS", //ZLib compressed Flash
+                        "ZWS", //LZMA compressed Flash
+                        "GFX", //Uncompressed ScaleForm GFx
+                        "CFX" //Compressed ScaleForm GFx
+                ).contains(signature)) {
+                    openSWFInsideTagMenuItem.setVisible(true);
+                }
+            }
+        }
+
+        if (item instanceof DefineSoundTag) {
+            replaceSelectionMenuItem.setVisible(true);
+        }
+
+        if (item instanceof SWF) {
+            closeSelectionMenuItem.setVisible(true);
+        }
+
+        if (item instanceof FolderItem) {
+            final FolderItem folderItem = (FolderItem) item;
+            List<Class> allowedTagTypes = getTreeItemClasses(folderItem.getName(), item.getSwf().gfx);
+            addTagMenu.removeAll();
+            if (allowedTagTypes != null) {
+                for (final Class cl : allowedTagTypes) {
+                    JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+                    tagItem.addActionListener(new ActionListener() {
+
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public void actionPerformed(ActionEvent ae) {
+                            try {
+                                SWF swf = folderItem.getSwf();
+                                Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+                                t.setTimelined(swf);
+                                swf.tags.add(t);
+                                swf.updateCharacters();
+                                mainPanel.refreshTree();
+                            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+                                Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    addTagMenu.add(tagItem);
+                }
+                addTagMenu.setVisible(true);
+            }
+        }
+
+        if (item instanceof Tag && swfs.size() > 1) {
+            final Tag tag = (Tag) item;
+            moveTagMenu.removeAll();
+            for (SWFList targetSwfList : swfs) {
+                for (final SWF targetSwf : targetSwfList) {
+                    if (targetSwf != tag.getSwf()) {
+                        JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
+                        swfItem.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                tag.getSwf().tags.remove(tag);
+                                tag.setSwf(targetSwf);
+                                targetSwf.tags.add(tag);
+                                mainPanel.refreshTree();
+                            }
+                        });
+                        moveTagMenu.add(swfItem);
+                    }
+                }
+            }
+            moveTagMenu.setVisible(true);
+        }
+
+        TreeModel model = getModel();
+        expandRecursiveMenuItem.setVisible(model.getChildCount(item) > 0);
+
+        jumpToCharacterMenuItem.setVisible(item instanceof CharacterIdTag && !(item instanceof CharacterTag));
+
+        rawEditMenuItem.setVisible(item instanceof Tag);
     }
 
     @Override
@@ -657,6 +692,9 @@ public class TagTree extends JTree implements ActionListener {
     }
 
     public List<TreeItem> getSelected(JTree tree) {
+        if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+            return new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
+        }
         TreeSelectionModel tsm = tree.getSelectionModel();
         TreePath[] tps = tsm.getSelectionPaths();
         List<TreeItem> ret = new ArrayList<>();
@@ -672,8 +710,17 @@ public class TagTree extends JTree implements ActionListener {
     }
 
     public List<TreeItem> getSelection(SWF swf) {
+        List<TreeItem> sel;
+        if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+            sel = getAllSelected(this);
+        } else {
+            sel = new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
+        }
+        return getSelection(swf, sel);
+    }
+
+    public List<TreeItem> getSelection(SWF swf, List<TreeItem> sel) {
         List<TreeItem> ret = new ArrayList<>();
-        List<TreeItem> sel = getAllSelected(this);
         for (TreeItem d : sel) {
             if (d.getSwf() != swf) {
                 continue;
@@ -731,6 +778,9 @@ public class TagTree extends JTree implements ActionListener {
     }
 
     public TreeItem getCurrentTreeItem() {
+        if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+            return mainPanel.folderPreviewPanel.selectedItems.get(0);
+        }
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;
     }

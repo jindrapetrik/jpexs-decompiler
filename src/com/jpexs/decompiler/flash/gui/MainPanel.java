@@ -127,6 +127,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -139,6 +140,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -227,7 +229,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final FlashPlayerPanel flashPanel;
     private final JPanel contentPanel;
     private final JPanel displayPanel;
-    private JPanel folderPreviewPanel;
+    public FolderPreviewPanel folderPreviewPanel;
     private boolean isWelcomeScreen = true;
     private static final String CARDPREVIEWPANEL = "Preview card";
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
@@ -350,7 +352,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
-        folderPreviewPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        folderPreviewPanel = new FolderPreviewPanel(this,new ArrayList<TreeItem>());
         folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
@@ -987,7 +989,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = tagTree.getAllSelected(tagTree);
+        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty()?tagTree.getAllSelected(tagTree):new ArrayList<>(folderPreviewPanel.selectedItems.values());
 
         List<SWF> allSwfs = new ArrayList<>();
         for (SWFList swfList : swfs) {
@@ -2274,6 +2276,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (flashPanel != null) {
             //flashPanel.specialPlayback = false;
         }
+        folderPreviewPanel.setItems(new ArrayList<TreeItem>());
         previewPanel.clear();
         if (soundThread != null) {
             soundThread.pause();
@@ -2457,94 +2460,70 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.showTextPanel(textTag);
     }
 
+    
+    
     private void showFolderPreview(TreeItem treeNode) {
-        folderPreviewPanel.removeAll();
+        List<TreeItem> folderPreviewItems = new ArrayList<>();
         FolderItem item = (FolderItem) treeNode;
         String folderName = item.getName();
         SWF swf = item.swf;
-        JPanel panel = folderPreviewPanel;
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ShapeTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_MORPHSHAPES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof MorphShapeTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_SPRITES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof DefineSpriteTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_BUTTONS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ButtonTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_FONTS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof FontTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_FRAMES:
                 for (Frame frame : swf.getTimeline().getFrames()) {
-                    Component c = PreviewImage.createFolderPreviewImage(this, frame);
-                    if (c != null) {
-                        panel.add(c);
-                    }
+                    folderPreviewItems.add(frame);
                 }
                 break;
             case TagTreeModel.FOLDER_IMAGES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ImageTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_TEXTS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof TextTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
+                        folderPreviewItems.add(tag);
                     }
                 }
                 break;
         }
-        panel.revalidate();
-        panel.repaint();
+        folderPreviewPanel.setItems(folderPreviewItems);
     }
 
     public void expandSwfNodes() {
