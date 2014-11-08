@@ -31,7 +31,7 @@
 
     <target name="-loadversion">
         <loadproperties srcfile="version.properties" prefix="version"/> 
-        <property name="VERSION" value="${version.major}.${version.minor}.@{version.release}.${version.build}" />
+        <property name="VERSION" value="${version.major}.${version.minor}.${version.release}.${version.build}" />
         <property name="VERSIONNUMBER" value="${VERSION}" />  
     </target>
     
