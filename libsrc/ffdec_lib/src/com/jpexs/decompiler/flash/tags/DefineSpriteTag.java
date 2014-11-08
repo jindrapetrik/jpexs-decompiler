@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -313,6 +314,18 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     public int getNumFrames() {
         return frameCount;
     }
+    
+    private int getRealFrameCount() {
+        int cnt = 1;
+        List<Frame> frames = getTimeline().getFrames();
+        for (int i = 1; i < frames.size(); i++) {
+            if (frames.get(i).layersChanged) {
+                cnt++;
+            }
+        }
+        
+        return cnt;
+    }
 
     @Override
     public boolean isSingleFrame() {
@@ -324,7 +337,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     private synchronized void initialiteIsSingleFrame() {
         if (!isSingleFrameInitialized) {
-            if (frameCount > 1) {
+            if (getRealFrameCount() > 1) {
                 isSingleFrameInitialized = true;
                 return;
             }

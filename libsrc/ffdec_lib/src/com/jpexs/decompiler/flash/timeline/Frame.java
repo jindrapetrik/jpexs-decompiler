@@ -42,6 +42,7 @@ public class Frame implements TreeItem {
     public List<DoActionTag> actions = new ArrayList<>();
     public List<Tag> innerTags = new ArrayList<>();
     public ShowFrameTag showFrameTag = null; // can be null for the last frame
+    public boolean layersChanged;
 
     public Frame(Timeline timeline, int frame) {
         this.timeline = timeline;

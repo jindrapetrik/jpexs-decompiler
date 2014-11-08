@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -129,6 +130,5 @@ public class PathExporter extends ShapeExporterBase {
     protected void finalizePath() {
         paths.add(path);
         path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
-
     }
 }

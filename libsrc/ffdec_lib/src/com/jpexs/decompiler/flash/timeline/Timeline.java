@@ -153,6 +153,7 @@ public class Timeline {
     private void initialize() {
         int frameIdx = 0;
         Frame frame = new Frame(this, frameIdx++);
+        frame.layersChanged = true;
         boolean tagAdded = false;
         for (Tag t : tags) {
             tagAdded = true;
@@ -171,6 +172,7 @@ public class Timeline {
                 if (!frame.layers.containsKey(depth)) {
                     frame.layers.put(depth, new DepthState(swf, frame));
                 }
+                frame.layersChanged = true;
                 DepthState fl = frame.layers.get(depth);
                 int characterId = po.getCharacterId();
                 if (characterId != -1) {
@@ -229,6 +231,7 @@ public class Timeline {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
+                frame.layersChanged = true;
             } else if (t instanceof DoActionTag) {
                 frame.actions.add((DoActionTag) t);
                 actionFrames.put((DoActionTag) t, frame.frame);
