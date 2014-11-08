@@ -490,7 +490,7 @@
         </exec> 
     </target>
     
-    <target name="-git-commit-versioninfo">
+    <target name="-git-commit-versioninfo">        
          <exec executable="git" failonerror="true">
             <arg value="add"/>            
             <arg value="version.properties"/>
@@ -507,42 +507,46 @@
     </target>
     
     <target name="-inc-major" depends="-loadoldversion">
-        <script language="javascript">
-            project.setProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
-            project.setProperty("newversion.minor",0);
-            project.setProperty("newversion.release",0);
-            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
-            project.setProperty("newversion.debug","false");
+        <script language="javascript"><![CDATA[
+            project.setNewProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
+            project.setNewProperty("newversion.minor",0);
+            project.setNewProperty("newversion.release",0);
+            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.debug","false");
+            ]]>
         </script>
     </target>
     
-    <target name="-inc-minor">
-        <script language="javascript">
-            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
-            project.setProperty("newversion.release",0);
-            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
-            project.setProperty("newversion.debug","false");
+    <target name="-inc-minor" depends="-loadoldversion">
+        <script language="javascript"><![CDATA[
+            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setNewProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
+            project.setNewProperty("newversion.release",0);
+            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.debug","false");
+            ]]>
         </script>
     </target>
     
-    <target name="-inc-release">
-        <script language="javascript">
-            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
-            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
-            project.setProperty("newversion.debug","false");
+    <target name="-inc-release" depends="-loadoldversion">
+        <script language="javascript"><![CDATA[
+            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
+            project.setNewProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
+            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.debug","false");
+            ]]>
         </script>
     </target>
     
-    <target name="-inc-nightlybuild">
-        <script language="javascript">
-            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setProperty("newversion.release",project.getProperty("oldversion.release"));
-            project.setProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setProperty("newversion.debug","true");
+    <target name="-inc-nightlybuild" depends="-loadoldversion">
+        <script language="javascript"><![CDATA[
+            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
+            project.setNewProperty("newversion.release",project.getProperty("oldversion.release"));
+            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
+            project.setNewProperty("newversion.debug","true");
+            ]]>
         </script>
     </target>   
     
