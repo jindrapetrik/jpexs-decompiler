@@ -33,6 +33,11 @@
         <loadproperties srcfile="version.properties" prefix="version"/> 
         <property name="VERSION" value="${version.major}.${version.minor}.${version.release}.${version.build}" />
         <property name="VERSIONNUMBER" value="${VERSION}" />  
+        <script type="text/javascript">
+            if(project.getProperty("version.debug")=="true"){
+                project.setProperty("NIGHTLY",true);
+            }
+        </script>
     </target>
     
     <target name="coverage.instrumentation">
@@ -231,16 +236,7 @@
          
     <target name="all" depends="clean,test,javadoc,release">    
         
-    </target>
-    
-    <target name="-nightly-flag-set" >
-        <property name="NIGHTLY" value="true" />                                 
-       
-   </target>
-    
-    <target name="nightly" depends="-nightly-flag-set,all">
-           
-    </target>              
+    </target>                    
     
     <target name="-upload-fail" unless="upload.config.exists">
         <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
@@ -399,6 +395,12 @@
             <entry key="builder" value="${BUILDER}"/>             
             <entry key="version" value="${VERSION}"/>          
             <entry key="nightly" value="${NIGHTLY}"/>
+            
+            <entry key="version.major" value="${version.major}"/>
+            <entry key="version.minor" value="${version.minor}"/>
+            <entry key="version.release" value="${version.release}"/>
+            <entry key="version.build" value="${version.build}"/>
+            <entry key="version.debug" value="${version.debug}"/>
         </propertyfile>
         
         <pathconvert pathsep=" " property="manifestClassPath">
@@ -510,6 +512,7 @@
             project.setProperty("newversion.minor",0);
             project.setProperty("newversion.release",0);
             project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setProperty("newversion.debug","false");
         </script>
     </target>
     
@@ -519,6 +522,7 @@
             project.setProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
             project.setProperty("newversion.release",0);
             project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setProperty("newversion.debug","false");
         </script>
     </target>
     
@@ -528,25 +532,29 @@
             project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
             project.setProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
             project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setProperty("newversion.debug","false");
         </script>
     </target>
     
-    <target name="-inc-build">
+    <target name="-inc-nightlybuild">
         <script type="text/javascript">
             project.setProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
             project.setProperty("newversion.release",project.getProperty("oldversion.release"));
             project.setProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
+            project.setProperty("newversion.debug","true");
         </script>
-    </target>
+    </target>   
     
-    <target name="-save-version-info-file">
-        <echo file="version.properties">#DO NOT MODIFY - it is updated automatically with the build script
-major = ${newversion.major}
-minor = ${newversion.minor}
-release = ${newversion.release}
-build = ${newversion.build}
-</echo>
+    <target name="-save-version-info-file">        
+        <propertyfile file="version.properties"
+                      comment="DO NOT MODIFY - it is updated automatically with the build script">                               
+            <entry key="major" value="${newversion.major}"/>
+            <entry key="minor" value="${newversion.minor}"/>
+            <entry key="release" value="${newversion.release}"/>
+            <entry key="build" value="${newversion.build}"/>
+            <entry key="debug" value="${newversion.debug}"/>
+        </propertyfile>        
     </target>     
     
     <target name="-save-version-info" depends="-save-version-info-file,-git-commit-versioninfo">        
@@ -564,13 +572,14 @@ build = ${newversion.build}
     <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload">
         
     </target>
-    
-    <target name="new-version-build" depends="git-pull,-inc-build,-save-version-info,all,-upload">
+       
+        
+    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-save-version-info,all,-upload">
         
     </target>
     
-        
-    <target name="new-version-nightlybuild" depends="-nightly-flag-set,new-version-build">
+    
+    <target name="upload-last" depends="all,-upload">
         
     </target>
 </project>
