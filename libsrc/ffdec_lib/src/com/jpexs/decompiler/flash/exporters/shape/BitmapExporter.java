@@ -374,9 +374,8 @@ public class BitmapExporter extends ShapeExporterBase {
                 break;
         }
         
-        // todo: negative width??? (wordctr1.swf)
         if (thickness < 0) {
-            thickness = 0;
+            thickness = -thickness;
         }
         
         if (joinStyle == BasicStroke.JOIN_MITER) {
