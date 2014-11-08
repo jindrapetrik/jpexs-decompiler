@@ -135,7 +135,7 @@
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  
-        <echo message="${GITTAG}" file="${REVFILE}"/>
+        <echo level="info" message="${GITTAG}" file="${REVFILE}"/>
         
         
         <loadfile srcfile="${REVFILE}" property="GITSHORTTAG">
@@ -147,9 +147,9 @@
                <striplinebreaks/>
             </filterchain>
         </loadfile>
-        <echo message="Git tag:${GITTAG}"/>
-        <echo message="Git shorttag:${GITSHORTTAG}"/>
-        <echo message="Library Version: ${VERSION}"/>
+        <echo level="info" message="Git tag:${GITTAG}"/>
+        <echo level="info" message="Git shorttag:${GITSHORTTAG}"/>
+        <echo level="info" message="Library Version: ${VERSION}"/>
     </target>
     
     <target name="build" depends="-timestamp,-nightly-suffix,-nonightly-suffix,compile">

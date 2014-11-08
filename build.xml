@@ -2,8 +2,10 @@
 
 <project name="FFDec" basedir="." default="all">
     <description>Builds project FFDec</description>    
-    <property name="VERSION" value="3.0.0" />
-    <property name="VERSIONNUMBER" value="3.0.0.0" />
+    <property name="VERSION" value="4.0.0" />
+    <property name="VERSIONNUMBER" value="4.0.0.0" />
+    <property name="VERSIONMAJOR" value="4" />
+    <property name="VERSIONMINOR" value="0" />
     <property name="BUILDER" value="jpexs" />
     <property name="PROJECTNAME" value="FFDec"/>
     
@@ -21,11 +23,12 @@
     <property name="VENDOR" value="JPEXS" />
     <property name="INTERNALNAME" value="FFDec" />
     <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler" />
+    <property name="PRODUCTURL" value="http://www.free-decompiler.com/flash/" />
     <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
-    <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
+    <property name="NSISPATH" value="c:\program files (x86)\NSIS"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
     <property name="MAXHEAPSIZEPERCENT" value="100"/>
-    <property name="MAXHEAPSIZERUN" value="4096"/> <!-- for run task (MB)-->
+    <property name="MAXHEAPSIZERUN" value="4096"/> <!-- for run task (MB)-->    
        
     
     <property name="SOURCEDIR" value="${basedir}/src"/>
@@ -53,8 +56,7 @@
     
     <property name="INSTALLERCONFIG" value="${basedir}/installer.cfg"/>
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
-    <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>    
-    <property name="EXE64CONFIG" value="${basedir}/build_exe64.xml"/>    
+    <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>   
     
     <property name="REVFILE" value="${basedir}/revision.txt"/>
     
