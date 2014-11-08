@@ -520,6 +520,12 @@
         </exec> 
     </target>
     
+    <target name="git-push">
+        <exec executable="git" failonerror="true">
+            <arg value="push"/>            
+        </exec> 
+    </target>
+    
     <target name="-git-commit-versioninfo">        
          <exec executable="git" failonerror="true">
             <arg value="add"/>            
@@ -595,20 +601,20 @@
         
     </target>
     
-    <target name="new-version-major" depends="git-pull,-inc-major,-save-version-info,all,-upload">
+    <target name="new-version-major" depends="git-pull,-inc-major,-save-version-info,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-minor" depends="git-pull,-inc-minor,-save-version-info,all,-upload">
+    <target name="new-version-minor" depends="git-pull,-inc-minor,-save-version-info,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload">
-        
+    <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload,git-push">
+       
     </target>
        
         
-    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-save-version-info,all,-upload">
+    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-save-version-info,all,-upload,git-push">
         
     </target>
     
