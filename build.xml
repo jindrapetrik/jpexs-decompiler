@@ -24,12 +24,13 @@
     <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
     <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
-    <property name="MAXHEAPSIZE" value="1024"/> <!-- MB -->
-    <property name="MAXHEAPSIZE64" value="8192"/> <!-- MB -->
+    <property name="MAXHEAPSIZEPERCENT" value="100"/>
+    <property name="MAXHEAPSIZERUN" value="4096"/> <!-- for run task (MB)-->
        
     
     <property name="SOURCEDIR" value="${basedir}/src"/>
     <property name="LOCALESDIR" value="${SOURCEDIR}/com/jpexs/decompiler/flash/gui/locales"/> 
+    <property name="LOCALESLIBDIR" value="${basedir}/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/locales"/>
     <property name="LOCALESTARGETDIR" value="${basedir}/locales"/> 
     
     <property name="RESOURCESDIR" value="${basedir}/resources"/>

@@ -36,7 +36,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "dist\ffdec.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\ffdec64.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dist\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "dist\ffdec.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dist\ffdec.jar"; DestDir: "{app}"; Flags: ignoreversion

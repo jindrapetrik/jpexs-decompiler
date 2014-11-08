@@ -6,6 +6,7 @@
 *.rej
 *.conflict~
 *.identcache
+Thumbs.db
 /build/
 /reports/
 /installer.cfg

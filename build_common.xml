@@ -156,6 +156,7 @@
                 <supportUrl></supportUrl>
                 <customProcName>false</customProcName>
                 <stayAlive>false</stayAlive>
+                <restartOnCrash>false</restartOnCrash>
                 <manifest></manifest>
                 <icon>${EXEICON}</icon>
                 <jre>
@@ -163,8 +164,15 @@
                     <minVersion>${MINJAVAVERSION}</minVersion>
                     <maxVersion></maxVersion>
                     <jdkPreference>preferJre</jdkPreference>
-                    <maxHeapSize>${MAXHEAPSIZE}</maxHeapSize>
+                    <runtimeBits>64/32</runtimeBits>
+                    <maxHeapPercent>${MAXHEAPSIZEPERCENT}</maxHeapPercent>
                 </jre>
+                <splash>
+                    <file>graphics/splash.bmp</file>
+                    <waitForWindow>true</waitForWindow>
+                    <timeout>60</timeout>
+                    <timeoutErr>true</timeoutErr>
+                </splash>
                 <versionInfo>
                     <fileVersion>${VERSIONNUMBER}</fileVersion>
                     <txtFileVersion>${VERSION}${VERSIONSUFFIX}</txtFileVersion>
@@ -179,46 +187,7 @@
                 </versionInfo>
             </launch4jConfig>
         </echoxml>
-    </target>
-    <target name="-exe64-config">
-        <echoxml file="${EXE64CONFIG}">
-            <launch4jConfig>
-                <dontWrapJar>true</dontWrapJar>
-                <headerType>${EXETYPE}</headerType>
-                <jar>${JARFILENAME}.jar</jar>
-                <outfile>${DISTRIBUTIONDIR}/${EXE64FILENAME}.exe</outfile>
-                <errTitle></errTitle>
-                <cmdLine></cmdLine>
-                <chdir></chdir>
-                <priority>normal</priority>
-                <downloadUrl>http://java.com/download</downloadUrl>
-                <supportUrl></supportUrl>
-                <customProcName>false</customProcName>
-                <stayAlive>false</stayAlive>
-                <manifest></manifest>
-                <icon>${EXEICON}</icon>
-                <jre>
-                    <path></path>
-                    <minVersion>${MINJAVAVERSION}</minVersion>
-                    <maxVersion></maxVersion>
-                    <jdkPreference>preferJre</jdkPreference>
-                    <maxHeapSize>${MAXHEAPSIZE64}</maxHeapSize>
-                </jre>
-                <versionInfo>
-                    <fileVersion>${VERSIONNUMBER}</fileVersion>
-                    <txtFileVersion>${VERSION}${VERSIONSUFFIX}</txtFileVersion>
-                    <fileDescription>${PRODUCTNAME}</fileDescription>
-                    <copyright>${VENDOR}</copyright>
-                    <productVersion>${VERSIONNUMBER}</productVersion>
-                    <txtProductVersion>${VERSION}${VERSIONSUFFIX}</txtProductVersion>
-                    <productName>${PRODUCTNAME}</productName>
-                    <companyName></companyName>
-                    <internalName>${INTERNALNAME}</internalName>
-                    <originalFilename>${EXE64FILENAME}.exe</originalFilename>
-                </versionInfo>
-            </launch4jConfig>
-        </echoxml>
-    </target>
+    </target>    
     <target name="-exe-linux" unless="is_windows" depends="-exe-config">
         <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}/launch4j">
             <arg file="${EXECONFIG}" />
@@ -228,16 +197,11 @@
         <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}\launch4jc.exe">
             <arg file="${EXECONFIG}" />
         </exec>
-    </target>
-    <target name="-exe64-windows" if="is_windows" depends="-exe64-config">
-        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}\launch4jc.exe">
-            <arg file="${EXE64CONFIG}" />
-        </exec>
-    </target>
-    <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows,-exe64-windows">
+    </target>   
+    <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
         
     </target>
-    <target name="exe-console" depends="-set-console-type,-exe-linux,-exe-windows,-exe64-windows">
+    <target name="exe-console" depends="-set-console-type,-exe-linux,-exe-windows">
 
     </target>
 
@@ -273,6 +237,8 @@
     
     <target name="-upload-do" if="upload.config.exists">
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
+        <echo>Uploading...</echo>
+        <!-- Note: You must have developer account to upload to JPEXS website -->
         <java jar="uploader.jar" fork="true" failonerror="true">    
             <arg value="${website.upload.url}" />                
 
@@ -342,6 +308,10 @@
         <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit"/>
         <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit">
             <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit" includes="**/config*.properties"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/lib"/>
+        <copy todir="${LOCALESTARGETDIR}/lib">
+            <fileset dir="${LOCALESLIBDIR}" includes="**/*.*"/>
         </copy>
         <echo file="${LOCALESTARGETDIR}/readme.txt">${PROJECTNAME} ${VERSION}${VERSIONSUFFIX} localization pack
             -------------------------------------------------------------------            
@@ -438,7 +408,7 @@
 
     <target name="run" depends="build">
         <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true">
-            <jvmarg value="-Xmx${MAXHEAPSIZE}m"/>
+            <jvmarg value="-Xmx${MAXHEAPSIZERUN}m"/>
             <jvmarg value="-XX:MinHeapFreeRatio=0"/>
             <jvmarg value="-XX:MaxHeapFreeRatio=0"/>
             <arg line="${RUNPARAMS}" />
