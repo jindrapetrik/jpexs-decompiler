@@ -2,10 +2,6 @@
 
 <project name="FFDec" basedir="." default="all">
     <description>Builds project FFDec</description>    
-    <property name="VERSION" value="4.0.0" />
-    <property name="VERSIONNUMBER" value="4.0.0.0" />
-    <property name="VERSIONMAJOR" value="4" />
-    <property name="VERSIONMINOR" value="0" />
     <property name="BUILDER" value="jpexs" />
     <property name="PROJECTNAME" value="FFDec"/>
     
@@ -63,6 +59,7 @@
     <property name="RUNPARAMS" value=""/>
     
     <property name="website.upload.url" value="https://www.free-decompiler.com/flash/release.html?action=release" />
+            
     
     <import file="${basedir}/build_common.xml"/>
 </project>

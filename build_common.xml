@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="common build script" default="all" basedir=".">
     <description>Builds project</description>      
+    
+      
+    
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>        
@@ -26,6 +29,12 @@
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
 
+    <target name="-loadversion">
+        <loadproperties srcfile="version.properties" prefix="version"/> 
+        <property name="VERSION" value="${version.major}.${version.minor}.@{version.release}.${version.build}" />
+        <property name="VERSIONNUMBER" value="${VERSION}" />  
+    </target>
+    
     <target name="coverage.instrumentation">
         <mkdir dir="${INSTRDIR}"/>
         <mkdir dir="${COVERAGEDIR}"/>
@@ -117,7 +126,7 @@
     
     
     
-    <target name="installer" depends="dist">
+    <target name="installer" depends="-loadversion,dist">
         <taskdef name="nsis" classname="com.danielreese.nsisant.Task">
             <classpath location="${basedir}/nsisant-1.3.jar" />
         </taskdef>
@@ -125,8 +134,8 @@
         <nsis script="installer.nsi" path="${NSISPATH}" verbosity="2">
             <define name="APP_NAME" value="${PRODUCTNAME}"/>
             <define name="APP_VER" value="${VERSION}${VERSIONSUFFIX}"/>
-            <define name="APP_VER_MAJOR" value="${VERSIONMAJOR}"/>
-            <define name="APP_VER_MINOR" value="${VERSIONMINOR}"/>
+            <define name="APP_VER_MAJOR" value="${version.major}"/>
+            <define name="APP_VER_MINOR" value="${version.minor}"/>
             <define name="APP_PUBLISHER" value="${VENDOR}"/>
             <define name="APP_URL" value="${PRODUCTURL}"/>
             <define name="APP_SETUPFILE" value="${exe.file}" />
@@ -134,12 +143,12 @@
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
-    <target name="library" depends="build_lib">
+    <target name="library" depends="-loadversion,build_lib">
         <mkdir dir="${RELEASESDIR}"/>
         <copy file="${CORELIBPATH}" tofile="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_lib.jar"/>
     </target>
     
-    <target name="archive" depends="dist">
+    <target name="archive" depends="-loadversion,dist">
         <mkdir dir="${RELEASESDIR}"/>
         <property  name="zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" />
         <zip destfile="${zip.file}" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
@@ -152,7 +161,7 @@
     <target name="-set-console-type">
       <property name="EXETYPE" value="console" />
     </target>
-    <target name="-exe-config">
+    <target name="-exe-config" depends="-loadversion"> 
         <echoxml file="${EXECONFIG}">
             <launch4jConfig>
                 <dontWrapJar>true</dontWrapJar>
@@ -231,16 +240,7 @@
     
     <target name="nightly" depends="-nightly-flag-set,all">
            
-    </target>
-    
-    <target name="nightly-upload" depends="nightly,-upload">
-       
-    </target>
-    
-    <target name="all-upload" depends="all,-upload">
-        
-    </target>
-    
+    </target>              
     
     <target name="-upload-fail" unless="upload.config.exists">
         <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
@@ -294,7 +294,7 @@
         </copy>
     </target>
     
-    <target name="locales">
+    <target name="locales" depends="-loadversion">
         <delete dir="${LOCALESTARGETDIR}"/>
         <mkdir dir="${LOCALESTARGETDIR}/${PROJECTNAME}"/>
         <copy todir="${LOCALESTARGETDIR}/${PROJECTNAME}">
@@ -333,14 +333,14 @@
     </target>
     
     <target name="-nightly-suffix" if="NIGHTLY">        
-        <property name="VERSIONSUFFIX" value="_${GITSHORTTAG}"/>         
+        <property name="VERSIONSUFFIX" value="_nightly"/>         
     </target>
     
     <target name="-nonightly-suffix" unless="NIGHTLY">
         <property name="VERSIONSUFFIX" value=""/>         
     </target>
     
-    <target name="-timestamp">
+    <target name="-timestamp" depends="-loadversion">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
             <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
@@ -380,7 +380,7 @@
         <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" />
     </target>
     
-    <target name="build" depends="build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
+    <target name="build" depends="-loadversion,build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
         <mkdir dir="${DISTRIBUTIONDIR}"/>
         <!-- <delete dir="${DISTLIBRARIESFULLDIR}"/> -->
         <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
@@ -479,5 +479,98 @@
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                                    
         </testng>     
+    </target>
+    
+    
+    <target name="git-pull">
+        <exec executable="git" failonerror="true">
+            <arg value="pull"/>            
+        </exec> 
+    </target>
+    
+    <target name="-git-commit-versioninfo">
+         <exec executable="git" failonerror="true">
+            <arg value="add"/>            
+            <arg value="version.properties"/>
+         </exec>
+        <exec executable="git" failonerror="true">
+            <arg value="commit"/>            
+            <arg value="-m"/>
+            <arg value="version changed to ${version.major}.${version.minor}.${version.release}.${version.build}"/>
+        </exec> 
+    </target>
+    
+    <target name="-loadoldversion">
+        <loadproperties srcfile="version.properties" prefix="oldversion" />
+    </target>
+    
+    <target name="-inc-major" depends="-loadoldversion">
+        <script type="text/javascript">
+            project.setProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
+            project.setProperty("newversion.minor",0);
+            project.setProperty("newversion.release",0);
+            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+        </script>
+    </target>
+    
+    <target name="-inc-minor">
+        <script type="text/javascript">
+            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
+            project.setProperty("newversion.release",0);
+            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+        </script>
+    </target>
+    
+    <target name="-inc-release">
+        <script type="text/javascript">
+            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
+            project.setProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
+            project.setProperty("newversion.build",project.getProperty("oldversion.build"));
+        </script>
+    </target>
+    
+    <target name="-inc-build">
+        <script type="text/javascript">
+            project.setProperty("newversion.major",project.getProperty("oldversion.major"));
+            project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
+            project.setProperty("newversion.release",project.getProperty("oldversion.release"));
+            project.setProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
+        </script>
+    </target>
+    
+    <target name="-save-version-info-file">
+        <echo file="version.properties">#DO NOT MODIFY - it is updated automatically with the build script
+major = ${newversion.major}
+minor = ${newversion.minor}
+release = ${newversion.release}
+build = ${newversion.build}
+</echo>
+    </target>     
+    
+    <target name="-save-version-info" depends="-save-version-info-file,-git-commit-versioninfo">        
+        
+    </target>
+    
+    <target name="new-version-major" depends="git-pull,-inc-major,-save-version-info,all,-upload">
+        
+    </target>
+    
+    <target name="new-version-minor" depends="git-pull,-inc-minor,-save-version-info,all,-upload">
+        
+    </target>
+    
+    <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload">
+        
+    </target>
+    
+    <target name="new-version-build" depends="git-pull,-inc-build,-save-version-info,all,-upload">
+        
+    </target>
+    
+        
+    <target name="new-version-nightlybuild" depends="-nightly-flag-set,new-version-build">
+        
     </target>
 </project>

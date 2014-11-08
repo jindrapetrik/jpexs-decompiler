@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class ApplicationInfo {
             build = prop.getProperty("build");
             nightly = prop.getProperty("nightly").equals("true");
             if (nightly) {
-                version = version + " nightly build " + build.substring(0, 7);
+                version = version + " nightly build";
             }
         } catch (IOException | NullPointerException ex) {
             //ignore
