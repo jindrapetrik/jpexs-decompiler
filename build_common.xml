@@ -548,7 +548,7 @@
             project.setNewProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
             project.setNewProperty("newversion.minor",0);
             project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
             project.setNewProperty("newversion.debug","false");
             ]]>
         </script>
@@ -559,7 +559,7 @@
             project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setNewProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
             project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
             project.setNewProperty("newversion.debug","false");
             ]]>
         </script>
@@ -570,7 +570,7 @@
             project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
             project.setNewProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
-            project.setNewProperty("newversion.build",project.getProperty("oldversion.build"));
+            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
             project.setNewProperty("newversion.debug","false");
             ]]>
         </script>
