@@ -185,8 +185,11 @@ public class FolderPreviewPanel extends JPanel {
                     }
                     g.fillRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                     if (cachedPreviews.contains(index)) {
-                        BufferedImage img = cachedPreviews.get(index).getBufferedImage();
-                        g.drawImage(img, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getHeight() / 2, null);
+                        SerializableImage sImg = cachedPreviews.get(index);
+                        if (sImg != null) {
+                            BufferedImage img = cachedPreviews.get(index).getBufferedImage();
+                            g.drawImage(img, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - img.getHeight() / 2, null);
+                        }
                     } else {
                         cachedPreviews.put(index, noImage);
                         renderImageTask(index, items.get(index));

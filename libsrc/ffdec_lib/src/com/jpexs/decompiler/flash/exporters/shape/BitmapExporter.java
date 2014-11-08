@@ -373,6 +373,12 @@ public class BitmapExporter extends ShapeExporterBase {
                 thickness *= Math.max(graphics.getTransform().getScaleX(), graphics.getTransform().getScaleY());
                 break;
         }
+        
+        // todo: negative width??? (wordctr1.swf)
+        if (thickness < 0) {
+            thickness = 0;
+        }
+        
         if (joinStyle == BasicStroke.JOIN_MITER) {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
         } else {
