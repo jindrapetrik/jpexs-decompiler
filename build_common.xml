@@ -259,7 +259,15 @@
 
             <arg value="-field" />
             <arg value="set_password" />            
-            <arg value="${website.password}" />            
+            <arg value="${website.password}" />  
+            
+            <arg value="-textarea" />
+            <arg value="new" />            
+            <arg value="New:" />
+            
+            <arg value="-textarea" />
+            <arg value="fixed" />            
+            <arg value="Fixed:" />
 
             <arg value="-file" />
             <arg value="fileExe" />
