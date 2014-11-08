@@ -33,7 +33,7 @@
         <loadproperties srcfile="version.properties" prefix="version"/> 
         <property name="VERSION" value="${version.major}.${version.minor}.${version.release}.${version.build}" />
         <property name="VERSIONNUMBER" value="${VERSION}" />  
-        <script type="text/javascript">
+        <script language="javascript">
             if(project.getProperty("version.debug")=="true"){
                 project.setProperty("NIGHTLY",true);
             }
@@ -507,7 +507,7 @@
     </target>
     
     <target name="-inc-major" depends="-loadoldversion">
-        <script type="text/javascript">
+        <script language="javascript">
             project.setProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
             project.setProperty("newversion.minor",0);
             project.setProperty("newversion.release",0);
@@ -517,7 +517,7 @@
     </target>
     
     <target name="-inc-minor">
-        <script type="text/javascript">
+        <script language="javascript">
             project.setProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
             project.setProperty("newversion.release",0);
@@ -527,7 +527,7 @@
     </target>
     
     <target name="-inc-release">
-        <script type="text/javascript">
+        <script language="javascript">
             project.setProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
             project.setProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
@@ -537,7 +537,7 @@
     </target>
     
     <target name="-inc-nightlybuild">
-        <script type="text/javascript">
+        <script language="javascript">
             project.setProperty("newversion.major",project.getProperty("oldversion.major"));
             project.setProperty("newversion.minor",project.getProperty("oldversion.minor"));
             project.setProperty("newversion.release",project.getProperty("oldversion.release"));
