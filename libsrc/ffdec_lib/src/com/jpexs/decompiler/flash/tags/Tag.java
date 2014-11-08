@@ -332,7 +332,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
             sos.write(newHeaderData);
             sos.write(newData);
         } else {
-            sos.write(originalRange.array, originalRange.pos, originalRange.length);
+            sos.write(originalRange.getArray(), originalRange.getPos(), originalRange.getLength());
         }
     }
 
@@ -357,14 +357,22 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
         return originalRange;
     }
 
-    public final ByteArrayRange getOriginalData() {
+    /**
+     * Returns the original inner data of the tag, without the 2-6 bytes length header
+     * Call this method only from debug codes
+     * @return The data
+     */
+    public final byte[] getOriginalData() {
         if (originalRange == null) {
-            return new ByteArrayRange();
+            return null;
         }
 
         int dataLength = getOriginalDataLength();
-        int pos = (int) (originalRange.pos + originalRange.length - dataLength);
-        return new ByteArrayRange(originalRange.array, pos, dataLength);
+        int pos = (int) (originalRange.getPos() + originalRange.getLength() - dataLength);
+
+        byte[] data = new byte[dataLength];
+        System.arraycopy(originalRange.getArray(), pos, data, 0, dataLength);
+        return data;
     }
 
     public final int getOriginalDataLength() {
@@ -372,11 +380,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
             return 0;
         }
 
-        return originalRange.length - (isLongOriginal() ? 6 : 2);
+        return originalRange.getLength() - (isLongOriginal() ? 6 : 2);
     }
 
     private boolean isLongOriginal() {
-        int shortLength = originalRange.array[(int) originalRange.pos] & 0x003F;
+        int shortLength = originalRange.getArray()[(int) originalRange.getPos()] & 0x003F;
         return shortLength == 0x3f;
     }
 
@@ -389,11 +397,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     public long getPos() {
-        return originalRange.pos;
+        return originalRange.getPos();
     }
 
     public long getDataPos() {
-        return originalRange.pos + (isLongOriginal() ? 6 : 2);
+        return originalRange.getPos() + (isLongOriginal() ? 6 : 2);
     }
 
     public void setModified(boolean value) {

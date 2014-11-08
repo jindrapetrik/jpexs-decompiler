@@ -102,7 +102,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         super(swf, ID, "DefineButton", null);
         buttonId = swf.getNextCharacterId();
         characters = new ArrayList<>();
-        actionBytes = new ByteArrayRange(new byte[] {0});
+        actionBytes = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -119,7 +119,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         int pos = (int) sis.getPos();
         byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
         if (data != null) {
-            actionBytes = new ByteArrayRange(data.array, pos, bytes.length);
+            actionBytes = new ByteArrayRange(data.getArray(), pos, bytes.length);
         } else {
             actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
         }
@@ -135,7 +135,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData().getRangeData()));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
@@ -186,12 +186,12 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            int prevLength = actionBytes.pos;
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            int prevLength = actionBytes.getPos();
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

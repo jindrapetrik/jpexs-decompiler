@@ -192,12 +192,12 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            int prevLength = actionBytes.pos;
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            int prevLength = actionBytes.getPos();
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
             return list;
 
         } catch (InterruptedException ex) {

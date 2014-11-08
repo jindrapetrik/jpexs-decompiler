@@ -74,7 +74,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         spriteId = sis.readUI16("spriteId");
         int pos = (int) sis.getPos();
         byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
-        actionBytes = new ByteArrayRange(data.array, pos, bytes.length);
+        actionBytes = new ByteArrayRange(data.getArray(), pos, bytes.length);
     }
 
     /**
@@ -127,12 +127,12 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            int prevLength = actionBytes.pos;
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            int prevLength = actionBytes.getPos();
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

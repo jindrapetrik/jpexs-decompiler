@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -49,7 +50,7 @@ public class TagStub extends Tag {
      */
     @Override
     public byte[] getData() {
-        return getOriginalData().getRangeData();
+        throw new Error("TagStub.getData call is not supported.");
     }
 
     public SWFInputStream getDataStream() {

@@ -200,7 +200,7 @@ public class DefineFont3Tag extends FontTag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         if (Configuration.debugCopy.get()) {
-            sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(getOriginalData().getRangeData())), getVersion());
+            sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(getOriginalData())), getVersion());
         }
         try {
             List<Long> offsetTable = new ArrayList<>();

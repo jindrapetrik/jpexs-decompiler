@@ -946,9 +946,9 @@ public class SWFInputStream implements AutoCloseable {
         sb.append(" len=");
         sb.append(Helper.formatInt(tag.getOriginalDataLength(), 8));
         sb.append("  ");
-        sb.append(Helper.bytesToHexString(64, tag.getData(), 0));
+        sb.append(Helper.bytesToHexString(64, tag.getOriginalData(), 0));
         out.println(sb.toString());
-//        out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
+        // out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
         if (tag.hasSubTags()) {
             for (Tag subTag : tag.getSubTags()) {
                 dumpTag(out, version, subTag, level + 1);
@@ -1430,7 +1430,7 @@ public class SWFInputStream implements AutoCloseable {
         int tagIDTagLength = readUI16("tagIDTagLength");
         int tagID = (tagIDTagLength) >> 6;
 
-        logger.log(Level.INFO, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
+        logger.log(Level.FINE, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
 
         long tagLength = (tagIDTagLength & 0x003F);
         boolean readLong = false;
@@ -1466,7 +1466,7 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             if (Configuration.debugMode.get()) {
-                byte[] data = ret.getOriginalData().getRangeData();
+                byte[] data = ret.getOriginalData();
                 byte[] dataNew = ret.getData();
                 int ignoreFirst = 0;
                 for (int i = 0; i < data.length; i++) {
@@ -1886,7 +1886,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag, String name) throws IOException {
         newDumpLevel(name, "CLIPACTIONRECORD");
-        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, getPos(), tag);
+        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, tag);
         endDumpLevel();
         if (ret.eventFlags.isClear()) {
             return null;

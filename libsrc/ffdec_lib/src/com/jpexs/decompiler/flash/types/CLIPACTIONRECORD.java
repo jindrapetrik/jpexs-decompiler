@@ -93,18 +93,16 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     private final SWF swf;
     @Internal
     private final Tag tag;
-    @Internal
-    private long pos;
 
     //Constructor for Generic tag editor. TODO:Handle this somehow better
     public CLIPACTIONRECORD() {
         swf = null;
         tag = null;
         eventFlags = new CLIPEVENTFLAGS();
-        actionBytes = new ByteArrayRange(new byte[0]);
+        actionBytes = ByteArrayRange.EMPTY;
     }
 
-    public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, long pos, Tag tag) throws IOException {
+    public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
         eventFlags = sis.readCLIPEVENTFLAGS("eventFlags");
@@ -119,7 +117,6 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         int actionBytesPos = (int) sis.getPos();
         byte[] bytes = sis.readBytesEx(actionRecordSize, "actionBytes");
         actionBytes = new ByteArrayRange(swf.uncompressedData, actionBytesPos, bytes.length);
-        this.pos = pos;
     }
 
     @Override
@@ -197,12 +194,12 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     @Override
     public ActionList getActions() throws InterruptedException {
         try {
-            int prevLength = actionBytes.pos;
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.array);
+            int prevLength = actionBytes.getPos();
+            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.length, toString()/*FIXME?*/);
+            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

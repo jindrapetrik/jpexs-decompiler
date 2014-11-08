@@ -233,7 +233,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData().getRangeData()));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {

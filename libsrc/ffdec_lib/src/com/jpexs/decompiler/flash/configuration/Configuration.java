@@ -619,8 +619,10 @@ public class Configuration {
 
     static {
         setConfigurationFields();
-        if (useDetailedLogging.get() || debugMode.get()) {
-            logLevel = Level.CONFIG;
+        if (useDetailedLogging.get()) {
+            logLevel = Level.FINEST;
+        } else if (debugMode.get()) {
+            logLevel = Level.INFO;
         } else {
             logLevel = Level.WARNING;
         }

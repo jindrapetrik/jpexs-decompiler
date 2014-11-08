@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 /**
@@ -21,13 +22,11 @@ package com.jpexs.helpers;
  */
 public class ByteArrayRange {
 
-    public final byte[] array;
-    public final int pos;
-    public final int length;
-
-    public ByteArrayRange() {
-        this(new byte[0]);
-    }
+    public static final ByteArrayRange EMPTY = new ByteArrayRange(new byte[0]);
+    
+    private final byte[] array;
+    private final int pos;
+    private final int length;
 
     public ByteArrayRange(byte[] array) {
         this.array = array;
@@ -41,6 +40,18 @@ public class ByteArrayRange {
         this.length = length;
     }
 
+    public byte[] getArray() {
+        return array;
+    }
+    
+    public int getPos() {
+        return pos;
+    }
+    
+    public int getLength() {
+        return length;
+    }
+    
     public byte[] getRangeData() {
         byte[] data = new byte[length];
         System.arraycopy(array, pos, data, 0, length);

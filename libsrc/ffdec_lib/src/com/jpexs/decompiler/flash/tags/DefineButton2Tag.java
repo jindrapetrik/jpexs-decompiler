@@ -133,7 +133,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData().getRangeData());
+            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData());
             os = new CopyOutputStream(os, bais);
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
