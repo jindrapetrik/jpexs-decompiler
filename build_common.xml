@@ -524,7 +524,15 @@
     
     <target name="git-push">
         <exec executable="git" failonerror="true">
-            <arg value="push"/>            
+            <arg value="config"/>            
+            <arg value="--global"/> 
+            <arg value="push.default"/> 
+            <arg value="matching"/> 
+        </exec> 
+        <exec executable="git" failonerror="true">
+            <arg value="push"/>        
+            <arg value="https://github.com/jindrapetrik/jpexs-decompiler.git" />    
+            <arg value="refs/heads/master:refs/heads/master"/> 
         </exec> 
     </target>
     
