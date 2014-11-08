@@ -535,7 +535,7 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>            
             <arg value="-m"/>
-            <arg value="version changed to ${version.major}.${version.minor}.${version.release}.${version.build}"/>
+            <arg value="version changed to ${newversion.major}.${newversion.minor}.${newversion.release}.${newversion.build}"/>
         </exec> 
     </target>
     
