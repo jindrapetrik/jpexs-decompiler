@@ -242,6 +242,8 @@
             Please create file named "tools.properties" and add two lines:
             nsis.path = Path to Nullsoft Install System
             launch4j.path = Path to launch4j
+            
+            WARNING: You must use double backslash in paths on Windows System or forward slash
         </fail>
     </target>
     
