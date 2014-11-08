@@ -17,18 +17,26 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,6 +45,8 @@ import java.util.Set;
  */
 public abstract class ShapeTag extends CharacterTag implements DrawableTag {
 
+    private final int markerSize = 10;
+    
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -53,6 +63,45 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag {
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShapes(), null, image, transformation, colorTransform);
+        if (Configuration.debugMode.get()) { // show control points
+            List<GeneralPath> paths = PathExporter.export(getShapes());
+            double[] coords = new double[6];
+            AffineTransform at = transformation.toTransform();
+            at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+            
+            // get the graphics from the inner image object, because it creates a new Graphics object
+            Graphics2D graphics = (Graphics2D) image.getBufferedImage().getGraphics();
+            graphics.setPaint(Color.black);
+            for (GeneralPath path : paths) {
+                PathIterator iterator = path.getPathIterator(at);
+                while (!iterator.isDone()) {
+                    int type = iterator.currentSegment(coords);
+                    double x = coords[0];
+                    double y = coords[1];
+                    switch (type) {
+                        case PathIterator.SEG_MOVETO:
+                            graphics.drawRect((int) (x - markerSize / 2), (int) (y - markerSize / 2), markerSize, markerSize);
+                            break;
+                        case PathIterator.SEG_LINETO:
+                            graphics.drawRect((int) (x - markerSize / 2), (int) (y - markerSize / 2), markerSize, markerSize);
+                            break;
+                        case PathIterator.SEG_QUADTO:
+                            graphics.drawRect((int) (x - markerSize / 2), (int) (y - markerSize / 2), markerSize, markerSize);
+                            x = coords[2];
+                            y = coords[3];
+                            graphics.drawRect((int) (x - markerSize / 2), (int) (y - markerSize / 2), markerSize, markerSize);
+                            break;
+                        case PathIterator.SEG_CUBICTO:
+                            System.out.print("CUBICTO NOT SUPPORTED. ");
+                            break;
+                        case PathIterator.SEG_CLOSE:
+                            System.out.print("CLOSE NOT SUPPORTED. ");
+                            break;
+                    }
+                    iterator.next();
+                }
+            }
+        }
     }
 
     @Override

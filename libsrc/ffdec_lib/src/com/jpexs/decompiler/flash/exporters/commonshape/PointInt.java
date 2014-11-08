@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 /**
@@ -21,12 +22,22 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
  */
 public class PointInt {
 
-    public int x;
-    public int y;
+    public static final PointInt MAX = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    
+    private int x;
+    private int y;
 
     public PointInt(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+    
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     @Override

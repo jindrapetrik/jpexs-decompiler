@@ -285,7 +285,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected void exportFillPath(int groupIndex) {
         List<IMorphEdge> path = createPathFromEdgeMap(_fillEdgeMaps.get(groupIndex));
-        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = PointInt.MAX;
         int fillStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginFills();
@@ -296,7 +296,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         endFill();
                     }
                     fillStyleIdx = e.getFillStyleIdx();
-                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = PointInt.MAX;
                     try {
                         Matrix matrix;
                         Matrix matrixEnd;
@@ -349,13 +349,13 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     }
                 }
                 if (!pos.equals(e.getFrom())) {
-                    moveTo(e.getFrom().x, e.getFrom().y, e.getFromEnd().x, e.getFromEnd().y);
+                    moveTo(e.getFrom().getX(), e.getFrom().getY(), e.getFromEnd().getX(), e.getFromEnd().getY());
                 }
                 if (e instanceof CurvedMorphEdge) {
                     CurvedMorphEdge c = (CurvedMorphEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y, c.getControlEnd().x, c.getControlEnd().y, c.toEnd.x, c.toEnd.y);
+                    curveTo(c.getControl().getX(), c.getControl().getY(), c.to.getX(), c.to.getY(), c.getControlEnd().getX(), c.getControlEnd().getY(), c.toEnd.getX(), c.toEnd.getY());
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y, e.getToEnd().x, e.getToEnd().y);
+                    lineTo(e.getTo().getX(), e.getTo().getY(), e.getToEnd().getX(), e.getToEnd().getY());
                 }
                 pos = e.getTo();
             }
@@ -368,7 +368,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected void exportLinePath(int groupIndex) {
         List<IMorphEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
-        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = PointInt.MAX;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginLines();
@@ -376,7 +376,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                 IMorphEdge e = path.get(i);
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
-                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = PointInt.MAX;
                     LINESTYLE lineStyle = null;
                     LINESTYLE lineStyleEnd = null;
                     try {
@@ -452,13 +452,13 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     }
                 }
                 if (!e.getFrom().equals(pos)) {
-                    moveTo(e.getFrom().x, e.getFrom().y, e.getFromEnd().x, e.getFromEnd().y);
+                    moveTo(e.getFrom().getX(), e.getFrom().getY(), e.getFromEnd().getX(), e.getFromEnd().getY());
                 }
                 if (e instanceof CurvedMorphEdge) {
                     CurvedMorphEdge c = (CurvedMorphEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y, c.getControlEnd().x, c.getControlEnd().y, c.toEnd.x, c.toEnd.y);
+                    curveTo(c.getControl().getX(), c.getControl().getY(), c.to.getX(), c.to.getY(), c.getControlEnd().getX(), c.getControlEnd().getY(), c.toEnd.getX(), c.toEnd.getY());
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y, e.getToEnd().x, e.getToEnd().y);
+                    lineTo(e.getTo().getX(), e.getTo().getY(), e.getToEnd().getX(), e.getToEnd().getY());
                 }
                 pos = e.getTo();
             }
@@ -515,7 +515,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         Map<String, List<IMorphEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
-            String key = from.x + "_" + from.y;
+            String key = from.getX() + "_" + from.getY();
             List<IMorphEdge> coordMapArray = coordMap.get(key);
             if (coordMapArray == null) {
                 List<IMorphEdge> list = new ArrayList<>();
@@ -529,7 +529,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
     }
 
     protected void removeEdgeFromCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
-        String key = edge.getFrom().x + "_" + edge.getFrom().y;
+        String key = edge.getFrom().getX() + "_" + edge.getFrom().getY();
         List<IMorphEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null) {
             if (coordMapArray.size() == 1) {
@@ -544,7 +544,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
     }
 
     protected IMorphEdge findNextEdgeInCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
-        String key = edge.getTo().x + "_" + edge.getTo().y;
+        String key = edge.getTo().getX() + "_" + edge.getTo().getY();
         List<IMorphEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null && coordMapArray.size() > 0) {
             return coordMapArray.get(0);

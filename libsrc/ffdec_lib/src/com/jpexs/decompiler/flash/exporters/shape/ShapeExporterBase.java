@@ -224,7 +224,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected void exportFillPath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(_fillEdgeMaps.get(groupIndex));
-        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = PointInt.MAX;
         int fillStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginFills();
@@ -235,7 +235,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         endFill();
                     }
                     fillStyleIdx = e.getFillStyleIdx();
-                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = PointInt.MAX;
                     try {
                         Matrix matrix;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
@@ -280,13 +280,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                 }
                 if (!pos.equals(e.getFrom())) {
-                    moveTo(e.getFrom().x, e.getFrom().y);
+                    moveTo(e.getFrom().getX(), e.getFrom().getY());
                 }
                 if (e instanceof CurvedEdge) {
                     CurvedEdge c = (CurvedEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y);
+                    curveTo(c.getControl().getX(), c.getControl().getY(), c.to.getX(), c.to.getY());
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y);
+                    lineTo(e.getTo().getX(), e.getTo().getY());
                 }
                 pos = e.getTo();
             }
@@ -299,7 +299,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected void exportLinePath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
-        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = PointInt.MAX;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginLines();
@@ -307,7 +307,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 IEdge e = path.get(i);
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
-                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = PointInt.MAX;
                     LINESTYLE lineStyle = null;
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
@@ -373,13 +373,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                 }
                 if (!e.getFrom().equals(pos)) {
-                    moveTo(e.getFrom().x, e.getFrom().y);
+                    moveTo(e.getFrom().getX(), e.getFrom().getY());
                 }
                 if (e instanceof CurvedEdge) {
                     CurvedEdge c = (CurvedEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y);
+                    curveTo(c.getControl().getX(), c.getControl().getY(), c.to.getX(), c.to.getY());
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y);
+                    lineTo(e.getTo().getX(), e.getTo().getY());
                 }
                 pos = e.getTo();
             }
@@ -436,7 +436,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         Map<String, List<IEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
-            String key = from.x + "_" + from.y;
+            String key = from.getX() + "_" + from.getY();
             List<IEdge> coordMapArray = coordMap.get(key);
             if (coordMapArray == null) {
                 List<IEdge> list = new ArrayList<>();
@@ -450,7 +450,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected void removeEdgeFromCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
-        String key = edge.getFrom().x + "_" + edge.getFrom().y;
+        String key = edge.getFrom().getX() + "_" + edge.getFrom().getY();
         List<IEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null) {
             if (coordMapArray.size() == 1) {
@@ -465,7 +465,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected IEdge findNextEdgeInCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
-        String key = edge.getTo().x + "_" + edge.getTo().y;
+        String key = edge.getTo().getX() + "_" + edge.getTo().getY();
         List<IEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null && coordMapArray.size() > 0) {
             return coordMapArray.get(0);
