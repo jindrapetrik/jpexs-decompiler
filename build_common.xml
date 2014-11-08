@@ -131,12 +131,12 @@
     
     
     
-    <target name="installer" depends="-loadversion,dist">
+    <target name="installer" depends="-loadversion,-load-tools,dist">
         <taskdef name="nsis" classname="com.danielreese.nsisant.Task">
             <classpath location="${basedir}/nsisant-1.3.jar" />
         </taskdef>
         <property name="exe.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_setup.exe"/>       
-        <nsis script="installer.nsi" path="${NSISPATH}" verbosity="2">
+        <nsis script="installer.nsi" path="${nsis.path}" verbosity="2">
             <define name="APP_NAME" value="${PRODUCTNAME}"/>
             <define name="APP_VER" value="${VERSION}${VERSIONSUFFIX}"/>
             <define name="APP_VER_MAJOR" value="${version.major}"/>
@@ -213,17 +213,39 @@
             </launch4jConfig>
         </echoxml>
     </target>    
-    <target name="-exe-linux" unless="is_windows" depends="-exe-config">
-        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}/launch4j">
+    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config">
+        <exec dir="${launch4j.path}" executable="${launch4j.path}/launch4j">
             <arg file="${EXECONFIG}" />
         </exec>
     </target>
-    <target name="-exe-windows" if="is_windows" depends="-exe-config">
-        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}\launch4jc.exe">
+    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config">
+        <exec dir="${launch4j.path}" executable="${launch4j.path}\launch4jc.exe">
             <arg file="${EXECONFIG}" />
         </exec>
     </target>   
     <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
+        
+    </target>
+    
+    
+    <target name="-check-tools">
+        <available file="tools.properties" property="tools.config.exists"/>
+    </target>
+    
+    <target name="-load-tools-ok" if="tools.config.exists">
+        <loadproperties srcfile="tools.properties" />
+    </target>
+    
+    <target name="-load-tools-fail" unless="tools.config.exists">
+        <fail>
+            tools.properties NOT found.
+            Please create file named "tools.properties" and add two lines:
+            nsis.path = Path to Nullsoft Install System
+            launch4j.path = Path to launch4j
+        </fail>
+    </target>
+    
+    <target name="-load-tools" depends="-check-tools,-load-tools-ok,-load-tools-fail">
         
     </target>
     <target name="exe-console" depends="-set-console-type,-exe-linux,-exe-windows">

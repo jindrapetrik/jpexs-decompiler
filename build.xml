@@ -22,7 +22,6 @@
     <property name="PRODUCTURL" value="http://www.free-decompiler.com/flash/" />
     <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
     <property name="NSISPATH" value="c:\program files (x86)\NSIS"/>
-    <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
     <property name="MAXHEAPSIZEPERCENT" value="100"/>
     <property name="MAXHEAPSIZERUN" value="4096"/> <!-- for run task (MB)-->    
        

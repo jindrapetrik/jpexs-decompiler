@@ -49,4 +49,5 @@ hs_err_pid*.log
 /libsrc/uploader/nbproject/private/
 /libsrc/uploader/build/
 /libsrc/uploader/dist/
-jpexs_website.properties
+/jpexs_website.properties
+/tools.properties
