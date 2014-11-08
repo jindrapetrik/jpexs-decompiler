@@ -5,6 +5,7 @@
  */
 package com.jpexs.uploader;
 
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +19,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.UIManager;
 
 /**
  *
@@ -132,31 +139,31 @@ public class Uploader {
          * status OK, otherwise an exception is thrown.
          * @throws IOException
          */
-        public List<String> finish() throws IOException {
-            List<String> response = new ArrayList<>();
-
+        public boolean finish(List<String> response) throws IOException {
+            response.clear();
             writer.append(LINE_FEED).flush();
             writer.append("--" + boundary + "--").append(LINE_FEED);
             writer.close();
 
             // checks server's status code first
             int status = httpConn.getResponseCode();
-            if (status == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        httpConn.getInputStream()));
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    response.add(line);
-                }
-                reader.close();
-                httpConn.disconnect();
-            } else {
-                throw new IOException("Server returned non-OK status: " + status);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    httpConn.getInputStream()));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                response.add(line);
             }
-
-            return response;
+            reader.close();
+            httpConn.disconnect();
+            
+            return status == HttpURLConnection.HTTP_OK;
         }
     }
+    
+    private static List<String> types = new ArrayList<>();
+    private static List<String> names = new ArrayList<>();
+    private static List<String> values = new ArrayList<>();
+    private static List<String> labels = new ArrayList<>();
 
     public static void main(String[] args) {
         
@@ -167,32 +174,99 @@ public class Uploader {
         
         String charset = "UTF-8";
         String requestURL = args[0];
- 
-        try {
+        
+        
+        for(int i=1;i<args.length;i++){
+                if(args[i].equals("-field")){
+                    types.add("field");
+                    names.add(args[i+1]);
+                    values.add(args[i+2]);
+                    labels.add("");
+                    i+=2;
+                }       
+                if(args[i].equals("-textarea")){
+                    types.add("textarea");
+                    names.add(args[i+1]);                    
+                    labels.add(args[i+2]);
+                    values.add("");
+                    i+=2;
+                }        
+                if(args[i].equals("-file")){
+                    types.add("file");
+                    names.add(args[i+1]);
+                    values.add(args[i+2]);
+                    labels.add("");                    
+                    i+=2;
+                }
+            }
+        
+        List<JTextArea> texts=new ArrayList<>();
+        List<JLabel> textLabels = new ArrayList<>();
+        List<Integer> textIndices=new ArrayList<>();
+        
+        for(int i=0;i<types.size();i++){
+            if(types.get(i).equals("textarea")){
+                JTextArea t = new JTextArea();
+                t.setPreferredSize(new Dimension(400,100));
+                texts.add(t);
+                textLabels.add(new JLabel(labels.get(i)));
+                textIndices.add(i);
+            }
+        }
+        if(!texts.isEmpty()){
+            JPanel pan=new JPanel();
+            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
+            for(int i=0;i<texts.size();i++){
+                textLabels.get(i).setAlignmentX(0f);
+                pan.add(textLabels.get(i));                
+                texts.get(i).setAlignmentX(0f);
+                pan.add(texts.get(i));
+            }
+            
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+               
+            }
+            
+            if(JOptionPane.showConfirmDialog(null, pan,"Enter values",JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE)!=JOptionPane.OK_OPTION){
+                System.exit(1);
+            }
+            for(int i=0;i<texts.size();i++){
+                int index=textIndices.get(i);
+                types.set(index, "field");
+                values.set(index, texts.get(i).getText());
+            }
+        }
+        
+         try {
             MultipartUtility multipart = new MultipartUtility(requestURL, charset);
              
             multipart.addHeaderField("User-Agent", "JPEXS Uploader");             
         
-            for(int i=1;i<args.length;i++){
-                if(args[i].equals("-field")){
-                    multipart.addFormField(args[i+1], args[i+2]);
-                    i+=2;
+            for(int i=0;i<types.size();i++){
+                if(types.get(i).equals("field")){
+                    multipart.addFormField(names.get(i), values.get(i));
                 }        
-                if(args[i].equals("-file")){
-                    multipart.addFilePart(args[i+1], new File(args[i+2]));
-                    i+=2;
+                if(types.get(i).equals("file")){                    
+                    multipart.addFilePart(names.get(i), new File(values.get(i)));
                 }
             }
              
             
  
-            List<String> response = multipart.finish();
+            List<String> response = new ArrayList<>();
+            boolean ok = multipart.finish(response);
              
              
             for (String line : response) {
-                System.out.println(line);
+                if(ok){
+                    System.out.println(line);
+                }else{
+                    System.err.println(line);
+                }
             }
-            System.exit(0);
+            System.exit(ok?0:1);
         } catch (IOException ex) {
             ex.printStackTrace();
             System.exit(1);
