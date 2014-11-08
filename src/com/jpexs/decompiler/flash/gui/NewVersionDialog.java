@@ -73,7 +73,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
                 changesStr += "<hr />";
             }
             first = false;
-            changesStr += "<b>" + translate("version") + " " + v.versionName + (v.nightly ? " nightly " + v.revision : "") + "</b><br />";
+            changesStr += "<b>" + translate("version") + " " + v.versionName + (v.nightly ? " nightly":"") + "</b><br />";           
             String releaseDate = v.releaseDate;
             try {
                 Date date = serverFormatter.parse(releaseDate);
