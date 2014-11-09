@@ -599,6 +599,3 @@ Section "Uninstall"
   DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"  
 
 SectionEnd
-
-
-;TODO: FlashPlayer detection/install, Java detection/install
