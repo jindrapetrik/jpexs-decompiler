@@ -23,7 +23,7 @@
     <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
     <property name="NSISPATH" value="c:\program files (x86)\NSIS"/>
     <property name="MAXHEAPSIZEPERCENT" value="100"/>
-    <property name="MAXHEAPSIZERUN" value="4096"/> <!-- for run task (MB)-->    
+    <property name="MAXHEAPSIZERUN" value="8094"/> <!-- for run task (MB)-->    
        
     
     <property name="SOURCEDIR" value="${basedir}/src"/>
