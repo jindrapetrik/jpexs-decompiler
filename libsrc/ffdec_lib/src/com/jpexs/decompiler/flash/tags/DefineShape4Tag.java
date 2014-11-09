@@ -31,6 +31,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DefineShape4Tag extends ShapeTag {
 
@@ -47,6 +49,8 @@ public class DefineShape4Tag extends ShapeTag {
     public SHAPEWITHSTYLE shapes;
     public static final int ID = 83;
 
+    private ByteArrayRange shapeData;
+
     @Override
     public int getShapeNum() {
         return 4;
@@ -54,6 +58,17 @@ public class DefineShape4Tag extends ShapeTag {
 
     @Override
     public SHAPEWITHSTYLE getShapes() {
+        if (shapes == null && shapeData != null) {
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
+                sis.seek(shapeData.getPos());
+                shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
+                shapeData = null; // not needed anymore, give it to GC
+            } catch (IOException ex) {
+                Logger.getLogger(DefineShape4Tag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         return shapes;
     }
 
@@ -93,7 +108,7 @@ public class DefineShape4Tag extends ShapeTag {
         shapes = SHAPEWITHSTYLE.createEmpty(4);
     }
 
-    public DefineShape4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public DefineShape4Tag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
         super(sis.getSwf(), ID, "DefineShape4", data);
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
@@ -102,7 +117,11 @@ public class DefineShape4Tag extends ShapeTag {
         usesFillWindingRule = sis.readUB(1, "usesFillWindingRule") == 1;
         usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
         usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
-        shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
+        if (!lazy) {
+            shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
+        } else {
+            shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
+        }
     }
 
     /**

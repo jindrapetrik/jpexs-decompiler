@@ -630,11 +630,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showDetail(DETAILCARDEMPTYPANEL);
             showCard(CARDEMPTYPANEL);
             updateUi(swf);
-
-            /*if (first && Configuration.gotoMainClassOnStartup.get()) {
-             gotoDocumentClass(swf);
-             }*/
-            first = false;
         }
     }
 
