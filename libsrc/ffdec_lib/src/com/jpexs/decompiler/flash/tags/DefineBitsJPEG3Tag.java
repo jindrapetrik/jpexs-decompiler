@@ -39,7 +39,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     public int characterID;
 
     @SWFType(BasicType.UI8)
-    public byte[] imageData;
+    public ByteArrayRange imageData;
 
     @SWFType(BasicType.UI8)
     public byte[] bitmapAlphaData;
@@ -63,7 +63,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         } else {
             bitmapAlphaData = new byte[0];
         }
-        imageData = data;
+        imageData = new ByteArrayRange(data);
         setModified(true);
     }
 
@@ -86,9 +86,9 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         try {
             InputStream stream;
             if (SWF.hasErrorHeader(imageData)) {
-                stream = new ByteArrayInputStream(imageData, 4, imageData.length - 4);
+                stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + 4, imageData.getLength() - 4);
             } else {
-                stream = new ByteArrayInputStream(imageData);
+                stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
             }
             BufferedImage image = ImageIO.read(stream);
             SerializableImage img = image == null ? null : new SerializableImage(image);
@@ -112,12 +112,13 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBitsJPEG3Tag(SWF swf) {
         super(swf, ID, "DefineBitsJPEG3", null);
         characterID = swf.getNextCharacterId();
-        imageData = new byte[0];
+        imageData = ByteArrayRange.EMPTY;
         bitmapAlphaData = new byte[0];
     }
 
@@ -125,7 +126,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         super(sis.getSwf(), ID, "DefineBitsJPEG3", data);
         characterID = sis.readUI16("characterID");
         long alphaDataOffset = sis.readUI32("alphaDataOffset");
-        imageData = sis.readBytesEx(alphaDataOffset, "imageData");
+        imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
         bitmapAlphaData = sis.readBytesZlib(sis.available(), "bitmapAlphaData");
     }
 
@@ -141,7 +142,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterID);
-            sos.writeUI32(imageData.length);
+            sos.writeUI32(imageData.getLength());
             sos.write(imageData);
             sos.writeBytesZlib(bitmapAlphaData);
         } catch (IOException e) {

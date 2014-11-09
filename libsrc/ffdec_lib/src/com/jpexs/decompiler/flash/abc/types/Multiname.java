@@ -264,7 +264,7 @@ public class Multiname {
             if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
                 return getNameWithNamespace(constants, raw);
             }
-            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true,name));
+            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
         }
     }
 

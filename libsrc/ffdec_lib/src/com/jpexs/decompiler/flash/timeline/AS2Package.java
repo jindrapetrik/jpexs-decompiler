@@ -31,9 +31,9 @@ public class AS2Package implements TreeItem {
     private final SWF swf;
     private final String name;
     private final AS2Package parent;
-    
+
     public Map<String, AS2Package> subPackages = new TreeMap<>();
-    
+
     public Map<String, ASMSource> scripts = new TreeMap<>();
 
     public AS2Package(String name, AS2Package parent, SWF swf) {
@@ -53,11 +53,11 @@ public class AS2Package implements TreeItem {
                 if (index == 0) {
                     return subPackage;
                 }
-                
+
                 index--;
             }
         }
-        
+
         index -= subPackages.size();
 
         for (ASMSource pack : scripts.values()) {
@@ -94,9 +94,10 @@ public class AS2Package implements TreeItem {
             }
             res++;
         }
-        
+
         return res;
     }
+
     @Override
     public String toString() {
         return name;

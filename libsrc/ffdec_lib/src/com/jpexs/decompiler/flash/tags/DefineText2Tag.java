@@ -475,6 +475,7 @@ public class DefineText2Tag extends TextTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineText2Tag(SWF swf) {

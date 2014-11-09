@@ -79,16 +79,16 @@ public class TryAVM2Item extends AVM2Item implements Block {
             writer.newLine();
             writer.append("catch(");
             String localName = catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames);
-            Map<String,String> data=new HashMap<>();
+            Map<String, String> data = new HashMap<>();
             data.put("localName", localName);
             data.put("declaration", "true");
-            
-            int eti= catchExceptions.get(e).type_index;            
-            
-            data.put("declaredType", eti<=0?"*":localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2, true));
-            writer.hilightSpecial(localName, "try.name",e,data);
+
+            int eti = catchExceptions.get(e).type_index;
+
+            data.put("declaredType", eti <= 0 ? "*" : localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2, true));
+            writer.hilightSpecial(localName, "try.name", e, data);
             writer.append(":");
-            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames),"try.type",e);
+            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), "try.type", e);
             writer.append(")");
             writer.startBlock();
             List<GraphTargetItem> commands = catchCommands.get(e);

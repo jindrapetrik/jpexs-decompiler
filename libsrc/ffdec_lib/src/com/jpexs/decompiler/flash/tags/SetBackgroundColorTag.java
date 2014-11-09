@@ -31,6 +31,7 @@ public class SetBackgroundColorTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public SetBackgroundColorTag(SWF swf) {

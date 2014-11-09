@@ -38,6 +38,7 @@ public class SymbolClassTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public SymbolClassTag(SWF swf) {

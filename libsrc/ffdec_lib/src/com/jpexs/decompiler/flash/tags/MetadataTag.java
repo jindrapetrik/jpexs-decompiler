@@ -33,6 +33,7 @@ public class MetadataTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public MetadataTag(SWF swf) {

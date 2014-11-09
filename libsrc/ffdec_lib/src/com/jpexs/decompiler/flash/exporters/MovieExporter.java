@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -101,7 +102,7 @@ public class MovieExporter {
 
             if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
                     || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
-                SWFInputStream sis = new SWFInputStream(swf, tag.videoData);
+                SWFInputStream sis = new SWFInputStream(swf, tag.videoData.getRangeData());
                 if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
                     sis.readUI24("offsetToAlpha"); //offsetToAlpha
                 }
@@ -135,7 +136,7 @@ public class MovieExporter {
                 sos.writeUB(4, verticalAdjustment);
             }
             if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
-                SWFInputStream sis = new SWFInputStream(swf, tag.videoData);
+                SWFInputStream sis = new SWFInputStream(swf, tag.videoData.getRangeData());
                 sis.readUB(17, "pictureStartCode");//pictureStartCode
                 sis.readUB(5, "version"); //version
                 sis.readUB(8, "temporalReference"); //temporalReference
@@ -162,7 +163,7 @@ public class MovieExporter {
                 }
             }
 
-            baos.write(tag.videoData);
+            baos.write(tag.videoData.getRangeData());
             flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0f / ((float) swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
         return fos.toByteArray();

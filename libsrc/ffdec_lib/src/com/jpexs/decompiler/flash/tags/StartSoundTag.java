@@ -60,6 +60,7 @@ public class StartSoundTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public StartSoundTag(SWF swf) {

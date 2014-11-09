@@ -60,7 +60,7 @@ public class DefineShape3Tag extends ShapeTag {
                 Logger.getLogger(DefineShape3Tag.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         return shapes;
     }
 
@@ -90,6 +90,7 @@ public class DefineShape3Tag extends ShapeTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineShape3Tag(SWF swf) {

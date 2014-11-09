@@ -76,22 +76,22 @@ public class Timeline {
             initialized = true;
         }
     }
-    
+
     public List<Frame> getFrames() {
         ensureInitialized();
         return frames;
     }
-    
+
     public AS2Package getAS2RootPackage() {
         ensureInitialized();
         return as2RootPackage;
     }
-    
+
     public Map<Integer, Integer> getDepthMaxFrame() {
         ensureInitialized();
         return depthMaxFrame;
     }
-    
+
     public void reset() {
         initialized = false;
         frames.clear();
@@ -101,12 +101,12 @@ public class Timeline {
         otherTags.clear();
         as2RootPackage = new AS2Package(null, null, swf);
     }
-    
+
     public final int getMaxDepth() {
         ensureInitialized();
         return getMaxDepthInternal();
     }
-    
+
     public final int getMaxDepthInternal() {
         int max_depth = 0;
         for (Frame f : frames) {
@@ -125,13 +125,13 @@ public class Timeline {
     public int getFrameCount() {
         return getFrames().size();
     }
-    
+
     public int getFrameForAction(ASMSource asm) {
         Integer frame = actionFrames.get(asm);
         if (frame == null) {
             return -1;
         }
-        
+
         return frame;
     }
 
@@ -149,7 +149,7 @@ public class Timeline {
         this.tags = tags;
         as2RootPackage = new AS2Package(null, null, swf);
     }
-    
+
     private void initialize() {
         int frameIdx = 0;
         Frame frame = new Frame(this, frameIdx++);
@@ -249,10 +249,9 @@ public class Timeline {
         if (tagAdded) {
             frames.add(frame);
         }
-        
+
         // todo: enable again after TweenDetector.detectRanges implemented
         //detectTweens();
-        
         int maxDepth = getMaxDepthInternal();
         for (int d = 1; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
@@ -262,9 +261,9 @@ public class Timeline {
                 }
             }
         }
-        
+
         createASPackages();
-        
+
         initialized = true;
     }
 
@@ -313,7 +312,7 @@ public class Timeline {
                 if (path == null || path.isEmpty()) {
                     path = initAction.getExportFileName();
                 }
-                               
+
                 String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
                 AS2Package pkg = as2RootPackage;
                 for (int pos = 0; pos < pathParts.length - 1; pos++) {
@@ -323,15 +322,15 @@ public class Timeline {
                         subPkg = new AS2Package(pathPart, pkg, swf);
                         pkg.subPackages.put(pathPart, subPkg);
                     }
-                    
+
                     pkg = subPkg;
                 }
-                
+
                 pkg.scripts.put(pathParts[pathParts.length - 1], asm);
             }
         }
     }
-    
+
     public void getNeededCharacters(Set<Integer> usedCharacters) {
         for (int i = 0; i < getFrameCount(); i++) {
             getNeededCharacters(i, usedCharacters);

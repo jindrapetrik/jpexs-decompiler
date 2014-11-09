@@ -56,8 +56,5 @@ public class KERNINGRECORD implements Serializable {
         fontKerningCode2 = char2;
         fontKerningAdjustment = FontHelper.getFontCharsKerning(font, char1, char2);
     }
-   
-   
 
-    
 }

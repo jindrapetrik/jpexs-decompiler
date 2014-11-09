@@ -61,7 +61,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function");
-        writer.startMethod(methodIndex);                
+        writer.startMethod(methodIndex);
         writer.append((!functionName.isEmpty() ? " " + functionName : ""));
         writer.appendNoHilight("(");
         methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
@@ -71,7 +71,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
             writer.appendNoHilight(abc.findBodyIndex(methodIndex));
             writer.newLine();
         }
-        methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);        
+        methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {

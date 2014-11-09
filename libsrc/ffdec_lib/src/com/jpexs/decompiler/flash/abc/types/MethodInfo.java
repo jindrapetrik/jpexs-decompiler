@@ -269,33 +269,32 @@ public class MethodInfo {
 
     public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         Map<Integer, String> localRegNames = new HashMap<>();
-        if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {            
-            localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);            
+        if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {
+            localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
         }
-        Map<String,String> pdata;
-        
+        Map<String, String> pdata;
+
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
             String ptype = "*";
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants,false);
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants, false);
             }
-            
-            
-            pdata=new HashMap<>();                                    
-            pdata.put("declaration", "true");          
+
+            pdata = new HashMap<>();
+            pdata.put("declaration", "true");
             pdata.put("declaredType", ptype);
             if (!localRegNames.isEmpty()) {
                 pdata.put("localName", localRegNames.get(i + 1)); //assuming it is a slot
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(i + 1)),"paramname",i,pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), "paramname", i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                pdata.put("localName", constants.getString(paramNames[i]));              
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,constants.getString(paramNames[i])),"paramname",i,pdata);
+                pdata.put("localName", constants.getString(paramNames[i]));
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), "paramname", i, pdata);
             } else {
-                pdata.put("localName","param"+(i+1));
-                writer.hilightSpecial("param" + (i + 1),"paramname",i,pdata);
+                pdata.put("localName", "param" + (i + 1));
+                writer.hilightSpecial("param" + (i + 1), "paramname", i, pdata);
             }
             writer.appendNoHilight(":");
             if (param_types[i] == 0) {
@@ -323,21 +322,21 @@ public class MethodInfo {
             } else {
                 restName = "rest";
             }
-            pdata=new HashMap<>();
+            pdata = new HashMap<>();
             pdata.put("declaration", "true");
             pdata.put("declaredType", "*");
-            pdata.put("localName",restName); 
+            pdata.put("localName", restName);
             writer.append(restAdd);
-            writer.hilightSpecial(restName, "flag.NEED_REST",0,pdata);
+            writer.hilightSpecial(restName, "flag.NEED_REST", 0, pdata);
         }
         return writer;
     }
 
     public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
         String rname = "*";
-        if(ret_type>0){
-            rname = IdentifiersDeobfuscation.printIdentifier(true,constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, true),"void");
-        }        
+        if (ret_type > 0) {
+            rname = IdentifiersDeobfuscation.printIdentifier(true, constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, true), "void");
+        }
         return writer.hilightSpecial(rname, "returns");
     }
 

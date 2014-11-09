@@ -33,6 +33,7 @@ public class JPEGTablesTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public JPEGTablesTag(SWF swf) {

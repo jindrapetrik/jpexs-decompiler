@@ -39,7 +39,7 @@ public class DefineShapeTag extends ShapeTag {
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
     public static final int ID = 2;
-    
+
     private ByteArrayRange shapeData;
 
     @Override
@@ -59,7 +59,7 @@ public class DefineShapeTag extends ShapeTag {
                 Logger.getLogger(DefineShapeTag.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         return shapes;
     }
 
@@ -84,6 +84,7 @@ public class DefineShapeTag extends ShapeTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineShapeTag(SWF swf) {

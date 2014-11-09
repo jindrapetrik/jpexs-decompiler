@@ -28,7 +28,6 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +89,7 @@ public class DefineFontInfo2Tag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFontInfo2Tag(SWF swf) {

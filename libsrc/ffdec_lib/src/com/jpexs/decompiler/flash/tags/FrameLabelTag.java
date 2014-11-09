@@ -40,6 +40,7 @@ public class FrameLabelTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public FrameLabelTag(SWF swf) {

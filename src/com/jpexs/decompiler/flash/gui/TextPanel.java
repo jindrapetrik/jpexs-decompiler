@@ -28,7 +28,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
@@ -49,7 +48,6 @@ public class TextPanel extends JPanel implements ActionListener {
 
     public TextPanel(MainPanel mainPanel) {
         super(new BorderLayout());
-       
 
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);

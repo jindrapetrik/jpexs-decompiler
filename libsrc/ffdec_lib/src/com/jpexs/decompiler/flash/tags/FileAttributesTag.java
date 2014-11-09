@@ -47,6 +47,7 @@ public class FileAttributesTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public FileAttributesTag(SWF swf) {

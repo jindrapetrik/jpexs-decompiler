@@ -193,7 +193,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
     @ConfigurationDefaultInt(1)
     public static final ConfigurationItem<Integer> lastRenameType = null;
-        
+
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastSaveDir = null;
 
@@ -340,32 +340,31 @@ public class Configuration {
 
     public static final ConfigurationItem<String> pluginPath = null;
 
-    
     @ConfigurationDefaultInt(55556)
-    @ConfigurationCategory("script")    
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Integer> debuggerPort = null;
-    
+
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("script")  
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> randomDebuggerPackage = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> displayDebuggerInfo = null;
-    
+
     @ConfigurationDefaultString("debugConsole")
     public static final ConfigurationItem<String> lastDebuggerReplaceFunction = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> getLocalNamesFromDebugInfo = null;    
-    
-    @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> tagTreeShowEmptyFolders = null;    
+    public static final ConfigurationItem<Boolean> getLocalNamesFromDebugInfo = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;    
+    public static final ConfigurationItem<Boolean> tagTreeShowEmptyFolders = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;
 
     private enum OSId {
 
@@ -494,7 +493,7 @@ public class Configuration {
         }
         return result;
     }
-  
+
     public static void addFontPair(String fileName, int fontId, String fontName, String installedName) {
         String key = fileName + "_" + fontId + "_" + fontName;
         Map<String, String> fontPairs = getFontToNameMap();

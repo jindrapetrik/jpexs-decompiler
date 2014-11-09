@@ -127,7 +127,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -140,7 +139,6 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -2234,6 +2232,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }, Configuration.parallelSpeedUp.get());
                     bswf.fileTitle = "(SWF Data)";
                     binaryDataTag.innerSwf = bswf;
+                    bswf.binaryData = binaryDataTag;
                 } catch (IOException | InterruptedException ex) {
                     //ignore
                 }

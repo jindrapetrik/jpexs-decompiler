@@ -41,10 +41,10 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
 
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-                
+
         int regId = getRegisterId(ins);
-        
-        if(regId == 0){
+
+        if (regId == 0) {
             if ((classIndex >= abc.instance_info.size()) || classIndex < 0) {
                 stack.push(new ScriptAVM2Item(scriptIndex));
                 return;
@@ -56,7 +56,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             }
             return;
         }
-        
+
         GraphTargetItem computedValue = localRegs.get(regId);
         int assignCount = 0;
         if (regAssignCount.containsKey(regId)) {

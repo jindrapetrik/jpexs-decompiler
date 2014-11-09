@@ -49,6 +49,7 @@ public class ExportAssetsTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public ExportAssetsTag(SWF swf) {

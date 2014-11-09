@@ -93,7 +93,7 @@ import java.util.logging.Logger;
  * Represents one ACTIONRECORD, also has some static method to work with Actions
  */
 public class Action implements GraphSourceItem {
-    
+
     private boolean ignored = false;
     /**
      * Action type identifier
@@ -103,7 +103,7 @@ public class Action implements GraphSourceItem {
      * Length of action data
      */
     public int actionLength;
-    private long address;    
+    private long address;
 
     /**
      * Names of ActionScript properties
@@ -880,7 +880,7 @@ public class Action implements GraphSourceItem {
                             "",
                             " * " + AppResources.translate("decompilationError"),
                             " * " + AppResources.translate("decompilationError.obfuscated"),
-                            Helper.decompilationErrorAdd==null?null:" * "+Helper.decompilationErrorAdd,
+                            Helper.decompilationErrorAdd == null ? null : " * " + Helper.decompilationErrorAdd,
                             " * " + AppResources.translate("decompilationError.errorType") + ": "
                             + ex2.getClass().getSimpleName(),
                             ""}));

@@ -32,10 +32,10 @@ import jsyntaxpane.actions.ActionUtils;
 public class MyMarkers {
 
     /**
-     * Removes only our private highlights
-     * This is public so that we can remove the highlights when the editorKit
-     * is unregistered.  SimpleMarker can be null, in which case all instances of
-     * our Markers are removed.
+     * Removes only our private highlights This is public so that we can remove
+     * the highlights when the editorKit is unregistered. SimpleMarker can be
+     * null, in which case all instances of our Markers are removed.
+     *
      * @param component the text component whose markers are to be removed
      * @param marker the SimpleMarker to remove
      */

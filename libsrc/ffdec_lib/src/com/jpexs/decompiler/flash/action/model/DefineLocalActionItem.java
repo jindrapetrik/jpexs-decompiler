@@ -76,7 +76,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("var ");
 
-        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false,((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
             writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
         } else {
             stripQuotes(name, localData, writer);

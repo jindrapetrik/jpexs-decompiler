@@ -90,6 +90,7 @@ public class DefineFontInfoTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFontInfoTag(SWF swf) {

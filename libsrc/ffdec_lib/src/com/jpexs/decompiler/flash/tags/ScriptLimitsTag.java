@@ -38,6 +38,7 @@ public class ScriptLimitsTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public ScriptLimitsTag(SWF swf) {

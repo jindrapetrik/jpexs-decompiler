@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -129,6 +130,12 @@ public class SWFOutputStream extends OutputStream {
         alignByte();
         os.write(b);
         pos += b.length;
+    }
+
+    public void write(ByteArrayRange b) throws IOException {
+        alignByte();
+        os.write(b.getArray(), b.getPos(), b.getLength());
+        pos += b.getLength();
     }
 
     private void alignByte() throws IOException {

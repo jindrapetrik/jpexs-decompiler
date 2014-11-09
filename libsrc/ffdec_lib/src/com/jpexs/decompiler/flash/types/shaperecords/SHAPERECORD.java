@@ -233,13 +233,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     public static SHAPE systemFontCharacterToSHAPE(Font font, int fontSize, char character) {
-        return fontCharacterToSHAPE(font,fontSize, character);
+        return fontCharacterToSHAPE(font, fontSize, character);
     }
 
     public static SHAPE fontCharacterToSHAPE(final Font font, float fontSize, char character) {
         int multiplier = 1;
         if (fontSize > 1024) {
-            multiplier = (int)(fontSize / 1024);
+            multiplier = (int) (fontSize / 1024);
             fontSize = 1024;
         }
         List<SHAPERECORD> retList = new ArrayList<>();

@@ -1395,7 +1395,7 @@ public class XFLConverter {
                     for (Tag t : tags) {
                         if (found && (t instanceof SoundStreamBlockTag)) {
                             SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
-                            soundData = bl.streamSoundData;
+                            soundData = bl.streamSoundData.getRangeData();
                             break;
                         }
                         if (t == symbol) {
@@ -1407,7 +1407,7 @@ public class XFLConverter {
                     soundFormat = sound.soundFormat;
                     soundRate = sound.soundRate;
                     soundType = sound.soundType;
-                    soundData = sound.soundData;
+                    soundData = sound.soundData.getRangeData();
                     soundSize = sound.soundSize;
                     soundSampleCount = sound.soundSampleCount;
                 }

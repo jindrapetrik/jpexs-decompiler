@@ -41,6 +41,7 @@ public class EndTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public EndTag(SWF swf) {

@@ -33,7 +33,7 @@ public class ThisAVM2Item extends AVM2Item {
 
     public Multiname className;
 
-    public ThisAVM2Item(GraphSourceItem instruction,Multiname className) {
+    public ThisAVM2Item(GraphSourceItem instruction, Multiname className) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.className = className;
         srcData.put("localName", "this");
@@ -45,7 +45,7 @@ public class ThisAVM2Item extends AVM2Item {
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {        
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("this");
     }
 

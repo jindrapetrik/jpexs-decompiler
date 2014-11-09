@@ -46,7 +46,7 @@ public class SWFList implements List<SWF>, SWFContainerItem {
     public String toString() {
         return name;
     }
-    
+
     @Override
     public Iterator<SWF> iterator() {
         return swfs.iterator();

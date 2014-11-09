@@ -109,8 +109,6 @@ public class NulWriter extends GraphTextWriter {
         stringAdded = true;
         return this;
     }
-    
-    
 
     @Override
     public NulWriter append(String str) {
@@ -123,8 +121,6 @@ public class NulWriter extends GraphTextWriter {
         stringAdded = true;
         return this;
     }
-    
-    
 
     @Override
     public NulWriter append(String str, long offset) {

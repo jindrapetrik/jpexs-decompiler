@@ -100,6 +100,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineVideoStreamTag(SWF swf) {

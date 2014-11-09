@@ -37,7 +37,7 @@ public class VideoFrameTag extends Tag {
     public int streamID;
     @SWFType(BasicType.UI16)
     public int frameNum;
-    public byte[] videoData;
+    public ByteArrayRange videoData;
     public static final int ID = 61;
 
     /**
@@ -62,11 +62,12 @@ public class VideoFrameTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public VideoFrameTag(SWF swf) {
         super(swf, ID, "VideoFrame", null);
-        videoData = new byte[0];
+        videoData = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -80,6 +81,6 @@ public class VideoFrameTag extends Tag {
         super(sis.getSwf(), ID, "VideoFrame", data);
         streamID = sis.readUI16("streamID");
         frameNum = sis.readUI16("frameNum");
-        videoData = sis.readBytesEx(sis.available(), "videoData"); //TODO: Parse video packets
+        videoData = sis.readByteRangeEx(sis.available(), "videoData"); //TODO: Parse video packets
     }
 }

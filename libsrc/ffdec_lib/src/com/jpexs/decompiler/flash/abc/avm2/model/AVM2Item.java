@@ -40,8 +40,8 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     public AVM2Item(GraphSourceItem instruction, int precedence) {
         super(instruction, precedence);
-        if(instruction instanceof AVM2Instruction){
-            this.instruction = (AVM2Instruction)instruction;
+        if (instruction instanceof AVM2Instruction) {
+            this.instruction = (AVM2Instruction) instruction;
         }
     }
 
@@ -81,11 +81,11 @@ public abstract class AVM2Item extends GraphTargetItem {
                 }
             }
         }
-        
+
         if (empty) {
             return propertyName.toString(writer, localData);
         }
-        if (propertyName instanceof FullMultinameAVM2Item) {            
+        if (propertyName instanceof FullMultinameAVM2Item) {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 return propertyName.toString(writer, localData);
             } else {
@@ -101,7 +101,7 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
         if (localRegNames.containsKey(reg)) {
-            return IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(reg));
+            return IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(reg));
         } else {
             if (reg == 0) {
                 return "this";

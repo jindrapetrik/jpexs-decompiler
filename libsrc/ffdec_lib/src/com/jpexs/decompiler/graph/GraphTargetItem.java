@@ -59,7 +59,7 @@ public abstract class GraphTargetItem implements Serializable {
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
     public GraphTargetItem value;
-    protected Map<String,String> srcData = new HashMap<>();
+    protected Map<String, String> srcData = new HashMap<>();
 
     public GraphPart getFirstPart() {
         if (value == null) {

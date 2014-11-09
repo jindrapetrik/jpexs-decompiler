@@ -38,7 +38,7 @@ public class DefineBitsTag extends ImageTag {
     public int characterID;
 
     @SWFType(BasicType.UI8)
-    public byte[] jpegData;
+    public ByteArrayRange jpegData;
 
     @Internal
     private JPEGTablesTag jtt = null;
@@ -57,18 +57,19 @@ public class DefineBitsTag extends ImageTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBitsTag(SWF swf) {
         super(swf, ID, "DefineBits", null);
         characterID = swf.getNextCharacterId();
-        jpegData = new byte[0];
+        jpegData = ByteArrayRange.EMPTY;
     }
 
     public DefineBitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBits", data);
         characterID = sis.readUI16("characterID");
-        jpegData = sis.readBytesEx(sis.available(), "jpegData");
+        jpegData = sis.readByteRangeEx(sis.available(), "jpegData");
     }
 
     private void getJPEGTables() {
@@ -94,10 +95,11 @@ public class DefineBitsTag extends ImageTag {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte[] jttdata = jtt.jpegData;
                 if (jttdata.length != 0) {
-                    baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
-                    baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
+                    boolean jttError = SWF.hasErrorHeader(jttdata);
+                    baos.write(jttdata, jttError ? 4 : 0, jttdata.length - (jttError ? 6 : 2));
+                    baos.write(jpegData.getArray(), jpegData.getPos() + (SWF.hasErrorHeader(jpegData) ? 6 : 2), jpegData.getLength() - (jttError ? 6 : 2));
                 } else {
-                    baos.write(jpegData, 0, jpegData.length);
+                    baos.write(jpegData.getArray(), jpegData.getPos(), jpegData.getLength());
                 }
                 return new SerializableImage(ImageIO.read(new ByteArrayInputStream(baos.toByteArray())));
             } catch (IOException ex) {

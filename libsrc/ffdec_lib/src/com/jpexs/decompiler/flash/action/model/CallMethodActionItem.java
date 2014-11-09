@@ -73,7 +73,7 @@ public class CallMethodActionItem extends ActionItem {
                 scriptObject.toString(writer, localData);
             }
             writer.append(".");
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false,methodName.toStringNoQuotes(localData)));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
         } else {
             scriptObject.toString(writer, localData);
         }

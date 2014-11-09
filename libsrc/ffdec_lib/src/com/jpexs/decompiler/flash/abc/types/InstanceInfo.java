@@ -53,11 +53,11 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
-    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer,ABC abc, List<String> fullyQualifiedNames, boolean allowPrivate) {       
+    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames, boolean allowPrivate) {
         String modifiers;
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         modifiers = ns.getPrefix(abc);
-        if(!allowPrivate && modifiers.equals("private")){
+        if (!allowPrivate && modifiers.equals("private")) {
             modifiers = "";
         }
         if (!modifiers.isEmpty()) {
@@ -74,16 +74,14 @@ public class InstanceInfo {
         if (isInterface()) {
             objType = "interface ";
         }
-        
+
         writer.appendNoHilight(modifiers + objType);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false),"classname");
-        
-        
-        
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false), "classname");
+
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true);
             writer.appendNoHilight(" extends ");
-            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false),"typename",typeName);
+            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false), "typename", typeName);
         }
         if (interfaces.length > 0) {
             if (isInterface()) {
@@ -96,10 +94,10 @@ public class InstanceInfo {
                     writer.append(", ");
                 }
                 String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true);
-                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false),"typename",typeName);
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false), "typename", typeName);
             }
         }
-        
+
         return writer;
     }
 

@@ -167,11 +167,11 @@ public class TagTree extends JTree implements ActionListener {
     public class TagTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private Font plainFont;
-        
+
         private Font boldFont;
-        
-        private Map<TreeNodeType, Icon> icons;
-        
+
+        private final Map<TreeNodeType, Icon> icons;
+
         public TagTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);
@@ -187,7 +187,7 @@ public class TagTree extends JTree implements ActionListener {
                 }
             }
         }
-        
+
         @Override
         public Component getTreeCellRendererComponent(
                 JTree tree,
@@ -204,7 +204,7 @@ public class TagTree extends JTree implements ActionListener {
                     hasFocus);
             TreeItem val = (TreeItem) value;
             TreeNodeType type = getTreeNodeType(val);
-            
+
             if (type == TreeNodeType.FOLDER && expanded) {
                 type = TreeNodeType.FOLDER_OPEN;
             }

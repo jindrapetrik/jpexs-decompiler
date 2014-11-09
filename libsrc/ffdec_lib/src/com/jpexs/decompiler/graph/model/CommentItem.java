@@ -42,7 +42,7 @@ public class CommentItem extends GraphTargetItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("/* ");
         for (int i = 0; i < commentLines.length; i++) {
-            if(commentLines[i]==null){
+            if (commentLines[i] == null) {
                 continue;
             }
             writer.append(commentLines[i]);

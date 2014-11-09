@@ -152,7 +152,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
         SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(decompiledEditor);
         if (sDoc != null) {
-            Token t = sDoc.getTokenAt(pos+1);
+            Token t = sDoc.getTokenAt(pos + 1);
             String ident = null;
             //It should be identifier or obfuscated identifier
             if (t != null && (t.type == TokenType.IDENTIFIER || t.type == TokenType.REGEX)) {

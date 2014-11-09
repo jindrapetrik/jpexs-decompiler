@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -27,7 +26,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

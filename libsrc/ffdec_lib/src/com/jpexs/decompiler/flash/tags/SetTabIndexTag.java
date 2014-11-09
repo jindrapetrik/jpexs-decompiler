@@ -66,6 +66,7 @@ public class SetTabIndexTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public SetTabIndexTag(SWF swf) {

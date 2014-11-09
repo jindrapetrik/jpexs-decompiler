@@ -85,6 +85,7 @@ public class CSMTextSettingsTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public CSMTextSettingsTag(SWF swf) {

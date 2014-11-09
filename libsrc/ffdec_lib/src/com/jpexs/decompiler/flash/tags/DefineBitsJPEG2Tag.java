@@ -39,7 +39,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     public int characterID;
 
     @SWFType(BasicType.UI8)
-    public byte[] imageData;
+    public ByteArrayRange imageData;
 
     public static final int ID = 21;
 
@@ -56,9 +56,9 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     @Override
     public InputStream getImageData() {
         if (SWF.hasErrorHeader(imageData)) {
-            return new ByteArrayInputStream(imageData, 4, imageData.length - 4);
+            return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + 4, imageData.getLength() - 4);
         }
-        return new ByteArrayInputStream(imageData);
+        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
     }
 
     @Override
@@ -73,29 +73,30 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBitsJPEG2Tag(SWF swf) {
         super(swf, ID, "DefineBitsJPEG2", null);
         characterID = swf.getNextCharacterId();
-        imageData = new byte[0];
+        imageData = ByteArrayRange.EMPTY;
     }
 
     public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBitsJPEG2", data);
         characterID = sis.readUI16("characterID");
-        imageData = sis.readBytesEx(sis.available(), "imageData");
+        imageData = sis.readByteRangeEx(sis.available(), "imageData");
     }
 
     public DefineBitsJPEG2Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
         super(swf, ID, "DefineBitsJPEG2", data);
         this.characterID = characterID;
-        this.imageData = imageData;
+        this.imageData = new ByteArrayRange(imageData);
     }
 
     @Override
     public void setImage(byte[] data) {
-        imageData = data;
+        imageData = new ByteArrayRange(data);
         setModified(true);
     }
 

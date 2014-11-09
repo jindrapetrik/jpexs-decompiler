@@ -59,6 +59,7 @@ public class EnableDebuggerTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public EnableDebuggerTag(SWF swf) {

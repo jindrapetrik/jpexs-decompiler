@@ -23,7 +23,7 @@ package com.jpexs.helpers;
 public class ByteArrayRange {
 
     public static final ByteArrayRange EMPTY = new ByteArrayRange(new byte[0]);
-    
+
     private final byte[] array;
     private final int pos;
     private final int length;
@@ -43,18 +43,28 @@ public class ByteArrayRange {
     public byte[] getArray() {
         return array;
     }
-    
+
     public int getPos() {
         return pos;
     }
-    
+
     public int getLength() {
         return length;
     }
-    
+
+    public byte get(int index) {
+        return array[pos + index];
+    }
+
     public byte[] getRangeData() {
         byte[] data = new byte[length];
         System.arraycopy(array, pos, data, 0, length);
+        return data;
+    }
+
+    public byte[] getRangeData(int pos, int length) {
+        byte[] data = new byte[length];
+        System.arraycopy(array, this.pos + pos, data, 0, length);
         return data;
     }
 }

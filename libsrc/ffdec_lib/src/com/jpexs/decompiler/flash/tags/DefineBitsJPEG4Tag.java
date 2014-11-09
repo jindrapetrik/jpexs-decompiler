@@ -47,10 +47,10 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public int deblockParam;
 
     @SWFType(BasicType.UI8)
-    public byte[] imageData;
+    public ByteArrayRange imageData;
 
     @SWFType(BasicType.UI8)
-    public byte[] bitmapAlphaData;
+    public ByteArrayRange bitmapAlphaData;
 
     public static final int ID = 90;
 
@@ -70,16 +70,16 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public void setImage(byte[] data) {
-        imageData = data;
+        imageData = new ByteArrayRange(data);
         if (ImageTag.getImageFormat(data).equals("jpg")) {
             SerializableImage image = getImage();
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
             }
-            bitmapAlphaData = ba;
+            bitmapAlphaData = new ByteArrayRange(ba);
         } else {
-            bitmapAlphaData = new byte[0];
+            bitmapAlphaData = ByteArrayRange.EMPTY;
         }
         setModified(true);
     }
@@ -92,16 +92,16 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     @Override
     public SerializableImage getImage() {
         try {
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
             SerializableImage img = image == null ? null : new SerializableImage(image);
-            if (bitmapAlphaData.length == 0) {
+            if (bitmapAlphaData.getLength() == 0) {
                 return img;
             }
             SerializableImage img2 = new SerializableImage(img.getWidth(), img.getHeight(), SerializableImage.TYPE_INT_ARGB);
             for (int y = 0; y < img.getHeight(); y++) {
                 for (int x = 0; x < img.getWidth(); x++) {
                     int val = img.getRGB(x, y);
-                    int a = bitmapAlphaData[x + y * img.getWidth()] & 0xff;
+                    int a = bitmapAlphaData.get(x + y * img.getWidth()) & 0xff;
                     val = (val & 0xffffff) | (a << 24);
                     img2.setRGB(x, y, colorToInt(multiplyAlpha(intToColor(val))));
                 }
@@ -124,7 +124,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterID);
-            sos.writeUI32(imageData.length);
+            sos.writeUI32(imageData.getLength());
             sos.writeUI16(deblockParam);
             sos.write(imageData);
             sos.write(bitmapAlphaData);
@@ -136,13 +136,14 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBitsJPEG4Tag(SWF swf) {
         super(swf, ID, "DefineBitsJPEG4", null);
         characterID = swf.getNextCharacterId();
-        imageData = new byte[0];
-        bitmapAlphaData = new byte[0];
+        imageData = ByteArrayRange.EMPTY;
+        bitmapAlphaData = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -157,7 +158,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         characterID = sis.readUI16("characterID");
         long alphaDataOffset = sis.readUI32("alphaDataOffset");
         deblockParam = sis.readUI16("deblockParam");
-        imageData = sis.readBytesEx(alphaDataOffset, "imageData");
-        bitmapAlphaData = sis.readBytesEx(sis.available(), "bitmapAlphaData");
+        imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
+        bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
     }
 }

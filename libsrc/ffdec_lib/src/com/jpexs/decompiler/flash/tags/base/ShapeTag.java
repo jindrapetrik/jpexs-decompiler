@@ -46,7 +46,7 @@ import java.util.Set;
 public abstract class ShapeTag extends CharacterTag implements DrawableTag {
 
     private final int markerSize = 10;
-    
+
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -68,7 +68,7 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag {
             double[] coords = new double[6];
             AffineTransform at = transformation.toTransform();
             at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-            
+
             // get the graphics from the inner image object, because it creates a new Graphics object
             Graphics2D graphics = (Graphics2D) image.getBufferedImage().getGraphics();
             graphics.setPaint(Color.black);

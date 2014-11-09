@@ -50,6 +50,7 @@ public class DoActionTag extends Tag implements ASMSource {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DoActionTag(SWF swf) {
@@ -65,9 +66,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoAction", data);
-        int pos = (int) sis.getPos();
-        byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
-        actionBytes = new ByteArrayRange(data.getArray(), pos, bytes.length);
+        actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
     }
 
     /**

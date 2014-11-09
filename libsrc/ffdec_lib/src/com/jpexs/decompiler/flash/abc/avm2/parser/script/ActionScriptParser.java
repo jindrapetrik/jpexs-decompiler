@@ -350,7 +350,7 @@ public class ActionScriptParser {
                 name = null;
             }
             s = lex();
-        }      
+        }
 
         GraphTargetItem ret = null;
         if (name != null) {

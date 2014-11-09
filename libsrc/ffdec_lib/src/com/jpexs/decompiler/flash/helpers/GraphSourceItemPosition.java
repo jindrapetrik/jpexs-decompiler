@@ -28,6 +28,6 @@ public class GraphSourceItemPosition {
 
     public GraphSourceItem graphSourceItem;
     public int position;
-    public Map<String,String> data;
+    public Map<String, String> data;
 
 }

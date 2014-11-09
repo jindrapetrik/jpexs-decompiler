@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import static com.jpexs.decompiler.flash.console.ContextMenuTools.getAppDir;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -820,7 +819,7 @@ public class Main {
         if (GraphicsEnvironment.isHeadless()) { //No GUI in OS
             return;
         }
-        if (!Configuration.locale.hasValue()){
+        if (!Configuration.locale.hasValue()) {
             if (Platform.isWindows()) {
                 //Load from Installer
                 String uninstKey = "{E618D276-6596-41F4-8A98-447D442A77DB}_is1";
@@ -833,30 +832,30 @@ public class Main {
                             char buf[] = new char[9];
                             int cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO639LANGNAME, buf, 9);
                             String langCode = new String(buf, 0, cnt).trim().toLowerCase();
-                            
+
                             cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO3166CTRYNAME, buf, 9);
                             String countryCode = new String(buf, 0, cnt).trim().toLowerCase();
-                            
-                            List<String> langs=Arrays.asList(SelectLanguageDialog.getAvailableLanguages());
-                            for(int i=0;i<langs.size();i++){
+
+                            List<String> langs = Arrays.asList(SelectLanguageDialog.getAvailableLanguages());
+                            for (int i = 0; i < langs.size(); i++) {
                                 langs.set(i, langs.get(i).toLowerCase());
                             }
-                            
+
                             String selectedLang = null;
-                            
-                            if(langs.contains(langCode+"-"+countryCode)){
-                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode+"-"+countryCode)];
-                            }else if(langs.contains(langCode)){
+
+                            if (langs.contains(langCode + "-" + countryCode)) {
+                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode + "-" + countryCode)];
+                            } else if (langs.contains(langCode)) {
                                 selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode)];
                             }
-                            if(selectedLang!=null){
+                            if (selectedLang != null) {
                                 Configuration.locale.set(selectedLang);
                             }
                         }
                     }
                 } catch (Exception ex) {
                     //ignore
-                }                
+                }
             }
         }
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));

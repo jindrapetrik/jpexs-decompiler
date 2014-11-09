@@ -35,6 +35,7 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public RemoveObject2Tag(SWF swf) {

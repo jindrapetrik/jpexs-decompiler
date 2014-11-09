@@ -50,11 +50,11 @@ public class AS3Package extends AS3ClassTreeItem {
                 if (index == 0) {
                     return subPackage;
                 }
-                
+
                 index--;
             }
         }
-        
+
         index -= subPackages.size();
 
         for (ScriptPack pack : scripts.values()) {
@@ -91,7 +91,7 @@ public class AS3Package extends AS3ClassTreeItem {
             }
             res++;
         }
-        
+
         return res;
     }
 
