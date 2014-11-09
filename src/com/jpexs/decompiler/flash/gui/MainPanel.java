@@ -2223,7 +2223,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             @Override
             public void run() {
                 try {
-                    SWF bswf = new SWF(new ByteArrayInputStream(binaryDataTag.binaryData), new ProgressListener() {
+                    SWF bswf = new SWF(new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData()), new ProgressListener() {
 
                         @Override
                         public void progress(int p) {

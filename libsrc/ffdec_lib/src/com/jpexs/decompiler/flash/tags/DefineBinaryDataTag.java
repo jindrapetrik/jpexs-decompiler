@@ -38,7 +38,7 @@ public class DefineBinaryDataTag extends CharacterTag {
     @SWFType(BasicType.UI16)
     public int tag;
 
-    public byte[] binaryData;
+    public ByteArrayRange binaryData;
 
     @Reserved
     @SWFType(BasicType.UI32)
@@ -77,18 +77,18 @@ public class DefineBinaryDataTag extends CharacterTag {
     public DefineBinaryDataTag(SWF swf) {
         super(swf, ID, "DefineBinaryData", null);
         tag = swf.getNextCharacterId();
-        binaryData = new byte[0];
+        binaryData = ByteArrayRange.EMPTY;
     }
 
     public DefineBinaryDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBinaryData", data);
         tag = sis.readUI16("tag");
         reserved = sis.readUI32("reserved");
-        binaryData = sis.readBytesEx(sis.available(), "binaryData");
+        binaryData = sis.readByteRangeEx(sis.available(), "binaryData");
 
         if (Configuration.autoLoadEmbeddedSwfs.get()) {
             try {
-                SWF bswf = new SWF(new ByteArrayInputStream(binaryData), Configuration.parallelSpeedUp.get());
+                SWF bswf = new SWF(new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength()), Configuration.parallelSpeedUp.get());
                 bswf.fileTitle = "(SWF Data)";
                 innerSwf = bswf;
                 bswf.binaryData = this;
@@ -105,8 +105,8 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     public boolean isSwfData() {
         try {
-            if (binaryData.length > 8) {
-                String signature = new String(binaryData, 0, 3, Utf8Helper.charset);
+            if (binaryData.getLength() > 8) {
+                String signature = new String(binaryData.getRangeData(0, 3), Utf8Helper.charset);
                 if (Arrays.asList(
                         "FWS", //Uncompressed Flash
                         "CWS", //ZLib compressed Flash

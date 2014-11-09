@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.sun.jna.Platform;
 import java.awt.event.ActionEvent;
@@ -486,7 +487,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         try {
                             swf.saveTo(baos);
-                            swf.binaryData.binaryData = baos.toByteArray();
+                            swf.binaryData.binaryData = new ByteArrayRange(baos.toByteArray());
                             swf.binaryData.setModified(true);
                             saved = true;
                         } catch (IOException ex) {

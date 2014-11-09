@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -55,7 +56,7 @@ public class BinaryDataExporter {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(((DefineBinaryDataTag) t).binaryData);
+                            fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
                         }
                     }
                 }, handler).run();

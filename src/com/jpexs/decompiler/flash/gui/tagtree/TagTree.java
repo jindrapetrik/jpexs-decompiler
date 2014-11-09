@@ -565,17 +565,8 @@ public class TagTree extends JTree implements ActionListener {
         if (item instanceof DefineBinaryDataTag) {
             replaceSelectionMenuItem.setVisible(true);
             DefineBinaryDataTag bin = (DefineBinaryDataTag) item;
-            if (bin.binaryData.length > 8) {
-                String signature = new String(bin.binaryData, 0, 3, Utf8Helper.charset);
-                if (Arrays.asList(
-                        "FWS", //Uncompressed Flash
-                        "CWS", //ZLib compressed Flash
-                        "ZWS", //LZMA compressed Flash
-                        "GFX", //Uncompressed ScaleForm GFx
-                        "CFX" //Compressed ScaleForm GFx
-                ).contains(signature)) {
-                    openSWFInsideTagMenuItem.setVisible(true);
-                }
+            if (bin.isSwfData()) {
+                openSWFInsideTagMenuItem.setVisible(true);
             }
         }
 

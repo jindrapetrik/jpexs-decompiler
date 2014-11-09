@@ -76,7 +76,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
 
     public void setBinaryData(DefineBinaryDataTag binaryDataTag) {
         this.binaryDataTag = binaryDataTag;
-        data = binaryDataTag == null ? null : binaryDataTag.binaryData;
+        data = binaryDataTag == null ? null : binaryDataTag.binaryData.getRangeData();
         if (data != null) {
             hexEditor.setData(data, null, null);
             swfInsidePanel.setVisible(binaryDataTag.innerSwf == null && binaryDataTag.isSwfData());
