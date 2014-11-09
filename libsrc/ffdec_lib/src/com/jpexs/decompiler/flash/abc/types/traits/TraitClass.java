@@ -348,8 +348,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        String classHeader = abc.instance_info.get(class_info).getClassHeaderStr(abc, fullyQualifiedNames);
-        return writer.appendNoHilight(classHeader);
+        abc.instance_info.get(class_info).getClassHeaderStr(writer,abc, fullyQualifiedNames,false);
+        return writer;
     }
 
     @Override
@@ -447,11 +447,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //class header     
-        String classHeader = abc.instance_info.get(class_info).getClassHeaderStr(abc, fullyQualifiedNames);
-        if (classHeader.startsWith("private ")) {
-            classHeader = classHeader.substring("private ".length());
-        }
-        writer.appendNoHilight(classHeader).startBlock();
+        abc.instance_info.get(class_info).getClassHeaderStr(writer,abc, fullyQualifiedNames,false);
+        writer.startBlock();
 
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {

@@ -540,6 +540,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     private boolean hasDeclaration(int pos) {
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
+            if(multinameIndex == 0){
+                return false;
+            }
             List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
 
             Multiname m = abc.constants.constant_multiname.get(multinameIndex);
@@ -561,10 +564,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (!usages.isEmpty()) {
                 return true;
             }
-        } else {
-            return decompiledTextArea.getLocalDeclarationOfPos(pos) != -1;
-        }
-        return false;
+        } 
+
+        return decompiledTextArea.getLocalDeclarationOfPos(pos) != -1;                
     }
 
     private void gotoDeclaration(int pos) {
@@ -591,15 +593,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (usages.size() > 1) {
                 UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, true);
                 usageFrame.setVisible(true);
+                return;
             } else if (!usages.isEmpty()) { //one
                 UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
-            }
-        } else {
-            int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos);
-            if (dpos > -1) {
-                decompiledTextArea.setCaretPosition(dpos);
+                return;
             }
         }
+        
+        int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos);
+        if (dpos > -1) {
+            decompiledTextArea.setCaretPosition(dpos);
+        }
+        
     }
 
     private class CtrlClickHandler extends KeyAdapter implements MouseListener, MouseMotionListener {

@@ -99,13 +99,13 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
-    public NulWriter hilightSpecial(String text, String type, int index) {
+    public NulWriter hilightSpecial(String text, String type, String index) {
         stringAdded = true;
         return this;
     }
 
     @Override
-    public NulWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+    public NulWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
         stringAdded = true;
         return this;
     }

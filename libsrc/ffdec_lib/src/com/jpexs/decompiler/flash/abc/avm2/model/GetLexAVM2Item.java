@@ -34,6 +34,9 @@ public class GetLexAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        
+        String localName = propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);        
+        srcData.put("localName",localName);
         return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
     }
 

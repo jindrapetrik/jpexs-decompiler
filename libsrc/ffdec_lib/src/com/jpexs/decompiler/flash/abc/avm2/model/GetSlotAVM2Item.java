@@ -39,7 +39,7 @@ public class GetSlotAVM2Item extends AVM2Item {
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }
-        srcData.put("slotName", slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        srcData.put("localName", slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
         
         return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
     }

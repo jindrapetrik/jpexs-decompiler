@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,28 +53,13 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
-    public String getClassHeaderStr(ABC abc, List<String> fullyQualifiedNames) {
-        String supIndexStr = "";
-        if (super_index > 0) {
-            supIndexStr = " extends " + abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
-        }
-        String implStr = "";
-        if (interfaces.length > 0) {
-            if (isInterface()) {
-                implStr = " extends ";
-            } else {
-                implStr = " implements ";
-            }
-            for (int i = 0; i < interfaces.length; i++) {
-                if (i > 0) {
-                    implStr += ", ";
-                }
-                implStr += abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false);
-            }
-        }
+    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer,ABC abc, List<String> fullyQualifiedNames, boolean allowPrivate) {       
         String modifiers;
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         modifiers = ns.getPrefix(abc);
+        if(!allowPrivate && modifiers.equals("private")){
+            modifiers = "";
+        }
         if (!modifiers.isEmpty()) {
             modifiers += " ";
         }
@@ -88,7 +74,31 @@ public class InstanceInfo {
         if (isInterface()) {
             objType = "interface ";
         }
-        return modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false) + supIndexStr + implStr;
+        writer.appendNoHilight(modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false));
+        
+        
+        
+        if (super_index > 0) {
+            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true);
+            writer.appendNoHilight(" extends ");
+            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false),"typename",typeName);
+        }
+        if (interfaces.length > 0) {
+            if (isInterface()) {
+                writer.appendNoHilight(" extends ");
+            } else {
+                writer.appendNoHilight(" implements ");
+            }
+            for (int i = 0; i < interfaces.length; i++) {
+                if (i > 0) {
+                    writer.append(", ");
+                }
+                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true);
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false),"typename",typeName);
+            }
+        }
+        
+        return writer;
     }
 
     public Multiname getName(AVM2ConstantPool constants) {

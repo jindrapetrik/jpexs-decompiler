@@ -64,7 +64,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.hilighOffset(offset);
     }
 
-    public void hilighSpecial(String type, int index) {
+    public void hilighSpecial(String type, String index) {
         sourceTextArea.hilighSpecial(type, index);
     }
 

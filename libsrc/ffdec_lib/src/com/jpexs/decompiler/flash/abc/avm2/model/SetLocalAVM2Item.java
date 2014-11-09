@@ -42,13 +42,14 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public SetLocalAVM2Item(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
         this.regIndex = regIndex;
-        this.value = value;
-        srcData.put("regIndex", ""+regIndex);        
+        this.value = value;             
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append(localRegName(localData.localRegNames, regIndex) + " = ");
+        String localName = localRegName(localData.localRegNames, regIndex);
+        srcData.put("localName", localName);
+        writer.append(localName + " = ");
         return value.toString(writer, localData);
     }
 

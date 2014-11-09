@@ -279,10 +279,9 @@ public class MethodInfo {
                 writer.appendNoHilight(", ");
             }
             pdata=new HashMap<>();
-            pdata.put("declaration", "true");
-            pdata.put("regIndex", ""+(i+1));            
+            pdata.put("declaration", "true");          
             if (!localRegNames.isEmpty()) {
-                pdata.put("slotName", localRegNames.get(i + 1)); //assuming it is a slot
+                pdata.put("localName", localRegNames.get(i + 1)); //assuming it is a slot
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(i + 1)),"paramname",i,pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,constants.getString(paramNames[i])),"paramname",i,pdata);
@@ -309,14 +308,16 @@ public class MethodInfo {
                 restAdd += ", ";
             }
             restAdd += "... ";
+            String restName;
             if (!localRegNames.isEmpty()) {
-                restAdd += localRegNames.get(param_types.length + 1);
+                restName = localRegNames.get(param_types.length + 1);
             } else {
-                restAdd += "rest";
+                restName = "rest";
             }
+            restAdd += restName;
             pdata=new HashMap<>();
             pdata.put("declaration", "true");
-            pdata.put("regIndex", ""+(param_types.length + 1));            
+            pdata.put("localName",restName);            
             writer.hilightSpecial(restAdd, "flag.NEED_REST",0,pdata);
         }
         return writer;

@@ -55,8 +55,7 @@ public class LocalRegAVM2Item extends AVM2Item {
                 computedResult = null;
             }
         }
-        this.computedValue = computedValue;
-        srcData.put("regIndex", ""+regIndex);
+        this.computedValue = computedValue;        
     }
 
     @Override
@@ -64,7 +63,9 @@ public class LocalRegAVM2Item extends AVM2Item {
         if (computedValue instanceof FilterAVM2Item) {
             return computedValue.toString(writer, localData);
         }
-        return writer.append(localRegName(localData.localRegNames, regIndex));
+        String localName = localRegName(localData.localRegNames, regIndex);
+        srcData.put("localName", localName);
+        return writer.append(localName);
     }
 
     @Override

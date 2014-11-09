@@ -144,20 +144,20 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     @Override
     public HilightedTextWriter hilightSpecial(String text, String type) {
-        return hilightSpecial(text, type, 0);
+        return hilightSpecial(text, type, "0");
     }
 
     @Override
-    public HilightedTextWriter hilightSpecial(String text, String type, int index) {
+    public HilightedTextWriter hilightSpecial(String text, String type, String index) {
         return hilightSpecial(text, type, index, new HashMap<String, String>());
     }
 
     @Override
-    public HilightedTextWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+    public HilightedTextWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
         Map<String, String> ndata = new HashMap<>();
         ndata.putAll(data);
         ndata.put("subtype", type);
-        ndata.put("index", Long.toString(index));        
+        ndata.put("index", index);        
         start(ndata, HilightType.SPECIAL);
         appendNoHilight(text);
         return end(HilightType.SPECIAL);

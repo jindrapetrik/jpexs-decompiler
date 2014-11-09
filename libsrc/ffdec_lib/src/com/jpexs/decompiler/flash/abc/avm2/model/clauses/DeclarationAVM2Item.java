@@ -16,15 +16,19 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 
 /**
  *
@@ -43,13 +47,15 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     public DeclarationAVM2Item(GraphTargetItem assignment) {
         this(assignment, null);
-    }
+    }        
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {               
+        
         if (assignment instanceof SetLocalAVM2Item) {            
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
-            srcData.put("regIndex",""+lti.regIndex);
+            String localName = localRegName(localData.localRegNames, lti.regIndex);
+            srcData.put("localName",localName);
             srcData.put("declaration", "true");
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
@@ -59,19 +65,20 @@ public class DeclarationAVM2Item extends AVM2Item {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
             writer.append("var ");
-            writer.append(localRegName(localData.localRegNames, lti.regIndex));
-            writer.append(":");
+            writer.append(localName);
+            writer.append(":");            
             coerType.appendTo(writer, localData);
             writer.append(" = ");
             return lti.value.toString(writer, localData);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
-            srcData.put("slotName",""+ssti.getNameAsStr(localData));
+            srcData.put("localName",ssti.getNameAsStr(localData));
             srcData.put("declaration", "true");
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");
+            
             type.appendTo(writer, localData);
             writer.append(" = ");
             return ssti.value.toString(writer, localData);

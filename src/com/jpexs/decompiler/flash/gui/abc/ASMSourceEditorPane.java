@@ -113,7 +113,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         addCaretListener(this);
     }
 
-    public void hilighSpecial(String type, int index) {
+    public void hilighSpecial(String type, String index) {
         Highlighting h2 = null;
         for (Highlighting sh : specialHilights) {
             if (type.equals(sh.getPropertyString("subtype"))) {

@@ -20,6 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
@@ -205,7 +209,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         Highlighting sh = Highlighting.search(specialHighlights, pos);
         if (sh != null) {
-            methodCodePanel.hilighSpecial(sh.getPropertyString("subtype"), (int) (long) sh.getPropertyLong("index"));
+            methodCodePanel.hilighSpecial(sh.getPropertyString("subtype"), sh.getPropertyString("index"));
             success = true;
         }
         return success;
@@ -234,35 +238,39 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public int getLocalDeclarationOfPos(int pos) {
         Highlighting sh = Highlighting.search(specialHighlights, pos);
         Highlighting h = Highlighting.search(highlights, pos);
-        Highlighting tm = Highlighting.search(methodHighlights, pos);
-        if (tm == null) {
-            return -1;
-        }
-        List<Highlighting> tms = Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);
-        if (h == null) {
-            return -1;
-        }
-        //is it already declaration?
-        if ("true".equals(h.getPropertyString("declaration")) || (sh != null && "true".equals(sh.getPropertyString("declaration")))) {
-            return -1; //no jump
-        }
 
-        Map<String, String> search = h.getProperties();
-        search.remove("index");
-        search.remove("subtype");
-        search.remove("offset");
-        if (search.isEmpty()) {
+        List<Highlighting> tms = Highlighting.searchAll(methodHighlights, pos, null, null, -1, -1);
+        if (tms.isEmpty()) {
             return -1;
         }
-        search.put("declaration", "true");
+        for (Highlighting tm : tms) {
 
-        for (Highlighting tm1 : tms) {
-            Highlighting rh = Highlighting.search(highlights, search, tm1.startPos, tm1.startPos + tm1.len);
-            if (rh == null) {
-                rh = Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos + tm1.len);
+            List<Highlighting> tm_tms = Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);
+            if (h == null) {
+                return -1;
             }
-            if (rh != null) {
-                return rh.startPos;
+            //is it already declaration?
+            if ("true".equals(h.getPropertyString("declaration")) || (sh != null && "true".equals(sh.getPropertyString("declaration")))) {
+                return -1; //no jump
+            }
+
+            Map<String, String> search = h.getProperties();
+            search.remove("index");
+            search.remove("subtype");
+            search.remove("offset");
+            if (search.isEmpty()) {
+                return -1;
+            }
+            search.put("declaration", "true");
+
+            for (Highlighting tm1 : tm_tms) {
+                Highlighting rh = Highlighting.search(highlights, search, tm1.startPos, tm1.startPos + tm1.len);
+                if (rh == null) {
+                    rh = Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos + tm1.len);
+                }
+                if (rh != null) {
+                    return rh.startPos;
+                }
             }
         }
 
@@ -271,48 +279,70 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public int getMultinameAtPos(int pos) {
         Highlighting tm = Highlighting.search(methodHighlights, pos);
-        if (tm == null) {
-            return -1;
-        }
-        int mi = (int) (long) tm.getPropertyLong("index");
-        int bi = abc.findBodyIndex(mi);
-        Highlighting h = Highlighting.search(highlights, pos);
-        if (h != null) {
-            List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
-            AVM2Instruction lastIns = null;
-            long inspos = 0;
-            AVM2Instruction selIns = null;
-            for (AVM2Instruction ins : list) {
-                if (h.getPropertyLong("offset") == ins.getOffset()) {
-                    selIns = ins;
-                    break;
+        Trait currentTrait = null;
+        int currentMethod = -1;
+        if (tm != null) {
+
+            int mi = (int) (long) tm.getPropertyLong("index");
+            int bi = abc.findBodyIndex(mi);
+            Highlighting h = Highlighting.search(highlights, pos);
+            if (h != null) {
+                List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
+                AVM2Instruction lastIns = null;
+                long inspos = 0;
+                AVM2Instruction selIns = null;
+                for (AVM2Instruction ins : list) {
+                    if (h.getPropertyLong("offset") == ins.getOffset()) {
+                        selIns = ins;
+                        break;
+                    }
+                    if (ins.getOffset() > h.getPropertyLong("offset")) {
+                        inspos = h.getPropertyLong("offset") - lastIns.offset;
+                        selIns = lastIns;
+                        break;
+                    }
+                    lastIns = ins;
                 }
-                if (ins.getOffset() > h.getPropertyLong("offset")) {
-                    inspos = h.getPropertyLong("offset") - lastIns.offset;
-                    selIns = lastIns;
-                    break;
-                }
-                lastIns = ins;
-            }
-            if (selIns != null) {
-                for (int i = 0; i < selIns.definition.operands.length; i++) {
-                    if (selIns.definition.operands[i] == AVM2Code.DAT_MULTINAME_INDEX) {
-                        return selIns.operands[i];
+                if (selIns != null) {
+                    if ((selIns.definition instanceof ConstructSuperIns) || (selIns.definition instanceof CallSuperIns)|| (selIns.definition instanceof CallSuperVoidIns)) {
+                        Highlighting tc = Highlighting.search(classHighlights, pos);
+                        if(tc!=null){
+                            int cindex = (int)(long)tc.getPropertyLong("index");
+                            if(cindex>-1){
+                                return abc.instance_info.get(cindex).super_index;
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < selIns.definition.operands.length; i++) {
+                            if (selIns.definition.operands[i] == AVM2Code.DAT_MULTINAME_INDEX) {
+                                return selIns.operands[i];
+                            }
+                        }
                     }
                 }
             }
-        }
-        int currentMethod = -1;
-        Trait currentTrait = getCurrentTrait();
-        if (currentTrait instanceof TraitMethodGetterSetter) {
-            currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
-        }
-        if (currentMethodHighlight != null) {
-            currentMethod = (int) (long) currentMethodHighlight.getPropertyLong("index");
+
+            currentTrait = getCurrentTrait();
+            if (currentTrait instanceof TraitMethodGetterSetter) {
+                currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
+            }
+            if (currentMethodHighlight != null) {
+                currentMethod = (int) (long) currentMethodHighlight.getPropertyLong("index");
+            }
         }
         Highlighting sh = Highlighting.search(specialHighlights, pos);
         if (sh != null) {
             switch (sh.getPropertyString("subtype")) {
+                case "typename":
+                    String typeName = sh.getPropertyString("index");
+                    for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
+                        Multiname m = abc.constants.constant_multiname.get(i);
+                        if (m != null) {
+                            if (typeName.equals(m.getNameWithNamespace(abc.constants, true))) {
+                                return i;
+                            }
+                        }
+                    }
                 case "traittypename":
                     if (currentTrait instanceof TraitSlotConst) {
                         TraitSlotConst ts = (TraitSlotConst) currentTrait;

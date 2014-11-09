@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -31,7 +32,9 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TryAVM2Item extends AVM2Item implements Block {
 
@@ -74,7 +77,15 @@ public class TryAVM2Item extends AVM2Item implements Block {
         writer.endBlock();
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
-            writer.append("catch(" + catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames) + ")");
+            writer.append("catch(");
+            String localName = catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames);
+            Map<String,String> data=new HashMap<>();
+            data.put("localName", localName);
+            data.put("declaration", "true");
+            writer.hilightSpecial(localName, "try.name",e,data);
+            writer.append(":");
+            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames),"try.type",e);
+            writer.append(")");
             writer.startBlock();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
