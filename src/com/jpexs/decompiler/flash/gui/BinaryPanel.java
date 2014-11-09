@@ -76,32 +76,12 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
         swfInsidePanel.setVisible(false);
     }
 
-    public void setBinaryData(byte[] data, DefineBinaryDataTag binaryDataTag) {
+    public void setBinaryData(DefineBinaryDataTag binaryDataTag) {
         this.binaryDataTag = binaryDataTag;
-        this.data = data;
+        data = binaryDataTag == null ? null : binaryDataTag.binaryData;
         if (data != null) {
             hexEditor.setData(data, null, null);
-
-            boolean binaryIsSwf = false;
-            if (binaryDataTag != null) {
-                if (binaryDataTag.innerSwf == null && data.length > 8) {
-                    try {
-                        String signature = new String(data, 0, 3, Utf8Helper.charset);
-                        if (Arrays.asList(
-                                "FWS", //Uncompressed Flash
-                                "CWS", //ZLib compressed Flash
-                                "ZWS", //LZMA compressed Flash
-                                "GFX", //Uncompressed ScaleForm GFx
-                                "CFX" //Compressed ScaleForm GFx
-                        ).contains(signature)) {
-                            binaryIsSwf = true;
-                        }
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-
-            swfInsidePanel.setVisible(binaryIsSwf);
+            swfInsidePanel.setVisible(binaryDataTag.innerSwf == null && binaryDataTag.isSwfData());
         } else {
             hexEditor.setData(new byte[0], null, null);
             swfInsidePanel.setVisible(false);
@@ -112,7 +92,7 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        setBinaryData(data, binaryDataTag);
+        setBinaryData(binaryDataTag);
     }
 
     @Override

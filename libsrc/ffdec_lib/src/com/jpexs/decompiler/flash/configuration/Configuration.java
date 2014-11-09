@@ -363,6 +363,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> tagTreeShowEmptyFolders = null;    
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;    
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

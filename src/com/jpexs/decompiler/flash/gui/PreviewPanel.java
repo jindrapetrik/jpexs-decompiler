@@ -422,14 +422,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     public void clear() {
         imagePanel.stop();
-        binaryPanel.setBinaryData(null, null);
+        binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         fontPanel.clear();
     }
 
-    public void showBinaryPanel(byte[] data, DefineBinaryDataTag binaryDataTag) {
+    public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
-        binaryPanel.setBinaryData(data, binaryDataTag);
+        binaryPanel.setBinaryData(binaryDataTag);
         parametersPanel.setVisible(false);
     }
 
