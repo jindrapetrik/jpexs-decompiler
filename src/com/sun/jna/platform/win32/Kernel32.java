@@ -299,4 +299,9 @@ public interface Kernel32 extends WinNT {
     DWORD QueryDosDevice(String lpDeviceName, char[] lpTargetPath, int lenght);
 
     boolean VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, int flNewProtect, IntByReference lpflOldProtect);
+    
+    
+    public static final int LOCALE_SISO3166CTRYNAME = 90;
+    public static final int LOCALE_SISO639LANGNAME = 89;
+    int GetLocaleInfo (int Locale, int LCType, char[] lpLCData, int cchData);
 }

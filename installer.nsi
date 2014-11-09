@@ -16,17 +16,19 @@
 
 
 
+
+!define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
+
 !define APP_VERNAME "${APP_NAME} v. ${APP_VER}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "graphics\installer_164x314.bmp" 
 !define MUI_HEADERIMAGE 
-!define MUI_HEADERIMAGE_BITMAP "graphics\installer_150x57.bmp"  
+!define MUI_HEADERIMAGE_BITMAP "graphics\installer_150x57.bmp"
 
 !define APP_UNINSTKEY "{E618D276-6596-41F4-8A98-447D442A77DB}_is1"
-
 SetCompressor /SOLID lzma
 
   ;Name and file
-  Name "${APP_VERNAME}"
+  Name "${APP_SHORTVERNAME}"
   OutFile "${APP_SETUPFILE}"
 
 
@@ -44,7 +46,14 @@ SetCompressor /SOLID lzma
 ;Interface Settings
 
   !define MUI_ABORTWARNING
+  !define MUI_LANGDLL_ALLLANGUAGES
 
+
+  
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW un.ModifyUnWelcome
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE un.LeaveUnWelcome
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_INSTFILES
 
 
 
@@ -74,6 +83,103 @@ Function GetInstalledSize
 	Pop $0
 	IntFmt $GetInstalledSize.total "0x%08X" $GetInstalledSize.total
 	Push $GetInstalledSize.total
+FunctionEnd
+
+
+
+Function IsFlashInstalled
+  Push $R0
+  ClearErrors
+  ReadRegStr $R0 HKCR "CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}\InprocServer32" ""
+  IfErrors lbl_na
+    IfFileExists $R0 0 lbl_na
+      StrCpy $R0 1
+  Goto lbl_end
+  lbl_na:
+    StrCpy $R0 0
+  lbl_end:
+  Exch $R0
+ FunctionEnd
+ 
+!define IsFlashInstalled "!insertmacro IsFlashInstalled"
+ 
+!macro IsFlashInstalled ResultVar
+  Call IsFlashInstalled
+  Pop "${ResultVar}"
+!macroend
+
+
+!define StrLoc "!insertmacro StrLoc"
+ 
+!macro StrLoc ResultVar String SubString StartPoint
+  Push "${String}"
+  Push "${SubString}"
+  Push "${StartPoint}"
+  Call StrLoc
+  Pop "${ResultVar}"
+!macroend
+ 
+Function StrLoc
+/*After this point:
+  ------------------------------------------
+   $R0 = StartPoint (input)
+   $R1 = SubString (input)
+   $R2 = String (input)
+   $R3 = SubStringLen (temp)
+   $R4 = StrLen (temp)
+   $R5 = StartCharPos (temp)
+   $R6 = TempStr (temp)*/
+ 
+  ;Get input from user
+  Exch $R0
+  Exch
+  Exch $R1
+  Exch 2
+  Exch $R2
+  Push $R3
+  Push $R4
+  Push $R5
+  Push $R6
+ 
+  ;Get "String" and "SubString" length
+  StrLen $R3 $R1
+  StrLen $R4 $R2
+  ;Start "StartCharPos" counter
+  StrCpy $R5 0
+ 
+  ;Loop until "SubString" is found or "String" reaches its end
+  ${Do}
+    ;Remove everything before and after the searched part ("TempStr")
+    StrCpy $R6 $R2 $R3 $R5
+ 
+    ;Compare "TempStr" with "SubString"
+    ${If} $R6 == $R1
+      ${If} $R0 == `<`
+        IntOp $R6 $R3 + $R5
+        IntOp $R0 $R4 - $R6
+      ${Else}
+        StrCpy $R0 $R5
+      ${EndIf}
+      ${ExitDo}
+    ${EndIf}
+    ;If not "SubString", this could be "String"'s end
+    ${If} $R5 >= $R4
+      StrCpy $R0 ``
+      ${ExitDo}
+    ${EndIf}
+    ;If not, continue the loop
+    IntOp $R5 $R5 + 1
+  ${Loop}
+ 
+  ;Return output to user
+  Pop $R6
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Exch
+  Pop $R1
+  Exch $R0
 FunctionEnd
 
 Function GetTime
@@ -216,6 +322,40 @@ Function GetTime
 	Exch $0
 FunctionEnd
 
+Function RIndexOf
+Exch $R0
+Exch
+Exch $R1
+Push $R2
+Push $R3
+ 
+ StrCpy $R3 $R0
+ StrCpy $R0 0
+ IntOp $R0 $R0 + 1
+  StrCpy $R2 $R3 1 -$R0
+  StrCmp $R2 "" +2
+  StrCmp $R2 $R1 +2 -3
+ 
+ StrCpy $R0 -1
+ 
+Pop $R3
+Pop $R2
+Pop $R1
+
+Exch $R0
+FunctionEnd
+ 
+!macro StrRPos Var Str Char
+Push "${Char}"
+Push "${Str}"
+Call RIndexOf
+Pop $1
+StrLen $0 ${Str} 
+IntOp ${Var} $0 - $1
+!macroend
+
+
+!define StrRPos "!insertmacro StrRPos"
 
 ;--------------------------------
 ;Pages
@@ -245,6 +385,18 @@ var SMDir
  
   !insertmacro MUI_LANGUAGE "English"
   !insertmacro MUI_LANGUAGE "Czech"  
+  !insertmacro MUI_LANGUAGE "SimpChinese"
+  !insertmacro MUI_LANGUAGE "Dutch"
+  !insertmacro MUI_LANGUAGE "French"
+  !insertmacro MUI_LANGUAGE "German"
+  !insertmacro MUI_LANGUAGE "Hungarian"
+  !insertmacro MUI_LANGUAGE "Polish"
+  !insertmacro MUI_LANGUAGE "Portuguese"
+  !insertmacro MUI_LANGUAGE "PortugueseBR"
+  !insertmacro MUI_LANGUAGE "Russian"
+  !insertmacro MUI_LANGUAGE "Spanish"
+  !insertmacro MUI_LANGUAGE "Swedish"
+  !insertmacro MUI_LANGUAGE "Ukrainian"
 
 
 
@@ -252,14 +404,13 @@ var SMDir
 ;Installer Sections
 
 
-LangString Sec1Name ${LANG_ENGLISH} "FFDec"
-LangString Sec1Name ${LANG_CZECH} "FFDec"
 
-LangString Sec2Desktop ${LANG_ENGLISH} "Desktop Shortcut"
-LangString Sec2Desktop ${LANG_CZECH} "Zástupce na Ploše"
+LangString Sec3PlayerGlobal ${LANG_ENGLISH} "PlayerGlobal.swc (download)"
+LangString Sec3PlayerGlobal ${LANG_CZECH} "PlayerGlobal.swc (stažení)"
 
 
-Section !$(Sec1Name) SecDummy
+
+Section "FFDec" SecDummy
 
   SetShellVarContext all
 
@@ -284,10 +435,11 @@ Section !$(Sec1Name) SecDummy
 
   ;Store installation folder
 
-  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"  
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayName" "${APP_NAME} (remove only)"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"  
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayName" "${APP_NAME}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayIcon" '"$INSTDIR\ffdec.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayVersion" "${APP_VER}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "URLInfoAbout" "${APP_URL}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "URLUpdateInfo" "${APP_URL}"
@@ -295,6 +447,9 @@ Section !$(Sec1Name) SecDummy
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "Publisher" "${APP_PUBLISHER}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "Inno Setup: Icon Group" "$SMDir"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "NSIS: Language" "$language"
+
+  
 
   Call GetInstalledSize
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "EstimatedSize" $GetInstalledSize.total
@@ -311,28 +466,111 @@ Section !$(Sec1Name) SecDummy
 
 SectionEnd
 
-Section !$(Sec2Desktop)
+
+
+
+var txt
+var pos
+var pgfound
+var f
+var pgname
+
+Section "PlayerGlobal.swc" SecPlayerGlobal
+
+!tempfile PGHTML
+inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" https://www.adobe.com/support/flashplayer/downloads.html ${PGHTML}
+Pop $0
+StrCmp $0 "OK" dlok
+MessageBox MB_OK|MB_ICONEXCLAMATION "PlayerGlobal.SWC was not found on Adobe webpages. Click OK to abort installation" /SD IDOK
+Abort
+dlok:
+
+StrCpy $pgfound 0
+
+FileOpen $f ${PGHTML} r
+loop:
+  FileRead $f $txt
+  IfErrors done      
+  StrCmp $pgfound 1 0 nolicheck
+    ${StrLoc} $pos $txt "<li><a href=$\"" ">"
+    StrCmp $pos "" nolicheck
+      IntOp $pos $pos + 13
+      StrCpy $txt $txt "" $pos
+      ${StrLoc} $pos $txt "$\"" ">"
+      StrCpy $txt $txt $pos
+      StrCpy $pgfound 2   
+      Goto done    
+  nolicheck:
+  ${StrLoc} $pos $txt "PlayerGlobal" ">"
+  StrCmp $pos "" loop
+    StrCpy $pgfound 1              
+  Goto loop
+done:
+  FileClose $f
+  StrCmp $pgfound 2 +3
+    MessageBox MB_OK|MB_ICONEXCLAMATION "PlayerGlobal.SWC not found on Adobe Webpages, click OK to abort installation" /SD IDOK    
+    Abort
+
+  ${StrRPos} $pos $txt "/"
+  IntOp $pos $pos + 1
+  StrCpy $pgname $txt "" $pos    
+  SetShellVarContext current    
+  
+  CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
+  inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
+SectionEnd
+
+Section "Desktop Shortcut"
 SetShellVarContext all
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\ffdec.exe" ""
 SectionEnd
 
 Function .onInit
-  # set section 'test' as selected and read-only
+  !insertmacro MUI_LANGDLL_DISPLAY
   IntOp $0 ${SF_SELECTED} | ${SF_RO}
-  SectionSetFlags ${SecDummy} $0
+  SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
 ;--------------------------------
 ;Descriptions
 
   ;Language strings
-  LangString DESC_SecDummy ${LANG_ENGLISH} "Application GUI and Libraries"
-  LangString DESC_SecDummy ${LANG_CZECH} "Aplikaèní rozhraní a knihovny"
+  ;LangString DESC_SecDummy ${LANG_ENGLISH} "Application GUI and Libraries"
+  ;LangString DESC_SecDummy ${LANG_CZECH} "Aplikaèní rozhraní a knihovny"
+
+  ;LangString DESC_PlayerGlobal ${LANG_ENGLISH} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"
+  ;LangString DESC_PlayerGlobal ${LANG_CZECH} "Stáhnout knihovnu FlashPlayeru ze stránek Adobe - užiteèné pro pøímou editaci ActionScriptu a další vìci"
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} $(DESC_SecDummy) 
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "Application GUI and Libraries"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecPlayerGlobal} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"   
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+         
+;LangString DESC_UninstLocal ${LANG_ENGLISH} "Remove user configuration"
+;LangString DESC_UninstLocal ${LANG_CZECH} "Odstranit uživatelskou konfiguraci"         
+
+
+
+
+Var mycheckbox
+Var uninstlocal
+
+Function un.ModifyUnWelcome
+${NSD_CreateCheckbox} 120u -18u 50% 12u "Remove user configuration"
+Pop $mycheckbox
+SetCtlColors $mycheckbox "" ${MUI_BGCOLOR}
+;${NSD_Check} $mycheckbox ; Check it by default
+FunctionEnd
+
+Function un.LeaveUnWelcome
+StrCpy $uninstlocal 0
+${NSD_GetState} $mycheckbox $0
+${If} $0 <> 0
+    StrCpy $uninstlocal 1     
+${EndIf}
+FunctionEnd
 
 ;--------------------------------
 ;Uninstaller Section
@@ -353,9 +591,17 @@ Section "Uninstall"
   !insertmacro MUI_STARTMENU_GETFOLDER 0 $SMDir  
 
   RmDir /r "$SMPROGRAMS\$SMDir\*.*"
-  RMDir "$SMPROGRAMS\$SMDir"
+  RmDir "$SMPROGRAMS\$SMDir"   
  
+  StrCmp $uninstlocal 1 0 +5
+    SetShellVarContext current      
+    RmDir /r "$APPDATA\JPEXS\FFDec\*.*"
+    RmDir "$APPDATA\JPEXS\FFDec"
+    RmDir "$APPDATA\JPEXS"
+
   DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"  
 
 SectionEnd
 
+
+;TODO: FlashPlayer detection/install, Java detection/install

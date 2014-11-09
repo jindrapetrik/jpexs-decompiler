@@ -79,7 +79,7 @@ public abstract class Advapi32Util {
      */
     public static boolean registryKeyExists(HKEY root, String key) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY, phkKey);
         switch (rc) {
             case W32Errors.ERROR_SUCCESS:
                 Advapi32.INSTANCE.RegCloseKey(phkKey.getValue());
@@ -101,7 +101,7 @@ public abstract class Advapi32Util {
      */
     public static boolean registryValueExists(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY, phkKey);
         try {
             switch (rc) {
                 case W32Errors.ERROR_SUCCESS:
@@ -144,7 +144,7 @@ public abstract class Advapi32Util {
      */
     public static String registryGetStringValue(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -184,7 +184,7 @@ public abstract class Advapi32Util {
      */
     public static String registryGetExpandableStringValue(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -224,7 +224,7 @@ public abstract class Advapi32Util {
      */
     public static String[] registryGetStringArray(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -272,7 +272,7 @@ public abstract class Advapi32Util {
      */
     public static byte[] registryGetBinaryValue(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -312,7 +312,7 @@ public abstract class Advapi32Util {
      */
     public static int registryGetIntValue(HKEY root, String key, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -417,7 +417,7 @@ public abstract class Advapi32Util {
      */
     public static void registrySetIntValue(HKEY root, String keyPath, String name, int value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -457,7 +457,7 @@ public abstract class Advapi32Util {
      */
     public static void registrySetStringValue(HKEY root, String keyPath, String name, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -497,7 +497,7 @@ public abstract class Advapi32Util {
      */
     public static void registrySetExpandableStringValue(HKEY root, String keyPath, String name, String value) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -551,7 +551,7 @@ public abstract class Advapi32Util {
      */
     public static void registrySetStringArray(HKEY root, String keyPath, String name, String[] arr) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -589,7 +589,7 @@ public abstract class Advapi32Util {
      */
     public static void registrySetBinaryValue(HKEY root, String keyPath, String name, byte[] data) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -625,7 +625,7 @@ public abstract class Advapi32Util {
      */
     public static void registryDeleteKey(HKEY root, String keyPath, String keyName) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -661,7 +661,7 @@ public abstract class Advapi32Util {
      */
     public static void registryDeleteValue(HKEY root, String keyPath, String valueName) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ | WinNT.KEY_WRITE| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -712,7 +712,7 @@ public abstract class Advapi32Util {
      */
     public static String[] registryGetKeys(HKEY root, String keyPath) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
@@ -803,7 +803,7 @@ public abstract class Advapi32Util {
      */
     public static TreeMap<String, Object> registryGetValues(HKEY root, String keyPath) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, keyPath, 0, WinNT.KEY_READ| WinNT.KEY_WOW64_32KEY, phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
