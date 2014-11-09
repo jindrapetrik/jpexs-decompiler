@@ -2361,7 +2361,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             showCard(CARDPREVIEWPANEL);
-            previewPanel.showBinaryPanel(binaryTag.binaryData, binaryTag);
+            previewPanel.showBinaryPanel(binaryTag);
         } else if (treeItem instanceof ASMSource) {
             ensureActionPanel();
             showCard(CARDACTIONSCRIPTPANEL);

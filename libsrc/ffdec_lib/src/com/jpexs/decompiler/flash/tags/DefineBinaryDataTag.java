@@ -19,15 +19,19 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class DefineBinaryDataTag extends CharacterTag {
 
@@ -80,10 +84,40 @@ public class DefineBinaryDataTag extends CharacterTag {
         tag = sis.readUI16("tag");
         reserved = sis.readUI32("reserved");
         binaryData = sis.readBytesEx(sis.available(), "binaryData");
+
+        if (Configuration.autoLoadEmbeddedSwfs.get()) {
+            try {
+                SWF bswf = new SWF(new ByteArrayInputStream(binaryData), Configuration.parallelSpeedUp.get());
+                bswf.fileTitle = "(SWF Data)";
+                innerSwf = bswf;
+            } catch (IOException | InterruptedException ex) {
+                //ignore
+            }
+        }
     }
 
     @Override
     public int getCharacterId() {
         return tag;
+    }
+    
+    public boolean isSwfData() {
+        try {
+            if (binaryData.length > 8) {
+                String signature = new String(binaryData, 0, 3, Utf8Helper.charset);
+                if (Arrays.asList(
+                        "FWS", //Uncompressed Flash
+                        "CWS", //ZLib compressed Flash
+                        "ZWS", //LZMA compressed Flash
+                        "GFX", //Uncompressed ScaleForm GFx
+                        "CFX" //Compressed ScaleForm GFx
+                ).contains(signature)) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+        }
+        
+        return false;
     }
 }
