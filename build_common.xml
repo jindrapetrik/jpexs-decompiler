@@ -144,6 +144,7 @@
             <define name="APP_PUBLISHER" value="${VENDOR}"/>
             <define name="APP_URL" value="${PRODUCTURL}"/>
             <define name="APP_SETUPFILE" value="${exe.file}" />
+            <define name="JRE_VERSION" value="${TARGETJAVA}" />
         </nsis>
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>

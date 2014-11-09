@@ -13,8 +13,20 @@
 ;!define APP_URL "http://www.free-decompiler.com/flash/"
 ;!define APP_PUBLISHER "JPEXS"
 ;!define APP_NAME "JPEXS Free Flash Decompiler"
+;!define JRE_VERSION "1.7"
 
 
+!addplugindir "nsis_plugins\ansi\"
+;!addplugindir "nsis_plugins\unicode\"
+
+
+SetCompressor /SOLID lzma
+!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52252"
+!include "nsis_plugins\JREDyna_Inetc.nsh"
+
+!define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
+!include "nsis_plugins\Flash_Inetc.nsh"
+!include x64.nsh
 
 
 !define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
@@ -25,10 +37,10 @@
 !define MUI_HEADERIMAGE_BITMAP "graphics\installer_150x57.bmp"
 
 !define APP_UNINSTKEY "{E618D276-6596-41F4-8A98-447D442A77DB}_is1"
-SetCompressor /SOLID lzma
 
-!addplugindir nsis_plugins/ansi/
-!addplugindir nsis_plugins/unicode/
+
+
+
 
   ;Name and file
   Name "${APP_SHORTVERNAME}"
@@ -88,29 +100,7 @@ Function GetInstalledSize
 	Push $GetInstalledSize.total
 FunctionEnd
 
-
-
-Function IsFlashInstalled
-  Push $R0
-  ClearErrors
-  ReadRegStr $R0 HKCR "CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}\InprocServer32" ""
-  IfErrors lbl_na
-    IfFileExists $R0 0 lbl_na
-      StrCpy $R0 1
-  Goto lbl_end
-  lbl_na:
-    StrCpy $R0 0
-  lbl_end:
-  Exch $R0
- FunctionEnd
  
-!define IsFlashInstalled "!insertmacro IsFlashInstalled"
- 
-!macro IsFlashInstalled ResultVar
-  Call IsFlashInstalled
-  Pop "${ResultVar}"
-!macroend
-
 
 !define StrLoc "!insertmacro StrLoc"
  
@@ -366,6 +356,8 @@ IntOp ${Var} $0 - $1
   !insertmacro MUI_PAGE_LICENSE "resources/license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
+  !insertmacro CUSTOM_PAGE_JREINFO
+  !insertmacro CUSTOM_PAGE_FLASHINFO
 
 var SMDir
 
@@ -463,9 +455,11 @@ Section "FFDec" SecDummy
   ${GetTime} "" "L" $0 $1 $2 $3 $4 $5 $6
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "InstallDate" "$2$1$0"
 
-
   ;Create un1installer
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+  call DownloadAndInstallJREIfNecessary
+  call DownloadAndInstallFlashIfNecessary
 
 SectionEnd
 
