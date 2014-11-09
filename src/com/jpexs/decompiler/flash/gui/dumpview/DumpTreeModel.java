@@ -100,7 +100,7 @@ public class DumpTreeModel implements TreeModel {
                 SWFInputStream sis = tagStub.getDataStream();
                 sis.seek(tagStub.getDataPos());
                 sis.dumpInfo = di;
-                SWFInputStream.resolveTag(tagStub, 0, false, true);
+                SWFInputStream.resolveTag(tagStub, 0, false, true, false);
             } catch (InterruptedException | IOException ex) {
                 Logger.getLogger(DumpTreeModel.class.getName()).log(Level.SEVERE, null, ex);
             }

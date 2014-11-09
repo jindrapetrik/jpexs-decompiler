@@ -30,13 +30,11 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -59,7 +57,7 @@ import javax.swing.JPanel;
  */
 public class FolderPreviewPanel extends JPanel {
 
-    private static final ExecutorService executor;
+    private static ExecutorService executor;
     private List<TreeItem> items;
     private int selectedIndex = -1;
 
@@ -143,6 +141,8 @@ public class FolderPreviewPanel extends JPanel {
 
     public synchronized void setItems(List<TreeItem> items) {
         this.items = items;
+        executor.shutdownNow();
+        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
         cachedPreviews.clear();
         revalidate();
         repaint();

@@ -980,7 +980,7 @@ public class SWFInputStream implements AutoCloseable {
         public Tag call() throws Exception {
             DumpInfo di = dumpInfo;
             try {
-                Tag t = resolveTag(tag, level, parallel, skipUnusualTags);
+                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, true);
                 if (dumpInfo != null && t != null) {
                     dumpInfo.name = t.getName();
                 }
@@ -1048,7 +1048,7 @@ public class SWFInputStream implements AutoCloseable {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
                         if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags);
+                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, true);
                         }
                         FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
@@ -1123,7 +1123,7 @@ public class SWFInputStream implements AutoCloseable {
         return tags;
     }
 
-    public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags) throws InterruptedException {
+    public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws InterruptedException {
         Tag ret;
 
         ByteArrayRange data = tag.getOriginalRange();
@@ -1139,7 +1139,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new ShowFrameTag(swf, data);
                     break;
                 case 2:
-                    ret = new DefineShapeTag(sis, data);
+                    ret = new DefineShapeTag(sis, data, lazy);
                     break;
                 //case 3: FreeCharacter
                 case 4:
@@ -1195,7 +1195,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new DefineBitsJPEG2Tag(sis, data);
                     break;
                 case 22:
-                    ret = new DefineShape2Tag(sis, data);
+                    ret = new DefineShape2Tag(sis, data, lazy);
                     break;
                 case 23:
                     ret = new DefineButtonCxformTag(sis, data);
@@ -1215,7 +1215,7 @@ public class SWFInputStream implements AutoCloseable {
                 //case 30:
                 //case 31: FreeAll
                 case 32:
-                    ret = new DefineShape3Tag(sis, data);
+                    ret = new DefineShape3Tag(sis, data, lazy);
                     break;
                 case 33:
                     ret = new DefineText2Tag(sis, data);
@@ -1332,7 +1332,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new DoABCDefineTag(sis, data);
                     break;
                 case 83:
-                    ret = new DefineShape4Tag(sis, data);
+                    ret = new DefineShape4Tag(sis, data, lazy);
                     break;
                 case 84:
                     ret = new DefineMorphShape2Tag(sis, data);
@@ -1459,7 +1459,7 @@ public class SWFInputStream implements AutoCloseable {
         if (resolve) {
             DumpInfo di = dumpInfo;
             try {
-                ret = resolveTag(tagStub, level, parallel, skipUnusualTags);
+                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, true);
             } catch (Exception ex) {
                 tagDataStream.endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);

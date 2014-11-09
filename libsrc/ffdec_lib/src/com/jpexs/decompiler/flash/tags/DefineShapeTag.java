@@ -29,6 +29,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DefineShapeTag extends ShapeTag {
 
@@ -37,6 +39,8 @@ public class DefineShapeTag extends ShapeTag {
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
     public static final int ID = 2;
+    
+    private ByteArrayRange shapeData;
 
     @Override
     public int getShapeNum() {
@@ -45,6 +49,17 @@ public class DefineShapeTag extends ShapeTag {
 
     @Override
     public SHAPEWITHSTYLE getShapes() {
+        if (shapes == null && shapeData != null) {
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
+                sis.seek(shapeData.getPos());
+                shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");
+                shapeData = null; // not needed anymore, give it to GC
+            } catch (IOException ex) {
+                Logger.getLogger(DefineShapeTag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         return shapes;
     }
 
@@ -78,11 +93,15 @@ public class DefineShapeTag extends ShapeTag {
         shapes = SHAPEWITHSTYLE.createEmpty(1);
     }
 
-    public DefineShapeTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public DefineShapeTag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
         super(sis.getSwf(), ID, "DefineShape", data);
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
-        shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");
+        if (!lazy) {
+            shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");
+        } else {
+            shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
+        }
     }
 
     /**
