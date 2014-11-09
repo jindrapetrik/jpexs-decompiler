@@ -284,8 +284,10 @@ public class MethodInfo {
                 pdata.put("localName", localRegNames.get(i + 1)); //assuming it is a slot
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(i + 1)),"paramname",i,pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
+                pdata.put("localName", constants.getString(paramNames[i]));              
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,constants.getString(paramNames[i])),"paramname",i,pdata);
             } else {
+                pdata.put("localName","param"+(i+1));
                 writer.hilightSpecial("param" + (i + 1),"paramname",i,pdata);
             }
             writer.appendNoHilight(":");
@@ -314,11 +316,11 @@ public class MethodInfo {
             } else {
                 restName = "rest";
             }
-            restAdd += restName;
             pdata=new HashMap<>();
             pdata.put("declaration", "true");
-            pdata.put("localName",restName);            
-            writer.hilightSpecial(restAdd, "flag.NEED_REST",0,pdata);
+            pdata.put("localName",restName); 
+            writer.append(restAdd);
+            writer.hilightSpecial(restName, "flag.NEED_REST",0,pdata);
         }
         return writer;
     }

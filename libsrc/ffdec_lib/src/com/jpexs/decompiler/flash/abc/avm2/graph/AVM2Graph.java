@@ -667,6 +667,7 @@ public class AVM2Graph extends Graph {
             WhileItem w = (WhileItem) loopItem;
 
             if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextAVM2Item)) {
+                HasNextAVM2Item hn=(HasNextAVM2Item)w.expression.get(w.expression.size() - 1);
                 if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection != null) {
                     if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckAVM2Item) {
                         //GraphTargetItem gti = ((HasNextAVM2Item) ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
@@ -701,9 +702,9 @@ public class AVM2Graph extends Graph {
                             SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             if (gti instanceof NextValueAVM2Item) {
-                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(null, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(hn.instruction, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(null, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(hn.instruction,sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             }
                         }
                     }

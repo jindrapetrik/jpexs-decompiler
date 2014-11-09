@@ -55,18 +55,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
     }
     
-    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
-        /*ret = scope.toString(constants, localRegNames) + ".";
-         if (!(scope instanceof NewActivationAVM2Item)) {
-         ret = scope.toString(constants, localRegNames) + ".";
-         }
-         if (scope instanceof LocalRegAVM2Item) {
-         if (((LocalRegAVM2Item) scope).computedValue != null) {
-         if (((LocalRegAVM2Item) scope).computedValue instanceof NewActivationAVM2Item) {
-         ret = "";
-         }
-         }
-         }*/
+    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {        
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }

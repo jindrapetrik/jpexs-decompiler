@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -51,6 +53,25 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {               
+        
+        if(assignment instanceof LocalRegAVM2Item){ //for..in
+            LocalRegAVM2Item lti=(LocalRegAVM2Item)assignment;
+            String localName = localRegName(localData.localRegNames, lti.regIndex);
+            srcData.put("localName",localName);
+            srcData.put("declaration", "true");
+            writer.append("var ");
+            writer.append(localName);
+            return writer;
+        }
+        
+        if(assignment instanceof GetSlotAVM2Item){ //for..in
+            GetSlotAVM2Item sti=(GetSlotAVM2Item)assignment;
+            srcData.put("localName",sti.getNameAsStr(localData));
+            srcData.put("declaration", "true");
+            writer.append("var ");
+            sti.getName(writer, localData);
+            return writer;
+        }
         
         if (assignment instanceof SetLocalAVM2Item) {            
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
