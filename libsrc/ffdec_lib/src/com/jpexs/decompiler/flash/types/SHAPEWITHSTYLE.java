@@ -51,7 +51,7 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         }
         return modified;
     }
-    
+
     public static SHAPEWITHSTYLE createEmpty(int shapeNum) {
         SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
         ret.shapeRecords = new ArrayList<>();
@@ -64,7 +64,7 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         } else if (shapeNum == 4) {
             ret.lineStyles.lineStyles = new LINESTYLE2[0];
         }
-        
+
         return ret;
     }
 }

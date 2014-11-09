@@ -68,7 +68,7 @@ public class DefineShape4Tag extends ShapeTag {
                 Logger.getLogger(DefineShape4Tag.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         return shapes;
     }
 
@@ -98,6 +98,7 @@ public class DefineShape4Tag extends ShapeTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineShape4Tag(SWF swf) {

@@ -96,6 +96,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineButton2Tag(SWF swf) {

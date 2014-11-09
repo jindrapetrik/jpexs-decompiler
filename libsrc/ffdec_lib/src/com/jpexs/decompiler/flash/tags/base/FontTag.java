@@ -104,25 +104,25 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public abstract int getDescent();
 
     public abstract int getLeading();
-        
-    public String getFontName(){
-        DefineFontNameTag fontNameTag = getFontNameTag();        
-        if(fontNameTag == null){
+
+    public String getFontName() {
+        DefineFontNameTag fontNameTag = getFontNameTag();
+        if (fontNameTag == null) {
             return getFontNameIntag();
         }
         return fontNameTag.fontName;
     }
-    
-    public String getFontCopyright(){
+
+    public String getFontCopyright() {
         DefineFontNameTag fontNameTag = getFontNameTag();
-        if(fontNameTag == null){
+        if (fontNameTag == null) {
             return "";
         }
         return fontNameTag.fontCopyright;
     }
 
     public static Map<String, Map<String, Font>> installedFontsByFamily;
-    public static Map<String,Font> installedFontsByName;
+    public static Map<String, Font> installedFontsByName;
 
     public static String defaultFontName;
 
@@ -226,13 +226,13 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public static void reload() {
         installedFontsByFamily = FontHelper.getInstalledFonts();
         installedFontsByName = new HashMap<>();
-        
-        for(String fam:installedFontsByFamily.keySet()){
-            for(String nam:installedFontsByFamily.get(fam).keySet()){
+
+        for (String fam : installedFontsByFamily.keySet()) {
+            for (String nam : installedFontsByFamily.get(fam).keySet()) {
                 installedFontsByName.put(nam, installedFontsByFamily.get(fam).get(nam));
             }
         }
-        
+
         if (installedFontsByFamily.containsKey("Times New Roman")) {
             defaultFontName = "Times New Roman";
         } else if (installedFontsByFamily.containsKey("Arial")) {
@@ -368,5 +368,5 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public FontTag toClassicFont() {
         return this;
-    }    
+    }
 }

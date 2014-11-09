@@ -26,7 +26,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class TagScript implements TreeItem {
-    
+
     private final SWF swf;
     private final Tag tag;
     private final List<TreeItem> frames;
@@ -36,15 +36,15 @@ public class TagScript implements TreeItem {
         this.tag = tag;
         this.frames = frames;
     }
-    
+
     public Tag getTag() {
         return tag;
     }
-    
+
     public List<TreeItem> getFrames() {
         return frames;
     }
-    
+
     @Override
     public SWF getSwf() {
         return swf;

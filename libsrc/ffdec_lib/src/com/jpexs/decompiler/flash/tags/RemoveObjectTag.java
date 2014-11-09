@@ -68,6 +68,7 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public RemoveObjectTag(SWF swf) {

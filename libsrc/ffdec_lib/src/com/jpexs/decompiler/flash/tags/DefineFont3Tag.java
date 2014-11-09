@@ -113,6 +113,7 @@ public class DefineFont3Tag extends FontTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFont3Tag(SWF swf) {

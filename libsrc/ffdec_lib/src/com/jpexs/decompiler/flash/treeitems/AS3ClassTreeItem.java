@@ -21,7 +21,7 @@ package com.jpexs.decompiler.flash.treeitems;
  * @author JPEXS
  */
 public abstract class AS3ClassTreeItem implements TreeItem {
-    
+
     private final String name;
     private final String path;
 

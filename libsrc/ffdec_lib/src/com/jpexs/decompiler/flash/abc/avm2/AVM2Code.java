@@ -1712,17 +1712,16 @@ public class AVM2Code implements Cloneable {
                 }
             }
         }
-        
-        
+
         /*
-        //undeclare registers at the end of the block?
-        for(int reg:nowdeclaredRegs){
-            declaredRegisters[reg] = false;
-        }
+         //undeclare registers at the end of the block?
+         for(int reg:nowdeclaredRegs){
+         declaredRegisters[reg] = false;
+         }
         
-        for(Slot s:nowdeclaredSlots){
-            declaredSlots.remove(s);
-        }*/
+         for(Slot s:nowdeclaredSlots){
+         declaredSlots.remove(s);
+         }*/
     }
 
     public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {

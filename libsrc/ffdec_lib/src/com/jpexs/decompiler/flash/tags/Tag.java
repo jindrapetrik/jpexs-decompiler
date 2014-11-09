@@ -358,8 +358,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     }
 
     /**
-     * Returns the original inner data of the tag, without the 2-6 bytes length header
-     * Call this method only from debug codes
+     * Returns the original inner data of the tag, without the 2-6 bytes length
+     * header Call this method only from debug codes
+     *
      * @return The data
      */
     public final byte[] getOriginalData() {

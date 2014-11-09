@@ -48,6 +48,7 @@ public class ProductInfoTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public ProductInfoTag(SWF swf) {

@@ -35,7 +35,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         super(instruction, PRECEDENCE_ASSIGMENT);
         this.slotName = slotName;
         this.value = value;
-        this.scope = scope;        
+        this.scope = scope;
     }
 
     @Override
@@ -51,11 +51,11 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         return value.toString(writer, localData);
     }
 
-    public String getNameAsStr(LocalData localData){
+    public String getNameAsStr(LocalData localData) {
         return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
     }
-    
-    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {        
+
+    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }

@@ -50,6 +50,7 @@ public class DefineFont4Tag extends CharacterTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFont4Tag(SWF swf) {

@@ -36,6 +36,7 @@ public class DefineFontNameTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFontNameTag(SWF swf) {

@@ -79,13 +79,14 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineSceneAndFrameLabelDataTag(SWF swf) {
         super(swf, ID, "DefineSceneAndFrameLabelData", null);
         sceneOffsets = new long[0];
         sceneNames = new String[0];
-        frameNums= new long[0];
+        frameNums = new long[0];
         frameNames = new String[0];
     }
 

@@ -697,6 +697,25 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
+     * Reads byte range from the stream
+     *
+     * @param count Number of bytes to read
+     * @param name
+     * @return ByteArrayRange object
+     * @throws IOException
+     */
+    public ByteArrayRange readByteRangeEx(long count, String name) throws IOException {
+        if (count <= 0) {
+            return ByteArrayRange.EMPTY;
+        }
+        newDumpLevel(name, "bytes");
+        int startPos = (int) getPos();
+        skipBytesEx(count);
+        endDumpLevel();
+        return new ByteArrayRange(swf.uncompressedData, startPos, (int) count);
+    }
+
+    /**
      * Reads bytes from the stream
      *
      * @param count Number of bytes to read
@@ -724,12 +743,22 @@ public class SWFInputStream implements AutoCloseable {
      * @param count Number of bytes to skip
      * @throws IOException
      */
+    public void skipBytesEx(long count) throws IOException {
+        bitPos = 0;
+        for (int i = 0; i < count; i++) {
+            readNoBitReset();
+        }
+    }
+
+    /**
+     * Skip bytes from the stream
+     *
+     * @param count Number of bytes to skip
+     * @throws IOException
+     */
     public void skipBytes(long count) throws IOException {
         try {
-            bitPos = 0;
-            for (int i = 0; i < count; i++) {
-                readNoBitReset();
-            }
+            skipBytesEx(count);
         } catch (EOFException | EndOfStreamException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -769,7 +798,7 @@ public class SWFInputStream implements AutoCloseable {
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (count > 0) {
-        byte[] buf = new byte[4096];
+            byte[] buf = new byte[4096];
             int c = 0;
             while ((c = dis.read(buf)) > 0) {
                 baos.write(buf, 0, c);

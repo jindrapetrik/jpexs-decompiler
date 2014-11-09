@@ -58,6 +58,7 @@ public class DebugIDTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DebugIDTag(SWF swf) {

@@ -191,6 +191,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineSpriteTag(SWF swf) {
@@ -314,7 +315,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     public int getNumFrames() {
         return frameCount;
     }
-    
+
     private int getRealFrameCount() {
         int cnt = 1;
         List<Frame> frames = getTimeline().getFrames();
@@ -323,7 +324,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
                 cnt++;
             }
         }
-        
+
         return cnt;
     }
 

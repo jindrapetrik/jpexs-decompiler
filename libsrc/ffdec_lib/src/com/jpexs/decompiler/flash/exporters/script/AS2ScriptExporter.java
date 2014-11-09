@@ -52,7 +52,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class AS2ScriptExporter {
-    
+
     public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Collection<ASMSource> asms, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
@@ -73,15 +73,15 @@ public class AS2ScriptExporter {
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
-        
+
         outdir += "scripts" + File.separator;
-        
+
         Map<String, List<String>> existingNamesMap = new HashMap<>();
         AtomicInteger cnt = new AtomicInteger(1);
         for (ASMSource asm : asms) {
-            String currentOutDir =  outdir + getFilePath(asm) + File.separator;
+            String currentOutDir = outdir + getFilePath(asm) + File.separator;
             currentOutDir = new File(currentOutDir).getParentFile().toString() + File.separator;
-            
+
             List<String> existingNames = existingNamesMap.get(currentOutDir);
             if (existingNames == null) {
                 existingNames = new ArrayList<>();
@@ -102,10 +102,10 @@ public class AS2ScriptExporter {
                 ret.add(f);
             }
         }
-        
+
         return ret;
     }
-    
+
     private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportMode exportMode, EventListener ev, AtomicInteger index, int count, String name) throws IOException {
         boolean retry;
         do {
@@ -172,10 +172,10 @@ public class AS2ScriptExporter {
                 }
             }
         } while (retry);
-        
+
         return null;
     }
-    
+
     // todo: honfika: get the path from the tree
     private String getFilePath(ASMSource asm) {
         if (asm instanceof DoInitActionTag) {
@@ -192,11 +192,11 @@ public class AS2ScriptExporter {
 
                     path += Helper.makeFileName(pathElement);
                 }
-    
+
                 return path;
             }
-        } 
-        
+        }
+
         if (!(asm instanceof Tag)) {
             return Helper.makeFileName(asm.getSourceTag().getExportFileName()) + File.separator + Helper.makeFileName(asm.getExportFileName());
         } else {
@@ -205,13 +205,13 @@ public class AS2ScriptExporter {
             if (timelined instanceof Tag) {
                 result += Helper.makeFileName(((Tag) timelined).getExportFileName()) + File.separator;
             }
-            
+
             Timeline timeline = timelined.getTimeline();
             int frame = timeline.getFrameForAction(asm);
             if (frame != -1) {
                 result += "frame_" + (frame + 1) + File.separator;
             }
-            
+
             return result + Helper.makeFileName(asm.getExportFileName());
         }
     }

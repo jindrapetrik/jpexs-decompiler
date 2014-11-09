@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -132,6 +131,7 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public SoundStreamHeadTag(SWF swf) {
@@ -228,9 +228,9 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         List<SoundStreamBlockTag> blocks = getBlocks();
         for (SoundStreamBlockTag block : blocks) {
             if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                ret.add(Arrays.copyOfRange(block.streamSoundData, 4, block.streamSoundData.length));
+                ret.add(block.streamSoundData.getRangeData(4, block.streamSoundData.getLength() - 4));
             } else {
-                ret.add(block.streamSoundData);
+                ret.add(block.streamSoundData.getRangeData());
             }
         }
         return ret;

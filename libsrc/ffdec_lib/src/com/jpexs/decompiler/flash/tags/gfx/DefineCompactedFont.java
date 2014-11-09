@@ -83,6 +83,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineCompactedFont(SWF swf) {
@@ -92,7 +93,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         fonts = new ArrayList<>();
         FontType ft = new FontType();
         fonts.add(ft);
-        
+
         rebuildShapeCache();
     }
 
@@ -403,7 +404,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             kr.fontKerningCode1 = ft.kerning.get(i).char1;
             kr.fontKerningCode2 = ft.kerning.get(i).char2;
             ret.fontKerningTable.add(kr);
-         }
+        }
 
         return ret;
     }
@@ -412,6 +413,5 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public boolean hasLayout() {
         return true;
     }
-    
-    
+
 }

@@ -100,6 +100,7 @@ public class DefineButtonSoundTag extends CharacterIdTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineButtonSoundTag(SWF swf) {

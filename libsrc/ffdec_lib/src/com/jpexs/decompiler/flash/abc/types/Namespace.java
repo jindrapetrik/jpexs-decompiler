@@ -104,7 +104,7 @@ public class Namespace {
         if (raw) {
             return constants.getString(name_index);
         }
-        return IdentifiersDeobfuscation.printNamespace(true,constants.getString(name_index));
+        return IdentifiersDeobfuscation.printNamespace(true, constants.getString(name_index));
     }
 
     public boolean hasName(String name, AVM2ConstantPool constants) {

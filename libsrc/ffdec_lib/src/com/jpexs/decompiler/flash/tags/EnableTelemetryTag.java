@@ -68,6 +68,7 @@ public class EnableTelemetryTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public EnableTelemetryTag(SWF swf) {

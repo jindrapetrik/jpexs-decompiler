@@ -193,6 +193,7 @@ public class DefineFont2Tag extends FontTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFont2Tag(SWF swf) {

@@ -63,7 +63,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     @SWFType(BasicType.UI32)
     public long soundSampleCount;
 
-    public byte[] soundData;
+    public ByteArrayRange soundData;
     public static final int ID = 14;
 
     @Override
@@ -98,12 +98,13 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineSoundTag(SWF swf) {
         super(swf, ID, "DefineSound", null);
         soundId = swf.getNextCharacterId();
-        soundData = new byte[] {0};
+        soundData = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -121,7 +122,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         soundSize = sis.readUB(1, "soundSize") == 1;
         soundType = sis.readUB(1, "soundType") == 1;
         soundSampleCount = sis.readUI32("soundSampleCount");
-        soundData = sis.readBytesEx(sis.available(), "soundData");
+        soundData = sis.readByteRangeEx(sis.available(), "soundData");
     }
 
     @Override
@@ -290,7 +291,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
             this.soundSize = newSoundSize;
             this.soundRate = newSoundRate;
             this.soundSampleCount = newSoundSampleCount;
-            this.soundData = newSoundData;
+            this.soundData = new ByteArrayRange(newSoundData);
             this.soundType = newSoundType;
             this.soundFormat = newSoundFormat;
             setModified(true);
@@ -319,10 +320,11 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public List<byte[]> getRawSoundData() {
         List<byte[]> ret = new ArrayList<>();
         if (soundFormat == SoundFormat.FORMAT_MP3) {
-            ret.add(Arrays.copyOfRange(soundData, 2, soundData.length));
+            ret.add(soundData.getRangeData(2, soundData.getLength() - 2));
             return ret;
         }
-        ret.add(soundData);
+
+        ret.add(soundData.getRangeData());
         return ret;
     }
 

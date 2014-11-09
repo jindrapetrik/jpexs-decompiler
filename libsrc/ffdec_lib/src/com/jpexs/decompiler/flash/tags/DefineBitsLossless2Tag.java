@@ -59,7 +59,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     @Conditional(value = "bitmapFormat", options = {FORMAT_8BIT_COLORMAPPED})
     public int bitmapColorTableSize;
 
-    public byte[] zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
+    public ByteArrayRange zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
 
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_32BIT_ARGB = 5;
@@ -125,13 +125,14 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
         SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
-        zlibBitmapData = zlibOS.toByteArray();
+        zlibBitmapData = new ByteArrayRange(zlibOS.toByteArray());
         decompressed = false;
         setModified(true);
     }
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBitsLossless2Tag(SWF swf) {
@@ -140,7 +141,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         bitmapFormat = DefineBitsLossless2Tag.FORMAT_32BIT_ARGB;
         bitmapWidth = 1;
         bitmapHeight = 1;
-        zlibBitmapData = createEmptyImage();
+        zlibBitmapData = new ByteArrayRange(createEmptyImage());
     }
 
     public DefineBitsLossless2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
@@ -152,7 +153,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             bitmapColorTableSize = sis.readUI8("bitmapColorTableSize");
         }
-        zlibBitmapData = sis.readBytesEx(sis.available(), "zlibBitmapData");
+        zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData");
     }
     private ALPHACOLORMAPDATA colorMapData;
     private ALPHABITMAPDATA bitmapData;
@@ -174,7 +175,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))));
+            SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength()))));
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
             }

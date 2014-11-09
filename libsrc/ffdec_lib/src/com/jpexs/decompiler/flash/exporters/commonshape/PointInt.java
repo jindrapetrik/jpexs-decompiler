@@ -23,15 +23,15 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
 public class PointInt {
 
     public static final PointInt MAX = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    
-    private int x;
-    private int y;
+
+    private final int x;
+    private final int y;
 
     public PointInt(int x, int y) {
         this.x = x;
         this.y = y;
     }
-    
+
     public int getX() {
         return x;
     }

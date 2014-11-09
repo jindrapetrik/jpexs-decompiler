@@ -59,8 +59,6 @@ public class Highlighting implements Serializable {
         return new HashMap<>(properties);
     }
 
-    
-    
     public String getPropertyString(String key) {
         return properties.get(key);
     }
@@ -72,27 +70,29 @@ public class Highlighting implements Serializable {
     public static Highlighting search(List<Highlighting> list, String property, String value) {
         return search(list, -1, property, value, -1, -1);
     }
-    
-    public static Highlighting search(List<Highlighting> list, Map<String,String> properties) { 
+
+    public static Highlighting search(List<Highlighting> list, Map<String, String> properties) {
         return search(list, -1, properties, -1, -1);
     }
 
     public static Highlighting search(List<Highlighting> list, String property, String value, int from, int to) {
         return search(list, -1, property, value, from, to);
     }
-    
-    public static Highlighting search(List<Highlighting> list, Map<String,String> properties, int from, int to) {
+
+    public static Highlighting search(List<Highlighting> list, Map<String, String> properties, int from, int to) {
         return search(list, -1, properties, from, to);
     }
-    
+
     public static Highlighting search(List<Highlighting> list, long pos, String property, String value, long from, long to) {
-        Map<String,String> map= new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put(property, value);
         return search(list, pos, map, from, to);
     }
-    public static Highlighting search(List<Highlighting> list, long pos, Map<String,String> properties, long from, long to) {
+
+    public static Highlighting search(List<Highlighting> list, long pos, Map<String, String> properties, long from, long to) {
         Highlighting ret = null;
-        looph:for (Highlighting h : list) {
+        looph:
+        for (Highlighting h : list) {
             if (from > -1) {
                 if (h.startPos < from) {
                     continue;
@@ -103,7 +103,7 @@ public class Highlighting implements Serializable {
                     continue;
                 }
             }
-            for(String property:properties.keySet()){                
+            for (String property : properties.keySet()) {
                 if (property != null) {
                     String v = h.getPropertyString(property);
                     String value = properties.get(property);
@@ -118,7 +118,7 @@ public class Highlighting implements Serializable {
                     }
                 }
             }
-            
+
             if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
                 if (ret == null || h.startPos > ret.startPos) { //get the closest one
                     ret = h;
@@ -163,13 +163,13 @@ public class Highlighting implements Serializable {
                     continue;
                 }
             }
-            if (pos == -1 ||(pos >= h.startPos && (pos < h.startPos + h.len))) {
+            if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
                 //if (ret == null || h.startPos > ret.startPos) { //get the closest one
-                    ret.add(h);
+                ret.add(h);
                 //}
             }
             //if (pos == -1) {
-             //   return ret;
+            //   return ret;
             //}
         }
 

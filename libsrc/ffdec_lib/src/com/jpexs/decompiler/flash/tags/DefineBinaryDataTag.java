@@ -48,7 +48,7 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     @Internal
     public SWF innerSwf;
-    
+
     /**
      * Gets data bytes
      *
@@ -71,6 +71,7 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineBinaryDataTag(SWF swf) {
@@ -90,6 +91,7 @@ public class DefineBinaryDataTag extends CharacterTag {
                 SWF bswf = new SWF(new ByteArrayInputStream(binaryData), Configuration.parallelSpeedUp.get());
                 bswf.fileTitle = "(SWF Data)";
                 innerSwf = bswf;
+                bswf.binaryData = this;
             } catch (IOException | InterruptedException ex) {
                 //ignore
             }
@@ -100,7 +102,7 @@ public class DefineBinaryDataTag extends CharacterTag {
     public int getCharacterId() {
         return tag;
     }
-    
+
     public boolean isSwfData() {
         try {
             if (binaryData.length > 8) {
@@ -117,7 +119,7 @@ public class DefineBinaryDataTag extends CharacterTag {
             }
         } catch (Exception ex) {
         }
-        
+
         return false;
     }
 }

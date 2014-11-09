@@ -52,7 +52,7 @@ public abstract class GraphTextWriter {
      * @param data
      * @return GraphTextWriter
      */
-    public GraphTextWriter startOffset(GraphSourceItem src, int pos, Map<String,String> data) {
+    public GraphTextWriter startOffset(GraphSourceItem src, int pos, Map<String, String> data) {
         return this;
     }
 
@@ -105,21 +105,20 @@ public abstract class GraphTextWriter {
     public GraphTextWriter hilightSpecial(String text, String type) {
         return hilightSpecial(text, type, "0");
     }
-    
+
     public GraphTextWriter hilightSpecial(String text, String type, int index) {
-        return hilightSpecial(text, type, ""+index);
+        return hilightSpecial(text, type, "" + index);
     }
 
     public GraphTextWriter hilightSpecial(String text, String type, String index) {
         return hilightSpecial(text, type, "0", new HashMap<String, String>());
     }
-    
-    
-    public GraphTextWriter hilightSpecial(String text, String type, int index, Map<String,String> data) {
-        return hilightSpecial(text, type, ""+index, data);
+
+    public GraphTextWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
+        return hilightSpecial(text, type, "" + index, data);
     }
-    
-    public GraphTextWriter hilightSpecial(String text, String type, String index, Map<String,String> data) {
+
+    public GraphTextWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
         return this;
     }
 
@@ -127,8 +126,8 @@ public abstract class GraphTextWriter {
         return "";
     }
 
-    public abstract GraphTextWriter appendWithData(String str, Map<String,String> data);
-    
+    public abstract GraphTextWriter appendWithData(String str, Map<String, String> data);
+
     public abstract GraphTextWriter append(String str);
 
     public abstract GraphTextWriter append(String str, long offset);

@@ -152,6 +152,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineMorphShape2Tag(SWF swf) {

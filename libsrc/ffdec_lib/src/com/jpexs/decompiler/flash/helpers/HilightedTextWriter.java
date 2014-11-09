@@ -73,7 +73,7 @@ public class HilightedTextWriter extends GraphTextWriter {
      * @return HilightedTextWriter
      */
     @Override
-    public HilightedTextWriter startOffset(GraphSourceItem src, int pos, Map<String,String> data) {
+    public HilightedTextWriter startOffset(GraphSourceItem src, int pos, Map<String, String> data) {
         GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
         itemPos.graphSourceItem = src;
         itemPos.position = pos;
@@ -157,30 +157,26 @@ public class HilightedTextWriter extends GraphTextWriter {
         Map<String, String> ndata = new HashMap<>();
         ndata.putAll(data);
         ndata.put("subtype", type);
-        ndata.put("index", index);        
+        ndata.put("index", index);
         start(ndata, HilightType.SPECIAL);
         appendNoHilight(text);
         return end(HilightType.SPECIAL);
     }
 
-    
-    
-    
-
     @Override
     public HilightedTextWriter append(String str) {
         return appendWithData(str, new HashMap<String, String>());
     }
-    
+
     @Override
-    public HilightedTextWriter appendWithData(String str, Map<String,String> data) {
+    public HilightedTextWriter appendWithData(String str, Map<String, String> data) {
         Highlighting h = null;
         if (!offsets.empty()) {
             GraphSourceItemPosition itemPos = offsets.peek();
             GraphSourceItem src = itemPos.graphSourceItem;
             int pos = itemPos.position;
             if (src != null && hilight) {
-                Map<String,String> ndata=new HashMap<>();
+                Map<String, String> ndata = new HashMap<>();
                 ndata.putAll(itemPos.data);
                 ndata.putAll(data);
                 ndata.put("offset", Long.toString(src.getOffset() + pos + 1));

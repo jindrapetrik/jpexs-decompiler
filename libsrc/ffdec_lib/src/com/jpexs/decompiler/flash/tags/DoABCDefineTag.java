@@ -67,6 +67,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DoABCDefineTag(SWF swf) {
@@ -89,7 +90,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
         ABCInputStream ais = new ABCInputStream(sis.getBaseStream());
         // put it to the dumpview:
-        sis.readBytesEx(sis.available(), "abcBytes");
+        sis.readByteRangeEx(sis.available(), "abcBytes");
         abc = new ABC(ais, swf, this);
     }
 
@@ -99,8 +100,6 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         abc.swf = swf;
     }
 
-    
-    
     /**
      * Gets data bytes
      *

@@ -96,6 +96,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineButtonTag(SWF swf) {
@@ -116,13 +117,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         super(sis.getSwf(), ID, "DefineButton", data);
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
-        int pos = (int) sis.getPos();
-        byte[] bytes = sis.readBytesEx(sis.available(), "actionBytes");
-        if (data != null) {
-            actionBytes = new ByteArrayRange(data.getArray(), pos, bytes.length);
-        } else {
-            actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
-        }
+        actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
     }
 
     /**

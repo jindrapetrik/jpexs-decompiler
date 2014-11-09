@@ -55,7 +55,7 @@ public class LocalRegAVM2Item extends AVM2Item {
                 computedResult = null;
             }
         }
-        this.computedValue = computedValue;        
+        this.computedValue = computedValue;
     }
 
     @Override

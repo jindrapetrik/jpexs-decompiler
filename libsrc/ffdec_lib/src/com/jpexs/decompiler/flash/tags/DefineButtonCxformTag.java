@@ -60,6 +60,7 @@ public class DefineButtonCxformTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineButtonCxformTag(SWF swf) {

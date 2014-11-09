@@ -373,11 +373,11 @@ public class BitmapExporter extends ShapeExporterBase {
                 thickness *= Math.max(graphics.getTransform().getScaleX(), graphics.getTransform().getScaleY());
                 break;
         }
-        
+
         if (thickness < 0) {
             thickness = -thickness;
         }
-        
+
         if (joinStyle == BasicStroke.JOIN_MITER) {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
         } else {

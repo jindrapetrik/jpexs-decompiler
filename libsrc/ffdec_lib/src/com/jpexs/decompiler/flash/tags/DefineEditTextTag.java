@@ -703,6 +703,7 @@ public class DefineEditTextTag extends TextTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineEditTextTag(SWF swf) {

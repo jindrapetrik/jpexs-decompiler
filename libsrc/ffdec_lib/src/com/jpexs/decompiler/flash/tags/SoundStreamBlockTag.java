@@ -35,15 +35,16 @@ public class SoundStreamBlockTag extends Tag {
     public static final int ID = 19;
 
     @Internal
-    public byte[] streamSoundData;
+    public ByteArrayRange streamSoundData;
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public SoundStreamBlockTag(SWF swf) {
         super(swf, ID, "SoundStreamBlock", null);
-        streamSoundData = new byte[0];
+        streamSoundData = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -56,7 +57,7 @@ public class SoundStreamBlockTag extends Tag {
     public SoundStreamBlockTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "SoundStreamBlock", data);
         //all data is streamSoundData
-        streamSoundData = sis.readBytesEx(sis.available(), "streamSoundData");
+        streamSoundData = sis.readByteRangeEx(sis.available(), "streamSoundData");
     }
 
     /**

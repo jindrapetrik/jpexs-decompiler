@@ -138,6 +138,7 @@ public class DefineFontTag extends FontTag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFontTag(SWF swf) {
@@ -145,7 +146,7 @@ public class DefineFontTag extends FontTag {
         fontId = swf.getNextCharacterId();
         glyphShapeTable = new ArrayList<>();
     }
-    
+
     /**
      * Constructor
      *

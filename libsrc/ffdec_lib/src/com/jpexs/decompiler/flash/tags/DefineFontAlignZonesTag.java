@@ -46,6 +46,7 @@ public class DefineFontAlignZonesTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public DefineFontAlignZonesTag(SWF swf) {

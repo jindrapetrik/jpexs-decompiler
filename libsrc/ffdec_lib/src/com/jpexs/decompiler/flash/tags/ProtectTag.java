@@ -59,6 +59,7 @@ public class ProtectTag extends Tag {
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public ProtectTag(SWF swf) {

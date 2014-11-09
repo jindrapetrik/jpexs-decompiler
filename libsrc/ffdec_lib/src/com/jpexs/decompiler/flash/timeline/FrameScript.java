@@ -32,11 +32,11 @@ public class FrameScript implements TreeItem {
         this.swf = swf;
         this.frame = frame;
     }
-    
+
     public Frame getFrame() {
         return frame;
     }
-    
+
     @Override
     public SWF getSwf() {
         return swf;

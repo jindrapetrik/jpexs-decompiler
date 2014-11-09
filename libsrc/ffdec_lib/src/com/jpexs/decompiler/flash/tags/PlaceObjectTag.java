@@ -100,6 +100,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
 
     /**
      * Constructor
+     *
      * @param swf
      */
     public PlaceObjectTag(SWF swf) {

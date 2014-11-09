@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -26,14 +25,13 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FullMultinameAVM2Item extends AVM2Item {
 
     public int multinameIndex;
     public GraphTargetItem name;
     public GraphTargetItem namespace;
-    
+
     public FullMultinameAVM2Item(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
@@ -155,10 +153,10 @@ public class FullMultinameAVM2Item extends AVM2Item {
             return false;
         }
         return true;
-    }   
-    
+    }
+
     @Override
-    public GraphTargetItem returnType() {              
+    public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
 
