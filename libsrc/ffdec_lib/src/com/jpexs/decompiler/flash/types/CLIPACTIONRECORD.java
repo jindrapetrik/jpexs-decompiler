@@ -114,9 +114,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
             keyCode = sis.readUI8("keyCode");
             actionRecordSize--;
         }
-        int actionBytesPos = (int) sis.getPos();
-        byte[] bytes = sis.readBytesEx(actionRecordSize, "actionBytes");
-        actionBytes = new ByteArrayRange(swf.uncompressedData, actionBytesPos, bytes.length);
+        actionBytes = sis.readByteRangeEx(actionRecordSize, "actionBytes");
     }
 
     @Override

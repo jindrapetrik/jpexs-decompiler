@@ -72,14 +72,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         condIdleToOverUp = sis.readUB(1, "condIdleToOverUp") == 1;
         condKeyPress = (int) sis.readUB(7, "condKeyPress");
         condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
-        int actionBytesPos = (int) sis.getPos();
-        byte[] bytes;
-        if (condActionSize <= 0) {
-            bytes = sis.readBytesEx(sis.available(), "actionBytes");
-        } else {
-            bytes = sis.readBytesEx(condActionSize - 4, "actionBytes");
-        }
-        actionBytes = new ByteArrayRange(swf.uncompressedData, actionBytesPos, bytes.length);
+        actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes");
     }
     /**
      * Is this BUTTONCONDACTION last in the list?
