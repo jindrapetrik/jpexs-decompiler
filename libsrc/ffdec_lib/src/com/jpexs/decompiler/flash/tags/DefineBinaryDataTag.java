@@ -85,12 +85,14 @@ public class DefineBinaryDataTag extends CharacterTag {
         reserved = sis.readUI32("reserved");
         binaryData = sis.readBytesEx(sis.available(), "binaryData");
 
-        try {
-            SWF bswf = new SWF(new ByteArrayInputStream(binaryData), Configuration.parallelSpeedUp.get());
-            bswf.fileTitle = "(SWF Data)";
-            innerSwf = bswf;
-        } catch (IOException | InterruptedException ex) {
-            //ignore
+        if (Configuration.autoLoadEmbeddedSwfs.get()) {
+            try {
+                SWF bswf = new SWF(new ByteArrayInputStream(binaryData), Configuration.parallelSpeedUp.get());
+                bswf.fileTitle = "(SWF Data)";
+                innerSwf = bswf;
+            } catch (IOException | InterruptedException ex) {
+                //ignore
+            }
         }
     }
 
