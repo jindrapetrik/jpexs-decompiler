@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -77,13 +78,13 @@ public class TypeItem extends GraphTargetItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {                                
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
-            writer.hilightSpecial(fullTypeName,"typename",fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2!=null, fullTypeName),"typename",fullTypeName);
         } else {
             String simpleName = fullTypeName;
             if (simpleName.contains(".")) {
                 simpleName = simpleName.substring(simpleName.lastIndexOf('.') + 1);
             }
-            writer.hilightSpecial(simpleName,"typename",fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2!=null, simpleName),"typename",fullTypeName);
         }
 
         return writer;

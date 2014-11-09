@@ -90,7 +90,7 @@ public class Cache<K, V> {
         }
     }
 
-    public boolean contains(K key) {
+    public synchronized boolean contains(K key) {
         if (storageType == STORAGE_FILES) {
             return cacheFiles.containsKey(key);
         } else if (storageType == STORAGE_MEMORY) {
@@ -99,7 +99,7 @@ public class Cache<K, V> {
         return false;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         cacheMemory.clear();
         for (File f : cacheFiles.values()) {
             f.delete();
@@ -107,7 +107,7 @@ public class Cache<K, V> {
         cacheFiles.clear();
     }
 
-    public void remove(K key) {
+    public synchronized void remove(K key) {
         if (storageType == STORAGE_FILES) {
             if (cacheFiles.containsKey(key)) {
                 File f = cacheFiles.get(key);
@@ -122,7 +122,7 @@ public class Cache<K, V> {
 
     }
 
-    public V get(K key) {
+    public synchronized V get(K key) {
         if (storageType == STORAGE_FILES) {
             if (!cacheFiles.containsKey(key)) {
                 return null;
@@ -146,7 +146,7 @@ public class Cache<K, V> {
         return null;
     }
 
-    public void put(K key, V value) {
+    public synchronized void put(K key, V value) {
         if (storageType == STORAGE_FILES) {
             File temp = null;
             try {

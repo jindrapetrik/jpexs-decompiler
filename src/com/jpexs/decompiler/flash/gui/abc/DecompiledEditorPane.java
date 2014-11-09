@@ -293,7 +293,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return -1;
     }
 
-    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex,Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex){
+    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex,Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex){       
         
         int m = getMultinameAtPos(pos,true);
         if (m <= 0) {
@@ -303,7 +303,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         Token t = sd.getTokenAt(pos+1);
         Token lastToken = t;
         Token prev = null;       
-        while(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD){
+        while(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX){
             prev = sd.getPrevToken(t);
             if(prev!=null){
                 if(!".".equals(prev.getString(sd))){
@@ -314,7 +314,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 break;
             }            
         }
-        if(t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD){
+        if(t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD || t.type == TokenType.REGEX){
             return false;
         }        
         Reference<String> locTypeRef = new Reference<>("");        
@@ -336,7 +336,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     InstanceInfo ii = a.instance_info.get(cindex);
                     for(int j=0;j<ii.instance_traits.traits.size();j++){
                         Trait tr = ii.instance_traits.traits.get(j);
-                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), true))){
+                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), false /*NOT RAW!*/))){
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -351,7 +351,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     ClassInfo ci = a.class_info.get(cindex);
                     for(int j=0;j<ci.static_traits.traits.size();j++){
                         Trait tr = ci.static_traits.traits.get(j);
-                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), true))){
+                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), false /*NOT RAW!*/))){
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -464,7 +464,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     break;
                 case "traitname":
                     if (currentTrait != null) {
-                        return currentTrait.name_index;
+                        //return currentTrait.name_index;
                     }
                     break;
                 case "returns":
