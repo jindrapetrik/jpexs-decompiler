@@ -278,8 +278,15 @@ public class MethodInfo {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
-            pdata=new HashMap<>();
+            String ptype = "*";
+            if (param_types[i] > 0) {
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants,false);
+            }
+            
+            
+            pdata=new HashMap<>();                                    
             pdata.put("declaration", "true");          
+            pdata.put("declaredType", ptype);
             if (!localRegNames.isEmpty()) {
                 pdata.put("localName", localRegNames.get(i + 1)); //assuming it is a slot
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true,localRegNames.get(i + 1)),"paramname",i,pdata);
@@ -318,6 +325,7 @@ public class MethodInfo {
             }
             pdata=new HashMap<>();
             pdata.put("declaration", "true");
+            pdata.put("declaredType", "*");
             pdata.put("localName",restName); 
             writer.append(restAdd);
             writer.hilightSpecial(restName, "flag.NEED_REST",0,pdata);

@@ -59,6 +59,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             String localName = localRegName(localData.localRegNames, lti.regIndex);
             srcData.put("localName",localName);
             srcData.put("declaration", "true");
+            srcData.put("declaredType", "*");
             writer.append("var ");
             writer.append(localName);
             return writer;
@@ -68,6 +69,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             GetSlotAVM2Item sti=(GetSlotAVM2Item)assignment;
             srcData.put("localName",sti.getNameAsStr(localData));
             srcData.put("declaration", "true");
+            srcData.put("declaredType", "*");
             writer.append("var ");
             sti.getName(writer, localData);
             return writer;
@@ -78,6 +80,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             String localName = localRegName(localData.localRegNames, lti.regIndex);
             srcData.put("localName",localName);
             srcData.put("declaration", "true");
+            
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
                 coerType = ((CoerceAVM2Item) lti.value).typeObj;
@@ -85,6 +88,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
+            srcData.put("declaredType", (coerType instanceof TypeItem)?((TypeItem)coerType).fullTypeName:"*");
             writer.append("var ");
             writer.append(localName);
             writer.append(":");            
@@ -96,9 +100,10 @@ public class DeclarationAVM2Item extends AVM2Item {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
             srcData.put("localName",ssti.getNameAsStr(localData));
             srcData.put("declaration", "true");
+            srcData.put("declaredType", (type instanceof TypeItem)?((TypeItem)type).fullTypeName:"*");
             writer.append("var ");
             ssti.getName(writer, localData);
-            writer.append(":");
+            writer.append(":");            
             
             type.appendTo(writer, localData);
             writer.append(" = ");

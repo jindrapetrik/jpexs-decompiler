@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -37,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
@@ -112,7 +114,9 @@ import javax.swing.table.TableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
@@ -356,9 +360,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         Helper.emptyObject(this);
     }
 
-    public ABCPanel(MainPanel mainPanel) {
-        DefaultSyntaxKit.initKit();
+    public ABCPanel(MainPanel mainPanel) {       
 
+        DefaultSyntaxKit.initKit();
+        
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
@@ -368,12 +373,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
             @Override
             public boolean isLink(Token token) {
-                return hasDeclaration(token.start);
+                return hasDeclaration(token.length==1?token.start:token.start+1);
             }
 
             @Override
             public void handleLink(Token token) {
-                gotoDeclaration(token.start);
+                gotoDeclaration(token.length==1?token.start:token.start+1);
             }
 
             @Override
@@ -538,6 +543,22 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     }
 
     private boolean hasDeclaration(int pos) {
+        
+        SyntaxDocument sd = (SyntaxDocument)decompiledTextArea.getDocument();
+        Token t = sd.getTokenAt(pos);
+        if(t==null || (t.type != TokenType.IDENTIFIER && t.type!=TokenType.KEYWORD && t.type!=TokenType.REGEX)){
+            return false;
+        }
+        Reference<Integer> abcIndex=new Reference<>(0);
+        Reference<Integer> classIndex=new Reference<>(0);
+        Reference<Integer> traitIndex=new Reference<>(0);
+        Reference<Integer> multinameIndexRef=new Reference<>(0);
+        Reference<Boolean> classTrait=new Reference<>(false);
+        
+        
+        if(decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait,multinameIndexRef)){
+            return true;
+        }
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
             if(multinameIndex == 0){
@@ -566,10 +587,22 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             }
         } 
 
-        return decompiledTextArea.getLocalDeclarationOfPos(pos) != -1;                
+        return decompiledTextArea.getLocalDeclarationOfPos(pos,new Reference<>("")) != -1;                
     }
 
     private void gotoDeclaration(int pos) {
+        Reference<Integer> abcIndex=new Reference<>(0);
+        Reference<Integer> classIndex=new Reference<>(0);
+        Reference<Integer> traitIndex=new Reference<>(0);
+        Reference<Boolean> classTrait=new Reference<>(false);
+        Reference<Integer> multinameIndexRef=new Reference<>(0);
+        
+        
+        if(decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait,multinameIndexRef)){
+            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(swf.abcList, swf.abcList.get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(),classIndex.getVal(), traitIndex.getVal(), classTrait.getVal(), null, -1) {
+            });
+            return;
+        }
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
             List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
@@ -600,7 +633,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             }
         }
         
-        int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos);
+        int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos,new Reference<>(""));
         if (dpos > -1) {
             decompiledTextArea.setCaretPosition(dpos);
         }
@@ -825,11 +858,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     if (oldSp != null) {
                         hilightScript(swf, oldSp);
                     }
-                    //decompiledTextArea.setClassIndex(-1);
-                    //navigator.setClassIndex(-1, oldIndex);
                     setDecompiledEditMode(false);
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
-                    //reload();
+                    reload();
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));                    
                 } catch (AVM2ParseException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);

@@ -95,7 +95,7 @@ public abstract class GraphTargetItem implements Serializable {
         writer.startOffset(src, pos, srcData);
         appendTo(writer, localData);
         if (needsSemicolon()) {
-            writer.append(";");
+            writer.appendNoHilight(";");
         }
         writer.endOffset();
         return writer;

@@ -23,6 +23,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
+import com.jpexs.decompiler.flash.abc.types.ClassInfo;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -47,6 +50,9 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -235,25 +241,34 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return getMultinameAtPos(getCaretPosition());
     }
 
-    public int getLocalDeclarationOfPos(int pos) {
+    public int getLocalDeclarationOfPos(int pos,Reference<String> type) {
         Highlighting sh = Highlighting.search(specialHighlights, pos);
         Highlighting h = Highlighting.search(highlights, pos);
 
+        if (h == null) {
+            return -1;
+        }
+        
         List<Highlighting> tms = Highlighting.searchAll(methodHighlights, pos, null, null, -1, -1);
         if (tms.isEmpty()) {
             return -1;
         }
         for (Highlighting tm : tms) {
 
-            List<Highlighting> tm_tms = Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);
-            if (h == null) {
-                return -1;
-            }
+            List<Highlighting> tm_tms = Highlighting.searchAll(methodHighlights, -1, "index", tm.getPropertyString("index"), -1, -1);            
             //is it already declaration?
             if ("true".equals(h.getPropertyString("declaration")) || (sh != null && "true".equals(sh.getPropertyString("declaration")))) {
                 return -1; //no jump
             }
 
+            String lname=h.getPropertyString("localName");
+            if("this".equals(lname)){
+                Highlighting ch= Highlighting.search(classHighlights, pos);
+                int cindex=(int)(long)ch.getPropertyLong("index");                
+                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));                               
+                return ch.startPos;
+            }
+            
             Map<String, String> search = h.getProperties();
             search.remove("index");
             search.remove("subtype");
@@ -269,6 +284,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     rh = Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos + tm1.len);
                 }
                 if (rh != null) {
+                    type.setVal(rh.getPropertyString("declaredType"));
                     return rh.startPos;
                 }
             }
@@ -277,13 +293,101 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return -1;
     }
 
+    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex,Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex){
+        
+        int m = getMultinameAtPos(pos,true);
+        if (m <= 0) {
+            return false;
+        }
+        SyntaxDocument sd=(SyntaxDocument)getDocument();
+        Token t = sd.getTokenAt(pos+1);
+        Token lastToken = t;
+        Token prev = null;       
+        while(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD){
+            prev = sd.getPrevToken(t);
+            if(prev!=null){
+                if(!".".equals(prev.getString(sd))){
+                    break;                    
+                }
+                t = sd.getPrevToken(prev);
+            }else{
+                break;
+            }            
+        }
+        if(t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD){
+            return false;
+        }        
+        Reference<String> locTypeRef = new Reference<>("");        
+        getLocalDeclarationOfPos(t.start,locTypeRef);
+        String currentType=locTypeRef.getVal();
+        if(currentType.equals("*")){
+           return false; 
+        }
+        boolean found=false;
+        t = sd.getNextToken(t);
+        while(t!=lastToken && !currentType.equals("*")){            
+            t = sd.getNextToken(t);
+            String ident=t.getString(sd);
+            found = false;
+            loopi:for(int i=0;i<abcList.size();i++){                              
+                ABC a = abcList.get(i).getABC();
+                int cindex=a.findClassByName(currentType);
+                if(cindex>-1){                    
+                    InstanceInfo ii = a.instance_info.get(cindex);
+                    for(int j=0;j<ii.instance_traits.traits.size();j++){
+                        Trait tr = ii.instance_traits.traits.get(j);
+                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), true))){
+                            classIndex.setVal(cindex);
+                            abcIndex.setVal(i);
+                            traitIndex.setVal(j);
+                            classTrait.setVal(false);
+                            multinameIndex.setVal(tr.name_index);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
+                            found = true;
+                            break loopi;
+                        }
+                    }
+                    
+                    ClassInfo ci = a.class_info.get(cindex);
+                    for(int j=0;j<ci.static_traits.traits.size();j++){
+                        Trait tr = ci.static_traits.traits.get(j);
+                        if(ident.equals(tr.getName(a).getName(a.constants, new ArrayList<String>(), true))){
+                            classIndex.setVal(cindex);
+                            abcIndex.setVal(i);
+                            traitIndex.setVal(j);
+                            classTrait.setVal(true);
+                            multinameIndex.setVal(tr.name_index);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
+                            found = true;
+                            break loopi;
+                        }
+                    }
+                }
+            }
+            if(!found){
+                return false;
+            }
+            
+            t = sd.getNextToken(t);
+            if(!".".equals(t.getString(sd))){
+                break;
+            }
+        }        
+        return true;
+    }
+    
     public int getMultinameAtPos(int pos) {
+        return getMultinameAtPos(pos, false);
+    }
+    
+    public int getMultinameAtPos(int pos, boolean codeOnly) {
         Highlighting tm = Highlighting.search(methodHighlights, pos);
         Trait currentTrait = null;
         int currentMethod = -1;
         if (tm != null) {
 
             int mi = (int) (long) tm.getPropertyLong("index");
+            currentMethod = mi;
             int bi = abc.findBodyIndex(mi);
             Highlighting h = Highlighting.search(highlights, pos);
             if (h != null) {
@@ -304,7 +408,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     lastIns = ins;
                 }
                 if (selIns != null) {
-                    if ((selIns.definition instanceof ConstructSuperIns) || (selIns.definition instanceof CallSuperIns)|| (selIns.definition instanceof CallSuperVoidIns)) {
+                    if (!codeOnly && ((selIns.definition instanceof ConstructSuperIns) || (selIns.definition instanceof CallSuperIns)|| (selIns.definition instanceof CallSuperVoidIns))) {
                         Highlighting tc = Highlighting.search(classHighlights, pos);
                         if(tc!=null){
                             int cindex = (int)(long)tc.getPropertyLong("index");
@@ -321,14 +425,23 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     }
                 }
             }
-
-            currentTrait = getCurrentTrait();
-            if (currentTrait instanceof TraitMethodGetterSetter) {
-                currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
+            
+        }        
+        if(codeOnly){
+            return -1;
+        }
+        
+        Highlighting ch = Highlighting.search(classHighlights, pos);
+        if(ch!=null){            
+            Highlighting th = Highlighting.search(traitHighlights, pos);
+            if (th != null) {
+               currentTrait = abc.findTraitByTraitId((int) (long) ch.getPropertyLong("index"), (int) (long) th.getPropertyLong("index"));
             }
-            if (currentMethodHighlight != null) {
-                currentMethod = (int) (long) currentMethodHighlight.getPropertyLong("index");
-            }
+        }                        
+        
+        
+        if (currentTrait instanceof TraitMethodGetterSetter) {
+            currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
         }
         Highlighting sh = Highlighting.search(specialHighlights, pos);
         if (sh != null) {

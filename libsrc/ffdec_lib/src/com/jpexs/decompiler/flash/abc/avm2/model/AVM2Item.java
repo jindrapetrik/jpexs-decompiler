@@ -81,11 +81,11 @@ public abstract class AVM2Item extends GraphTargetItem {
                 }
             }
         }
-
+        
         if (empty) {
             return propertyName.toString(writer, localData);
         }
-        if (propertyName instanceof FullMultinameAVM2Item) {
+        if (propertyName instanceof FullMultinameAVM2Item) {            
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 return propertyName.toString(writer, localData);
             } else {

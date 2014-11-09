@@ -82,6 +82,10 @@ public class TryAVM2Item extends AVM2Item implements Block {
             Map<String,String> data=new HashMap<>();
             data.put("localName", localName);
             data.put("declaration", "true");
+            
+            int eti= catchExceptions.get(e).type_index;            
+            
+            data.put("declaredType", eti<=0?"*":localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2, true));
             writer.hilightSpecial(localName, "try.name",e,data);
             writer.append(":");
             writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames),"try.type",e);

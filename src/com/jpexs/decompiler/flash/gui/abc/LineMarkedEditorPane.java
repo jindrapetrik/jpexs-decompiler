@@ -177,7 +177,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 if (d instanceof SyntaxDocument) {
                     SyntaxDocument sd = (SyntaxDocument) d;
                     int pos = viewToModel(lastPos);
-                    if (pos < 0) {
+                    if (pos <= 0) {
                         return;
                     }
                     Token t = sd.getTokenAt(pos);
@@ -211,7 +211,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 setCursor(Cursor.getDefaultCursor());
                 repaint();
             }
-
         }
 
         @Override
@@ -222,7 +221,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 if (pos < 0) {
                     return;
                 }
-                Token t = sd.getTokenAt(pos);
+                Token t = sd.getTokenAt(pos + 1);
                 if (t != null && linkHandler.isLink(t)) {
                     linkHandler.handleLink(t);
                 }

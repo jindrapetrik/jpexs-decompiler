@@ -74,7 +74,9 @@ public class InstanceInfo {
         if (isInterface()) {
             objType = "interface ";
         }
-        writer.appendNoHilight(modifiers + objType + abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false));
+        
+        writer.appendNoHilight(modifiers + objType);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false),"classname");
         
         
         

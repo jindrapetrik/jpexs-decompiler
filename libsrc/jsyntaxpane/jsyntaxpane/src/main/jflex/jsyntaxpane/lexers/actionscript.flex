@@ -63,10 +63,14 @@ Comment = {TraditionalComment} | {EndOfLineComment}
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 
+IdentFirst = [\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}_$]
+IdentNext = {IdentFirst} | [\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}]
 
 
 /* identifiers */
-Identifier = [:jletter:][:jletterdigit:]*
+Identifier = {IdentFirst}{IdentNext}*
+
+/* identifiers */
 
 IdentifierNs = {Identifier} ":" {Identifier}
 
