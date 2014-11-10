@@ -14,7 +14,7 @@
 ;!define APP_PUBLISHER "JPEXS"
 ;!define APP_NAME "JPEXS Free Flash Decompiler"
 ;!define JRE_VERSION "1.7"
-
+!define APP_EXENAME "ffdec.exe"
 
 !addplugindir "nsis_plugins\ansi\"
 ;!addplugindir "nsis_plugins\unicode\"
@@ -353,6 +353,8 @@ IntOp ${Var} $0 - $1
 ;--------------------------------
 ;Pages
 
+
+
   !insertmacro MUI_PAGE_LICENSE "resources/license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -366,9 +368,10 @@ var SMDir
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Inno Setup: Icon Group"
   !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
+  ;Page custom CUSTOM_PAGE_CONTEXTMENU
   !insertmacro MUI_PAGE_INSTFILES
-  
-!define MUI_FINISHPAGE_RUN "$INSTDIR\ffdec.exe"
+  Page custom CUSTOM_PAGE_HELPUS
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXENAME}"
   !insertmacro MUI_PAGE_FINISH
 
 
@@ -398,11 +401,282 @@ var SMDir
 ;--------------------------------
 ;Installer Sections
 
+!macro IfKeyExists ROOT MAIN_KEY KEY
+  Push $R0
+  Push $R1
+  Push $R2
+
+  # XXX bug if ${ROOT}, ${MAIN_KEY} or ${KEY} use $R0 or $R1
+
+  StrCpy $R1 "0" # loop index
+  StrCpy $R2 "0" # not found
+
+  ${Do}
+    EnumRegKey $R0 ${ROOT} "${MAIN_KEY}" "$R1"
+    ${If} $R0 == "${KEY}"
+      StrCpy $R2 "1" # found
+      ${Break}
+    ${EndIf}
+    IntOp $R1 $R1 + 1
+  ${LoopWhile} $R0 != ""
+
+  ClearErrors
+
+  Exch 2
+  Pop $R0
+  Pop $R1
+  Exch $R2
+!macroend
+
+Function HelpUsClick
+  ExecShell "Open" "http://www.free-decompiler.com/flash/help_us.html"
+FunctionEnd
 
 
-LangString Sec3PlayerGlobal ${LANG_ENGLISH} "PlayerGlobal.swc (download)"
-LangString Sec3PlayerGlobal ${LANG_CZECH} "PlayerGlobal.swc (staï¿½enï¿½)"
+!define StrRep "!insertmacro StrRep"
+!macro StrRep output string old new
+    Push `${string}`
+    Push `${old}`
+    Push `${new}`
+    !ifdef __UNINSTALL__
+        Call un.StrRep
+    !else
+        Call StrRep
+    !endif
+    Pop ${output}
+!macroend
 
+!macro Func_StrRep un
+    Function ${un}StrRep
+        Exch $R2 ;new
+        Exch 1
+        Exch $R1 ;old
+        Exch 2
+        Exch $R0 ;string
+        Push $R3
+        Push $R4
+        Push $R5
+        Push $R6
+        Push $R7
+        Push $R8
+        Push $R9
+
+        StrCpy $R3 0
+        StrLen $R4 $R1
+        StrLen $R6 $R0
+        StrLen $R9 $R2
+        loop:
+            StrCpy $R5 $R0 $R4 $R3
+            StrCmp $R5 $R1 found
+            StrCmp $R3 $R6 done
+            IntOp $R3 $R3 + 1 ;move offset by 1 to check the next character
+            Goto loop
+        found:
+            StrCpy $R5 $R0 $R3
+            IntOp $R8 $R3 + $R4
+            StrCpy $R7 $R0 "" $R8
+            StrCpy $R0 $R5$R2$R7
+            StrLen $R6 $R0
+            IntOp $R3 $R3 + $R9 ;move offset by length of the replacement string
+            Goto loop
+        done:
+
+        Pop $R9
+        Pop $R8
+        Pop $R7
+        Pop $R6
+        Pop $R5
+        Pop $R4
+        Pop $R3
+        Push $R0
+        Push $R1
+        Pop $R0
+        Pop $R1
+        Pop $R0
+        Pop $R2
+        Exch $R1
+    FunctionEnd
+!macroend
+!insertmacro Func_StrRep ""
+!insertmacro Func_StrRep "un."
+
+;var AddToContextMenu
+/*
+Function CUSTOM_PAGE_CONTEXTMENU
+  StrCpy $AddToContextMenu 1
+  nsDialogs::create /NOUNLOAD 1018
+  pop $1
+  !insertmacro MUI_HEADER_TEXT "Add to Context Menu" "Set up Context menu"
+  ${NSD_CreateLabel} 0 0 100% 50 "You can add FFDec to right click context menu in Windows Explorer."
+  pop $1
+  ${NSD_CreateCheckbox} 0 50 100% 25 "Add FFDec to context menu of SWF and GFX files"
+  pop $1
+  ${NSD_SetState} $1 ${BST_CHECKED}
+  ${NSD_OnClick} $1 AddContextClick
+  nsDialogs::Show
+FunctionEnd
+
+*/
+
+/*
+Function AddContextClick
+  pop $1
+  ${NSD_GetState} $1 $AddToContextMenu
+FunctionEnd
+*/
+Function CUSTOM_PAGE_HELPUS
+
+  nsDialogs::create /NOUNLOAD 1018
+  pop $1
+
+
+  !insertmacro MUI_HEADER_TEXT "Help us" "Do you know you can help us?"
+  ${NSD_CreateLabel} 0 0 100% 50 "This whole decompiler is Free and OpenSource. If you want to support us, you can tell other people about our decompiler. Use link to our pages, share a word."
+  pop $1
+  ${NSD_CreateLabel} 0 75 100% 50 "If you wish to express your appreciation for the time and resources the author has spent developing, we also do accept and appreciate monetary donations."
+  pop $1
+  ${NSD_CreateLabel} 0 150 125 25 "Click here for more info:"
+  pop $1
+  ${NSD_CreateButton} 130 145 75 25 "Help us!"
+  pop $1
+  ${NSD_OnClick} $1 HelpUsClick
+  nsDialogs::Show
+
+FunctionEnd
+
+
+Function IndexOf
+Exch $R0
+Exch
+Exch $R1
+Push $R2
+Push $R3
+
+ StrCpy $R3 $R0
+ StrCpy $R0 -1
+ IntOp $R0 $R0 + 1
+  StrCpy $R2 $R3 1 $R0
+  StrCmp $R2 "" +2
+  StrCmp $R2 $R1 +2 -3
+
+ StrCpy $R0 -1
+
+Pop $R3
+Pop $R2
+Pop $R1
+Exch $R0
+FunctionEnd
+
+!macro IndexOf Var Str Char
+Push "${Char}"
+Push "${Str}"
+ Call IndexOf
+Pop "${Var}"
+!macroend
+!define IndexOf "!insertmacro IndexOf"
+
+var clsname
+!define VERB "ffdec"
+!define VERBNAME "Open with FFDec"
+!define ALPHABET "abcdefghijklmnopqrstuvwxyz"
+var ext
+var MRUList
+var exists
+
+
+!define REG_CLASSES_HKEY HKLM
+
+Function un.RemoveExtContextMenu
+  pop $ext
+  DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}"
+  ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+  IfErrors step2
+    DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}"
+  step2:
+  ReadRegStr $MRUList HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" "MRUList"
+     IfErrors step3
+       StrLen $0 $MRUList
+       ${For} $R1 0 $0
+              StrCpy $2 $MRUList 1 $R1 ;Copy one character
+              ReadRegStr $3 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $2
+              ${If} $3 == ${APP_EXENAME}
+                ${StrRep} $MRUList $MRUList $2 ""
+                WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" "MRUList" $MRUList
+                DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $2
+                ${Break}
+              ${EndIf}
+       ${Next}
+   step3:
+  DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}"
+FunctionEnd
+
+
+
+
+Function AddToExtContextMenu
+    pop $ext
+    
+    
+    WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}\shell\open" "" ${VERB}
+    WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}\shell\open\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+
+    !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" ".$ext"
+     Pop $R0
+     ${If} $R0 == 0
+           WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\.$ext" "" "ShockwaveFlash.ShockwaveFlash"
+     ${EndIf}
+
+     ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" $clsname
+     Pop $R0
+     ${If} $R0 == 0
+          WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname" "" "Flash Movie"
+     ${EndIf}
+
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}" "" "${VERBNAME}"
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+    
+
+
+
+     ReadRegStr $MRUList HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" "MRUList"
+     IfErrors not_mru
+       StrLen $0 $MRUList
+       StrCpy $exists 0
+       ${For} $R1 0 $0
+              StrCpy $2 $MRUList 1 $R1 ;Copy one character
+              ReadRegStr $2 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $2
+              ${If} $2 == ${APP_EXENAME}
+                StrCpy $exists 1
+                ${Break}
+              ${EndIf}
+       ${Next}
+       ${If} $exists == 0
+          StrLen $0 ${ALPHABET}
+          ${For} $R1 0 $0
+            StrCpy $1 ${ALPHABET} 1 $R1
+            ${IndexOf} $R0 $MRUList $1
+            ${If} $R0 == -1
+              WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $1 ${APP_EXENAME}
+              StrCpy $MRUList "$MRUList$1"
+              WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" "MRUList" $MRUList
+              ${Break}
+            ${EndIf}
+          ${Next}
+       ${EndIf}
+     not_mru:
+
+     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" "SystemFileAssociations"
+     Pop $R0
+     ${If} $R0 == 1
+       !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell" ${VERB}
+       Pop $R0
+       ${If} $R0 == 0
+         WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "" "${VERBNAME}"
+         WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}\Command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+       ${EndIf}
+     ${EndIf}
+FunctionEnd
 
 
 Section "FFDec" SecDummy
@@ -411,7 +685,7 @@ Section "FFDec" SecDummy
 
   SetOutPath "$INSTDIR"
   
-  File "dist\ffdec.exe"
+  File "dist\${APP_EXENAME}"
   File "dist\ffdec.bat"
   File "dist\ffdec.jar"
   File "dist\license.txt"
@@ -419,13 +693,20 @@ Section "FFDec" SecDummy
   SetOutPath "$INSTDIR"  
   File /r "dist\lib"
 
- 
+/*
+  ${If} $AddToContextMenu == 1
+
+
+
+  ${EndIf}
+
+ */
  ;create start-menu items
 !insertmacro MUI_STARTMENU_WRITE_BEGIN 0 ;This macro sets $SMDir and skips to MUI_STARTMENU_WRITE_END if the "Don't create shortcuts" checkbox is checked... 
 
   CreateDirectory "$SMPROGRAMS\$SMDir"
   CreateShortCut "$SMPROGRAMS\$SMDir\Uninstall ${APP_NAME}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\$SMDir\${APP_NAME}.lnk" "$INSTDIR\ffdec.exe" "" "$INSTDIR\ffdec.exe" 0
+  CreateShortCut "$SMPROGRAMS\$SMDir\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" "" "$INSTDIR\${APP_EXENAME}" 0
  !insertmacro MUI_STARTMENU_WRITE_END
 
   ;Store installation folder
@@ -434,7 +715,7 @@ Section "FFDec" SecDummy
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayName" "${APP_NAME}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayIcon" '"$INSTDIR\ffdec.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayIcon" '"$INSTDIR\${APP_EXENAME}"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "DisplayVersion" "${APP_VER}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "URLInfoAbout" "${APP_URL}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}" "URLUpdateInfo" "${APP_URL}"
@@ -474,6 +755,7 @@ var pgname
 
 Section "PlayerGlobal.swc" SecPlayerGlobal
 
+DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
 !tempfile PGHTML
 inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" https://www.adobe.com/support/flashplayer/downloads.html ${PGHTML}
 Pop $0
@@ -512,14 +794,26 @@ done:
   IntOp $pos $pos + 1
   StrCpy $pgname $txt "" $pos    
   SetShellVarContext current    
-  
-  CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
-  inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
+
+  IfFileExists "$APPDATA\JPEXS\FFDec\flashlib\$pgname" swcexists
+    CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
+    DetailPrint "Starting download PlayerGlobal.swc"
+    inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
+    Pop $0
+    StrCmp $0 "OK" saved
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Failed to download PlayerGlobal.SWC. Click OK to abort installation" /SD IDOK
+    Abort
+    saved:
+     DetailPrint "PlayerGlobal.swc saved to $APPDATA\JPEXS\FFDec\flashlib\$pgname"
+  Goto exit
+  swcexists:
+     DetailPrint "$APPDATA\JPEXS\FFDec\flashlib\$pgname already exists, skipping download"
+  exit:
 SectionEnd
 
 Section "Desktop Shortcut"
 SetShellVarContext all
-CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\ffdec.exe" ""
+CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" ""
 SectionEnd
 
 Function .onInit
@@ -528,25 +822,41 @@ Function .onInit
   SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
+Section "Add to context menu" SecContextMenu
+    SetRegView 64
+    Push "swf"
+    Call AddToExtContextMenu
+    Push "gfx"
+    Call AddToExtContextMenu
+    
+    SetRegView 32
+    Push "swf"
+    Call AddToExtContextMenu
+    Push "gfx"
+    Call AddToExtContextMenu
+
+SectionEnd
+
 ;--------------------------------
 ;Descriptions
 
   ;Language strings
   ;LangString DESC_SecDummy ${LANG_ENGLISH} "Application GUI and Libraries"
-  ;LangString DESC_SecDummy ${LANG_CZECH} "Aplikaï¿½nï¿½ rozhranï¿½ a knihovny"
+  ;LangString DESC_SecDummy ${LANG_CZECH} "Aplikaèní rozhraní a knihovny"
 
   ;LangString DESC_PlayerGlobal ${LANG_ENGLISH} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"
-  ;LangString DESC_PlayerGlobal ${LANG_CZECH} "Stï¿½hnout knihovnu FlashPlayeru ze strï¿½nek Adobe - uï¿½iteï¿½nï¿½ pro pï¿½ï¿½mou editaci ActionScriptu a dalï¿½ï¿½ vï¿½ci"
+  ;LangString DESC_PlayerGlobal ${LANG_CZECH} "Stáhnout knihovnu FlashPlayeru ze stránek Adobe - užiteèné pro pøímou editaci ActionScriptu a další vìci"
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "Application GUI and Libraries"
     !insertmacro MUI_DESCRIPTION_TEXT ${SecPlayerGlobal} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"   
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "Adds FFDec to context menu of SWF and GFX files in windows explorer."
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
          
 ;LangString DESC_UninstLocal ${LANG_ENGLISH} "Remove user configuration"
-;LangString DESC_UninstLocal ${LANG_CZECH} "Odstranit uï¿½ivatelskou konfiguraci"         
+;LangString DESC_UninstLocal ${LANG_CZECH} "Odstranit uživatelskou konfiguraci"
 
 
 
@@ -569,6 +879,9 @@ ${If} $0 <> 0
 ${EndIf}
 FunctionEnd
 
+
+
+
 ;--------------------------------
 ;Uninstaller Section
 
@@ -589,6 +902,21 @@ Section "Uninstall"
 
   RmDir /r "$SMPROGRAMS\$SMDir\*.*"
   RmDir "$SMPROGRAMS\$SMDir"   
+  
+
+
+  SetRegView 64
+  Push "swf"
+  Call un.RemoveExtContextMenu
+  Push "gfx"
+  Call un.RemoveExtContextMenu
+  
+  SetRegView 32
+  Push "swf"
+  Call un.RemoveExtContextMenu
+  Push "gfx"
+  Call un.RemoveExtContextMenu
+
  
   StrCmp $uninstlocal 1 0 +5
     SetShellVarContext current      
@@ -596,6 +924,6 @@ Section "Uninstall"
     RmDir "$APPDATA\JPEXS\FFDec"
     RmDir "$APPDATA\JPEXS"
 
-  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"  
+  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"
 
 SectionEnd

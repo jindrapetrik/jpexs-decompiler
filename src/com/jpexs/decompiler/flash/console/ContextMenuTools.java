@@ -70,16 +70,14 @@ public class ContextMenuTools {
             return true;
         }
 
-        String exeName32 = "ffdec.exe";
-        String exeName64 = "ffdec64.exe";
+        String exeName = "ffdec.exe";
 
-        if (add) {
-            String exeName = Platform.is64Bit() ? exeName64 : exeName32;
+        if (add) {            
             return addToContextMenu(add, fromCommandLine, exeName);
         } else {
             // remove both 32 and 64 bit references
-            return addToContextMenu(add, fromCommandLine, exeName32)
-                    && addToContextMenu(add, fromCommandLine, exeName64);
+            return addToContextMenu(add, fromCommandLine, exeName)
+                    && addToContextMenu(add, fromCommandLine, "ffdec64.exe"); //remove 64 exe from previous versions
         }
     }
 
