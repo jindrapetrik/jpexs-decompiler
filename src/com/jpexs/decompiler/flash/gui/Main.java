@@ -1285,7 +1285,13 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build, "UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8") 
+                    + "&currentRevision=" + URLEncoder.encode(ApplicationInfo.revision, "UTF-8")
+                    + "&currentVersionMajor=" + URLEncoder.encode(""+ApplicationInfo.version_major, "UTF-8") 
+                    + "&currentVersionMinor=" + URLEncoder.encode(""+ApplicationInfo.version_minor, "UTF-8")
+                    + "&currentVersionRelease=" + URLEncoder.encode(""+ApplicationInfo.version_release, "UTF-8")
+                    + "&currentVersionBuild=" + URLEncoder.encode(""+ApplicationInfo.version_build, "UTF-8")
+                    + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"
                     + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"

@@ -29,7 +29,11 @@ public class ApplicationInfo {
     public static final String SHORT_APPLICATION_NAME = "FFDec";
     public static final String VENDOR = "JPEXS";
     public static String version = "";
-    public static String build = "";
+    public static String revision = "";
+    public static int version_major = 4;
+    public static int version_minor = 0;
+    public static int version_release = 0;
+    public static int version_build = 0;
     public static boolean nightly = false;
     public static String applicationVerName;
     public static String shortApplicationVerName;
@@ -46,10 +50,14 @@ public class ApplicationInfo {
         try {
             prop.load(ApplicationInfo.class.getResourceAsStream("/project.properties"));
             version = prop.getProperty("version");
-            build = prop.getProperty("build");
+            revision = prop.getProperty("build");
+            version_major = Integer.parseInt(prop.getProperty("version.major"));
+            version_minor = Integer.parseInt(prop.getProperty("version.minor"));
+            version_release = Integer.parseInt(prop.getProperty("version.release"));
+            version_build = Integer.parseInt(prop.getProperty("version.build"));
             nightly = prop.getProperty("nightly").equals("true");
             if (nightly) {
-                version = version + " nightly build";
+                version = version + " nightly build " + version_build;
             }
         } catch (IOException | NullPointerException ex) {
             //ignore
