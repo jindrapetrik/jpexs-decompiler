@@ -215,12 +215,12 @@
         </echoxml>
     </target>    
     <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}/launch4j">
+        <exec dir="${launch4j.path}" executable="${launch4j.path}/launch4j" failonerror="true">
             <arg file="${EXECONFIG}" />
         </exec>
     </target>
     <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}\launch4jc.exe">
+        <exec dir="${launch4j.path}" executable="${launch4j.path}\launch4jc.exe" failonerror="true">
             <arg file="${EXECONFIG}" />
         </exec>
     </target>   
@@ -259,7 +259,7 @@
 
     </target>
          
-    <target name="all" depends="clean,test,javadoc,release">    
+    <target name="all" depends="clean,build,test,javadoc,release">    
         
     </target>                    
     
@@ -374,7 +374,7 @@
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
             <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
         </tstamp>
-        <exec executable="git" outputproperty="GITTAG">
+        <exec executable="git" outputproperty="GITTAG" failonerror="true">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  
