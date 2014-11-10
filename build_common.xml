@@ -396,18 +396,18 @@
     </target>
     
     <target name="build_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="build" inheritAll="false" />
+        <ant antfile="${CORELIBSCRIPT}" target="build" inheritAll="false" usenativebasedir="true"/>
         <copy file="${CORELIBPATH}" todir="${LIBRARIESDIR}" />
     </target>
     
     <target name="clean_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" />
+        <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" usenativebasedir="true" />
         <delete file="${LIBRARIESDIR}/${CORELIBNAME}" />
     </target>
     
     
     <target name="test_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" />
+        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
     </target>
     
     <target name="build" depends="-loadversion,build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
