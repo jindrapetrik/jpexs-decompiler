@@ -32,7 +32,7 @@
     <target name="-loadversion">
         <loadproperties srcfile="version.properties" prefix="version"/> 
         <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
-        <property name="VERSIONNUMBER" value="${VERSION}" />  
+        <property name="VERSIONNUMBER" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
             if(project.getProperty("version.debug")=="true"){
                 project.setProperty("NIGHTLY",true);
