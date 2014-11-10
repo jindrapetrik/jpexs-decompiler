@@ -113,15 +113,14 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -216,13 +215,15 @@ public class TagTree extends JTree {
         setCellRenderer(new TagTreeCellRenderer());
         setRootVisible(false);
         setBackground(Color.white);
-        setUI(new BasicTreeUI() {
-            @Override
-            public void paint(Graphics g, JComponent c) {
+        setRowHeight(16);
+        setLargeModel(true);
+        
+        TreeUI treeUI = new BasicTreeUI() {
+            {
                 setHashColor(Color.gray);
-                super.paint(g, c);
             }
-        });
+        };
+        setUI(treeUI);
     }
 
     public void createContextMenu() {

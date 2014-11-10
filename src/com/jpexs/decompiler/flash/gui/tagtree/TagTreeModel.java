@@ -461,7 +461,7 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof Frame) {
             return ((Frame) parentNode).innerTags.indexOf(childNode);
         } else if (parentNode instanceof DefineSpriteTag) {
-            return ((Frame) parentNode).frame;
+            return ((Frame) childNode).frame;
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return 0; // binary data tag can have only 1 child
         } else if (parentNode instanceof AS2Package) {

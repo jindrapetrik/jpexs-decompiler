@@ -364,7 +364,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 if (path == null) {
                     return;
                 }
-                View.expandTreeNodesRecursive(tagTree, path, true);
+                View.expandTreeNodes(tagTree, path, true);
             }
             break;
             case ACTION_REMOVE_ITEM:

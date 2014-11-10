@@ -69,6 +69,7 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicColorChooserUI;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
@@ -514,7 +515,14 @@ public class View {
         tree.expandPath(tp);
     }
 
-    public static void expandTreeNodesRecursive(JTree tree, TreePath parent, boolean expand) {
+    public static void expandTreeNodes(JTree tree, TreePath parent, boolean expand) {
+        TreeUI ui = tree.getUI();
+        tree.setUI(null);
+        expandTreeNodesRecursive(tree, parent, expand);
+        tree.setUI(ui);
+    }
+    
+    private static void expandTreeNodesRecursive(JTree tree, TreePath parent, boolean expand) {
         TreeModel model = tree.getModel();
 
         Object node = parent.getLastPathComponent();
