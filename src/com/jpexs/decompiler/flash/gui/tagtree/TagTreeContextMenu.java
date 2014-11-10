@@ -194,8 +194,9 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 allSelectedIsSwf = false;
                 break;
             } else if (item instanceof SWF) {
+                SWF swf = (SWF) item;
                 // Do not allow to close SWF in bundle
-                if (((SWF) item).swfList.isBundle) {
+                if (swf.swfList != null &&swf.swfList.isBundle) {
                     allSelectedIsSwf = false; 
                 }
             }
@@ -328,11 +329,15 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         switch (e.getActionCommand()) {
             case ACTION_OPEN_SWFINSIDE: {
                 List<TreeItem> sel = tagTree.getSelected(tagTree);
+                List<DefineBinaryDataTag> binaryDatas = new ArrayList<>();
                 for (TreeItem item : sel) {
-                    if (item instanceof DefineBinaryDataTag) {
-                        mainPanel.loadFromBinaryTag((DefineBinaryDataTag) item);
+                    DefineBinaryDataTag binaryData = (DefineBinaryDataTag) item;
+                    if (binaryData.isSwfData()) {
+                        binaryDatas.add((DefineBinaryDataTag) item);
                     }
                 }
+                
+                mainPanel.loadFromBinaryTag(binaryDatas);
             }
             break;
             case ACTION_RAW_EDIT: {
@@ -403,7 +408,14 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 List<TreeItem> sel = tagTree.getSelected(tagTree);
                 for (TreeItem item : sel) {
                     if (item instanceof SWF) {
-                        Main.closeFile(((SWF) item).swfList);
+                        SWF swf = (SWF) item;
+                        if (swf.binaryData != null) {
+                            // embedded swf
+                            swf.binaryData.innerSwf = null;
+                            mainPanel.refreshTree();
+                        } else {
+                            Main.closeFile(swf.swfList);
+                        }
                     } else if (item instanceof SWFList) {
                         Main.closeFile((SWFList) item);
                     }

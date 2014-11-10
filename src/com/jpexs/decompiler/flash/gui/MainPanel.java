@@ -2216,6 +2216,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void loadFromBinaryTag(final DefineBinaryDataTag binaryDataTag) {
+        loadFromBinaryTag(Arrays.asList(binaryDataTag));
+    }
+    
+    public void loadFromBinaryTag(final List<DefineBinaryDataTag> binaryDataTags) {
 
         if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {
             Main.loadingDialog = new LoadingDialog(mainFrame == null ? null : mainFrame.getWindow());
@@ -2227,19 +2231,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             @Override
             public void run() {
                 try {
-                    SWF bswf = new SWF(new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData()), new ProgressListener() {
+                    for (DefineBinaryDataTag binaryDataTag : binaryDataTags) {
+                        try {
+                            SWF bswf = new SWF(new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData()), new ProgressListener() {
 
-                        @Override
-                        public void progress(int p) {
-                            Main.loadingDialog.setPercent(p);
+                                @Override
+                                public void progress(int p) {
+                                    Main.loadingDialog.setPercent(p);
+                                }
+                            }, Configuration.parallelSpeedUp.get());
+                            bswf.fileTitle = "(SWF Data)";
+                            binaryDataTag.innerSwf = bswf;
+                            bswf.binaryData = binaryDataTag;
+                        } catch (IOException ex) {
+                            //ignore
                         }
-                    }, Configuration.parallelSpeedUp.get());
-                    bswf.fileTitle = "(SWF Data)";
-                    binaryDataTag.innerSwf = bswf;
-                    bswf.binaryData = binaryDataTag;
-                } catch (IOException | InterruptedException ex) {
+                    }
+                } catch (InterruptedException ex) {
                     //ignore
                 }
+
                 Main.loadingDialog.setVisible(false);
                 Main.stopWork();
             }
