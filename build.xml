@@ -10,7 +10,8 @@
     <property name="EXEFILENAME" value="${PREFIXFILENAME}"/>
     <property name="EXE64FILENAME" value="${PREFIXFILENAME}64"/>
     
-    <property name="CORELIBPATH" value="${basedir}/libsrc/ffdec_lib/dist/ffdec_lib.jar"/>
+    <property name="CORELIBNAME" value="ffdec_lib.jar"/>
+    <property name="CORELIBPATH" value="${basedir}/libsrc/ffdec_lib/dist/${CORELIBNAME}"/>
     <property name="CORELIBSCRIPT" value="${basedir}/libsrc/ffdec_lib/build.xml"/>
     
     <property name="EXEICON" value="${basedir}/graphics/icon_ffdec_round.ico"/>

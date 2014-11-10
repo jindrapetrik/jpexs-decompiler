@@ -402,6 +402,7 @@
     
     <target name="clean_lib">
         <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" />
+        <delete file="${LIBRARIESDIR}/${CORELIBNAME}" />
     </target>
     
     
