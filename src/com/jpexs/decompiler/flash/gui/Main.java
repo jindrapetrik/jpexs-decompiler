@@ -115,7 +115,7 @@ public class Main {
     private static MenuItem stopMenuItem;
     private static MainFrame mainFrame;
     public static final int UPDATE_SYSTEM_MAJOR = 1;
-    public static final int UPDATE_SYSTEM_MINOR = 1;
+    public static final int UPDATE_SYSTEM_MINOR = 2;
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -1342,6 +1342,18 @@ public class Main {
                                 }
                                 if (key.equals("revision")) {
                                     ver.revision = val;
+                                }
+                                if (key.equals("build")) {
+                                    ver.build = Integer.parseInt(val);
+                                }
+                                if (key.equals("major")) {
+                                    ver.major = Integer.parseInt(val);
+                                }
+                                if (key.equals("minor")) {
+                                    ver.minor = Integer.parseInt(val);
+                                }
+                                if (key.equals("release")) {
+                                    ver.release = Integer.parseInt(val);
                                 }
                                 if (key.equals("longVersionName")) {
                                     ver.longVersionName = val;

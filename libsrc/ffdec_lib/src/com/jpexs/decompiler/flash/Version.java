@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import java.util.HashMap;
@@ -33,6 +34,10 @@ public class Version {
     public String appName;
     public String appFullName;
     public String updateLink;
+    public int major;
+    public int minor;
+    public int release;
+    public int build;
     public boolean nightly;
     public Map<String, List<String>> changes = new HashMap<>();
 }

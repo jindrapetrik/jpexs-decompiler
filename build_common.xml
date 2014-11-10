@@ -31,7 +31,7 @@
 
     <target name="-loadversion">
         <loadproperties srcfile="version.properties" prefix="version"/> 
-        <property name="VERSION" value="${version.major}.${version.minor}.${version.release}.${version.build}" />
+        <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
         <property name="VERSIONNUMBER" value="${VERSION}" />  
         <script language="javascript">
             if(project.getProperty("version.debug")=="true"){
@@ -362,7 +362,7 @@
     </target>
     
     <target name="-nightly-suffix" if="NIGHTLY">        
-        <property name="VERSIONSUFFIX" value="_nightly"/>         
+        <property name="VERSIONSUFFIX" value="_nightly${version.build}"/>         
     </target>
     
     <target name="-nonightly-suffix" unless="NIGHTLY">
@@ -534,7 +534,7 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>            
             <arg value="-m"/>
-            <arg value="version changed to ${newversion.major}.${newversion.minor}.${newversion.release}.${newversion.build}"/>
+            <arg value="version changed to ${newversion.major}.${newversion.minor}.${newversion.release} build ${newversion.build}"/>
         </exec> 
     </target>
     
