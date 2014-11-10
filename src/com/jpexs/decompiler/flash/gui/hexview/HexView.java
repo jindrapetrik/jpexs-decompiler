@@ -228,6 +228,9 @@ public class HexView extends JTable {
 
     private int getIdxByColAndRow(int row, int col) {
         int idx = -1;
+        if (row < 0 || col < 0) {
+            return -1;
+        }
         if (col > 0 && col != bytesInRow + 1) {
             idx = row * bytesInRow + ((col > bytesInRow + 1) ? (col - bytesInRow - 2) : (col - 1));
         }
