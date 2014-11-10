@@ -471,7 +471,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         });
 
-        tagTree.createContextMenu(swfs);
+        tagTree.createContextMenu();
 
         dumpTree = new DumpTree(null, this);
         dumpTree.addTreeSelectionListener(this);
@@ -1120,6 +1120,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    public List<SWFList> getSwfs() {
+        return swfs;
+    }
+    
     public SWFList getCurrentSwfList() {
         SWF swf = getCurrentSwf();
         if (swf == null) {
@@ -1140,7 +1144,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 return swfs.get(0).get(0);
             }
 
-            if (treeNode instanceof SWFBundle) {
+            if (treeNode instanceof SWFList) {
                 return null;
             }
 

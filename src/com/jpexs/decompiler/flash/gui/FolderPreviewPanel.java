@@ -130,7 +130,7 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    mainPanel.tagTree.updateContextMenu(mainPanel.tagTree.swfs, new ArrayList<>(selectedItems.values()));
+                    mainPanel.tagTree.contextPopupMenu.update(new ArrayList<>(selectedItems.values()));
                     mainPanel.tagTree.contextPopupMenu.show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
