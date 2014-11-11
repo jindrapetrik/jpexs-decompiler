@@ -267,6 +267,37 @@
         <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
     </target>
     
+    <target namd="-set-none-newversion" unless="newversion.type">
+        <property name="newversion.type" value="none"/>
+    </target>
+    <target name="-check-version-online" depends="-set-none-newversion">
+            <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
+        <echo level="info">Checking version online...</echo>
+        <!-- Note: You must have developer account to upload to JPEXS website -->
+        <java jar="uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
+            <arg value="${website.version.url}" />                
+
+            <arg value="-field" />
+            <arg value="mode" />
+            <arg value="commandline" />
+            
+            <arg value="-field" />
+            <arg value="set_username" />
+            <arg value="${website.username}" />
+
+            <arg value="-field" />
+            <arg value="set_password" />            
+            <arg value="${website.password}" />  
+            
+            <arg value="-field" />
+            <arg value="new" />            
+            <arg value="${newversion.type}" />
+            
+        </java>
+        <echo file="version.properties" message="${newversion.prop}" />
+    </target>
+    
+    </target>
     <target name="-upload-do" if="upload.config.exists">
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Uploading...</echo>
@@ -543,48 +574,20 @@
         <loadproperties srcfile="version.properties" prefix="oldversion" />
     </target>
     
-    <target name="-inc-major" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
-            project.setNewProperty("newversion.minor",0);
-            project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-major">
+        <property name="newversion.type" value="major"/>
     </target>
     
-    <target name="-inc-minor" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
-            project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-minor">
+       <property name="newversion.type" value="minor"/>
     </target>
     
-    <target name="-inc-release" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setNewProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-release">
+       <property name="newversion.type" value="releasr"/> 
     </target>
     
-    <target name="-inc-nightlybuild" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setNewProperty("newversion.release",project.getProperty("oldversion.release"));
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","true");
-            ]]>
-        </script>
+    <target name="-inc-nightlybuild">
+        <property name="newversion.type" value="nightly"/>
     </target>   
     
     <target name="-save-version-info-file">        
@@ -602,20 +605,20 @@
         
     </target>
     
-    <target name="new-version-major" depends="git-pull,-inc-major,-save-version-info,all,-upload,git-push">
+    <target name="new-version-major" depends="git-pull,-inc-major,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-minor" depends="git-pull,-inc-minor,-save-version-info,all,-upload,git-push">
+    <target name="new-version-minor" depends="git-pull,-inc-minor,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload,git-push">
+    <target name="new-version-release" depends="git-pull,-inc-release,-check-version-online,all,-upload,git-push">
        
     </target>
        
         
-    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-save-version-info,all,-upload,git-push">
+    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
         
     </target>
     
