@@ -584,8 +584,7 @@
     </target>
     
     <target name="git-push">
-        <!-- TODO -->
-        <echo>WARNING: Changes need to be PUSHed to the GIT repository.</echo>
+        <!-- NOTHING -->       
     </target>
     
     <target name="-git-commit-versioninfo">        
