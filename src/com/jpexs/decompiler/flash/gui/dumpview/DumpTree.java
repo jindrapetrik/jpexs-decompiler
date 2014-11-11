@@ -211,7 +211,7 @@ public class DumpTree extends JTree implements ActionListener {
                 if (path == null) {
                     return;
                 }
-                View.expandTreeNodesRecursive(this, path, true);
+                View.expandTreeNodes(this, path, true);
             }
             break;
             case ACTION_SAVE_TO_FILE: {
