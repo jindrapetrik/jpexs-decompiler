@@ -213,7 +213,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        Color newColor = null;
+        Color newColor;
         if (colorType == COLOR_TYPE_RGB) {
             try {
                 newColor = noTransparencyColorChooser(null, AppStrings.translate("dialog.selectcolor.title"), color);

@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
@@ -222,6 +223,10 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             if (firstItem instanceof ImageTag && ((ImageTag) firstItem).importSupported()) {
                 replaceMenuItem.setVisible(true);
             }   
+
+            if (firstItem instanceof ShapeTag) {
+                replaceMenuItem.setVisible(true);
+            }
 
             if (firstItem instanceof DefineBinaryDataTag) {
                 replaceMenuItem.setVisible(true);

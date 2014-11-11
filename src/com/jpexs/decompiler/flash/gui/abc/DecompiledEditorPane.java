@@ -302,7 +302,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         SyntaxDocument sd = (SyntaxDocument) getDocument();
         Token t = sd.getTokenAt(pos + 1);
         Token lastToken = t;
-        Token prev = null;
+        Token prev;
         while (t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX) {
             prev = sd.getPrevToken(t);
             if (prev != null) {
@@ -323,7 +323,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (currentType.equals("*")) {
             return false;
         }
-        boolean found = false;
+        boolean found;
         t = sd.getNextToken(t);
         while (t != lastToken && !currentType.equals("*")) {
             t = sd.getNextToken(t);
@@ -540,7 +540,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 setNoTrait();
                 return;
             }
-            Trait currentTrait = null;
+            Trait currentTrait;
             currentTraitHighlight = Highlighting.search(traitHighlights, pos);
             if (currentTraitHighlight != null) {
                 lastTraitIndex = (int) (long) currentTraitHighlight.getPropertyLong("index");

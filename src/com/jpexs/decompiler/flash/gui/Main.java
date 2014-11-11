@@ -1306,8 +1306,8 @@ public class Main {
             final java.util.List<Version> versions = new ArrayList<>();
             String header = "";
             Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
-            int updateMajor = 0;
-            int updateMinor = 0;
+            int updateMajor;
+            int updateMinor;
             Version ver = null;
             while ((s = br.readLine()) != null) {
                 if (start) {

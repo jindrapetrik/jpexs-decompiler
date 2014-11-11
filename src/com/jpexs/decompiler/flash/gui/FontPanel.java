@@ -198,7 +198,7 @@ public class FontPanel extends javax.swing.JPanel {
         setAllowSave(false);
         String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontName();
 
-        String selectedFont = "";
+        String selectedFont;
 
         if (swf.sourceFontNamesMap.containsKey(ft.getFontId())) {
             selectedFont = swf.sourceFontNamesMap.get(ft.getFontId());

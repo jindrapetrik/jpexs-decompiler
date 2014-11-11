@@ -109,6 +109,12 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     private SHAPEWITHSTYLE getShape() {
+        RECT rect = getRect(new HashSet<BoundedTag>());
+        return getShape(rect, false);
+    }
+    
+    public SHAPEWITHSTYLE getShape(RECT rect, boolean fill) {
+        boolean translated = rect.Xmin != 0 || rect.Ymin != 0;
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = new FILLSTYLEARRAY();
         shape.fillStyles.fillStyles = new FILLSTYLE[1];
@@ -117,8 +123,18 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         fillStyle.bitmapId = getCharacterId();
         MATRIX matrix = new MATRIX();
         matrix.hasScale = true;
-        matrix.scaleX = ((int) SWF.unitDivisor) << 16;
-        matrix.scaleY = matrix.scaleX;
+        if (fill) { 
+            RECT imageRect = getRect(new HashSet<BoundedTag>());
+            matrix.scaleX = (int) ((((long) SWF.unitDivisor) << 16) * rect.getWidth() / imageRect.getWidth());
+            matrix.scaleY = (int) ((((long) SWF.unitDivisor) << 16) * rect.getHeight() / imageRect.getHeight());
+        } else {
+            matrix.scaleX = ((int) SWF.unitDivisor) << 16;
+            matrix.scaleY = matrix.scaleX;
+        }
+        if (translated) {
+            matrix.translateX = rect.Xmin;
+            matrix.translateY = rect.Ymin;
+        }
         fillStyle.bitmapMatrix = matrix;
         shape.fillStyles.fillStyles[0] = fillStyle;
 
@@ -129,8 +145,11 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         style.stateFillStyle0 = true;
         style.fillStyle0 = 1;
         style.stateMoveTo = true;
+        if (translated) {
+            style.moveDeltaX = rect.Xmin;
+            style.moveDeltaY = rect.Ymin;
+        }
         shape.shapeRecords.add(style);
-        RECT rect = getRect(new HashSet<BoundedTag>());
         StraightEdgeRecord top = new StraightEdgeRecord();
         top.generalLineFlag = true;
         top.deltaX = rect.getWidth();

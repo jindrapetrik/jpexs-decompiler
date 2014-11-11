@@ -1195,10 +1195,10 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeGRADRECORD(GRADRECORD value, int shapeNum) throws IOException {
         writeUI8(value.ratio);
-        if (shapeNum == 1 || shapeNum == 2) {
-            writeRGB(value.color);
-        } else if (shapeNum == 3) {
+        if (shapeNum >= 3) {
             writeRGBA((RGBA) value.color);
+        } else {
+            writeRGB(value.color);
         }
     }
 
@@ -1303,6 +1303,8 @@ public class SWFOutputStream extends OutputStream {
     public void writeSHAPEWITHSTYLE(SHAPEWITHSTYLE value, int shapeNum) throws IOException {
         writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
         writeLINESTYLEARRAY(value.lineStyles, shapeNum);
+        value.numFillBits = getNeededBitsU(value.fillStyles.fillStyles.length);
+        value.numLineBits = getNeededBitsU(value.lineStyles.lineStyles.length);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
@@ -1323,15 +1325,17 @@ public class SWFOutputStream extends OutputStream {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) sh;
                 writeUB(1, 1); //typeFlag
                 writeUB(1, 0);//curvedEdge
+                cer.numBits = Math.max(getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2, 0);
                 writeUB(4, cer.numBits);
-                writeUB(cer.numBits + 2, cer.controlDeltaX);
-                writeUB(cer.numBits + 2, cer.controlDeltaY);
-                writeUB(cer.numBits + 2, cer.anchorDeltaX);
-                writeUB(cer.numBits + 2, cer.anchorDeltaY);
+                writeSB(cer.numBits + 2, cer.controlDeltaX);
+                writeSB(cer.numBits + 2, cer.controlDeltaY);
+                writeSB(cer.numBits + 2, cer.anchorDeltaX);
+                writeSB(cer.numBits + 2, cer.anchorDeltaY);
             } else if (sh instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) sh;
                 writeUB(1, 1); //typeFlag
                 writeUB(1, 1);//straightEdge
+                ser.numBits = Math.max(getNeededBitsS(ser.deltaX, ser.deltaY) - 2, 0);
                 writeUB(4, ser.numBits);
                 writeUB(1, ser.generalLineFlag ? 1 : 0);
                 if (!ser.generalLineFlag) {
@@ -1352,9 +1356,10 @@ public class SWFOutputStream extends OutputStream {
                 writeUB(1, scr.stateFillStyle0 ? 1 : 0);
                 writeUB(1, scr.stateMoveTo ? 1 : 0);
                 if (scr.stateMoveTo) {
+                    scr.moveBits = getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
                     writeUB(5, scr.moveBits);
-                    writeUB(scr.moveBits, scr.moveDeltaX);
-                    writeUB(scr.moveBits, scr.moveDeltaY);
+                    writeSB(scr.moveBits, scr.moveDeltaX);
+                    writeSB(scr.moveBits, scr.moveDeltaY);
                 }
                 if (scr.stateFillStyle0) {
                     writeUB(fillBits, scr.fillStyle0);
@@ -1368,6 +1373,10 @@ public class SWFOutputStream extends OutputStream {
                 if (scr.stateNewStyles) {
                     writeFILLSTYLEARRAY(scr.fillStyles, shapeNum);
                     writeLINESTYLEARRAY(scr.lineStyles, shapeNum);
+                    scr.numFillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
+                    scr.numLineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
+                    fillBits = scr.numFillBits;
+                    fillBits = scr.numLineBits;
                     writeUB(4, scr.numFillBits);
                     writeUB(4, scr.numLineBits);
                 }

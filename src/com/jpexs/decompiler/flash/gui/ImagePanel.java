@@ -420,7 +420,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             h = h1 * w2 / w1;
             if (h > h2) {
                 w = w1 * h2 / h1;
-                h = h2;
             } else {
                 w = w2;
             }

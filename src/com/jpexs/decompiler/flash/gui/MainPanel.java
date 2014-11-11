@@ -70,6 +70,7 @@ import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -1948,51 +1949,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
 
                 if (item instanceof DefineSoundTag) {
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                    fc.setFileFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(".mp3"))
-                                    || (f.getName().toLowerCase().endsWith(".wav"))
-                                    || (f.isDirectory());
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return translate("filter.sounds");
-                        }
-                    });
-                    fc.addChoosableFileFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(".mp3"))
-                                    || (f.isDirectory());
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return translate("filter.sounds.mp3");
-                        }
-                    });
-                    fc.addChoosableFileFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(".wav"))
-                                    || (f.isDirectory());
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return translate("filter.sounds.wav");
-                        }
-                    });
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    int returnVal = fc.showOpenDialog(f);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                    File selectedFile = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
+                    if (selectedFile != null) {
+                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(selectedFile);
                         DefineSoundTag ds = (DefineSoundTag) item;
                         int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
                         if (selfile.getName().toLowerCase().endsWith(".mp3")) {
@@ -2014,32 +1974,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (item instanceof ImageTag) {
                     ImageTag it = (ImageTag) item;
                     if (it.importSupported()) {
-                        JFileChooser fc = new JFileChooser();
-                        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                        fc.setFileFilter(new FileFilter() {
-                            @Override
-                            public boolean accept(File f) {
-                                return (f.getName().toLowerCase().endsWith(".jpg"))
-                                        || (f.getName().toLowerCase().endsWith(".jpeg"))
-                                        || (f.getName().toLowerCase().endsWith(".gif"))
-                                        || (f.getName().toLowerCase().endsWith(".png"))
-                                        || (f.isDirectory());
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return translate("filter.images");
-                            }
-                        });
-                        JFrame f = new JFrame();
-                        View.setWindowIcon(f);
-                        int returnVal = fc.showOpenDialog(f);
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                            File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                        File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png");
+                        if (selectedFile != null) {
+                            Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
+                            File selfile = Helper.fixDialogFile(selectedFile);
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
-                                SWF swf = it.getSwf();
                                 Tag newTag = new ImageImporter().importImage(it, data);
                                 if (newTag != null) {
                                     refreshTree();
@@ -2054,16 +1994,33 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     }
                 }
+                if (item instanceof ShapeTag) {
+                    ShapeTag st = (ShapeTag) item;
+                    File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png");
+                    if (selectedFile != null) {
+                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(selectedFile);
+                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                        try {
+                            Tag newTag = new ShapeImporter().importImage(st, data);
+                            if (newTag != null) {
+                                refreshTree();
+                                setTagTreeSelectedNode(newTag);
+                            }
+                            SWF.clearImageCache();
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, "Invalid image", ex);
+                            View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                        reload(true);
+                    }
+                }
                 if (item instanceof DefineBinaryDataTag) {
                     DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    int returnVal = fc.showOpenDialog(f);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                    File selectedFile = showImportFileChooser("");
+                    if (selectedFile != null) {
+                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(selectedFile);
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         new BinaryDataImporter().importData(bt, data);
                         reload(true);
@@ -2084,6 +2041,58 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    private File showImportFileChooser(String filter) {
+        String[] filterArray = filter.split("\\|");
+        
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+        boolean first = true;
+        for (int i = 0; i < filterArray.length; i += 2) {
+            final String filterName = filterArray[i];
+            final String[] extensions = filterArray[i + 1].split(";");
+            for (int j = 0; j < extensions.length; j++) {
+                if (extensions[j].startsWith("*.")) {
+                    extensions[j] = extensions[j].substring(1);
+                }
+            }
+            FileFilter ff = new FileFilter() {
+
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    }
+                    String fileName = f.getName().toLowerCase();
+                    for (String ext : extensions) {
+                        if (fileName.endsWith(ext)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public String getDescription() {
+                    return translate(filterName);
+                }
+            };
+            if (first) {
+                fc.setFileFilter(ff);
+            } else {
+                fc.addChoosableFileFilter(ff);
+            }
+            first = false;
+        }
+
+        JFrame f = new JFrame();
+        View.setWindowIcon(f);
+        if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+            return fc.getSelectedFile();
+        }
+        
+        return null;
+    }
+    
     private int splitPos = 0;
 
     public void showDetail(String card) {
