@@ -54,6 +54,7 @@
                 project.setProperty("NIGHTLY",true);
             }
         </script>
+        <echo level="info" message="Loaded Version:${version.major}.${version.minor}.${version.release}.${version.build}"/>
     </target>
     
     <target name="coverage.instrumentation">
@@ -287,8 +288,8 @@
         <property name="newversion.type" value="none"/>
     </target>
     <target name="-check-version-online" depends="-set-none-newversion,git-tag">      
-            <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
-        <echo level="info">Checking version online...</echo>
+        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
+        <echo level="info">Checking version online: ${newversion.type}...</echo>
         <!-- Note: You must have developer account to upload to JPEXS website -->
         <java jar="uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
             <arg value="${website.version.url}" />                
@@ -313,8 +314,8 @@
             <arg value="new" />            
             <arg value="${newversion.type}" />
             
-        </java>
-        <echo file="version.properties" message="${newversion.prop}" />
+        </java>        
+        <echo file="version.properties" message="${newversion.prop}" force=""/>
     </target>
     
     <target name="-upload-do" if="upload.config.exists">
