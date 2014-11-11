@@ -29,7 +29,23 @@
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
 
-    <target name="-loadversion">
+    <target name="-loadversion" depends="-loadversion-prop,-loadversion-private">
+        
+    </target>
+    <target name="-loadversion-private" unless="newversion.type">
+        <property name="version.major" value="0" />
+        <property name="version.minor" value="0" />
+        <property name="version.release" value="0" />
+        <property name="version.major" value="0" />
+        <property name="version.build" value="0" />
+        <!-- <property name="version.revision" value="" /> -->
+        <property name="version.debug" value="true" />
+        
+        <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
+        <property name="VERSIONNUMBER" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
+        <property name="PRIVATE" value="true" />        
+    </target>
+    <target name="-loadversion-prop" if="newversion.type">
         <loadproperties srcfile="version.properties" prefix="version"/> 
         <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
         <property name="VERSIONNUMBER" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
@@ -38,6 +54,7 @@
                 project.setProperty("NIGHTLY",true);
             }
         </script>
+        <echo level="info" message="Loaded Version:${version.major}.${version.minor}.${version.release}.${version.build}"/>
     </target>
     
     <target name="coverage.instrumentation">
@@ -267,6 +284,40 @@
         <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
     </target>
     
+    <target name="-set-none-newversion" unless="newversion.type">
+        <property name="newversion.type" value="none"/>
+    </target>
+    <target name="-check-version-online" depends="-set-none-newversion,git-tag">      
+        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
+        <echo level="info">Checking version online: ${newversion.type}...</echo>
+        <!-- Note: You must have developer account to upload to JPEXS website -->
+        <java jar="uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
+            <arg value="${website.version.url}" />                
+
+            <arg value="-field" />
+            <arg value="mode" />
+            <arg value="commandline" />
+            
+            <arg value="-field" />
+            <arg value="set_username" />
+            <arg value="${website.username}" />
+
+            <arg value="-field" />
+            <arg value="set_password" />            
+            <arg value="${website.password}" />  
+            
+            <arg value="-field" />
+            <arg value="revision" />            
+            <arg value="${GITTAG}" />
+            
+            <arg value="-field" />
+            <arg value="new" />            
+            <arg value="${newversion.type}" />
+            
+        </java>        
+        <echo file="version.properties" message="${newversion.prop}" force=""/>
+    </target>
+    
     <target name="-upload-do" if="upload.config.exists">
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Uploading...</echo>
@@ -365,33 +416,22 @@
         <property name="VERSIONSUFFIX" value="_nightly${version.build}"/>         
     </target>
     
-    <target name="-nonightly-suffix" unless="NIGHTLY">
+    <target name="-no-suffix" unless="VERSIONSUFFIX">
         <property name="VERSIONSUFFIX" value=""/>         
     </target>
     
-    <target name="-timestamp" depends="-loadversion">
+    <target name="-private-suffix" if="PRIVATE">
+        <property name="VERSIONSUFFIX" value="_private_${GITSHORTTAG}"/>         
+    </target>
+    
+    <target name="-suffix" depends="-nightly-suffix,-private-suffix,-no-suffix">
+       
+    </target>
+    <target name="-timestamp" depends="-loadversion,git-tag">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
             <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
-        </tstamp>
-        <exec executable="git" outputproperty="GITTAG" failonerror="true">
-            <arg value="rev-parse"/>
-            <arg value="HEAD"/>
-        </exec>  
-        <echo level="info" message="${GITTAG}" file="${REVFILE}"/>
-        
-        
-        <loadfile srcfile="${REVFILE}" property="GITSHORTTAG">
-            <filterchain>
-               <headfilter lines="1" skip="0"/>
-               <tokenfilter>
-                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
-               </tokenfilter>
-               <striplinebreaks/>
-            </filterchain>
-        </loadfile>
-        <echo level="info" message="Git tag:${GITTAG}"/>
-        <echo level="info" message="Git shorttag:${GITSHORTTAG}"/>
+        </tstamp>        
         <echo level="info" message="Version: ${VERSION}"/>
     </target>
     
@@ -410,7 +450,28 @@
         <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
     </target>
     
-    <target name="build" depends="-loadversion,build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
+    <target name="git-tag">
+       <exec executable="git" outputproperty="GITTAG" failonerror="true">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>  
+        <echo level="info" message="${GITTAG}" file="${REVFILE}"/>
+        
+        
+        <loadfile srcfile="${REVFILE}" property="GITSHORTTAG">
+            <filterchain>
+               <headfilter lines="1" skip="0"/>
+               <tokenfilter>
+                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
+               </tokenfilter>
+               <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo level="info" message="Git tag:${GITTAG}"/>
+        <echo level="info" message="Git shorttag:${GITSHORTTAG}"/>
+    </target>
+    
+    <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
         <mkdir dir="${DISTRIBUTIONDIR}"/>
         <!-- <delete dir="${DISTLIBRARIESFULLDIR}"/> -->
         <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
@@ -523,8 +584,7 @@
     </target>
     
     <target name="git-push">
-        <!-- TODO -->
-        <echo>WARNING: Changes need to be PUSHed to the GIT repository.</echo>
+        <!-- NOTHING -->       
     </target>
     
     <target name="-git-commit-versioninfo">        
@@ -543,48 +603,20 @@
         <loadproperties srcfile="version.properties" prefix="oldversion" />
     </target>
     
-    <target name="-inc-major" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",parseInt(project.getProperty("oldversion.major"))+1);
-            project.setNewProperty("newversion.minor",0);
-            project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-major">
+        <property name="newversion.type" value="major"/>
     </target>
     
-    <target name="-inc-minor" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",parseInt(project.getProperty("oldversion.minor"))+1);
-            project.setNewProperty("newversion.release",0);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-minor">
+       <property name="newversion.type" value="minor"/>
     </target>
     
-    <target name="-inc-release" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setNewProperty("newversion.release",parseInt(project.getProperty("oldversion.release"))+1);
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","false");
-            ]]>
-        </script>
+    <target name="-inc-release">
+       <property name="newversion.type" value="releasr"/> 
     </target>
     
-    <target name="-inc-nightlybuild" depends="-loadoldversion">
-        <script language="javascript"><![CDATA[
-            project.setNewProperty("newversion.major",project.getProperty("oldversion.major"));
-            project.setNewProperty("newversion.minor",project.getProperty("oldversion.minor"));
-            project.setNewProperty("newversion.release",project.getProperty("oldversion.release"));
-            project.setNewProperty("newversion.build",parseInt(project.getProperty("oldversion.build"))+1);
-            project.setNewProperty("newversion.debug","true");
-            ]]>
-        </script>
+    <target name="-inc-nightlybuild">
+        <property name="newversion.type" value="nightly"/>
     </target>   
     
     <target name="-save-version-info-file">        
@@ -602,21 +634,21 @@
         
     </target>
     
-    <target name="new-version-major" depends="git-pull,-inc-major,-save-version-info,all,-upload,git-push">
+    <target name="new-version-major" depends="git-pull,-inc-major,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-minor" depends="git-pull,-inc-minor,-save-version-info,all,-upload,git-push">
+    <target name="new-version-minor" depends="git-pull,-inc-minor,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-release" depends="git-pull,-inc-release,-save-version-info,all,-upload,git-push">
+    <target name="new-version-release" depends="git-pull,-inc-release,-check-version-online,all,-upload,git-push">
        
     </target>
        
         
-    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-save-version-info,all,-upload,git-push">
-        
+    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
+
     </target>
     
     

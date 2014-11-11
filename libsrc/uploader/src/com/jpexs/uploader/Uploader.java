@@ -141,7 +141,7 @@ public class Uploader {
          */
         public boolean finish(List<String> response) throws IOException {
             response.clear();
-            writer.append(LINE_FEED).flush();
+            //writer.append(LINE_FEED).flush();
             writer.append("--" + boundary + "--").append(LINE_FEED);
             writer.close();
 
