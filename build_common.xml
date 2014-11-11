@@ -286,7 +286,7 @@
     <target name="-set-none-newversion" unless="newversion.type">
         <property name="newversion.type" value="none"/>
     </target>
-    <target name="-check-version-online" depends="-set-none-newversion,-timestamp">
+    <target name="-check-version-online" depends="-set-none-newversion,git-tag">      
             <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Checking version online...</echo>
         <!-- Note: You must have developer account to upload to JPEXS website -->
@@ -426,12 +426,31 @@
     <target name="-suffix" depends="-nightly-suffix,-private-suffix,-no-suffix">
        
     </target>
-    <target name="-timestamp" depends="-loadversion">
+    <target name="-timestamp" depends="-loadversion,git-tag">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
             <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
-        </tstamp>
-        <exec executable="git" outputproperty="GITTAG" failonerror="true">
+        </tstamp>        
+        <echo level="info" message="Version: ${VERSION}"/>
+    </target>
+    
+    <target name="build_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="build" inheritAll="false" usenativebasedir="true"/>
+        <copy file="${CORELIBPATH}" todir="${LIBRARIESDIR}" />
+    </target>
+    
+    <target name="clean_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" usenativebasedir="true" />
+        <delete file="${LIBRARIESDIR}/${CORELIBNAME}" />
+    </target>
+    
+    
+    <target name="test_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
+    </target>
+    
+    <target name="git-tag">
+       <exec executable="git" outputproperty="GITTAG" failonerror="true">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  
@@ -449,22 +468,6 @@
         </loadfile>
         <echo level="info" message="Git tag:${GITTAG}"/>
         <echo level="info" message="Git shorttag:${GITSHORTTAG}"/>
-        <echo level="info" message="Version: ${VERSION}"/>
-    </target>
-    
-    <target name="build_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="build" inheritAll="false" usenativebasedir="true"/>
-        <copy file="${CORELIBPATH}" todir="${LIBRARIESDIR}" />
-    </target>
-    
-    <target name="clean_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="clean" inheritAll="false" usenativebasedir="true" />
-        <delete file="${LIBRARIESDIR}/${CORELIBNAME}" />
-    </target>
-    
-    
-    <target name="test_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
     </target>
     
     <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
@@ -645,7 +648,7 @@
        
         
     <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
-        
+
     </target>
     
     
