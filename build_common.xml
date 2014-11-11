@@ -29,7 +29,23 @@
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
 
-    <target name="-loadversion">
+    <target name="-loadversion" depends="-loadversion-prop,-loadversion-private">
+        
+    </target>
+    <target name="-loadversion-private" unless="newversion.type">
+        <property name="version.major" value="0" />
+        <property name="version.minor" value="0" />
+        <property name="version.release" value="0" />
+        <property name="version.major" value="0" />
+        <property name="version.build" value="0" />
+        <!-- <property name="version.revision" value="" /> -->
+        <property name="version.debug" value="true" />
+        
+        <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
+        <property name="VERSIONNUMBER" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
+        <property name="PRIVATE" value="true" />        
+    </target>
+    <target name="-loadversion-prop" if="newversion.type">
         <loadproperties srcfile="version.properties" prefix="version"/> 
         <property name="VERSION" value="${version.major}.${version.minor}.${version.release}" />
         <property name="VERSIONNUMBER" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
@@ -267,10 +283,10 @@
         <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
     </target>
     
-    <target namd="-set-none-newversion" unless="newversion.type">
+    <target name="-set-none-newversion" unless="newversion.type">
         <property name="newversion.type" value="none"/>
     </target>
-    <target name="-check-version-online" depends="-set-none-newversion">
+    <target name="-check-version-online" depends="-set-none-newversion,-timestamp">
             <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Checking version online...</echo>
         <!-- Note: You must have developer account to upload to JPEXS website -->
@@ -290,6 +306,10 @@
             <arg value="${website.password}" />  
             
             <arg value="-field" />
+            <arg value="revision" />            
+            <arg value="${GITTAG}" />
+            
+            <arg value="-field" />
             <arg value="new" />            
             <arg value="${newversion.type}" />
             
@@ -297,7 +317,6 @@
         <echo file="version.properties" message="${newversion.prop}" />
     </target>
     
-    </target>
     <target name="-upload-do" if="upload.config.exists">
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Uploading...</echo>
@@ -396,10 +415,17 @@
         <property name="VERSIONSUFFIX" value="_nightly${version.build}"/>         
     </target>
     
-    <target name="-nonightly-suffix" unless="NIGHTLY">
+    <target name="-no-suffix" unless="VERSIONSUFFIX">
         <property name="VERSIONSUFFIX" value=""/>         
     </target>
     
+    <target name="-private-suffix" if="PRIVATE">
+        <property name="VERSIONSUFFIX" value="_private_${GITSHORTTAG}"/>         
+    </target>
+    
+    <target name="-suffix" depends="-nightly-suffix,-private-suffix,-no-suffix">
+       
+    </target>
     <target name="-timestamp" depends="-loadversion">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
@@ -441,7 +467,7 @@
         <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
     </target>
     
-    <target name="build" depends="-loadversion,build_lib,-timestamp,-nightly-suffix,-nonightly-suffix,compile">        
+    <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
         <mkdir dir="${DISTRIBUTIONDIR}"/>
         <!-- <delete dir="${DISTLIBRARIESFULLDIR}"/> -->
         <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
