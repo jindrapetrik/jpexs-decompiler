@@ -582,7 +582,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
         detailPanel.setVisible(false);
 
-        showView(Configuration.dumpView.get() ? VIEW_DUMP : VIEW_RESOURCES);
+        showView(getCurrentView());
         updateUi();
 
         //Opening files with drag&drop to main window
@@ -593,18 +593,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         previewPanel.clear();
 
-        swfs.add(newSwfs);
-
         for (SWF swf : newSwfs) {
-
-            tagTree.setModel(new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
-            dumpTree.setModel(new DumpTreeModel(swfs));
-
-            if (swf.isAS3) {
-                getABCPanel().setSwf(swf);
-            }
-
-            expandSwfNodes();
 
             for (Tag t : swf.tags) {
                 if (t instanceof JPEGTablesTag) {
@@ -625,11 +614,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
+        }
 
-            showDetail(DETAILCARDEMPTYPANEL);
-            showCard(CARDEMPTYPANEL);
+        showDetail(DETAILCARDEMPTYPANEL);
+        showCard(CARDEMPTYPANEL);
+        swfs.add(newSwfs);
+        SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
+        if (swf != null) {
             updateUi(swf);
         }
+        refreshTree();
     }
 
     private ABCPanel getABCPanel() {
@@ -1883,8 +1877,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
         DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
-        View.refreshTree(tagTree, new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
-        View.refreshTree(dumpTree, new DumpTreeModel(swfs));
+
+        if (tagTree.getModel() != null) {
+            View.refreshTree(tagTree, new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
+        }
+        
+        if (dumpTree.getModel() != null) {
+            View.refreshTree(dumpTree, new DumpTreeModel(swfs));
+        }
+        
         if (treeItem != null) {
             setTagTreeSelectedNode(treeItem);
         }
@@ -2166,9 +2167,29 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public static final int VIEW_DUMP = 1;
     public static final int VIEW_TIMELINE = 2;
 
+    private int getCurrentView() {
+        return Configuration.dumpView.get() ? VIEW_DUMP : VIEW_RESOURCES;
+    } 
+    
+    public void setTreeModel(int view) {
+        switch (view) {
+            case VIEW_DUMP:
+                if (dumpTree.getModel() == null) {
+                    dumpTree.setModel(new DumpTreeModel(swfs));
+                }
+                break;
+            case VIEW_RESOURCES:
+                if (tagTree.getModel() == null) {
+                    tagTree.setModel(new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
+                }
+                break;
+        }
+    }
+    
     public boolean showView(int view) {
 
         CardLayout cl = (CardLayout) (contentPanel.getLayout());
+        setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
                 if (!isWelcomeScreen) {
@@ -2540,16 +2561,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 break;
         }
         folderPreviewPanel.setItems(folderPreviewItems);
-    }
-
-    public void expandSwfNodes() {
-        TreeModel model = tagTree.getModel();
-        Object node = model.getRoot();
-        int childCount = model.getChildCount(node);
-        for (int j = 0; j < childCount; j++) {
-            Object child = model.getChild(node, j);
-            tagTree.expandPath(new TreePath(new Object[]{node, child}));
-        }
     }
 
     private boolean isFreeing;

@@ -75,27 +75,10 @@ public class DumpTree extends JTree implements ActionListener {
 
     public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
 
-        @Override
-        public Component getTreeCellRendererComponent(
-                JTree tree,
-                Object value,
-                boolean sel,
-                boolean expanded,
-                boolean leaf,
-                int row,
-                boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                    tree, value, sel,
-                    expanded, leaf, row,
-                    hasFocus);
-
-            //DumpInfo dumpInfo = (DumpInfo) value;
+        public DumpTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);
             setBackgroundNonSelectionColor(Color.white);
-
-            return this;
         }
     }
 
@@ -313,5 +296,4 @@ public class DumpTree extends JTree implements ActionListener {
             }
         }
     }
-
 }

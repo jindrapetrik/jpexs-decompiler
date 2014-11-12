@@ -124,6 +124,7 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -529,5 +530,16 @@ public class TagTree extends JTree {
         }
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;
+    }
+
+    @Override
+    public void setModel(TreeModel tm) {
+        super.setModel(tm);
+        if (tm != null) {
+            int rowCount = tm.getChildCount(tm.getRoot());
+            for (int i = rowCount - 1; i >= 0; i--) {
+                expandRow(i);
+            }
+        }
     }
 }

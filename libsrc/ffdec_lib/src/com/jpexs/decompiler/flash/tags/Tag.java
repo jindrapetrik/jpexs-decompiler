@@ -343,6 +343,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
      */
     @Override
     public String toString() {
+        if (getName().equals("DefineSprite (406)")) {
+            int a = 1;
+        }
         return getName();
     }
 
