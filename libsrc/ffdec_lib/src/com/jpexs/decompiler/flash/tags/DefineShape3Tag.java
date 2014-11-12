@@ -66,12 +66,12 @@ public class DefineShape3Tag extends ShapeTag {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
-        shapes.getNeededCharacters(needed);
+        getShapes().getNeededCharacters(needed);
     }
 
     @Override
     public boolean removeCharacter(int characterId) {
-        boolean modified = shapes.removeCharacter(characterId);
+        boolean modified = getShapes().removeCharacter(characterId);
         if (modified) {
             setModified(true);
         }
@@ -124,7 +124,7 @@ public class DefineShape3Tag extends ShapeTag {
         try {
             sos.writeUI16(shapeId);
             sos.writeRECT(shapeBounds);
-            sos.writeSHAPEWITHSTYLE(shapes, 3);
+            sos.writeSHAPEWITHSTYLE(getShapes(), 3);
         } catch (IOException e) {
             throw new Error("This should never happen.", e);
         }
