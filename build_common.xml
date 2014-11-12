@@ -612,7 +612,7 @@
     </target>
     
     <target name="-inc-release">
-       <property name="newversion.type" value="releasr"/> 
+       <property name="newversion.type" value="release"/> 
     </target>
     
     <target name="-inc-nightlybuild">
