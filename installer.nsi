@@ -433,18 +433,16 @@ Function HelpUsClick
 FunctionEnd
 
 
-!define StrRep "!insertmacro StrRep"
-!macro StrRep output string old new
+!define un.StrRep "!insertmacro un.StrRep"
+!macro un.StrRep output string old new
     Push `${string}`
     Push `${old}`
     Push `${new}`
-    !ifdef __UNINSTALL__
-        Call un.StrRep
-    !else
-        Call StrRep
-    !endif
+    Call un.StrRep
+    
     Pop ${output}
 !macroend
+
 
 !macro Func_StrRep un
     Function ${un}StrRep
@@ -497,7 +495,7 @@ FunctionEnd
         Exch $R1
     FunctionEnd
 !macroend
-!insertmacro Func_StrRep ""
+;!insertmacro Func_StrRep ""
 !insertmacro Func_StrRep "un."
 
 ;var AddToContextMenu
@@ -600,7 +598,7 @@ Function un.RemoveExtContextMenu
               StrCpy $2 $MRUList 1 $R1 ;Copy one character
               ReadRegStr $3 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $2
               ${If} $3 == ${APP_EXENAME}
-                ${StrRep} $MRUList $MRUList $2 ""
+                ${un.StrRep} $MRUList $MRUList $2 ""
                 WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" "MRUList" $MRUList
                 DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList" $2
                 ${Break}
@@ -753,20 +751,20 @@ var pgfound
 var f
 var pgname
 
-Section "PlayerGlobal.swc" SecPlayerGlobal
-
+Section "Download PlayerGlobal.swc" SecPlayerGlobal
+checkadobe:
 DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
 !tempfile PGHTML
-inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" https://www.adobe.com/support/flashplayer/downloads.html ${PGHTML}
+inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "${PGHTML}"
 Pop $0
 StrCmp $0 "OK" dlok
-MessageBox MB_OK|MB_ICONEXCLAMATION "PlayerGlobal.SWC was not found on Adobe webpages. Click OK to abort installation" /SD IDOK
+MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
 Abort
 dlok:
 
 StrCpy $pgfound 0
 
-FileOpen $f ${PGHTML} r
+FileOpen $f "${PGHTML}" r
 loop:
   FileRead $f $txt
   IfErrors done      
@@ -787,8 +785,9 @@ loop:
 done:
   FileClose $f
   StrCmp $pgfound 2 +3
-    MessageBox MB_OK|MB_ICONEXCLAMATION "PlayerGlobal.SWC not found on Adobe Webpages, click OK to abort installation" /SD IDOK    
-    Abort
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
+Abort
+
 
   ${StrRPos} $pos $txt "/"
   IntOp $pos $pos + 1
@@ -801,7 +800,7 @@ done:
     inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
     Pop $0
     StrCmp $0 "OK" saved
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Failed to download PlayerGlobal.SWC. Click OK to abort installation" /SD IDOK
+    MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Failed to download PlayerGlobal.SWC from Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
     Abort
     saved:
      DetailPrint "PlayerGlobal.swc saved to $APPDATA\JPEXS\FFDec\flashlib\$pgname"

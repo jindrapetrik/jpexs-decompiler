@@ -1250,7 +1250,15 @@ public class Main {
         if (Configuration.checkForUpdatesAuto.get()) {
             Calendar lastUpdatesCheckDate = Configuration.lastUpdatesCheckDate.get();
             if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - Configuration.checkForUpdatesDelay.get())) {
-                checkForUpdates();
+                new SwingWorker(){
+                    @Override
+                    protected Object doInBackground() throws Exception {                        
+                        checkForUpdates();
+                        return null;
+                    }                    
+                }.execute();
+                System.out.println("finished");
+                
             }
         }
     }

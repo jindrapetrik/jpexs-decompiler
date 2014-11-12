@@ -101,8 +101,9 @@ downloadJRE:
   DetailPrint "Download result = $0"
 
   strcmp $0 "OK" downloadsuccessful
-  MessageBox MB_OK "There was a problem downloading required component - Error: $0"
-  abort
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Cannot download Java. You can download it later manually." /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
+  Abort
+ 
 downloadsuccessful:
 
 
@@ -142,7 +143,7 @@ JREPathStorage:
  
 ExitInstallJRE:
   Pop $1
-  MessageBox MB_OK "Unable to install Java - Setup will be aborted$\n$\n$1"
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Java. You can installl it later manually.\n$\n$1" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
   Pop $1 	; Restore $1
   Pop $0 	; Restore $0
   Abort

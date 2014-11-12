@@ -65,8 +65,9 @@ downloadFlash:
   DetailPrint "Download result = $0"
 
   strcmp $0 "OK" downloadsuccessful
-  MessageBox MB_OK "There was a problem downloading required component - Error: $0"
-  abort
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Cannot download Flash ActiveX. You can download it later manually or use our own flash viewer." /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
+  Abort
+
 downloadsuccessful:
 
 
@@ -97,7 +98,7 @@ InstallVerif:
   
 ExitInstallFlash:
   Pop $1
-  MessageBox MB_OK "Unable to install Flash ActiveX - Setup will be aborted$\n$\n$1"
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Flash ActiveX. You can download it later manually or use our own flash viewer.\n$\n$1" /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
   Pop $1 	; Restore $1
   Pop $0 	; Restore $0
   Abort
