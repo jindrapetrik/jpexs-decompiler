@@ -2987,14 +2987,13 @@ public class AVM2Code implements Cloneable {
      return 1;
      }*/
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public AVM2Code clone() throws CloneNotSupportedException {
         AVM2Code ret = (AVM2Code) super.clone();
         if (code != null) {
             List<AVM2Instruction> codeCopy = new ArrayList<>(code.size());
             for (AVM2Instruction ins : code) {
-                codeCopy.add((AVM2Instruction) ins.clone());
+                codeCopy.add(ins.clone());
             }
             ret.code = codeCopy;
         }

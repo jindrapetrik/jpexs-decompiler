@@ -12,21 +12,20 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.filters.Filtering;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.image.RescaleOp;
-import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class ColorTransform implements Serializable {
+public class ColorTransform implements Cloneable {
 
     public RescaleOp toRescaleOp() {
         return new RescaleOp(new float[]{getRedMulti() / 255f, getGreenMulti() / 255f, getBlueMulti() / 255f, getAlphaMulti() / 255f},
@@ -56,9 +55,14 @@ public class ColorTransform implements Serializable {
     }
 
     public GRADRECORD[] apply(GRADRECORD[] gradRecords) {
-        GRADRECORD[] ret = Helper.deepCopy(gradRecords);
-        for (GRADRECORD r : ret) {
-            r.color = apply(r.color);
+        GRADRECORD[] ret = new GRADRECORD[gradRecords.length];
+        for (int i = 0; i < gradRecords.length; i++) {
+            GRADRECORD r = gradRecords[i];
+            GRADRECORD r2 = new GRADRECORD();
+            r2.inShape3 = r.inShape3;
+            r2.ratio = r.ratio;
+            r2.color = apply(r.color);
+            ret[i] = r2; 
         }
         return ret;
     }
@@ -147,4 +151,12 @@ public class ColorTransform implements Serializable {
                 + ", redMulti=" + getRedMulti() + ", greenMulti=" + getGreenMulti() + ", blueMulti=" + getBlueMulti() + ", alphaMulti=" + getAlphaMulti() + "]";
     }
 
+    @Override
+    public ColorTransform clone() {
+        try {
+            return (ColorTransform) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
+    }
 }

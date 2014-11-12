@@ -23,7 +23,7 @@ import java.awt.geom.AffineTransform;
  *
  * @author JPEXS
  */
-public class Matrix {
+public final class Matrix implements Cloneable {
 
     public double scaleX = 1;
     public double scaleY = 1;
@@ -82,14 +82,12 @@ public class Matrix {
 
     @Override
     public Matrix clone() {
-        Matrix mat = new Matrix();
-        mat.translateX = translateX;
-        mat.translateY = translateY;
-        mat.scaleX = scaleX;
-        mat.scaleY = scaleY;
-        mat.rotateSkew0 = rotateSkew0;
-        mat.rotateSkew1 = rotateSkew1;
-        return mat;
+        try {
+            Matrix mat = (Matrix) super.clone();
+            return mat;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
     }
 
     public Point transform(double x, double y) {

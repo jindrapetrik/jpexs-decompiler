@@ -81,7 +81,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -164,7 +166,7 @@ public class Action implements GraphSourceItem {
      *
      * @param refs list of addresses
      */
-    public void getRef(List<Long> refs) {
+    public void getRef(Set<Long> refs) {
     }
 
     /**
@@ -173,8 +175,8 @@ public class Action implements GraphSourceItem {
      * @param list List of actions
      * @return List of addresses
      */
-    public static List<Long> getActionsAllRefs(List<Action> list) {
-        List<Long> ret = new ArrayList<>();
+    public static Set<Long> getActionsAllRefs(List<Action> list) {
+        Set<Long> ret = new HashSet<>();
         for (Action a : list) {
             a.getRef(ret);
         }
@@ -403,7 +405,7 @@ public class Action implements GraphSourceItem {
      */
     public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         long offset;
-        List<Long> importantOffsets = getActionsAllRefs(list);
+        Set<Long> importantOffsets = getActionsAllRefs(list);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
          if (!cps.isEmpty()) {
          setConstantPool(list, cps.get(cps.size() - 1));
@@ -583,7 +585,7 @@ public class Action implements GraphSourceItem {
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */
-    public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
         return toString();
     }
 
@@ -1220,7 +1222,7 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public GraphTextWriter getASMSourceReplaced(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         writer.appendNoHilight(getASMSource(container, knownAddreses, exportMode));
         return writer;
     }

@@ -137,28 +137,28 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     s.add(constants.getString(operands[i]));
                     break;
                 case AVM2Code.DAT_INT_INDEX:
-                    s.add(Long.valueOf(constants.getInt(operands[i])));
+                    s.add(constants.getInt(operands[i]));
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
-                    s.add(new Long(constants.getUInt(operands[i])));
+                    s.add(constants.getUInt(operands[i]));
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
-                    s.add(Double.valueOf(constants.getDouble(operands[i])));
+                    s.add(constants.getDouble(operands[i]));
                     break;
                 case AVM2Code.DAT_OFFSET:
-                    s.add(new Long(offset + operands[i] + getBytes().length));
+                    s.add(offset + operands[i] + getBytes().length);
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
-                    s.add(new Long(offset + operands[i]));
+                    s.add(offset + operands[i]);
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
-                    s.add(new Long(operands[i]));
+                    s.add((long) operands[i]);
                     for (int j = i + 1; j < operands.length; j++) {
                         s.add(offset + operands[j]);
                     }
                     break;
                 default:
-                    s.add(new Long(operands[i]));
+                    s.add((long) operands[i]);
             }
 
         }
@@ -367,7 +367,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public AVM2Instruction clone() throws CloneNotSupportedException {
         AVM2Instruction ret = (AVM2Instruction) super.clone();
         if (operands != null) {
             ret.operands = Arrays.copyOf(operands, operands.length);

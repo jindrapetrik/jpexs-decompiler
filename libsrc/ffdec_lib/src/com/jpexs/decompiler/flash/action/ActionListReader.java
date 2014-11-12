@@ -52,6 +52,7 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -806,7 +807,7 @@ public class ActionListReader {
             }
 
             if (debugMode) {
-                String atos = a.getASMSource(new ActionList(), new ArrayList<Long>(), ScriptExportMode.PCODE);
+                String atos = a.getASMSource(new ActionList(), new HashSet<Long>(), ScriptExportMode.PCODE);
                 if (a instanceof GraphSourceItemContainer) {
                     atos = a.toString();
                 }

@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class ActionPush extends Action {
 
@@ -232,7 +233,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public GraphTextWriter getASMSourceReplaced(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString(writer);
         }
@@ -243,7 +244,7 @@ public class ActionPush extends Action {
         return writer;
     }
 
-    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
         }

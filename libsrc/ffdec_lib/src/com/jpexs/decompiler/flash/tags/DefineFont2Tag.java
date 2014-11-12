@@ -448,6 +448,11 @@ public class DefineFont2Tag extends FontTag {
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         char c1 = glyphToChar(glyphIndex);
         char c2 = glyphToChar(nextGlyphIndex);
+        return getCharKerningAdjustment(c1, c2);
+    }
+
+    @Override
+    public int getCharKerningAdjustment(char c1, char c2) {
         int kerningAdjustment = 0;
         for (KERNINGRECORD ker : fontKerningTable) {
             if (ker.fontKerningCode1 == c1 && ker.fontKerningCode2 == c2) {

@@ -29,6 +29,7 @@ import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +59,7 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public void getRef(List<Long> refs) {
+    public void getRef(Set<Long> refs) {
         refs.add(getAddress() + getTotalActionLength() + offset);
     }
 
@@ -76,7 +77,7 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public String getASMSource(ActionList container, List<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
         long address = getAddress() + getTotalActionLength() + offset;
         String ofsStr = Helper.formatAddress(address);
         return "Jump loc" + ofsStr;

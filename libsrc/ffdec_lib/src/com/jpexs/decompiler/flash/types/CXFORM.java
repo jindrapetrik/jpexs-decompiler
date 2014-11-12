@@ -12,12 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.Serializable;
 
 /**
  * Defines a transform that can be applied to the color space of a graphic
@@ -25,7 +25,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class CXFORM extends ColorTransform implements Serializable {
+public class CXFORM extends ColorTransform {
 
     /**
      * Has color addition values
@@ -99,4 +99,18 @@ public class CXFORM extends ColorTransform implements Serializable {
         return hasMultTerms ? blueMultTerm : super.getBlueMulti();
     }
 
+    @Override
+    public CXFORM clone() {
+        CXFORM ret = (CXFORM) super.clone();
+        ret.hasAddTerms = hasAddTerms;
+        ret.hasMultTerms = hasMultTerms;
+        ret.nbits = nbits;
+        ret.redMultTerm = redMultTerm;
+        ret.greenMultTerm = greenMultTerm;
+        ret.blueMultTerm = blueMultTerm;
+        ret.redAddTerm = redAddTerm;
+        ret.greenAddTerm = greenAddTerm;
+        ret.blueAddTerm = blueAddTerm;
+        return ret;
+    }
 }

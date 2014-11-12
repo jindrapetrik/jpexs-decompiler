@@ -12,17 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -52,53 +50,27 @@ public class EdgeType implements Serializable {
     private static final int Edge_Line = 2;
     private static final int Edge_Quad = 3;
     public int data[];
-    public byte raw[];
 
     public EdgeType(boolean vertical, int v) {
         data = new int[]{vertical ? Edge_VLine : Edge_HLine, v};
-        calcRaw();
     }
 
     public EdgeType(int x, int y) {
         data = new int[]{Edge_Line, x, y};
-        calcRaw();
     }
 
     public EdgeType(int cx, int cy, int ax, int ay) {
         data = new int[]{Edge_Quad, cx, cy, ax, ay};
-        calcRaw();
-    }
-
-    private void calcRaw() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        GFxOutputStream sos = new GFxOutputStream(baos);
-        try {
-            write(sos);
-        } catch (IOException ex) {
-            Logger.getLogger(EdgeType.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        raw = baos.toByteArray();
     }
 
     @Override
     public String toString() {
-        String ret = "[Edge " + (raw[0] & 0xf) + " data:";
+        String ret = "[Edge data:";
         for (int i = 0; i < data.length; i++) {
             if (i > 0) {
                 ret += ", ";
             }
             ret += "" + data[i];
-        }
-        ret += " raw: 0x";
-        for (int i = 0; i < raw.length; i++) {
-            if (i > 0) {
-                ret += "";
-            }
-            String h = Integer.toHexString(raw[i] & 0xff);
-            if (h.length() < 2) {
-                h = "0" + h;
-            }
-            ret += "" + h;
         }
         ret += "]";
         return ret;
@@ -118,19 +90,6 @@ public class EdgeType implements Serializable {
          }*/
     }
 
-    private byte[] readRawEdge(GFxInputStream sis) throws IOException {
-        int firstByte = sis.readUI8("firstByte");
-        int nb = sizes[firstByte & 0xF];
-        byte ret[] = new byte[1 + nb];
-        ret[0] = (byte) firstByte;
-        int i;
-        for (i = 0; i < nb; i++) {
-            ret[i + 1] = (byte) sis.readUI8("byte");
-        }
-
-        return ret;
-    }
-
     private static int SInt8(int val) {
         /*boolean sign = (val & 0x80) == 0x80;
          val = val & 0x7F;
@@ -144,7 +103,7 @@ public class EdgeType implements Serializable {
     public SHAPERECORD toSHAPERECORD() {
         int multiplier = 1;
         StraightEdgeRecord ser;
-        CurvedEdgeRecord cer;
+            CurvedEdgeRecord cer;
         switch (data[0]) {
             case Edge_HLine:
                 ser = new StraightEdgeRecord();
@@ -179,116 +138,163 @@ public class EdgeType implements Serializable {
     }
 
     private int[] readEdge(GFxInputStream sis) throws IOException {
-        raw = readRawEdge(sis);
+        byte firstByte = (byte) sis.readUI8("firstByte");
+        int nb = sizes[firstByte & 0xF];
+        byte raw1, raw2, raw3, raw4, raw5, raw6, raw7, raw8, raw9;
+        raw1 = (byte) sis.readUI8("byte1");
         int data[] = new int[5];
 
-        switch (raw[0] & 0xF) {
+        switch (firstByte & 0xF) {
             case Edge_H12:
                 data[0] = Edge_HLine;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8(raw[1] & 0xff) << 4);
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8(raw1 & 0xff) << 4);
                 break;
 
             case Edge_H20:
+                raw2 = (byte) sis.readUI8("byte2");
                 data[0] = Edge_HLine;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8(raw[2] & 0xff) << 12);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8(raw2 & 0xff) << 12);
                 break;
 
             case Edge_V12:
                 data[0] = Edge_VLine;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8(raw[1] & 0xff) << 4);
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8(raw1 & 0xff) << 4);
                 break;
 
             case Edge_V20:
                 data[0] = Edge_VLine;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8(raw[2] & 0xff) << 12);
+                raw2 = (byte) sis.readUI8("byte2");
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8(raw2 & 0xff) << 12);
                 break;
 
             case Edge_L6:
                 data[0] = Edge_Line;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 6) >> 2);
-                data[2] = SInt8(raw[1] & 0xff) >> 2;
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 6) >> 2);
+                data[2] = SInt8(raw1 & 0xff) >> 2;
                 break;
 
             case Edge_L10:
+                raw2 = (byte) sis.readUI8("byte2");
                 data[0] = Edge_Line;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 2) << 2);
-                data[2] = ((raw[1] & 0xff) >> 6) | (SInt8((raw[2] & 0xff)) << 2);
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 2) << 2);
+                data[2] = ((raw1 & 0xff) >> 6) | (SInt8((raw2 & 0xff)) << 2);
                 break;
 
             case Edge_L14:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
                 data[0] = Edge_Line;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8((raw[2] & 0xff) << 6) << 6);
-                data[2] = ((raw[2] & 0xff) >> 2) | (SInt8((raw[3] & 0xff)) << 6);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8((raw2 & 0xff) << 6) << 6);
+                data[2] = ((raw2 & 0xff) >> 2) | (SInt8((raw3 & 0xff)) << 6);
                 break;
 
             case Edge_L18:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
                 data[0] = Edge_Line;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8((raw[2] & 0xff) << 2) << 10);
-                data[2] = ((raw[2] & 0xff) >> 6) | ((raw[3] & 0xff) << 2) | (SInt8((raw[4] & 0xff)) << 10);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8((raw2 & 0xff) << 2) << 10);
+                data[2] = ((raw2 & 0xff) >> 6) | ((raw3 & 0xff) << 2) | (SInt8((raw4 & 0xff)) << 10);
                 break;
 
             case Edge_C5:
+                raw2 = (byte) sis.readUI8("byte2");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 7) >> 3);
-                data[2] = SInt8((raw[1] & 0xff) << 2) >> 3;
-                data[3] = ((raw[1] & 0xff) >> 6) | (SInt8((raw[2] & 0xff) << 5) >> 3);
-                data[4] = SInt8((raw[2] & 0xff)) >> 3;
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 7) >> 3);
+                data[2] = SInt8((raw1 & 0xff) << 2) >> 3;
+                data[3] = ((raw1 & 0xff) >> 6) | (SInt8((raw2 & 0xff) << 5) >> 3);
+                data[4] = SInt8((raw2 & 0xff)) >> 3;
                 break;
 
             case Edge_C7:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 5) >> 1);
-                data[2] = ((raw[1] & 0xff) >> 3) | (SInt8((raw[2] & 0xff) << 6) >> 1);
-                data[3] = ((raw[2] & 0xff) >> 2) | (SInt8((raw[3] & 0xff) << 7) >> 1);
-                data[4] = SInt8(raw[3]) >> 1;
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 5) >> 1);
+                data[2] = ((raw1 & 0xff) >> 3) | (SInt8((raw2 & 0xff) << 6) >> 1);
+                data[3] = ((raw2 & 0xff) >> 2) | (SInt8((raw3 & 0xff) << 7) >> 1);
+                data[4] = SInt8(raw3) >> 1;
                 break;
 
             case Edge_C9:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 3) << 1);
-                data[2] = ((raw[1] & 0xff) >> 5) | (SInt8((raw[2] & 0xff) << 2) << 1);
-                data[3] = ((raw[2] & 0xff) >> 6) | (SInt8((raw[3] & 0xff) << 1) << 1);
-                data[4] = ((raw[3] & 0xff) >> 7) | (SInt8(raw[4] & 0xff) << 1);
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 3) << 1);
+                data[2] = ((raw1 & 0xff) >> 5) | (SInt8((raw2 & 0xff) << 2) << 1);
+                data[3] = ((raw2 & 0xff) >> 6) | (SInt8((raw3 & 0xff) << 1) << 1);
+                data[4] = ((raw3 & 0xff) >> 7) | (SInt8(raw4 & 0xff) << 1);
                 break;
 
             case Edge_C11:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
+                raw5 = (byte) sis.readUI8("byte5");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | (SInt8((raw[1] & 0xff) << 1) << 3);
-                data[2] = (raw[1] >> 7) | ((raw[2] & 0xff) << 1) | (SInt8((raw[3] & 0xff) << 6) << 3);
-                data[3] = ((raw[3] & 0xff) >> 2) | (SInt8((raw[4] & 0xff) << 3) << 3);
-                data[4] = ((raw[4] & 0xff) >> 5) | (SInt8(raw[5] & 0xff) << 3);
+                data[1] = ((firstByte & 0xff) >> 4) | (SInt8((raw1 & 0xff) << 1) << 3);
+                data[2] = (raw1 >> 7) | ((raw2 & 0xff) << 1) | (SInt8((raw3 & 0xff) << 6) << 3);
+                data[3] = ((raw3 & 0xff) >> 2) | (SInt8((raw4 & 0xff) << 3) << 3);
+                data[4] = ((raw4 & 0xff) >> 5) | (SInt8(raw5 & 0xff) << 3);
                 break;
 
             case Edge_C13:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
+                raw5 = (byte) sis.readUI8("byte5");
+                raw6 = (byte) sis.readUI8("byte6");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8((raw[2] & 0xff) << 7) << 5);
-                data[2] = ((raw[2] & 0xff) >> 1) | (SInt8((raw[3] & 0xff) << 2) << 5);
-                data[3] = ((raw[3] & 0xff) >> 6) | ((raw[4] & 0xff) << 2) | (SInt8((raw[5] & 0xff) << 5) << 5);
-                data[4] = ((raw[5] & 0xff) >> 3) | (SInt8(raw[6] & 0xff) << 5);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8((raw2 & 0xff) << 7) << 5);
+                data[2] = ((raw2 & 0xff) >> 1) | (SInt8((raw3 & 0xff) << 2) << 5);
+                data[3] = ((raw3 & 0xff) >> 6) | ((raw4 & 0xff) << 2) | (SInt8((raw5 & 0xff) << 5) << 5);
+                data[4] = ((raw5 & 0xff) >> 3) | (SInt8(raw6 & 0xff) << 5);
                 break;
 
             case Edge_C15:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
+                raw5 = (byte) sis.readUI8("byte5");
+                raw6 = (byte) sis.readUI8("byte6");
+                raw7 = (byte) sis.readUI8("byte7");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8((raw[2] & 0xff) << 5) << 7);
-                data[2] = ((raw[2] & 0xff) >> 3) | ((raw[3] & 0xff) << 5) | (SInt8((raw[4] & 0xff) << 6) << 7);
-                data[3] = ((raw[4] & 0xff) >> 2) | ((raw[5] & 0xff) << 6) | (SInt8((raw[6] & 0xff) << 7) << 7);
-                data[4] = ((raw[6] & 0xff) >> 1) | (SInt8((raw[7] & 0xff)) << 7);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8((raw2 & 0xff) << 5) << 7);
+                data[2] = ((raw2 & 0xff) >> 3) | ((raw3 & 0xff) << 5) | (SInt8((raw4 & 0xff) << 6) << 7);
+                data[3] = ((raw4 & 0xff) >> 2) | ((raw5 & 0xff) << 6) | (SInt8((raw6 & 0xff) << 7) << 7);
+                data[4] = ((raw6 & 0xff) >> 1) | (SInt8((raw7 & 0xff)) << 7);
                 break;
 
             case Edge_C17:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
+                raw5 = (byte) sis.readUI8("byte5");
+                raw6 = (byte) sis.readUI8("byte6");
+                raw7 = (byte) sis.readUI8("byte7");
+                raw8 = (byte) sis.readUI8("byte8");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8((raw[2] & 0xff) << 3) << 9);
-                data[2] = ((raw[2] & 0xff) >> 5) | ((raw[3] & 0xff) << 3) | (SInt8((raw[4] & 0xff) << 2) << 9);
-                data[3] = ((raw[4] & 0xff) >> 6) | ((raw[5] & 0xff) << 2) | (SInt8((raw[6] & 0xff) << 1) << 9);
-                data[4] = ((raw[6] & 0xff) >> 7) | ((raw[7] & 0xff) << 1) | (SInt8(raw[8] & 0xff) << 9);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8((raw2 & 0xff) << 3) << 9);
+                data[2] = ((raw2 & 0xff) >> 5) | ((raw3 & 0xff) << 3) | (SInt8((raw4 & 0xff) << 2) << 9);
+                data[3] = ((raw4 & 0xff) >> 6) | ((raw5 & 0xff) << 2) | (SInt8((raw6 & 0xff) << 1) << 9);
+                data[4] = ((raw6 & 0xff) >> 7) | ((raw7 & 0xff) << 1) | (SInt8(raw8 & 0xff) << 9);
                 break;
 
             case Edge_C19:
+                raw2 = (byte) sis.readUI8("byte2");
+                raw3 = (byte) sis.readUI8("byte3");
+                raw4 = (byte) sis.readUI8("byte4");
+                raw5 = (byte) sis.readUI8("byte5");
+                raw6 = (byte) sis.readUI8("byte6");
+                raw7 = (byte) sis.readUI8("byte7");
+                raw8 = (byte) sis.readUI8("byte8");
+                raw9 = (byte) sis.readUI8("byte9");
                 data[0] = Edge_Quad;
-                data[1] = ((raw[0] & 0xff) >> 4) | ((raw[1] & 0xff) << 4) | (SInt8(raw[2] << 1) << 11);
-                data[2] = ((raw[2] & 0xff) >> 7) | ((raw[3] & 0xff) << 1) | ((raw[4] & 0xff) << 9) | (SInt8(raw[5] << 6) << 11);
-                data[3] = ((raw[5] & 0xff) >> 2) | ((raw[6] & 0xff) << 6) | (SInt8(raw[7] << 3) << 11);
-                data[4] = ((raw[7] & 0xff) >> 5) | ((raw[8] & 0xff) << 3) | (SInt8(raw[9]) << 11);
+                data[1] = ((firstByte & 0xff) >> 4) | ((raw1 & 0xff) << 4) | (SInt8(raw2 << 1) << 11);
+                data[2] = ((raw2 & 0xff) >> 7) | ((raw3 & 0xff) << 1) | ((raw4 & 0xff) << 9) | (SInt8(raw5 << 6) << 11);
+                data[3] = ((raw5 & 0xff) >> 2) | ((raw6 & 0xff) << 6) | (SInt8(raw7 << 3) << 11);
+                data[4] = ((raw7 & 0xff) >> 5) | ((raw8 & 0xff) << 3) | (SInt8(raw9) << 11);
                 break;
         }
         return data;

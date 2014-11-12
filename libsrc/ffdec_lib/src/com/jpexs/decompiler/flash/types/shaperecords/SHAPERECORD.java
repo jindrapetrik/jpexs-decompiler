@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -423,7 +422,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         ret.numLineBits = shp.numLineBits;
         List<SHAPERECORD> recs = new ArrayList<>();
         for (SHAPERECORD r : shp.shapeRecords) {
-            SHAPERECORD c = Helper.deepCopy(r);
+            SHAPERECORD c = r.clone();
             if (c instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) c;
                 scr.moveDeltaX = (int) (multiplier * scr.moveDeltaX);
@@ -464,5 +463,14 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         s = AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor).createTransformedShape(s);
         s = AffineTransform.getTranslateInstance(-dx / SWF.unitDivisor, -dy / SWF.unitDivisor).createTransformedShape(s);
         return s;
+    }
+
+    @Override
+    public SHAPERECORD clone() {
+        try {
+            return (SHAPERECORD) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
     }
 }

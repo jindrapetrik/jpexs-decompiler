@@ -833,7 +833,7 @@ public class DefineEditTextTag extends TextTag {
                     if (font != null && font.hasLayout()) {
                         int kerningAdjustment = 0;
                         if (nextChar != null) {
-                            kerningAdjustment = font.getGlyphKerningAdjustment(ge.glyphIndex, font.charToGlyph(nextChar));
+                            kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
                             kerningAdjustment /= font.getDivider();
                         }
                         advance = (int) Math.round(Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));

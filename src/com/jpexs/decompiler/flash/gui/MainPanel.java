@@ -204,7 +204,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**

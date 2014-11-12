@@ -393,7 +393,7 @@ public class DefineTextTag extends TextTag {
                             if (font.hasLayout()) {
                                 int kerningAdjustment = 0;
                                 if (nextChar != null) {
-                                    kerningAdjustment = font.getGlyphKerningAdjustment(tr.glyphEntries[i].glyphIndex, font.charToGlyph(nextChar));
+                                    kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
                                 }
                                 advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
                             } else {

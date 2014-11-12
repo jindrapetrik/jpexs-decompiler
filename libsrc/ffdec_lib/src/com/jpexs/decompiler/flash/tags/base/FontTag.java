@@ -75,6 +75,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex);
 
+    public abstract int getCharKerningAdjustment(char c1, char c2);
+
     public abstract int getGlyphWidth(int glyphIndex);
 
     public abstract String getFontNameIntag();

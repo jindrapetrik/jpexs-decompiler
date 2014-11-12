@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -23,14 +24,12 @@ import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
+public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
 
     public boolean typeFlag = false;
     public boolean stateNewStyles;
@@ -127,13 +126,8 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     }
 
     @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(StyleChangeRecord.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+    public StyleChangeRecord clone() {
+        return (StyleChangeRecord) super.clone();
     }
 
     @Override

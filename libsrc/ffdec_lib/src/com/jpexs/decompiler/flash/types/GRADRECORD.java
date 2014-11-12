@@ -12,18 +12,18 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class GRADRECORD implements Serializable {
+public class GRADRECORD {
 
     @SWFType(BasicType.UI8)
     public int ratio;

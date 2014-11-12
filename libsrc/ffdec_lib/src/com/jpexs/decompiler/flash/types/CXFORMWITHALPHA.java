@@ -12,13 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.Serializable;
 
 /**
  * Defines a transform that can be applied to the color space of a graphic
@@ -26,7 +26,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
+public class CXFORMWITHALPHA extends ColorTransform {
 
     /**
      * Has color addition values
@@ -129,4 +129,20 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
         return hasMultTerms ? alphaMultTerm : super.getAlphaMulti();
     }
 
+    @Override
+    public CXFORMWITHALPHA clone() {
+        CXFORMWITHALPHA ret = (CXFORMWITHALPHA) super.clone();
+        ret.hasAddTerms = hasAddTerms;
+        ret.hasMultTerms = hasMultTerms;
+        ret.nbits = nbits;
+        ret.redMultTerm = redMultTerm;
+        ret.greenMultTerm = greenMultTerm;
+        ret.blueMultTerm = blueMultTerm;
+        ret.alphaMultTerm = alphaMultTerm;
+        ret.redAddTerm = redAddTerm;
+        ret.greenAddTerm = greenAddTerm;
+        ret.blueAddTerm = blueAddTerm;
+        ret.alphaAddTerm = alphaAddTerm;
+        return ret;
+    }
 }

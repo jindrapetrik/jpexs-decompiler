@@ -249,7 +249,7 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
                     scr2 = new StyleChangeRecord();
                     endIndex--;
                 }
-                StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
+                StyleChangeRecord scr = scr1.clone();
                 if (scr1.stateMoveTo || scr2.stateMoveTo) {
                     scr.moveDeltaX = startPosX + (endPosX - startPosX) * ratio / MAX_RATIO;
                     scr.moveDeltaY = startPosY + (endPosY - startPosY) * ratio / MAX_RATIO;

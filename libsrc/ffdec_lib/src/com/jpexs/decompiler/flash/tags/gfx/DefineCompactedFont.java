@@ -38,7 +38,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
@@ -224,10 +223,15 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
-        int char1 = glyphToChar(glyphIndex);
-        int char2 = glyphToChar(nextGlyphIndex);
+        char c1 = glyphToChar(glyphIndex);
+        char c2 = glyphToChar(nextGlyphIndex);
+        return getCharKerningAdjustment(c1, c2);
+    }
+
+    @Override
+    public int getCharKerningAdjustment(char c1, char c2) {
         for (KerningPairType kp : fonts.get(0).kerning) {
-            if (kp.char1 == char1 && kp.char2 == char2) {
+            if (kp.char1 == c1 && kp.char2 == c2) {
                 return resize(kp.advance);
             }
         }
@@ -335,7 +339,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         ret.numLineBits = 0;
         List<SHAPERECORD> recs = new ArrayList<>();
         for (SHAPERECORD r : shp.shapeRecords) {
-            SHAPERECORD c = Helper.deepCopy(r);
+            SHAPERECORD c = r.clone();
             if (c instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) c;
                 scr.moveDeltaX = resize(scr.moveDeltaX);

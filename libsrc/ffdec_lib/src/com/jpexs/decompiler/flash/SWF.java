@@ -1566,7 +1566,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new ArrayList<Long>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new HashSet<Long>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;
@@ -2378,7 +2378,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 colorTransform = new ColorTransform();
             }
 
-            ColorTransform clrTrans = Helper.deepCopy(colorTransform);
+            ColorTransform clrTrans = colorTransform.clone();
             if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
                 clrTrans = colorTransform.merge(layer.colorTransForm);
             }
@@ -2525,7 +2525,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 colorTransform = new ColorTransform();
             }
 
-            ColorTransform clrTrans = Helper.deepCopy(colorTransform);
+            ColorTransform clrTrans = colorTransform.clone();
             if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
                 clrTrans = colorTransform.merge(layer.colorTransForm);
             }

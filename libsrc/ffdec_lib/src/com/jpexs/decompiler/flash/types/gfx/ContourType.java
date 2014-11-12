@@ -41,8 +41,9 @@ public class ContourType implements Serializable {
         int i = 0;
         int divider = 1;
         for (; i < records.size(); i++) {
-            if (records.get(i) instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) records.get(i);
+            SHAPERECORD rec = records.get(i);
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
                 if (scr.stateMoveTo) {
                     moveToX = scr.moveDeltaX / divider;
                     moveToY = scr.moveDeltaY / divider;
