@@ -320,11 +320,11 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     @Override
     public String getCharacters(List<Tag> tags) {
         FontType ft = fonts.get(0);
-        String ret = "";
+        StringBuilder ret = new StringBuilder(ft.glyphInfo.size());
         for (GlyphInfoType gi : ft.glyphInfo) {
-            ret += (char) gi.glyphCode;
+            ret.append((char) gi.glyphCode);
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override
