@@ -213,8 +213,10 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 if (swfList.getSelectedIndex() > -1) {
                     Replacement r = listModel.getElementAt(swfList.getSelectedIndex());
                     String s = View.showInputDialog("URL", r.urlPattern);
-                    r.urlPattern = s;
-                    listModel.dataChanged(swfList.getSelectedIndex());
+                    if (s != null) {
+                        r.urlPattern = s;
+                        listModel.dataChanged(swfList.getSelectedIndex());
+                    }
                 }
                 break;
             case ACTION_CLEAR:
