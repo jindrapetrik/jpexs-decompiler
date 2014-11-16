@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -86,9 +87,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (val != null && val.isNamespace()) {
             slotconst = "namespace";
         }
-        writer.hilightSpecial(slotconst + " ", "traittype");
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), "traitname");
-        writer.hilightSpecial(typeStr, "traittypename");
+        writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(typeStr, HighlightSpecialType.TRAIT_TYPE_NAME);
         return writer;
     }
 
@@ -117,7 +118,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
         if (value_kind != 0) {
             ValueKind val = new ValueKind(value_index, value_kind);
-            writer.hilightSpecial(val.toString(abc.constants), "traitvalue");
+            writer.hilightSpecial(val.toString(abc.constants), HighlightSpecialType.TRAIT_VALUE);
         }
     }
 

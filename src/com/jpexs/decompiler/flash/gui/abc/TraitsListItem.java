@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
@@ -90,12 +90,12 @@ public class TraitsListItem {
         try {
             if ((type != Type.INITIALIZER) && isStatic) {
                 abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
-                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if ((type != Type.INITIALIZER) && (!isStatic)) {
                 abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
-                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if (!isStatic) {

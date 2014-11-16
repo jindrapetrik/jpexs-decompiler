@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.helpers.HilightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.io.Serializable;
 import java.util.List;
@@ -54,12 +54,12 @@ public class CachedDecompilation implements Serializable {
         return specialHilights;
     }
 
-    public CachedDecompilation(HilightedText hilightedText) {
-        this.text = hilightedText.text;
-        this.traitHilights = hilightedText.traitHilights;
-        this.classHilights = hilightedText.classHilights;
-        this.methodHilights = hilightedText.methodHilights;
-        this.instructionHilights = hilightedText.instructionHilights;
-        this.specialHilights = hilightedText.specialHilights;
+    public CachedDecompilation(HighlightedText HighlightedText) {
+        this.text = HighlightedText.text;
+        this.traitHilights = HighlightedText.traitHilights;
+        this.classHilights = HighlightedText.classHilights;
+        this.methodHilights = HighlightedText.methodHilights;
+        this.instructionHilights = HighlightedText.instructionHilights;
+        this.specialHilights = HighlightedText.specialHilights;
     }
 }

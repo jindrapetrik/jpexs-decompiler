@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -64,7 +64,7 @@ public class AS3Generator {
                     s.append("(){\r\ndecompileMethod(\"");
                     s.append(name);
                     s.append("\", ");
-                    HilightedTextWriter src = new HilightedTextWriter(new CodeFormatting(), false);
+                    HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
                     b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);
                     b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<String>());

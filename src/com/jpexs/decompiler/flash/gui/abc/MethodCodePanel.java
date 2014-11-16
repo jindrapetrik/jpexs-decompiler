@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -64,8 +65,8 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.hilighOffset(offset);
     }
 
-    public void hilighSpecial(String type, String index) {
-        sourceTextArea.hilighSpecial(type, index);
+    public void hilighSpecial(HighlightSpecialType type, String specialValue) {
+        sourceTextArea.hilighSpecial(type, specialValue);
     }
 
     public void setBodyIndex(int bodyIndex, ABC abc, Trait trait) {

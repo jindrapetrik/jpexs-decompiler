@@ -19,15 +19,14 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,7 +58,7 @@ public abstract class GraphTargetItem implements Serializable {
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
     public GraphTargetItem value;
-    protected Map<String, String> srcData = new HashMap<>();
+    protected HighlightData srcData = new HighlightData();
 
     public GraphPart getFirstPart() {
         if (value == null) {
@@ -120,7 +119,7 @@ public abstract class GraphTargetItem implements Serializable {
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
     public String toString(LocalData localData) throws InterruptedException {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         toString(writer, localData);
         return writer.toString();
     }

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -90,7 +90,7 @@ public class RecompileTest {
                     for (int s = 0; s < abc.script_info.size(); s++) {
 
                         String startAfter = null;
-                        HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
+                        HighlightedTextWriter htw = new HighlightedTextWriter(new CodeFormatting(), false);
                         MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
                         if (startAfter == null || en.getKey().toString().equals(startAfter)) {
                             dotest = true;
@@ -112,7 +112,7 @@ public class RecompileTest {
 
                 for (ASMSource asm : asms.values()) {
                     try {
-                        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as = writer.toString();
                         as = asm.removePrefixAndSuffix(as);
@@ -122,7 +122,7 @@ public class RecompileTest {
                         } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
                         }
-                        writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as2 = writer.toString();
                         as2 = asm.removePrefixAndSuffix(as2);
@@ -131,7 +131,7 @@ public class RecompileTest {
                         } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
                         }
-                        writer = new HilightedTextWriter(new CodeFormatting(), false);
+                        writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as3 = writer.toString();
                         as3 = asm.removePrefixAndSuffix(as3);

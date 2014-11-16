@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -52,7 +52,7 @@ public abstract class GraphTextWriter {
      * @param data
      * @return GraphTextWriter
      */
-    public GraphTextWriter startOffset(GraphSourceItem src, int pos, Map<String, String> data) {
+    public GraphTextWriter startOffset(GraphSourceItem src, int pos, HighlightData data) {
         return this;
     }
 
@@ -102,23 +102,23 @@ public abstract class GraphTextWriter {
         return this;
     }
 
-    public GraphTextWriter hilightSpecial(String text, String type) {
-        return hilightSpecial(text, type, "0");
+    public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type) {
+        return hilightSpecial(text, type, "");
     }
 
-    public GraphTextWriter hilightSpecial(String text, String type, int index) {
-        return hilightSpecial(text, type, "" + index);
+    public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue) {
+        return hilightSpecial(text, type, Integer.toString(specialValue), new HighlightData());
     }
 
-    public GraphTextWriter hilightSpecial(String text, String type, String index) {
-        return hilightSpecial(text, type, "0", new HashMap<String, String>());
+    public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue, HighlightData data) {
+        return hilightSpecial(text, type, Integer.toString(specialValue), data);
     }
 
-    public GraphTextWriter hilightSpecial(String text, String type, int index, Map<String, String> data) {
-        return hilightSpecial(text, type, "" + index, data);
+    public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue) {
+        return hilightSpecial(text, type, specialValue, new HighlightData());
     }
 
-    public GraphTextWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
+    public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         return this;
     }
 
@@ -126,7 +126,7 @@ public abstract class GraphTextWriter {
         return "";
     }
 
-    public abstract GraphTextWriter appendWithData(String str, Map<String, String> data);
+    public abstract GraphTextWriter appendWithData(String str, HighlightData data);
 
     public abstract GraphTextWriter append(String str);
 

@@ -53,9 +53,9 @@ public class DeclarationAVM2Item extends AVM2Item {
         if (assignment instanceof LocalRegAVM2Item) { //for..in
             LocalRegAVM2Item lti = (LocalRegAVM2Item) assignment;
             String localName = localRegName(localData.localRegNames, lti.regIndex);
-            srcData.put("localName", localName);
-            srcData.put("declaration", "true");
-            srcData.put("declaredType", "*");
+            srcData.localName = localName;
+            srcData.declaration = true;
+            srcData.declaredType = "*";
             writer.append("var ");
             writer.append(localName);
             return writer;
@@ -63,9 +63,9 @@ public class DeclarationAVM2Item extends AVM2Item {
 
         if (assignment instanceof GetSlotAVM2Item) { //for..in
             GetSlotAVM2Item sti = (GetSlotAVM2Item) assignment;
-            srcData.put("localName", sti.getNameAsStr(localData));
-            srcData.put("declaration", "true");
-            srcData.put("declaredType", "*");
+            srcData.localName = sti.getNameAsStr(localData);
+            srcData.declaration = true;
+            srcData.declaredType = "*";
             writer.append("var ");
             sti.getName(writer, localData);
             return writer;
@@ -74,8 +74,8 @@ public class DeclarationAVM2Item extends AVM2Item {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String localName = localRegName(localData.localRegNames, lti.regIndex);
-            srcData.put("localName", localName);
-            srcData.put("declaration", "true");
+            srcData.localName = localName;
+            srcData.declaration = true;
 
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
@@ -84,7 +84,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
-            srcData.put("declaredType", (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : "*");
+            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : "*";
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
@@ -94,9 +94,9 @@ public class DeclarationAVM2Item extends AVM2Item {
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
-            srcData.put("localName", ssti.getNameAsStr(localData));
-            srcData.put("declaration", "true");
-            srcData.put("declaredType", (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : "*");
+            srcData.localName = ssti.getNameAsStr(localData);
+            srcData.declaration = true;
+            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : "*";
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");

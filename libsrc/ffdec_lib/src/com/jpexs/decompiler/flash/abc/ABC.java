@@ -563,7 +563,7 @@ public class ABC {
         loadNamespaceMap();
         /*for(int i=0;i<script_count;i++){
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
-         GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+         GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
          try {
          bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
          } catch (InterruptedException ex) {

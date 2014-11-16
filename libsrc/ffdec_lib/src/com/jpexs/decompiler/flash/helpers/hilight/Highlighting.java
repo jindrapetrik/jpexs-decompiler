@@ -17,12 +17,9 @@
 package com.jpexs.decompiler.flash.helpers.hilight;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.helpers.HilightType;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -31,8 +28,8 @@ import java.util.Map;
  */
 public class Highlighting implements Serializable {
 
-    public HilightType type;
-    public String hilightedText;
+    public HighlightType type;
+    public String HighlightedText;
     /**
      * Starting position
      */
@@ -41,55 +38,13 @@ public class Highlighting implements Serializable {
      * Length of highlighted text
      */
     public int len;
-    private final Map<String, String> properties;
+    private final HighlightData properties;
 
-    public Long getPropertyLong(String key) {
-        String dataStr = getPropertyString(key);
-        if (dataStr == null) {
-            return null;
-        }
-        try {
-            return Long.parseLong(dataStr);
-        } catch (NumberFormatException nfe) {
-            return null;
-        }
+    public HighlightData getProperties() {
+        return properties;
     }
 
-    public Map<String, String> getProperties() {
-        return new HashMap<>(properties);
-    }
-
-    public String getPropertyString(String key) {
-        return properties.get(key);
-    }
-
-    public static Highlighting search(List<Highlighting> list, long pos) {
-        return search(list, pos, null, null, -1, -1);
-    }
-
-    public static Highlighting search(List<Highlighting> list, String property, String value) {
-        return search(list, -1, property, value, -1, -1);
-    }
-
-    public static Highlighting search(List<Highlighting> list, Map<String, String> properties) {
-        return search(list, -1, properties, -1, -1);
-    }
-
-    public static Highlighting search(List<Highlighting> list, String property, String value, int from, int to) {
-        return search(list, -1, property, value, from, to);
-    }
-
-    public static Highlighting search(List<Highlighting> list, Map<String, String> properties, int from, int to) {
-        return search(list, -1, properties, from, to);
-    }
-
-    public static Highlighting search(List<Highlighting> list, long pos, String property, String value, long from, long to) {
-        Map<String, String> map = new HashMap<>();
-        map.put(property, value);
-        return search(list, pos, map, from, to);
-    }
-
-    public static Highlighting search(List<Highlighting> list, long pos, Map<String, String> properties, long from, long to) {
+    public static Highlighting search(List<Highlighting> list, HighlightData properties, long from, long to) {
         Highlighting ret = null;
         looph:
         for (Highlighting h : list) {
@@ -103,56 +58,34 @@ public class Highlighting implements Serializable {
                     continue;
                 }
             }
-            for (String property : properties.keySet()) {
-                if (property != null) {
-                    String v = h.getPropertyString(property);
-                    String value = properties.get(property);
-                    if (v == null) {
-                        if (value != null) {
-                            continue looph;
-                        }
-                    } else {
-                        if (!v.equals(value)) {
-                            continue looph;
-                        }
-                    }
-                }
+            HighlightData hProp = h.getProperties();
+            if (properties.declaration && !hProp.declaration) {
+                continue;
+            }
+            if (properties.declaredType != null && !properties.declaredType.equals(hProp.declaredType)) {
+                continue;
+            }
+            if (properties.localName != null && !properties.localName.equals(hProp.localName)) {
+                continue;
+            }
+            if (properties.specialValue != null && !properties.specialValue.equals(hProp.specialValue)) {
+                continue;
             }
 
-            if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
-                if (ret == null || h.startPos > ret.startPos) { //get the closest one
-                    ret = h;
-                }
-            }
-            if (pos == -1 && ret != null) {
-                return ret;
-            }
+            return h;
         }
 
-        if (Configuration.debugMode.get()) {
-            if (ret != null) {
-                System.out.println("Highlight found: " + ret.hilightedText);
-            }
-        }
-
-        return ret;
+        return null;
     }
 
-    public static List<Highlighting> searchAll(List<Highlighting> list, long pos, String property, String value, long from, long to) {
-        List<Highlighting> ret = new ArrayList<>();
+    public static Highlighting searchPos(List<Highlighting> list, long pos) {
+        return searchPos(list, pos, -1, -1);
+    }
+
+    public static Highlighting searchPos(List<Highlighting> list, long pos, long from, long to) {
+        Highlighting ret = null;
+        looph:
         for (Highlighting h : list) {
-            if (property != null) {
-                String v = h.getPropertyString(property);
-                if (v == null) {
-                    if (value != null) {
-                        continue;
-                    }
-                } else {
-                    if (!v.equals(value)) {
-                        continue;
-                    }
-                }
-            }
             if (from > -1) {
                 if (h.startPos < from) {
                     continue;
@@ -164,13 +97,90 @@ public class Highlighting implements Serializable {
                 }
             }
             if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
-                //if (ret == null || h.startPos > ret.startPos) { //get the closest one
-                ret.add(h);
-                //}
+                if (ret == null || h.startPos > ret.startPos) { //get the closest one
+                    ret = h;
+                }
             }
-            //if (pos == -1) {
-            //   return ret;
-            //}
+            if (pos == -1 && ret != null) {
+                return ret;
+            }
+        }
+
+        return ret;
+    }
+
+    public static Highlighting searchOffset(List<Highlighting> list, long offset) {
+        return searchOffset(list, offset, -1, -1);
+    }
+    
+    public static Highlighting searchOffset(List<Highlighting> list, long offset, long from, long to) {
+        looph:
+        for (Highlighting h : list) {
+            if (from > -1) {
+                if (h.startPos < from) {
+                    continue;
+                }
+            }
+            if (to > -1) {
+                if (h.startPos > to) {
+                    continue;
+                }
+            }
+            if (h.getProperties().offset != offset) {
+                continue;
+            }
+
+            return h;
+        }
+
+        return null;
+    }
+
+    public static Highlighting searchIndex(List<Highlighting> list, long index) {
+        return searchIndex(list, index, -1, -1);
+    }
+    
+    public static Highlighting searchIndex(List<Highlighting> list, long index, long from, long to) {
+        looph:
+        for (Highlighting h : list) {
+            if (from > -1) {
+                if (h.startPos < from) {
+                    continue;
+                }
+            }
+            if (to > -1) {
+                if (h.startPos > to) {
+                    continue;
+                }
+            }
+            if (h.getProperties().index != index) {
+                continue;
+            }
+
+            return h;
+        }
+
+        return null;
+    }
+
+    public static List<Highlighting> searchAllPos(List<Highlighting> list, long pos) {
+        List<Highlighting> ret = new ArrayList<>();
+        for (Highlighting h : list) {
+            if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
+                ret.add(h);
+            }
+        }
+
+        return ret;
+    }
+
+    public static List<Highlighting> searchAllIndexes(List<Highlighting> list, long index) {
+        List<Highlighting> ret = new ArrayList<>();
+        for (Highlighting h : list) {
+            long i = h.getProperties().index;
+            if (i == index) {
+                ret.add(h);
+            }
         }
 
         return ret;
@@ -193,11 +203,11 @@ public class Highlighting implements Serializable {
      * @param type Highlighting type
      * @param text
      */
-    public Highlighting(int startPos, Map<String, String> data, HilightType type, String text) {
+    public Highlighting(int startPos, HighlightData data, HighlightType type, String text) {
         this.startPos = startPos;
         this.type = type;
         if (Configuration.debugMode.get()) {
-            this.hilightedText = text;
+            this.HighlightedText = text;
         }
         this.properties = data;
     }

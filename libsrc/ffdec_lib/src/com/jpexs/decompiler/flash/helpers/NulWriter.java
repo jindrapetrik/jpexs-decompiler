@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import java.util.Map;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.util.Stack;
 
 /**
@@ -93,19 +94,7 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
-    public NulWriter hilightSpecial(String text, String type) {
-        stringAdded = true;
-        return this;
-    }
-
-    @Override
-    public NulWriter hilightSpecial(String text, String type, String index) {
-        stringAdded = true;
-        return this;
-    }
-
-    @Override
-    public NulWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
+    public NulWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         stringAdded = true;
         return this;
     }
@@ -117,7 +106,7 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
-    public GraphTextWriter appendWithData(String str, Map<String, String> data) {
+    public GraphTextWriter appendWithData(String str, HighlightData data) {
         stringAdded = true;
         return this;
     }

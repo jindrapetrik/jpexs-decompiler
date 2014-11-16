@@ -30,7 +30,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
@@ -1166,7 +1166,7 @@ public class XFLConverter {
     }
 
     private static String convertActionScript(ASMSource as) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
             Action.actionsToSource(as, as.getActions(), as.toString(), writer);
         } catch (InterruptedException ex) {

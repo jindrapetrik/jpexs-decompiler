@@ -19,7 +19,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -53,7 +53,7 @@ public class AS2Generator {
                 if (doa == null) {
                     continue;
                 }
-                HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+                HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
                 Action.actionsToSource(doa, doa.getActions(), "", writer);
                 String src = writer.toString();
                 if (src.trim().isEmpty()) {

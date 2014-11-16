@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -32,9 +34,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TryAVM2Item extends AVM2Item implements Block {
 
@@ -79,16 +79,16 @@ public class TryAVM2Item extends AVM2Item implements Block {
             writer.newLine();
             writer.append("catch(");
             String localName = catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames);
-            Map<String, String> data = new HashMap<>();
-            data.put("localName", localName);
-            data.put("declaration", "true");
+            HighlightData data = new HighlightData();
+            data.localName = localName;
+            data.declaration = true;
 
             int eti = catchExceptions.get(e).type_index;
 
-            data.put("declaredType", eti <= 0 ? "*" : localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2, true));
-            writer.hilightSpecial(localName, "try.name", e, data);
+            data.declaredType = eti <= 0 ? "*" : localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2, true);
+            writer.hilightSpecial(localName, HighlightSpecialType.TRY_NAME, e, data);
             writer.append(":");
-            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), "try.type", e);
+            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);
             writer.append(")");
             writer.startBlock();
             List<GraphTargetItem> commands = catchCommands.get(e);

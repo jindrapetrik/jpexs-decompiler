@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,12 +77,12 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false), "classname");
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
 
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true);
             writer.appendNoHilight(" extends ");
-            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false), "typename", typeName);
+            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
         }
         if (interfaces.length > 0) {
             if (isInterface()) {
@@ -94,7 +95,7 @@ public class InstanceInfo {
                     writer.append(", ");
                 }
                 String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true);
-                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false), "typename", typeName);
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
             }
         }
 

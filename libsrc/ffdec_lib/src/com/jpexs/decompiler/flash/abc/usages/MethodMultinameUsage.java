@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
             ((TraitMethodGetterSetter) traits.traits.get(traitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
         }
 
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         writer.appendNoHilight(super.toString());
         writer.appendNoHilight(" ");
         if (isInitializer) {

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
@@ -66,8 +67,8 @@ public class TraitMethodGetterSetter extends Trait {
         }
 
         writer.appendNoHilight(modifier);
-        writer.hilightSpecial("function " + addKind, "traittype");
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), "traitname");
+        writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");

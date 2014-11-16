@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -76,7 +76,7 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
             String actualResult = normalizeLabels(writer.toString());
 
@@ -97,7 +97,7 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
             String actualResult = normalizeLabels(writer.toString());
 

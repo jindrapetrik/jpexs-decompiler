@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,19 +44,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     }
 
     @Override
-    public FileTextWriter hilightSpecial(String text, String type) {
-        writeToFile(text);
-        return this;
-    }
-
-    @Override
-    public FileTextWriter hilightSpecial(String text, String type, String index) {
-        writeToFile(text);
-        return this;
-    }
-
-    @Override
-    public GraphTextWriter hilightSpecial(String text, String type, String index, Map<String, String> data) {
+    public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         writeToFile(text);
         return this;
     }
@@ -67,7 +56,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     }
 
     @Override
-    public GraphTextWriter appendWithData(String str, Map<String, String> data) {
+    public GraphTextWriter appendWithData(String str, HighlightData data) {
         writeToFile(str);
         return this;
     }

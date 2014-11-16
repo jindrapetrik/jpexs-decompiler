@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -272,7 +274,6 @@ public class MethodInfo {
         if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
         }
-        Map<String, String> pdata;
 
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
@@ -283,30 +284,30 @@ public class MethodInfo {
                 ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants, false);
             }
 
-            pdata = new HashMap<>();
-            pdata.put("declaration", "true");
-            pdata.put("declaredType", ptype);
+            HighlightData pdata = new HighlightData();
+            pdata.declaration = true;
+            pdata.declaredType = ptype;
             if (!localRegNames.isEmpty()) {
-                pdata.put("localName", localRegNames.get(i + 1)); //assuming it is a slot
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), "paramname", i, pdata);
+                pdata.localName = localRegNames.get(i + 1); //assuming it is a slot
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                pdata.put("localName", constants.getString(paramNames[i]));
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), "paramname", i, pdata);
+                pdata.localName = constants.getString(paramNames[i]);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else {
-                pdata.put("localName", "param" + (i + 1));
-                writer.hilightSpecial("param" + (i + 1), "paramname", i, pdata);
+                pdata.localName = "param" + (i + 1);
+                writer.hilightSpecial("param" + (i + 1), HighlightSpecialType.PARAM_NAME, i, pdata);
             }
             writer.appendNoHilight(":");
             if (param_types[i] == 0) {
-                writer.hilightSpecial("*", "param", i);
+                writer.hilightSpecial("*", HighlightSpecialType.PARAM, i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false), "param", i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false), HighlightSpecialType.PARAM, i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
                     int optionalIndex = i - (param_types.length - optional.length);
                     writer.appendNoHilight(" = ");
-                    writer.hilightSpecial(optional[optionalIndex].toString(constants), "optional", optionalIndex);
+                    writer.hilightSpecial(optional[optionalIndex].toString(constants), HighlightSpecialType.OPTIONAL, optionalIndex);
                 }
             }
         }
@@ -322,12 +323,13 @@ public class MethodInfo {
             } else {
                 restName = "rest";
             }
-            pdata = new HashMap<>();
-            pdata.put("declaration", "true");
-            pdata.put("declaredType", "*");
-            pdata.put("localName", restName);
+            
+            HighlightData pdata = new HighlightData();
+            pdata.declaration = true;
+            pdata.declaredType = "*";
+            pdata.localName = restName;
             writer.append(restAdd);
-            writer.hilightSpecial(restName, "flag.NEED_REST", 0, pdata);
+            writer.hilightSpecial(restName, HighlightSpecialType.FLAG_NEED_REST, 0, pdata);
         }
         return writer;
     }
@@ -337,7 +339,7 @@ public class MethodInfo {
         if (ret_type > 0) {
             rname = IdentifiersDeobfuscation.printIdentifier(true, constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames, true), "void");
         }
-        return writer.hilightSpecial(rname, "returns");
+        return writer.hilightSpecial(rname, HighlightSpecialType.RETURNS);
     }
 
     public void setBody(MethodBody body) {

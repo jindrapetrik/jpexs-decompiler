@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
@@ -56,7 +56,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
     
     private String recompile(String str) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException{
         ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         List<Action> actions = par.actionsFromString(str);        
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         ActionList list = ActionListReader.readActionListTimeout(new ArrayList<DisassemblyListener>(), new SWFInputStream(swf,hex), SWF.DEFAULT_VERSION, 0, hex.length, "");                                    
@@ -256,7 +256,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(doa, doa.getActions(), "", writer);
             String actualResult = writer.toString();
 

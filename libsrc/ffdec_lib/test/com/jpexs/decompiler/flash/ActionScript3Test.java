@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -70,10 +70,10 @@ public class ActionScript3Test extends ActionScriptTestBase {
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(bodyIndex > -1);
-        HilightedTextWriter writer = null;
+        HighlightedTextWriter writer = null;
         try {
             abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(clsIndex).instance_traits, true);
-            writer = new HilightedTextWriter(new CodeFormatting(), false);
+            writer = new HighlightedTextWriter(new CodeFormatting(), false);
             abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, writer, new ArrayList<String>());
         } catch (InterruptedException ex) {
             fail();
@@ -902,7 +902,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(methodInfo > -1);
         assertTrue(bodyIndex > -1);
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<String>());
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";

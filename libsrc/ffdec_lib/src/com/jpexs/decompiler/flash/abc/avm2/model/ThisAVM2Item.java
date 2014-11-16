@@ -36,7 +36,7 @@ public class ThisAVM2Item extends AVM2Item {
     public ThisAVM2Item(GraphSourceItem instruction, Multiname className) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.className = className;
-        srcData.put("localName", "this");
+        srcData.localName = "this";
     }
 
     @Override

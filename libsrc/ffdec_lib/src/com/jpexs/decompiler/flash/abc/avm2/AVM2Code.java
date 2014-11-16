@@ -221,7 +221,8 @@ import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
@@ -927,10 +928,10 @@ public class AVM2Code implements Cloneable {
             if (trait instanceof TraitFunction) {
                 TraitFunction tf = (TraitFunction) trait;
                 writer.appendNoHilight("trait ");
-                writer.hilightSpecial("function ", "traittype");
-                writer.hilightSpecial(constants.multinameToString(tf.name_index), "traitname");
+                writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
+                writer.hilightSpecial(constants.multinameToString(tf.name_index), HighlightSpecialType.TRAIT_NAME);
                 writer.appendNoHilight(" slotid ");
-                writer.hilightSpecial("" + tf.slot_id, "slotid");
+                writer.hilightSpecial("" + tf.slot_id, HighlightSpecialType.SLOT_ID);
                 writer.newLine();
             }
             if (trait instanceof TraitMethodGetterSetter) {
@@ -938,70 +939,70 @@ public class AVM2Code implements Cloneable {
                 writer.appendNoHilight("trait ");
                 switch (tm.kindType) {
                     case Trait.TRAIT_METHOD:
-                        writer.hilightSpecial("method ", "traittype");
+                        writer.hilightSpecial("method ", HighlightSpecialType.TRAIT_TYPE);
                         break;
                     case Trait.TRAIT_GETTER:
-                        writer.hilightSpecial("getter ", "traittype");
+                        writer.hilightSpecial("getter ", HighlightSpecialType.TRAIT_TYPE);
                         break;
                     case Trait.TRAIT_SETTER:
-                        writer.hilightSpecial("setter ", "traittype");
+                        writer.hilightSpecial("setter ", HighlightSpecialType.TRAIT_TYPE);
                         break;
                 }
-                writer.hilightSpecial(constants.multinameToString(tm.name_index), "traitname");
+                writer.hilightSpecial(constants.multinameToString(tm.name_index), HighlightSpecialType.TRAIT_NAME);
                 writer.appendNoHilight(" dispid ");
-                writer.hilightSpecial("" + tm.disp_id, "dispid");
+                writer.hilightSpecial("" + tm.disp_id, HighlightSpecialType.DISP_ID);
                 writer.newLine();
             }
         }
         if (info != null) {
             writer.appendNoHilight("method").newLine();
             writer.appendNoHilight("name ");
-            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", "methodname");
+            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
             writer.newLine();
             if (info.flagExplicit()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("EXPLICIT", "flag.EXPLICIT");
+                writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_EXPLICIT);
                 writer.newLine();
             }
             if (info.flagHas_optional()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("HAS_OPTIONAL", "flag.HAS_OPTIONAL");
+                writer.hilightSpecial("HAS_OPTIONAL", HighlightSpecialType.FLAG_HAS_OPTIONAL);
                 writer.newLine();
                 writer.appendNoHilight("flag HAS_OPTIONAL").newLine();
             }
             if (info.flagHas_paramnames()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("HAS_PARAM_NAMES", "flag.HAS_PARAM_NAMES");
+                writer.hilightSpecial("HAS_PARAM_NAMES", HighlightSpecialType.FLAG_HAS_PARAM_NAMES);
                 writer.newLine();
             }
             if (info.flagIgnore_rest()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("EXPLICIT", "flag.IGNORE_REST");
+                writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_IGNORE_REST);
                 writer.newLine();
             }
             if (info.flagNeed_activation()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_ACTIVATION", "flag.NEED_ACTIVATION");
+                writer.hilightSpecial("NEED_ACTIVATION", HighlightSpecialType.FLAG_NEED_ACTIVATION);
                 writer.newLine();
             }
             if (info.flagNeed_arguments()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_ARGUMENTS", "flag.NEED_ARGUMENTS");
+                writer.hilightSpecial("NEED_ARGUMENTS", HighlightSpecialType.FLAG_NEED_ARGUMENTS);
                 writer.newLine();
             }
             if (info.flagNeed_rest()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_REST", "flag.NEED_REST");
+                writer.hilightSpecial("NEED_REST", HighlightSpecialType.FLAG_NEED_REST);
                 writer.newLine();
             }
             if (info.flagSetsdxns()) {
                 writer.appendNoHilight("flag ");
-                writer.hilightSpecial("SET_DXNS", "flag.SET_DXNS");
+                writer.hilightSpecial("SET_DXNS", HighlightSpecialType.FLAG_SET_DXNS);
                 writer.newLine();
             }
             for (int p = 0; p < info.param_types.length; p++) {
                 writer.appendNoHilight("param ");
-                writer.hilightSpecial(constants.multinameToString(info.param_types[p]), "param", p);
+                writer.hilightSpecial(constants.multinameToString(info.param_types[p]), HighlightSpecialType.PARAM, p);
                 writer.newLine();
             }
             if (info.flagHas_paramnames()) {
@@ -1021,12 +1022,12 @@ public class AVM2Code implements Cloneable {
                 for (int i = 0; i < info.optional.length; i++) {
                     ValueKind vk = info.optional[i];
                     writer.appendNoHilight("optional ");
-                    writer.hilightSpecial(vk.toString(constants), "optional", i);
+                    writer.hilightSpecial(vk.toString(constants), HighlightSpecialType.OPTIONAL, i);
                     writer.newLine();
                 }
             }
             writer.appendNoHilight("returns ");
-            writer.hilightSpecial(constants.multinameToString(info.ret_type), "returns");
+            writer.hilightSpecial(constants.multinameToString(info.ret_type), HighlightSpecialType.RETURNS);
             writer.newLine();
         }
         writer.newLine();
@@ -1068,10 +1069,10 @@ public class AVM2Code implements Cloneable {
             offsets.add((long) body.exceptions[e].target);
 
             writer.appendNoHilight(" type ");
-            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<String>()), "try.type", e);
+            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<String>()), HighlightSpecialType.TRY_TYPE, e);
 
             writer.appendNoHilight(" name ");
-            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<String>()), "try.name", e);
+            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<String>()), HighlightSpecialType.TRY_NAME, e);
             writer.newLine();
         }
 
@@ -2448,7 +2449,7 @@ public class AVM2Code implements Cloneable {
         invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
             String src = writer.toString();
 
@@ -2490,7 +2491,7 @@ public class AVM2Code implements Cloneable {
     public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         try {
             List<Integer> outputMap = new ArrayList<>();
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
             String src = writer.toString();
             AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);

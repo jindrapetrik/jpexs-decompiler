@@ -57,7 +57,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -387,7 +387,7 @@ public class Action implements GraphSourceItem {
      *
      */
     public static String actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode) {
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         actionsToString(listeners, address, list, version, exportMode, writer);
         return writer.toString();
     }
@@ -682,7 +682,7 @@ public class Action implements GraphSourceItem {
      * @throws java.lang.InterruptedException
      */
     public static String actionsToSource(final ASMSource asm, final List<Action> actions, final String path) throws InterruptedException {
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         actionsToSource(asm, actions, path, writer);
         return writer.toString();
     }

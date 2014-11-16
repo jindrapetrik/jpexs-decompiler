@@ -42,8 +42,8 @@ import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
-import com.jpexs.decompiler.flash.helpers.HilightedText;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -123,9 +123,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private ActionList lastCode;
     private ASMSource src;
     public JPanel topButtonsPan;
-    private HilightedText srcWithHex;
-    private HilightedText srcNoHex;
-    private HilightedText srcHexOnly;
+    private HighlightedText srcWithHex;
+    private HighlightedText srcNoHex;
+    private HighlightedText srcHexOnly;
     private String lastDecompiled = "";
     private ASMSource lastASM;
     public SearchPanel<ActionSearchResult> searchPanel;
@@ -172,19 +172,19 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 }
             }
             if (ident == null) {
-                Highlighting h = Highlighting.search(decompiledHilights, pos);
+                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
                 if (h != null) {
                     List<Action> list = lastCode;
                     Action lastIns = null;
                     int inspos = 0;
                     Action selIns = null;
                     for (Action ins : list) {
-                        if (h.getPropertyLong("offset") == ins.getOffset()) {
+                        if (h.getProperties().offset == ins.getOffset()) {
                             selIns = ins;
                             break;
                         }
-                        if (ins.getOffset() > h.getPropertyLong("offset")) {
-                            inspos = (int) (h.getPropertyLong("offset") - lastIns.getAddress());
+                        if (ins.getOffset() > h.getProperties().offset) {
+                            inspos = (int) (h.getProperties().offset - lastIns.getAddress());
                             selIns = lastIns;
                             break;
                         }
@@ -226,7 +226,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             if (actions == null) {
                 actions = src.getActions();
             }
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
             Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
             List<Highlighting> hilights = writer.instructionHilights;
             String srcNoHex = writer.toString();
@@ -306,7 +306,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         });
     }
 
-    private void setText(final HilightedText text, final String contentType) {
+    private void setText(final HighlightedText text, final String contentType) {
         View.execInEventDispatch(new Runnable() {
 
             @Override
@@ -319,11 +319,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     }
                     lastH = h;
                 }
-                String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
+                Long offset = lastH == null ? 0 : lastH.getProperties().offset;
                 disassembledHilights = text.instructionHilights;
                 String stripped = text.text;
                 setEditorText(stripped, contentType);
-                Highlighting h = Highlighting.search(disassembledHilights, "offset", offset);
+                Highlighting h = Highlighting.searchOffset(disassembledHilights, offset);
                 if (h != null) {
                     if (h.startPos <= editor.getDocument().getLength()) {
                         editor.setCaretPosition(h.startPos);
@@ -333,38 +333,38 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         });
     }
 
-    private HilightedText getHilightedText(ScriptExportMode exportMode) {
+    private HighlightedText getHighlightedText(ScriptExportMode exportMode) {
         ASMSource asm = (ASMSource) src;
         DisassemblyListener listener = getDisassemblyListener();
         asm.addDisassemblyListener(listener);
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         try {
             asm.getASMSource(exportMode, writer, lastCode);
         } catch (InterruptedException ex) {
             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         asm.removeDisassemblyListener(listener);
-        return new HilightedText(writer);
+        return new HighlightedText(writer);
     }
 
     public void setHex(ScriptExportMode exportMode) {
         if (exportMode != ScriptExportMode.HEX) {
             if (exportMode == ScriptExportMode.PCODE) {
                 if (srcNoHex == null) {
-                    srcNoHex = getHilightedText(exportMode);
+                    srcNoHex = getHighlightedText(exportMode);
                 }
                 setText(srcNoHex, "text/flasm");
             } else {
                 if (srcWithHex == null) {
-                    srcWithHex = getHilightedText(exportMode);
+                    srcWithHex = getHighlightedText(exportMode);
                 }
                 setText(srcWithHex, "text/flasm");
             }
         } else {
             if (srcHexOnly == null) {
-                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
-                srcHexOnly = new HilightedText(writer);
+                srcHexOnly = new HighlightedText(writer);
             }
             setText(srcHexOnly, "text/plain");
         }
@@ -606,8 +606,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     }
                     lastH = h;
                 }
-                String ofs = lastH == null ? "0" : lastH.getPropertyString("offset");
-                Highlighting h2 = Highlighting.search(decompiledHilights, "offset", ofs);
+                Long ofs = lastH == null ? 0 : lastH.getProperties().offset;
+                Highlighting h2 = Highlighting.searchOffset(decompiledHilights, ofs);
                 if (h2 != null) {
                     ignoreCarret = true;
                     if (h2.startPos <= decompiledEditor.getDocument().getLength()) {
@@ -630,9 +630,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 }
                 decompiledEditor.getCaret().setVisible(true);
                 int pos = decompiledEditor.getCaretPosition();
-                Highlighting h = Highlighting.search(decompiledHilights, pos);
+                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
                 if (h != null) {
-                    Highlighting h2 = Highlighting.search(disassembledHilights, "offset", h.getPropertyString("offset"));
+                    Highlighting h2 = Highlighting.searchOffset(disassembledHilights, h.getProperties().offset);
                     if (h2 != null) {
                         ignoreCarret = true;
                         if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {

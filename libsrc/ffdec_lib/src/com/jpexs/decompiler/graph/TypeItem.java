@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.ArrayList;
@@ -72,13 +73,13 @@ public class TypeItem extends GraphTargetItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName), "typename", fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName), HighlightSpecialType.TYPE_NAME, fullTypeName);
         } else {
             String simpleName = fullTypeName;
             if (simpleName.contains(".")) {
                 simpleName = simpleName.substring(simpleName.lastIndexOf('.') + 1);
             }
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, simpleName), "typename", fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, simpleName), HighlightSpecialType.TYPE_NAME, fullTypeName);
         }
 
         return writer;

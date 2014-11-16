@@ -24,7 +24,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -63,9 +64,9 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
                 if (ignoreCaret) {
                     return;
                 }
-                Highlighting spec = Highlighting.search(specialHilights, slotConstEditor.getCaretPosition());
+                Highlighting spec = Highlighting.searchPos(specialHilights, slotConstEditor.getCaretPosition());
                 if (spec != null) {
-                    editor.hilightSpecial(spec.getPropertyString("subtype"), (int) (long) spec.getPropertyLong("index"));
+                    editor.hilightSpecial(spec.getProperties().subtype, (int) spec.getProperties().index);
                     slotConstEditor.getCaret().setVisible(true);
                 }
             }
@@ -75,8 +76,8 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public void hilightSpecial(Highlighting special) {
         Highlighting sel = null;
         for (Highlighting h : specialHilights) {
-            if (h.getPropertyString("subtype").equals(special.getPropertyString("subtype"))) {
-                if (h.getPropertyString("index").equals(special.getPropertyString("index"))) {
+            if (h.getProperties().subtype.equals(special.getProperties().subtype)) {
+                if (h.getProperties().index == special.getProperties().index) {
                     sel = h;
                     break;
                 }
@@ -93,17 +94,17 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.appendNoHilight("trait ");
-        writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), "traitname");
+        writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight(" ");
-        writer.hilightSpecial(trait.isConst() ? "const" : "slot", "traittype");
+        writer.hilightSpecial(trait.isConst() ? "const" : "slot", HighlightSpecialType.TRAIT_TYPE);
         writer.appendNoHilight(" slotid ");
-        writer.hilightSpecial("" + trait.slot_id, "slotid");
+        writer.hilightSpecial("" + trait.slot_id, HighlightSpecialType.SLOT_ID);
         writer.appendNoHilight(" type ");
-        writer.hilightSpecial(abc.constants.multinameToString(trait.type_index), "traittypename");
+        writer.hilightSpecial(abc.constants.multinameToString(trait.type_index), HighlightSpecialType.TRAIT_TYPE_NAME);
         writer.appendNoHilight(" value ");
-        writer.hilightSpecial((new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), "traitvalue");
+        writer.hilightSpecial((new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), HighlightSpecialType.TRAIT_VALUE);
         String s = writer.toString();
         specialHilights = writer.specialHilights;
         showWarning = trait.isConst() || isStatic;

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -49,7 +49,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
             Action.actionsToSource(doa, doa.getActions(), "", writer);
         } catch (InterruptedException ex) {

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -56,7 +56,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws InterruptedException {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
         String obj = writer.toString();
         return obj + ".super." + multiname;

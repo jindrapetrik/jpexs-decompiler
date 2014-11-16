@@ -48,7 +48,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String localName = localRegName(localData.localRegNames, regIndex);
-        srcData.put("localName", localName);
+        srcData.localName = localName;
         writer.append(localName + " = ");
         return value.toString(writer, localData);
     }

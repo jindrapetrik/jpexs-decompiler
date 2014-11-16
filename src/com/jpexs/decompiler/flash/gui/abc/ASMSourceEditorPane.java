@@ -28,8 +28,9 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.HilightedText;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -54,9 +55,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private final DecompiledEditorPane decompiledEditor;
     private boolean ignoreCarret = false;
     private String name;
-    private HilightedText textWithHex;
-    private HilightedText textNoHex;
-    private HilightedText textHexOnly;
+    private HighlightedText textWithHex;
+    private HighlightedText textNoHex;
+    private HighlightedText textHexOnly;
     private ScriptExportMode exportMode = ScriptExportMode.PCODE;
     private Trait trait;
 
@@ -68,10 +69,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         return exportMode;
     }
 
-    private HilightedText getHilightedText(ScriptExportMode exportMode) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+    private HighlightedText getHighlightedText(ScriptExportMode exportMode) {
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
-        return new HilightedText(writer);
+        return new HighlightedText(writer);
     }
 
     public void setHex(ScriptExportMode exportMode, boolean force) {
@@ -83,21 +84,21 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (exportMode == ScriptExportMode.PCODE) {
             setContentType("text/flasm");
             if (textNoHex == null) {
-                textNoHex = getHilightedText(exportMode);
+                textNoHex = getHighlightedText(exportMode);
             }
             setText(textNoHex);
         } else if (exportMode == ScriptExportMode.PCODE_HEX) {
             setContentType("text/flasm");
             if (textWithHex == null) {
-                textWithHex = getHilightedText(exportMode);
+                textWithHex = getHighlightedText(exportMode);
             }
             setText(textWithHex);
         } else {
             setContentType("text/plain");
             if (textHexOnly == null) {
-                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
+                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCode().getBytes());
-                textHexOnly = new HilightedText(writer);
+                textHexOnly = new HighlightedText(writer);
             }
             setText(textHexOnly);
         }
@@ -113,11 +114,11 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         addCaretListener(this);
     }
 
-    public void hilighSpecial(String type, String index) {
+    public void hilighSpecial(HighlightSpecialType type, String specialValue) {
         Highlighting h2 = null;
         for (Highlighting sh : specialHilights) {
-            if (type.equals(sh.getPropertyString("subtype"))) {
-                if (sh.getPropertyString("index").equals("" + index)) {
+            if (type.equals(sh.getProperties().subtype)) {
+                if (sh.getProperties().specialValue.equals(specialValue)) {
                     h2 = sh;
                     break;
                 }
@@ -137,7 +138,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (isEditable()) {
             return;
         }
-        Highlighting h2 = Highlighting.search(disassembledHilights, "offset", "" + offset);
+        Highlighting h2 = Highlighting.searchOffset(disassembledHilights, offset);
         if (h2 != null) {
             ignoreCarret = true;
             if (h2.startPos <= getDocument().getLength()) {
@@ -236,10 +237,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(0);
     }
 
-    public void setText(HilightedText hilightedText) {
-        disassembledHilights = hilightedText.instructionHilights;
-        specialHilights = hilightedText.specialHilights;
-        super.setText(hilightedText.text);
+    public void setText(HighlightedText HighlightedText) {
+        disassembledHilights = HighlightedText.instructionHilights;
+        specialHilights = HighlightedText.specialHilights;
+        super.setText(HighlightedText.text);
         setCaretPosition(0);
     }
 
@@ -282,7 +283,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public Highlighting getSelectedSpecial() {
-        return Highlighting.search(specialHilights, getCaretPosition());
+        return Highlighting.searchPos(specialHilights, getCaretPosition());
     }
 
     public long getSelectedOffset() {
@@ -294,7 +295,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             }
             lastH = h;
         }
-        return lastH == null ? 0 : lastH.getPropertyLong("offset");
+        return lastH == null ? 0 : lastH.getProperties().offset;
     }
 
     @Override
@@ -310,7 +311,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         decompiledEditor.hilightOffset(getSelectedOffset());
         Highlighting spec = getSelectedSpecial();
         if (spec != null) {
-            decompiledEditor.hilightSpecial(spec.getPropertyString("subtype"), (int) (long) spec.getPropertyLong("index"));
+            decompiledEditor.hilightSpecial(spec.getProperties().subtype, spec.getProperties().index);
         }
     }
 }

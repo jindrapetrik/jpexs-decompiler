@@ -53,3 +53,8 @@ hs_err_pid*.log
 /version.properties
 /tools.properties
 /nbproject/private/
+/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/hilight/HighlightType.java
+/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/HighlightedText.java
+/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/hilight/HighlightData.java
+/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/HighlightedTextWriter.java
+/libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/hilight/HighlightSpecialType.java
