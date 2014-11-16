@@ -648,7 +648,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void findABCTags() {
-        List<ContainerItem> objs = new ArrayList<>();
+        List<ContainerItem> objs = new ArrayList<>(tags.size());
         objs.addAll(tags);
 
         ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();

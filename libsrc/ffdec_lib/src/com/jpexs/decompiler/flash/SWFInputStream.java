@@ -2209,9 +2209,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public List<FILTER> readFILTERLIST(String name) throws IOException {
-        List<FILTER> ret = new ArrayList<>();
         newDumpLevel(name, "FILTERLIST");
         int numberOfFilters = readUI8("numberOfFilters");
+        List<FILTER> ret = new ArrayList<>(numberOfFilters);
         for (int i = 0; i < numberOfFilters; i++) {
             ret.add(readFILTER("filter"));
         }

@@ -118,11 +118,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
         @Override
         protected List<SwfInMemory> doInBackground() throws Exception {
-            Map<Long, InputStream> ret = new HashMap<>();
             List<SwfInMemory> swfStreams = new ArrayList<>();
             for (com.jpexs.process.Process proc : procs) {
                 publish(proc);
-                ret = proc.search(new ProgressListener() {
+                Map<Long, InputStream> ret = proc.search(new ProgressListener() {
                     @Override
                     public void progress(int p) {
                         setProgress(p);

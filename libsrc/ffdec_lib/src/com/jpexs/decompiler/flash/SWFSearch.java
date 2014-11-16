@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.Helper;
@@ -61,7 +62,7 @@ public class SWFSearch {
     }
 
     public void process() {
-        Map<Long, InputStream> ret = new HashMap<>();
+        Map<Long, InputStream> ret;
         ret = s.search(new ProgressListener() {
             @Override
             public void progress(int p) {
