@@ -1430,7 +1430,7 @@ public class CommandLineArgumentParser {
             try {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             } catch (ActionParseException ex) {
-                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
                 System.exit(1);
             }
         }
@@ -1444,10 +1444,10 @@ public class CommandLineArgumentParser {
         try {
             src.setActions(par.actionsFromString(as));
         } catch (ActionParseException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
         } catch (CompilationException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
         }
         src.setModified();
@@ -1486,7 +1486,7 @@ public class CommandLineArgumentParser {
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
             } catch (AVM2ParseException ex) {
-                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+                System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
                 System.exit(1);
             }
         }
@@ -1509,10 +1509,10 @@ public class CommandLineArgumentParser {
         try {
             pack.abc.replaceSciptPack(pack, as);
         } catch (AVM2ParseException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
         } catch (CompilationException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", "" + ex.line));
+            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
         }
     }

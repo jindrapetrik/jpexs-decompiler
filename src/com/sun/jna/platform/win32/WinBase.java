@@ -36,7 +36,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      */
     HANDLE INVALID_HANDLE_VALUE
             = new HANDLE(Pointer.createConstant(Pointer.SIZE == 8
-                            ? -1 : 0xFFFFFFFFL));
+                                    ? -1 : 0xFFFFFFFFL));
     /**
      * Maximum computer name length. The value is 15 on Mac, 31 on everything
      * else.

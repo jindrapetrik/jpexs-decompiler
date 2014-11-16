@@ -74,21 +74,21 @@ public class ConstantsListModel implements ListModel {
     public Object getElementAt(int index) {
         switch (type) {
             case TYPE_UINT:
-                return "" + (index + 1) + ":" + constants.getUInt(index + 1);
+                return (index + 1) + ":" + constants.getUInt(index + 1);
             case TYPE_INT:
-                return "" + (index + 1) + ":" + constants.getInt(index + 1);
+                return (index + 1) + ":" + constants.getInt(index + 1);
             case TYPE_DOUBLE:
-                return "" + (index + 1) + ":" + constants.getDouble(index + 1);
+                return (index + 1) + ":" + constants.getDouble(index + 1);
             case TYPE_DECIMAL:
-                return "" + (index + 1) + ":" + constants.getDecimal(index + 1);
+                return (index + 1) + ":" + constants.getDecimal(index + 1);
             case TYPE_STRING:
-                return "" + (index + 1) + ":" + Helper.escapeString(constants.getString(index + 1));
+                return (index + 1) + ":" + Helper.escapeString(constants.getString(index + 1));
             case TYPE_NAMESPACE:
-                return "" + (index + 1) + ":" + constants.getNamespace(index + 1).getNameWithKind(constants);
+                return (index + 1) + ":" + constants.getNamespace(index + 1).getNameWithKind(constants);
             case TYPE_NAMESPACESET:
-                return "" + (index + 1) + ":" + constants.getNamespaceSet(index + 1).toString(constants);
+                return (index + 1) + ":" + constants.getNamespaceSet(index + 1).toString(constants);
             case TYPE_MULTINAME:
-                return "" + (index + 1) + ":" + constants.getMultiname(index + 1).toString(constants, new ArrayList<String>());
+                return (index + 1) + ":" + constants.getMultiname(index + 1).toString(constants, new ArrayList<String>());
         }
         return null;
     }

@@ -100,7 +100,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         writer.appendNoHilight(" ");
         writer.hilightSpecial(trait.isConst() ? "const" : "slot", HighlightSpecialType.TRAIT_TYPE);
         writer.appendNoHilight(" slotid ");
-        writer.hilightSpecial("" + trait.slot_id, HighlightSpecialType.SLOT_ID);
+        writer.hilightSpecial(Integer.toString(trait.slot_id), HighlightSpecialType.SLOT_ID);
         writer.appendNoHilight(" type ");
         writer.hilightSpecial(abc.constants.multinameToString(trait.type_index), HighlightSpecialType.TRAIT_TYPE_NAME);
         writer.appendNoHilight(" value ");

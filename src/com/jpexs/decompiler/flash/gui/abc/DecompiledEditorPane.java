@@ -159,7 +159,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             return;
         }
         for (Highlighting h : traitHighlights) {
-            if (h.getProperties().index  == lastTraitIndex) {
+            if (h.getProperties().index == lastTraitIndex) {
                 Highlighting h2 = Highlighting.searchOffset(highlights, offset, h.startPos, h.startPos + h.len);
                 if (h2 != null) {
                     ignoreCarret = true;

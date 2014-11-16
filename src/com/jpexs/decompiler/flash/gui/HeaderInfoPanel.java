@@ -79,21 +79,21 @@ public class HeaderInfoPanel extends JPanel {
                 compressionLabel.setText(AppStrings.translate("header.compression.none"));
                 break;
         }
-        versionLabel.setText("" + swf.version);
+        versionLabel.setText(Integer.toString(swf.version));
         gfxLabel.setText(swf.gfx ? AppStrings.translate("yes") : AppStrings.translate("no"));
-        fileSizeLabel.setText("" + swf.fileSize);
-        frameRateLabel.setText("" + swf.frameRate);
+        fileSizeLabel.setText(Long.toString(swf.fileSize));
+        frameRateLabel.setText(Integer.toString(swf.frameRate));
         frameCountLabel.setText("" + swf.frameCount);
         displayRectTwipsLabel.setText(AppStrings.translate("header.displayrect.value.twips")
-                .replace("%xmin%", "" + swf.displayRect.Xmin)
-                .replace("%ymin%", "" + swf.displayRect.Ymin)
-                .replace("%xmax%", "" + swf.displayRect.Xmax)
-                .replace("%ymax%", "" + swf.displayRect.Ymax));
+                .replace("%xmin%", Integer.toString(swf.displayRect.Xmin))
+                .replace("%ymin%", Integer.toString(swf.displayRect.Ymin))
+                .replace("%xmax%", Integer.toString(swf.displayRect.Xmax))
+                .replace("%ymax%", Integer.toString(swf.displayRect.Ymax)));
         displayRectPixelsLabel.setText(AppStrings.translate("header.displayrect.value.pixels")
-                .replace("%xmin%", "" + fmtDouble(swf.displayRect.Xmin / SWF.unitDivisor))
-                .replace("%ymin%", "" + fmtDouble(swf.displayRect.Ymin / SWF.unitDivisor))
-                .replace("%xmax%", "" + fmtDouble(swf.displayRect.Xmax / SWF.unitDivisor))
-                .replace("%ymax%", "" + fmtDouble(swf.displayRect.Ymax / SWF.unitDivisor)));
+                .replace("%xmin%", fmtDouble(swf.displayRect.Xmin / SWF.unitDivisor))
+                .replace("%ymin%", fmtDouble(swf.displayRect.Ymin / SWF.unitDivisor))
+                .replace("%xmax%", fmtDouble(swf.displayRect.Xmax / SWF.unitDivisor))
+                .replace("%ymax%", fmtDouble(swf.displayRect.Ymax / SWF.unitDivisor)));
     }
 
     private String fmtDouble(double d) {

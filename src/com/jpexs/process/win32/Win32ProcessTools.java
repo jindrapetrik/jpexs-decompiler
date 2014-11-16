@@ -148,7 +148,7 @@ public class Win32ProcessTools extends ProcessTools {
         Map<String, Character> ret = new HashMap<>();
         for (char d = 'A'; d <= 'Z'; d++) {
             char[] buf = new char[1024];
-            int len = Kernel32.INSTANCE.QueryDosDevice("" + d + ":", buf, buf.length).intValue();
+            int len = Kernel32.INSTANCE.QueryDosDevice(d + ":", buf, buf.length).intValue();
             String tar = new String(buf, 0, len);
             tar = tar.trim();
             if (!"".equals(tar)) {

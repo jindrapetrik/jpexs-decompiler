@@ -151,7 +151,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                     if (paths == null || paths.length == 0) {
                         return;
                     }
-                    
+
                     List<TreeItem> li = new ArrayList<>();
                     for (TreePath treePath : paths) {
                         TreeItem item = (TreeItem) treePath.getLastPathComponent();
@@ -164,15 +164,15 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             }
         });
     }
-    
+
     public void update(List<TreeItem> items) {
 
         if (items.isEmpty()) {
             return;
         }
-        
+
         final List<SWFList> swfs = mainPanel.getSwfs();
-        
+
         boolean allSelectedIsTagOrFrame = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag) && !(item instanceof Frame)) {
@@ -197,8 +197,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             } else if (item instanceof SWF) {
                 SWF swf = (SWF) item;
                 // Do not allow to close SWF in bundle
-                if (swf.swfList != null &&swf.swfList.isBundle) {
-                    allSelectedIsSwf = false; 
+                if (swf.swfList != null && swf.swfList.isBundle) {
+                    allSelectedIsSwf = false;
                 }
             }
         }
@@ -217,12 +217,12 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
         final TreeItem firstItem = items.get(0);
         boolean singleSelect = items.size() == 1;
-        
+
         if (singleSelect) {
             // replace
             if (firstItem instanceof ImageTag && ((ImageTag) firstItem).importSupported()) {
                 replaceMenuItem.setVisible(true);
-            }   
+            }
 
             if (firstItem instanceof ShapeTag) {
                 replaceMenuItem.setVisible(true);
@@ -314,22 +314,22 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 rawEditMenuItem.setVisible(firstItem instanceof Tag);
             }
         }
-        
+
         if (allSelectedIsBinaryData) {
             boolean anyInnerSwf = false;
             for (TreeItem item : items) {
                 DefineBinaryDataTag binary = (DefineBinaryDataTag) item;
-                
+
                 // inner swf is not loaded yet
                 if (binary.innerSwf == null && binary.isSwfData()) {
                     anyInnerSwf = true;
                 }
             }
-            
+
             openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -342,7 +342,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         binaryDatas.add((DefineBinaryDataTag) item);
                     }
                 }
-                
+
                 mainPanel.loadFromBinaryTag(binaryDatas);
             }
             break;

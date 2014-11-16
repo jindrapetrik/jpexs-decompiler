@@ -863,12 +863,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (CompilationException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);
                     decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException | InterruptedException ex) {
                     //ignore                    
                 }

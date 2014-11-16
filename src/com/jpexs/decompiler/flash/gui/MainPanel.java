@@ -933,7 +933,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     }
                 }
-                View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", "" + mulCount));
+                View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", Integer.toString(mulCount)));
                 if (abcPanel != null) {
                     abcPanel.reload();
                 }
@@ -1117,7 +1117,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public List<SWFList> getSwfs() {
         return swfs;
     }
-    
+
     public SWFList getCurrentSwfList() {
         SWF swf = getCurrentSwf();
         if (swf == null) {
@@ -1774,7 +1774,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 try {
                                     int cnt = get();
                                     Main.stopWork();
-                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
+                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
                                     swf.assignClassesToSymbols();
                                     clearCache();
                                     if (abcPanel != null) {
@@ -1880,11 +1880,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (tagTree.getModel() != null) {
             View.refreshTree(tagTree, new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
         }
-        
+
         if (dumpTree.getModel() != null) {
             View.refreshTree(dumpTree, new DumpTreeModel(swfs));
         }
-        
+
         if (treeItem != null) {
             setTagTreeSelectedNode(treeItem);
         }
@@ -1927,7 +1927,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 return true;
             }
         } catch (TextParseException ex) {
-            View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }
@@ -2043,7 +2043,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private File showImportFileChooser(String filter) {
         String[] filterArray = filter.split("\\|");
-        
+
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         boolean first = true;
@@ -2089,10 +2089,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
             return fc.getSelectedFile();
         }
-        
+
         return null;
     }
-    
+
     private int splitPos = 0;
 
     public void showDetail(String card) {
@@ -2168,8 +2168,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private int getCurrentView() {
         return Configuration.dumpView.get() ? VIEW_DUMP : VIEW_RESOURCES;
-    } 
-    
+    }
+
     public void setTreeModel(int view) {
         switch (view) {
             case VIEW_DUMP:
@@ -2184,7 +2184,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 break;
         }
     }
-    
+
     public boolean showView(int view) {
 
         CardLayout cl = (CardLayout) (contentPanel.getLayout());
@@ -2247,7 +2247,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void loadFromBinaryTag(final DefineBinaryDataTag binaryDataTag) {
         loadFromBinaryTag(Arrays.asList(binaryDataTag));
     }
-    
+
     public void loadFromBinaryTag(final List<DefineBinaryDataTag> binaryDataTags) {
 
         if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {

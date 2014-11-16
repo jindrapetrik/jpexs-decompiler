@@ -75,7 +75,7 @@ public class Debugger {
 
         @Override
         public void run() {
-            String clientName = "" + id;
+            String clientName = Integer.toString(id);
             try (InputStream is = s.getInputStream()) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

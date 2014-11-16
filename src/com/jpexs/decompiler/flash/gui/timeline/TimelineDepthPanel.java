@@ -38,7 +38,7 @@ public class TimelineDepthPanel extends JPanel {
 
     public TimelineDepthPanel(Timeline timeline) {
         maxDepth = timeline.getMaxDepth();
-        String maxDepthStr = "" + maxDepth;
+        String maxDepthStr = Integer.toString(maxDepth);
         setFont(getFont().deriveFont(fontSize));
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
         Dimension dim = new Dimension(maxDepthW + 2 * padding, Integer.MAX_VALUE);
@@ -65,7 +65,7 @@ public class TimelineDepthPanel extends JPanel {
             g.drawLine(0, yofs + d * TimelinePanel.FRAME_HEIGHT + 1, getWidth(), yofs + d * TimelinePanel.FRAME_HEIGHT + 1);
             int curr_d = start_d + d;
             g.setColor(fontColor);
-            g.drawString("" + (start_d + d == 0 ? "a" : curr_d), padding, yofs + d * TimelinePanel.FRAME_HEIGHT - padding);
+            g.drawString(start_d + d == 0 ? "a" : Integer.toString(curr_d), padding, yofs + d * TimelinePanel.FRAME_HEIGHT - padding);
         }
     }
 

@@ -324,9 +324,9 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             }
             rangeSamples[i].setText(sample);
             rangeSamples[i].setFont(f);
-            rangeCheckboxes[i].setText(translate("range.description").replace("%available%", "" + avail).replace("%name%", rangeNames[i]).replace("%total%", "" + codes.length));
+            rangeCheckboxes[i].setText(translate("range.description").replace("%available%", Integer.toString(avail)).replace("%name%", rangeNames[i]).replace("%total%", Integer.toString(codes.length)));
         }
-        allCheckbox.setText(translate("allcharacters").replace("%available%", "" + allChars.size()));
+        allCheckbox.setText(translate("allcharacters").replace("%available%", Integer.toString(allChars.size())));
         individialSample.setFont(f);
         updateIndividual();
     }

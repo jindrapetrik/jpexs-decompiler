@@ -190,9 +190,9 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontIsBoldCheckBox.setSelected(ft.isBold());
         fontIsItalicCheckBox.setSelected(ft.isItalic());
-        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
-        fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
-        fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
+        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : Integer.toString(ft.getDescent()));
+        fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : Integer.toString(ft.getAscent()));
+        fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : Integer.toString(ft.getLeading()));
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
         setAllowSave(false);

@@ -1250,15 +1250,15 @@ public class Main {
         if (Configuration.checkForUpdatesAuto.get()) {
             Calendar lastUpdatesCheckDate = Configuration.lastUpdatesCheckDate.get();
             if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - Configuration.checkForUpdatesDelay.get())) {
-                new SwingWorker(){
+                new SwingWorker() {
                     @Override
-                    protected Object doInBackground() throws Exception {                        
+                    protected Object doInBackground() throws Exception {
                         checkForUpdates();
                         return null;
-                    }                    
+                    }
                 }.execute();
                 System.out.println("finished");
-                
+
             }
         }
     }
@@ -1293,12 +1293,12 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8") 
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8")
                     + "&currentRevision=" + URLEncoder.encode(ApplicationInfo.revision, "UTF-8")
-                    + "&currentVersionMajor=" + URLEncoder.encode(""+ApplicationInfo.version_major, "UTF-8") 
-                    + "&currentVersionMinor=" + URLEncoder.encode(""+ApplicationInfo.version_minor, "UTF-8")
-                    + "&currentVersionRelease=" + URLEncoder.encode(""+ApplicationInfo.version_release, "UTF-8")
-                    + "&currentVersionBuild=" + URLEncoder.encode(""+ApplicationInfo.version_build, "UTF-8")
+                    + "&currentVersionMajor=" + URLEncoder.encode("" + ApplicationInfo.version_major, "UTF-8")
+                    + "&currentVersionMinor=" + URLEncoder.encode("" + ApplicationInfo.version_minor, "UTF-8")
+                    + "&currentVersionRelease=" + URLEncoder.encode("" + ApplicationInfo.version_release, "UTF-8")
+                    + "&currentVersionBuild=" + URLEncoder.encode("" + ApplicationInfo.version_build, "UTF-8")
                     + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"

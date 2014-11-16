@@ -45,7 +45,7 @@ public class SwfInMemory {
 
     @Override
     public String toString() {
-        String p = translate("swfitem").replace("%version%", "" + version).replace("%size%", "" + fileSize);
+        String p = translate("swfitem").replace("%version%", Integer.toString(version)).replace("%size%", Long.toString(fileSize));
         return p;
     }
 }

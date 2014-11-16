@@ -69,7 +69,7 @@ public class LicenseUpdater {
         int defaultStartYear = 2010;
         int defaultFinalYear = 2014;
         String defaultAuthor = "JPEXS";
-        String defaultYearStr = "" + defaultStartYear;
+        String defaultYearStr = Integer.toString(defaultStartYear);
         if (defaultFinalYear != defaultStartYear) {
             defaultYearStr += "-" + defaultFinalYear;
         }
@@ -116,9 +116,9 @@ public class LicenseUpdater {
                                             author = mAuthor.group(3).trim();
                                             int startYear = Integer.parseInt(mAuthor.group(1).trim());
                                             if (startYear == defaultFinalYear) {
-                                                yearStr = "" + startYear;
+                                                yearStr = Integer.toString(startYear);
                                             } else {
-                                                yearStr = "" + startYear + "-" + defaultFinalYear;
+                                                yearStr = Integer.toString(startYear) + "-" + defaultFinalYear;
                                             }
                                             if (!author.equals(defaultAuthor)) {
                                                 System.out.println("Detected nodefault author:" + author + " in " + f.getAbsolutePath());

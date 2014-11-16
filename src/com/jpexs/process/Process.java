@@ -40,12 +40,8 @@ public interface Process extends Comparable<Process>, Searchable {
     public String getPid();
 
     @Override
-    public Map<Long, InputStream> search(byte[] 
-
-    ... data);
+    public Map<Long, InputStream> search(byte[]... data);
 
     @Override
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[] 
-
-... data);
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data);
 }

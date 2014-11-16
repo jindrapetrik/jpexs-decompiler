@@ -115,7 +115,7 @@ public class DoubleTableModel implements TableModel {
         } else if (Double.isNaN(abc.constants.getDouble(rowIndex))) {
             return "NaN";
         } else {
-            return "" + abc.constants.getDouble(rowIndex);
+            return Double.toString(abc.constants.getDouble(rowIndex));
         }
     }
 

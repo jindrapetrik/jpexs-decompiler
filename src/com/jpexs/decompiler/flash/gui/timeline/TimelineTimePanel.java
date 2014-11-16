@@ -95,7 +95,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
             }
             g.setColor(fontColor);
             if ((cur_f + 1) % 5 == 0 || cur_f == 0) {
-                String timeStr = "" + (cur_f + 1);
+                String timeStr = Integer.toString(cur_f + 1);
                 int w = g.getFontMetrics().stringWidth(timeStr);
                 g.drawString(timeStr, xofs + (f - 1) * TimelinePanel.FRAME_WIDTH + TimelinePanel.FRAME_WIDTH / 2 - w / 2, TimelinePanel.FRAME_HEIGHT - lineLength - lineTextSpace);
             }

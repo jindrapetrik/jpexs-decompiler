@@ -191,11 +191,11 @@ public class PlayerControls extends JPanel implements ActionListener {
         s %= 60;
         long h = m / 60;
         m %= 60;
-        return "" + (h > 0 ? h + ":" : "") + pad(m) + ":" + pad(s) + "." + pad(ms / 10);
+        return (h > 0 ? h + ":" : "") + pad(m) + ":" + pad(s) + "." + pad(ms / 10);
     }
 
     private String pad(long t) {
-        String ret = "" + t;
+        String ret = Long.toString(t);
         while (ret.length() < 2) {
             ret = "0" + ret;
         }
@@ -268,12 +268,12 @@ public class PlayerControls extends JPanel implements ActionListener {
 
     private void updateZoom() {
         double pctzoom = roundZoom(realZoom * 100, 3);
-        String r = "" + pctzoom;
+        String r = Double.toString(pctzoom);
         double zoom = pctzoom / 100.0;
         if (r.endsWith(".0")) {
             r = r.substring(0, r.length() - 2);
         }
-        percentLabel.setText("" + r + "%");
+        percentLabel.setText(r + "%");
         display.zoom(zoom);
     }
 
@@ -346,7 +346,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         @Override
         public DataFlavor[] getTransferDataFlavors() {
             DataFlavor[] flavors = new DataFlavor[1];
-            flavors[ 0] = DataFlavor.imageFlavor;
+            flavors[0] = DataFlavor.imageFlavor;
             return flavors;
         }
 
@@ -354,7 +354,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             DataFlavor[] flavors = getTransferDataFlavors();
             for (int i = 0; i < flavors.length; i++) {
-                if (flavor.equals(flavors[ i])) {
+                if (flavor.equals(flavors[i])) {
                     return true;
                 }
             }

@@ -218,7 +218,7 @@ public class TagTree extends JTree {
         setBackground(Color.white);
         setRowHeight(16);
         setLargeModel(true);
-        
+
         TreeUI treeUI = new BasicTreeUI() {
             {
                 setHashColor(Color.gray);

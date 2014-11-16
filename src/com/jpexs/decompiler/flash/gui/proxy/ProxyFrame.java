@@ -97,7 +97,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      * @param port Port number
      */
     public void setPort(int port) {
-        portField.setText("" + port);
+        portField.setText(Integer.toString(port));
     }
 
     /**

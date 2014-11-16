@@ -30,16 +30,16 @@ public class DialogMissingSymbolHandler implements MissingSymbolHandler {
 
     @Override
     public boolean missingInt(long value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.integer").replace("%value%", "" + value), AppStrings.translate("message.constant.new.integer.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.integer").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.integer.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override
     public boolean missingUInt(long value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.unsignedinteger").replace("%value%", "" + value), AppStrings.translate("message.constant.new.unsignedinteger.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.unsignedinteger").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.unsignedinteger.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override
     public boolean missingDouble(double value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.double").replace("%value%", "" + value), AppStrings.translate("message.constant.new.double.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.double").replace("%value%", Double.toString(value)), AppStrings.translate("message.constant.new.double.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 }

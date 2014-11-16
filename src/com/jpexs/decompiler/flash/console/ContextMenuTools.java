@@ -72,7 +72,7 @@ public class ContextMenuTools {
 
         String exeName = "ffdec.exe";
 
-        if (add) {            
+        if (add) {
             return addToContextMenu(add, fromCommandLine, exeName);
         } else {
             // remove both 32 and 64 bit references

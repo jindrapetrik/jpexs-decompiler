@@ -37,7 +37,7 @@ public class Win32Process implements Process {
 
     @Override
     public String getPid() {
-        return "" + th32ProcessID.longValue();
+        return Long.toString(th32ProcessID.longValue());
     }
 
     public Win32Process(String filePath, String fileName, BufferedImage icon, DWORD th32ProcessID) {
@@ -81,14 +81,12 @@ public class Win32Process implements Process {
     }
 
     @Override
-    public Map<Long, InputStream> search(byte[]  
-        ... data) {
+    public Map<Long, InputStream> search(byte[]... data) {
         return search(null, data);
     }
 
     @Override
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[]  
-        ... data) {
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data) {
         return Win32ProcessTools.findBytesInProcessMemory(progListener, th32ProcessID, data);
     }
 }

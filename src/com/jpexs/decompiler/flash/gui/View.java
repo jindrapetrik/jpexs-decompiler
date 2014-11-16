@@ -521,7 +521,7 @@ public class View {
         expandTreeNodesRecursive(tree, parent, expand);
         tree.setUI(ui);
     }
-    
+
     private static void expandTreeNodesRecursive(JTree tree, TreePath parent, boolean expand) {
         TreeModel model = tree.getModel();
 
