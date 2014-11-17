@@ -520,15 +520,19 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             byte[] data;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
-                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                
+                RECT outrect = new RECT(swf.displayRect);
+                                                
                 if (tagObj instanceof FontTag) {
-                    width = FontTag.PREVIEWSIZE*20;
-                    height = FontTag.PREVIEWSIZE*20;
+                    outrect.Xmin=0;
+                    outrect.Ymin=0;
+                    outrect.Xmax = FontTag.PREVIEWSIZE*20;                    
+                    outrect.Ymax = FontTag.PREVIEWSIZE*20;
                 }
+                int width = outrect.getWidth();
+                int height = outrect.getHeight();
                 
-                sos2.writeRECT(swf.displayRect);
+                
+                sos2.writeRECT(outrect);
                 sos2.writeUI8(0);
                 sos2.writeUI8(frameRate);
                 sos2.writeUI16(frameCount); //framecnt
@@ -649,32 +653,45 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     }
                     if (tagObj instanceof FontTag) {
 
-                        int countGlyphsTotal = ((FontTag) tagObj).getGlyphShapeTable().size();
+                        FontTag ft=(FontTag)classicTag((Tag)tagObj);
+                        
+                        int countGlyphsTotal = ft.getGlyphShapeTable().size();
                         int countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal);
-                        int fontId = ((FontTag) tagObj).getFontId();
+                        int fontId = ft.getFontId();
                         int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
                         int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
                         int x = 0;
                         int y = 0;
                         int firstGlyphIndex = fontPageNum * SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW;
                         countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal - firstGlyphIndex);
-                        List<SHAPE> shapes=((FontTag) tagObj).getGlyphShapeTable();
+                        List<SHAPE> shapes=ft.getGlyphShapeTable();
                         int maxw = 0;
-                        for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
+                        for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {                            
                             RECT b = shapes.get(f).getBounds();
-                            int w=(int)(b.getWidth()/((FontTag) tagObj).getDivider());
+                            if(b.Xmin == Integer.MAX_VALUE){
+                                continue;
+                            }
+                            if(b.Ymin == Integer.MAX_VALUE){
+                                continue;
+                            }
+                            int w=(int)(b.getWidth()/ft.getDivider());
                             if(w>maxw){
                                 maxw = w;
-                            }
+                            }                           
+                            x++;
                         }
                         
-                        int BORDER = 5*20;
+                        x = 0;
                         
-                        int textHeight = height / rows;
-                        while(maxw*textHeight/1024 > width/cols-2*BORDER){
+                        int BORDER = 3*20;
+                        
+                        int textHeight = height / rows;                                                                 
+                        
+                        while(maxw*textHeight/1024.0 > width/cols-2*BORDER){
                             textHeight--;
                         }
                         
+                        MATRIX tmat=new MATRIX();
                         for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
                             if (x >= cols) {
                                 x = 0;
@@ -684,13 +701,13 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             TEXTRECORD tr = new TEXTRECORD();
                                                         
                             RECT b = shapes.get(f).getBounds();
-                            int xmin = b.Xmin == Integer.MAX_VALUE?0:(int)(b.Xmin/((FontTag) tagObj).getDivider());
+                            int xmin = b.Xmin == Integer.MAX_VALUE?0:(int)(b.Xmin/ft.getDivider());
                             xmin *= textHeight/1024.0;
-                            int ymin = b.Ymin == Integer.MAX_VALUE?0:(int)(b.Ymin/((FontTag) tagObj).getDivider());
+                            int ymin = b.Ymin == Integer.MAX_VALUE?0:(int)(b.Ymin/ft.getDivider());
                             ymin *= textHeight/1024.0;
-                            int w=(int)(b.getWidth()/((FontTag) tagObj).getDivider());
+                            int w=(int)(b.getWidth()/ft.getDivider());
                             w *= textHeight/1024.0;
-                            int h=(int)(b.getHeight()/((FontTag) tagObj).getDivider());
+                            int h=(int)(b.getHeight()/ft.getDivider());
                             h *= textHeight/1024.0;
                             
                             tr.fontId = fontId;
@@ -707,17 +724,17 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             
                             
                             
-                            double ga=((FontTag) tagObj).getGlyphAdvance(f);                            
-                            int cw=ga==-1?w:(int)(ga/((FontTag) tagObj).getDivider()*textHeight/1024);
+                            double ga=ft.getGlyphAdvance(f);                            
+                            int cw=ga==-1?w:(int)(ga/ft.getDivider()*textHeight/1024.0);
                             
-                            tr.glyphEntries[0].glyphAdvance = cw;
+                            tr.glyphEntries[0].glyphAdvance = 0;
                             tr.glyphEntries[0].glyphIndex = f;
                             rec.add(tr);                            
                                                                                     
-                            mat.translateX = x * width/ cols + width/cols/2 - w/2;
-                            mat.translateY = y * height / rows;
+                            tmat.translateX = x * width/ cols + width/ cols/2-w/2;
+                            tmat.translateY = y * height / rows + height / rows / 2;
                             new DefineTextTag(swf, 999 + f, new RECT(0, cw, ymin, ymin+h), new MATRIX(), rec).writeTag(sos2);
-                            new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null).writeTag(sos2);
+                            new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1 + f, 999 + f, tmat, null, 0, null, 0, null).writeTag(sos2);
                             x++;
                         }
                         new ShowFrameTag(swf).writeTag(sos2);

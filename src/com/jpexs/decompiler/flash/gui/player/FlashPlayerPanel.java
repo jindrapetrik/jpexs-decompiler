@@ -100,6 +100,9 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public synchronized int getTotalFrames() {
+        if(flash==null){
+            return 0;
+        }
         if(flash.getReadyState() == 4){
             return flash.getTotalFrames();
         }
