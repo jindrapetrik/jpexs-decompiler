@@ -1256,9 +1256,7 @@ public class Main {
                         checkForUpdates();
                         return null;
                     }
-                }.execute();
-                System.out.println("finished");
-
+                }.execute();                
             }
         }
     }
