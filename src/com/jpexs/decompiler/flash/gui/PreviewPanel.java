@@ -61,6 +61,7 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.Helper;
@@ -521,6 +522,12 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
                 int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
                 int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                
+                if (tagObj instanceof FontTag) {
+                    width = FontTag.PREVIEWSIZE*20;
+                    height = FontTag.PREVIEWSIZE*20;
+                }
+                
                 sos2.writeRECT(swf.displayRect);
                 sos2.writeUI8(0);
                 sos2.writeUI8(frameRate);
@@ -648,9 +655,26 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
                         int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
                         int x = 0;
-                        int y = 1;
+                        int y = 0;
                         int firstGlyphIndex = fontPageNum * SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW;
                         countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal - firstGlyphIndex);
+                        List<SHAPE> shapes=((FontTag) tagObj).getGlyphShapeTable();
+                        int maxw = 0;
+                        for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
+                            RECT b = shapes.get(f).getBounds();
+                            int w=(int)(b.getWidth()/((FontTag) tagObj).getDivider());
+                            if(w>maxw){
+                                maxw = w;
+                            }
+                        }
+                        
+                        int BORDER = 5*20;
+                        
+                        int textHeight = height / rows;
+                        while(maxw*textHeight/1024 > width/cols-2*BORDER){
+                            textHeight--;
+                        }
+                        
                         for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
                             if (x >= cols) {
                                 x = 0;
@@ -658,20 +682,41 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             }
                             List<TEXTRECORD> rec = new ArrayList<>();
                             TEXTRECORD tr = new TEXTRECORD();
-                            int textHeight = height / rows;
+                                                        
+                            RECT b = shapes.get(f).getBounds();
+                            int xmin = b.Xmin == Integer.MAX_VALUE?0:(int)(b.Xmin/((FontTag) tagObj).getDivider());
+                            xmin *= textHeight/1024.0;
+                            int ymin = b.Ymin == Integer.MAX_VALUE?0:(int)(b.Ymin/((FontTag) tagObj).getDivider());
+                            ymin *= textHeight/1024.0;
+                            int w=(int)(b.getWidth()/((FontTag) tagObj).getDivider());
+                            w *= textHeight/1024.0;
+                            int h=(int)(b.getHeight()/((FontTag) tagObj).getDivider());
+                            h *= textHeight/1024.0;
+                            
                             tr.fontId = fontId;
                             tr.styleFlagsHasFont = true;
                             tr.textHeight = textHeight;
+                            tr.xOffset=-xmin;
+                            tr.yOffset=0;
+                            tr.styleFlagsHasXOffset=true;
+                            tr.styleFlagsHasYOffset=true;
                             tr.glyphEntries = new GLYPHENTRY[1];
                             tr.styleFlagsHasColor = true;
                             tr.textColor = new RGB(0, 0, 0);
                             tr.glyphEntries[0] = new GLYPHENTRY();
-                            tr.glyphEntries[0].glyphAdvance = 0;
+                            
+                            
+                            
+                            double ga=((FontTag) tagObj).getGlyphAdvance(f);                            
+                            int cw=ga==-1?w:(int)(ga/((FontTag) tagObj).getDivider()*textHeight/1024);
+                            
+                            tr.glyphEntries[0].glyphAdvance = cw;
                             tr.glyphEntries[0].glyphIndex = f;
-                            rec.add(tr);
-                            mat.translateX = swf.displayRect.Xmin + x * width / cols;
-                            mat.translateY = swf.displayRect.Ymin + y * height / rows;
-                            new DefineTextTag(swf, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec).writeTag(sos2);
+                            rec.add(tr);                            
+                                                                                    
+                            mat.translateX = x * width/ cols + width/cols/2 - w/2;
+                            mat.translateY = y * height / rows;
+                            new DefineTextTag(swf, 999 + f, new RECT(0, cw, ymin, ymin+h), new MATRIX(), rec).writeTag(sos2);
                             new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null).writeTag(sos2);
                             x++;
                         }
@@ -861,7 +906,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 fos.flush();
             }
             if (flashPanel != null) {
-                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
+                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);                
             }
             showFlashViewerPanel();
         } catch (IOException | ActionParseException ex) {

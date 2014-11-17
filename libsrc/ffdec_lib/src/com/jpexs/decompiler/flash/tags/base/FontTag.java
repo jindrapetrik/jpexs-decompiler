@@ -55,7 +55,7 @@ import java.util.Set;
  */
 public abstract class FontTag extends CharacterTag implements AloneTag, DrawableTag {
 
-    protected final int previewSize = 500;
+    public static final int PREVIEWSIZE = 500;
 
     public FontTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
@@ -316,7 +316,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
-        return new RECT(0, (int) (previewSize * SWF.unitDivisor), 0, (int) (previewSize * SWF.unitDivisor));
+        return new RECT(0, (int) (PREVIEWSIZE * SWF.unitDivisor), 0, (int) (PREVIEWSIZE * SWF.unitDivisor));
     }
 
     @Override

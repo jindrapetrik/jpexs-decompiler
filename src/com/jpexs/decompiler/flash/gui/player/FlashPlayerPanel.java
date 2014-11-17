@@ -173,7 +173,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (bgColor != null) {
             setBackground(bgColor);
         }
-        flash.setMovie(flashName);        
+        flash.setMovie(flashName);  
         //play
         stopped = false;
 
@@ -181,7 +181,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public void close() throws IOException {
-
+        
     }
 
     @Override
