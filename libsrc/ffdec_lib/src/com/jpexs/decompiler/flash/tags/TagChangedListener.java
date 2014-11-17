@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.tags;
 
 /**
  *
  * @author JPEXS
  */
-public interface EventListener {
-
-    public void handleEvent(String event, Object data);
+public interface TagChangedListener {
+    
+    public void handleEvent(Tag tag);
 }

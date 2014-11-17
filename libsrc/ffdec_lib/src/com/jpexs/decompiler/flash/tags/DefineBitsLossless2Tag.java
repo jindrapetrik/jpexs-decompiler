@@ -66,6 +66,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 36;
 
+    private SerializableImage cachedImage;
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -127,6 +129,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = new ByteArrayRange(zlibOS.toByteArray());
         decompressed = false;
+        cachedImage = null;
         setModified(true);
     }
 
@@ -224,6 +227,9 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
         SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_ARGB);
         ALPHACOLORMAPDATA colorMapData = null;
         ALPHABITMAPDATA bitmapData = null;
@@ -252,6 +258,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 pos32aligned++;
             }
         }
+        cachedImage = bi;
         return bi;
     }
 }

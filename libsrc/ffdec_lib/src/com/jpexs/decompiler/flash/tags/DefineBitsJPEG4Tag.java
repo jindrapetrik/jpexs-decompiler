@@ -54,6 +54,8 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 90;
 
+    private SerializableImage cachedImage;
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -91,6 +93,9 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
         try {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
             SerializableImage img = image == null ? null : new SerializableImage(image);
@@ -106,6 +111,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
                     img2.setRGB(x, y, colorToInt(multiplyAlpha(intToColor(val))));
                 }
             }
+            cachedImage = img2;
             return img2;
         } catch (IOException ex) {
         }

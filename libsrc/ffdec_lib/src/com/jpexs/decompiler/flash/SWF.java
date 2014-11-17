@@ -261,7 +261,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public boolean isAS3;
     public Map<Integer, CharacterTag> characters = new HashMap<>();
     public List<ABCContainerTag> abcList;
-    public JPEGTablesTag jtt;
+    private JPEGTablesTag jtt;
     public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
     public static final double unitDivisor = 20;
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
@@ -287,6 +287,19 @@ public final class SWF implements SWFContainerItem, Timelined {
         return max + 1;
     }
 
+    public synchronized JPEGTablesTag getJtt() {
+        if (jtt == null) {
+            for (Tag t : tags) {
+                if (t instanceof JPEGTablesTag) {
+                    jtt = (JPEGTablesTag) t;
+                    break;
+                }
+            }
+        }
+        
+        return jtt;
+    }
+    
     public void fixCharactersOrder(boolean checkAll) {
         Set<Integer> addedCharacterIds = new HashSet<>();
         Set<CharacterTag> movedTags = new HashSet<>();

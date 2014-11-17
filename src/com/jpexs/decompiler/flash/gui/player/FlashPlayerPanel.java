@@ -100,10 +100,10 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public synchronized int getTotalFrames() {
-        if(flash==null){
+        if (flash == null) {
             return 0;
         }
-        if(flash.getReadyState() == 4){
+        if (flash.getReadyState() == 4) {
             return flash.getTotalFrames();
         }
         return 0;
@@ -176,7 +176,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (bgColor != null) {
             setBackground(bgColor);
         }
-        flash.setMovie(flashName);  
+        flash.setMovie(flashName);
         //play
         stopped = false;
 
@@ -184,7 +184,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public void close() throws IOException {
-        
+
     }
 
     @Override

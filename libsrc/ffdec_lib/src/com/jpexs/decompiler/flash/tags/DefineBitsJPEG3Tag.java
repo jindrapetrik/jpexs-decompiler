@@ -45,6 +45,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     public byte[] bitmapAlphaData;
 
     public static final int ID = 35;
+    
+    private SerializableImage cachedImage;
 
     @Override
     public int getCharacterId() {
@@ -64,6 +66,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             bitmapAlphaData = new byte[0];
         }
         imageData = new ByteArrayRange(data);
+        cachedImage = null;
         setModified(true);
     }
 
@@ -83,6 +86,9 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
         try {
             InputStream stream;
             if (SWF.hasErrorHeader(imageData)) {
@@ -104,6 +110,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
                     img2.setRGB(x, y, colorToInt(multiplyAlpha(intToColor(val))));
                 }
             }
+            cachedImage = img2;
             return img2;
         } catch (IOException ex) {
         }

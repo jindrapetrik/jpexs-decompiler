@@ -579,8 +579,8 @@ public class View {
 
         return false;
     }
-    
-     public static JTable autoResizeColWidth(final JTable table, final TableModel model) {
+
+    public static JTable autoResizeColWidth(final JTable table, final TableModel model) {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {

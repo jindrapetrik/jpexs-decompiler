@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
@@ -32,7 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.imageio.ImageIO;
 
-public class DefineBitsTag extends ImageTag {
+public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @SWFType(BasicType.UI16)
     public int characterID;
@@ -40,9 +39,9 @@ public class DefineBitsTag extends ImageTag {
     @SWFType(BasicType.UI8)
     public ByteArrayRange jpegData;
 
-    @Internal
-    private JPEGTablesTag jtt = null;
     public static final int ID = 6;
+
+    private SerializableImage cachedImage;
 
     @Override
     public void setImage(byte[] data) {
@@ -72,17 +71,6 @@ public class DefineBitsTag extends ImageTag {
         jpegData = sis.readByteRangeEx(sis.available(), "jpegData");
     }
 
-    private void getJPEGTables() {
-        if (jtt == null) {
-            for (Tag t : swf.tags) {
-                if (t instanceof JPEGTablesTag) {
-                    jtt = (JPEGTablesTag) t;
-                    break;
-                }
-            }
-        }
-    }
-
     @Override
     public InputStream getImageData() {
         return null;
@@ -90,10 +78,12 @@ public class DefineBitsTag extends ImageTag {
 
     @Override
     public SerializableImage getImage() {
-        getJPEGTables();
-        if ((jtt != null)) {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
+        if (swf.getJtt() != null) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] jttdata = jtt.jpegData;
+                byte[] jttdata = swf.getJtt().jpegData;
                 if (jttdata.length != 0) {
                     boolean jttError = SWF.hasErrorHeader(jttdata);
                     baos.write(jttdata, jttError ? 4 : 0, jttdata.length - (jttError ? 6 : 2));
@@ -101,7 +91,9 @@ public class DefineBitsTag extends ImageTag {
                 } else {
                     baos.write(jpegData.getArray(), jpegData.getPos(), jpegData.getLength());
                 }
-                return new SerializableImage(ImageIO.read(new ByteArrayInputStream(baos.toByteArray())));
+                SerializableImage ret = new SerializableImage(ImageIO.read(new ByteArrayInputStream(baos.toByteArray())));
+                cachedImage = ret;
+                return ret;
             } catch (IOException ex) {
                 return null;
             }
@@ -136,5 +128,10 @@ public class DefineBitsTag extends ImageTag {
     @Override
     public String getImageFormat() {
         return "jpg";
+    }
+
+    @Override
+    public void handleEvent(Tag tag) {
+        cachedImage = null;
     }
 }

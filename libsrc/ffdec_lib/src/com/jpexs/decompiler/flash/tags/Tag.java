@@ -70,6 +70,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
     @Internal
     private ByteArrayRange originalRange;
 
+    private final HashSet<TagChangedListener> listeners = new HashSet<>();
+
     public String getTagName() {
         return tagName;
     }
@@ -407,6 +409,23 @@ public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem,
 
     public void setModified(boolean value) {
         modified = value;
+        if (value) {
+            informListeners();
+        }
+    }
+
+    public final void addEventListener(TagChangedListener listener) {
+        listeners.add(listener);
+    }
+
+    public final void removeEventListener(TagChangedListener listener) {
+        listeners.remove(listener);
+    }
+
+    protected void informListeners() {
+        for (TagChangedListener listener : listeners) {
+            listener.handleEvent(this);
+        }
     }
 
     public void createOriginalData() {
