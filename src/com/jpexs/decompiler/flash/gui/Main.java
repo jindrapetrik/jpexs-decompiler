@@ -589,7 +589,7 @@ public class Main {
             case SAVE:
             case SAVEAS:
                 if (swf.file != null) {
-                    ext = Path.getExtension(swf.file);
+                    ext = Path.getExtension(swf.file);                    
                 }
                 break;
             case EXE:
@@ -600,12 +600,12 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter" + extension);
+                return AppStrings.translate("filter.swf");
             }
         };
         if (!swf.gfx) {

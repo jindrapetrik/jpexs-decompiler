@@ -224,57 +224,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         return false;
     }
 
-    private JTable autoResizeColWidth(final JTable table, final TableModel model) {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                table.setModel(model);
-
-                int margin = 5;
-
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    int vColIndex = i;
-                    DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
-                    TableColumn col = colModel.getColumn(vColIndex);
-                    int width;
-
-                    // Get width of column header
-                    TableCellRenderer renderer = col.getHeaderRenderer();
-
-                    if (renderer == null) {
-                        renderer = table.getTableHeader().getDefaultRenderer();
-                    }
-
-                    Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
-
-                    width = comp.getPreferredSize().width;
-
-                    // Get maximum width of column data
-                    for (int r = 0; r < table.getRowCount(); r++) {
-                        renderer = table.getCellRenderer(r, vColIndex);
-                        comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
-                                r, vColIndex);
-                        width = Math.max(width, comp.getPreferredSize().width);
-                    }
-
-                    // Add margin
-                    width += 2 * margin;
-
-                    // Set the width
-                    col.setPreferredWidth(width);
-                }
-
-                ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
-                        SwingConstants.LEFT);
-
-                // table.setAutoCreateRowSorter(true);
-                table.getTableHeader().setReorderingAllowed(false);
-            }
-        });
-
-        return table;
-    }
+    
 
     public void setAbc(ABC abc) {
         this.abc = abc;
@@ -284,28 +234,28 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public void updateConstList() {
         switch (constantTypeList.getSelectedIndex()) {
             case 0:
-                autoResizeColWidth(constantTable, new UIntTableModel(abc));
+                View.autoResizeColWidth(constantTable, new UIntTableModel(abc));
                 break;
             case 1:
-                autoResizeColWidth(constantTable, new IntTableModel(abc));
+                View.autoResizeColWidth(constantTable, new IntTableModel(abc));
                 break;
             case 2:
-                autoResizeColWidth(constantTable, new DoubleTableModel(abc));
+                View.autoResizeColWidth(constantTable, new DoubleTableModel(abc));
                 break;
             case 3:
-                autoResizeColWidth(constantTable, new DecimalTableModel(abc));
+                View.autoResizeColWidth(constantTable, new DecimalTableModel(abc));
                 break;
             case 4:
-                autoResizeColWidth(constantTable, new StringTableModel(abc));
+                View.autoResizeColWidth(constantTable, new StringTableModel(abc));
                 break;
             case 5:
-                autoResizeColWidth(constantTable, new NamespaceTableModel(abc));
+                View.autoResizeColWidth(constantTable, new NamespaceTableModel(abc));
                 break;
             case 6:
-                autoResizeColWidth(constantTable, new NamespaceSetTableModel(abc));
+                View.autoResizeColWidth(constantTable, new NamespaceSetTableModel(abc));
                 break;
             case 7:
-                autoResizeColWidth(constantTable, new MultinameTableModel(abc));
+                View.autoResizeColWidth(constantTable, new MultinameTableModel(abc));
                 break;
         }
         //DefaultTableColumnModel colModel  = (DefaultTableColumnModel) constantTable.getColumnModel();
@@ -513,7 +463,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         constantTypeList = new JComboBox<>(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
         constantTable = new JTable();
         if (abc != null) {
-            autoResizeColWidth(constantTable, new UIntTableModel(abc));
+            View.autoResizeColWidth(constantTable, new UIntTableModel(abc));
         }
         constantTable.setAutoCreateRowSorter(true);
 

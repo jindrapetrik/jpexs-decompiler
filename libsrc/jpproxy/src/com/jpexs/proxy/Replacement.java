@@ -1,5 +1,6 @@
 package com.jpexs.proxy;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.regex.Pattern;
@@ -45,6 +46,16 @@ public class Replacement {
         return Pattern.matches(pat, url);
     }
 
+    private static String byteCountStr(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
     /**
      * Returns a string representation of the object.
      *
@@ -54,10 +65,16 @@ public class Replacement {
     public String toString() {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
+        long size = new File(targetFile).length();
+        String sizeS = byteCountStr(size, false);
+        while (sizeS.length() < 12) {
+            sizeS = " " + sizeS;
+        }
+
         if (lastAccess == null) {
-            return "         " + urlPattern;
+            return "        "+" | " + sizeS + " | " + urlPattern;
         } else {
-            return format.format(lastAccess.getTime()) + " " + urlPattern;
+            return format.format(lastAccess.getTime()) + " | " + sizeS + " | " + urlPattern;
         }
     }
 }

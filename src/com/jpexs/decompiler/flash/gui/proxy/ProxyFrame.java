@@ -16,13 +16,19 @@
  */
 package com.jpexs.decompiler.flash.gui.proxy;
 
+import com.jpexs.decompiler.flash.RetryTask;
+import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppFrame;
+import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.GuiAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
+import com.jpexs.decompiler.flash.gui.SaveFileMode;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;
 import com.jpexs.proxy.Replacement;
@@ -33,30 +39,57 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.RowSorter;
+import javax.swing.SwingConstants;
+import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import org.pushingpixels.substance.api.renderers.SubstanceDefaultTableCellRenderer;
 
 /**
  * Frame with Proxy
@@ -70,10 +103,12 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     static final String ACTION_CLEAR = "CLEAR";
     static final String ACTION_RENAME = "RENAME";
     static final String ACTION_REMOVE = "REMOVE";
+    static final String ACTION_COPYURL = "COPYURL";
+    static final String ACTION_SAVEAS = "SAVEAS";
+    static final String ACTION_REPLACE = "REPLACE";
 
-    private MainFrame mainFrame;
-    private JList<Replacement> swfList;
-    private SWFListModel listModel;
+          
+    private JTable replacementsTable;   
     private JButton switchButton = new JButton(translate("proxy.start"));
     private boolean started = false;
     private JTextField portField = new JTextField("55555");
@@ -99,24 +134,106 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     public void setPort(int port) {
         portField.setText(Integer.toString(port));
     }
+    
+    
+    
+    private static class SizeItem implements Comparable<SizeItem>{
+        String file;
+        public SizeItem(String file){
+            this.file = file;
+        }
 
+        @Override
+        public String toString() {
+            return Helper.byteCountStr(new File(file).length(), false);
+        }                
+
+        @Override
+        public int compareTo(SizeItem o) {           
+            return (int)(new File(file).length() - new File(o.file).length());
+        }
+        
+    }
+    
+    DefaultTableModel tableModel;
+    private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");    
+
+    List<Replacement> reps;
     /**
      * Constructor
      *
      * @param mainFrame
      */
     public ProxyFrame(final MainFrame mainFrame) {
+        
+        
+        final String[] columnNames=new String[]{
+            translate("column.accessed"),
+            translate("column.size"),
+            translate("column.url")};            
+        
+        reps = Configuration.getReplacements();
+        
+        Object data[][] = new Object[reps.size()][3];
+                     
+        for(int i=0;i<reps.size();i++){
+            Replacement r = reps.get(i);
+            data[i][0] = r.lastAccess == null?"":format.format(r.lastAccess.getTime());
+            data[i][1] = new SizeItem(r.targetFile);
+            data[i][2] = r.urlPattern;
+        }
+        
+        tableModel = new DefaultTableModel(data, columnNames){
 
-        this.mainFrame = mainFrame;
-        listModel = new SWFListModel(Configuration.getReplacements());
-        swfList = new JList<>(listModel);
-        swfList.addMouseListener(this);
-        swfList.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                Class classes[] = new Class[]{String.class,SizeItem.class,String.class};
+                return classes[columnIndex];
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            
+            
+            
+        };        
+        replacementsTable = new JTable(tableModel);
+        
+        DefaultTableCellRenderer tcr=new DefaultTableCellRenderer();  
+        tcr.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        
+        replacementsTable.setDefaultRenderer(String.class, new DefaultTableCellRenderer());
+        replacementsTable.setDefaultRenderer(SizeItem.class, tcr);                
+        
+        
+        replacementsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);        
+        
+        replacementsTable.setRowSelectionAllowed(true);
+            
+        
+        DefaultTableColumnModel colModel = (DefaultTableColumnModel) replacementsTable.getColumnModel();
+        colModel.getColumn(0).setMaxWidth(100);
+        
+        colModel.getColumn(1).setMaxWidth(200);
+        
+        
+        
+        replacementsTable.setAutoCreateRowSorter(true);
+                       
+        
+        replacementsTable.setAutoCreateRowSorter(false);
+        
+        
+        replacementsTable.addMouseListener(this);
+        replacementsTable.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switchButton.addActionListener(this);
         switchButton.setActionCommand(ACTION_SWITCH_STATE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(new JScrollPane(swfList), BorderLayout.CENTER);
+        cnt.add(new JScrollPane(replacementsTable), BorderLayout.CENTER);
 
         portField.setPreferredSize(new Dimension(80, portField.getPreferredSize().height));
         JPanel buttonsPanel = new JPanel();
@@ -129,24 +246,40 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         JPanel buttonsPanel23 = new JPanel();
         buttonsPanel23.setLayout(new BoxLayout(buttonsPanel23, BoxLayout.Y_AXIS));
 
-        JPanel buttonsPanel2 = new JPanel();
-        buttonsPanel2.setLayout(new FlowLayout());
+        JPanel buttonsPanel21 = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("open"));
         openButton.setActionCommand(ACTION_OPEN);
         openButton.addActionListener(this);
-        buttonsPanel2.add(openButton);
+        buttonsPanel21.add(openButton);
         JButton clearButton = new JButton(translate("clear"));
         clearButton.setActionCommand(ACTION_CLEAR);
         clearButton.addActionListener(this);
-        buttonsPanel2.add(clearButton);
+        buttonsPanel21.add(clearButton);
         JButton renameButton = new JButton(translate("rename"));
         renameButton.setActionCommand(ACTION_RENAME);
         renameButton.addActionListener(this);
-        buttonsPanel2.add(renameButton);
+        buttonsPanel21.add(renameButton);
         JButton removeButton = new JButton(translate("remove"));
         removeButton.setActionCommand(ACTION_REMOVE);
         removeButton.addActionListener(this);
-        buttonsPanel2.add(removeButton);
+        buttonsPanel21.add(removeButton);
+
+        //JPanel buttonsPanel22 = new JPanel(new FlowLayout());
+        
+        JButton copyUrlButton = new JButton(translate("copy.url"));
+        copyUrlButton.setActionCommand(ACTION_COPYURL);
+        copyUrlButton.addActionListener(this);
+        buttonsPanel21.add(copyUrlButton);
+
+        JButton saveAsButton = new JButton(translate("save.as"));
+        saveAsButton.setActionCommand(ACTION_SAVEAS);
+        saveAsButton.addActionListener(this);
+        buttonsPanel21.add(saveAsButton);
+
+        JButton replaceButton = new JButton(translate("replace"));
+        replaceButton.setActionCommand(ACTION_REPLACE);
+        replaceButton.addActionListener(this);
+        buttonsPanel21.add(replaceButton);
 
         JPanel buttonsPanel3 = new JPanel();
         buttonsPanel3.setLayout(new FlowLayout());
@@ -156,11 +289,12 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         //buttonsPanel3.add(sniffJSCheckBox);
         //buttonsPanel3.add(sniffXMLCheckBox);
 
-        buttonsPanel23.add(buttonsPanel2);
+        buttonsPanel23.add(buttonsPanel21);
+        //buttonsPanel23.add(buttonsPanel22);
         buttonsPanel23.add(buttonsPanel3);
 
         cnt.add(buttonsPanel23, BorderLayout.SOUTH);
-        setSize(400, 300);
+        setSize(800, 500);
         View.centerScreen(this);
         View.setWindowIcon(this);
         setTitle(translate("dialog.title"));
@@ -192,12 +326,27 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     }
 
     private void open() {
-        if (swfList.getSelectedIndex() > -1) {
-            Replacement r = listModel.getElementAt(swfList.getSelectedIndex());
+        if (replacementsTable.getSelectedRow()>-1){           
+            Replacement r = reps.get(replacementsTable.getRowSorter().convertRowIndexToModel(replacementsTable.getSelectedRow()));
             Main.openFile(r.targetFile, r.urlPattern);
         }
     }
 
+    
+    private String selectExportDir() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("export.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+            return selFile;
+        }
+        return null;
+    }
+    
     /**
      * Method handling actions from buttons
      *
@@ -205,23 +354,160 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        int sel[] = replacementsTable.getSelectedRows();   
+        for(int i=0;i<sel.length;i++){
+            sel[i] = replacementsTable.getRowSorter().convertRowIndexToModel(sel[i]);
+        }
         switch (e.getActionCommand()) {
             case ACTION_OPEN:
                 open();
                 break;
+            case ACTION_SAVEAS:                                             
+                if (sel.length == 1) {                    
+                    Replacement r = reps.get(sel[0]);
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+                    String n=r.urlPattern;
+                    if(n.contains("?")){
+                        n = n.substring(0,n.indexOf("?"));
+                    }
+                    if(n.contains("/")){
+                        n=n.substring(n.lastIndexOf("/"));
+                    }
+                    n = Helper.makeFileName(n);
+                    fc.setSelectedFile(new File(Configuration.lastSaveDir.get(),n));
+                    String ext = ".swf";
+                    final String extension = ext;
+                    FileFilter swfFilter = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return AppStrings.translate("filter" + extension);
+                        }
+                    };
+                    fc.setFileFilter(swfFilter);
+                    fc.setAcceptAllFileFilterUsed(true);                    
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+                        File file = Helper.fixDialogFile(fc.getSelectedFile());
+                        try {
+                            Files.copy(new File(r.targetFile).toPath(), file.toPath(), REPLACE_EXISTING);
+                        } catch (IOException ex) {
+                            View.showMessageDialog(this, translate("error.save.as")+"\r\n"+ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }else{
+                    GuiAbortRetryIgnoreHandler handler=new GuiAbortRetryIgnoreHandler();
+                    File exportDir = new File(selectExportDir());
+                    for(int s:sel){
+                        final Replacement r = reps.get(s);
+                        String n=r.urlPattern;
+                        if(n.contains("?")){
+                            n = n.substring(0,n.indexOf("?"));
+                        }
+                        if(n.contains("/")){
+                            n=n.substring(n.lastIndexOf("/"));
+                        }
+                        n = Helper.makeFileName(n);
+                        int c = 2;
+                        String n2=n;
+                        while(new File(exportDir,n2).exists()){
+                            if(n.contains(".")){
+                                n2 = n.substring(0,n.lastIndexOf("."))+c+n.substring(n.lastIndexOf("."));
+                                c++;
+                            }else{
+                                n2 = n + c + ".swf";
+                                c++;
+                            }
+                        }
+                        
+                        final File outfile = new File(exportDir,n2);
+                        try {
+                            new RetryTask(new RunnableIOEx() {
+                                @Override
+                                public void run() throws IOException {                                    
+                                    Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), REPLACE_EXISTING);                                    
+                                }
+                            }, handler).run();                        
+                        } catch (IOException ex) {
+                            break;
+                        }
+                    }
+                }
+                break;
+            case ACTION_REPLACE:                
+                if (sel.length>0) {
+                    Replacement r = reps.get(sel[0]);
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                    String n=r.urlPattern;
+                    if(n.contains("?")){
+                        n = n.substring(0,n.indexOf("?"));
+                    }
+                    if(n.contains("/")){
+                        n=n.substring(n.lastIndexOf("/"));
+                    }                    
+                    String ext = ".swf";
+                    final String extension = ext;
+                    FileFilter swfFilter = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return AppStrings.translate("filter" + extension);
+                        }
+                    };
+                    fc.setFileFilter(swfFilter);
+                    fc.setAcceptAllFileFilterUsed(true);                    
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+                        File file = Helper.fixDialogFile(fc.getSelectedFile());
+                        try {
+                            Files.copy(file.toPath(),new File(r.targetFile).toPath(), REPLACE_EXISTING);
+                            tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
+                        } catch (IOException ex) {
+                            View.showMessageDialog(f, translate("error.replace")+"\r\n"+ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+                break;
+            case ACTION_COPYURL:                
+                String copyText="";
+                for (int sc:sel) {
+                    Replacement r = reps.get(sc);
+                    if(!copyText.isEmpty()){
+                        copyText += System.lineSeparator();                        
+                    }                                      
+                    copyText += r.urlPattern;
+                }
+                
+                if(!copyText.isEmpty()){
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    StringSelection stringSelection = new StringSelection(copyText);
+                    clipboard.setContents(stringSelection, null);
+                }
+                break;
             case ACTION_RENAME:
-                if (swfList.getSelectedIndex() > -1) {
-                    Replacement r = listModel.getElementAt(swfList.getSelectedIndex());
+                if (sel.length>0) {
+                    Replacement r = reps.get(sel[0]);
                     String s = View.showInputDialog("URL", r.urlPattern);
                     if (s != null) {
                         r.urlPattern = s;
-                        listModel.dataChanged(swfList.getSelectedIndex());
+                        tableModel.setValueAt(s, sel[0], 2/*url*/);                        
                     }
                 }
                 break;
             case ACTION_CLEAR:
-                for (int i = 0; i < listModel.getSize(); i++) {
-                    Replacement r = listModel.getElementAt(i);
+                for (Replacement r:reps) {
                     File f;
                     try {
                         f = (new File(Main.tempFile(r.targetFile)));
@@ -231,28 +517,22 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     } catch (IOException ex) {
                         Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
                 }
-                listModel.clear();
+                tableModel = new DefaultTableModel(0,3);
+                replacementsTable.setModel(tableModel);
+                reps.clear();
                 break;
             case ACTION_REMOVE:
-                int lastIndex = -1;
-                for (int k = listModel.getSize() - 1; k >= 0; k--) {
-                    if (swfList.isSelectedIndex(k)) {
-                        Replacement r = listModel.removeURL(k);
-                        File f = (new File(r.targetFile));
-                        if (f.exists()) {
-                            f.delete();
-                        }
-                        lastIndex = k;
-                    }
-                }
-                if (lastIndex >= listModel.getSize()) {
-                    lastIndex--;
-                }
-                if (lastIndex > -1) {
-                    swfList.setSelectedIndex(lastIndex);
-                }
+                
+                Arrays.sort(sel);
+                for(int i=sel.length-1;i>=0;i--){                          
+                    tableModel.removeRow(sel[i]);
+                    Replacement r = reps.remove(sel[i]);
+                    File f = (new File(r.targetFile));
+                    if (f.exists()) {
+                        f.delete();
+                    }                    
+                }                                                              
                 break;
             case ACTION_SWITCH_STATE:
                 Main.switchProxy();
@@ -285,7 +565,11 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
-            Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this);
+            if(!Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this)){
+                JOptionPane.showMessageDialog(this, translate("error.start.server"),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
+                started = false;
+                return;
+            }
             switchButton.setText(translate("proxy.stop"));
             portField.setEditable(false);
         } else {
@@ -302,7 +586,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getSource() == swfList) {
+        if (e.getSource() == replacementsTable) {
             if (e.getClickCount() == 2) {
                 open();
             }
@@ -374,7 +658,14 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
         byte[] result = null;
 
-        if (!listModel.contains(url)) {
+        boolean cont = false;
+        for(Replacement r:reps){
+            if(r.matches(url)){
+                cont = true;
+                break;
+            }
+        }
+        if (!cont) {
             try {
                 byte[] hdr = new byte[3];
                 data.read(hdr);
@@ -394,7 +685,12 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
                 Replacement r = new Replacement(url, tempFilePath);
                 r.lastAccess = Calendar.getInstance();
-                listModel.addURL(r);
+                reps.add(r);
+                tableModel.addRow(new Object[]{
+                    r.lastAccess == null?"":format.format(r.lastAccess.getTime()),
+                    new SizeItem(r.targetFile),
+                    r.urlPattern
+                });
             } catch (IOException e) {
             }
         }
@@ -429,6 +725,9 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
     @Override
     public void replaced(Replacement replacement, String url, String contentType) {
-        listModel.dataChanged(listModel.indexOf(replacement));
+        int index = reps.indexOf(replacement);
+        tableModel.setValueAt(replacement.lastAccess == null?"":format.format(replacement.lastAccess.getTime()), index, 0);
+        tableModel.setValueAt(new SizeItem(replacement.targetFile), index, 1);
+        tableModel.setValueAt(replacement.urlPattern, index, 2);
     }
 }
