@@ -305,6 +305,63 @@ public class TagTreeModel implements TreeModel {
 
         return null;
     }
+    
+    public TreeItem getFolderNode(SWF swf,String folderType) {
+        int childCount = getChildCount(swf);
+        for (int i = 0; i < childCount; i++) {
+            TreeItem child = getChild(swf, i);
+            if (child instanceof FolderItem) {
+                FolderItem folder = (FolderItem) child;
+                if (folder.getName().equals(folderType)) {
+                    return folder;
+                }
+            }
+        }
+
+        return null;
+    }
+    
+    
+    private Frame searchForFrame(Object parent,SWF swf,Timelined t, int frame){
+        int childCount = getChildCount(parent);
+        Frame lastVisibleFrame = null;
+        for (int i = 0; i < childCount; i++) {
+            TreeItem child = getChild(parent, i);
+            if((child instanceof DefineSpriteTag)&& child==t){
+                Frame si=searchForFrame(child, swf, t,frame);
+                if(si!=null){
+                    return si;
+                }
+            }
+            if(child instanceof Frame){
+                Frame f = (Frame)child;
+                if(f.frame<=frame){
+                    lastVisibleFrame = f;
+                }
+            }
+            if (child instanceof FolderItem) {
+                FolderItem folder = (FolderItem) child;
+                if (folder.getName().equals(FOLDER_FRAMES) && t==swf) {
+                    Frame si=searchForFrame(folder, swf, t,frame);
+                    if(si!=null){
+                        return si;
+                    }
+                }
+                if(folder.getName().equals(FOLDER_SPRITES)){
+                    Frame si=searchForFrame(folder, swf, t,frame);
+                    if(si!=null){
+                        return si;
+                    }
+                }
+            }            
+        }
+        return lastVisibleFrame;
+    }
+    
+    public Frame getFrame(SWF swf,Timelined t, int frame) {                
+        return searchForFrame(swf, swf, t,frame);
+    }
+    
 
     private List<TreeItem> searchTag(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;

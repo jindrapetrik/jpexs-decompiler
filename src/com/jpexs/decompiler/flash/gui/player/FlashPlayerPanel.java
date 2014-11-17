@@ -100,7 +100,10 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public synchronized int getTotalFrames() {
-        return flash.getTotalFrames();
+        if(flash.getReadyState() == 4){
+            return flash.getTotalFrames();
+        }
+        return 0;
     }
 
     @Override
@@ -166,11 +169,11 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public synchronized void displaySWF(String flashName, Color bgColor, int frameRate) {
 
         zoom = 1.0;
-        //this.frameRate = frameRate;
+        this.frameRate = frameRate;
         if (bgColor != null) {
             setBackground(bgColor);
         }
-        flash.setMovie(flashName);
+        flash.setMovie(flashName);        
         //play
         stopped = false;
 

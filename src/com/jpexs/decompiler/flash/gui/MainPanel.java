@@ -1075,6 +1075,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    public void gotoFrame(int frame){
+        TreeItem treeItem = (TreeItem) tagTree.getLastSelectedPathComponent();
+        if (treeItem == null) {
+            return;
+        }
+        if(treeItem instanceof Timelined){
+            Timelined t = (Timelined)treeItem;
+            Timeline tim = t.getTimeline();
+            Frame f = ((TagTreeModel)tagTree.getModel()).getFrame(treeItem.getSwf(), t, frame);
+            if(f!=null){
+                setTagTreeSelectedNode(f);
+            }
+        }
+    }
+    
     public void gotoDocumentClass(SWF swf) {
         if (swf == null) {
             return;

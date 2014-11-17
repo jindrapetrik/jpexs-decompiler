@@ -218,4 +218,17 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     public CLIPACTIONS getClipActions() {
         return null;
     }
+
+    @Override
+    public void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException {
+        MATRIX old=matrix;
+        matrix = m;
+        boolean mod=isModified();
+        setModified(true);
+        super.writeTag(sos);
+        setModified(mod);
+        matrix = old;
+    }
+    
+    
 }

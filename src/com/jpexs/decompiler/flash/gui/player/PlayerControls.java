@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -34,9 +37,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.BoxLayout;
@@ -46,6 +53,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -68,7 +76,9 @@ public class PlayerControls extends JPanel implements ActionListener {
     private JProgressBar progress;
     private final Timer timer;
     private final JLabel timeLabel;
+    private final JLabel frameLabel;
     private final JLabel totalTimeLabel;
+    private final JLabel totalFrameLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
 
@@ -83,7 +93,20 @@ public class PlayerControls extends JPanel implements ActionListener {
     public static final int ZOOM_DECADE_STEPS = 10;
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
 
-    public PlayerControls(MediaDisplay display) {
+    private static String underline(String s){
+        return "<html><font color=\"#000099\"><u>"+s+"</u></font></html>";
+    }
+
+    private static Font underlinedFont=null;
+    private static Font notUnderlinedFont=null;
+    static{
+        notUnderlinedFont = new JLabel().getFont();
+        Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
+        fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        underlinedFont= notUnderlinedFont.deriveFont(fontAttributes);
+    }
+    
+    public PlayerControls(final MainPanel mainPanel,MediaDisplay display) {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -137,10 +160,59 @@ public class PlayerControls extends JPanel implements ActionListener {
         playbackControls = new JPanel();
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
-        timeLabel = new JLabel("00:00.00");
-        totalTimeLabel = new JLabel("00:00.00");
-        controlPanel.add(timeLabel, BorderLayout.WEST);
-        controlPanel.add(totalTimeLabel, BorderLayout.EAST);
+        frameLabel = new JLabel("0",SwingConstants.RIGHT);        
+        frameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        frameLabel.addMouseMotionListener(new MouseMotionAdapter() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                
+            }
+            
+        });
+                
+        Dimension min=new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"),frameLabel.getPreferredSize().height);
+        frameLabel.setMinimumSize(min);
+        frameLabel.setPreferredSize(min);
+        
+        frameLabel.addMouseListener(new MouseAdapter() {           
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                frameLabel.setFont(underlinedFont);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                frameLabel.setFont(notUnderlinedFont);
+            }
+            
+                     
+            
+            
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int gotoFrame = PlayerControls.this.display.getCurrentFrame();
+                if(gotoFrame>0){
+                    mainPanel.gotoFrame(gotoFrame);
+                }
+            }
+            
+        });
+        timeLabel = new JLabel("(00:00.00)");        
+        totalTimeLabel = new JLabel("(00:00.00)");
+        totalFrameLabel = new JLabel("0");
+        
+        JPanel currentPanel=new JPanel(new FlowLayout());
+        currentPanel.add(frameLabel);
+        currentPanel.add(timeLabel);
+        JPanel totalPanel=new JPanel(new FlowLayout());
+        totalPanel.add(totalFrameLabel);
+        totalPanel.add(totalTimeLabel);
+        
+        controlPanel.add(currentPanel, BorderLayout.WEST);
+        controlPanel.add(totalPanel, BorderLayout.EAST);
         playbackControls.setLayout(new BoxLayout(playbackControls, BoxLayout.Y_AXIS));
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
@@ -230,9 +302,11 @@ public class PlayerControls extends JPanel implements ActionListener {
                     progress.setValue(currentFrame);
                     progress.setIndeterminate(false);
                 }
-                if (frameRate != 0) {
-                    timeLabel.setText(formatMs((currentFrame * 1000) / frameRate));
-                    totalTimeLabel.setText(formatMs(((totalFrames - 1) * 1000) / frameRate));
+                frameLabel.setText((""+(currentFrame+1)));
+                totalFrameLabel.setText(""+totalFrames);
+                if (frameRate != 0) {                    
+                    timeLabel.setText("("+formatMs((currentFrame * 1000) / frameRate)+")");
+                    totalTimeLabel.setText("("+formatMs(((totalFrames - 1) * 1000) / frameRate)+")");
                 }
                 if (totalFrames <= 1 && playbackControls.isVisible()) {
                     playbackControls.setVisible(false);

@@ -409,4 +409,15 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
             return null;
         }
     }
+    
+    @Override
+    public void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException {
+        MATRIX old=matrix;
+        matrix = m;
+        boolean mod=isModified();
+        setModified(true);
+        super.writeTag(sos);
+        setModified(mod);
+        matrix = old;
+    }
 }

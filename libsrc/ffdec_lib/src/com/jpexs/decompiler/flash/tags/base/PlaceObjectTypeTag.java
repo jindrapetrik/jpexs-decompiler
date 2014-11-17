@@ -12,14 +12,17 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -61,4 +64,6 @@ public interface PlaceObjectTypeTag {
     public int getRatio();
 
     public CLIPACTIONS getClipActions();
+    
+    public void writeTagWithMatrix(SWFOutputStream sos,MATRIX m) throws IOException;
 }

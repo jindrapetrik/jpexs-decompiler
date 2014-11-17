@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -107,6 +108,8 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
+    
+    
     private float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
@@ -160,21 +163,7 @@ public class MATRIX implements Serializable {
     public int getScaleY() {
         return (hasScale ? (scaleY) : (1 << 16));
     }
-
-    public MATRIX merge(MATRIX m) {
-        MATRIX ret = new MATRIX();
-        ret.translateX = m.translateX + this.translateX;
-        ret.translateY = m.translateY + this.translateY;
-
-        ret.scaleX = (m.hasScale ? m.scaleX : 1) * (this.hasScale ? this.scaleX : 1);
-        ret.scaleY = (m.hasScale ? m.scaleY : 1) * (this.hasScale ? this.scaleY : 1);
-        ret.rotateSkew0 = m.rotateSkew0 + this.rotateSkew0;
-        ret.rotateSkew1 = m.rotateSkew1 + this.rotateSkew1;
-        ret.hasScale = true;
-        ret.hasRotate = true;
-        return ret;
-    }
-
+  
     public boolean isEmpty() {
         return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
     }

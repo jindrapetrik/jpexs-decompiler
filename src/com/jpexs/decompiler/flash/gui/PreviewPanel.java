@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -280,7 +282,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
              flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(new PlayerControls(flashPanel), BorderLayout.SOUTH);
+            flashPlayPanel2.add(new PlayerControls(mainPanel,flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
@@ -300,7 +302,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
         previewCnt.add(imagePanel, BorderLayout.CENTER);
-        previewCnt.add(imagePlayControls = new PlayerControls(imagePanel), BorderLayout.SOUTH);
+        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel,imagePanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -509,6 +511,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             if (tagObj instanceof DefineSoundTag) {
                 frameCount = 1;
             }
+            
+            if(tagObj instanceof DefineSpriteTag){
+                frameCount = ((DefineSpriteTag)tagObj).frameCount;
+            }
 
             byte[] data;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -588,6 +594,16 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     new ShowFrameTag(swf).writeTag(sos2);
                 } else {
 
+                    boolean isSprite=false;
+                    if(tagObj instanceof DefineSpriteTag){
+                        isSprite = true;
+                    }
+                    int chtId = 0;
+                    if (tagObj instanceof CharacterTag) {
+                        chtId = ((CharacterTag) tagObj).getCharacterId();
+                    }
+                    
+                    
                     if (tagObj instanceof DefineBitsTag) {
                         JPEGTablesTag jtt = swf.jtt;
                         if (jtt != null) {
@@ -598,16 +614,16 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         Set<Integer> needed = new HashSet<>();
                         ((Tag) tagObj).getNeededCharactersDeep(needed);
                         for (int n : needed) {
+                            if(isSprite && chtId == n){
+                                continue;
+                            }
                             classicTag(swf.characters.get(n)).writeTag(sos2);
                         }
                     }
 
                     classicTag((Tag) tagObj).writeTag(sos2);
 
-                    int chtId = 0;
-                    if (tagObj instanceof CharacterTag) {
-                        chtId = ((CharacterTag) tagObj).getCharacterId();
-                    }
+                    
 
                     MATRIX mat = new MATRIX();
                     mat.hasRotate = false;
@@ -804,6 +820,27 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             new ShowFrameTag(swf).writeTag(sos2);
                             first = false;
                         }
+                    } else if(tagObj instanceof DefineSpriteTag){
+                        DefineSpriteTag s=(DefineSpriteTag)tagObj;
+                        Tag lastTag = null;
+                        for(Tag t:s.subTags){
+                            if(t instanceof EndTag){
+                                break;
+                            } else if(t instanceof PlaceObjectTypeTag){
+                                PlaceObjectTypeTag pt=(PlaceObjectTypeTag)t;
+                                MATRIX m = pt.getMatrix();
+                                MATRIX m2 = new Matrix(m).preConcatenate(new Matrix(mat)).toMATRIX();
+                                pt.writeTagWithMatrix(sos2, m2);
+                                lastTag = t;
+                            }
+                            else{                                
+                                t.writeTag(sos2);
+                                lastTag = t;
+                            }
+                        }
+                        if(!s.subTags.isEmpty() && (lastTag!=null)&&(!(lastTag instanceof ShowFrameTag))){
+                            new ShowFrameTag(swf).writeTag(sos2);
+                        }
                     } else {
                         new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);
                         new ShowFrameTag(swf).writeTag(sos2);
@@ -823,7 +860,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 sos.write(data);
                 fos.flush();
             }
-
             if (flashPanel != null) {
                 flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
             }
