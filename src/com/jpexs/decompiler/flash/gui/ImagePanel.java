@@ -214,7 +214,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (e == null) {
             return;
         }
-        synchronized (iconPanel) {
+        boolean draw2 = false;
+        synchronized (ImagePanel.class) {
             lastMouseEvent = e;
             boolean handCursor = false;
             DepthState newStateUnderCursor = null;
@@ -272,11 +273,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 }
                 if (newStateUnderCursor != stateUnderCursor) {
                     stateUnderCursor = newStateUnderCursor;
-                    if (draw) {
-                        drawFrame();
-                    }
+                    draw2 = true;
                 }
             }
+        }
+        if (draw2) {
+            drawFrame();
         }
     }
 

@@ -93,20 +93,21 @@ public class PlayerControls extends JPanel implements ActionListener {
     public static final int ZOOM_DECADE_STEPS = 10;
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
 
-    private static String underline(String s){
-        return "<html><font color=\"#000099\"><u>"+s+"</u></font></html>";
+    private static String underline(String s) {
+        return "<html><font color=\"#000099\"><u>" + s + "</u></font></html>";
     }
 
-    private static Font underlinedFont=null;
-    private static Font notUnderlinedFont=null;
-    static{
+    private static Font underlinedFont = null;
+    private static Font notUnderlinedFont = null;
+
+    static {
         notUnderlinedFont = new JLabel().getFont();
-        Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
+        Map<TextAttribute, Integer> fontAttributes = new HashMap<>();
         fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        underlinedFont= notUnderlinedFont.deriveFont(fontAttributes);
+        underlinedFont = notUnderlinedFont.deriveFont(fontAttributes);
     }
-    
-    public PlayerControls(final MainPanel mainPanel,MediaDisplay display) {
+
+    public PlayerControls(final MainPanel mainPanel, MediaDisplay display) {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -160,22 +161,22 @@ public class PlayerControls extends JPanel implements ActionListener {
         playbackControls = new JPanel();
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
-        frameLabel = new JLabel("0",SwingConstants.RIGHT);        
+        frameLabel = new JLabel("0", SwingConstants.RIGHT);
         frameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         frameLabel.addMouseMotionListener(new MouseMotionAdapter() {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                
+
             }
-            
+
         });
-                
-        Dimension min=new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"),frameLabel.getPreferredSize().height);
+
+        Dimension min = new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"), frameLabel.getPreferredSize().height);
         frameLabel.setMinimumSize(min);
         frameLabel.setPreferredSize(min);
-        
-        frameLabel.addMouseListener(new MouseAdapter() {           
+
+        frameLabel.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -186,31 +187,27 @@ public class PlayerControls extends JPanel implements ActionListener {
             public void mouseExited(MouseEvent e) {
                 frameLabel.setFont(notUnderlinedFont);
             }
-            
-                     
-            
-            
-            
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 int gotoFrame = PlayerControls.this.display.getCurrentFrame();
-                if(gotoFrame>0){
+                if (gotoFrame > 0) {
                     mainPanel.gotoFrame(gotoFrame);
                 }
             }
-            
+
         });
-        timeLabel = new JLabel("(00:00.00)");        
+        timeLabel = new JLabel("(00:00.00)");
         totalTimeLabel = new JLabel("(00:00.00)");
         totalFrameLabel = new JLabel("0");
-        
-        JPanel currentPanel=new JPanel(new FlowLayout());
+
+        JPanel currentPanel = new JPanel(new FlowLayout());
         currentPanel.add(frameLabel);
         currentPanel.add(timeLabel);
-        JPanel totalPanel=new JPanel(new FlowLayout());
+        JPanel totalPanel = new JPanel(new FlowLayout());
         totalPanel.add(totalFrameLabel);
         totalPanel.add(totalTimeLabel);
-        
+
         controlPanel.add(currentPanel, BorderLayout.WEST);
         controlPanel.add(totalPanel, BorderLayout.EAST);
         playbackControls.setLayout(new BoxLayout(playbackControls, BoxLayout.Y_AXIS));
@@ -302,11 +299,11 @@ public class PlayerControls extends JPanel implements ActionListener {
                     progress.setValue(currentFrame);
                     progress.setIndeterminate(false);
                 }
-                frameLabel.setText((""+(currentFrame+1)));
-                totalFrameLabel.setText(""+totalFrames);
-                if (frameRate != 0) {                    
-                    timeLabel.setText("("+formatMs((currentFrame * 1000) / frameRate)+")");
-                    totalTimeLabel.setText("("+formatMs(((totalFrames - 1) * 1000) / frameRate)+")");
+                frameLabel.setText(("" + (currentFrame + 1)));
+                totalFrameLabel.setText("" + totalFrames);
+                if (frameRate != 0) {
+                    timeLabel.setText("(" + formatMs((currentFrame * 1000) / frameRate) + ")");
+                    totalTimeLabel.setText("(" + formatMs(((totalFrames - 1) * 1000) / frameRate) + ")");
                 }
                 if (totalFrames <= 1 && playbackControls.isVisible()) {
                     playbackControls.setVisible(false);

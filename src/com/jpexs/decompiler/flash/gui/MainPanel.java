@@ -73,37 +73,14 @@ import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
-import com.jpexs.decompiler.flash.tags.DefineBitsTag;
-import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
-import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
-import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
-import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
-import com.jpexs.decompiler.flash.tags.DefineFontTag;
-import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
-import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
-import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineText2Tag;
-import com.jpexs.decompiler.flash.tags.DefineTextTag;
-import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -594,12 +571,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         for (SWF swf : newSwfs) {
 
-            for (Tag t : swf.tags) {
-                if (t instanceof JPEGTablesTag) {
-                    swf.jtt = (JPEGTablesTag) t;
-                }
-            }
-
             if (Configuration.autoRenameIdentifiers.get()) {
                 try {
                     swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
@@ -1075,21 +1046,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void gotoFrame(int frame){
+    public void gotoFrame(int frame) {
         TreeItem treeItem = (TreeItem) tagTree.getLastSelectedPathComponent();
         if (treeItem == null) {
             return;
         }
-        if(treeItem instanceof Timelined){
-            Timelined t = (Timelined)treeItem;
+        if (treeItem instanceof Timelined) {
+            Timelined t = (Timelined) treeItem;
             Timeline tim = t.getTimeline();
-            Frame f = ((TagTreeModel)tagTree.getModel()).getFrame(treeItem.getSwf(), t, frame);
-            if(f!=null){
+            Frame f = ((TagTreeModel) tagTree.getModel()).getFrame(treeItem.getSwf(), t, frame);
+            if (f != null) {
                 setTagTreeSelectedNode(f);
             }
         }
     }
-    
+
     public void gotoDocumentClass(SWF swf) {
         if (swf == null) {
             return;

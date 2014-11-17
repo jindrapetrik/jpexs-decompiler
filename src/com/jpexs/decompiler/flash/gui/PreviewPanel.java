@@ -283,7 +283,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
              flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(new PlayerControls(mainPanel,flashPanel), BorderLayout.SOUTH);
+            flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
@@ -303,7 +303,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
         previewCnt.add(imagePanel, BorderLayout.CENTER);
-        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel,imagePanel), BorderLayout.SOUTH);
+        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -512,26 +512,25 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             if (tagObj instanceof DefineSoundTag) {
                 frameCount = 1;
             }
-            
-            if(tagObj instanceof DefineSpriteTag){
-                frameCount = ((DefineSpriteTag)tagObj).frameCount;
+
+            if (tagObj instanceof DefineSpriteTag) {
+                frameCount = ((DefineSpriteTag) tagObj).frameCount;
             }
 
             byte[] data;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
                 RECT outrect = new RECT(swf.displayRect);
-                                                
+
                 if (tagObj instanceof FontTag) {
-                    outrect.Xmin=0;
-                    outrect.Ymin=0;
-                    outrect.Xmax = FontTag.PREVIEWSIZE*20;                    
-                    outrect.Ymax = FontTag.PREVIEWSIZE*20;
+                    outrect.Xmin = 0;
+                    outrect.Ymin = 0;
+                    outrect.Xmax = FontTag.PREVIEWSIZE * 20;
+                    outrect.Ymax = FontTag.PREVIEWSIZE * 20;
                 }
                 int width = outrect.getWidth();
                 int height = outrect.getHeight();
-                
-                
+
                 sos2.writeRECT(outrect);
                 sos2.writeUI8(0);
                 sos2.writeUI8(frameRate);
@@ -605,18 +604,17 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     new ShowFrameTag(swf).writeTag(sos2);
                 } else {
 
-                    boolean isSprite=false;
-                    if(tagObj instanceof DefineSpriteTag){
+                    boolean isSprite = false;
+                    if (tagObj instanceof DefineSpriteTag) {
                         isSprite = true;
                     }
                     int chtId = 0;
                     if (tagObj instanceof CharacterTag) {
                         chtId = ((CharacterTag) tagObj).getCharacterId();
                     }
-                    
-                    
+
                     if (tagObj instanceof DefineBitsTag) {
-                        JPEGTablesTag jtt = swf.jtt;
+                        JPEGTablesTag jtt = swf.getJtt();
                         if (jtt != null) {
                             jtt.writeTag(sos2);
                         }
@@ -625,7 +623,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         Set<Integer> needed = new HashSet<>();
                         ((Tag) tagObj).getNeededCharactersDeep(needed);
                         for (int n : needed) {
-                            if(isSprite && chtId == n){
+                            if (isSprite && chtId == n) {
                                 continue;
                             }
                             classicTag(swf.characters.get(n)).writeTag(sos2);
@@ -633,8 +631,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     }
 
                     classicTag((Tag) tagObj).writeTag(sos2);
-
-                    
 
                     MATRIX mat = new MATRIX();
                     mat.hasRotate = false;
@@ -653,8 +649,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     }
                     if (tagObj instanceof FontTag) {
 
-                        FontTag ft=(FontTag)classicTag((Tag)tagObj);
-                        
+                        FontTag ft = (FontTag) classicTag((Tag) tagObj);
+
                         int countGlyphsTotal = ft.getGlyphShapeTable().size();
                         int countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal);
                         int fontId = ft.getFontId();
@@ -664,34 +660,34 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         int y = 0;
                         int firstGlyphIndex = fontPageNum * SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW;
                         countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal - firstGlyphIndex);
-                        List<SHAPE> shapes=ft.getGlyphShapeTable();
+                        List<SHAPE> shapes = ft.getGlyphShapeTable();
                         int maxw = 0;
-                        for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {                            
+                        for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
                             RECT b = shapes.get(f).getBounds();
-                            if(b.Xmin == Integer.MAX_VALUE){
+                            if (b.Xmin == Integer.MAX_VALUE) {
                                 continue;
                             }
-                            if(b.Ymin == Integer.MAX_VALUE){
+                            if (b.Ymin == Integer.MAX_VALUE) {
                                 continue;
                             }
-                            int w=(int)(b.getWidth()/ft.getDivider());
-                            if(w>maxw){
+                            int w = (int) (b.getWidth() / ft.getDivider());
+                            if (w > maxw) {
                                 maxw = w;
-                            }                           
+                            }
                             x++;
                         }
-                        
+
                         x = 0;
-                        
-                        int BORDER = 3*20;
-                        
-                        int textHeight = height / rows;                                                                 
-                        
-                        while(maxw*textHeight/1024.0 > width/cols-2*BORDER){
+
+                        int BORDER = 3 * 20;
+
+                        int textHeight = height / rows;
+
+                        while (maxw * textHeight / 1024.0 > width / cols - 2 * BORDER) {
                             textHeight--;
                         }
-                        
-                        MATRIX tmat=new MATRIX();
+
+                        MATRIX tmat = new MATRIX();
                         for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
                             if (x >= cols) {
                                 x = 0;
@@ -699,41 +695,39 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             }
                             List<TEXTRECORD> rec = new ArrayList<>();
                             TEXTRECORD tr = new TEXTRECORD();
-                                                        
+
                             RECT b = shapes.get(f).getBounds();
-                            int xmin = b.Xmin == Integer.MAX_VALUE?0:(int)(b.Xmin/ft.getDivider());
-                            xmin *= textHeight/1024.0;
-                            int ymin = b.Ymin == Integer.MAX_VALUE?0:(int)(b.Ymin/ft.getDivider());
-                            ymin *= textHeight/1024.0;
-                            int w=(int)(b.getWidth()/ft.getDivider());
-                            w *= textHeight/1024.0;
-                            int h=(int)(b.getHeight()/ft.getDivider());
-                            h *= textHeight/1024.0;
-                            
+                            int xmin = b.Xmin == Integer.MAX_VALUE ? 0 : (int) (b.Xmin / ft.getDivider());
+                            xmin *= textHeight / 1024.0;
+                            int ymin = b.Ymin == Integer.MAX_VALUE ? 0 : (int) (b.Ymin / ft.getDivider());
+                            ymin *= textHeight / 1024.0;
+                            int w = (int) (b.getWidth() / ft.getDivider());
+                            w *= textHeight / 1024.0;
+                            int h = (int) (b.getHeight() / ft.getDivider());
+                            h *= textHeight / 1024.0;
+
                             tr.fontId = fontId;
                             tr.styleFlagsHasFont = true;
                             tr.textHeight = textHeight;
-                            tr.xOffset=-xmin;
-                            tr.yOffset=0;
-                            tr.styleFlagsHasXOffset=true;
-                            tr.styleFlagsHasYOffset=true;
+                            tr.xOffset = -xmin;
+                            tr.yOffset = 0;
+                            tr.styleFlagsHasXOffset = true;
+                            tr.styleFlagsHasYOffset = true;
                             tr.glyphEntries = new GLYPHENTRY[1];
                             tr.styleFlagsHasColor = true;
                             tr.textColor = new RGB(0, 0, 0);
                             tr.glyphEntries[0] = new GLYPHENTRY();
-                            
-                            
-                            
-                            double ga=ft.getGlyphAdvance(f);                            
-                            int cw=ga==-1?w:(int)(ga/ft.getDivider()*textHeight/1024.0);
-                            
+
+                            double ga = ft.getGlyphAdvance(f);
+                            int cw = ga == -1 ? w : (int) (ga / ft.getDivider() * textHeight / 1024.0);
+
                             tr.glyphEntries[0].glyphAdvance = 0;
                             tr.glyphEntries[0].glyphIndex = f;
-                            rec.add(tr);                            
-                                                                                    
-                            tmat.translateX = x * width/ cols + width/ cols/2-w/2;
+                            rec.add(tr);
+
+                            tmat.translateX = x * width / cols + width / cols / 2 - w / 2;
                             tmat.translateY = y * height / rows + height / rows / 2;
-                            new DefineTextTag(swf, 999 + f, new RECT(0, cw, ymin, ymin+h), new MATRIX(), rec).writeTag(sos2);
+                            new DefineTextTag(swf, 999 + f, new RECT(0, cw, ymin, ymin + h), new MATRIX(), rec).writeTag(sos2);
                             new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1 + f, 999 + f, tmat, null, 0, null, 0, null).writeTag(sos2);
                             x++;
                         }
@@ -882,25 +876,24 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             new ShowFrameTag(swf).writeTag(sos2);
                             first = false;
                         }
-                    } else if(tagObj instanceof DefineSpriteTag){
-                        DefineSpriteTag s=(DefineSpriteTag)tagObj;
+                    } else if (tagObj instanceof DefineSpriteTag) {
+                        DefineSpriteTag s = (DefineSpriteTag) tagObj;
                         Tag lastTag = null;
-                        for(Tag t:s.subTags){
-                            if(t instanceof EndTag){
+                        for (Tag t : s.subTags) {
+                            if (t instanceof EndTag) {
                                 break;
-                            } else if(t instanceof PlaceObjectTypeTag){
-                                PlaceObjectTypeTag pt=(PlaceObjectTypeTag)t;
+                            } else if (t instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
                                 MATRIX m = pt.getMatrix();
                                 MATRIX m2 = new Matrix(m).preConcatenate(new Matrix(mat)).toMATRIX();
                                 pt.writeTagWithMatrix(sos2, m2);
                                 lastTag = t;
-                            }
-                            else{                                
+                            } else {
                                 t.writeTag(sos2);
                                 lastTag = t;
                             }
                         }
-                        if(!s.subTags.isEmpty() && (lastTag!=null)&&(!(lastTag instanceof ShowFrameTag))){
+                        if (!s.subTags.isEmpty() && (lastTag != null) && (!(lastTag instanceof ShowFrameTag))) {
                             new ShowFrameTag(swf).writeTag(sos2);
                         }
                     } else {
@@ -923,7 +916,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 fos.flush();
             }
             if (flashPanel != null) {
-                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);                
+                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
             }
             showFlashViewerPanel();
         } catch (IOException | ActionParseException ex) {
