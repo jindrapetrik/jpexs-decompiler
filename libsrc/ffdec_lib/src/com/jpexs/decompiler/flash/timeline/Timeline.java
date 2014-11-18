@@ -509,7 +509,11 @@ public class Timeline {
 
                 int dframe = 0;
                 if (c instanceof Timelined) {
-                    dframe = (time + ds.time) % ((Timelined) c).getTimeline().frames.size();
+                    int frameCount = ((Timelined) c).getTimeline().frames.size();
+                    if (frameCount < 1) {
+                        frameCount = 1;
+                    }
+                    dframe = (time + ds.time) % frameCount;
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;

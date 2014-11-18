@@ -589,7 +589,7 @@ public class Main {
             case SAVE:
             case SAVEAS:
                 if (swf.file != null) {
-                    ext = Path.getExtension(swf.file);                    
+                    ext = Path.getExtension(swf.file);
                 }
                 break;
             case EXE:
@@ -1256,7 +1256,7 @@ public class Main {
                         checkForUpdates();
                         return null;
                     }
-                }.execute();                
+                }.execute();
             }
         }
     }

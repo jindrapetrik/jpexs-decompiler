@@ -65,7 +65,6 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -105,12 +104,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -223,8 +217,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         }
         return false;
     }
-
-    
 
     public void setAbc(ABC abc) {
         this.abc = abc;

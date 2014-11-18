@@ -43,6 +43,8 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 21;
 
+    private SerializableImage cachedImage;
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -63,9 +65,14 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
         try {
             BufferedImage image = ImageIO.read(getImageData());
-            return image == null ? null : new SerializableImage(image);
+            SerializableImage ret = image == null ? null : new SerializableImage(image);
+            cachedImage = ret;
+            return ret;
         } catch (IOException ex) {
         }
         return null;
@@ -97,6 +104,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) {
         imageData = new ByteArrayRange(data);
+        cachedImage = null;
         setModified(true);
     }
 
