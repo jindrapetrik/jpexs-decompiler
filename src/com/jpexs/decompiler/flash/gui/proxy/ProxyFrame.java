@@ -566,7 +566,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
             if(!Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this)){
-                JOptionPane.showMessageDialog(this, translate("error.start.server"),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, translate("error.start.server").replace("%port%", ""+port),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
             }
