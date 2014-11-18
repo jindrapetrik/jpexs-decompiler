@@ -38,6 +38,7 @@ public class Server implements Runnable {
      */
     public static boolean startServer(int port, List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener) {
         stopServer();
+        stopping = false;
         try {
             myServer = new Server(port, replacements, catchedContentTypes, catchedListener, replacedListener);
         } catch (IOException ex) {
@@ -55,6 +56,7 @@ public class Server implements Runnable {
 
     public static void stopServer() {
         if (serverRunning) {
+            stopping = true;
             serverRunning = false;
             try {
                 myServer.server.close();

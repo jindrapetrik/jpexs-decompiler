@@ -209,6 +209,7 @@
                     <jdkPreference>preferJre</jdkPreference>
                     <runtimeBits>64/32</runtimeBits>
                     <maxHeapPercent>${MAXHEAPSIZEPERCENT}</maxHeapPercent>
+                    <opt>-Djava.net.preferIPv4Stack=true</opt>
                 </jre>
                 <splash>
                     <file>graphics/splash.bmp</file>
@@ -516,7 +517,8 @@
 
     <target name="run" depends="build">
         <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true">
-            <jvmarg value="-Xmx${MAXHEAPSIZERUN}m"/>
+            <jvmarg value="-Xmx${MAXHEAPSIZERUN}m" />
+            <jvmarg value="-Djava.net.preferIPv4Stack=true" />
             <arg line="${RUNPARAMS}" />
         </java>
     </target>

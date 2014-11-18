@@ -491,8 +491,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                         Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                tableModel = new DefaultTableModel(0, 3);
-                replacementsTable.setModel(tableModel);
+                tableModel.setRowCount(0);                
                 reps.clear();
                 break;
             case ACTION_REMOVE:
@@ -538,8 +537,8 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
-            if(!Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this)){
-                JOptionPane.showMessageDialog(this, translate("error.start.server").replace("%port%", ""+port),AppStrings.translate("error"),JOptionPane.ERROR_MESSAGE);
+            if (!Server.startServer(port, reps, catchedContentTypes, this, this)) {
+                JOptionPane.showMessageDialog(this, translate("error.start.server").replace("%port%", "" + port), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
             }
