@@ -20,11 +20,14 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -39,30 +42,27 @@ import javax.swing.SwingConstants;
  */
 public class AboutDialog extends AppDialog {
 
-    private static final String[] CONTRIBUTORS = new String[]{
-        "Paolo Cancedda",
-        "Capasha",
-        "focus",
+    private static final String[] DEVELOPERS = new String[]{
+        "JPEXS",
         "honfika",
-        "Krock",
-        "Laurent LOUVET",
-        "MaGiC",
-        "pepka",
-        "poxyran",
-        "Rtsjx"};
+        "+ others from GitHub and Google code"
+    };
     private static final String AUTHOR = "JPEXS";
 
     public AboutDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        setSize(new Dimension(300, 320));
+        //setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
 
+        JPanel twoPanes=new JPanel();
+        twoPanes.setLayout(new BoxLayout(twoPanes, BoxLayout.X_AXIS));
+        
         Container cnt = getContentPane();
         JPanel cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         cnt.setLayout(new BorderLayout());
-        cnt.add(cp, BorderLayout.CENTER);
-        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+        
+        
 
         JPanel appNamePanel = new JPanel(new FlowLayout());
         JLabel jpLabel = new JLabel("JPEXS");
@@ -85,15 +85,27 @@ public class AboutDialog extends AppDialog {
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         appNamePanel.add(decLabel);
         appNamePanel.setAlignmentX(0.5f);
+        
+        
+        cp = new JPanel();
+        cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
         cp.add(appNamePanel);
-
-        JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
-        verLabel.setAlignmentX(0.5f);
+         JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
+        verLabel.setAlignmentX(0.5f);        
         //verLabel.setPreferredSize(new Dimension(300, 15));
         verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
         verLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(verLabel);
 
+        
+        cnt.add(cp,BorderLayout.NORTH);
+
+        cp = new JPanel();
+        cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+        
+       
         JLabel byLabel = new JLabel(translate("by"));
         byLabel.setAlignmentX(0.5f);
         byLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -112,40 +124,75 @@ public class AboutDialog extends AppDialog {
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(dateLabel);
-
-        JLabel transAuthorLabel = new JLabel(translate("translation.author.label"));
-        transAuthorLabel.setAlignmentX(0.5f);
-        //transAuthorLabel.setPreferredSize(new Dimension(300, 20));
-        transAuthorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel transAuthor = new JLabel(translate("translation.author"));
-        transAuthor.setAlignmentX(0.5f);
-        //transAuthor.setPreferredSize(new Dimension(300, 20));
-        transAuthor.setHorizontalAlignment(SwingConstants.CENTER);
-        cp.add(transAuthorLabel);
-        cp.add(transAuthor);
-
-        JLabel contributorsLabel = new JLabel(translate("contributors"));
-        contributorsLabel.setAlignmentX(0.5f);
-        contributorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        contributorsLabel.setFont(contributorsLabel.getFont().deriveFont(Font.BOLD));
-        cp.add(contributorsLabel);
-
-        for (String c : CONTRIBUTORS) {
-            JLabel contributorLabel = new JLabel(c);
-            contributorLabel.setAlignmentX(0.5f);
-            contributorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            cp.add(contributorLabel);
-        }
-
-        cp.add(Box.createVerticalStrut(10));
-
+        
         LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE);
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
         //wwwLabel.setPreferredSize(new Dimension(300, 25));
         wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(wwwLabel);
+
+        cp.add(Box.createVerticalStrut(20));
+        JLabel transAuthorLabel = new JLabel(translate("translation.author.label"));
+        transAuthorLabel.setAlignmentX(0.5f);
+        //transAuthorLabel.setPreferredSize(new Dimension(300, 20));
+        transAuthorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel transAuthor = new JLabel(translate("translation.author"));
+        transAuthor.setAlignmentX(0.5f);
+        transAuthor.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(transAuthorLabel);
+        cp.add(transAuthor);
+        cp.add(Box.createVerticalStrut(50));
+        JLabel developersLabel = new JLabel(translate("developers"));
+        developersLabel.setAlignmentX(0.5f);
+        developersLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        developersLabel.setFont(developersLabel.getFont().deriveFont(Font.BOLD));
+        cp.add(developersLabel);
+        
+        
+        for (String c : DEVELOPERS) {
+            JLabel developerNameLabel = new JLabel(c);
+            developerNameLabel.setAlignmentX(0.5f);
+            developerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            cp.add(developerNameLabel);
+        }
+        
+        
+        
+        
+        
+        cp.setAlignmentY(0);
+        twoPanes.add(cp);
+        cp = new JPanel();
+        cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));                
+        
+        JLabel translatorsLabel = new JLabel(translate("translators"));
+        translatorsLabel.setAlignmentX(0.5f);
+        translatorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        translatorsLabel.setFont(translatorsLabel.getFont().deriveFont(Font.BOLD));
+        cp.add(translatorsLabel);
+        
+        List<String> translators=new ArrayList<>();
+        for(String code:SelectLanguageDialog.languages){
+            Locale l = Locale.forLanguageTag(code.equals("en") ? "" : code);
+            ResourceBundle b = ResourceBundle.getBundle(AppStrings.getResourcePath(AboutDialog.class),l);
+            translators.add(Locale.forLanguageTag(code).getDisplayName()+" - "+b.getString("translation.author"));
+        }
+        for (String c : translators) {
+            JLabel translatorName = new JLabel(c);
+            translatorName.setAlignmentX(0.5f);
+            translatorName.setHorizontalAlignment(SwingConstants.CENTER);
+            cp.add(translatorName);
+        }
+
         cp.add(Box.createVerticalStrut(10));
+        cp.setAlignmentY(0);
+        twoPanes.add(cp);
+        
+        cnt.add(twoPanes, BorderLayout.CENTER);
+        cp = new JPanel(new FlowLayout());
+        cnt.add(cp,BorderLayout.SOUTH);
         JButton okButton = new JButton(translate("button.ok"));
         okButton.setAlignmentX(0.5f);
         cp.add(okButton);
@@ -157,9 +204,9 @@ public class AboutDialog extends AppDialog {
         });
         getRootPane().setDefaultButton(okButton);
         setModal(true);
-        View.centerScreen(this);
         View.setWindowIcon(this);
         setResizable(false);
         pack();
+        View.centerScreen(this);        
     }
 }
