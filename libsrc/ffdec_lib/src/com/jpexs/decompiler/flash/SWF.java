@@ -312,6 +312,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 for (Integer id : needed) {
                     if (!addedCharacterIds.contains(id)) {
                         CharacterTag neededCharacter = characters.get(id);
+                        if (neededCharacter == null) {
+                            continue;
+                        }
+                        
                         if (movedTags.contains(neededCharacter)) {
                             logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
                             return;
