@@ -125,11 +125,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public int getNumFrames() {
-        return 1;
-    }
-
-    @Override
     public String getFontNameIntag() {
         String ret = "";
         for (int i = 0; i < fonts.size(); i++) {
