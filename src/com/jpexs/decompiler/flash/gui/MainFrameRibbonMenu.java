@@ -776,11 +776,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.dumpView.set(false);
                 mainFrame.panel.showView(MainPanel.VIEW_RESOURCES);
                 timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+                viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
                 break;
             case ACTION_VIEWMODE_HEX:
                 Configuration.dumpView.set(true);
                 mainFrame.panel.showView(MainPanel.VIEW_DUMP);
                 timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+                viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
                 break;
             case ACTION_DEOBFUSCATION_MODE_OLD:
                 Configuration.deobfuscationMode.set(0);
