@@ -3184,7 +3184,7 @@ public class XFLConverter {
         }
 
         return "<AdjustColorFilter brightness=\"" + normBrightness(b) + "\" contrast=\"" + normContrast(c) + "\" saturation=\"" + normSaturation(s) + "\" hue=\"" + normHue(h) + "\"/>";
-    }
+    }   
 
     private static String convertHTMLText(List<Tag> tags, DefineEditTextTag det, String html) {
         HTMLTextParser tparser = new HTMLTextParser(tags, det);
@@ -3215,7 +3215,7 @@ public class XFLConverter {
     }
 
     private static double twipToPixel(double tw) {
-        return tw / 20.0;
+        return tw /SWF.unitDivisor;
     }
 
     private static class HTMLTextParser extends DefaultHandler {

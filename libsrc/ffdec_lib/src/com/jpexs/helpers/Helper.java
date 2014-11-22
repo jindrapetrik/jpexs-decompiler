@@ -169,6 +169,8 @@ public class Helper {
                 ret.append("\\\"");
             } else if (c == '\'') {
                 ret.append("\\'");
+            } else if (c < 32) {
+                ret.append("\\x").append(padZeros(Integer.toHexString(i), 2));
             } else {
                 ret.append(c);
             }
