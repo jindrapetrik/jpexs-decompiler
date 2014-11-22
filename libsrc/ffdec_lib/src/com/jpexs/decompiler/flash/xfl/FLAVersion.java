@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.xfl;
 
 import java.util.HashMap;
@@ -58,6 +59,9 @@ public enum FLAVersion {
         versionToPlayerMap.put(21, "FlashPlayer11.8");
         versionToPlayerMap.put(22, "FlashPlayer11.9");
         versionToPlayerMap.put(23, "FlashPlayer12.0");
+        versionToPlayerMap.put(24, "FlashPlayer13.0");
+        versionToPlayerMap.put(25, "FlashPlayer14.0");
+        versionToPlayerMap.put(26, "FlashPlayer15.0");
     }
 
     private FLAVersion(String shortName, String applicationName, String xflVersion, int maxSwfVersion) {
