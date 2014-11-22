@@ -131,12 +131,8 @@ public class BMPFile extends Component {
         int pad;
         int padCount;
         byte rgb[] = new byte[3];
-        size = (biWidth * biHeight) - 1;
-        pad = 4 - ((biWidth * 3) % 4);
-        if (pad == 4) // <==== Bug correction
-        {
-            pad = 0;     // <==== Bug correction
-        }
+        size = (biWidth * biHeight);
+        pad = (biWidth * 3) % 4;
         rowCount = 1;
         padCount = 0;
         rowIndex = size - biWidth;

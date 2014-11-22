@@ -26,8 +26,12 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -37,6 +41,14 @@ public class ShapeImporter {
     
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
         SWF swf = st.getSwf();
+        
+        if(newData[0] == 'B' && newData[1] == 'M'){
+            BufferedImage b = ImageIO.read(new ByteArrayInputStream(newData));
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            ImageIO.write(b, "PNG", baos);
+            newData = baos.toByteArray();
+        }
+        
         DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
         jpeg2Tag.setModified(true);
         swf.tags.add(jpeg2Tag);
