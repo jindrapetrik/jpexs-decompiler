@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -76,6 +77,9 @@ public class ShapeExporter {
                 if (settings.mode == ShapeExportMode.PNG) {
                     ext = "png";
                 }
+                if (settings.mode == ShapeExportMode.BMP) {
+                    ext = "bmp";
+                }
                 if (settings.mode == ShapeExportMode.CANVAS) {
                     ext = "html";
                 }
@@ -99,6 +103,7 @@ public class ShapeExporter {
                                 }
                                 break;
                             case PNG:
+                            case BMP:
                                 RECT rect = st.getRect(new HashSet<BoundedTag>());
                                 int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor);
                                 int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor);
@@ -108,7 +113,11 @@ public class ShapeExporter {
                                 m.translate(-rect.Xmin, -rect.Ymin);
                                 m.scale(settings.zoom);
                                 st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
-                                ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
+                                if(settings.mode==ShapeExportMode.PNG){
+                                    ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
+                                }else{
+                                    BMPFile.saveBitmap(img.getBufferedImage(), file);
+                                }
                                 break;
                             case CANVAS:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {

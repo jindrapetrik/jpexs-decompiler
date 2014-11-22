@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
+import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.helpers.Helper;
@@ -59,19 +61,31 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.JPEG) {
                     fileFormat = "jpg";
                 }
+                
+                if (settings.mode == ImageExportMode.BMP) {
+                    fileFormat = "bmp";
+                }
+                {
 
                 final ImageTag imageTag = (ImageTag) t;
                 final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
                 final List<Tag> ttags = tags;
                 final String ffileFormat = fileFormat;
+                
+                                
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-
-                        ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                        if(ffileFormat.equals("bmp")){
+                            BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
+                        }else{
+                            ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                        }
                     }
-                }, handler).run();
-                ret.add(file);
+                }, handler).run();                
+                 ret.add(file);
+                }
+               
             }
         }
         return ret;

@@ -82,6 +82,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -1510,6 +1511,19 @@ public final class SWF implements SWFContainerItem, Timelined {
                         ret.add(f);
                     }
                 }, handler).run();
+                break;
+            case BMP:
+                for (int i = 0; frameImages.hasNext(); i++) {
+                    final int fi = i;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
+                            BMPFile.saveBitmap(frameImages.next(), f);
+                            ret.add(f);
+                        }
+                    }, handler).run();
+                }
                 break;
             case PNG:
                 for (int i = 0; frameImages.hasNext(); i++) {

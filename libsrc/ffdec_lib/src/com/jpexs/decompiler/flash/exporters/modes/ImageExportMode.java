@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
@@ -21,5 +22,5 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum ImageExportMode {
 
-    PNG_JPEG, PNG, JPEG
+    PNG_JPEG, PNG, JPEG, BMP
 }
