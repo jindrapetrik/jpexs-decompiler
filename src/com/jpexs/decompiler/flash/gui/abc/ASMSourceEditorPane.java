@@ -82,13 +82,13 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         this.exportMode = exportMode;
         long oldOffset = getSelectedOffset();
         if (exportMode == ScriptExportMode.PCODE) {
-            setContentType("text/flasm");
+            setContentType("text/flasm3");
             if (textNoHex == null) {
                 textNoHex = getHighlightedText(exportMode);
             }
             setText(textNoHex);
         } else if (exportMode == ScriptExportMode.PCODE_HEX) {
-            setContentType("text/flasm");
+            setContentType("text/flasm3");
             if (textWithHex == null) {
                 textWithHex = getHighlightedText(exportMode);
             }
