@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.CachedDecompilation;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -32,17 +34,12 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.HighlightedText;
-import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.helpers.Cache;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +69,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private final ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
-    private final Cache<ScriptPack, CachedDecompilation> cache = Cache.getInstance(true);
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
 
@@ -583,25 +579,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    public void uncache(ScriptPack pack) {
-        cache.remove(pack);
-    }
-
-    public boolean isCached(ScriptPack pack) {
-        return cache.contains(pack);
-    }
-
-    private CachedDecompilation getCached(ScriptPack pack) throws InterruptedException {
-        if (!cache.contains(pack)) {
-            cacheScriptPack(pack, abcList);
-        }
-        return (CachedDecompilation) cache.get(pack);
-    }
-
-    public String getCachedText(ScriptPack pack) throws InterruptedException {
-        return getCached(pack).text;
-    }
-
     public void gotoLastTrait() {
         gotoTrait(lastTraitIndex);
     }
@@ -647,27 +624,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
     private List<ABCContainerTag> abcList;
 
-    public void clearScriptCache() {
-        cache.clear();
-    }
-
-    public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) throws InterruptedException {
-        int maxCacheSize = 50;
-        int scriptIndex = scriptLeaf.scriptIndex;
-        ScriptInfo script = null;
-        ABC abc = scriptLeaf.abc;
-        if (scriptIndex > -1) {
-            script = abc.script_info.get(scriptIndex);
-        }
-        if (!cache.contains(scriptLeaf)) {
-            boolean parallel = Configuration.parallelSpeedUp.get();
-            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-            scriptLeaf.toSource(writer, abcList, script.traits.traits, ScriptExportMode.AS, parallel);
-            HighlightedText hilightedCode = new HighlightedText(writer);
-            cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
-        }
-    }
-
     public void setScript(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
         abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
         int scriptIndex = scriptLeaf.scriptIndex;
@@ -691,8 +647,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.script = scriptLeaf;
         CachedDecompilation cd = null;
         try {
-            cacheScriptPack(scriptLeaf, abcList);
-            cd = getCached(scriptLeaf);
+            cd = SWF.getCached(scriptLeaf);
         } catch (InterruptedException ex) {
         }
         if (cd != null) {
@@ -710,7 +665,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void reloadClass() {
         int ci = classIndex;
-        uncache(script);
+        SWF.uncache(script);
         if ((script != null) && (abc != null)) {
             setScript(script, abcList);
         }
@@ -724,7 +679,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void setABC(ABC abc) {
         this.abc = abc;
-        cache.clear();
         setText("");
     }
 

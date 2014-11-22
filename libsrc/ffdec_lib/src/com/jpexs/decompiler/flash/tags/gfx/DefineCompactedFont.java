@@ -125,20 +125,15 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public int getNumFrames() {
-        return 1;
-    }
-
-    @Override
     public String getFontNameIntag() {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < fonts.size(); i++) {
             if (i > 0) {
-                ret += ", ";
+                ret.append(", ");
             }
-            ret += fonts.get(i).fontName;
+            ret.append(fonts.get(i).fontName);
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override
@@ -197,7 +192,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         }
 
         setModified(true);
-        SWF.clearImageCache();
+        getSwf().clearImageCache();
     }
 
     @Override

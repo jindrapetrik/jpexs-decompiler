@@ -127,23 +127,26 @@ public class DefineText2Tag extends TextTag {
     @Override
     public String getFormattedText() {
         FontTag fnt = null;
-        String ret = "";
-        ret += "[\r\nxmin " + textBounds.Xmin + "\r\nymin " + textBounds.Ymin + "\r\nxmax " + textBounds.Xmax + "\r\nymax " + textBounds.Ymax;
+        StringBuilder ret = new StringBuilder();
+        ret.append("[\r\nxmin ").append(textBounds.Xmin).
+                append("\r\nymin ").append(textBounds.Ymin).
+                append("\r\nxmax ").append(textBounds.Xmax).
+                append("\r\nymax ").append(textBounds.Ymax);
         if (textMatrix.translateX != 0) {
-            ret += "\r\ntranslatex " + textMatrix.translateX;
+            ret.append("\r\ntranslatex ").append(textMatrix.translateX);
         }
         if (textMatrix.translateY != 0) {
-            ret += "\r\ntranslatey " + textMatrix.translateY;
+            ret.append("\r\ntranslatey ").append(textMatrix.translateY);
         }
         if (textMatrix.hasScale) {
-            ret += "\r\nscalex " + textMatrix.scaleX;
-            ret += "\r\nscaley " + textMatrix.scaleY;
+            ret.append("\r\nscalex ").append(textMatrix.scaleX);
+            ret.append("\r\nscaley ").append(textMatrix.scaleY);
         }
         if (textMatrix.hasRotate) {
-            ret += "\r\nrotateskew0 " + textMatrix.rotateSkew0;
-            ret += "\r\nrotateskew1 " + textMatrix.rotateSkew1;
+            ret.append("\r\nrotateskew0 ").append(textMatrix.rotateSkew0);
+            ret.append("\r\nrotateskew1 ").append(textMatrix.rotateSkew1);
         }
-        ret += "\r\n]";
+        ret.append("\r\n]");
         for (TEXTRECORD rec : textRecords) {
             String params = "";
             if (rec.styleFlagsHasFont) {
@@ -167,11 +170,11 @@ public class DefineText2Tag extends TextTag {
                 params += "\r\ny " + rec.yOffset;
             }
             if (params.length() > 0) {
-                ret += "[" + params + "\r\n]";
+                ret.append("[").append(params).append("\r\n]");
             }
-            ret += Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]");
+            ret.append(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"));
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override

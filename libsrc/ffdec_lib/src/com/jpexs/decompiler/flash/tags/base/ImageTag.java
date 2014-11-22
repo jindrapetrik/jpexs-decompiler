@@ -50,6 +50,8 @@ import java.util.Set;
  */
 public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
+    protected SerializableImage cachedImage;
+
     public ImageTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -209,5 +211,9 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShape().getOutline());
+    }
+    
+    public void clearCache() {
+        cachedImage = null;
     }
 }

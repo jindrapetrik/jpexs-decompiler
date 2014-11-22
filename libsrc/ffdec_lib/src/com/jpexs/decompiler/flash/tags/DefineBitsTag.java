@@ -41,8 +41,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     public static final int ID = 6;
 
-    private SerializableImage cachedImage;
-
     @Override
     public void setImage(byte[] data) {
         throw new UnsupportedOperationException("Set image is not supported for DefineBits");
@@ -132,6 +130,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @Override
     public void handleEvent(Tag tag) {
-        cachedImage = null;
+        clearCache();
     }
 }

@@ -163,23 +163,24 @@ public class IdentifiersDeobfuscation {
         } else {
             parts = new String[]{pkg};
         }
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         boolean isChanged = false;
         for (int p = 0; p < parts.length; p++) {
             if (p > 0) {
-                ret += ".";
+                ret.append(".");
             }
             String partChanged = deobfuscateName(as3, parts[p], false, "package", namesMap, renameType, selected);
             if (partChanged != null) {
-                ret += partChanged;
+                ret.append(partChanged);
                 isChanged = true;
             } else {
-                ret += parts[p];
+                ret.append(parts[p]);
             }
         }
         if (isChanged) {
-            namesMap.put(pkg, ret);
-            return ret;
+            String retStr = ret.toString();
+            namesMap.put(pkg, retStr);
+            return retStr;
         }
         return null;
     }
@@ -328,15 +329,16 @@ public class IdentifiersDeobfuscation {
         } else {
             parts = new String[]{pkg};
         }
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             if (i > 0) {
-                ret += ".";
+                ret.append(".");
             }
-            ret += printIdentifier(as3, parts[i], validNameExceptions);
+            ret.append(printIdentifier(as3, parts[i], validNameExceptions));
         }
-        nameCache.put(pkg, ret);
-        return ret;
+        String retStr = ret.toString();
+        nameCache.put(pkg, retStr);
+        return retStr;
     }
 
     public static String escapeOIdentifier(String s) {

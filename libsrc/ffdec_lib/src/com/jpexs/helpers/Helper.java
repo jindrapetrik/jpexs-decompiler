@@ -277,7 +277,7 @@ public class Helper {
     }
 
     public static String padZeros(long number, int length) {
-        String ret = "" + number;
+        String ret = Long.toString(number);
         while (ret.length() < length) {
             ret = "0" + ret;
         }
@@ -330,59 +330,59 @@ public class Helper {
     }
 
     public static String joinStrings(List<String> arr, String glue) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         boolean first = true;
         for (String s : arr) {
             if (!first) {
-                ret += glue;
+                ret.append(glue);
             } else {
                 first = false;
             }
-            ret += s;
+            ret.append(s);
         }
-        return ret;
+        return ret.toString();
     }
 
     public static String joinStrings(String[] arr, String glue) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         boolean first = true;
         for (String s : arr) {
             if (!first) {
-                ret += glue;
+                ret.append(glue);
             } else {
                 first = false;
             }
-            ret += s;
+            ret.append(s);
         }
-        return ret;
+        return ret.toString();
     }
 
     public static String joinStrings(List<String> arr, String formatString, String glue) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         boolean first = true;
         for (String s : arr) {
             if (!first) {
-                ret += glue;
+                ret.append(glue);
             } else {
                 first = false;
             }
-            ret += String.format(formatString, s);
+            ret.append(String.format(formatString, s));
         }
-        return ret;
+        return ret.toString();
     }
 
     public static String joinStrings(String[] arr, String formatString, String glue) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         boolean first = true;
         for (String s : arr) {
             if (!first) {
-                ret += glue;
+                ret.append(glue);
             } else {
                 first = false;
             }
-            ret += String.format(formatString, s);
+            ret.append(String.format(formatString, s));
         }
-        return ret;
+        return ret.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -866,7 +866,7 @@ public class Helper {
      * @return String
      */
     public static String doubleStr(double d) {
-        String ret = "" + d;
+        String ret = Double.toString(d);
         if (ret.endsWith(".0")) {
             ret = ret.substring(0, ret.length() - 2);
         }

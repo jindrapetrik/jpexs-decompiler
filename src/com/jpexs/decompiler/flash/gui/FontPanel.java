@@ -178,7 +178,7 @@ public class FontPanel extends javax.swing.JPanel {
             }
         }
         ft.setModified(true);
-        SWF.clearImageCache();
+        ft.getSwf().clearImageCache();
     }
 
     public void showFontTag(FontTag ft) {
