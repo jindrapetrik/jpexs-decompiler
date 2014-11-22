@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.CachedScript;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
@@ -48,7 +49,6 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -129,7 +129,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private String lastDecompiled = "";
     private ASMSource lastASM;
     public SearchPanel<ActionSearchResult> searchPanel;
-    private Cache<ASMSource, CachedScript> cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
 
     public void clearSource() {
@@ -141,10 +140,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         srcWithHex = null;
         srcNoHex = null;
         srcHexOnly = null;
-    }
-
-    public void clearCache() {
-        cache.clear();
     }
 
     public String getStringUnderCursor() {
@@ -213,27 +208,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         return null;
     }
 
-    private CachedScript getCached(ASMSource pack) {
-        return (CachedScript) cache.get(pack);
-    }
-
-    private boolean isCached(ASMSource src) {
-        return cache.contains(src);
-    }
-
-    private void cacheScript(ASMSource src, List<Action> actions) throws InterruptedException {
-        if (!cache.contains(src)) {
-            if (actions == null) {
-                actions = src.getActions();
-            }
-            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-            Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
-            List<Highlighting> hilights = writer.instructionHilights;
-            String srcNoHex = writer.toString();
-            cache.put(src, new CachedScript(srcNoHex, hilights));
-        }
-    }
-
     public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
@@ -251,17 +225,17 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 pos++;
                 String workText = AppStrings.translate("work.searching");
                 String decAdd = "";
-                if (!isCached(item.getValue())) {
+                ASMSource asm = item.getValue();
+                if (!SWF.isCached(asm)) {
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
                 try {
-                    cacheScript(item.getValue(), null);
+                    if (pat.matcher(SWF.getCached(asm, null).text).find()) {
+                        found.add(new ActionSearchResult(asm, item.getKey()));
+                    }
                 } catch (InterruptedException ex) {
                     break;
-                }
-                if (pat.matcher(getCached(item.getValue()).text).find()) {
-                    found.add(new ActionSearchResult(item.getValue(), item.getKey()));
                 }
             }
 
@@ -434,10 +408,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 if (Configuration.decompile.get()) {
                     setDecompiledText("//" + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
-                        uncache(asm);
+                        SWF.uncache(asm);
                     }
-                    cacheScript(asm, actions);
-                    CachedScript sc = getCached(asm);
+                    CachedScript sc = SWF.getCached(asm, actions);
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;
@@ -829,9 +802,5 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 searchPanel.showQuickFindDialog(decompiledEditor);
             }
         });
-    }
-
-    private void uncache(ASMSource pack) {
-        cache.remove(pack);
     }
 }

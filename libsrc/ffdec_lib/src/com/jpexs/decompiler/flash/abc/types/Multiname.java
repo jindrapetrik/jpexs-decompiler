@@ -269,16 +269,16 @@ public class Multiname {
     }
 
     public String getNameWithNamespace(AVM2ConstantPool constants, boolean raw) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         Namespace ns = getNamespace(constants);
         if (ns != null) {
             String nsname = ns.getName(constants, raw);
             if (nsname != null && !nsname.isEmpty()) {
-                ret += nsname + ".";
+                ret.append(nsname).append(".");
             }
         }
-        ret += getName(constants, null, raw);
-        return ret;
+        ret.append(getName(constants, null, raw));
+        return ret.toString();
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {

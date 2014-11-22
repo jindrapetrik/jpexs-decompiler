@@ -153,12 +153,13 @@ public class XFLConverter {
     public static final int KEY_MODE_SHAPE_TWEEN = 17922;
     public static final int KEY_MODE_MOTION_TWEEN = 8195;
     public static final int KEY_MODE_SHAPE_LAYERS = 8192;
+    
+    private static final Random random = new Random(123); // predictable random
 
     private XFLConverter() {
     }
 
     public static String convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y) {
-        String ret = "";
         if (record instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) record;
             Point p = new Point(scr.moveDeltaX, scr.moveDeltaY);
@@ -192,20 +193,20 @@ public class XFLConverter {
             //anchor = mat.apply(anchor);
             return "[ " + control.x + " " + control.y + " " + anchor.x + " " + anchor.y;
         }
-        return ret;
+        return "";
     }
 
     public static String convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         int x = startX;
         int y = startY;
-        ret += "!" + startX + " " + startY;
+        ret.append("!").append(startX).append(" ").append(startY);
         for (SHAPERECORD rec : records) {
-            ret += convertShapeEdge(mat, rec, x, y);
+            ret.append(convertShapeEdge(mat, rec, x, y));
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
-        return ret;
+        return ret.toString();
     }
 
     public static String convertLineStyle(LINESTYLE ls, int shapeNum) {
@@ -219,59 +220,59 @@ public class XFLConverter {
     }
 
     public static String convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum) {
-        String ret = "";
-        String params = "";
+        StringBuilder ret = new StringBuilder();
+        StringBuilder params = new StringBuilder();
         if (ls.pixelHintingFlag) {
-            params += " pixelHinting=\"true\"";
+            params.append(" pixelHinting=\"true\"");
         }
         if (ls.width == 1) {
-            params += " solidStyle=\"hairline\"";
+            params.append(" solidStyle=\"hairline\"");
         }
         if ((!ls.noHScaleFlag) && (!ls.noVScaleFlag)) {
-            params += " scaleMode=\"normal\"";
+            params.append(" scaleMode=\"normal\"");
         } else if ((!ls.noHScaleFlag) && ls.noVScaleFlag) {
-            params += " scaleMode=\"horizontal\"";
+            params.append(" scaleMode=\"horizontal\"");
         } else if (ls.noHScaleFlag && (!ls.noVScaleFlag)) {
-            params += " scaleMode=\"vertical\"";
+            params.append(" scaleMode=\"vertical\"");
         }
 
         switch (ls.endCapStyle) {  //What about endCapStyle?
             case LINESTYLE2.NO_CAP:
-                params += " caps=\"none\"";
+                params.append(" caps=\"none\"");
                 break;
             case LINESTYLE2.SQUARE_CAP:
-                params += " caps=\"square\"";
+                params.append(" caps=\"square\"");
                 break;
         }
         switch (ls.joinStyle) {
             case LINESTYLE2.BEVEL_JOIN:
-                params += " joints=\"bevel\"";
+                params.append(" joints=\"bevel\"");
                 break;
             case LINESTYLE2.MITER_JOIN:
-                params += " joints=\"miter\"";
+                params.append(" joints=\"miter\"");
                 float miterLimitFactor = toFloat(ls.miterLimitFactor);
                 if (miterLimitFactor != 3.0f) {
-                    params += " miterLimit=\"" + miterLimitFactor + "\"";
+                    params.append(" miterLimit=\"").append(miterLimitFactor).append("\"");
                 }
                 break;
         }
 
-        ret += "<SolidStroke weight=\"" + (((float) ls.width) / 20.0) + "\"";
-        ret += params;
-        ret += ">";
-        ret += "<fill>";
+        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / 20.0).append("\"");
+        ret.append(params);
+        ret.append(">");
+        ret.append("<fill>");
 
         if (!ls.hasFillFlag) {
             RGBA color = (RGBA) ls.color;
-            ret += "<SolidColor color=\"" + color.toHexRGB() + "\""
-                    + (color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "")
-                    + " />";
+            ret.append("<SolidColor color=\"").append(color.toHexRGB()).append("\"").
+                    append(color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "").
+                    append(" />");
         } else {
-            ret += convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum);
+            ret.append(convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum));
         }
-        ret += "</fill>";
-        ret += "</SolidStroke>";
-        return ret;
+        ret.append("</fill>");
+        ret.append("</SolidStroke>");
+        return ret.toString();
     }
 
     private static float toFloat(int i) {
@@ -279,62 +280,63 @@ public class XFLConverter {
     }
 
     public static String convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
+        /* todo: use matrix
         if (mat == null) {
             mat = new MATRIX();
-        }
-        String ret = "";
+        }*/
+        StringBuilder ret = new StringBuilder();
         //ret += "<FillStyle index=\"" + index + "\">";
         switch (fs.fillStyleType) {
             case FILLSTYLE.SOLID:
-                ret += "<SolidColor color=\"";
-                ret += fs.color.toHexRGB();
-                ret += "\"";
+                ret.append("<SolidColor color=\"");
+                ret.append(fs.color.toHexRGB());
+                ret.append("\"");
                 if (shapeNum >= 3) {
-                    ret += " alpha=\"" + ((RGBA) fs.color).getAlphaFloat() + "\"";
+                    ret.append(" alpha=\"").append(((RGBA) fs.color).getAlphaFloat()).append("\"");
                 }
-                ret += " />";
+                ret.append(" />");
                 break;
             case FILLSTYLE.REPEATING_BITMAP:
             case FILLSTYLE.CLIPPED_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                ret += "<BitmapFill";
-                ret += " bitmapPath=\"";
+                ret.append("<BitmapFill");
+                ret.append(" bitmapPath=\"");
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
                 if (bitmapCh instanceof ImageTag) {
                     ImageTag it = (ImageTag) bitmapCh;
-                    ret += "bitmap" + bitmapCh.getCharacterId() + "." + it.getImageFormat();
+                    ret.append("bitmap").append(bitmapCh.getCharacterId()).append(".").append(it.getImageFormat());
                 } else {
                     if (bitmapCh != null) {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:" + bitmapCh.getClass().getSimpleName());
                     }
                     return "<SolidColor color=\"#ffffff\" />";
                 }
-                ret += "\"";
+                ret.append("\"");
 
                 if ((fs.fillStyleType == FILLSTYLE.CLIPPED_BITMAP) || (fs.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
-                    ret += " bitmapIsClipped=\"true\"";
+                    ret.append(" bitmapIsClipped=\"true\"");
                 }
 
-                ret += ">";
-                ret += "<matrix>" + convertMatrix(fs.bitmapMatrix) + "</matrix>";
-                ret += "</BitmapFill>";
+                ret.append(">");
+                ret.append("<matrix>").append(convertMatrix(fs.bitmapMatrix)).append("</matrix>");
+                ret.append("</BitmapFill>");
                 break;
             case FILLSTYLE.LINEAR_GRADIENT:
             case FILLSTYLE.RADIAL_GRADIENT:
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    ret += "<LinearGradient";
+                    ret.append("<LinearGradient");
                 } else {
-                    ret += "<RadialGradient";
-                    ret += " focalPointRatio=\"";
+                    ret.append("<RadialGradient");
+                    ret.append(" focalPointRatio=\"");
                     if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                        ret += ((FOCALGRADIENT) fs.gradient).focalPoint;
+                        ret.append(((FOCALGRADIENT) fs.gradient).focalPoint);
                     } else {
-                        ret += "0";
+                        ret.append("0");
                     }
-                    ret += "\"";
+                    ret.append("\"");
                 }
 
                 int interpolationMode;
@@ -350,23 +352,23 @@ public class XFLConverter {
                     spreadMode = fs.gradient.spreadMode;
                 }
                 if (interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
-                    ret += " interpolationMethod=\"linearRGB\"";
+                    ret.append(" interpolationMethod=\"linearRGB\"");
                 }
                 switch (spreadMode) {
                     case GRADIENT.SPREAD_PAD_MODE:
 
                         break;
                     case GRADIENT.SPREAD_REFLECT_MODE:
-                        ret += " spreadMethod=\"reflect\"";
+                        ret.append(" spreadMethod=\"reflect\"");
                         break;
                     case GRADIENT.SPREAD_REPEAT_MODE:
-                        ret += " spreadMethod=\"repeat\"";
+                        ret.append(" spreadMethod=\"repeat\"");
                         break;
                 }
 
-                ret += ">";
+                ret.append(">");
 
-                ret += "<matrix>" + convertMatrix(fs.gradientMatrix) + "</matrix>";
+                ret.append("<matrix>").append(convertMatrix(fs.gradientMatrix)).append("</matrix>");
                 GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.gradient.gradientRecords;
@@ -374,24 +376,23 @@ public class XFLConverter {
                     records = fs.gradient.gradientRecords;
                 }
                 for (GRADRECORD rec : records) {
-                    ret += "<GradientEntry";
-                    ret += " color=\"" + (shapeNum >= 3 ? rec.color.toHexRGB() : rec.color.toHexRGB()) + "\"";
+                    ret.append("<GradientEntry");
+                    ret.append(" color=\"").append(rec.color.toHexRGB()).append("\"");
                     if (shapeNum >= 3) {
-                        ret += " alpha=\"" + ((RGBA) rec.color).getAlphaFloat() + "\"";
+                        ret.append(" alpha=\"").append(((RGBA) rec.color).getAlphaFloat()).append("\"");
                     }
-                    ret += " ratio=\"" + rec.getRatioFloat() + "\"";
-                    ret += " />";
+                    ret.append(" ratio=\"").append(rec.getRatioFloat()).append("\"");
+                    ret.append(" />");
                 }
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    ret += "</LinearGradient>";
+                    ret.append("</LinearGradient>");
                 } else {
-                    ret += "</RadialGradient>";
+                    ret.append("</RadialGradient>");
                 }
                 break;
         }
         //ret += "</FillStyle>";
-        return ret;
-
+        return ret.toString();
     }
 
     public static String convertMatrix(MATRIX m) {
@@ -399,23 +400,23 @@ public class XFLConverter {
     }
 
     public static String convertMatrix(Matrix m) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         if (m == null) {
             m = new Matrix();
         }
-        ret += "<Matrix ";
-        ret += "tx=\"" + (((float) m.translateX) / 20.0) + "\" ";
-        ret += "ty=\"" + (((float) m.translateY) / 20.0) + "\" ";
+        ret.append("<Matrix ");
+        ret.append("tx=\"").append(((float) m.translateX) / 20.0).append("\" ");
+        ret.append("ty=\"").append(((float) m.translateY) / 20.0).append("\" ");
         if (m.scaleX != 1.0 || m.scaleY != 1.0) {
-            ret += "a=\"" + m.scaleX + "\" ";
-            ret += "d=\"" + m.scaleY + "\" ";
+            ret.append("a=\"").append(m.scaleX).append("\" ");
+            ret.append("d=\"").append(m.scaleY).append("\" ");
         }
         if (m.rotateSkew0 != 0.0 || m.rotateSkew1 != 0.0) {
-            ret += "b=\"" + m.rotateSkew0 + "\" ";
-            ret += "c=\"" + m.rotateSkew1 + "\" ";
+            ret.append("b=\"").append(m.rotateSkew0).append("\" ");
+            ret.append("c=\"").append(m.rotateSkew1).append("\" ");
         }
-        ret += "/>";
-        return ret;
+        ret.append("/>");
+        return ret.toString();
     }
     /*
      public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPE shape) {
@@ -440,25 +441,25 @@ public class XFLConverter {
     }
 
     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (layers.size() == 1 && !useLayers) {
-            ret += layers.get(0);
+            ret.append(layers.get(0));
         } else {
             int layer = 1;
             for (int l = layers.size() - 1; l >= 0; l--) {
-                ret += "<DOMLayer name=\"Layer " + (layer++) + "\">"; //color=\"#4FFF4F\"
-                ret += "<frames>";
-                ret += "<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"" + KEY_MODE_SHAPE_LAYERS + "\">";
-                ret += "<elements>";
-                ret += layers.get(l);
-                ret += "</elements>";
-                ret += "</DOMFrame>";
-                ret += "</frames>";
-                ret += "</DOMLayer>";
+                ret.append("<DOMLayer name=\"Layer ").append(layer++).append("\">"); //color=\"#4FFF4F\"
+                ret.append("<frames>");
+                ret.append("<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"").append(KEY_MODE_SHAPE_LAYERS).append("\">");
+                ret.append("<elements>");
+                ret.append(layers.get(l));
+                ret.append("</elements>");
+                ret.append("</DOMFrame>");
+                ret.append("</frames>");
+                ret.append("</DOMLayer>");
             }
         }
-        return ret;
+        return ret.toString();
     }
 
     /**
@@ -901,149 +902,149 @@ public class XFLConverter {
     }
 
     public static String convertFilter(FILTER filter) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
-            ret += "<DropShadowFilter";
+            ret.append("<DropShadowFilter");
             if (dsf.dropShadowColor.alpha != 255) {
-                ret += " alpha=\"" + doubleToString(dsf.dropShadowColor.getAlphaFloat()) + "\"";
+                ret.append(" alpha=\"").append(doubleToString(dsf.dropShadowColor.getAlphaFloat())).append("\"");
             }
-            ret += " angle=\"" + doubleToString(radToDeg(dsf.angle)) + "\"";
-            ret += " blurX=\"" + doubleToString(dsf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(dsf.blurY) + "\"";
-            ret += " color=\"" + dsf.dropShadowColor.toHexRGB() + "\"";
-            ret += " distance=\"" + doubleToString(dsf.distance) + "\"";
+            ret.append(" angle=\"").append(doubleToString(radToDeg(dsf.angle))).append("\"");
+            ret.append(" blurX=\"").append(doubleToString(dsf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(dsf.blurY)).append("\"");
+            ret.append(" color=\"").append(dsf.dropShadowColor.toHexRGB()).append("\"");
+            ret.append(" distance=\"").append(doubleToString(dsf.distance)).append("\"");
             if (!dsf.compositeSource) {
-                ret += " hideObject=\"true\"";
+                ret.append(" hideObject=\"true\"");
             }
             if (dsf.innerShadow) {
-                ret += " inner=\"true\"";
+                ret.append(" inner=\"true\"");
             }
             if (dsf.knockout) {
-                ret += " knockout=\"true\"";
+                ret.append(" knockout=\"true\"");
             }
-            ret += " quality=\"" + dsf.passes + "\"";
-            ret += " strength=\"" + doubleToString(dsf.strength, 2) + "\"";
-            ret += " />";
+            ret.append(" quality=\"").append(dsf.passes).append("\"");
+            ret.append(" strength=\"").append(doubleToString(dsf.strength, 2)).append("\"");
+            ret.append(" />");
         } else if (filter instanceof BLURFILTER) {
             BLURFILTER bf = (BLURFILTER) filter;
-            ret += "<BlurFilter";
-            ret += " blurX=\"" + doubleToString(bf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(bf.blurY) + "\"";
-            ret += " quality=\"" + bf.passes + "\"";
-            ret += " />";
+            ret.append("<BlurFilter");
+            ret.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
+            ret.append(" quality=\"").append(bf.passes).append("\"");
+            ret.append(" />");
         } else if (filter instanceof GLOWFILTER) {
             GLOWFILTER gf = (GLOWFILTER) filter;
-            ret += "<GlowFilter";
+            ret.append("<GlowFilter");
             if (gf.glowColor.alpha != 255) {
-                ret += " alpha=\"" + gf.glowColor.getAlphaFloat() + "\"";
+                ret.append(" alpha=\"").append(gf.glowColor.getAlphaFloat()).append("\"");
             }
-            ret += " blurX=\"" + doubleToString(gf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(gf.blurY) + "\"";
-            ret += " color=\"" + gf.glowColor.toHexRGB() + "\"";
+            ret.append(" blurX=\"").append(doubleToString(gf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(gf.blurY)).append("\"");
+            ret.append(" color=\"").append(gf.glowColor.toHexRGB()).append("\"");
 
             if (gf.innerGlow) {
-                ret += " inner=\"true\"";
+                ret.append(" inner=\"true\"");
             }
             if (gf.knockout) {
-                ret += " knockout=\"true\"";
+                ret.append(" knockout=\"true\"");
             }
-            ret += " quality=\"" + gf.passes + "\"";
-            ret += " strength=\"" + doubleToString(gf.strength, 2) + "\"";
-            ret += " />";
+            ret.append(" quality=\"").append(gf.passes).append("\"");
+            ret.append(" strength=\"").append(doubleToString(gf.strength, 2)).append("\"");
+            ret.append(" />");
         } else if (filter instanceof BEVELFILTER) {
             BEVELFILTER bf = (BEVELFILTER) filter;
-            ret += "<BevelFilter";
-            ret += " blurX=\"" + doubleToString(bf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(bf.blurY) + "\"";
-            ret += " quality=\"" + bf.passes + "\"";
-            ret += " angle=\"" + doubleToString(radToDeg(bf.angle)) + "\"";
-            ret += " distance=\"" + bf.distance + "\"";
+            ret.append("<BevelFilter");
+            ret.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
+            ret.append(" quality=\"").append(bf.passes).append("\"");
+            ret.append(" angle=\"").append(doubleToString(radToDeg(bf.angle))).append("\"");
+            ret.append(" distance=\"").append(bf.distance).append("\"");
             if (bf.highlightColor.alpha != 255) {
-                ret += " highlightAlpha=\"" + bf.highlightColor.getAlphaFloat() + "\"";
+                ret.append(" highlightAlpha=\"").append(bf.highlightColor.getAlphaFloat()).append("\"");
             }
-            ret += " highlightColor=\"" + bf.highlightColor.toHexRGB() + "\"";
+            ret.append(" highlightColor=\"").append(bf.highlightColor.toHexRGB()).append("\"");
             if (bf.knockout) {
-                ret += " knockout=\"true\"";
+                ret.append(" knockout=\"true\"");
             }
             if (bf.shadowColor.alpha != 255) {
-                ret += " shadowAlpha=\"" + bf.shadowColor.getAlphaFloat() + "\"";
+                ret.append(" shadowAlpha=\"").append(bf.shadowColor.getAlphaFloat()).append("\"");
             }
-            ret += " shadowColor=\"" + bf.shadowColor.toHexRGB() + "\"";
-            ret += " strength=\"" + doubleToString(bf.strength, 2) + "\"";
+            ret.append(" shadowColor=\"").append(bf.shadowColor.toHexRGB()).append("\"");
+            ret.append(" strength=\"").append(doubleToString(bf.strength, 2)).append("\"");
             if (bf.onTop && !bf.innerShadow) {
-                ret += " type=\"full\"";
+                ret.append(" type=\"full\"");
             } else if (!bf.innerShadow) {
-                ret += " type=\"outer\"";
+                ret.append(" type=\"outer\"");
             }
-            ret += " />";
+            ret.append(" />");
         } else if (filter instanceof GRADIENTGLOWFILTER) {
             GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER) filter;
-            ret += "<GradientGlowFilter";
-            ret += " angle=\"" + doubleToString(radToDeg(ggf.angle)) + "\"";
+            ret.append("<GradientGlowFilter");
+            ret.append(" angle=\"").append(doubleToString(radToDeg(ggf.angle))).append("\"");
 
-            ret += " blurX=\"" + doubleToString(ggf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(ggf.blurY) + "\"";
-            ret += " quality=\"" + ggf.passes + "\"";
-            ret += " distance=\"" + doubleToString(ggf.distance) + "\"";
+            ret.append(" blurX=\"").append(doubleToString(ggf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(ggf.blurY)).append("\"");
+            ret.append(" quality=\"").append(ggf.passes).append("\"");
+            ret.append(" distance=\"").append(doubleToString(ggf.distance)).append("\"");
             if (ggf.knockout) {
-                ret += " knockout=\"true\"";
+                ret.append(" knockout=\"true\"");
             }
-            ret += " strength=\"" + doubleToString(ggf.strength, 2) + "\"";
+            ret.append(" strength=\"").append(doubleToString(ggf.strength, 2)).append("\"");
             if (ggf.onTop && !ggf.innerShadow) {
-                ret += " type=\"full\"";
+                ret.append(" type=\"full\"");
             } else if (!ggf.innerShadow) {
-                ret += " type=\"outer\"";
+                ret.append(" type=\"outer\"");
             }
-            ret += ">";
+            ret.append(">");
             for (int g = 0; g < ggf.gradientColors.length; g++) {
                 RGBA gc = ggf.gradientColors[g];
-                ret += "<GradientEntry color=\"" + gc.toHexRGB() + "\"";
+                ret.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
                 if (gc.alpha != 255) {
-                    ret += " alpha=\"" + gc.getAlphaFloat() + "\"";
+                    ret.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
                 }
-                ret += " ratio=\"" + doubleToString(((float) ggf.gradientRatio[g]) / 255.0) + "\"";
-                ret += "/>";
+                ret.append(" ratio=\"").append(doubleToString(((float) ggf.gradientRatio[g]) / 255.0)).append("\"");
+                ret.append("/>");
             }
-            ret += "</GradientGlowFilter>";
+            ret.append("</GradientGlowFilter>");
         } else if (filter instanceof GRADIENTBEVELFILTER) {
             GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER) filter;
-            ret += "<GradientBevelFilter";
-            ret += " angle=\"" + doubleToString(radToDeg(gbf.angle)) + "\"";
+            ret.append("<GradientBevelFilter");
+            ret.append(" angle=\"").append(doubleToString(radToDeg(gbf.angle))).append("\"");
 
-            ret += " blurX=\"" + doubleToString(gbf.blurX) + "\"";
-            ret += " blurY=\"" + doubleToString(gbf.blurY) + "\"";
-            ret += " quality=\"" + gbf.passes + "\"";
-            ret += " distance=\"" + doubleToString(gbf.distance) + "\"";
+            ret.append(" blurX=\"").append(doubleToString(gbf.blurX)).append("\"");
+            ret.append(" blurY=\"").append(doubleToString(gbf.blurY)).append("\"");
+            ret.append(" quality=\"").append(gbf.passes).append("\"");
+            ret.append(" distance=\"").append(doubleToString(gbf.distance)).append("\"");
             if (gbf.knockout) {
-                ret += " knockout=\"true\"";
+                ret.append(" knockout=\"true\"");
             }
-            ret += " strength=\"" + doubleToString(gbf.strength, 2) + "\"";
+            ret.append(" strength=\"").append(doubleToString(gbf.strength, 2)).append("\"");
             if (gbf.onTop && !gbf.innerShadow) {
-                ret += " type=\"full\"";
+                ret.append(" type=\"full\"");
             } else if (!gbf.innerShadow) {
-                ret += " type=\"outer\"";
+                ret.append(" type=\"outer\"");
             }
-            ret += ">";
+            ret.append(">");
             for (int g = 0; g < gbf.gradientColors.length; g++) {
                 RGBA gc = gbf.gradientColors[g];
-                ret += "<GradientEntry color=\"" + gc.toHexRGB() + "\"";
+                ret.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
                 if (gc.alpha != 255) {
-                    ret += " alpha=\"" + gc.getAlphaFloat() + "\"";
+                    ret.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
                 }
-                ret += " ratio=\"" + doubleToString(((float) gbf.gradientRatio[g]) / 255.0) + "\"";
-                ret += "/>";
+                ret.append(" ratio=\"").append(doubleToString(((float) gbf.gradientRatio[g]) / 255.0)).append("\"");
+                ret.append("/>");
             }
-            ret += "</GradientBevelFilter>";
+            ret.append("</GradientBevelFilter>");
         } else if (filter instanceof COLORMATRIXFILTER) {
             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
-            ret += convertAdjustColorFilter(cmf);
+            ret.append(convertAdjustColorFilter(cmf));
         }
-        return ret;
+        return ret.toString();
     }
 
     public static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1059,110 +1060,110 @@ public class XFLConverter {
             }
         }
 
-        ret += "<DOMSymbolInstance libraryItemName=\"" + "Symbol " + tag.getCharacterId() + "\"";
+        ret.append("<DOMSymbolInstance libraryItemName=\"" + "Symbol ").append(tag.getCharacterId()).append("\"");
         if (name != null) {
-            ret += " name=\"" + xmlString(name) + "\"";
+            ret.append(" name=\"").append(xmlString(name)).append("\"");
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
             blendModeStr = BLENDMODES[blendMode];
         }
         if (blendModeStr != null) {
-            ret += " blendMode=\"" + blendModeStr + "\"";
+            ret.append(" blendMode=\"").append(blendModeStr).append("\"");
         }
         if (tag instanceof ShapeTag) {
-            ret += " symbolType=\"graphic\" loop=\"loop\"";
+            ret.append(" symbolType=\"graphic\" loop=\"loop\"");
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
             RECT spriteRect = sprite.getRect(new HashSet<BoundedTag>());
             double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
             double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
-            ret += " centerPoint3DX=\"" + centerPoint3DX + "\" centerPoint3DY=\"" + centerPoint3DY + "\"";
+            ret.append(" centerPoint3DX=\"").append(centerPoint3DX).append("\" centerPoint3DY=\"").append(centerPoint3DY).append("\"");
         } else if (tag instanceof ButtonTag) {
-            ret += " symbolType=\"button\"";
+            ret.append(" symbolType=\"button\"");
         }
         if (cacheAsBitmap) {
-            ret += " cacheAsBitmap=\"true\"";
+            ret.append(" cacheAsBitmap=\"true\"");
         }
         if (!isVisible && flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
-            ret += " isVisible=\"false\"";
+            ret.append(" isVisible=\"false\"");
         }
-        ret += ">";
-        ret += "<matrix>";
-        ret += convertMatrix(matrix);
-        ret += "</matrix>";
-        ret += "<transformationPoint><Point/></transformationPoint>";
+        ret.append(">");
+        ret.append("<matrix>");
+        ret.append(convertMatrix(matrix));
+        ret.append("</matrix>");
+        ret.append("<transformationPoint><Point/></transformationPoint>");
 
         if (backgroundColor != null) {
-            ret += "<MatteColor color=\"" + backgroundColor.toHexRGB() + "\"";
+            ret.append("<MatteColor color=\"").append(backgroundColor.toHexRGB()).append("\"");
             if (backgroundColor.alpha != 255) {
-                ret += " alpha=\"" + doubleToString(backgroundColor.getAlphaFloat()) + "\"";
+                ret.append(" alpha=\"").append(doubleToString(backgroundColor.getAlphaFloat())).append("\"");
             }
-            ret += "/>";
+            ret.append("/>");
         }
         if (colorTransform != null) {
-            ret += "<color><Color";
+            ret.append("<color><Color");
             if (colorTransform.getRedMulti() != 255) {
-                ret += " redMultiplier=\"" + (((float) colorTransform.getRedMulti()) / 255.0f) + "\"";
+                ret.append(" redMultiplier=\"").append(((float) colorTransform.getRedMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getGreenMulti() != 255) {
-                ret += " greenMultiplier=\"" + (((float) colorTransform.getGreenMulti()) / 255.0f) + "\"";
+                ret.append(" greenMultiplier=\"").append(((float) colorTransform.getGreenMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getBlueMulti() != 255) {
-                ret += " blueMultiplier=\"" + (((float) colorTransform.getBlueMulti()) / 255.0f) + "\"";
+                ret.append(" blueMultiplier=\"").append(((float) colorTransform.getBlueMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getAlphaMulti() != 255) {
-                ret += " alphaMultiplier=\"" + (((float) colorTransform.getAlphaMulti()) / 255.0f) + "\"";
+                ret.append(" alphaMultiplier=\"").append(((float) colorTransform.getAlphaMulti()) / 255.0f).append("\"");
             }
 
             if (colorTransform.getRedAdd() != 0) {
-                ret += " redOffset=\"" + colorTransform.getRedAdd() + "\"";
+                ret.append(" redOffset=\"").append(colorTransform.getRedAdd()).append("\"");
             }
             if (colorTransform.getGreenAdd() != 0) {
-                ret += " greenOffset=\"" + colorTransform.getGreenAdd() + "\"";
+                ret.append(" greenOffset=\"").append(colorTransform.getGreenAdd()).append("\"");
             }
             if (colorTransform.getBlueAdd() != 0) {
-                ret += " blueOffset=\"" + colorTransform.getBlueAdd() + "\"";
+                ret.append(" blueOffset=\"").append(colorTransform.getBlueAdd()).append("\"");
             }
             if (colorTransform.getAlphaAdd() != 0) {
-                ret += " alphaOffset=\"" + colorTransform.getAlphaAdd() + "\"";
+                ret.append(" alphaOffset=\"").append(colorTransform.getAlphaAdd()).append("\"");
             }
 
-            ret += "/></color>";
+            ret.append("/></color>");
         }
         if (filters != null) {
-            ret += "<filters>";
+            ret.append("<filters>");
             for (FILTER f : filters) {
-                ret += convertFilter(f);
+                ret.append(convertFilter(f));
             }
-            ret += "</filters>";
+            ret.append("</filters>");
         }
         if (tag instanceof DefineButtonTag) {
-            ret += "<Actionscript><script><![CDATA[";
-            ret += "on(press){\r\n";
-            ret += convertActionScript(((DefineButtonTag) tag));
-            ret += "}";
-            ret += "]]></script></Actionscript>";
+            ret.append("<Actionscript><script><![CDATA[");
+            ret.append("on(press){\r\n");
+            ret.append(convertActionScript(((DefineButtonTag) tag)));
+            ret.append("}");
+            ret.append("]]></script></Actionscript>");
         }
         if (tag instanceof DefineButton2Tag) {
             DefineButton2Tag db2 = (DefineButton2Tag) tag;
             if (!db2.actions.isEmpty()) {
-                ret += "<Actionscript><script><![CDATA[";
+                ret.append("<Actionscript><script><![CDATA[");
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    ret += convertActionScript(bca);
+                    ret.append(convertActionScript(bca));
                 }
-                ret += "]]></script></Actionscript>";
+                ret.append("]]></script></Actionscript>");
             }
         }
         if (clipActions != null) {
-            ret += "<Actionscript><script><![CDATA[";
+            ret.append("<Actionscript><script><![CDATA[");
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
-                ret += convertActionScript(rec);
+                ret.append(convertActionScript(rec));
             }
-            ret += "]]></script></Actionscript>";
+            ret.append("]]></script></Actionscript>");
         }
-        ret += "</DOMSymbolInstance>";
-        return ret;
+        ret.append("</DOMSymbolInstance>");
+        return ret.toString();
     }
 
     private static String convertActionScript(ASMSource as) {
@@ -1183,7 +1184,7 @@ public class XFLConverter {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         List<String> media = new ArrayList<>();
         List<String> symbols = new ArrayList<>();
         for (int ch : characters.keySet()) {
@@ -1192,40 +1193,39 @@ public class XFLConverter {
                 continue; //shapes with 1 ocurrence and single layer are not added to library
             }
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
-                String symbolStr = "";
+                StringBuilder symbolStr = new StringBuilder();
 
-                symbolStr += "<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol " + symbol.getCharacterId() + "\" lastModified=\"" + getTimestamp() + "\""; //TODO:itemID
+                symbolStr.append("<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol ").append(symbol.getCharacterId()).append("\" lastModified=\"").append(getTimestamp()).append("\""); //TODO:itemID
                 if (symbol instanceof ShapeTag) {
-                    symbolStr += " symbolType=\"graphic\"";
+                    symbolStr.append(" symbolType=\"graphic\"");
                 } else if (symbol instanceof ButtonTag) {
-                    symbolStr += " symbolType=\"button\"";
+                    symbolStr.append(" symbolType=\"button\"");
                     if (((ButtonTag) symbol).trackAsMenu()) {
-                        symbolStr += "  trackAsMenu=\"true\"";
+                        symbolStr.append("  trackAsMenu=\"true\"");
                     }
                 }
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageClassName=\"" + xmlString(characterClasses.get(symbol.getCharacterId())) + "\"";
+                    symbolStr.append(" linkageClassName=\"").append(xmlString(characterClasses.get(symbol.getCharacterId()))).append("\"");
                 }
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                    symbolStr.append(" linkageIdentifier=\"").append(xmlString(characterVariables.get(symbol.getCharacterId()))).append("\"");
                 }
                 if (linkageExportForAS) {
-                    symbolStr += " linkageExportForAS=\"true\"";
+                    symbolStr.append(" linkageExportForAS=\"true\"");
                 }
-                symbolStr += ">";
-                symbolStr += "<timeline>";
+                symbolStr.append(">");
+                symbolStr.append("<timeline>");
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
                     itemIcon = "0";
-                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterId() + "\" currentFrame=\"0\">";
-                    symbolStr += "<layers>";
+                    symbolStr.append("<DOMTimeline name=\"Symbol ").append(symbol.getCharacterId()).append("\" currentFrame=\"0\">");
+                    symbolStr.append("<layers>");
 
                     ButtonTag button = (ButtonTag) symbol;
                     List<BUTTONRECORD> records = button.getRecords();
-                    String[] frames = {"", "", "", ""};
 
                     int maxDepth = 0;
                     for (BUTTONRECORD rec : records) {
@@ -1234,12 +1234,12 @@ public class XFLConverter {
                         }
                     }
                     for (int i = maxDepth; i >= 1; i--) {
-                        symbolStr += "<DOMLayer name=\"Layer " + (maxDepth - i + 1) + "\"";
+                        symbolStr.append("<DOMLayer name=\"Layer ").append(maxDepth - i + 1).append("\"");
                         if (i == 1) {
-                            symbolStr += " current=\"true\" isSelected=\"true\"";
+                            symbolStr.append(" current=\"true\" isSelected=\"true\"");
                         }
-                        symbolStr += " color=\"" + randomOutlineColor() + "\">";
-                        symbolStr += "<frames>";
+                        symbolStr.append(" color=\"").append(randomOutlineColor()).append("\">");
+                        symbolStr.append("<frames>");
                         int lastFrame = 0;
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
@@ -1277,7 +1277,7 @@ public class XFLConverter {
                                     }
                                     CharacterTag character = characters.get(rec.characterId);
                                     MATRIX matrix = rec.placeMatrix;
-                                    String recCharStr = "";
+                                    String recCharStr;
                                     if (character instanceof TextTag) {
                                         recCharStr = convertText(null, tags, (TextTag) character, matrix, filters, null);
                                     } else if (character instanceof DefineVideoStreamTag) {
@@ -1289,52 +1289,52 @@ public class XFLConverter {
                                     lastFrame = frame;
                                     if (duration > 0) {
                                         if (duration > 1) {
-                                            symbolStr += "<DOMFrame index=\"";
-                                            symbolStr += (frame - duration);
-                                            symbolStr += "\"";
-                                            symbolStr += " duration=\"" + (duration - 1) + "\"";
-                                            symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                                            symbolStr += "<elements>";
-                                            symbolStr += "</elements>";
-                                            symbolStr += "</DOMFrame>";
+                                            symbolStr.append("<DOMFrame index=\"");
+                                            symbolStr.append((frame - duration));
+                                            symbolStr.append("\"");
+                                            symbolStr.append(" duration=\"").append(duration - 1).append("\"");
+                                            symbolStr.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
+                                            symbolStr.append("<elements>");
+                                            symbolStr.append("</elements>");
+                                            symbolStr.append("</DOMFrame>");
                                         }
-                                        symbolStr += "<DOMFrame index=\"";
-                                        symbolStr += (frame - 1);
-                                        symbolStr += "\"";
-                                        symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                                        symbolStr += "<elements>";
-                                        symbolStr += recCharStr;
-                                        symbolStr += "</elements>";
-                                        symbolStr += "</DOMFrame>";
+                                        symbolStr.append("<DOMFrame index=\"");
+                                        symbolStr.append((frame - 1));
+                                        symbolStr.append("\"");
+                                        symbolStr.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
+                                        symbolStr.append("<elements>");
+                                        symbolStr.append(recCharStr);
+                                        symbolStr.append("</elements>");
+                                        symbolStr.append("</DOMFrame>");
                                     }
                                 }
                             }
                         }
-                        symbolStr += "</frames>";
-                        symbolStr += "</DOMLayer>";
+                        symbolStr.append("</frames>");
+                        symbolStr.append("</DOMLayer>");
                     }
-                    symbolStr += "</layers>";
-                    symbolStr += "</DOMTimeline>";
+                    symbolStr.append("</layers>");
+                    symbolStr.append("</DOMTimeline>");
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
                     if (sprite.subTags.isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    symbolStr += convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files);
+                    symbolStr.append(convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files));
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
-                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterId() + "\" currentFrame=\"0\">";
-                    symbolStr += "<layers>";
-                    symbolStr += convertShape(characters, null, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, true);
-                    symbolStr += "</layers>";
-                    symbolStr += "</DOMTimeline>";
+                    symbolStr.append("<DOMTimeline name=\"Symbol ").append(symbol.getCharacterId()).append("\" currentFrame=\"0\">");
+                    symbolStr.append("<layers>");
+                    symbolStr.append(convertShape(characters, null, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, true));
+                    symbolStr.append("</layers>");
+                    symbolStr.append("</DOMTimeline>");
                 }
-                symbolStr += "</timeline>";
-                symbolStr += "</DOMSymbolItem>";
-                symbolStr = prettyFormatXML(symbolStr);
+                symbolStr.append("</timeline>");
+                symbolStr.append("</DOMSymbolItem>");
+                String symbolStr2 = prettyFormatXML(symbolStr.toString());
                 String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
-                files.put(symbolFile, Utf8Helper.getBytes(symbolStr));
+                files.put(symbolFile, Utf8Helper.getBytes(symbolStr2));
                 String symbLinkStr = "";
                 symbLinkStr += "<Include href=\"" + symbolFile + "\"";
                 if (itemIcon != null) {
@@ -1351,6 +1351,8 @@ public class XFLConverter {
                 ImageTag imageTag = (ImageTag) symbol;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 SerializableImage image = imageTag.getImage();
+                // do not store the image in cache during xfl conversion
+                imageTag.clearCache();
                 String format = imageTag.getImageFormat();
                 try {
                     ImageIO.write(image.getBufferedImage(), format.toUpperCase(), baos);
@@ -1616,20 +1618,20 @@ public class XFLConverter {
 
         }
         if (!media.isEmpty()) {
-            ret += "<media>";
+            ret.append("<media>");
             for (String m : media) {
-                ret += m;
+                ret.append(m);
             }
-            ret += "</media>";
+            ret.append("</media>");
         }
         if (!symbols.isEmpty()) {
-            ret += "<symbols>";
+            ret.append("<symbols>");
             for (String s : symbols) {
-                ret += s;
+                ret.append(s);
             }
-            ret += "</symbols>";
+            ret.append("</symbols>");
         }
-        return ret;
+        return ret.toString();
     }
 
     private static String prettyFormatXML(String input) {
@@ -1653,7 +1655,7 @@ public class XFLConverter {
     }
 
     private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         DefineSoundTag sound = null;
         if (startSound != null) {
             for (Tag t : tags) {
@@ -1667,79 +1669,80 @@ public class XFLConverter {
             }
         }
 
-        ret += "<DOMFrame index=\"" + (frame) + "\"";
+        ret.append("<DOMFrame index=\"").append(frame).append("\"");
         if (duration > 1) {
-            ret += " duration=\"" + duration + "\"";
+            ret.append(" duration=\"").append(duration).append("\"");
         }
         if (shapeTween) {
-            ret += " tweenType=\"shape\" keyMode=\"" + KEY_MODE_SHAPE_TWEEN + "\"";
+            ret.append(" tweenType=\"shape\" keyMode=\"").append(KEY_MODE_SHAPE_TWEEN).append("\"");
         } else {
-            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
+            ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\"");
         }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null && startSound == null) {
             String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat();
-            ret += " soundName=\"" + soundName + "\"";
-            ret += " soundSync=\"stream\"";
+            ret.append(" soundName=\"").append(soundName).append("\"");
+            ret.append(" soundSync=\"stream\"");
             soundEnvelopeStr += "<SoundEnvelope>";
             soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
             soundEnvelopeStr += "</SoundEnvelope>";
         }
         if (startSound != null && sound != null) {
             String soundName = "sound" + sound.soundId + "." + sound.getExportFormat();
-            ret += " soundName=\"" + soundName + "\"";
+            ret.append(" soundName=\"").append(soundName).append("\"");
             if (startSound.soundInfo.hasInPoint) {
-                ret += " inPoint44=\"" + startSound.soundInfo.inPoint + "\"";
+                ret.append(" inPoint44=\"").append(startSound.soundInfo.inPoint).append("\"");
             }
             if (startSound.soundInfo.hasOutPoint) {
-                ret += " outPoint44=\"" + startSound.soundInfo.outPoint + "\"";
+                ret.append(" outPoint44=\"").append(startSound.soundInfo.outPoint).append("\"");
             }
             if (startSound.soundInfo.hasLoops) {
                 if (startSound.soundInfo.loopCount == 32767) {
-                    ret += " soundLoopMode=\"loop\"";
+                    ret.append(" soundLoopMode=\"loop\"");
                 }
-                ret += " soundLoop=\"" + startSound.soundInfo.loopCount + "\"";
+                ret.append(" soundLoop=\"").append(startSound.soundInfo.loopCount).append("\"");
             }
 
             if (startSound.soundInfo.syncStop) {
-                ret += " soundSync=\"stop\"";
+                ret.append(" soundSync=\"stop\"");
             } else if (startSound.soundInfo.syncNoMultiple) {
-                ret += " soundSync=\"start\"";
+                ret.append(" soundSync=\"start\"");
             }
             soundEnvelopeStr += "<SoundEnvelope>";
             if (startSound.soundInfo.hasEnvelope) {
-                for (SOUNDENVELOPE env : startSound.soundInfo.envelopeRecords) {
+                SOUNDENVELOPE[] envelopeRecords = startSound.soundInfo.envelopeRecords;
+                for (SOUNDENVELOPE env : envelopeRecords) {
                     soundEnvelopeStr += "<SoundEnvelopePoint mark44=\"" + env.pos44 + "\" level0=\"" + env.leftLevel + "\" level1=\"" + env.rightLevel + "\"/>";
                 }
 
-                if (startSound.soundInfo.envelopeRecords.length == 1
-                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 32768
-                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
-                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 0) {
-                    ret += " soundEffect=\"left channel\"";
-                } else if (startSound.soundInfo.envelopeRecords.length == 1
-                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 0
-                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
-                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 32768) {
-                    ret += " soundEffect=\"right channel\"";
-                } else if (startSound.soundInfo.envelopeRecords.length == 2
-                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 32768
-                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
-                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 0
-                        && startSound.soundInfo.envelopeRecords[1].leftLevel == 0
-                        && startSound.soundInfo.envelopeRecords[1].pos44 == sound.soundSampleCount
-                        && startSound.soundInfo.envelopeRecords[1].rightLevel == 32768) {
-                    ret += " soundEffect=\"fade left to right\"";
-                } else if (startSound.soundInfo.envelopeRecords.length == 2
-                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 0
-                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
-                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 32768
-                        && startSound.soundInfo.envelopeRecords[1].leftLevel == 32768
-                        && startSound.soundInfo.envelopeRecords[1].pos44 == sound.soundSampleCount
-                        && startSound.soundInfo.envelopeRecords[1].rightLevel == 0) {
-                    ret += " soundEffect=\"fade right to left\"";
+                if (envelopeRecords.length == 1
+                        && envelopeRecords[0].leftLevel == 32768
+                        && envelopeRecords[0].pos44 == 0
+                        && envelopeRecords[0].rightLevel == 0) {
+                    ret.append(" soundEffect=\"left channel\"");
+                } else if (envelopeRecords.length == 1
+                        && envelopeRecords[0].leftLevel == 0
+                        && envelopeRecords[0].pos44 == 0
+                        && envelopeRecords[0].rightLevel == 32768) {
+                    ret.append(" soundEffect=\"right channel\"");
+                } else if (envelopeRecords.length == 2
+                        && envelopeRecords[0].leftLevel == 32768
+                        && envelopeRecords[0].pos44 == 0
+                        && envelopeRecords[0].rightLevel == 0
+                        && envelopeRecords[1].leftLevel == 0
+                        && envelopeRecords[1].pos44 == sound.soundSampleCount
+                        && envelopeRecords[1].rightLevel == 32768) {
+                    ret.append(" soundEffect=\"fade left to right\"");
+                } else if (envelopeRecords.length == 2
+                        && envelopeRecords[0].leftLevel == 0
+                        && envelopeRecords[0].pos44 == 0
+                        && envelopeRecords[0].rightLevel == 32768
+                        && envelopeRecords[1].leftLevel == 32768
+                        && envelopeRecords[1].pos44 == sound.soundSampleCount
+                        && envelopeRecords[1].rightLevel == 0) {
+                    ret.append(" soundEffect=\"fade right to left\"");
                 } else {
-                    ret += " soundEffect=\"custom\"";
+                    ret.append(" soundEffect=\"custom\"");
                 }
                 //TODO: fade in, fade out
 
@@ -1748,39 +1751,40 @@ public class XFLConverter {
             }
             soundEnvelopeStr += "</SoundEnvelope>";
         }
-        ret += ">";
+        ret.append(">");
 
-        ret += soundEnvelopeStr;
+        ret.append(soundEnvelopeStr);
         if (!actionScript.isEmpty()) {
-            ret += "<Actionscript><script><![CDATA[";
-            ret += actionScript;
-            ret += "]]></script></Actionscript>";
+            ret.append("<Actionscript><script><![CDATA[");
+            ret.append(actionScript);
+            ret.append("]]></script></Actionscript>");
         }
-        ret += "<elements>";
-        ret += elements;
-        ret += "</elements>";
-        ret += "</DOMFrame>";
-        return ret;
+        ret.append("<elements>");
+        ret.append(elements);
+        ret.append("</elements>");
+        ret.append("</DOMFrame>");
+        return ret.toString();
     }
 
     private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video, CLIPACTIONS clipActions) {
-        String ret = "<DOMVideoInstance libraryItemName=\"movie" + video.characterID + ".flv\" frameRight=\"" + (20 * video.width) + "\" frameBottom=\"" + (20 * video.height) + "\"";
+        StringBuilder ret = new StringBuilder();
+        ret.append("<DOMVideoInstance libraryItemName=\"movie").append(video.characterID).append(".flv\" frameRight=\"").append(20 * video.width).append("\" frameBottom=\"").append(20 * video.height).append("\"");
         if (instanceName != null) {
-            ret += " name=\"" + xmlString(instanceName) + "\"";
+            ret.append(" name=\"").append(xmlString(instanceName)).append("\"");
         }
-        ret += ">";
-        ret += "<matrix>";
-        ret += convertMatrix(matrix);
-        ret += "</matrix>";
-        ret += "<transformationPoint>";
-        ret += "<Point />";
-        ret += "</transformationPoint>";
-        ret += "</DOMVideoInstance>";
-        return ret;
+        ret.append(">");
+        ret.append("<matrix>");
+        ret.append(convertMatrix(matrix));
+        ret.append("</matrix>");
+        ret.append("<transformationPoint>");
+        ret.append("<Point />");
+        ret.append("</transformationPoint>");
+        ret.append("</DOMVideoInstance>");
+        return ret.toString();
     }
 
     private static String convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         prevStr += "<frames>";
         int frame = -1;
         String elements = "";
@@ -1912,7 +1916,7 @@ public class XFLConverter {
 
                 frame++;
                 if (!elements.equals(lastElements) && frame > 0) {
-                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files);
+                    ret.append(convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files));
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -1926,17 +1930,18 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty()) {
             frame++;
-            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files);
+            ret.append(convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files));
         }
         afterStr = "</frames>" + afterStr;
-        if (!ret.isEmpty()) {
-            ret = prevStr + ret + afterStr;
+        String retStr = ret.toString();
+        if (!retStr.isEmpty()) {
+            retStr = prevStr + retStr + afterStr;
         }
-        return ret;
+        return retStr;
     }
 
     public static String convertFonts(List<Tag> tags) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (Tag t : tags) {
             if (t instanceof FontTag) {
                 FontTag font = (FontTag) t;
@@ -1992,20 +1997,21 @@ public class XFLConverter {
                 if (hasAllRanges) {
                     embedRanges = "9999";
                 }
-                ret += "<DOMFontItem name=\"Font " + fontId + "\" font=\"" + xmlString(fontName) + "\" size=\"0\" id=\"" + fontId + "\" embedRanges=\"" + embedRanges + "\"" + (!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "") + " />";
+                ret.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(xmlString(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "").append(" />");
             }
 
         }
 
-        if (!"".equals(ret)) {
-            ret = "<fonts>" + ret + "</fonts>";
+        String retStr = ret.toString();
+        if (!retStr.isEmpty()) {
+            retStr = "<fonts>" + retStr + "</fonts>";
         }
 
-        return ret;
+        return retStr;
     }
 
     public static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         String script = "";
         int duration = 0;
@@ -2032,41 +2038,42 @@ public class XFLConverter {
                     duration++;
                 } else {
                     if (duration > 0) {
-                        ret += "<DOMFrame index=\"" + (frame - duration) + "\"";
+                        ret.append("<DOMFrame index=\"").append(frame - duration).append("\"");
                         if (duration > 1) {
-                            ret += " duration=\"" + duration + "\"";
+                            ret.append(" duration=\"").append(duration).append("\"");
                         }
-                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                        ret += "<elements>";
-                        ret += "</elements>";
-                        ret += "</DOMFrame>";
+                        ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
+                        ret.append("<elements>");
+                        ret.append("</elements>");
+                        ret.append("</DOMFrame>");
                     }
-                    ret += "<DOMFrame index=\"" + frame + "\"";
-                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                    ret += "<Actionscript><script><![CDATA[";
-                    ret += script;
-                    ret += "]]></script></Actionscript>";
-                    ret += "<elements>";
-                    ret += "</elements>";
-                    ret += "</DOMFrame>";
+                    ret.append("<DOMFrame index=\"").append(frame).append("\"");
+                    ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
+                    ret.append("<Actionscript><script><![CDATA[");
+                    ret.append(script);
+                    ret.append("]]></script></Actionscript>");
+                    ret.append("<elements>");
+                    ret.append("</elements>");
+                    ret.append("</DOMFrame>");
                     script = "";
                     duration = 0;
                 }
                 frame++;
             }
         }
-        if (!ret.isEmpty()) {
-            ret = "<DOMLayer name=\"Script Layer\" color=\"" + randomOutlineColor() + "\">"
+        String retStr = ret.toString();
+        if (!retStr.isEmpty()) {
+            retStr = "<DOMLayer name=\"Script Layer\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
-                    + ret
+                    + retStr
                     + "</frames>"
                     + "</DOMLayer>";
         }
-        return ret;
+        return retStr;
     }
 
     public static String convertLabelsLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         int duration = 0;
         int frame = 0;
         String frameLabel = "";
@@ -2083,45 +2090,46 @@ public class XFLConverter {
                     duration++;
                 } else {
                     if (duration > 0) {
-                        ret += "<DOMFrame index=\"" + (frame - duration) + "\"";
+                        ret.append("<DOMFrame index=\"").append(frame - duration).append("\"");
                         if (duration > 1) {
-                            ret += " duration=\"" + duration + "\"";
+                            ret.append(" duration=\"").append(duration).append("\"");
                         }
-                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                        ret += "<elements>";
-                        ret += "</elements>";
-                        ret += "</DOMFrame>";
+                        ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
+                        ret.append("<elements>");
+                        ret.append("</elements>");
+                        ret.append("</DOMFrame>");
                     }
-                    ret += "<DOMFrame index=\"" + frame + "\"";
-                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
-                    ret += " name=\"" + frameLabel + "\"";
+                    ret.append("<DOMFrame index=\"").append(frame).append("\"");
+                    ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\"");
+                    ret.append(" name=\"").append(frameLabel).append("\"");
                     if (isAnchor) {
-                        ret += " labelType=\"anchor\" bookmark=\"true\"";
+                        ret.append(" labelType=\"anchor\" bookmark=\"true\"");
                     } else {
-                        ret += " labelType=\"name\"";
+                        ret.append(" labelType=\"name\"");
                     }
-                    ret += ">";
-                    ret += "<elements>";
-                    ret += "</elements>";
-                    ret += "</DOMFrame>";
+                    ret.append(">");
+                    ret.append("<elements>");
+                    ret.append("</elements>");
+                    ret.append("</DOMFrame>");
                     frameLabel = "";
                     duration = 0;
                 }
                 frame++;
             }
         }
-        if (!ret.isEmpty()) {
-            ret = "<DOMLayer name=\"Labels Layer\" color=\"" + randomOutlineColor() + "\">"
+        String retStr = ret.toString();
+        if (!retStr.isEmpty()) {
+            retStr = "<DOMLayer name=\"Labels Layer\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
-                    + ret
+                    + retStr
                     + "</frames>"
                     + "</DOMLayer>";
         }
-        return ret;
+        return retStr;
     }
 
     public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
         StartSoundTag startSound = null;
@@ -2154,7 +2162,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files);
+                        ret.append(convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files));
                     }
                     frame += duration;
                     duration = 1;
@@ -2172,36 +2180,36 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files);
+            ret.append(convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files));
         }
-        if (!ret.isEmpty()) {
-            ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
-                    + "<frames>" + ret + "</frames>"
+        String retStr = ret.toString();
+        if (!retStr.isEmpty()) {
+            retStr = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
+                    + "<frames>" + retStr + "</frames>"
                     + "</DOMLayer>";
         }
-        return ret;
+        return retStr;
     }
 
     private static String randomOutlineColor() {
         RGB outlineColor = new RGB();
-        Random rnd = new Random();
         do {
-            outlineColor.red = rnd.nextInt(256);
-            outlineColor.green = rnd.nextInt(256);
-            outlineColor.blue = rnd.nextInt(256);
+            outlineColor.red = random.nextInt(256);
+            outlineColor.green = random.nextInt(256);
+            outlineColor.blue = random.nextInt(256);
         } while ((outlineColor.red + outlineColor.green + outlineColor.blue) / 3 < 128);
         return outlineColor.toHexRGB();
     }
 
     public static String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
-        String ret = "";
-        ret += "<DOMTimeline name=\"" + name + "\">";
-        ret += "<layers>";
+        StringBuilder ret = new StringBuilder();
+        ret.append("<DOMTimeline name=\"").append(name).append("\">");
+        ret.append("<layers>");
 
         String labelsLayer = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
-        ret += labelsLayer;
+        ret.append(labelsLayer);
         String scriptLayer = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
-        ret += scriptLayer;
+        ret.append(scriptLayer);
 
         int index = 0;
 
@@ -2225,11 +2233,11 @@ public class XFLConverter {
                             parentLayers.push(index);
                         }
 
-                        ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + randomOutlineColor() + "\" ";
-                        ret += " layerType=\"mask\" locked=\"true\"";
-                        ret += ">";
-                        ret += convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files);
-                        ret += "</DOMLayer>";
+                        ret.append("<DOMLayer name=\"Layer ").append(index + 1).append("\" color=\"").append(randomOutlineColor()).append("\" ");
+                        ret.append(" layerType=\"mask\" locked=\"true\"");
+                        ret.append(">");
+                        ret.append(convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files));
+                        ret.append("</DOMLayer>");
                         index++;
                         break;
                     }
@@ -2273,15 +2281,15 @@ public class XFLConverter {
             if (cf.isEmpty()) {
                 index--;
             }
-            ret += cf;
+            ret.append(cf);
         }
 
         int soundLayerIndex = layerCount;
         layerCount++;
-        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files);
-        ret += "</layers>";
-        ret += "</DOMTimeline>";
-        return ret;
+        ret.append(convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files));
+        ret.append("</layers>");
+        ret.append("</DOMTimeline>");
+        return ret.toString();
     }
 
     private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException {
@@ -2326,7 +2334,7 @@ public class XFLConverter {
     }
 
     public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         if (m == null) {
             m = new MATRIX();
@@ -2396,21 +2404,21 @@ public class XFLConverter {
                 }
             }
 
-            ret += "<DOMStaticText";
-            ret += left;
+            ret.append("<DOMStaticText");
+            ret.append(left);
             if (fontRenderingMode != null) {
-                ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+                ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret += " instanceName=\"" + xmlString(instanceName) + "\"";
+                ret.append(" instanceName=\"").append(xmlString(instanceName)).append("\"");
             }
-            ret += antiAlias;
+            ret.append(antiAlias);
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, tags);
 
-            ret += " width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
-            ret += matStr;
+            ret.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
+            ret.append(matStr);
 
-            ret += "<textRuns>";
+            ret.append("<textRuns>");
             int fontId = -1;
             FontTag font = null;
             String fontName = null;
@@ -2470,32 +2478,32 @@ public class XFLConverter {
                 }
                 firstRun = false;
                 if (font != null) {
-                    ret += "<DOMTextRun>";
-                    ret += "<characters>" + xmlString((newline ? "\r" : "") + rec.getText(font)) + "</characters>";
-                    ret += "<textAttrs>";
+                    ret.append("<DOMTextRun>");
+                    ret.append("<characters>").append(xmlString((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
+                    ret.append("<textAttrs>");
 
-                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"" + textHeight + "\"";
-                    ret += " letterSpacing=\"" + doubleToString(twipToPixel(letterSpacings.get(r))) + "\"";
-                    ret += " indent=\"" + doubleToString(twipToPixel((int) attrs.get("indent"))) + "\"";
-                    ret += " leftMargin=\"" + doubleToString(twipToPixel(leftMargins.get(r))) + "\"";
-                    ret += " lineSpacing=\"" + doubleToString(twipToPixel((int) attrs.get("lineSpacing"))) + "\"";
-                    ret += " rightMargin=\"" + doubleToString(twipToPixel((int) attrs.get("rightMargin"))) + "\"";
+                    ret.append("<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"").append(twipToPixel(textHeight)).append("\" bitmapSize=\"").append(textHeight).append("\"");
+                    ret.append(" letterSpacing=\"").append(doubleToString(twipToPixel(letterSpacings.get(r)))).append("\"");
+                    ret.append(" indent=\"").append(doubleToString(twipToPixel((int) attrs.get("indent")))).append("\"");
+                    ret.append(" leftMargin=\"").append(doubleToString(twipToPixel(leftMargins.get(r)))).append("\"");
+                    ret.append(" lineSpacing=\"").append(doubleToString(twipToPixel((int) attrs.get("lineSpacing")))).append("\"");
+                    ret.append(" rightMargin=\"").append(doubleToString(twipToPixel((int) attrs.get("rightMargin")))).append("\"");
 
                     if (textColor != null) {
-                        ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
+                        ret.append(" fillColor=\"").append(textColor.toHexRGB()).append("\"");
                     } else if (textColorA != null) {
-                        ret += " fillColor=\"" + textColorA.toHexRGB() + "\" alpha=\"" + textColorA.getAlphaFloat() + "\"";
+                        ret.append(" fillColor=\"").append(textColorA.toHexRGB()).append("\" alpha=\"").append(textColorA.getAlphaFloat()).append("\"");
                     }
-                    ret += " face=\"" + psFontName + "\"";
-                    ret += "/>";
+                    ret.append(" face=\"").append(psFontName).append("\"");
+                    ret.append("/>");
 
-                    ret += "</textAttrs>";
-                    ret += "</DOMTextRun>";
+                    ret.append("</textAttrs>");
+                    ret.append("</DOMTextRun>");
                 }
             }
-            ret += "</textRuns>";
-            ret += filterStr;
-            ret += "</DOMStaticText>";
+            ret.append("</textRuns>");
+            ret.append(filterStr);
+            ret.append("</DOMStaticText>");
         } else if (tag instanceof DefineEditTextTag) {
             DefineEditTextTag det = (DefineEditTextTag) tag;
             String tagName;
@@ -2520,14 +2528,14 @@ public class XFLConverter {
             } else {
                 tagName = "DOMInputText";
             }
-            ret += "<" + tagName;
+            ret.append("<").append(tagName);
             if (fontRenderingMode != null) {
-                ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+                ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret += " name=\"" + xmlString(instanceName) + "\"";
+                ret.append(" name=\"").append(xmlString(instanceName)).append("\"");
             }
-            ret += antiAlias;
+            ret.append(antiAlias);
             double width = twipToPixel(bounds.getWidth());
             double height = twipToPixel(bounds.getHeight());
             //There is usually 4px difference between width/height and XML width/height
@@ -2539,43 +2547,43 @@ public class XFLConverter {
                 width -= twipToPixel(det.rightMargin);
                 width -= twipToPixel(det.leftMargin);
             }
-            ret += " width=\"" + width + "\"";
-            ret += " height=\"" + height + "\"";
+            ret.append(" width=\"").append(width).append("\"");
+            ret.append(" height=\"").append(height).append("\"");
             if (det.border) {
-                ret += "  border=\"true\"";
+                ret.append("  border=\"true\"");
             }
             if (det.html) {
-                ret += " renderAsHTML=\"true\"";
+                ret.append(" renderAsHTML=\"true\"");
             }
             if (det.noSelect) {
-                ret += " isSelectable=\"false\"";
+                ret.append(" isSelectable=\"false\"");
             }
             if (det.multiline && det.wordWrap) {
-                ret += " lineType=\"multiline\"";
+                ret.append(" lineType=\"multiline\"");
             } else if (det.multiline && (!det.wordWrap)) {
-                ret += " lineType=\"multiline no wrap\"";
+                ret.append(" lineType=\"multiline no wrap\"");
             } else if (det.password) {
-                ret += " lineType=\"password\"";
+                ret.append(" lineType=\"password\"");
             }
             if (det.hasMaxLength) {
-                ret += " maxCharacters=\"" + det.maxLength + "\"";
+                ret.append(" maxCharacters=\"").append(det.maxLength).append("\"");
             }
             if (!det.variableName.isEmpty()) {
-                ret += " variableName=\"" + det.variableName + "\"";
+                ret.append(" variableName=\"").append(det.variableName).append("\"");
             }
-            ret += ">";
-            ret += matStr;
-            ret += "<textRuns>";
+            ret.append(">");
+            ret.append(matStr);
+            ret.append("<textRuns>");
             String txt = "";
             if (det.hasText) {
                 txt = det.initialText;
             }
 
             if (det.html) {
-                ret += convertHTMLText(tags, det, txt);
+                ret.append(convertHTMLText(tags, det, txt));
             } else {
-                ret += "<DOMTextRun>";
-                ret += "<characters>" + xmlString(txt) + "</characters>";
+                ret.append("<DOMTextRun>");
+                ret.append("<characters>").append(xmlString(txt)).append("</characters>");
                 int leftMargin = -1;
                 int rightMargin = -1;
                 int indent = -1;
@@ -2635,53 +2643,48 @@ public class XFLConverter {
                         alignment = "unknown";
                     }
                 }
-                ret += "<textAttrs>";
-                ret += "<DOMTextAttrs";
+                ret.append("<textAttrs>");
+                ret.append("<DOMTextAttrs");
                 if (alignment != null) {
-                    ret += " alignment=\"" + alignment + "\"";
+                    ret.append(" alignment=\"").append(alignment).append("\"");
                 }
-                ret += " rotation=\"true\""; //?
+                ret.append(" rotation=\"true\""); //?
                 if (indent > -1) {
-                    ret += " indent=\"" + twipToPixel(indent) + "\"";
+                    ret.append(" indent=\"").append(twipToPixel(indent)).append("\"");
                 }
                 if (leftMargin > -1) {
-                    ret += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
+                    ret.append(" leftMargin=\"").append(twipToPixel(leftMargin)).append("\"");
                 }
                 if (lineSpacing > -1) {
-                    ret += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
+                    ret.append(" lineSpacing=\"").append(twipToPixel(lineSpacing)).append("\"");
                 }
                 if (rightMargin > -1) {
-                    ret += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
+                    ret.append(" rightMargin=\"").append(twipToPixel(rightMargin)).append("\"");
                 }
                 if (size > -1) {
-                    ret += " size=\"" + twipToPixel(size) + "\"";
-                    ret += " bitmapSize=\"" + size + "\"";
+                    ret.append(" size=\"").append(twipToPixel(size)).append("\"");
+                    ret.append(" bitmapSize=\"").append(size).append("\"");
                 }
                 if (fontFace != null) {
-                    ret += " face=\"" + fontFace + "\"";
+                    ret.append(" face=\"").append(fontFace).append("\"");
                 }
                 if (textColor != null) {
-                    ret += " fillColor=\"" + textColor.toHexRGB() + "\" alpha=\"" + textColor.getAlphaFloat() + "\"";
+                    ret.append(" fillColor=\"").append(textColor.toHexRGB()).append("\" alpha=\"").append(textColor.getAlphaFloat()).append("\"");
                 }
-                ret += "/>";
-                ret += "</textAttrs>";
-                ret += "</DOMTextRun>";
+                ret.append("/>");
+                ret.append("</textAttrs>");
+                ret.append("</DOMTextRun>");
             }
-            ret += "</textRuns>";
-            ret += filterStr;
-            ret += "</" + tagName + ">";
+            ret.append("</textRuns>");
+            ret.append(filterStr);
+            ret.append("</").append(tagName).append(">");
         }
-        return ret;
+        return ret.toString();
     }
 
     public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException {
 
-        FileAttributesTag fa = null;
-        for (Tag t : swf.tags) {
-            if (t instanceof FileAttributesTag) {
-                fa = (FileAttributesTag) t;
-            }
-        }
+        FileAttributesTag fa = swf.fileAttributes;
 
         boolean useAS3 = false;
         boolean useNetwork = false;
@@ -2702,7 +2705,7 @@ public class XFLConverter {
                 }
             }
         }
-        String domDocument = "";
+        StringBuilder domDocument = new StringBuilder();
         String baseName = swfFileName;
         File f = new File(baseName);
         baseName = f.getName();
@@ -2723,26 +2726,26 @@ public class XFLConverter {
                 backgroundColor = sbc.backgroundColor.toHexRGB();
             }
         }
-        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"" + flaVersion.xflVersion() + "\" creatorInfo=\"" + generator + "\" platform=\"Windows\" versionInfo=\"Saved by " + generatorVerName + "\" majorVersion=\"" + generatorVersion + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
-        domDocument += " backgroundColor=\"" + backgroundColor + "\"";
-        domDocument += " frameRate=\"" + swf.frameRate + "\"";
+        domDocument.append("<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"").append(flaVersion.xflVersion()).append("\" creatorInfo=\"").append(generator).append("\" platform=\"Windows\" versionInfo=\"Saved by ").append(generatorVerName).append("\" majorVersion=\"").append(generatorVersion).append("\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"");
+        domDocument.append(" backgroundColor=\"").append(backgroundColor).append("\"");
+        domDocument.append(" frameRate=\"").append(swf.frameRate).append("\"");
 
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());
         if (Double.compare(width, 550) != 0) {
-            domDocument += " width=\"" + doubleToString(width) + "\"";
+            domDocument.append(" width=\"").append(doubleToString(width)).append("\"");
         }
         if (Double.compare(height, 400) != 0) {
-            domDocument += " height=\"" + doubleToString(height) + "\"";
+            domDocument.append(" height=\"").append(doubleToString(height)).append("\"");
         }
-        domDocument += ">";
-        domDocument += convertFonts(swf.tags);
-        domDocument += convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion);
-        domDocument += "<timelines>";
-        domDocument += convertTimeline(0, nonLibraryShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1", flaVersion, files);
-        domDocument += "</timelines>";
-        domDocument += "</DOMDocument>";
-        domDocument = prettyFormatXML(domDocument);
+        domDocument.append(">");
+        domDocument.append(convertFonts(swf.tags));
+        domDocument.append(convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion));
+        domDocument.append("<timelines>");
+        domDocument.append(convertTimeline(0, nonLibraryShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1", flaVersion, files));
+        domDocument.append("</timelines>");
+        domDocument.append("</DOMDocument>");
+        String domDocumentStr = prettyFormatXML(domDocument.toString());
 
         for (Tag t : swf.tags) {
             if (t instanceof DoInitActionTag) {
@@ -2780,235 +2783,242 @@ public class XFLConverter {
         }
 
         int flaSwfVersion = swf.version > flaVersion.maxSwfVersion() ? flaVersion.maxSwfVersion() : swf.version;
-        String publishSettings = "<flash_profiles>\n"
-                + "<flash_profile version=\"1.0\" name=\"Default\" current=\"true\">\n"
-                + "  <PublishFormatProperties enabled=\"true\">\n"
-                + "    <defaultNames>1</defaultNames>\n"
-                + "    <flash>1</flash>\n"
-                + "    <projectorWin>0</projectorWin>\n"
-                + "    <projectorMac>0</projectorMac>\n"
-                + "    <html>1</html>\n"
-                + "    <gif>0</gif>\n"
-                + "    <jpeg>0</jpeg>\n"
-                + "    <png>0</png>\n"
-                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svg>0</svg>\n" : "    <qt>0</qt>\n")
-                + "    <rnwk>0</rnwk>\n"
-                + "    <swc>0</swc>\n"
-                + "    <flashDefaultName>1</flashDefaultName>\n"
-                + "    <projectorWinDefaultName>1</projectorWinDefaultName>\n"
-                + "    <projectorMacDefaultName>1</projectorMacDefaultName>\n"
-                + "    <htmlDefaultName>1</htmlDefaultName>\n"
-                + "    <gifDefaultName>1</gifDefaultName>\n"
-                + "    <jpegDefaultName>1</jpegDefaultName>\n"
-                + "    <pngDefaultName>1</pngDefaultName>\n"
-                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svgDefaultName>1</svgDefaultName>\n" : "    <qtDefaultName>1</qtDefaultName>\n")
-                + "    <rnwkDefaultName>1</rnwkDefaultName>\n"
-                + "    <swcDefaultName>1</swcDefaultName>\n"
-                + "    <flashFileName>" + baseName + ".swf</flashFileName>\n"
-                + "    <projectorWinFileName>" + baseName + ".exe</projectorWinFileName>\n"
-                + "    <projectorMacFileName>" + baseName + ".app</projectorMacFileName>\n"
-                + "    <htmlFileName>" + baseName + ".html</htmlFileName>\n"
-                + "    <gifFileName>" + baseName + ".gif</gifFileName>\n"
-                + "    <jpegFileName>" + baseName + ".jpg</jpegFileName>\n"
-                + "    <pngFileName>" + baseName + ".png</pngFileName>\n"
-                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svgFileName>1</svgFileName>\n" : "    <qtFileName>1</qtFileName>\n")
-                + "    <rnwkFileName>" + baseName + ".smil</rnwkFileName>\n"
-                + "    <swcFileName>" + baseName + ".swc</swcFileName>\n"
-                + "  </PublishFormatProperties>\n"
-                + "  <PublishHtmlProperties enabled=\"true\">\n"
-                + "    <VersionDetectionIfAvailable>0</VersionDetectionIfAvailable>\n"
-                + "    <VersionInfo>12,0,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;</VersionInfo>\n"
-                + "    <UsingDefaultContentFilename>1</UsingDefaultContentFilename>\n"
-                + "    <UsingDefaultAlternateFilename>1</UsingDefaultAlternateFilename>\n"
-                + "    <ContentFilename>" + baseName + "_content.html</ContentFilename>\n"
-                + "    <AlternateFilename>" + baseName + "_alternate.html</AlternateFilename>\n"
-                + "    <UsingOwnAlternateFile>0</UsingOwnAlternateFile>\n"
-                + "    <OwnAlternateFilename></OwnAlternateFilename>\n"
-                + "    <Width>" + width + "</Width>\n"
-                + "    <Height>" + height + "</Height>\n"
-                + "    <Align>0</Align>\n"
-                + "    <Units>0</Units>\n"
-                + "    <Loop>1</Loop>\n"
-                + "    <StartPaused>0</StartPaused>\n"
-                + "    <Scale>0</Scale>\n"
-                + "    <HorizontalAlignment>1</HorizontalAlignment>\n"
-                + "    <VerticalAlignment>1</VerticalAlignment>\n"
-                + "    <Quality>4</Quality>\n"
-                + "    <DeblockingFilter>0</DeblockingFilter>\n"
-                + "    <WindowMode>0</WindowMode>\n"
-                + "    <DisplayMenu>1</DisplayMenu>\n"
-                + "    <DeviceFont>0</DeviceFont>\n"
-                + "    <TemplateFileName></TemplateFileName>\n"
-                + "    <showTagWarnMsg>1</showTagWarnMsg>\n"
-                + "  </PublishHtmlProperties>\n"
-                + "  <PublishFlashProperties enabled=\"true\">\n"
-                + "    <TopDown></TopDown>\n"
-                + "    <FireFox></FireFox>\n"
-                + "    <Report>0</Report>\n"
-                + "    <Protect>0</Protect>\n"
-                + "    <OmitTraceActions>0</OmitTraceActions>\n"
-                + "    <Quality>80</Quality>\n"
-                + "    <DeblockingFilter>0</DeblockingFilter>\n"
-                + "    <StreamFormat>0</StreamFormat>\n"
-                + "    <StreamCompress>7</StreamCompress>\n"
-                + "    <EventFormat>0</EventFormat>\n"
-                + "    <EventCompress>7</EventCompress>\n"
-                + "    <OverrideSounds>0</OverrideSounds>\n"
-                + "    <Version>" + flaSwfVersion + "</Version>\n"
-                + "    <ExternalPlayer>" + FLAVersion.swfVersionToPlayer(flaSwfVersion) + "</ExternalPlayer>\n"
-                + "    <ActionScriptVersion>" + (useAS3 ? "3" : "2") + "</ActionScriptVersion>\n"
-                + "    <PackageExportFrame>1</PackageExportFrame>\n"
-                + "    <PackagePaths></PackagePaths>\n"
-                + "    <AS3PackagePaths>.</AS3PackagePaths>\n"
-                + "    <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>\n"
-                + "    <DebuggingPermitted>0</DebuggingPermitted>\n"
-                + "    <DebuggingPassword></DebuggingPassword>\n"
-                + "    <CompressMovie>" + (swf.compression == SWFCompression.NONE ? "0" : "1") + "</CompressMovie>\n"
-                + "    <CompressionType>" + (swf.compression == SWFCompression.LZMA ? "1" : "0") + "</CompressionType>\n"
-                + "    <InvisibleLayer>1</InvisibleLayer>\n"
-                + "    <DeviceSound>0</DeviceSound>\n"
-                + "    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n"
-                + "    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n"
-                + "    <UseNetwork>" + (useNetwork ? 1 : 0) + "</UseNetwork>\n"
-                + "    <DocumentClass>" + xmlString(characterClasses.containsKey(0) ? characterClasses.get(0) : "") + "</DocumentClass>\n"
-                + "    <AS3Strict>2</AS3Strict>\n"
-                + "    <AS3Coach>4</AS3Coach>\n"
-                + "    <AS3AutoDeclare>4096</AS3AutoDeclare>\n"
-                + "    <AS3Dialect>AS3</AS3Dialect>\n"
-                + "    <AS3ExportFrame>1</AS3ExportFrame>\n"
-                + "    <AS3Optimize>1</AS3Optimize>\n"
-                + "    <ExportSwc>0</ExportSwc>\n"
-                + "    <ScriptStuckDelay>15</ScriptStuckDelay>\n"
-                + "    <IncludeXMP>1</IncludeXMP>\n"
-                + "    <HardwareAcceleration>0</HardwareAcceleration>\n"
-                + "    <AS3Flags>4102</AS3Flags>\n"
-                + "    <DefaultLibraryLinkage>rsl</DefaultLibraryLinkage>\n"
-                + "    <RSLPreloaderMethod>wrap</RSLPreloaderMethod>\n"
-                + "    <RSLPreloaderSWF>$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf</RSLPreloaderSWF>\n"
-                + ((flaVersion.ordinal() >= FLAVersion.CC.ordinal()) ? ("    <LibraryPath>\n"
-                + "      <library-path-entry>\n"
-                + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n"
-                + "        <linkage>merge</linkage>\n"
-                + "      </library-path-entry>\n"
-                + "      <library-path-entry>\n"
-                + "        <swc-path>$(FlexSDK)/frameworks/libs/flex.swc</swc-path>\n"
-                + "        <linkage>merge</linkage>\n"
-                + "        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "      </library-path-entry>\n"
-                + "      <library-path-entry>\n"
-                + "        <swc-path>$(FlexSDK)/frameworks/libs/core.swc</swc-path>\n"
-                + "        <linkage>merge</linkage>\n"
-                + "        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "      </library-path-entry>\n"
-                + "    </LibraryPath>\n"
-                + "    <LibraryVersions>\n"
-                + "    </LibraryVersions> ")
-                : "    <LibraryPath>\n"
-                + "      <library-path-entry>\n"
-                + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n"
-                + "        <linkage>merge</linkage>\n"
-                + "      </library-path-entry>\n"
-                + "      <library-path-entry>\n"
-                + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>\n"
-                + "        <linkage usesDefault=\"true\">rsl</linkage>\n"
-                + "        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>\n"
-                + "        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "      </library-path-entry>\n"
-                + "    </LibraryPath>\n"
-                + "    <LibraryVersions>\n"
-                + "      <library-version>\n"
-                + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>\n"
-                + "        <feature name=\"tlfText\" majorVersion=\"2\" minorVersion=\"0\" build=\"232\"/>\n"
-                + "        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>\n"
-                + "        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n"
-                + "      </library-version>\n"
-                + "    </LibraryVersions>\n")
-                + "  </PublishFlashProperties>\n"
-                + "  <PublishJpegProperties enabled=\"true\">\n"
-                + "    <Width>" + width + "</Width>\n"
-                + "    <Height>" + height + "</Height>\n"
-                + "    <Progressive>0</Progressive>\n"
-                + "    <DPI>4718592</DPI>\n"
-                + "    <Size>0</Size>\n"
-                + "    <Quality>80</Quality>\n"
-                + "    <MatchMovieDim>1</MatchMovieDim>\n"
-                + "  </PublishJpegProperties>\n"
-                + "  <PublishRNWKProperties enabled=\"true\">\n"
-                + "    <exportFlash>1</exportFlash>\n"
-                + "    <flashBitRate>0</flashBitRate>\n"
-                + "    <exportAudio>1</exportAudio>\n"
-                + "    <audioFormat>0</audioFormat>\n"
-                + "    <singleRateAudio>0</singleRateAudio>\n"
-                + "    <realVideoRate>100000</realVideoRate>\n"
-                + "    <speed28K>1</speed28K>\n"
-                + "    <speed56K>1</speed56K>\n"
-                + "    <speedSingleISDN>0</speedSingleISDN>\n"
-                + "    <speedDualISDN>0</speedDualISDN>\n"
-                + "    <speedCorporateLAN>0</speedCorporateLAN>\n"
-                + "    <speed256K>0</speed256K>\n"
-                + "    <speed384K>0</speed384K>\n"
-                + "    <speed512K>0</speed512K>\n"
-                + "    <exportSMIL>1</exportSMIL>\n"
-                + "  </PublishRNWKProperties>\n"
-                + "  <PublishGifProperties enabled=\"true\">\n"
-                + "    <Width>" + width + "</Width>\n"
-                + "    <Height>" + height + "</Height>\n"
-                + "    <Animated>0</Animated>\n"
-                + "    <MatchMovieDim>1</MatchMovieDim>\n"
-                + "    <Loop>1</Loop>\n"
-                + "    <LoopCount></LoopCount>\n"
-                + "    <OptimizeColors>1</OptimizeColors>\n"
-                + "    <Interlace>0</Interlace>\n"
-                + "    <Smooth>1</Smooth>\n"
-                + "    <DitherSolids>0</DitherSolids>\n"
-                + "    <RemoveGradients>0</RemoveGradients>\n"
-                + "    <TransparentOption></TransparentOption>\n"
-                + "    <TransparentAlpha>128</TransparentAlpha>\n"
-                + "    <DitherOption></DitherOption>\n"
-                + "    <PaletteOption></PaletteOption>\n"
-                + "    <MaxColors>255</MaxColors>\n"
-                + "    <PaletteName></PaletteName>\n"
-                + "  </PublishGifProperties>\n"
-                + "  <PublishPNGProperties enabled=\"true\">\n"
-                + "    <Width>" + width + "</Width>\n"
-                + "    <Height>" + height + "</Height>\n"
-                + "    <OptimizeColors>1</OptimizeColors>\n"
-                + "    <Interlace>0</Interlace>\n"
-                + "    <Transparent>0</Transparent>\n"
-                + "    <Smooth>1</Smooth>\n"
-                + "    <DitherSolids>0</DitherSolids>\n"
-                + "    <RemoveGradients>0</RemoveGradients>\n"
-                + "    <MatchMovieDim>1</MatchMovieDim>\n"
-                + "    <DitherOption></DitherOption>\n"
-                + "    <FilterOption></FilterOption>\n"
-                + "    <PaletteOption></PaletteOption>\n"
-                + "    <BitDepth>24-bit with Alpha</BitDepth>\n"
-                + "    <MaxColors>255</MaxColors>\n"
-                + "    <PaletteName></PaletteName>\n"
-                + "  </PublishPNGProperties>\n"
-                + ((flaVersion.ordinal() >= FLAVersion.CC.ordinal()) ? ""
-                : ("  <PublishQTProperties enabled=\"true\">\n"
-                + "    <Width>" + width + "</Width>\n"
-                + "    <Height>" + height + "</Height>\n"
-                + "    <MatchMovieDim>1</MatchMovieDim>\n"
-                + "    <UseQTSoundCompression>0</UseQTSoundCompression>\n"
-                + "    <AlphaOption></AlphaOption>\n"
-                + "    <LayerOption></LayerOption>\n"
-                + "    <QTSndSettings>00000000</QTSndSettings>\n"
-                + "    <ControllerOption>0</ControllerOption>\n"
-                + "    <Looping>0</Looping>\n"
-                + "    <PausedAtStart>0</PausedAtStart>\n"
-                + "    <PlayEveryFrame>0</PlayEveryFrame>\n"
-                + "    <Flatten>1</Flatten>\n"
-                + "  </PublishQTProperties>\n"))
-                + "</flash_profile>\n"
-                + "</flash_profiles>";
+        boolean greaterThanCC = flaVersion.ordinal() >= FLAVersion.CC.ordinal();
+        StringBuilder publishSettings = new StringBuilder();
+        publishSettings.append("<flash_profiles>\n");
+        publishSettings.append("<flash_profile version=\"1.0\" name=\"Default\" current=\"true\">\n");
+        publishSettings.append("  <PublishFormatProperties enabled=\"true\">\n");
+        publishSettings.append("    <defaultNames>1</defaultNames>\n");
+        publishSettings.append("    <flash>1</flash>\n");
+        publishSettings.append("    <projectorWin>0</projectorWin>\n");
+        publishSettings.append("    <projectorMac>0</projectorMac>\n");
+        publishSettings.append("    <html>1</html>\n");
+        publishSettings.append("    <gif>0</gif>\n");
+        publishSettings.append("    <jpeg>0</jpeg>\n");
+        publishSettings.append("    <png>0</png>\n");
+        publishSettings.append(greaterThanCC ? "    <svg>0</svg>\n" : "    <qt>0</qt>\n");
+        publishSettings.append("    <rnwk>0</rnwk>\n");
+        publishSettings.append("    <swc>0</swc>\n");
+        publishSettings.append("    <flashDefaultName>1</flashDefaultName>\n");
+        publishSettings.append("    <projectorWinDefaultName>1</projectorWinDefaultName>\n");
+        publishSettings.append("    <projectorMacDefaultName>1</projectorMacDefaultName>\n");
+        publishSettings.append("    <htmlDefaultName>1</htmlDefaultName>\n");
+        publishSettings.append("    <gifDefaultName>1</gifDefaultName>\n");
+        publishSettings.append("    <jpegDefaultName>1</jpegDefaultName>\n");
+        publishSettings.append("    <pngDefaultName>1</pngDefaultName>\n");
+        publishSettings.append(greaterThanCC ? "    <svgDefaultName>1</svgDefaultName>\n" : "    <qtDefaultName>1</qtDefaultName>\n");
+        publishSettings.append("    <rnwkDefaultName>1</rnwkDefaultName>\n");
+        publishSettings.append("    <swcDefaultName>1</swcDefaultName>\n");
+        publishSettings.append("    <flashFileName>").append(baseName).append(".swf</flashFileName>\n");
+        publishSettings.append("    <projectorWinFileName>").append(baseName).append(".exe</projectorWinFileName>\n");
+        publishSettings.append("    <projectorMacFileName>").append(baseName).append(".app</projectorMacFileName>\n");
+        publishSettings.append("    <htmlFileName>").append(baseName).append(".html</htmlFileName>\n");
+        publishSettings.append("    <gifFileName>").append(baseName).append(".gif</gifFileName>\n");
+        publishSettings.append("    <jpegFileName>").append(baseName).append(".jpg</jpegFileName>\n");
+        publishSettings.append("    <pngFileName>").append(baseName).append(".png</pngFileName>\n");
+        publishSettings.append(greaterThanCC ? "    <svgFileName>1</svgFileName>\n" : "    <qtFileName>1</qtFileName>\n");
+        publishSettings.append("    <rnwkFileName>").append(baseName).append(".smil</rnwkFileName>\n");
+        publishSettings.append("    <swcFileName>").append(baseName).append(".swc</swcFileName>\n");
+        publishSettings.append("  </PublishFormatProperties>\n");
+        publishSettings.append("  <PublishHtmlProperties enabled=\"true\">\n");
+        publishSettings.append("    <VersionDetectionIfAvailable>0</VersionDetectionIfAvailable>\n");
+        publishSettings.append("    <VersionInfo>12,0,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;</VersionInfo>\n");
+        publishSettings.append("    <UsingDefaultContentFilename>1</UsingDefaultContentFilename>\n");
+        publishSettings.append("    <UsingDefaultAlternateFilename>1</UsingDefaultAlternateFilename>\n");
+        publishSettings.append("    <ContentFilename>").append(baseName).append("_content.html</ContentFilename>\n");
+        publishSettings.append("    <AlternateFilename>").append(baseName).append("_alternate.html</AlternateFilename>\n");
+        publishSettings.append("    <UsingOwnAlternateFile>0</UsingOwnAlternateFile>\n");
+        publishSettings.append("    <OwnAlternateFilename></OwnAlternateFilename>\n");
+        publishSettings.append("    <Width>").append(width).append("</Width>\n");
+        publishSettings.append("    <Height>").append(height).append("</Height>\n");
+        publishSettings.append("    <Align>0</Align>\n");
+        publishSettings.append("    <Units>0</Units>\n");
+        publishSettings.append("    <Loop>1</Loop>\n");
+        publishSettings.append("    <StartPaused>0</StartPaused>\n");
+        publishSettings.append("    <Scale>0</Scale>\n");
+        publishSettings.append("    <HorizontalAlignment>1</HorizontalAlignment>\n");
+        publishSettings.append("    <VerticalAlignment>1</VerticalAlignment>\n");
+        publishSettings.append("    <Quality>4</Quality>\n");
+        publishSettings.append("    <DeblockingFilter>0</DeblockingFilter>\n");
+        publishSettings.append("    <WindowMode>0</WindowMode>\n");
+        publishSettings.append("    <DisplayMenu>1</DisplayMenu>\n");
+        publishSettings.append("    <DeviceFont>0</DeviceFont>\n");
+        publishSettings.append("    <TemplateFileName></TemplateFileName>\n");
+        publishSettings.append("    <showTagWarnMsg>1</showTagWarnMsg>\n");
+        publishSettings.append("  </PublishHtmlProperties>\n");
+        publishSettings.append("  <PublishFlashProperties enabled=\"true\">\n");
+        publishSettings.append("    <TopDown></TopDown>\n");
+        publishSettings.append("    <FireFox></FireFox>\n");
+        publishSettings.append("    <Report>0</Report>\n");
+        publishSettings.append("    <Protect>0</Protect>\n");
+        publishSettings.append("    <OmitTraceActions>0</OmitTraceActions>\n");
+        publishSettings.append("    <Quality>80</Quality>\n");
+        publishSettings.append("    <DeblockingFilter>0</DeblockingFilter>\n");
+        publishSettings.append("    <StreamFormat>0</StreamFormat>\n");
+        publishSettings.append("    <StreamCompress>7</StreamCompress>\n");
+        publishSettings.append("    <EventFormat>0</EventFormat>\n");
+        publishSettings.append("    <EventCompress>7</EventCompress>\n");
+        publishSettings.append("    <OverrideSounds>0</OverrideSounds>\n");
+        publishSettings.append("    <Version>").append(flaSwfVersion).append("</Version>\n");
+        publishSettings.append("    <ExternalPlayer>").append(FLAVersion.swfVersionToPlayer(flaSwfVersion)).append("</ExternalPlayer>\n");
+        publishSettings.append("    <ActionScriptVersion>").append(useAS3 ? "3" : "2").append("</ActionScriptVersion>\n");
+        publishSettings.append("    <PackageExportFrame>1</PackageExportFrame>\n");
+        publishSettings.append("    <PackagePaths></PackagePaths>\n");
+        publishSettings.append("    <AS3PackagePaths>.</AS3PackagePaths>\n");
+        publishSettings.append("    <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>\n");
+        publishSettings.append("    <DebuggingPermitted>0</DebuggingPermitted>\n");
+        publishSettings.append("    <DebuggingPassword></DebuggingPassword>\n");
+        publishSettings.append("    <CompressMovie>").append(swf.compression == SWFCompression.NONE ? "0" : "1").append("</CompressMovie>\n");
+        publishSettings.append("    <CompressionType>").append(swf.compression == SWFCompression.LZMA ? "1" : "0").append("</CompressionType>\n");
+        publishSettings.append("    <InvisibleLayer>1</InvisibleLayer>\n");
+        publishSettings.append("    <DeviceSound>0</DeviceSound>\n");
+        publishSettings.append("    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n");
+        publishSettings.append("    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n");
+        publishSettings.append("    <UseNetwork>").append(useNetwork ? 1 : 0).append("</UseNetwork>\n");
+        publishSettings.append("    <DocumentClass>").append(xmlString(characterClasses.containsKey(0) ? characterClasses.get(0) : "")).append("</DocumentClass>\n");
+        publishSettings.append("    <AS3Strict>2</AS3Strict>\n");
+        publishSettings.append("    <AS3Coach>4</AS3Coach>\n");
+        publishSettings.append("    <AS3AutoDeclare>4096</AS3AutoDeclare>\n");
+        publishSettings.append("    <AS3Dialect>AS3</AS3Dialect>\n");
+        publishSettings.append("    <AS3ExportFrame>1</AS3ExportFrame>\n");
+        publishSettings.append("    <AS3Optimize>1</AS3Optimize>\n");
+        publishSettings.append("    <ExportSwc>0</ExportSwc>\n");
+        publishSettings.append("    <ScriptStuckDelay>15</ScriptStuckDelay>\n");
+        publishSettings.append("    <IncludeXMP>1</IncludeXMP>\n");
+        publishSettings.append("    <HardwareAcceleration>0</HardwareAcceleration>\n");
+        publishSettings.append("    <AS3Flags>4102</AS3Flags>\n");
+        publishSettings.append("    <DefaultLibraryLinkage>rsl</DefaultLibraryLinkage>\n");
+        publishSettings.append("    <RSLPreloaderMethod>wrap</RSLPreloaderMethod>\n");
+        publishSettings.append("    <RSLPreloaderSWF>$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf</RSLPreloaderSWF>\n");
+        if (greaterThanCC) {
+            publishSettings.append("    <LibraryPath>\n");
+            publishSettings.append("      <library-path-entry>\n");
+            publishSettings.append("        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n");
+            publishSettings.append("        <linkage>merge</linkage>\n");
+            publishSettings.append("      </library-path-entry>\n");
+            publishSettings.append("      <library-path-entry>\n");
+            publishSettings.append("        <swc-path>$(FlexSDK)/frameworks/libs/flex.swc</swc-path>\n");
+            publishSettings.append("        <linkage>merge</linkage>\n");
+            publishSettings.append("        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("      </library-path-entry>\n");
+            publishSettings.append("      <library-path-entry>\n");
+            publishSettings.append("        <swc-path>$(FlexSDK)/frameworks/libs/core.swc</swc-path>\n");
+            publishSettings.append("        <linkage>merge</linkage>\n");
+            publishSettings.append("        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("      </library-path-entry>\n");
+            publishSettings.append("    </LibraryPath>\n");
+            publishSettings.append("    <LibraryVersions>\n");
+            publishSettings.append("    </LibraryVersions> ");
+        } else {
+            publishSettings.append("    <LibraryPath>\n");
+            publishSettings.append("      <library-path-entry>\n");
+            publishSettings.append("        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n");
+            publishSettings.append("        <linkage>merge</linkage>\n");
+            publishSettings.append("      </library-path-entry>\n");
+            publishSettings.append("      <library-path-entry>\n");
+            publishSettings.append("        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>\n");
+            publishSettings.append("        <linkage usesDefault=\"true\">rsl</linkage>\n");
+            publishSettings.append("        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>\n");
+            publishSettings.append("        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("      </library-path-entry>\n");
+            publishSettings.append("    </LibraryPath>\n");
+            publishSettings.append("    <LibraryVersions>\n");
+            publishSettings.append("      <library-version>\n");
+            publishSettings.append("        <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>\n");
+            publishSettings.append("        <feature name=\"tlfText\" majorVersion=\"2\" minorVersion=\"0\" build=\"232\"/>\n");
+            publishSettings.append("        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("        <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>\n");
+            publishSettings.append("        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n");
+            publishSettings.append("      </library-version>\n");
+            publishSettings.append("    </LibraryVersions>\n");
+        }
+        publishSettings.append("  </PublishFlashProperties>\n");
+        publishSettings.append("  <PublishJpegProperties enabled=\"true\">\n");
+        publishSettings.append("    <Width>").append(width).append("</Width>\n");
+        publishSettings.append("    <Height>").append(height).append("</Height>\n");
+        publishSettings.append("    <Progressive>0</Progressive>\n");
+        publishSettings.append("    <DPI>4718592</DPI>\n");
+        publishSettings.append("    <Size>0</Size>\n");
+        publishSettings.append("    <Quality>80</Quality>\n");
+        publishSettings.append("    <MatchMovieDim>1</MatchMovieDim>\n");
+        publishSettings.append("  </PublishJpegProperties>\n");
+        publishSettings.append("  <PublishRNWKProperties enabled=\"true\">\n");
+        publishSettings.append("    <exportFlash>1</exportFlash>\n");
+        publishSettings.append("    <flashBitRate>0</flashBitRate>\n");
+        publishSettings.append("    <exportAudio>1</exportAudio>\n");
+        publishSettings.append("    <audioFormat>0</audioFormat>\n");
+        publishSettings.append("    <singleRateAudio>0</singleRateAudio>\n");
+        publishSettings.append("    <realVideoRate>100000</realVideoRate>\n");
+        publishSettings.append("    <speed28K>1</speed28K>\n");
+        publishSettings.append("    <speed56K>1</speed56K>\n");
+        publishSettings.append("    <speedSingleISDN>0</speedSingleISDN>\n");
+        publishSettings.append("    <speedDualISDN>0</speedDualISDN>\n");
+        publishSettings.append("    <speedCorporateLAN>0</speedCorporateLAN>\n");
+        publishSettings.append("    <speed256K>0</speed256K>\n");
+        publishSettings.append("    <speed384K>0</speed384K>\n");
+        publishSettings.append("    <speed512K>0</speed512K>\n");
+        publishSettings.append("    <exportSMIL>1</exportSMIL>\n");
+        publishSettings.append("  </PublishRNWKProperties>\n");
+        publishSettings.append("  <PublishGifProperties enabled=\"true\">\n");
+        publishSettings.append("    <Width>").append(width).append("</Width>\n");
+        publishSettings.append("    <Height>").append(height).append("</Height>\n");
+        publishSettings.append("    <Animated>0</Animated>\n");
+        publishSettings.append("    <MatchMovieDim>1</MatchMovieDim>\n");
+        publishSettings.append("    <Loop>1</Loop>\n");
+        publishSettings.append("    <LoopCount></LoopCount>\n");
+        publishSettings.append("    <OptimizeColors>1</OptimizeColors>\n");
+        publishSettings.append("    <Interlace>0</Interlace>\n");
+        publishSettings.append("    <Smooth>1</Smooth>\n");
+        publishSettings.append("    <DitherSolids>0</DitherSolids>\n");
+        publishSettings.append("    <RemoveGradients>0</RemoveGradients>\n");
+        publishSettings.append("    <TransparentOption></TransparentOption>\n");
+        publishSettings.append("    <TransparentAlpha>128</TransparentAlpha>\n");
+        publishSettings.append("    <DitherOption></DitherOption>\n");
+        publishSettings.append("    <PaletteOption></PaletteOption>\n");
+        publishSettings.append("    <MaxColors>255</MaxColors>\n");
+        publishSettings.append("    <PaletteName></PaletteName>\n");
+        publishSettings.append("  </PublishGifProperties>\n");
+        publishSettings.append("  <PublishPNGProperties enabled=\"true\">\n");
+        publishSettings.append("    <Width>").append(width).append("</Width>\n");
+        publishSettings.append("    <Height>").append(height).append("</Height>\n");
+        publishSettings.append("    <OptimizeColors>1</OptimizeColors>\n");
+        publishSettings.append("    <Interlace>0</Interlace>\n");
+        publishSettings.append("    <Transparent>0</Transparent>\n");
+        publishSettings.append("    <Smooth>1</Smooth>\n");
+        publishSettings.append("    <DitherSolids>0</DitherSolids>\n");
+        publishSettings.append("    <RemoveGradients>0</RemoveGradients>\n");
+        publishSettings.append("    <MatchMovieDim>1</MatchMovieDim>\n");
+        publishSettings.append("    <DitherOption></DitherOption>\n");
+        publishSettings.append("    <FilterOption></FilterOption>\n");
+        publishSettings.append("    <PaletteOption></PaletteOption>\n");
+        publishSettings.append("    <BitDepth>24-bit with Alpha</BitDepth>\n");
+        publishSettings.append("    <MaxColors>255</MaxColors>\n");
+        publishSettings.append("    <PaletteName></PaletteName>\n");
+        publishSettings.append("  </PublishPNGProperties>\n");
+        if (!greaterThanCC) {
+            publishSettings.append("  <PublishQTProperties enabled=\"true\">\n");
+            publishSettings.append("    <Width>").append(width).append("</Width>\n");
+            publishSettings.append("    <Height>").append(height).append("</Height>\n");
+            publishSettings.append("    <MatchMovieDim>1</MatchMovieDim>\n");
+            publishSettings.append("    <UseQTSoundCompression>0</UseQTSoundCompression>\n");
+            publishSettings.append("    <AlphaOption></AlphaOption>\n");
+            publishSettings.append("    <LayerOption></LayerOption>\n");
+            publishSettings.append("    <QTSndSettings>00000000</QTSndSettings>\n");
+            publishSettings.append("    <ControllerOption>0</ControllerOption>\n");
+            publishSettings.append("    <Looping>0</Looping>\n");
+            publishSettings.append("    <PausedAtStart>0</PausedAtStart>\n");
+            publishSettings.append("    <PlayEveryFrame>0</PlayEveryFrame>\n");
+            publishSettings.append("    <Flatten>1</Flatten>\n");
+            publishSettings.append("  </PublishQTProperties>\n");
+        }
+        publishSettings.append("</flash_profile>\n");
+        publishSettings.append("</flash_profiles>");
+        String publishSettingsStr = publishSettings.toString();
 
         if (compressed) {
-            final String domDocumentF = domDocument;
-            final String publishSettingsF = publishSettings;
+            final String domDocumentF = domDocumentStr;
+            final String publishSettingsF = publishSettingsStr;
             final String outfileF = outfile;
             new RetryTask(new RunnableIOEx() {
                 @Override
@@ -3039,8 +3049,8 @@ public class XFLConverter {
                     }
                 }
             }
-            writeFile(handler, Utf8Helper.getBytes(domDocument), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
-            writeFile(handler, Utf8Helper.getBytes(publishSettings), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
+            writeFile(handler, Utf8Helper.getBytes(domDocumentStr), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
+            writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
             File libraryDir = new File(outDir.getAbsolutePath() + File.separator + "LIBRARY");
             libraryDir.mkdir();
             File binDir = new File(outDir.getAbsolutePath() + File.separator + "bin");

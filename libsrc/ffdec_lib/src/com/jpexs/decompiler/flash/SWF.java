@@ -79,8 +79,14 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.abc.CachedDecompilation;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.action.CachedScript;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -270,6 +276,10 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public DumpInfoSwfNode dumpInfo;
     public DefineBinaryDataTag binaryData;
+
+    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false);
+    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true);
+    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true);
 
     public void updateCharacters() {
         characters.clear();
@@ -637,6 +647,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 throw new IOException("Invalid SWF file. No known tag found.");
             }
         }
+    
+        /* preload shape tags
+        for (Tag tag : tags) {
+            if (tag instanceof ShapeTag) {
+                ((ShapeTag) tag).getShapes();
+            }
+        }*/
     }
 
     @Override
@@ -2065,10 +2082,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException {
         XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, parallel, version);
+        clearAllCache();
     }
 
     public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException {
         XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, parallel, version);
+        clearAllCache();
     }
 
     public static AffineTransform matrixToTransform(MATRIX mat) {
@@ -2076,8 +2095,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                 mat.getRotateSkew1Float(), mat.getScaleYFloat(),
                 mat.translateX, mat.translateY);
     }
-
-    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false);
 
     public static SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {
@@ -2092,8 +2109,80 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public static void clearImageCache() {
+    public void clearImageCache() {
         frameCache.clear();
+        for (Tag tag : tags) {
+            if (tag instanceof ImageTag) {
+                ((ImageTag) tag).clearCache();
+            }
+        }
+    }
+
+    public void clearScriptCache() {
+        as2Cache.clear();
+        as3Cache.clear();
+    }
+    
+    public void clearAllCache() {
+        clearImageCache();
+        clearScriptCache();
+        Cache.clearAll();
+        System.gc();
+    }
+    
+    public static void uncache(ASMSource src) {
+        src.getSwf().as2Cache.remove(src);
+    }
+
+    public static void uncache(ScriptPack pack) {
+        pack.getSwf().as3Cache.remove(pack);
+    }
+
+    public static boolean isCached(ASMSource src) {
+        return src.getSwf().as2Cache.contains(src);
+    }
+
+    public static boolean isCached(ScriptPack pack) {
+        return pack.getSwf().as3Cache.contains(pack);
+    }
+
+    public static CachedScript getCached(ASMSource src, ActionList actions) throws InterruptedException {
+        SWF swf = src.getSwf();
+        if (swf.as2Cache.contains(src)) {
+            return swf.as2Cache.get(src);
+        }
+        
+        if (actions == null) {
+            actions = src.getActions();
+        }
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
+        List<Highlighting> hilights = writer.instructionHilights;
+        String srcNoHex = writer.toString();
+        CachedScript res = new CachedScript(srcNoHex, hilights);
+        swf.as2Cache.put(src, res);
+        return res;
+    }
+
+    public static CachedDecompilation getCached(ScriptPack pack) throws InterruptedException {
+        SWF swf = pack.getSwf();
+        if (swf.as3Cache.contains(pack)) {
+            return swf.as3Cache.get(pack);
+        }
+
+        int scriptIndex = pack.scriptIndex;
+        ScriptInfo script = null;
+        if (scriptIndex > -1) {
+            script = pack.abc.script_info.get(scriptIndex);
+        }
+        boolean parallel = Configuration.parallelSpeedUp.get();
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        pack.toSource(writer, swf.abcList, script.traits.traits, ScriptExportMode.AS, parallel);
+        HighlightedText hilightedCode = new HighlightedText(writer);
+        CachedDecompilation res = new CachedDecompilation(hilightedCode);
+        swf.as3Cache.put(pack, res);
+
+        return res;
     }
 
     public static RECT fixRect(RECT rect) {

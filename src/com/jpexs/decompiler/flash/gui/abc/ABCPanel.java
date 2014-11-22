@@ -167,7 +167,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     pos++;
                     String workText = AppStrings.translate("work.searching");
                     String decAdd = "";
-                    if (!decompiledTextArea.isCached(item.getValue())) {
+                    final ScriptPack pack = item.getValue();
+                    if (!SWF.isCached(pack)) {
                         decAdd = ", " + AppStrings.translate("work.decompiling");
                     }
 
@@ -176,10 +177,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                             @Override
                             public Void doInBackground() throws Exception {
-                                decompiledTextArea.cacheScriptPack(item.getValue(), swf.abcList);
-                                if (pat.matcher(decompiledTextArea.getCachedText(item.getValue())).find()) {
+                                if (pat.matcher(SWF.getCached(pack).text).find()) {
                                     ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
-                                    searchResult.scriptPack = item.getValue();
+                                    searchResult.scriptPack = pack;
                                     searchResult.classPath = item.getKey();
                                     found.add(searchResult);
                                 }
@@ -644,7 +644,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public void reload() {
         lastDecompiled = "";
-        decompiledTextArea.clearScriptCache();
+        swf.clearScriptCache();
         decompiledTextArea.reloadClass();
         detailPanel.methodTraitPanel.methodCodePanel.clear();
     }
@@ -781,7 +781,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             case ACTION_SAVE_DECOMPILED:
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
                 int oldIndex = pack.scriptIndex;
-                decompiledTextArea.uncache(pack);
+                SWF.uncache(pack);
 
                 try {
                     String oldSp = null;

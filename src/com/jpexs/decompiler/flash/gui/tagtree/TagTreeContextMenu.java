@@ -288,10 +288,13 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
                                 @Override
                                 public void actionPerformed(ActionEvent ae) {
-                                    tag.getSwf().tags.remove(tag);
+                                    SWF sourceSwf = tag.getSwf();
+                                    sourceSwf.tags.remove(tag);
                                     tag.setSwf(targetSwf);
                                     targetSwf.tags.add(tag);
                                     tag.setModified(true);
+                                    sourceSwf.clearImageCache();
+                                    targetSwf.clearImageCache();
                                     mainPanel.refreshTree();
                                 }
                             });

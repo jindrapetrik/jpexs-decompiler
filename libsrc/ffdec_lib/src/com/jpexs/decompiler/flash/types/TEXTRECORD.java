@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
@@ -60,10 +61,10 @@ public class TEXTRECORD implements Serializable {
     public GLYPHENTRY[] glyphEntries;
 
     public String getText(FontTag font) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (GLYPHENTRY ge : glyphEntries) {
-            ret += font.glyphToChar(ge.glyphIndex);
+            ret.append(font.glyphToChar(ge.glyphIndex));
         }
-        return ret;
+        return ret.toString();
     }
 }

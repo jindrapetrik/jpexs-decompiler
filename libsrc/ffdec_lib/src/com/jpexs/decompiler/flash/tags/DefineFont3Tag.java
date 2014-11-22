@@ -435,11 +435,11 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public String getCharacters(List<Tag> tags) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i : codeTable) {
-            ret += (char) i;
+            ret.append((char) i);
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override

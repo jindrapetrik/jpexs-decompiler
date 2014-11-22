@@ -82,20 +82,20 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     public static String getJsSuffix(int width, int height) {
-        String ret = "";
-        ret += "}\r\n";
+        StringBuilder ret = new StringBuilder();
+        ret.append("}\r\n");
         int step = Math.round(65535 / 100);
         int rate = 10;
-        ret += "var step = " + step + ";\r\n";
-        ret += "var ratio = -1;\r\n";
-        ret += "function nextFrame(ctx){\r\n";
-        ret += "\tctx.clearRect(0,0," + width + "," + height + ");\r\n";
-        ret += "\tratio = (ratio+step)%65535;\r\n";
-        ret += "\tmorphshape(ctx,ratio);\r\n";
-        ret += "}\r\n";
-        ret += "window.setInterval(function(){nextFrame(ctx)}," + rate + ");\r\n";
-        ret += CanvasShapeExporter.getJsSuffix();
-        return ret;
+        ret.append("var step = ").append(step).append(";\r\n");
+        ret.append("var ratio = -1;\r\n");
+        ret.append("function nextFrame(ctx){\r\n");
+        ret.append("\tctx.clearRect(0,0,").append(width).append(",").append(height).append(");\r\n");
+        ret.append("\tratio = (ratio+step)%65535;\r\n");
+        ret.append("\tmorphshape(ctx,ratio);\r\n");
+        ret.append("}\r\n");
+        ret.append("window.setInterval(function(){nextFrame(ctx)},").append(rate).append(");\r\n");
+        ret.append(CanvasShapeExporter.getJsSuffix());
+        return ret.toString();
     }
 
     public static String getJsPrefix() {

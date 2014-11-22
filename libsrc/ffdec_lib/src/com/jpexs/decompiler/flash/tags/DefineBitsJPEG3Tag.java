@@ -46,8 +46,6 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 35;
     
-    private SerializableImage cachedImage;
-
     @Override
     public int getCharacterId() {
         return characterID;
@@ -66,7 +64,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             bitmapAlphaData = new byte[0];
         }
         imageData = new ByteArrayRange(data);
-        cachedImage = null;
+        clearCache();
         setModified(true);
     }
 

@@ -131,7 +131,7 @@ public class TextPanel extends JPanel implements ActionListener {
                         setEditText(false);
                         mainPanel.reload(true);
                     }
-                    SWF.clearImageCache();
+                    item.getSwf().clearImageCache();
                 }
                 break;
         }

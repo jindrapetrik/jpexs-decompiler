@@ -575,7 +575,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 try {
                     swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
                     swf.assignClassesToSymbols();
-                    clearCache();
+                    swf.clearScriptCache();
                     if (abcPanel != null) {
                         abcPanel.reload();
                     }
@@ -1037,15 +1037,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return null;
     }
 
-    private void clearCache() {
-        if (abcPanel != null) {
-            abcPanel.decompiledTextArea.clearScriptCache();
-        }
-        if (actionPanel != null) {
-            actionPanel.clearCache();
-        }
-    }
-
     public void gotoFrame(int frame) {
         TreeItem treeItem = (TreeItem) tagTree.getLastSelectedPathComponent();
         if (treeItem == null) {
@@ -1087,7 +1078,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void disableDecompilationChanged() {
-        clearCache();
+        clearAllScriptCache();
+
         if (abcPanel != null) {
             abcPanel.reload();
         }
@@ -1095,6 +1087,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         updateClassesList();
     }
 
+    private void clearAllScriptCache() {
+        for (SWFList swfList : swfs) {
+            for (SWF swf : swfList) {
+                swf.clearScriptCache();
+            }
+        }
+    }
+    
     public void searchAs() {
         if (searchDialog == null) {
             searchDialog = new SearchDialog(getMainFrame().getWindow());
@@ -1204,7 +1204,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void autoDeobfuscateChanged() {
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
-        clearCache();
+        clearAllScriptCache();
         if (abcPanel != null) {
             abcPanel.reload();
         }
@@ -1507,7 +1507,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
 
-            SWF.clearImageCache();
+            swf.clearImageCache();
             reload(true);
         }
     }
@@ -1672,7 +1672,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     Main.stopWork();
                                     View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
                                     swf.assignClassesToSymbols();
-                                    clearCache();
+                                    swf.clearScriptCache();
                                     if (abcPanel != null) {
                                         abcPanel.reload();
                                     }
@@ -1743,7 +1743,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                         @Override
                         public void run() {
-                            clearCache();
+                            clearAllScriptCache();
                             getABCPanel().reload();
                             updateClassesList();
                         }
@@ -1792,7 +1792,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void refreshDecompiled() {
-        clearCache();
+        clearAllScriptCache();
         if (abcPanel != null) {
             abcPanel.reload();
         }
@@ -1881,7 +1881,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     refreshTree();
                                     setTagTreeSelectedNode(newTag);
                                 }
-                                SWF.clearImageCache();
+                                it.getSwf().clearImageCache();
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, "Invalid image", ex);
                                 View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -1903,7 +1903,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 refreshTree();
                                 setTagTreeSelectedNode(newTag);
                             }
-                            SWF.clearImageCache();
+                            st.getSwf().clearImageCache();
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, "Invalid image", ex);
                             View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);

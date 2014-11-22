@@ -966,9 +966,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             break;
             case ACTION_SAVE_GENERIC_TAG: {
                 genericTagPanel.save();
-                SWF.clearImageCache();
                 Tag tag = genericTagPanel.getTag();
-                tag.getSwf().updateCharacters();
+                SWF swf = tag.getSwf();
+                swf.clearImageCache();
+                swf.updateCharacters();
                 tag.getTimelined().getTimeline().reset();
                 mainPanel.refreshTree();
                 mainPanel.setTagTreeSelectedNode(tag);

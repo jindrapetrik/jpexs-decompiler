@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import java.util.Collections;
@@ -34,19 +35,19 @@ public class GraphPartMulti extends GraphPart {
 
     @Override
     public String toString() {
-        String ret = "";
-        ret += "[multi ";
+        StringBuilder ret = new StringBuilder();
+        ret.append("[multi ");
         boolean first = true;
         for (GraphPart g : parts) {
             if (first) {
                 first = false;
             } else {
-                ret += ", ";
+                ret.append(", ");
             }
-            ret += g.toString();
+            ret.append(g.toString());
         }
-        ret += "]";
-        return ret;
+        ret.append("]");
+        return ret.toString();
     }
 
     @Override

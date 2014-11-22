@@ -174,18 +174,18 @@ public class AVM2Deobfuscation {
                 } else {
                     parts = new String[]{s};
                 }
-                String ret = "";
+                StringBuilder ret = new StringBuilder();
                 for (int p = 0; p < parts.length; p++) {
                     if (p > 0) {
-                        ret += ".";
+                        ret.append(".");
                     }
                     if (!isValidNSPart(parts[p])) {
-                        ret += fooString(namesMap, parts[p], false, DEFAULT_FOO_SIZE, "package", renameType);
+                        ret.append(fooString(namesMap, parts[p], false, DEFAULT_FOO_SIZE, "package", renameType));
                     } else {
-                        ret += parts[p];
+                        ret.append(parts[p]);
                     }
                 }
-                newName = ret;
+                newName = ret.toString();
                 namesMap.put(s, newName);
             }
             if (stringUsages.contains(strIndex)) {

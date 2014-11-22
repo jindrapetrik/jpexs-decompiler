@@ -755,9 +755,7 @@ public class Action implements GraphSourceItem {
      * @throws java.lang.InterruptedException
      */
     public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        //Stack<ActionItem> stack = new Stack<ActionItem>();
         return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version, staticOperation, path);
-        //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
     }
 
     @Override
