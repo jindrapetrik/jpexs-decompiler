@@ -1774,7 +1774,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 isNs = true;
             }
         }
-
+        
         if ((type instanceof TypeItem) && (((TypeItem) type).fullTypeName.equals("Namespace"))) {
             isNs = true;
         }
@@ -1782,7 +1782,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (val instanceof StringAVM2Item) {
             StringAVM2Item sval = (StringAVM2Item) val;
             if (isNs) {
-                return new ValueKind(namespace(abc.constants.constant_namespace.get(ns).kind, sval.value), Namespace.KIND_NAMESPACE);
+                return new ValueKind(namespace(Namespace.KIND_NAMESPACE, sval.value), ValueKind.CONSTANT_Namespace);
             } else {
                 return new ValueKind(str(sval.value), ValueKind.CONSTANT_Utf8);
             }
@@ -2081,7 +2081,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         Reference<Integer> class_index = new Reference<>(classPos);
         ScriptInfo si = new ScriptInfo();
         localData.currentScript = si;
-        Trait[] traitArr = generateTraitsPhase1(null, null, false, localData, commands, si.traits, class_index);
+        Trait[] traitArr = generateTraitsPhase1(null, null, true, localData, commands, si.traits, class_index);
         generateTraitsPhase2(new ArrayList<String>(), null/*FIXME*/, commands, traitArr, new ArrayList<Integer>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
@@ -2135,7 +2135,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;
         localData.pkg = null; //FIXME: pkg.packageName;
-        generateTraitsPhase3(1/*??*/, false, null, null, false, localData, commands, si.traits, traitArr, initScopes, class_index);
+        generateTraitsPhase3(1/*??*/, false, null, null, true, localData, commands, si.traits, traitArr, initScopes, class_index);
         return si;
     }
 
