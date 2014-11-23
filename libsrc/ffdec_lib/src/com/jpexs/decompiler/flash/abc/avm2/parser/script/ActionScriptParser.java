@@ -2303,7 +2303,6 @@ public class ActionScriptParser {
 
     public void addScriptFromTree(List<GraphTargetItem> items, boolean documentClass, int classPos) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abc, otherABCs);
-        List<AVM2Instruction> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
         localData.documentClass = documentClass;

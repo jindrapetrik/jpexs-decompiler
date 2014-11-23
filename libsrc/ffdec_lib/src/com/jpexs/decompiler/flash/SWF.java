@@ -2145,11 +2145,15 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
     
     public static void uncache(ASMSource src) {
-        src.getSwf().as2Cache.remove(src);
+        if (src != null) {
+            src.getSwf().as2Cache.remove(src);
+        }
     }
 
     public static void uncache(ScriptPack pack) {
-        pack.getSwf().as3Cache.remove(pack);
+        if (pack != null) {
+            pack.getSwf().as3Cache.remove(pack);
+        }
     }
 
     public static boolean isCached(ASMSource src) {
