@@ -54,15 +54,20 @@ public class UniTools {
         Font origFont=metrics.getFont();
         getSegments(origFont, segment, segments, unis);
         Graphics g=new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
-        Font uniFont = defaultUniFont.deriveFont(origFont.getStyle(),origFont.getSize2D());
-        int ret=0;
-        int pos=0;
+        Font uniFont = defaultUniFont.deriveFont(origFont.getStyle(),origFont.getSize2D());       
+        int ofs=0;
+        int totalto = 0;
         for(int i=0;i<segments.size();i++){
             Segment seg=segments.get(i);
-            ret += Utilities.getTabbedTextOffset(seg, g.getFontMetrics(unis.get(i)?uniFont:origFont), tabBase,x, e, startOffset+pos);     
-            pos += seg.length();
-        }
-        return ret;
+            FontMetrics fm=unis.get(i)?g.getFontMetrics(uniFont):metrics;
+            int to = Utilities.getTabbedTextOffset(seg, fm, tabBase+ofs,x, e, startOffset);
+            totalto += to;
+            ofs+=fm.stringWidth(seg.toString());
+            if(to<seg.length()){
+                break;
+            }            
+        }        
+        return totalto;
     }
     
     private static void getSegments(Font f,Segment segment,List<Segment> segments,List<Boolean> unis){

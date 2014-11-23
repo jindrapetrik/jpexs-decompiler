@@ -134,7 +134,7 @@ public class SyntaxView extends PlainView {
                 graphics.setColor(rightMarginColor);
                 graphics.drawLine(m_x, y, m_x, y - h);
             }
-            return super.drawUnselectedText(graphics, x, y, p0, p1);
+            return drawUnselectedText(graphics, x, y, p0, p1);
         } else {
             return drawUnselectedText(graphics, x, y, p0, p1);
         }
