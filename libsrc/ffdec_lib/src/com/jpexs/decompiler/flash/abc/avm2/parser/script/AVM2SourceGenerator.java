@@ -1484,7 +1484,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        int slotScope = className == null ? 0 : 1;
+        int slotScope = subMethod? 0 : 1;
 
         for (AssignableAVM2Item an : subvariables) {
             if (an instanceof NameAVM2Item) {
