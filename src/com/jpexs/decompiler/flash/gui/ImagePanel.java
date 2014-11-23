@@ -729,6 +729,16 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     @Override
     public void gotoFrame(int frame) {
+        if (timelined == null) {
+            return;
+        }
+        Timeline timeline = timelined.getTimeline();
+        if (frame >= timeline.getFrameCount()) {
+            return;
+        }
+        if(frame<0){
+            return;
+        }
         this.frame = frame;
         drawFrame();
     }

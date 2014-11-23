@@ -35,6 +35,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -46,14 +48,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  *
@@ -69,6 +77,9 @@ public class PlayerControls extends JPanel implements ActionListener {
     static final String ACTION_ZOOMFIT = "ZOOMFIT";
     static final String ACTION_ZOOMNONE = "ZOOMNONE";
     static final String ACTION_SNAPSHOT = "SNAPSHOT";
+    static final String ACTION_NEXTFRAME = "NEXTFRAME";
+    static final String ACTION_PREVFRAME = "PREVFRAME";
+    static final String ACTION_GOTOFRAME = "SELECTFRAME";
 
     private final JButton pauseButton;
     private boolean paused = false;
@@ -86,6 +97,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     private final JPanel zoomPanel;
     private final JPanel graphicControls;
     private final JPanel playbackControls;
+    private final JPanel frameControls;
     private double realZoom = 1.0;
 
     private final JButton zoomFitButton;
@@ -157,11 +169,12 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         add(graphicControls);
         graphicControls.setVisible(display.screenAvailable());
+        
 
         playbackControls = new JPanel();
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
-        frameLabel = new JLabel("0", SwingConstants.RIGHT);
+        frameLabel = new JLabel("0", SwingConstants.CENTER);
         frameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         frameLabel.addMouseMotionListener(new MouseMotionAdapter() {
 
@@ -172,6 +185,8 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         });
 
+        frameLabel.setVisible(display.screenAvailable());
+        
         Dimension min = new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"), frameLabel.getPreferredSize().height);
         frameLabel.setMinimumSize(min);
         frameLabel.setPreferredSize(min);
@@ -200,9 +215,40 @@ public class PlayerControls extends JPanel implements ActionListener {
         timeLabel = new JLabel("(00:00.00)");
         totalTimeLabel = new JLabel("(00:00.00)");
         totalFrameLabel = new JLabel("0");
+        
+        totalFrameLabel.setVisible(display.screenAvailable());
 
+        
+         frameControls = new JPanel(new FlowLayout());
+        
+        JButton prevFrameButton = new JButton(View.getIcon("prevframe16"));
+        prevFrameButton.setToolTipText(AppStrings.translate("preview.prevframe"));
+        prevFrameButton.setMargin(new Insets(4, 2, 2, 2));
+        prevFrameButton.setActionCommand(ACTION_PREVFRAME);
+        prevFrameButton.addActionListener(this);
+        frameControls.add(prevFrameButton);
+        frameControls.setVisible(display.screenAvailable());
+
+        
+        frameControls.add(frameLabel);
+                
+        JButton nextFrameButton = new JButton(View.getIcon("nextframe16"));
+        nextFrameButton.setToolTipText(AppStrings.translate("preview.nextframe"));
+        nextFrameButton.setMargin(new Insets(4, 2, 2, 2));
+        nextFrameButton.setActionCommand(ACTION_NEXTFRAME);
+        nextFrameButton.addActionListener(this);
+        frameControls.add(nextFrameButton);
+        
+        JButton gotoFrameButton = new JButton(View.getIcon("gotoframe16"));
+        gotoFrameButton.setToolTipText(AppStrings.translate("preview.gotoframe"));
+        gotoFrameButton.setMargin(new Insets(4, 2, 2, 2));
+        gotoFrameButton.setActionCommand(ACTION_GOTOFRAME);
+        gotoFrameButton.addActionListener(this);
+        frameControls.add(gotoFrameButton);
+
+        
         JPanel currentPanel = new JPanel(new FlowLayout());
-        currentPanel.add(frameLabel);
+        currentPanel.add(frameControls);
         currentPanel.add(timeLabel);
         JPanel totalPanel = new JPanel(new FlowLayout());
         totalPanel.add(totalFrameLabel);
@@ -213,16 +259,19 @@ public class PlayerControls extends JPanel implements ActionListener {
         playbackControls.setLayout(new BoxLayout(playbackControls, BoxLayout.Y_AXIS));
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
-        pauseButton = new JButton(AppStrings.translate("preview.pause"), pauseIcon);
-        pauseButton.setMargin(new Insets(0, 0, 0, 0));
+              
+        pauseButton = new JButton(pauseIcon);
+        pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
+        pauseButton.setMargin(new Insets(4, 2, 2, 2));
         pauseButton.setActionCommand(ACTION_PAUSE);
         pauseButton.addActionListener(this);
-        JButton stopButton = new JButton(AppStrings.translate("preview.stop"), View.getIcon("stop16"));
-        stopButton.setMargin(new Insets(0, 0, 0, 0));
+        JButton stopButton = new JButton(View.getIcon("stop16"));
+        stopButton.setToolTipText(AppStrings.translate("preview.stop"));
+        stopButton.setMargin(new Insets(4, 2, 2, 2));
         stopButton.setActionCommand(ACTION_STOP);
         stopButton.addActionListener(this);
         buttonsPanel.add(pauseButton);
-        buttonsPanel.add(stopButton);
+        buttonsPanel.add(stopButton);      
         controlPanel.add(buttonsPanel, BorderLayout.CENTER);
 
         progress = new JProgressBar();
@@ -288,6 +337,9 @@ public class PlayerControls extends JPanel implements ActionListener {
                 percentLabel.setVisible(zoom != 0.0);
                 zoomPanel.setVisible(display.zoomAvailable());
                 graphicControls.setVisible(display.screenAvailable());
+                totalFrameLabel.setVisible(display.screenAvailable());
+                frameLabel.setVisible(display.screenAvailable());
+                frameControls.setVisible(display.screenAvailable());
                 int totalFrames = display.getTotalFrames();
                 int currentFrame = display.getCurrentFrame();
                 int frameRate = display.getFrameRate();
@@ -315,10 +367,10 @@ public class PlayerControls extends JPanel implements ActionListener {
                     paused = !paused;
 
                     if (paused) {
-                        pauseButton.setText(AppStrings.translate("preview.play"));
+                        pauseButton.setToolTipText(AppStrings.translate("preview.play"));
                         pauseButton.setIcon(playIcon);
                     } else {
-                        pauseButton.setText(AppStrings.translate("preview.pause"));
+                        pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
                         pauseButton.setIcon(pauseIcon);
                     }
                 }
@@ -357,6 +409,60 @@ public class PlayerControls extends JPanel implements ActionListener {
                 } else {
                     display.pause();
                 }
+                break;
+
+            case ACTION_GOTOFRAME:
+                final JPanel gotoPanel = new JPanel(new BorderLayout());
+                final JTextField frameField = new JTextField("" + display.getCurrentFrame());
+                gotoPanel.add(new JLabel(AppStrings.translate("preview.gotoframe.dialog.message").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames())), BorderLayout.NORTH);
+                gotoPanel.add(frameField, BorderLayout.CENTER);
+                gotoPanel.addAncestorListener(new AncestorListener() {
+
+                    @Override
+                    public void ancestorAdded(AncestorEvent event) {
+                        final AncestorListener al = this;
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                frameField.selectAll();
+                                frameField.requestFocusInWindow();
+                                gotoPanel.removeAncestorListener(al);
+
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void ancestorRemoved(AncestorEvent event) {
+
+                    }
+
+                    @Override
+                    public void ancestorMoved(AncestorEvent event) {
+
+                    }
+                });
+                if (View.showConfirmDialog(this, gotoPanel, AppStrings.translate("preview.gotoframe.dialog.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+                    int frame = -1;
+                    try {
+                        frame = Integer.parseInt(frameField.getText());
+                    } catch (NumberFormatException nfe) {
+                        //handled as -1
+                    }
+                    if (frame <= 0 || frame > display.getTotalFrames()) {
+                        View.showMessageDialog(this, AppStrings.translate("preview.gotoframe.dialog.frame.error").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    display.gotoFrame(frame - 1);
+                }
+                break;
+            case ACTION_NEXTFRAME:
+                display.gotoFrame(display.getCurrentFrame() + 1);
+                break;
+            case ACTION_PREVFRAME:
+                display.gotoFrame(display.getCurrentFrame() - 1);
                 break;
             case ACTION_STOP:
                 display.pause();

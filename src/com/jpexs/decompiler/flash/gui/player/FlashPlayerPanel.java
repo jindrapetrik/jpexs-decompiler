@@ -137,17 +137,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
                     }
                 }
             }
-        });
-        flash.addFSCommandListener(new ActiveXEventListener() {
-
-            @Override
-            public void onEvent(ActiveXEvent axe) {
-                System.out.println("Event:" + axe.name);
-                for (String k : axe.args.keySet()) {
-                    System.out.println(k + "=" + axe.args.get(k));
-                }
-            }
-        });
+        });        
     }
 
     public synchronized void stopSWF() {
@@ -203,12 +193,18 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     @Override
-    public boolean isPlaying() {
+    public boolean isPlaying() {       
         return flash.IsPlaying();
     }
 
     @Override
     public void gotoFrame(int frame) {
+        if(frame<0){
+            return;
+        }
+        if(frame>=getTotalFrames()){
+            return;
+        }
         flash.GotoFrame(frame);
     }
 
