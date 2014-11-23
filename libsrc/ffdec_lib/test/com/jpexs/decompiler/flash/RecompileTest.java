@@ -163,7 +163,6 @@ public class RecompileTest {
         Object[][] ret = new Object[files.length + 2][1];
         ret[0][0] = "..\\as2\\as2.swf";
         ret[1][0] = "..\\as3\\as3.swf";
-        ret[1][0] = ret[0][0]; // todo: remove this line
         for (int f = 0; f < files.length; f++) {
             ret[f + 2][0] = files[f].getName();
         }
