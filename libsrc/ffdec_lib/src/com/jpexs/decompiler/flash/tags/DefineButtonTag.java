@@ -245,7 +245,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         return modified;
     }
 
-    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true);
+    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true,"rect_button");
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {

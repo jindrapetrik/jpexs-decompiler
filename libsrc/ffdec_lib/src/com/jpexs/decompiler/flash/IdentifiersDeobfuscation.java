@@ -289,8 +289,8 @@ public class IdentifiersDeobfuscation {
         return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
 
-    private static final Cache<String, String> as3NameCache = Cache.getInstance(false);
-    private static final Cache<String, String> as2NameCache = Cache.getInstance(false);
+    private static final Cache<String, String> as3NameCache = Cache.getInstance(false,"as3_ident");
+    private static final Cache<String, String> as2NameCache = Cache.getInstance(false,"as2_ident");
 
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax

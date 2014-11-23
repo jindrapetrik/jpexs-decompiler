@@ -278,9 +278,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     public DumpInfoSwfNode dumpInfo;
     public DefineBinaryDataTag binaryData;
 
-    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false);
-    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true);
-    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true);
+    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false,"frame");
+    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true,"as2");
+    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true,"as3");
 
     public void updateCharacters() {
         characters.clear();

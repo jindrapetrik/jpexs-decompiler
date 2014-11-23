@@ -67,6 +67,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -966,11 +967,40 @@ public class Main {
     }
 
     /**
+     * Clear old FFDec/JavactiveX temp files
+     */
+    private static void clearTemp() {
+        String tempDirPath = System.getProperty("java.io.tmpdir");
+        if (tempDirPath == null) {
+            return;
+        }
+        File tempDir = new File(tempDirPath);
+        if (!tempDir.exists()) {
+            return;
+        }
+        File delFiles[] = tempDir.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.matches("ffdec_cache.*\\.tmp") || name.matches("javactivex_.*\\.exe") || name.matches("temp[0-9]+\\.swf") || name.matches("ffdec_view_.*\\.swf");
+            }
+        });
+        for (File f : delFiles) {
+            try {
+                f.delete();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+
+    /**
      * @param args the command line arguments
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
 
+        clearTemp();
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
             try {

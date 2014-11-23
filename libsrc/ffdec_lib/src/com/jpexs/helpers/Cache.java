@@ -16,20 +16,14 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.helpers.Freed;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -37,16 +31,31 @@ import java.util.logging.Logger;
  * @param <K>
  * @param <V>
  */
-public class Cache<K, V> {
+public class Cache<K, V> implements Freed {
 
-    private final Map<K, File> cacheFiles;
-    private final Map<K, V> cacheMemory;
+    private Map<K, V> cache;
     private static final List<Cache> instances = new ArrayList<>();
     public static final int STORAGE_FILES = 1;
     public static final int STORAGE_MEMORY = 2;
+    private boolean weak;
+    private String name;
 
-    public static <K, V> Cache<K, V> getInstance(boolean weak) {
-        Cache<K, V> instance = new Cache<>(weak);
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+
+            @Override
+            public void run() {
+                for (Cache c : instances) {
+                    c.clear();
+                    c.free();
+                }
+            }
+            
+        });
+    }
+    
+    public static <K, V> Cache<K, V> getInstance(boolean weak,String name) {
+        Cache<K, V> instance = new Cache<>(weak,name);
         instances.add(instance);
         return instance;
     }
@@ -56,6 +65,7 @@ public class Cache<K, V> {
     public static void clearAll() {
         for (Cache c : instances) {
             c.clear();
+            c.initCache();
         }
     }
 
@@ -80,103 +90,66 @@ public class Cache<K, V> {
         return storageType;
     }
 
-    private Cache(boolean weak) {
-        if (weak) {
-            cacheFiles = new WeakHashMap<>();
-            cacheMemory = new WeakHashMap<>();
-        } else {
-            cacheFiles = new HashMap<>();
-            cacheMemory = new HashMap<>();
+    private void initCache() {
+        int thisStorageType = storageType;
+        Map<K, V> newCache = null;
+        if (thisStorageType == STORAGE_FILES) {
+            try {
+                newCache = new FileHashMap<>(File.createTempFile("ffdec_cache_"+name+"_", ".tmp"));
+            } catch (IOException ex) {
+                thisStorageType = STORAGE_MEMORY;
+            }
         }
+        if (thisStorageType == STORAGE_MEMORY) {
+            if (weak) {
+                newCache = new WeakHashMap<>();
+            } else {
+                newCache = new HashMap<>();
+            }
+        }
+        if (this.cache instanceof Freed) {
+            ((Freed) this.cache).free();
+        }
+        this.cache = newCache;
+    }
+
+    private Cache(boolean weak,String name) {
+        this.weak = weak;
+        this.name = name;
+        initCache();
     }
 
     public synchronized boolean contains(K key) {
-        if (storageType == STORAGE_FILES) {
-            return cacheFiles.containsKey(key);
-        } else if (storageType == STORAGE_MEMORY) {
-            return cacheMemory.containsKey(key);
-        }
-        return false;
+        return cache.containsKey(key);
     }
 
     public synchronized void clear() {
-        cacheMemory.clear();
-        for (File f : cacheFiles.values()) {
-            f.delete();
-        }
-        cacheFiles.clear();
+        cache.clear();
     }
 
     public synchronized void remove(K key) {
-        if (storageType == STORAGE_FILES) {
-            if (cacheFiles.containsKey(key)) {
-                File f = cacheFiles.get(key);
-                f.delete();
-                cacheFiles.remove(key);
-            }
-        } else if (storageType == STORAGE_MEMORY) {
-            if (cacheMemory.containsKey(key)) {
-                cacheMemory.remove(key);
-            }
+        if (cache.containsKey(key)) {
+            cache.remove(key);
         }
-
     }
 
     public synchronized V get(K key) {
-        if (storageType == STORAGE_FILES) {
-            if (!cacheFiles.containsKey(key)) {
-                return null;
-            }
-            File f = cacheFiles.get(key);
-            try (FileInputStream fis = new FileInputStream(f)) {
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                @SuppressWarnings("unchecked")
-                V item = (V) ois.readObject();
-                return item;
-            } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
-        } else if (storageType == STORAGE_MEMORY) {
-            if (cacheMemory.containsKey(key)) {
-                return cacheMemory.get(key);
-            }
-            return null;
-        }
-        return null;
+        return cache.get(key);
     }
 
     public synchronized void put(K key, V value) {
-        if (storageType == STORAGE_FILES) {
-            File temp = null;
-            try {
-                temp = File.createTempFile("ffdec_cache", ".tmp");
-            } catch (IOException ex) {
-                Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+        cache.put(key, value);
+    }
 
-                return;
-            }
-            try {
-                temp.deleteOnExit();
-            } catch (IllegalStateException iex) {
-                return;
-            }
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
-                if (value instanceof Serializable) {
-                    oos.writeObject(value);
-                } else {
-                    // Object serialization not supported
-                    return;
-                }
-                oos.flush();
+    @Override
+    public boolean isFreeing() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
-                cacheFiles.put(key, temp);
-
-            } catch (IOException ex) {
-                //ignore
-            }
-        } else if (storageType == STORAGE_MEMORY) {
-            cacheMemory.put(key, value);
+    @Override
+    public void free() {
+        if(cache instanceof Freed){
+            ((Freed)cache).free();
         }
     }
 }
