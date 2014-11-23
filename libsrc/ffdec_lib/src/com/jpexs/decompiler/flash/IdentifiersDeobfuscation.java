@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.helpers.Cache;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -288,7 +289,8 @@ public class IdentifiersDeobfuscation {
         return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
 
-    private static final Map<String, String> nameCache = new HashMap<>();
+    private static final Cache<String, String> as3NameCache = Cache.getInstance(false);
+    private static final Cache<String, String> as2NameCache = Cache.getInstance(false);
 
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
@@ -309,9 +311,13 @@ public class IdentifiersDeobfuscation {
                 return s;
             }
         }        
-        if (nameCache.containsKey(s)) {
+        Cache<String, String> nameCache = as3?as3NameCache:as2NameCache;
+        
+        
+        if (nameCache.contains(s)) {
             return nameCache.get(s);
         }
+        
         if (isValidName(as3, s, validExceptions)) {
             nameCache.put(s, s);
             return s;
@@ -322,7 +328,8 @@ public class IdentifiersDeobfuscation {
     }
 
     public static String printNamespace(boolean as3, String pkg, String... validNameExceptions) {
-        if (nameCache.containsKey(pkg)) {
+        Cache<String, String> nameCache = as3?as3NameCache:as2NameCache;
+        if (nameCache.contains(pkg)) {
             return nameCache.get(pkg);
         }
         if (pkg.isEmpty()) {
