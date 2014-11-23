@@ -54,15 +54,13 @@ public class AboutDialog extends AppDialog {
         //setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
 
-        JPanel twoPanes=new JPanel();
+        JPanel twoPanes = new JPanel();
         twoPanes.setLayout(new BoxLayout(twoPanes, BoxLayout.X_AXIS));
-        
+
         Container cnt = getContentPane();
         JPanel cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         cnt.setLayout(new BorderLayout());
-        
-        
 
         JPanel appNamePanel = new JPanel(new FlowLayout());
         JLabel jpLabel = new JLabel("JPEXS");
@@ -85,27 +83,24 @@ public class AboutDialog extends AppDialog {
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         appNamePanel.add(decLabel);
         appNamePanel.setAlignmentX(0.5f);
-        
-        
+
         cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
         cp.add(appNamePanel);
-         JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
-        verLabel.setAlignmentX(0.5f);        
+        JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
+        verLabel.setAlignmentX(0.5f);
         //verLabel.setPreferredSize(new Dimension(300, 15));
         verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
         verLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(verLabel);
 
-        
-        cnt.add(cp,BorderLayout.NORTH);
+        cnt.add(cp, BorderLayout.NORTH);
 
         cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-        
-       
+
         JLabel byLabel = new JLabel(translate("by"));
         byLabel.setAlignmentX(0.5f);
         byLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -124,7 +119,7 @@ public class AboutDialog extends AppDialog {
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(dateLabel);
-        
+
         LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE);
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
@@ -148,36 +143,31 @@ public class AboutDialog extends AppDialog {
         developersLabel.setHorizontalAlignment(SwingConstants.CENTER);
         developersLabel.setFont(developersLabel.getFont().deriveFont(Font.BOLD));
         cp.add(developersLabel);
-        
-        
+
         for (String c : DEVELOPERS) {
             JLabel developerNameLabel = new JLabel(c);
             developerNameLabel.setAlignmentX(0.5f);
             developerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
             cp.add(developerNameLabel);
         }
-        
-        
-        
-        
-        
+
         cp.setAlignmentY(0);
         twoPanes.add(cp);
         cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));                
-        
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+
         JLabel translatorsLabel = new JLabel(translate("translators"));
         translatorsLabel.setAlignmentX(0.5f);
         translatorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
         translatorsLabel.setFont(translatorsLabel.getFont().deriveFont(Font.BOLD));
         cp.add(translatorsLabel);
-        
-        List<String> translators=new ArrayList<>();
-        for(String code:SelectLanguageDialog.languages){
+
+        List<String> translators = new ArrayList<>();
+        for (String code : SelectLanguageDialog.languages) {
             Locale l = Locale.forLanguageTag(code.equals("en") ? "" : code);
-            ResourceBundle b = ResourceBundle.getBundle(AppStrings.getResourcePath(AboutDialog.class),l);
-            translators.add(Locale.forLanguageTag(code).getDisplayName()+" - "+b.getString("translation.author"));
+            ResourceBundle b = ResourceBundle.getBundle(AppStrings.getResourcePath(AboutDialog.class), l);
+            translators.add(Locale.forLanguageTag(code).getDisplayName() + " - " + b.getString("translation.author"));
         }
         for (String c : translators) {
             JLabel translatorName = new JLabel(c);
@@ -189,10 +179,10 @@ public class AboutDialog extends AppDialog {
         cp.add(Box.createVerticalStrut(10));
         cp.setAlignmentY(0);
         twoPanes.add(cp);
-        
+
         cnt.add(twoPanes, BorderLayout.CENTER);
         cp = new JPanel(new FlowLayout());
-        cnt.add(cp,BorderLayout.SOUTH);
+        cnt.add(cp, BorderLayout.SOUTH);
         JButton okButton = new JButton(translate("button.ok"));
         okButton.setAlignmentX(0.5f);
         cp.add(okButton);
@@ -207,6 +197,6 @@ public class AboutDialog extends AppDialog {
         View.setWindowIcon(this);
         setResizable(false);
         pack();
-        View.centerScreen(this);        
+        View.centerScreen(this);
     }
 }

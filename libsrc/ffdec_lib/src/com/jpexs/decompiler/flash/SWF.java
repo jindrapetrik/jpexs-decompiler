@@ -1079,9 +1079,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public Map<String, ASMSource> getASMs() {
-        Map<String, ASMSource> asms2 = new HashMap<>();
-        getASMs("", tags, asms2);
-        return asms2;
+        Map<String, ASMSource> asms = new HashMap<>();
+        getASMs("", tags, asms);
+        return asms;
     }
 
     private static void getASMs(String path, List<? extends ContainerItem> items, Map<String, ASMSource> asms) {

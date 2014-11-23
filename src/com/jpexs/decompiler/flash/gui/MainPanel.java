@@ -136,11 +136,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -158,7 +156,6 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
@@ -185,7 +182,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreePath;
-import org.monte.media.io.ByteArrayImageInputStream;
 
 /**
  *
@@ -611,8 +607,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void ensureActionPanel() {
         if (actionPanel == null) {
-            actionPanel = new ActionPanel(this);
-            displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+            final MainPanel diz = this;
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    actionPanel = new ActionPanel(diz);
+                    displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+                }
+            });
         }
     }
 
@@ -1098,7 +1100,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void searchAs() {
         if (searchDialog == null) {
             searchDialog = new SearchDialog(getMainFrame().getWindow());
@@ -1900,8 +1902,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (selectedFile != null) {
                         Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(selectedFile);
-                        byte[] data = Helper.readFile(selfile.getAbsolutePath());                        
-                        try {                                                   
+                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                        try {
                             Tag newTag = new ShapeImporter().importImage(st, data);
                             if (newTag != null) {
                                 refreshTree();

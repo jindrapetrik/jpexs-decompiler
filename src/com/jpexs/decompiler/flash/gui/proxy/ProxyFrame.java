@@ -491,7 +491,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                         Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                tableModel.setRowCount(0);                
+                tableModel.setRowCount(0);
                 reps.clear();
                 break;
             case ACTION_REMOVE:
