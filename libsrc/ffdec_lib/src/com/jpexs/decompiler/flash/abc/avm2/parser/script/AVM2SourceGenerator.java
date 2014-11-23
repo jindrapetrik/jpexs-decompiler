@@ -1308,6 +1308,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (type instanceof UnboundedTypeItem) {
             return 0;
         }
+        if((""+type).equals("*")){
+            return 0;
+        }
 
         return resolveType(localData, type, abc, allABCs);
         /*
