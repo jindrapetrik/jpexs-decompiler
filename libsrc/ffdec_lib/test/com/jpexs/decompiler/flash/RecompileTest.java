@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -86,9 +87,8 @@ public class RecompileTest {
                 for (ABCContainerTag ct : swf.abcList) {
                     allAbcs.add(ct.getABC());
                 }
-                for (ABC abc : allAbcs) {
+                for (ABC abc : allAbcs) {                   
                     for (int s = 0; s < abc.script_info.size(); s++) {
-
                         String startAfter = null;
                         HighlightedTextWriter htw = new HighlightedTextWriter(new CodeFormatting(), false);
                         MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
@@ -105,6 +105,8 @@ public class RecompileTest {
                         String original = htw.toString();
                         ABC nabc = abc; //new ABC(swf);
                         com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
+                        //remove last compiled script:
+                        abc.script_info.remove(abc.script_info.size()-1);
                     }
                 }
             } else {

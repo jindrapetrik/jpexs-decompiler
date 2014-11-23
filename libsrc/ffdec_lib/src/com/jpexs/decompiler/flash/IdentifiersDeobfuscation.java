@@ -303,6 +303,12 @@ public class IdentifiersDeobfuscation {
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
             return s;
         }
+        
+        for (String e : validExceptions) {
+            if (e.equals(s)) {
+                return s;
+            }
+        }        
         if (nameCache.containsKey(s)) {
             return nameCache.get(s);
         }
