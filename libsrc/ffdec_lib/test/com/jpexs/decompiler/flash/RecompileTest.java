@@ -63,7 +63,7 @@ public class RecompileTest {
     @Test(dataProvider = "provideFiles")
     public void testRecompile(String filename) {
         try {
-            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + filename)){
+            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + filename)) {
                 Configuration.debugCopy.set(true);
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 swf.saveTo(new ByteArrayOutputStream());
@@ -151,15 +151,15 @@ public class RecompileTest {
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {
         File dir = new File(TESTDATADIR);
-        if (!dir.exists()) {
-            return new Object[0][];
+        File[] files = new File[0];
+        if (dir.exists()) {
+            files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".swf");
+                }
+            });
         }
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".swf");
-            }
-        });
         Object[][] ret = new Object[files.length + 2][1];
         ret[0][0] = "..\\as2\\as2.swf";
         ret[1][0] = "..\\as3\\as3.swf";
