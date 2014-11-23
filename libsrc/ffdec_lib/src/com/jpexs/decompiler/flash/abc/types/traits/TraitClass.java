@@ -91,7 +91,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (name.isEmpty()) {
             name = "*";
         }
-        String newimport = ns.getName(abc.constants, false);
+        String newimport = ns.getName(abc.constants, ns.kind == Namespace.KIND_NAMESPACE);
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {

@@ -1839,7 +1839,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if (fullCustom.equals(m.getNameWithNamespace(a.constants, true))) {
                                 if (t instanceof TraitSlotConst) {
                                     if (((TraitSlotConst) t).isNamespace()) {
-                                        return ((TraitSlotConst) t).value_index;
+                                        Namespace ns = a.constants.getNamespace(((TraitSlotConst) t).value_index);
+                                        return abc.constants.getNamespaceId(new Namespace(ns.kind, abc.constants.getStringId(ns.getName(a.constants, true),true)), 0, true);
                                     }
                                 }
                             }
