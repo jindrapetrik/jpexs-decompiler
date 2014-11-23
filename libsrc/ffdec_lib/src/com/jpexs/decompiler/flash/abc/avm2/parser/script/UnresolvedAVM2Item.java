@@ -326,7 +326,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 impName = impName.substring(impName.lastIndexOf('.') + 1);
             }
             if (impName.equals(parts.get(0))) {
-                TypeItem ret = new TypeItem(imp);                
+                TypeItem ret = new TypeItem(imp);
                 resolved = ret;
                 for (int i = 1; i < parts.size(); i++) {
                     resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());

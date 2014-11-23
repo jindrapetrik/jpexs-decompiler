@@ -23,7 +23,7 @@ import java.io.Serializable;
  * @author JPEXS
  */
 public class HighlightData implements Cloneable, Serializable {
-    
+
     public boolean declaration;
 
     public String declaredType;
@@ -37,13 +37,13 @@ public class HighlightData implements Cloneable, Serializable {
     public long index;
 
     public long offset;
- 
+
     public boolean isEmpty() {
-        return !declaration && declaredType == null && localName == null && 
-                subtype == null && specialValue == null &&
-                index == 0 && offset == 0;
+        return !declaration && declaredType == null && localName == null
+                && subtype == null && specialValue == null
+                && index == 0 && offset == 0;
     }
-    
+
     public void merge(HighlightData data) {
         if (data.declaration) {
             declaration = data.declaration;

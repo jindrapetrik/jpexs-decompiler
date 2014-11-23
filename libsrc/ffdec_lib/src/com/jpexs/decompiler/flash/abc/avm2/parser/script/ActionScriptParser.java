@@ -587,9 +587,9 @@ public class ActionScriptParser {
                             throw new AVM2ParseException("Only one static keyword allowed", lexer.yyline());
                         }
                         isStatic = true;
-                    } else if(s.type == SymbolType.NAMESPACE) {
+                    } else if (s.type == SymbolType.NAMESPACE) {
                         break;
-                    } else if(s.type == SymbolType.NATIVE) {
+                    } else if (s.type == SymbolType.NATIVE) {
                         throw new AVM2ParseException("Cannot compile native code", lexer.yyline());
                     } else if (s.group == SymbolGroup.IDENTIFIER) {
                         customAccess = s.value.toString();

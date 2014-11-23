@@ -64,6 +64,6 @@ public interface PlaceObjectTypeTag {
     public int getRatio();
 
     public CLIPACTIONS getClipActions();
-    
-    public void writeTagWithMatrix(SWFOutputStream sos,MATRIX m) throws IOException;
+
+    public void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
 }

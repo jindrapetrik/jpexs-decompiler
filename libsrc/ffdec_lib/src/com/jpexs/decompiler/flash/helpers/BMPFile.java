@@ -65,12 +65,12 @@ public class BMPFile extends Component {
     public static void saveBitmap(Image image, File file) throws IOException {
         BMPFile b = new BMPFile();
         b.fo = new FileOutputStream(file);
-        try{
+        try {
             b.save(image, image.getWidth(null), image.getHeight(null));
-        }finally{
-            try{
+        } finally {
+            try {
                 b.fo.close();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 //ignore
             }
         }

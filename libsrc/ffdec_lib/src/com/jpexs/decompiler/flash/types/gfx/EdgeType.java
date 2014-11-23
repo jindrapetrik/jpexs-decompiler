@@ -103,7 +103,7 @@ public class EdgeType implements Serializable {
     public SHAPERECORD toSHAPERECORD() {
         int multiplier = 1;
         StraightEdgeRecord ser;
-            CurvedEdgeRecord cer;
+        CurvedEdgeRecord cer;
         switch (data[0]) {
             case Edge_HLine:
                 ser = new StraightEdgeRecord();

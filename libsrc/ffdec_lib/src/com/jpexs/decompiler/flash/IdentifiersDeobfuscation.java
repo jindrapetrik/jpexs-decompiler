@@ -289,8 +289,8 @@ public class IdentifiersDeobfuscation {
         return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
     }
 
-    private static final Cache<String, String> as3NameCache = Cache.getInstance(false,"as3_ident");
-    private static final Cache<String, String> as2NameCache = Cache.getInstance(false,"as2_ident");
+    private static final Cache<String, String> as3NameCache = Cache.getInstance(false, "as3_ident");
+    private static final Cache<String, String> as2NameCache = Cache.getInstance(false, "as2_ident");
 
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
@@ -305,19 +305,18 @@ public class IdentifiersDeobfuscation {
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
             return s;
         }
-        
+
         for (String e : validExceptions) {
             if (e.equals(s)) {
                 return s;
             }
-        }        
-        Cache<String, String> nameCache = as3?as3NameCache:as2NameCache;
-        
-        
+        }
+        Cache<String, String> nameCache = as3 ? as3NameCache : as2NameCache;
+
         if (nameCache.contains(s)) {
             return nameCache.get(s);
         }
-        
+
         if (isValidName(as3, s, validExceptions)) {
             nameCache.put(s, s);
             return s;
@@ -328,7 +327,7 @@ public class IdentifiersDeobfuscation {
     }
 
     public static String printNamespace(boolean as3, String pkg, String... validNameExceptions) {
-        Cache<String, String> nameCache = as3?as3NameCache:as2NameCache;
+        Cache<String, String> nameCache = as3 ? as3NameCache : as2NameCache;
         if (nameCache.contains(pkg)) {
             return nameCache.get(pkg);
         }

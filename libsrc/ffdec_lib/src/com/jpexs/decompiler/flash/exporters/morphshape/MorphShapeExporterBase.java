@@ -297,7 +297,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     }
                     fillStyleIdx = e.getFillStyleIdx();
                     pos = PointInt.MAX;
-                    try {
+                    if (fillStyleIdx - 1 < _fillStyles.size()) {
                         Matrix matrix;
                         Matrix matrixEnd;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
@@ -342,7 +342,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                 );
                                 break;
                         }
-                    } catch (Exception ex) {
+                    } else {
                         // Font shapes define no fillstyles per se, but do reference fillstyle index 1,
                         // which represents the font color. We just report null in this case.
                         beginFill(null, null);

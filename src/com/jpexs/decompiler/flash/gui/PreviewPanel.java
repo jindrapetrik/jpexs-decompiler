@@ -155,20 +155,20 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.mainPanel = mainPanel;
         this.flashPanel = flashPanel;
-        
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
-                if(tempFile!=null){
-                    try{
+                if (tempFile != null) {
+                    try {
                         tempFile.delete();
-                    }catch(Exception ex){
-                        
+                    } catch (Exception ex) {
+
                     }
                 }
             }
-            
+
         });
 
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -952,7 +952,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             tempFile.delete();
         }
         try {
-            tempFile = File.createTempFile("ffdec_view_", ".swf");           
+            tempFile = File.createTempFile("ffdec_view_", ".swf");
             swf.saveTo(new BufferedOutputStream(new FileOutputStream(tempFile)));
             flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
         } catch (IOException iex) {

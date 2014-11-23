@@ -1308,7 +1308,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (type instanceof UnboundedTypeItem) {
             return 0;
         }
-        if((""+type).equals("*")){
+        if (("" + type).equals("*")) {
             return 0;
         }
 
@@ -1487,7 +1487,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        int slotScope = subMethod? 0 : 1;
+        int slotScope = subMethod ? 0 : 1;
 
         for (AssignableAVM2Item an : subvariables) {
             if (an instanceof NameAVM2Item) {
@@ -1777,7 +1777,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 isNs = true;
             }
         }
-        
+
         if ((type instanceof TypeItem) && (((TypeItem) type).fullTypeName.equals("Namespace"))) {
             isNs = true;
         }
@@ -1840,7 +1840,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 if (t instanceof TraitSlotConst) {
                                     if (((TraitSlotConst) t).isNamespace()) {
                                         Namespace ns = a.constants.getNamespace(((TraitSlotConst) t).value_index);
-                                        return abc.constants.getNamespaceId(new Namespace(ns.kind, abc.constants.getStringId(ns.getName(a.constants, true),true)), 0, true);
+                                        return abc.constants.getNamespaceId(new Namespace(ns.kind, abc.constants.getStringId(ns.getName(a.constants, true), true)), 0, true);
                                     }
                                 }
                             }

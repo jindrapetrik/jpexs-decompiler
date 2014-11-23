@@ -107,8 +107,6 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
-    
-    
     private float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
@@ -162,7 +160,7 @@ public class MATRIX implements Serializable {
     public int getScaleY() {
         return (hasScale ? (scaleY) : (1 << 16));
     }
-  
+
     public boolean isEmpty() {
         return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
     }

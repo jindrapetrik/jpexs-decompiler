@@ -153,7 +153,7 @@ public class XFLConverter {
     public static final int KEY_MODE_SHAPE_TWEEN = 17922;
     public static final int KEY_MODE_MOTION_TWEEN = 8195;
     public static final int KEY_MODE_SHAPE_LAYERS = 8192;
-    
+
     private static final Random random = new Random(123); // predictable random
 
     private XFLConverter() {
@@ -281,9 +281,9 @@ public class XFLConverter {
 
     public static String convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
         /* todo: use matrix
-        if (mat == null) {
-            mat = new MATRIX();
-        }*/
+         if (mat == null) {
+         mat = new MATRIX();
+         }*/
         StringBuilder ret = new StringBuilder();
         //ret += "<FillStyle index=\"" + index + "\">";
         switch (fs.fillStyleType) {
@@ -3184,7 +3184,7 @@ public class XFLConverter {
         }
 
         return "<AdjustColorFilter brightness=\"" + normBrightness(b) + "\" contrast=\"" + normContrast(c) + "\" saturation=\"" + normSaturation(s) + "\" hue=\"" + normHue(h) + "\"/>";
-    }   
+    }
 
     private static String convertHTMLText(List<Tag> tags, DefineEditTextTag det, String html) {
         HTMLTextParser tparser = new HTMLTextParser(tags, det);
@@ -3215,7 +3215,7 @@ public class XFLConverter {
     }
 
     private static double twipToPixel(double tw) {
-        return tw /SWF.unitDivisor;
+        return tw / SWF.unitDivisor;
     }
 
     private static class HTMLTextParser extends DefaultHandler {

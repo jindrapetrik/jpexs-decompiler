@@ -61,31 +61,29 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.JPEG) {
                     fileFormat = "jpg";
                 }
-                
+
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = "bmp";
                 }
                 {
 
-                final ImageTag imageTag = (ImageTag) t;
-                final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
-                final List<Tag> ttags = tags;
-                final String ffileFormat = fileFormat;
-                
-                                
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        if(ffileFormat.equals("bmp")){
-                            BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
-                        }else{
-                            ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                    final ImageTag imageTag = (ImageTag) t;
+                    final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
+                    final String ffileFormat = fileFormat;
+
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            if (ffileFormat.equals("bmp")) {
+                                BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
+                            } else {
+                                ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                            }
                         }
-                    }
-                }, handler).run();                
-                 ret.add(file);
+                    }, handler).run();
+                    ret.add(file);
                 }
-               
+
             }
         }
         return ret;

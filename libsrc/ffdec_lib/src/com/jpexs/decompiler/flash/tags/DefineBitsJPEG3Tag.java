@@ -45,7 +45,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     public byte[] bitmapAlphaData;
 
     public static final int ID = 35;
-    
+
     @Override
     public int getCharacterId() {
         return characterID;

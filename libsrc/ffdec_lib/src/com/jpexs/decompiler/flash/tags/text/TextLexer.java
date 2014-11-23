@@ -637,7 +637,7 @@ public final class TextLexer {
                             zzInput = zzBufferL[zzCurrentPosL++];
                         }
                     }
-                    int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput]];
+                    int zzNext = zzTransL[zzRowMapL[zzState] + zzCMapL[zzInput]];
                     if (zzNext == -1) {
                         break zzForAction;
                     }

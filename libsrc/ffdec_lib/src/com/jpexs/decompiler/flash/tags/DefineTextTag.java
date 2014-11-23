@@ -185,11 +185,10 @@ public class DefineTextTag extends TextTag {
 
     @Override
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException {
-        List<TEXTRECORD> oldTextRecords = textRecords;
         try {
             TextLexer lexer = new TextLexer(new StringReader(formattedText));
             ParsedSymbol s = null;
-            textRecords = new ArrayList<>();
+            List<TEXTRECORD> textRecords = new ArrayList<>();
             RGB color = null;
             int fontId = -1;
             int textHeight = -1;
@@ -217,7 +216,7 @@ public class DefineTextTag extends TextTag {
                                 if (m.matches()) {
                                     color = new RGB(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16));
                                 } else {
-                                    throw new TextParseException("Invalid color. Valid format is #rrggbb.", lexer.yyline());
+                                    throw new TextParseException("Invalid color. Valid format is #rrggbb. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "font":
@@ -237,14 +236,14 @@ public class DefineTextTag extends TextTag {
                                         throw new TextParseException("Font not found", lexer.yyline());
                                     }
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid font id - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid font id - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "height":
                                 try {
                                     textHeight = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid font height - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid font height - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "x":
@@ -252,7 +251,7 @@ public class DefineTextTag extends TextTag {
                                     x = Integer.parseInt(paramValue);
                                     currentX = x;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid x position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid x position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "y":
@@ -260,35 +259,35 @@ public class DefineTextTag extends TextTag {
                                     y = Integer.parseInt(paramValue);
                                     currentY = y;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid y position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid y position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "xmin":
                                 try {
                                     textBounds.Xmin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid xmin position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid xmin position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "xmax":
                                 try {
                                     textBounds.Xmax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid xmax position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid xmax position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "ymin":
                                 try {
                                     textBounds.Ymin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid ymin position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid ymin position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "ymax":
                                 try {
                                     textBounds.Ymax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid ymax position - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid ymax position - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "scalex":
@@ -296,7 +295,7 @@ public class DefineTextTag extends TextTag {
                                     textMatrix.scaleX = Integer.parseInt(paramValue);
                                     textMatrix.hasScale = true;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid scalex value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid scalex value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "scaley":
@@ -304,7 +303,7 @@ public class DefineTextTag extends TextTag {
                                     textMatrix.scaleY = Integer.parseInt(paramValue);
                                     textMatrix.hasScale = true;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid scalex value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid scalex value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "rotateskew0":
@@ -312,7 +311,7 @@ public class DefineTextTag extends TextTag {
                                     textMatrix.rotateSkew0 = Integer.parseInt(paramValue);
                                     textMatrix.hasRotate = true;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid rotateskew0 value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid rotateskew0 value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "rotateskew1":
@@ -320,23 +319,25 @@ public class DefineTextTag extends TextTag {
                                     textMatrix.rotateSkew1 = Integer.parseInt(paramValue);
                                     textMatrix.hasRotate = true;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid rotateskew1 value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid rotateskew1 value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "translatex":
                                 try {
                                     textMatrix.translateX = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid translatex value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid translatex value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "translatey":
                                 try {
                                     textMatrix.translateY = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid translatey value - number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid translatey value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
+                            default:
+                                throw new TextParseException("Unrecognized parameter name: " + paramName, lexer.yyline());
                         }
                         break;
                     case TEXT:
@@ -418,17 +419,17 @@ public class DefineTextTag extends TextTag {
                 }
 
             }
+
+            setModified(true);
+            this.textRecords = textRecords;
             this.textMatrix = textMatrix;
             this.textBounds = textBounds;
-            //this.textBounds.Xmin = minX;
-            //this.textBounds.Xmax = maxX;
         } catch (IOException ex) {
-            textRecords = oldTextRecords;
             return false;
         } catch (TextParseException ex) {
-            textRecords = oldTextRecords;
             throw ex;
         }
+
         return true;
     }
 

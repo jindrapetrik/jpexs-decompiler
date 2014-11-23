@@ -323,7 +323,7 @@ public class MethodInfo {
             } else {
                 restName = "rest";
             }
-            
+
             HighlightData pdata = new HighlightData();
             pdata.declaration = true;
             pdata.declaredType = "*";

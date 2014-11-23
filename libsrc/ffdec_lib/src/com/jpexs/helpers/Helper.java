@@ -412,8 +412,7 @@ public class Helper {
         return ret;
     }
 
-    public static ByteArrayInputStream getInputStream(byte[]  
-        ... data) {
+    public static ByteArrayInputStream getInputStream(byte[]... data) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
@@ -480,8 +479,7 @@ public class Helper {
         }
     }
 
-    public static void writeFile(String file, byte[]  
-        ... data) {
+    public static void writeFile(String file, byte[]... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte[] d : data) {
                 fos.write(d);
@@ -874,7 +872,7 @@ public class Helper {
         }
         return ret;
     }
-    
+
     public static String byteCountStr(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) {
@@ -885,5 +883,4 @@ public class Helper {
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
-       
 }

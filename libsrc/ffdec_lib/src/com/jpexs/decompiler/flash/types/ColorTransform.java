@@ -62,7 +62,7 @@ public class ColorTransform implements Cloneable {
             r2.inShape3 = r.inShape3;
             r2.ratio = r.ratio;
             r2.color = apply(r.color);
-            ret[i] = r2; 
+            ret[i] = r2;
         }
         return ret;
     }

@@ -38,27 +38,27 @@ import javax.imageio.ImageIO;
  * @author JPEXS
  */
 public class ShapeImporter {
-    
+
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
         SWF swf = st.getSwf();
-        
-        if(newData[0] == 'B' && newData[1] == 'M'){
+
+        if (newData[0] == 'B' && newData[1] == 'M') {
             BufferedImage b = ImageIO.read(new ByteArrayInputStream(newData));
-            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(b, "PNG", baos);
             newData = baos.toByteArray();
         }
-        
+
         DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
         jpeg2Tag.setModified(true);
         swf.tags.add(jpeg2Tag);
         swf.updateCharacters();
         st.setModified(true);
         SHAPEWITHSTYLE shapes = jpeg2Tag.getShape(st.getRect(new HashSet<BoundedTag>()), true);
-        
+
         if (st instanceof DefineShapeTag) {
             DefineShapeTag dst = (DefineShapeTag) st;
-            dst.shapes  = shapes;
+            dst.shapes = shapes;
         } else if (st instanceof DefineShape2Tag) {
             DefineShape2Tag dst = (DefineShape2Tag) st;
             dst.shapes = shapes;
@@ -69,7 +69,7 @@ public class ShapeImporter {
             DefineShape4Tag dst = (DefineShape4Tag) st;
             dst.shapes = shapes;
         }
-        
+
         return (Tag) st;
     }
 }

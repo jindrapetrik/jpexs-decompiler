@@ -41,7 +41,7 @@ public class Cache<K, V> implements Freed {
     private String name;
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
@@ -50,12 +50,12 @@ public class Cache<K, V> implements Freed {
                     c.free();
                 }
             }
-            
+
         });
     }
-    
-    public static <K, V> Cache<K, V> getInstance(boolean weak,String name) {
-        Cache<K, V> instance = new Cache<>(weak,name);
+
+    public static <K, V> Cache<K, V> getInstance(boolean weak, String name) {
+        Cache<K, V> instance = new Cache<>(weak, name);
         instances.add(instance);
         return instance;
     }
@@ -95,7 +95,7 @@ public class Cache<K, V> implements Freed {
         Map<K, V> newCache = null;
         if (thisStorageType == STORAGE_FILES) {
             try {
-                newCache = new FileHashMap<>(File.createTempFile("ffdec_cache_"+name+"_", ".tmp"));
+                newCache = new FileHashMap<>(File.createTempFile("ffdec_cache_" + name + "_", ".tmp"));
             } catch (IOException ex) {
                 thisStorageType = STORAGE_MEMORY;
             }
@@ -113,7 +113,7 @@ public class Cache<K, V> implements Freed {
         this.cache = newCache;
     }
 
-    private Cache(boolean weak,String name) {
+    private Cache(boolean weak, String name) {
         this.weak = weak;
         this.name = name;
         initCache();
@@ -148,8 +148,8 @@ public class Cache<K, V> implements Freed {
 
     @Override
     public void free() {
-        if(cache instanceof Freed){
-            ((Freed)cache).free();
+        if (cache instanceof Freed) {
+            ((Freed) cache).free();
         }
     }
 }

@@ -34,8 +34,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
     private int maxGapLen = 0;
     private boolean deleted = false;
 
-    
-
     private static class Gap implements Comparable<Gap> {
 
         public long offset;
@@ -111,7 +109,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public boolean containsKey(Object key) {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         return offsets.containsKey(key);
@@ -119,7 +117,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public Set<K> keySet() {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         return offsets.keySet();
@@ -127,7 +125,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public V get(Object key) {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         try {
@@ -156,7 +154,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public synchronized V put(K key, V value) {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         ObjectOutputStream oos = null;
@@ -222,11 +220,11 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public V remove(Object objKey) {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
-        }                
+        }
         @SuppressWarnings("unchecked")
-        K key=(K)objKey;
+        K key = (K) objKey;
         if (!containsKey(key)) {
             return null;
         }
@@ -247,19 +245,19 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
-        Set<Entry<K,V>> ret=new HashSet<Entry<K, V>>();
-        for(K key:keySet()){
-            ret.add(new FileEntry<K,V>(this,key));
+        Set<Entry<K, V>> ret = new HashSet<Entry<K, V>>();
+        for (K key : keySet()) {
+            ret.add(new FileEntry<K, V>(this, key));
         }
         return ret;
     }
 
     @Override
     public void clear() {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         offsets.clear();
@@ -271,10 +269,10 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         } catch (IOException ex) {
             Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                
+    }
 
     public void delete() {
-        if(deleted){
+        if (deleted) {
             throw new NullPointerException();
         }
         try {
@@ -284,9 +282,9 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         }
         fileName.delete();
         deleted = true;
-        
+
     }
-    
+
     @Override
     public boolean isFreeing() {
         return !deleted;
@@ -294,7 +292,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     @Override
     public void free() {
-        if(!deleted){
+        if (!deleted) {
             delete();
         }
     }
@@ -308,6 +306,5 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
     public int size() {
         return offsets.size();
     }
-    
-    
+
 }

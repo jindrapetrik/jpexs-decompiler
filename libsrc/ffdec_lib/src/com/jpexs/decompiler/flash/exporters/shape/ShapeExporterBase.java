@@ -236,7 +236,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                     fillStyleIdx = e.getFillStyleIdx();
                     pos = PointInt.MAX;
-                    try {
+                    if (fillStyleIdx - 1 < _fillStyles.size()) {
                         Matrix matrix;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
                         switch (fillStyle.fillStyleType) {
@@ -273,7 +273,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 );
                                 break;
                         }
-                    } catch (Exception ex) {
+                    } else {
                         // Font shapes define no fillstyles per se, but do reference fillstyle index 1,
                         // which represents the font color. We just report null in this case.
                         beginFill(null);

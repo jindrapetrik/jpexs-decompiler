@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -237,9 +238,9 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 return toSourceMerge(localData, generator,
                         ins(new GetScopeObjectIns(), slotScope),
                         assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
-                        ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
-                        ? ins(new SetSlotIns(), slotNumber)
-                        : null,
+                                ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
+                                ? ins(new SetSlotIns(), slotNumber)
+                                : null,
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {

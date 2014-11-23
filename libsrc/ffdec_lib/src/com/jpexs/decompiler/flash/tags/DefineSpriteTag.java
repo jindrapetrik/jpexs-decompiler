@@ -122,7 +122,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         return ret;
     }
 
-    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true,"rect_sprite");
+    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, "rect_sprite");
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {

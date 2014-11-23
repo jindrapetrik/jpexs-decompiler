@@ -35,8 +35,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -48,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -169,7 +166,6 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         add(graphicControls);
         graphicControls.setVisible(display.screenAvailable());
-        
 
         playbackControls = new JPanel();
         this.display = display;
@@ -186,7 +182,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         });
 
         frameLabel.setVisible(display.screenAvailable());
-        
+
         Dimension min = new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"), frameLabel.getPreferredSize().height);
         frameLabel.setMinimumSize(min);
         frameLabel.setPreferredSize(min);
@@ -215,12 +211,11 @@ public class PlayerControls extends JPanel implements ActionListener {
         timeLabel = new JLabel("(00:00.00)");
         totalTimeLabel = new JLabel("(00:00.00)");
         totalFrameLabel = new JLabel("0");
-        
+
         totalFrameLabel.setVisible(display.screenAvailable());
 
-        
-         frameControls = new JPanel(new FlowLayout());
-        
+        frameControls = new JPanel(new FlowLayout());
+
         JButton prevFrameButton = new JButton(View.getIcon("prevframe16"));
         prevFrameButton.setToolTipText(AppStrings.translate("preview.prevframe"));
         prevFrameButton.setMargin(new Insets(4, 2, 2, 2));
@@ -229,16 +224,15 @@ public class PlayerControls extends JPanel implements ActionListener {
         frameControls.add(prevFrameButton);
         frameControls.setVisible(display.screenAvailable());
 
-        
         frameControls.add(frameLabel);
-                
+
         JButton nextFrameButton = new JButton(View.getIcon("nextframe16"));
         nextFrameButton.setToolTipText(AppStrings.translate("preview.nextframe"));
         nextFrameButton.setMargin(new Insets(4, 2, 2, 2));
         nextFrameButton.setActionCommand(ACTION_NEXTFRAME);
         nextFrameButton.addActionListener(this);
         frameControls.add(nextFrameButton);
-        
+
         JButton gotoFrameButton = new JButton(View.getIcon("gotoframe16"));
         gotoFrameButton.setToolTipText(AppStrings.translate("preview.gotoframe"));
         gotoFrameButton.setMargin(new Insets(4, 2, 2, 2));
@@ -246,7 +240,6 @@ public class PlayerControls extends JPanel implements ActionListener {
         gotoFrameButton.addActionListener(this);
         frameControls.add(gotoFrameButton);
 
-        
         JPanel currentPanel = new JPanel(new FlowLayout());
         currentPanel.add(frameControls);
         currentPanel.add(timeLabel);
@@ -259,7 +252,6 @@ public class PlayerControls extends JPanel implements ActionListener {
         playbackControls.setLayout(new BoxLayout(playbackControls, BoxLayout.Y_AXIS));
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
-              
         pauseButton = new JButton(pauseIcon);
         pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
         pauseButton.setMargin(new Insets(4, 2, 2, 2));
@@ -271,7 +263,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         stopButton.setActionCommand(ACTION_STOP);
         stopButton.addActionListener(this);
         buttonsPanel.add(pauseButton);
-        buttonsPanel.add(stopButton);      
+        buttonsPanel.add(stopButton);
         controlPanel.add(buttonsPanel, BorderLayout.CENTER);
 
         progress = new JProgressBar();

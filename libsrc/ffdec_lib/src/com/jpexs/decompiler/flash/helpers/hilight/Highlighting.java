@@ -112,7 +112,7 @@ public class Highlighting implements Serializable {
     public static Highlighting searchOffset(List<Highlighting> list, long offset) {
         return searchOffset(list, offset, -1, -1);
     }
-    
+
     public static Highlighting searchOffset(List<Highlighting> list, long offset, long from, long to) {
         looph:
         for (Highlighting h : list) {
@@ -139,7 +139,7 @@ public class Highlighting implements Serializable {
     public static Highlighting searchIndex(List<Highlighting> list, long index) {
         return searchIndex(list, index, -1, -1);
     }
-    
+
     public static Highlighting searchIndex(List<Highlighting> list, long index, long from, long to) {
         looph:
         for (Highlighting h : list) {

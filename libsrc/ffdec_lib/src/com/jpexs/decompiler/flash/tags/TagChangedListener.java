@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash.tags;
  * @author JPEXS
  */
 public interface TagChangedListener {
-    
+
     public void handleEvent(Tag tag);
 }

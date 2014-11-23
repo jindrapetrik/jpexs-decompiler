@@ -4,7 +4,7 @@
 
 Filters = {};
 
-var createCanvas = function(width, height) {
+var createCanvas = function (width, height) {
     var c = document.createElement("canvas");
     c.width = width;
     c.height = height;
@@ -15,7 +15,7 @@ var createCanvas = function(width, height) {
     return c;
 };
 
-Filters._premultiply = function(data) {
+Filters._premultiply = function (data) {
     var len = data.length;
     for (var i = 0; i < len; i += 4) {
         var f = data[i + 3] * 0.003921569;
@@ -25,7 +25,7 @@ Filters._premultiply = function(data) {
     }
 };
 
-Filters._unpremultiply = function(data) {
+Filters._unpremultiply = function (data) {
     var len = data.length;
     for (var i = 0; i < len; i += 4) {
         var a = data[i + 3];
@@ -53,7 +53,7 @@ Filters._unpremultiply = function(data) {
 };
 
 
-Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius, maskType) {
+Filters._boxBlurHorizontal = function (pixels, mask, w, h, radius, maskType) {
     var index = 0;
     var newColors = [];
 
@@ -119,7 +119,7 @@ Filters._boxBlurHorizontal = function(pixels, mask, w, h, radius, maskType) {
     }
 };
 
-Filters._boxBlurVertical = function(pixels, mask, w, h, radius, maskType) {
+Filters._boxBlurVertical = function (pixels, mask, w, h, radius, maskType) {
     var newColors = [];
     var oldPixelOffset = -(radius + 1) * w * 4;
     var newPixelOffset = (radius) * w * 4;
@@ -189,7 +189,7 @@ Filters._boxBlurVertical = function(pixels, mask, w, h, radius, maskType) {
 };
 
 
-Filters.blur = function(canvas, ctx, hRadius, vRadius, iterations, mask, maskType) {
+Filters.blur = function (canvas, ctx, hRadius, vRadius, iterations, mask, maskType) {
     var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var data = imgData.data;
     Filters._premultiply(data);
@@ -208,7 +208,7 @@ Filters.blur = function(canvas, ctx, hRadius, vRadius, iterations, mask, maskTyp
     return retCanvas;
 }
 
-Filters._moveRGB = function(width, height, rgb, deltaX, deltaY, fill) {
+Filters._moveRGB = function (width, height, rgb, deltaX, deltaY, fill) {
     var img = createCanvas(width, height);
 
     var ig = img.getContext("2d");
@@ -230,7 +230,7 @@ Filters.FULL = 1;
 Filters.INNER = 2;
 Filters.OUTER = 3;
 
-Filters._setRGB = function(ctx, x, y, width, height, data) {
+Filters._setRGB = function (ctx, x, y, width, height, data) {
     var id = ctx.createImageData(width, height);
     for (var i = 0; i < data.length; i++) {
         id.data[i] = data[i];
@@ -238,7 +238,7 @@ Filters._setRGB = function(ctx, x, y, width, height, data) {
     ctx.putImageData(id, x, y);
 };
 
-Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, colors, ratios, type, iterations, strength, knockout) {
+Filters.gradientGlow = function (srcCanvas, src, blurX, blurY, angle, distance, colors, ratios, type, iterations, strength, knockout) {
     var width = canvas.width;
     var height = canvas.height;
     var retCanvas = createCanvas(width, height);
@@ -322,7 +322,7 @@ Filters.gradientGlow = function(srcCanvas, src, blurX, blurY, angle, distance, c
 
 
 
-Filters.dropShadow = function(canvas, src, blurX, blurY, angle, distance, color, inner, iterations, strength, knockout) {
+Filters.dropShadow = function (canvas, src, blurX, blurY, angle, distance, color, inner, iterations, strength, knockout) {
     var width = canvas.width;
     var height = canvas.height;
     var srcPixels = src.getImageData(0, 0, width, height).data;
@@ -374,7 +374,7 @@ Filters.dropShadow = function(canvas, src, blurX, blurY, angle, distance, color,
     return retCanvas;
 };
 
-Filters._cut = function(a, min, max) {
+Filters._cut = function (a, min, max) {
     if (a > max)
         a = max;
     if (a < min)
@@ -382,7 +382,7 @@ Filters._cut = function(a, min, max) {
     return a;
 }
 
-Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, strength, type, angle, distance, knockout, iterations) {
+Filters.gradientBevel = function (canvas, src, colors, ratios, blurX, blurY, strength, type, angle, distance, knockout, iterations) {
     var width = canvas.width;
     var height = canvas.height;
     var retImg = createCanvas(width, height);
@@ -497,7 +497,7 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
     }
     return retImg;
 }
-Filters.bevel = function(canvas, src, blurX, blurY, strength, type, highlightColor, shadowColor, angle, distance, knockout, iterations) {
+Filters.bevel = function (canvas, src, blurX, blurY, strength, type, highlightColor, shadowColor, angle, distance, knockout, iterations) {
     return Filters.gradientBevel(canvas, src, [
         shadowColor,
         [shadowColor[0], shadowColor[1], shadowColor[2], 0],
@@ -510,7 +510,7 @@ Filters.bevel = function(canvas, src, blurX, blurY, strength, type, highlightCol
 
 
 //http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
-Filters.convolution = function(canvas, ctx, weights, opaque) {
+Filters.convolution = function (canvas, ctx, weights, opaque) {
     var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var side = Math.round(Math.sqrt(weights.length));
     var halfSide = Math.floor(side / 2);
@@ -558,7 +558,7 @@ Filters.convolution = function(canvas, ctx, weights, opaque) {
     return outCanvas;
 };
 
-Filters.colorMatrix = function(canvas, ctx, m) {
+Filters.colorMatrix = function (canvas, ctx, m) {
     var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     var data = pixels.data;
@@ -586,14 +586,14 @@ Filters.colorMatrix = function(canvas, ctx, m) {
 };
 
 
-Filters.glow = function(canvas, src, blurX, blurY, strength, color, inner, knockout, iterations) {
+Filters.glow = function (canvas, src, blurX, blurY, strength, color, inner, knockout, iterations) {
     return Filters.dropShadow(canvas, src, blurX, blurY, 45, 0, color, inner, iterations, strength, knockout);
 };
 
 
 var BlendModes = {};
 
-BlendModes._cut = function(v) {
+BlendModes._cut = function (v) {
     if (v < 0)
         v = 0;
     if (v > 255)
@@ -601,7 +601,7 @@ BlendModes._cut = function(v) {
     return v;
 };
 
-BlendModes.normal = function(src, dst, result, pos) {
+BlendModes.normal = function (src, dst, result, pos) {
     var am = (255 - src[pos + 3]) / 255;
     result[pos] = this._cut(src[pos] * src[pos + 3] / 255 + dst[pos] * dst[pos + 3] / 255 * am);
     result[pos + 1] = this._cut(src[pos + 1] * src[pos + 3] / 255 + dst[pos + 1] * dst[pos + 3] / 255 * am);
@@ -609,81 +609,81 @@ BlendModes.normal = function(src, dst, result, pos) {
     result[pos + 3] = this._cut(src[pos + 3] + dst[pos + 3] * am);
 };
 
-BlendModes.layer = function(src, dst, result, pos) {
+BlendModes.layer = function (src, dst, result, pos) {
     BlendModes.normal(src, dst, result, pos);
 };
 
-BlendModes.multiply = function(src, dst, result, pos) {
+BlendModes.multiply = function (src, dst, result, pos) {
     result[pos + 0] = (src[pos + 0] * dst[pos + 0]) >> 8;
     result[pos + 1] = (src[pos + 1] * dst[pos + 1]) >> 8;
     result[pos + 2] = (src[pos + 2] * dst[pos + 2]) >> 8;
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.screen = function(src, dst, result, pos) {
+BlendModes.screen = function (src, dst, result, pos) {
     result[pos + 0] = 255 - ((255 - src[pos + 0]) * (255 - dst[pos + 0]) >> 8);
     result[pos + 1] = 255 - ((255 - src[pos + 1]) * (255 - dst[pos + 1]) >> 8);
     result[pos + 2] = 255 - ((255 - src[pos + 2]) * (255 - dst[pos + 2]) >> 8);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.lighten = function(src, dst, result, pos) {
+BlendModes.lighten = function (src, dst, result, pos) {
     result[pos + 0] = Math.max(src[pos + 0], dst[pos + 0]);
     result[pos + 1] = Math.max(src[pos + 1], dst[pos + 1]);
     result[pos + 2] = Math.max(src[pos + 2], dst[pos + 2]);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.darken = function(src, dst, result, pos) {
+BlendModes.darken = function (src, dst, result, pos) {
     result[pos + 0] = Math.min(src[pos + 0], dst[pos + 0]);
     result[pos + 1] = Math.min(src[pos + 1], dst[pos + 1]);
     result[pos + 2] = Math.min(src[pos + 2], dst[pos + 2]);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.difference = function(src, dst, result, pos) {
+BlendModes.difference = function (src, dst, result, pos) {
     result[pos + 0] = Math.abs(dst[pos + 0] - src[pos + 0]);
     result[pos + 1] = Math.abs(dst[pos + 1] - src[pos + 1]);
     result[pos + 2] = Math.abs(dst[pos + 2] - src[pos + 2]);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.add = function(src, dst, result, pos) {
+BlendModes.add = function (src, dst, result, pos) {
     result[pos + 0] = Math.min(255, src[pos + 0] + dst[pos + 0]);
     result[pos + 1] = Math.min(255, src[pos + 1] + dst[pos + 1]);
     result[pos + 2] = Math.min(255, src[pos + 2] + dst[pos + 2]);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3]);
 };
 
-BlendModes.subtract = function(src, dst, result, pos) {
+BlendModes.subtract = function (src, dst, result, pos) {
     result[pos + 0] = Math.max(0, src[pos + 0] + dst[pos + 0] - 256);
     result[pos + 1] = Math.max(0, src[pos + 1] + dst[pos + 1] - 256);
     result[pos + 2] = Math.max(0, src[pos + 2] + dst[pos + 2] - 256);
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.invert = function(src, dst, result, pos) {
+BlendModes.invert = function (src, dst, result, pos) {
     result[pos + 0] = 255 - dst[pos + 0];
     result[pos + 1] = 255 - dst[pos + 1];
     result[pos + 2] = 255 - dst[pos + 2];
     result[pos + 3] = src[pos + 3];
 };
 
-BlendModes.alpha = function(src, dst, result, pos) {
+BlendModes.alpha = function (src, dst, result, pos) {
     result[pos + 0] = src[pos + 0];
     result[pos + 1] = src[pos + 1];
     result[pos + 2] = src[pos + 2];
     result[pos + 3] = dst[pos + 3]; //?
 };
 
-BlendModes.erase = function(src, dst, result, pos) {
+BlendModes.erase = function (src, dst, result, pos) {
     result[pos + 0] = src[pos + 0];
     result[pos + 1] = src[pos + 1];
     result[pos + 2] = src[pos + 2];
     result[pos + 3] = 255 - dst[pos + 3]; //?
 };
 
-BlendModes.overlay = function(src, dst, result, pos) {
+BlendModes.overlay = function (src, dst, result, pos) {
     result[pos + 0] = dst[pos + 0] < 128 ? dst[pos + 0] * src[pos + 0] >> 7
             : 255 - ((255 - dst[pos + 0]) * (255 - src[pos + 0]) >> 7);
     result[pos + 1] = dst[pos + 1] < 128 ? dst[pos + 1] * src[pos + 1] >> 7
@@ -693,7 +693,7 @@ BlendModes.overlay = function(src, dst, result, pos) {
     result[pos + 3] = Math.min(255, src[pos + 3] + dst[pos + 3] - (src[pos + 3] * dst[pos + 3]) / 255);
 };
 
-BlendModes.hardlight = function(src, dst, result, pos) {
+BlendModes.hardlight = function (src, dst, result, pos) {
     result[pos + 0] = src[pos + 0] < 128 ? dst[pos + 0] * src[pos + 0] >> 7
             : 255 - ((255 - src[pos + 0]) * (255 - dst[pos + 0]) >> 7);
     result[pos + 1] = src[pos + 1] < 128 ? dst[pos + 1] * src[pos + 1] >> 7
@@ -721,7 +721,7 @@ BlendModes._list = [
     BlendModes.hardlight
 ];
 
-BlendModes.blendData = function(srcPixel, dstPixel, retData, modeIndex) {
+BlendModes.blendData = function (srcPixel, dstPixel, retData, modeIndex) {
     var result = [];
     var retPixel = [];
     var alpha = 1.0;
@@ -741,7 +741,7 @@ BlendModes.blendData = function(srcPixel, dstPixel, retData, modeIndex) {
     }
 };
 
-BlendModes.blendCanvas = function(src, dst, result, modeIndex) {
+BlendModes.blendCanvas = function (src, dst, result, modeIndex) {
     var width = src.width;
     var height = src.height;
     var rctx = result.getContext("2d");
@@ -776,7 +776,7 @@ function concatMatrix(m1, m2) {
 }
 
 
-var enhanceContext = function(context) {
+var enhanceContext = function (context) {
     var m = [1, 0, 0, 1, 0, 0];
     context._matrix = m;
 
@@ -785,42 +785,42 @@ var enhanceContext = function(context) {
 
     var super_ = context.__proto__;
     context.__proto__ = ({
-        save: function() {
+        save: function () {
             this._savedMatrices.push(this._matrix); //.slice()
             super_.save.call(this);
         },
         //if the stack of matrices we're managing doesn't have a saved matrix,
         //we won't even call the context's original `restore` method.
-        restore: function() {
+        restore: function () {
             if (this._savedMatrices.length == 0)
                 return;
             super_.restore.call(this);
             this._matrix = this._savedMatrices.pop();
         },
-        scale: function(x, y) {
+        scale: function (x, y) {
             super_.scale.call(this, x, y);
         },
-        rotate: function(theta) {
+        rotate: function (theta) {
             super_.rotate.call(this, theta);
         },
-        translate: function(x, y) {
+        translate: function (x, y) {
             super_.translate.call(this, x, y);
         },
-        transform: function(a, b, c, d, e, f) {
+        transform: function (a, b, c, d, e, f) {
             this._matrix = concatMatrix([a, b, c, d, e, f], this._matrix);
             super_.transform.call(this, a, b, c, d, e, f);
         },
-        setTransform: function(a, b, c, d, e, f) {
+        setTransform: function (a, b, c, d, e, f) {
             this._matrix = [a, b, c, d, e, f];
             super_.setTransform.call(this, a, b, c, d, e, f);
         },
-        resetTransform: function() {
+        resetTransform: function () {
             super_.resetTransform.call(this);
         },
-        applyTransforms: function(m) {
+        applyTransforms: function (m) {
             this.setTransform(m[0], m[1], m[2], m[3], m[4], m[5])
         },
-        applyTransformToPoint: function(p) {
+        applyTransformToPoint: function (p) {
             var ret = {};
             ret.x = this._matrix[0] * p.x + this._matrix[2] * p.y + this._matrix[4];
             ret.y = this._matrix[1] * p.x + this._matrix[3] * p.y + this._matrix[5];
@@ -831,7 +831,7 @@ var enhanceContext = function(context) {
 
     return context;
 };
-var cxform = function(r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mult) {
+var cxform = function (r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mult) {
     this.r_add = r_add;
     this.g_add = g_add;
     this.b_add = b_add;
@@ -840,14 +840,14 @@ var cxform = function(r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mult
     this.g_mult = g_mult;
     this.b_mult = b_mult;
     this.a_mult = a_mult;
-    this._cut = function(v, min, max) {
+    this._cut = function (v, min, max) {
         if (v < min)
             v = min;
         if (v > max)
             v = max;
         return v;
     };
-    this.apply = function(c) {
+    this.apply = function (c) {
         var d = c;
         d[0] = this._cut(Math.round(d[0] * this.r_mult / 255 + this.r_add), 0, 255);
         d[1] = this._cut(Math.round(d[1] * this.g_mult / 255 + this.g_add), 0, 255);
@@ -855,7 +855,7 @@ var cxform = function(r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mult
         d[3] = this._cut(Math.round(d[3] * this.a_mult / 255 + this.a_add / 255), 0, 1);
         return d;
     };
-    this.applyToImage = function(fimg) {
+    this.applyToImage = function (fimg) {
         if (this.isEmpty()) {
             return fimg
         }
@@ -875,15 +875,15 @@ var cxform = function(r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mult
         ictx.putImageData(imdata, 0, 0);
         return icanvas;
     };
-    this.merge = function(cx) {
+    this.merge = function (cx) {
         return new cxform(this.r_add + cx.r_add, this.g_add + cx.g_add, this.b_add + cx.b_add, this.a_add + cx.a_add, this.r_mult * cx.r_mult / 255, this.g_mult * cx.g_mult / 255, this.b_mult * cx.b_mult / 255, this.a_mult * cx.a_mult / 255);
     };
-    this.isEmpty = function() {
+    this.isEmpty = function () {
         return this.r_add == 0 && this.g_add == 0 && this.b_add == 0 && this.a_add == 0 && this.r_mult == 255 && this.g_mult == 255 && this.b_mult == 255 && this.a_mult == 255;
     };
 };
 
-var place = function(obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
+var place = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
     ctx.save();
     ctx.transform(matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
     if (blendMode > 1) {
@@ -904,14 +904,14 @@ var place = function(obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, 
     }
     ctx.restore();
 }
-var tocolor = function(c) {
+var tocolor = function (c) {
     var r = "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + c[3] + ")";
     return r;
 };
 
 
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
 
     var wsize = document.getElementById("width_size");
     var hsize = document.getElementById("height_size");

@@ -258,7 +258,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         for (int i = 0; i < openedNamespaces.size(); i++) {
                             int nsindex = openedNamespaces.get(i);
                             int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                            String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants, true);                            
+                            String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants, true);
                             int name_index = 0;
                             for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
                                 Multiname mname = abc.constants.constant_multiname.get(m);

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -71,6 +72,7 @@ import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
+import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
@@ -90,6 +92,7 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -141,7 +144,6 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1372,125 +1374,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    private Map<Integer, String[]> splitTextRecords(String texts) {
-        String[] textsArr = texts.split(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine);
-        String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
-        Map<Integer, String[]> result = new HashMap<>();
-        for (String text : textsArr) {
-            String[] textArr = text.split(Helper.newLine, 2);
-            String idLine = textArr[0];
-            if (idLine.startsWith("ID:")) {
-                int id = Integer.parseInt(idLine.substring(3).trim());
-                String[] records = textArr[1].split(recordSeparator);
-                result.put(id, records);
-            } else {
-                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                    return null;
-                }
-            }
-        }
-        return result;
-    }
-
-    private void importTextsSingleFile(File textsFile, SWF swf) {
-        String texts = Helper.readTextFile(textsFile.getPath());
-        Map<Integer, String[]> records = splitTextRecords(texts);
-        if (records != null) {
-            for (int characterId : records.keySet()) {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String[] currentRecords = records.get(characterId);
-                            String text = textTag.getFormattedText();
-                            if (!saveText(textTag, text, currentRecords)) {
-                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void importTextsSingleFileFormatted(File textsFile, SWF swf) {
-        String texts = Helper.readTextFile(textsFile.getPath());
-        Map<Integer, String[]> records = splitTextRecords(texts);
-        if (records != null) {
-            for (int characterId : records.keySet()) {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String[] currentRecords = records.get(characterId);
-                            if (!saveText(textTag, currentRecords[0], null)) {
-                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void importTextsMultipleFiles(String folder, SWF swf) {
-        File textsFolder = new File(Path.combine(folder, TextExporter.TEXT_EXPORT_FOLDER));
-        String[] files = textsFolder.list(new FilenameFilter() {
-
-            private final Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
-
-            @Override
-            public boolean accept(File dir, String name) {
-
-                return pat.matcher(name).matches();
-            }
-        });
-
-        for (String fileName : files) {
-            String texts = Helper.readTextFile(Path.combine(textsFolder.getPath(), fileName));
-            int characterId = Integer.parseInt(fileName.split("\\.")[0]);
-            String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
-            boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
-            if (!formatted) {
-                String[] records = texts.split(recordSeparator);
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String text = textTag.getFormattedText();
-                            if (!saveText(textTag, text, records)) {
-                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            } else {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            if (!saveText(textTag, texts, null)) {
-                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void importText(final SWF swf) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
@@ -1500,16 +1383,38 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            final MainPanel diz = this;
+            TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
+
+                // "configuration items" for the current replace only
+                private final ConfigurationItem<Boolean> doNotShowImportError = new ConfigurationItem<>("doNotShowImportError", true, true);
+                private final ConfigurationItem<Boolean> doNotShowInvalidText = new ConfigurationItem<>("doNotShowInvalidText", true, true);
+
+                @Override
+                public boolean handle() {
+                    String msg = translate("error.text.import");
+                    logger.log(Level.SEVERE, msg);
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowImportError, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                }
+
+                @Override
+                public boolean handle(String message, long line) {
+                    String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
+                    logger.log(Level.SEVERE, msg);
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowInvalidText, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                }
+            });
+
             // try to import formatted texts
             if (textsFile.exists()) {
-                importTextsSingleFileFormatted(textsFile, swf);
+                textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
                 textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
                 // try to import plain texts
                 if (textsFile.exists()) {
-                    importTextsSingleFile(textsFile, swf);
+                    textImporter.importTextsSingleFile(textsFile, swf);
                 } else {
-                    importTextsMultipleFiles(selFile, swf);
+                    textImporter.importTextsMultipleFiles(selFile, swf);
                 }
             }
 
@@ -1806,31 +1711,35 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         updateClassesList();
     }
 
+    private MissingCharacterHandler getMissingCharacterHandler() {
+        return new MissingCharacterHandler() {
+            @Override
+            public boolean handle(FontTag font, char character) {
+                String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
+                if (fontName == null) {
+                    fontName = font.getFontName();
+                }
+                Font f = FontTag.installedFontsByName.get(fontName);
+                if (f == null || !f.canDisplay(character)) {
+                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+                font.addCharacter(character, f);
+                return true;
+
+            }
+        };
+    }
+
     public boolean saveText(TextTag textTag, String formattedText, String[] texts) {
         try {
-            if (textTag.setFormattedText(new MissingCharacterHandler() {
-                @Override
-                public boolean handle(FontTag font, char character) {
-                    String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
-                    if (fontName == null) {
-                        fontName = font.getFontName();
-                    }
-                    Font f = FontTag.installedFontsByName.get(fontName);
-                    if (f == null || !f.canDisplay(character)) {
-                        View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        return false;
-                    }
-                    font.addCharacter(character, f);
-                    return true;
-
-                }
-            }, formattedText, texts)) {
-                textTag.setModified(true);
+            if (textTag.setFormattedText(getMissingCharacterHandler(), formattedText, texts)) {
                 return true;
             }
         } catch (TextParseException ex) {
             View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
         }
+
         return false;
     }
 

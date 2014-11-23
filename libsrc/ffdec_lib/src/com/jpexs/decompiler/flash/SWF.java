@@ -278,9 +278,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     public DumpInfoSwfNode dumpInfo;
     public DefineBinaryDataTag binaryData;
 
-    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false,"frame");
-    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true,"as2");
-    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true,"as3");
+    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, "frame");
+    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, "as2");
+    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, "as3");
 
     public void updateCharacters() {
         characters.clear();
@@ -307,10 +307,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             }
         }
-        
+
         return jtt;
     }
-    
+
     public void fixCharactersOrder(boolean checkAll) {
         Set<Integer> addedCharacterIds = new HashSet<>();
         Set<CharacterTag> movedTags = new HashSet<>();
@@ -326,7 +326,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                         if (neededCharacter == null) {
                             continue;
                         }
-                        
+
                         if (movedTags.contains(neededCharacter)) {
                             logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
                             return;
@@ -648,13 +648,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 throw new IOException("Invalid SWF file. No known tag found.");
             }
         }
-    
+
         /* preload shape tags
-        for (Tag tag : tags) {
-            if (tag instanceof ShapeTag) {
-                ((ShapeTag) tag).getShapes();
-            }
-        }*/
+         for (Tag tag : tags) {
+         if (tag instanceof ShapeTag) {
+         ((ShapeTag) tag).getShapes();
+         }
+         }*/
     }
 
     @Override
@@ -2136,14 +2136,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         as2Cache.clear();
         as3Cache.clear();
     }
-    
+
     public void clearAllCache() {
         clearImageCache();
         clearScriptCache();
         Cache.clearAll();
         System.gc();
     }
-    
+
     public static void uncache(ASMSource src) {
         if (src != null) {
             src.getSwf().as2Cache.remove(src);
@@ -2169,7 +2169,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (swf.as2Cache.contains(src)) {
             return swf.as2Cache.get(src);
         }
-        
+
         if (actions == null) {
             actions = src.getActions();
         }

@@ -114,7 +114,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         RECT rect = getRect(new HashSet<BoundedTag>());
         return getShape(rect, false);
     }
-    
+
     public SHAPEWITHSTYLE getShape(RECT rect, boolean fill) {
         boolean translated = rect.Xmin != 0 || rect.Ymin != 0;
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
@@ -125,7 +125,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         fillStyle.bitmapId = getCharacterId();
         MATRIX matrix = new MATRIX();
         matrix.hasScale = true;
-        if (fill) { 
+        if (fill) {
             RECT imageRect = getRect(new HashSet<BoundedTag>());
             matrix.scaleX = (int) ((((long) SWF.unitDivisor) << 16) * rect.getWidth() / imageRect.getWidth());
             matrix.scaleY = (int) ((((long) SWF.unitDivisor) << 16) * rect.getHeight() / imageRect.getHeight());
@@ -212,7 +212,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShape().getOutline());
     }
-    
+
     public void clearCache() {
         cachedImage = null;
     }

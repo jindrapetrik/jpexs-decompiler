@@ -31,17 +31,14 @@ public interface Searchable {
      * @param data
      * @return Map Position=>Input stream
      */
-    public Map<Long, InputStream> search(byte[] 
-
-    ... data);
+    public Map<Long, InputStream> search(byte[]... data);
 
     /**
      * Searches for byte sequences with progress listener
+     *
      * @param progListener Listener
      * @param data
      * @return Map Position=>Input stream
      */
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[] 
-
-... data);
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data);
 }

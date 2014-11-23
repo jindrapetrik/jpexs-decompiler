@@ -406,28 +406,28 @@ public class DefineEditTextTag extends TextTag {
                                 try {
                                     bounds.Xmin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid xmin value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid xmin value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "ymin":
                                 try {
                                     bounds.Ymin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid ymin value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid ymin value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "xmax":
                                 try {
                                     bounds.Xmax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid xmax value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid xmax value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "ymax":
                                 try {
                                     bounds.Ymax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid ymax value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid ymax value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "wordwrap":
@@ -484,7 +484,7 @@ public class DefineEditTextTag extends TextTag {
                                 try {
                                     fontId = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid font value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid font value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "fontclass":
@@ -494,7 +494,7 @@ public class DefineEditTextTag extends TextTag {
                                 try {
                                     fontHeight = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid height value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid height value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "color":
@@ -502,14 +502,14 @@ public class DefineEditTextTag extends TextTag {
                                 if (m.matches()) {
                                     textColor = new RGBA(Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), Integer.parseInt(m.group(4), 16), Integer.parseInt(m.group(1), 16));
                                 } else {
-                                    throw new TextParseException("Invalid color. Valid format is #aarrggbb.", lexer.yyline());
+                                    throw new TextParseException("Invalid color. Valid format is #aarrggbb. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "maxlength":
                                 try {
                                     maxLength = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid maxLength value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid maxLength value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "align":
@@ -527,42 +527,42 @@ public class DefineEditTextTag extends TextTag {
                                         align = 3;
                                         break;
                                     default:
-                                        throw new TextParseException("Invalid align value. Expected one of: left,right,center or justify.", lexer.yyline());
+                                        throw new TextParseException("Invalid align value. Expected one of: left,right,center or justify. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "leftmargin":
                                 try {
                                     leftMargin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid leftmargin value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid leftmargin value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "rightmargin":
                                 try {
                                     rightMargin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid rightmargin value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid rightmargin value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "indent":
                                 try {
                                     indent = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid indent value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid indent value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "leading":
                                 try {
                                     leading = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException ne) {
-                                    throw new TextParseException("Invalid leading value. Number expected.", lexer.yyline());
+                                    throw new TextParseException("Invalid leading value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "variablename":
                                 variableName = paramValue;
                                 break;
                             default:
-                                throw new TextParseException("Unrecognized parameter name", lexer.yyline());
+                                throw new TextParseException("Unrecognized parameter name: " + paramName, lexer.yyline());
                         }
                         break;
                     case TEXT:
@@ -571,6 +571,7 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
+            setModified(true);
             this.bounds = bounds;
             if (formattedText.length() > 0) {
                 initialText = formattedText;
@@ -625,8 +626,8 @@ public class DefineEditTextTag extends TextTag {
             Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        return true;
 
+        return true;
     }
 
     @Override

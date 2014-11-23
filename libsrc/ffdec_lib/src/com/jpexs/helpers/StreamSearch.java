@@ -36,14 +36,12 @@ public class StreamSearch implements Searchable {
     }
 
     @Override
-    public Map<Long, InputStream> search(byte[]  
-        ... data) {
+    public Map<Long, InputStream> search(byte[]... data) {
         return search(null, data);
     }
 
     @Override
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[]  
-        ... data) {
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data) {
         Map<Long, InputStream> ret = new HashMap<>();
         int maxFindLen = 0;
         for (int i = 0; i < data.length; i++) {

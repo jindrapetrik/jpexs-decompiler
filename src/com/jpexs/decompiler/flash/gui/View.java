@@ -382,6 +382,10 @@ public class View {
         return ret[0];
     }
 
+    public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
+        return showConfirmDialog(parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE, showAgainConfig, defaultOption);
+    }
+
     public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageTyp, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
 
         JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");

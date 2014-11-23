@@ -137,7 +137,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
                     }
                 }
             }
-        });        
+        });
     }
 
     public synchronized void stopSWF() {
@@ -193,16 +193,16 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     @Override
-    public boolean isPlaying() {       
+    public boolean isPlaying() {
         return flash.IsPlaying();
     }
 
     @Override
     public void gotoFrame(int frame) {
-        if(frame<0){
+        if (frame < 0) {
             return;
         }
-        if(frame>=getTotalFrames()){
+        if (frame >= getTotalFrames()) {
             return;
         }
         flash.GotoFrame(frame);

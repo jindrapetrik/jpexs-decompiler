@@ -288,16 +288,16 @@ public final class Matrix implements Cloneable {
     public double getTotalScaleY() {
         return Math.sqrt(rotateSkew1 * rotateSkew1 + scaleY * scaleY);
     }
-    
-    private int fromFloat(double f){
-        return (int)(f *  (1 << 16));
+
+    private int fromFloat(double f) {
+        return (int) (f * (1 << 16));
     }
-    
-    public MATRIX toMATRIX(){
+
+    public MATRIX toMATRIX() {
         MATRIX result = new MATRIX();
-      
-        result.translateX = (int)translateX;
-        result.translateY = (int)translateY;
+
+        result.translateX = (int) translateX;
+        result.translateY = (int) translateY;
         result.hasRotate = true;
         result.hasScale = true;
         result.scaleX = fromFloat(scaleX);

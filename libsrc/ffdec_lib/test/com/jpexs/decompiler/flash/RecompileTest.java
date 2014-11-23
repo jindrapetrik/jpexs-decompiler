@@ -103,8 +103,7 @@ public class RecompileTest {
                         System.out.println("Recompiling:" + en.getKey().toString() + "...");
                         en.getValue().toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
-                        ABC nabc = abc; //new ABC(swf);
-                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
+                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, abc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
                         //remove last compiled script:
                         abc.script_info.remove(abc.script_info.size()-1);
                     }
