@@ -135,6 +135,9 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
 
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<String> overrideTextExportFileName = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;

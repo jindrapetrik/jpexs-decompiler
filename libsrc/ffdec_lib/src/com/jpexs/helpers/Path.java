@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public class Path {
         int i = s.lastIndexOf('.');
 
         if (i > 0 && i < s.length() - 1) {
-            ext = s.substring(0, i).toLowerCase();
+            ext = s.substring(0, i);
         }
         return ext;
     }

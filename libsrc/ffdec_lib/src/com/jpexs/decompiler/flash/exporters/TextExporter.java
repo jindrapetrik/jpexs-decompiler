@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,8 +85,14 @@ public class TextExporter {
         }
 
         if (settings.singleFile) {
-            final File file = new File(outdir + File.separator
-                    + (settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN));
+            String fileName = Configuration.overrideTextExportFileName.get();
+            if (fileName != null) {
+                String swfName = Path.getFileNameWithoutExtension(new File(tags.get(0).getSwf().getShortFileName()));
+                fileName = fileName.replace("{fileName}", swfName);
+            } else {
+                fileName = settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN;
+            }
+            final File file = new File(outdir + File.separator + fileName);
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 for (final Tag t : tags) {
                     if (t instanceof TextTag) {
