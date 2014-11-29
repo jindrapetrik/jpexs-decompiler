@@ -112,8 +112,8 @@ StringCharacter = [^\r\n\"\\]
 
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));  }
+  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));  }
+  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
 
   ":"                     {return new ParsedSymbol(ParsedSymbol.TYPE_COLON);}
   ","                     {return new ParsedSymbol(ParsedSymbol.TYPE_COMMA);}

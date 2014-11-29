@@ -49,7 +49,7 @@ import java.util.Stack;
         return yyline + 1;
     }
 
-    private Stack<ConditionToken> pushedBack = new Stack<ConditionToken>();
+    private Stack<ConditionToken> pushedBack = new Stack<>();
 
     public void pushback(ConditionToken symb) {
         pushedBack.push(symb);

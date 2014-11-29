@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 %% 
 
@@ -40,12 +40,12 @@ import java.util.ArrayList;
         return yychar;
     }
 
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private final Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
     }
-    private List<LexListener> listeners = new ArrayList<>();
+    private final List<LexListener> listeners = new ArrayList<>();
 
     public void addListener(LexListener listener){
         listeners.add(listener);
@@ -318,13 +318,13 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 
   /* numeric literals */
 
-  {DecIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong((yytext())))); }
+  {DecIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong((yytext()))); }
   
-  {HexIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext().substring(2), 16))); }
+  {HexIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext().substring(2), 16)); }
  
-  {OctIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext(), 8))); }
+  {OctIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext(), 8)); }
   
-  {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new Double(Double.parseDouble((yytext())))); }
+  {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext()))); }
   
   /* comments */
   {Comment}                      { /*ignore*/ }
@@ -338,7 +338,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                     String s = yytext();                                    
                                     s = s.substring(1, s.length() - 1);
                                     if (s.contains(" ")){
-                                       s = s.substring(0, s.indexOf(" "));
+                                       s = s.substring(0, s.indexOf(' '));
                                     }
                                     xmlTagName = s;
                                     string.append(yytext());

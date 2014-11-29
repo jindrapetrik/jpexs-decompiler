@@ -1037,7 +1037,7 @@ public final class FlasmLexer {
                 case 40:
                     break;
                 case 10: {
-                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
                 }
                 case 41:
                     break;
@@ -1111,7 +1111,7 @@ public final class FlasmLexer {
                 case 54:
                     break;
                 case 24: {
-                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));
+                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                 }
                 case 55:
                     break;

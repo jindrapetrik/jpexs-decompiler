@@ -1022,7 +1022,7 @@ public final class MethodInfoLexer {
                 case 38:
                     break;
                 case 3: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
                 }
                 case 39:
                     break;
@@ -1075,7 +1075,7 @@ public final class MethodInfoLexer {
                 case 47:
                     break;
                 case 12: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                 }
                 case 48:
                     break;

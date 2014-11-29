@@ -16,10 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 %% 
 
@@ -60,7 +60,7 @@ import java.io.StringReader;
         return yychar;
     }
 
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
@@ -338,13 +338,13 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 
   /* numeric literals */
 
-  {DecIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong((yytext())))); }
+  {DecIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong((yytext()))); }
   
-  {HexIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext().substring(2), 16))); }
+  {HexIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext().substring(2), 16)); }
  
-  {OctIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, new Long(Long.parseLong(yytext(), 8))); }
+  {OctIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext(), 8)); }
   
-  {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new Double(Double.parseDouble((yytext())))); }
+  {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext()))); }
   
   /* comments */
   {Comment}                      { /*ignore*/ }

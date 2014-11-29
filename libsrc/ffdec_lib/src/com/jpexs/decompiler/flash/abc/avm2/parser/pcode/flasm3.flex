@@ -258,8 +258,8 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));  }
+  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));  }
+  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
   {Identifier}            { return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
   {LineTerminator}      {yybegin(YYINITIAL);}
   {Comment}             {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}

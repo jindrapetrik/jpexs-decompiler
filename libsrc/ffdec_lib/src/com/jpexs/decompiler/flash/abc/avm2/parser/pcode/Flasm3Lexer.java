@@ -3223,7 +3223,7 @@ public final class Flasm3Lexer {
                 case 110:
                     break;
                 case 10: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
                 }
                 case 111:
                     break;
@@ -3322,7 +3322,7 @@ public final class Flasm3Lexer {
                 case 129:
                     break;
                 case 29: {
-                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                 }
                 case 130:
                     break;
