@@ -45,6 +45,7 @@ import java.util.Stack;
     public int yyline() {
         return yyline + 1;
     }
+
     private final List<LexListener> listeners = new ArrayList<>();
 
     public void addListener(LexListener listener){
@@ -72,12 +73,13 @@ import java.util.Stack;
         last = null;
         informListenersPushBack(symb);
     }
+
     ParsedSymbol last;
     public ParsedSymbol lex() throws java.io.IOException, ActionParseException{
         ParsedSymbol ret = null;
-        if(!pushedBack.isEmpty()){
+        if (!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();
-        }else{
+        } else {
             ret = last = yylex();
         }
         informListenersLex(ret);

@@ -32,7 +32,6 @@ import java.util.Stack;
 
 %{
 
-
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -57,9 +56,9 @@ import java.util.Stack;
 
     public ConditionToken lex() throws java.io.IOException, AnnotationParseException{
         ConditionToken ret = null;
-        if(!pushedBack.isEmpty()){
+        if (!pushedBack.isEmpty()){
             ret = pushedBack.pop();
-        }else{
+        } else {
             ret = yylex();
         }
         return ret;

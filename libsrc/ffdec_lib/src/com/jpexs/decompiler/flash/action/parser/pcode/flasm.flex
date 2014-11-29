@@ -37,7 +37,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 
 %{
 
-  StringBuffer string = new StringBuffer();
+    StringBuffer string = new StringBuffer();
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign

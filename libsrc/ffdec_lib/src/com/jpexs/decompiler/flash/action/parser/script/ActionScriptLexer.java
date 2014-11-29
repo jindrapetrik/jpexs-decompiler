@@ -1260,6 +1260,7 @@ public final class ActionScriptLexer {
     public int yyline() {
         return yyline + 1;
     }
+
     private final List<LexListener> listeners = new ArrayList<>();
 
     public void addListener(LexListener listener) {
@@ -1287,6 +1288,7 @@ public final class ActionScriptLexer {
         last = null;
         informListenersPushBack(symb);
     }
+
     ParsedSymbol last;
 
     public ParsedSymbol lex() throws java.io.IOException, ActionParseException {

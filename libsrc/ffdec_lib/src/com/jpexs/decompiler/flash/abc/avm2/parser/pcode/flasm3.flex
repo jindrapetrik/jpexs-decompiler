@@ -34,10 +34,9 @@ import java.util.Stack;
 
 %{
 
-  StringBuffer string = new StringBuffer();
-  boolean isMultiname = false;
-  long multinameId = 0;
-
+    StringBuffer string = new StringBuffer();
+    boolean isMultiname = false;
+    long multinameId = 0;
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -55,21 +54,19 @@ import java.util.Stack;
         return yyline + 1;
     }
 
-
-
     private Stack<ParsedSymbol> pushedBack = new Stack<>();
-
 
     public void pushback(ParsedSymbol symb) {
         pushedBack.push(symb);
         last = null;
     }
+
     ParsedSymbol last;
     public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException{
         ParsedSymbol ret = null;
-        if(!pushedBack.isEmpty()){
+        if (!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();
-        }else{
+        } else {
             ret = last = yylex();
         }
         return ret;
@@ -269,9 +266,9 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   \"                             {
                                      yybegin(PARAMETERS);
                                      // length also includes the trailing quote
-                                     if(isMultiname){
+                                     if (isMultiname){
                                         return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
-                                     }else{
+                                     } else {
                                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                                      }
                                  }

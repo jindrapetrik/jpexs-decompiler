@@ -2794,6 +2794,7 @@ public final class Flasm3Lexer {
         pushedBack.push(symb);
         last = null;
     }
+
     ParsedSymbol last;
 
     public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException {

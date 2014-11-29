@@ -35,7 +35,6 @@ package com.jpexs.decompiler.flash.tags.text;
     boolean finish = false;
     String parameterName = null;
 
-
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -66,7 +65,7 @@ HexDigit          = [0-9a-fA-F]
 <YYINITIAL> {
   "["                            {
                                     yybegin(PARAMETER);
-                                    if(string != null){
+                                    if (string != null){
                                         String ret = string.toString();
                                         string = null;
                                         return new ParsedSymbol(SymbolType.TEXT, ret);

@@ -31,10 +31,9 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 %{
 
-  StringBuffer string = new StringBuffer();
-  boolean isMultiname = false;
-  long multinameId = 0;
-
+    StringBuffer string = new StringBuffer();
+    boolean isMultiname = false;
+    long multinameId = 0;
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -144,9 +143,9 @@ StringCharacter = [^\r\n\"\\]
   \"                             {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
-                                     if(isMultiname){
+                                     if (isMultiname){
                                         return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
-                                     }else{
+                                     } else {
                                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                                      }
                                  }

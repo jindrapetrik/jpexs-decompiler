@@ -65,6 +65,7 @@ import java.util.Stack;
     public int yyline() {
         return yyline + 1;
     }
+
     private List<LexListener> listeners=new ArrayList<>();
 
     public void addListener(LexListener listener){
@@ -92,12 +93,13 @@ import java.util.Stack;
         last = null;
         informListenersPushBack(symb);
     }
+
     ParsedSymbol last;
     public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException{
-        ParsedSymbol ret=null;
-        if(!pushedBack.isEmpty()){
+        ParsedSymbol ret = null;
+        if (!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();
-        }else{
+        } else {
             ret = last = yylex();
         }
         informListenersLex(ret);
@@ -368,7 +370,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XmlAttribute}                 {
                                     yybegin(XMLOPENTAGATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -377,7 +379,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "{"                            {
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRNAMEVAR_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -386,7 +388,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XmlOpenTagEnd}                {
                                     yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_END, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -395,7 +397,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XmlOpenTagClose}              {
                                     yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTFINISHTAG_END, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -423,7 +425,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XmlAttribute}                 {
                                     yybegin(XMLINSTRATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -432,7 +434,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "{"                            {
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTRATTRNAMEVAR_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -441,7 +443,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XmlInstrEnd}                  {
                                     yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR_END, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -487,19 +489,19 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                      string.setLength(0);
                                      return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
                                   }
-   {LineTerminator}               { string.append(yytext());  yyline++;}
+   {LineTerminator}               { string.append(yytext()); yyline++;}
    .|\n                           { string.append(yytext());}
 }
 
 <XML> {
    {XmlCDataStart}                    {
-                                    String ret=string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
-                                    if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT,ret);
+                                    String ret = string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
+                                    if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }
    {XmlInstrStart}                {
                                     yybegin(XMLINSTROPENTAG);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -508,20 +510,20 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "<?{"                          {
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTRVARTAG_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    {XmlCommentStart}                        {
-                                     String ret=string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
-                                     if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT,ret);
+                                     String ret = string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
+                                     if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }
    {XmlOpenTagStart}              {
                                     yybegin(XMLOPENTAG);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -529,7 +531,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                   }
    {XmlCloseTag}                  { 
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_FINISHTAG, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -539,7 +541,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "<{"                           {
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -548,7 +550,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "</{"                          { 
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_FINISHVARTAG_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
@@ -557,7 +559,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    "{"                            { 
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_VAR_BEGIN, yytext()));
-                                    if(string.length()>0){
+                                    if (string.length() > 0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
