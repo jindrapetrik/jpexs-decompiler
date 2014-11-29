@@ -1,7 +1,23 @@
+/*
+ *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 /* Flash assembler language lexer specification */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.util.Stack;
 %%
 
@@ -14,7 +30,7 @@ import java.util.Stack;
 %line
 %column
 %type ParsedSymbol
-%throws ParseException
+%throws AVM2ParseException
 
 %{
 
@@ -49,7 +65,7 @@ import java.util.Stack;
         last = null;
     }
     ParsedSymbol last;
-    public ParsedSymbol lex() throws java.io.IOException, ParseException{
+    public ParsedSymbol lex() throws java.io.IOException, AVM2ParseException{
         ParsedSymbol ret = null;
         if(!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();
@@ -94,6 +110,7 @@ FLit2    = \. [0-9]+
 FLit3    = [0-9]+ 
 Exponent = [eE] [+-]? [0-9]+
 
+HexDigit          = [0-9a-fA-F]
 OctDigit          = [0-7]
 
 /* string and character literals */
@@ -127,7 +144,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                 }
   {Label}                        {
                                     String s = yytext();
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_LABEL, s.substring(0,s.length() - 1));
+                                    return new ParsedSymbol(ParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
                                 }
   "name"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}  
   "try"                         {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRY, yytext());}
@@ -241,8 +258,8 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
+  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));  }
+  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));  }
   {Identifier}            { return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
   {LineTerminator}      {yybegin(YYINITIAL);}
   {Comment}             {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
@@ -259,23 +276,25 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                      }
                                  }
 
-  {StringCharacter}+             { string.append( yytext() ); }
+  {StringCharacter}+             { string.append(yytext()); }
 
   /* escape sequences */
-  "\\b"                          { string.append( '\b' ); }
-  "\\t"                          { string.append( '\t' ); }
-  "\\n"                          { string.append( '\n' ); }
-  "\\f"                          { string.append( '\f' ); }
-  "\\r"                          { string.append( '\r' ); }
-  "\\\""                         { string.append( '\"' ); }
-  "\\'"                          { string.append( '\'' ); }
-  "\\\\"                         { string.append( '\\' ); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1),8);
-                        				   string.append( val ); }
+  "\\b"                          { string.append('\b'); }
+  "\\t"                          { string.append('\t'); }
+  "\\n"                          { string.append('\n'); }
+  "\\f"                          { string.append('\f'); }
+  "\\r"                          { string.append('\r'); }
+  "\\\""                         { string.append('\"'); }
+  "\\'"                          { string.append('\''); }
+  "\\\\"                         { string.append('\\'); }
+  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+                        				   string.append(val); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
-  {LineTerminator}               { throw new ParseException("Unterminated string at end of line", yyline + 1); }
+  \\.                            { throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
+  {LineTerminator}               { throw new AVM2ParseException("Unterminated string at end of line", yyline + 1); }
 
 }
 

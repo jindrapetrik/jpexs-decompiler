@@ -28,7 +28,7 @@ import java.util.Stack;
 %line
 %column
 %type ConditionToken
-%throws ParseException
+%throws AnnotationParseException
 
 %{
 
@@ -46,7 +46,7 @@ import java.util.Stack;
     }
 
     public int yyline() {
-        return yyline+1;
+        return yyline + 1;
     }
 
     private Stack<ConditionToken> pushedBack = new Stack<ConditionToken>();
@@ -55,7 +55,7 @@ import java.util.Stack;
         pushedBack.push(symb);
     }
 
-    public ConditionToken lex() throws java.io.IOException, ParseException{
+    public ConditionToken lex() throws java.io.IOException, AnnotationParseException{
         ConditionToken ret = null;
         if(!pushedBack.isEmpty()){
             ret = pushedBack.pop();

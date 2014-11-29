@@ -33,7 +33,7 @@ import java.util.List;
 public class MethodInfoParser {
 
     public static boolean parseSlotConst(String text, TraitSlotConst trait, ABC abc) throws MethodInfoParseException {
-        MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
+        MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         ParsedSymbol symb;
         int type_index = -1;
         ValueKind value = new ValueKind(0, 0);
@@ -122,7 +122,7 @@ public class MethodInfoParser {
     }
 
     public static boolean parseReturnType(String text, MethodInfo update) throws MethodInfoParseException {
-        MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
+        MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         ParsedSymbol symb;
         int type = -1;
         try {
@@ -146,7 +146,7 @@ public class MethodInfoParser {
     }
 
     public static boolean parseParams(String text, MethodInfo update, ABC abc) throws MethodInfoParseException {
-        MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
+        MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         List<String> paramNames = new ArrayList<>();
         List<Long> paramTypes = new ArrayList<>();
         List<ValueKind> optionalValues = new ArrayList<>();

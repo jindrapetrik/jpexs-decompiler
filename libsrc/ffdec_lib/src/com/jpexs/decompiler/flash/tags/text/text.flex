@@ -27,7 +27,7 @@ package com.jpexs.decompiler.flash.tags.text;
 %line
 %column
 %type ParsedSymbol
-%throws ParseException
+%throws TextParseException
 
 %{
 
@@ -49,7 +49,7 @@ package com.jpexs.decompiler.flash.tags.text;
     }
 
     public int yyline() {
-        return yyline+1;
+        return yyline + 1;
     }
 
 %}
@@ -57,6 +57,7 @@ package com.jpexs.decompiler.flash.tags.text;
 Parameter = [a-z0-9_]+
 Value = [^ \r\n\]]+
 Divider = [ \r\n]+
+HexDigit          = [0-9a-fA-F]
 
 %state PARAMETER,VALUE
 
@@ -72,20 +73,22 @@ Divider = [ \r\n]+
                                     }
                                  }
   /* escape sequences */
-  "\\["                          { if (string == null) string = new StringBuffer(); string.append( '[' ); }
-  "\\]"                          { if (string == null) string = new StringBuffer(); string.append( ']' ); }
-  "\\b"                          { if (string == null) string = new StringBuffer(); string.append( '\b' ); }
-  "\\t"                          { if (string == null) string = new StringBuffer(); string.append( '\t' ); }
-  "\\n"                          { if (string == null) string = new StringBuffer(); string.append( '\n' ); }
-  "\\f"                          { if (string == null) string = new StringBuffer(); string.append( '\f' ); }
-  "\\r"                          { if (string == null) string = new StringBuffer(); string.append( '\r' ); }
-  "\\\""                         { if (string == null) string = new StringBuffer(); string.append( '\"' ); }
-  "\\'"                          { if (string == null) string = new StringBuffer(); string.append( '\'' ); }
-  "\\\\"                         { if (string == null) string = new StringBuffer(); string.append( '\\' ); }
+  "\\["                          { if (string == null) string = new StringBuffer(); string.append('['); }
+  "\\]"                          { if (string == null) string = new StringBuffer(); string.append(']'); }
+  "\\b"                          { if (string == null) string = new StringBuffer(); string.append('\b'); }
+  "\\t"                          { if (string == null) string = new StringBuffer(); string.append('\t'); }
+  "\\n"                          { if (string == null) string = new StringBuffer(); string.append('\n'); }
+  "\\f"                          { if (string == null) string = new StringBuffer(); string.append('\f'); }
+  "\\r"                          { if (string == null) string = new StringBuffer(); string.append('\r'); }
+  "\\\""                         { if (string == null) string = new StringBuffer(); string.append('\"'); }
+  "\\'"                          { if (string == null) string = new StringBuffer(); string.append('\''); }
+  "\\\\"                         { if (string == null) string = new StringBuffer(); string.append('\\'); }
+  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }   
-  .                              { if (string == null) string = new StringBuffer(); string.append( yytext() ); }
+  \\.                            { throw new TextParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }   
+  .                              { if (string == null) string = new StringBuffer(); string.append(yytext()); }
  <<EOF>>                         { if (finish) {return null;} else {finish=true; return new ParsedSymbol(SymbolType.TEXT, string == null ? null : string.toString());}}
 }
 

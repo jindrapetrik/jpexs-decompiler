@@ -1,12 +1,27 @@
+/*
+ *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 /* Flash assembler language lexer specification */
-
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
-import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
-import com.jpexs.decompiler.flash.action.swf4.Undefined;
-import com.jpexs.decompiler.flash.action.swf4.Null;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 
 %%
 
@@ -18,7 +33,7 @@ import com.jpexs.decompiler.flash.action.swf4.Null;
 %line
 %column
 %type ASMParsedSymbol
-%throws ParseException
+%throws ActionParseException
 
 %{
 
@@ -37,7 +52,7 @@ import com.jpexs.decompiler.flash.action.swf4.Null;
     }
 
     public int yyline() {
-        return yyline+1;
+        return yyline + 1;
     }
 
 %}
@@ -85,6 +100,7 @@ FLit2    = \. [0-9]+
 FLit3    = [0-9]+ 
 Exponent = [eE] [+-]? [0-9]+
 
+HexDigit          = [0-9a-fA-F]
 OctDigit          = [0-7]
 
 /* string and character literals */
@@ -124,18 +140,18 @@ Constant= constant{PositiveNumberLiteral}
 
   /* numeric literals */
 
-  {NumberLiteral}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
+  {NumberLiteral}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));  }
+  {FloatLiteral}                 { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));  }
   {LineTerminator}      {yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOL); }
   {Comment}             {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
   {StartOfBlock}                        {  yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_START); }
   {True}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
   {False}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
-  {Null}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL,new Null());}
-  {Undefined}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED,new Undefined());}
+  {Null}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL, new Null());}
+  {Undefined}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED, new Undefined());}
 
-  {Register}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER,new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
-  {Constant}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT,new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
+  {Register}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER, new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
+  {Constant}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT, new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
 
   {Identifier}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_IDENTIFIER, yytext());  }
       
@@ -148,23 +164,25 @@ Constant= constant{PositiveNumberLiteral}
                                      return new ASMParsedSymbol(ASMParsedSymbol.TYPE_STRING, string.toString());
                                  }
 
-  {StringCharacter}+             { string.append( yytext() ); }
+  {StringCharacter}+             { string.append(yytext()); }
 
   /* escape sequences */
-  "\\b"                          { string.append( '\b' ); }
-  "\\t"                          { string.append( '\t' ); }
-  "\\n"                          { string.append( '\n' ); }
-  "\\f"                          { string.append( '\f' ); }
-  "\\r"                          { string.append( '\r' ); }
-  "\\\""                         { string.append( '\"' ); }
-  "\\'"                          { string.append( '\'' ); }
-  "\\\\"                         { string.append( '\\' ); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1),8);
-                        				   string.append( val ); }
+  "\\b"                          { string.append('\b'); }
+  "\\t"                          { string.append('\t'); }
+  "\\n"                          { string.append('\n'); }
+  "\\f"                          { string.append('\f'); }
+  "\\r"                          { string.append('\r'); }
+  "\\\""                         { string.append('\"'); }
+  "\\'"                          { string.append('\''); }
+  "\\\\"                         { string.append('\\'); }
+  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+                        				   string.append(val); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"", yyline + 1); }
-  {LineTerminator}               { throw new ParseException("Unterminated string at end of line", yyline + 1); }
+  \\.                            { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
+  {LineTerminator}               { throw new ActionParseException("Unterminated string at end of line", yyline + 1); }
 
 }
 

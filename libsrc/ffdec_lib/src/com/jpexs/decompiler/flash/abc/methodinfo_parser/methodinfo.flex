@@ -1,5 +1,20 @@
+/*
+ *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 /* Method info lexer specification */
-
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 %%
@@ -12,7 +27,7 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 %line
 %column
 %type ParsedSymbol
-%throws ParseException
+%throws MethodInfoParseException
 
 %{
 
@@ -34,7 +49,7 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
     }
 
     public int yyline() {
-        return yyline+1;
+        return yyline + 1;
     }
 
 %}
@@ -67,6 +82,7 @@ FLit2    = \. [0-9]+
 FLit3    = [0-9]+ 
 Exponent = [eE] [+-]? [0-9]+
 
+HexDigit          = [0-9a-fA-F]
 OctDigit          = [0-7]
 
 /* string and character literals */
@@ -82,7 +98,7 @@ StringCharacter = [^\r\n\"\\]
   {Multiname}\"                   {
                                     isMultiname = true;
                                     String s = yytext();
-                                    multinameId = Long.parseLong(s.substring(2,s.length()-2));
+                                    multinameId = Long.parseLong(s.substring(2, s.length() - 2));
                                     yybegin(STRING);
                                     string.setLength(0);
                                   }
@@ -96,8 +112,8 @@ StringCharacter = [^\r\n\"\\]
 
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
+  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, new Long(Long.parseLong((yytext()))));  }
+  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, new Double(Double.parseDouble((yytext()))));  }
 
   ":"                     {return new ParsedSymbol(ParsedSymbol.TYPE_COLON);}
   ","                     {return new ParsedSymbol(ParsedSymbol.TYPE_COMMA);}
@@ -113,7 +129,7 @@ StringCharacter = [^\r\n\"\\]
   explicit               {return new ParsedSymbol(ParsedSymbol.TYPE_EXPLICIT);}
   {Namespace}           {
                                     String s = yytext();
-                                    long ns = Long.parseLong(s.substring(3, s.length()-2));
+                                    long ns = Long.parseLong(s.substring(3, s.length() - 2));
                                     return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, new Long(ns));
                                   }
   true                  {return new ParsedSymbol(ParsedSymbol.TYPE_TRUE);}
@@ -135,23 +151,25 @@ StringCharacter = [^\r\n\"\\]
                                      }
                                  }
 
-  {StringCharacter}+             { string.append( yytext() ); }
+  {StringCharacter}+             { string.append(yytext()); }
 
   /* escape sequences */
-  "\\b"                          { string.append( '\b' ); }
-  "\\t"                          { string.append( '\t' ); }
-  "\\n"                          { string.append( '\n' ); }
-  "\\f"                          { string.append( '\f' ); }
-  "\\r"                          { string.append( '\r' ); }
-  "\\\""                         { string.append( '\"' ); }
-  "\\'"                          { string.append( '\'' ); }
-  "\\\\"                         { string.append( '\\' ); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1),8);
-                        				   string.append( val ); }
+  "\\b"                          { string.append('\b'); }
+  "\\t"                          { string.append('\t'); }
+  "\\n"                          { string.append('\n'); }
+  "\\f"                          { string.append('\f'); }
+  "\\r"                          { string.append('\r'); }
+  "\\\""                         { string.append('\"'); }
+  "\\'"                          { string.append('\''); }
+  "\\\\"                         { string.append('\\'); }
+  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+                        				   string.append(val); }
 
   /* error cases */
-  \\.                            { throw new ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
-  {LineTerminator}               { throw new ParseException("Unterminated string at end of line", yyline + 1); }
+  \\.                            { throw new MethodInfoParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }
+  {LineTerminator}               { throw new MethodInfoParseException("Unterminated string at end of line", yyline + 1); }
 
 }
 
