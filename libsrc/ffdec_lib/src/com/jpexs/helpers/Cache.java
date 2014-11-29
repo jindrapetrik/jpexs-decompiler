@@ -37,8 +37,8 @@ public class Cache<K, V> implements Freed {
     private static final List<Cache> instances = new ArrayList<>();
     public static final int STORAGE_FILES = 1;
     public static final int STORAGE_MEMORY = 2;
-    private boolean weak;
-    private String name;
+    private final boolean weak;
+    private final String name;
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {

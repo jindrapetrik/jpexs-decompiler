@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetTime;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
@@ -41,6 +42,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitOr;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
+import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -66,7 +68,61 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
+        removeGetTimes(actions);
         removeObfuscationIfs(actions);
+    }
+
+    private boolean removeGetTimes(ActionList actions) {
+        if (actions.size() == 0) {
+            return false;
+        }
+
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            removeUnreachableActions(actions);
+            removeZeroJumps(actions);
+
+            // GetTime, If => Jump, assume GetTime > 0
+            for (int i = 0; i < actions.size() - 1; i++) {
+                Action a = actions.get(i);
+                Action a2 = actions.get(i + 1);
+                if (a instanceof ActionGetTime && a2 instanceof ActionIf) {
+                    ActionIf aIf = (ActionIf) a2;
+                    ActionJump jump = new ActionJump(0);
+                    jump.setAddress(aIf.getAddress());
+                    jump.setJumpOffset(aIf.getJumpOffset());
+                    actions.remove(i); // GetTime
+                    actions.remove(i); // If
+                    actions.addAction(i, jump); // replace If with Jump
+                    changed = true;
+                    break;
+                }
+            }
+
+            if (!changed) {
+                // GetTime, Increment If => Jump
+                for (int i = 0; i < actions.size() - 2; i++) {
+                    Action a = actions.get(i);
+                    Action a1 = actions.get(i + 1);
+                    Action a2 = actions.get(i + 2);
+                    if (a instanceof ActionGetTime && a1 instanceof ActionIncrement && a2 instanceof ActionIf) {
+                        ActionIf aIf = (ActionIf) a2;
+                        ActionJump jump = new ActionJump(0);
+                        jump.setAddress(aIf.getAddress());
+                        jump.setJumpOffset(aIf.getJumpOffset());
+                        actions.remove(i); // GetTime
+                        actions.remove(i); // Increment
+                        actions.remove(i); // If
+                        actions.addAction(i, jump); // replace If with Jump
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private boolean removeObfuscationIfs(ActionList actions) {
@@ -84,10 +140,10 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
             if (result.idx != -1) {
                 int newIstructionCount = 1; // jump
                 if (!result.stack.isEmpty()) {
-                    newIstructionCount++;
+                    newIstructionCount += result.stack.size();
                 }
 
-                if (newIstructionCount + 1 < result.instructionsProcessed) {
+                if (newIstructionCount < result.instructionsProcessed) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 
@@ -258,6 +314,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 if (action instanceof ActionPush) {
                     ActionPush push = (ActionPush) action;
                     boolean ok = true;
+                    instructionsProcessed += push.values.size() - 1;
                     for (Object value : push.values) {
                         if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
                             ok = false;

@@ -4,7 +4,6 @@ import com.jpexs.decompiler.flash.helpers.Freed;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,6 +21,8 @@ import java.util.logging.Logger;
 /**
  *
  * @author JPEXS
+ * @param <K>
+ * @param <V>
  */
 public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
@@ -75,8 +76,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     public static class FileEntry<K, V> implements Map.Entry<K, V> {
 
-        private FileHashMap<K, V> parent;
-        private K key;
+        private final FileHashMap<K, V> parent;
+        private final K key;
 
         public FileEntry(FileHashMap<K, V> parent, K key) {
             this.parent = parent;
@@ -248,9 +249,9 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         if (deleted) {
             throw new NullPointerException();
         }
-        Set<Entry<K, V>> ret = new HashSet<Entry<K, V>>();
+        Set<Entry<K, V>> ret = new HashSet<>();
         for (K key : keySet()) {
-            ret.add(new FileEntry<K, V>(this, key));
+            ret.add(new FileEntry<>(this, key));
         }
         return ret;
     }

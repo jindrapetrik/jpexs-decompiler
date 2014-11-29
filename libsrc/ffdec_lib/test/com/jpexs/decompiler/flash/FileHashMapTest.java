@@ -3,16 +3,12 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.FileHashMap;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 
 /**
