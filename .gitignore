@@ -53,3 +53,4 @@ hs_err_pid*.log
 /version.properties
 /tools.properties
 /nbproject/private/
+/libsrc/avi/nbproject/private/

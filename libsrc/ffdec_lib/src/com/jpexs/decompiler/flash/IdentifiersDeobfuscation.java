@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -373,6 +374,8 @@ public class IdentifiersDeobfuscation {
                 ret.append("\\\\");
             } else if (c == '\u00A7') {
                 ret.append("\\\u00A7");
+            } else if (c < 32) {
+                ret.append("\\x").append(Helper.padZeros(Integer.toHexString((int) c), 2));
             } else {
                 ret.append(c);
             }
