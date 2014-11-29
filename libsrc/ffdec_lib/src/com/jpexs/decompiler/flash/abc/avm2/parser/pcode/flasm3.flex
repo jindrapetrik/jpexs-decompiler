@@ -267,7 +267,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                      yybegin(PARAMETERS);
                                      // length also includes the trailing quote
                                      if (isMultiname){
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
+                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
                                      } else {
                                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                                      }

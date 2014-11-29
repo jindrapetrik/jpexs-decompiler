@@ -129,7 +129,7 @@ StringCharacter = [^\r\n\"\\]
   {Namespace}           {
                                     String s = yytext();
                                     long ns = Long.parseLong(s.substring(3, s.length() - 2));
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, new Long(ns));
+                                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, ns);
                                   }
   true                  {return new ParsedSymbol(ParsedSymbol.TYPE_TRUE);}
   false                  {return new ParsedSymbol(ParsedSymbol.TYPE_FALSE);}
@@ -144,7 +144,7 @@ StringCharacter = [^\r\n\"\\]
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
                                      if (isMultiname){
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
+                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
                                      } else {
                                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                                      }

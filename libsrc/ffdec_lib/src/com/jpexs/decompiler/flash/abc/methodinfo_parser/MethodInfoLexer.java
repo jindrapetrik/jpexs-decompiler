@@ -741,6 +741,7 @@ public final class MethodInfoLexer {
 
     /**
      * Closes the input stream.
+     * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
@@ -782,6 +783,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the current lexical state.
+     * @return 
      */
     public final int yystate() {
         return zzLexicalState;
@@ -798,6 +800,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the text matched by the current regular expression.
+     * @return 
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -819,6 +822,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the length of the matched text region.
+     * @return 
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;
@@ -870,6 +874,7 @@ public final class MethodInfoLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
+     * @throws com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParseException
      */
     public ParsedSymbol yylex() throws java.io.IOException, MethodInfoParseException {
         int zzInput;
@@ -1067,7 +1072,7 @@ public final class MethodInfoLexer {
                     yybegin(YYINITIAL);
                     // length also includes the trailing quote
                     if (isMultiname) {
-                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, new Long(multinameId));
+                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
                     } else {
                         return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
                     }
@@ -1203,7 +1208,7 @@ public final class MethodInfoLexer {
                 case 36: {
                     String s = yytext();
                     long ns = Long.parseLong(s.substring(3, s.length() - 2));
-                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, new Long(ns));
+                    return new ParsedSymbol(ParsedSymbol.TYPE_NAMESPACE, ns);
                 }
                 case 72:
                     break;
