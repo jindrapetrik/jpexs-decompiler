@@ -83,7 +83,7 @@ public class ActionConstantPool extends Action {
         StringBuilder ret = new StringBuilder();
         ret.append("ConstantPool");
         for (int i = 0; i < constantPool.size(); i++) {
-            ret.append("\"").append(Helper.escapeString(constantPool.get(i))).append("\"");
+            ret.append(" \"").append(Helper.escapeString(constantPool.get(i))).append("\"");
         }
         return ret.toString();
     }
