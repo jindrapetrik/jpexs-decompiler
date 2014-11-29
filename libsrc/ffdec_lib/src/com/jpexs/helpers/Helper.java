@@ -170,7 +170,7 @@ public class Helper {
             } else if (c == '\'') {
                 ret.append("\\'");
             } else if (c < 32) {
-                ret.append("\\x").append(padZeros(Integer.toHexString(i), 2));
+                ret.append("\\x").append(padZeros(Integer.toHexString((int) c), 2));
             } else {
                 ret.append(c);
             }

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
+import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -236,6 +237,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
                 if (!(action instanceof ActionPush
                         || action instanceof ActionPushDuplicate
+                        || action instanceof ActionCharToAscii
                         || action instanceof ActionAdd
                         || action instanceof ActionAdd2
                         || action instanceof ActionSubtract
