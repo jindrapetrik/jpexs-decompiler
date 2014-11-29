@@ -173,5 +173,5 @@ StringCharacter = [^\r\n\"\\]
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return new ParsedSymbol(ParsedSymbol.TYPE_EOF); }

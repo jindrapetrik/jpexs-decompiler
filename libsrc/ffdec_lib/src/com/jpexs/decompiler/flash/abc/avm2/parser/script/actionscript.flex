@@ -478,7 +478,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                      return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_CDATA, ret);
                                   }
  {LineTerminator}                 { string.append(yytext());  yyline++;}
-    .|\n                          { string.append(yytext()); }
+    [^]                           { string.append(yytext()); }
 }
 
 <XMLCOMMENT> {
@@ -490,7 +490,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                      return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
                                   }
    {LineTerminator}               { string.append(yytext()); yyline++;}
-   .|\n                           { string.append(yytext());}
+   [^]                            { string.append(yytext());}
 }
 
 <XML> {
@@ -566,7 +566,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                     return lex();
                                   } 
    {LineTerminator}               { string.append(yytext());  yyline++;}
-   .|\n                           { string.append(yytext()); }
+   [^]                            { string.append(yytext()); }
 }
 
 <OIDENTIFIER> {
@@ -654,5 +654,5 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 }
 
 /* error fallback */
-.|\n                             {  }
+[^]                              {  }
 <<EOF>>                          { return new ParsedSymbol(SymbolGroup.EOF, SymbolType.EOF, null); }

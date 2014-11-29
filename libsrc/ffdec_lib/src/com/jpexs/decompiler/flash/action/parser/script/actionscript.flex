@@ -366,7 +366,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                                    }
                                  }
    {LineTerminator}               { string.append(yytext()); yyline++;}
-   .|\n                          { string.append(yytext()); }
+   [^]                           { string.append(yytext()); }
 }
 
 <OIDENTIFIER> {
@@ -451,5 +451,5 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 }
 
 /* error fallback */
-.|\n                             {  }
+[^]                              {  }
 <<EOF>>                          { return new ParsedSymbol(SymbolGroup.EOF, SymbolType.EOF, null); }

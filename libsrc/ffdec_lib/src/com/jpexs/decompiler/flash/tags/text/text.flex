@@ -114,5 +114,5 @@ HexDigit          = [0-9a-fA-F]
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return null; }

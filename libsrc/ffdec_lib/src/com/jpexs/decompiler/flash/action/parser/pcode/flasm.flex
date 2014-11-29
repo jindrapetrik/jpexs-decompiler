@@ -187,5 +187,5 @@ Constant= constant{PositiveNumberLiteral}
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOF); }
