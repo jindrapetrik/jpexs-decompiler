@@ -35,7 +35,7 @@ public class MarkItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("//" + AppResources.translate("decompilerMark") + ":" + mark);
+        return writer.append("// " + AppResources.translate("decompilerMark") + ":" + mark);
     }
 
     public String getMark() {

@@ -169,7 +169,7 @@ public final class MethodBody implements Cloneable {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
-                writer.appendNoHilight("//" + AppResources.translate("decompilation.skipped")).newLine();
+                writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 return;
             }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
@@ -209,7 +209,7 @@ public final class MethodBody implements Cloneable {
         } else {
             if (!Configuration.decompile.get()) {
                 //writer.startMethod(this.method_info);
-                writer.appendNoHilight("//" + AppResources.translate("decompilation.skipped")).newLine();
+                writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 //writer.endMethod();
                 return writer;
             }

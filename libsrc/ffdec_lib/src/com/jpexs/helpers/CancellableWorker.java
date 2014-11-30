@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import java.util.ArrayList;
@@ -40,13 +41,12 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     public CancellableWorker() {
         super();
-        Callable<T> callable
-                = new Callable<T>() {
-                    @Override
-                    public T call() throws Exception {
-                        return doInBackground();
-                    }
-                };
+        Callable<T> callable = new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                return doInBackground();
+            }
+        };
 
         future = new FutureTask<T>(callable) {
             @Override

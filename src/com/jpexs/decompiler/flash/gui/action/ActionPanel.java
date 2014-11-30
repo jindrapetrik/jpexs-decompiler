@@ -357,6 +357,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
                     percent = newpercent;
                     this.phase = phase;
+                    // todo: honfika: it is very slow to show every percent
                     setEditorText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
                 }
             }
@@ -394,7 +395,10 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             protected Void doInBackground() throws Exception {
                 setEditorText("; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                 if (Configuration.decompile.get()) {
-                    setDecompiledText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
+                    setDecompiledText("// " + AppStrings.translate("work.waitingfordissasembly") + "...");
+                } else {
+                    lastDecompiled = Helper.getDecompilationSkippedComment();
+                    setDecompiledText(lastDecompiled);
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
@@ -406,7 +410,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 srcHexOnly = null;
                 setHex(getExportMode());
                 if (Configuration.decompile.get()) {
-                    setDecompiledText("//" + AppStrings.translate("work.decompiling") + "...");
+                    setDecompiledText("// " + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
                         SWF.uncache(asm);
                     }
@@ -435,7 +439,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                         } catch (CancellationException ex) {
                             setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
                         } catch (Exception ex) {
-                            setDecompiledText("//" + AppStrings.translate("decompilationError") + ": " + ex);
+                            setDecompiledText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                         }
                     }
                 });

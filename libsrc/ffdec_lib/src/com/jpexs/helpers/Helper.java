@@ -794,6 +794,10 @@ public class Helper {
         }
     }
 
+    public static String getDecompilationSkippedComment() {
+        return "// " + AppResources.translate("decompilation.skipped");
+    }
+    
     public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();

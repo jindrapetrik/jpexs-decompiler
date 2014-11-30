@@ -640,7 +640,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.script = scriptLeaf;
             return;
         }
-        setText("//" + AppStrings.translate("pleasewait") + "...");
+        setText("// " + AppStrings.translate("pleasewait") + "...");
 
         this.abc = abc;
         this.abcList = abcList;

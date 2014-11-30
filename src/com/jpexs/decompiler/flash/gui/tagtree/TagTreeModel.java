@@ -92,11 +92,11 @@ public class TagTreeModel implements TreeModel {
         return AppStrings.translate(key);
     }
 
-    private List<TreeItem> getSoundStreams(DefineSpriteTag sprite) {
-        List<TreeItem> ret = new ArrayList<>();
+    private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
+        List<SoundStreamHeadTypeTag> ret = new ArrayList<>();
         for (Tag t : sprite.subTags) {
             if (t instanceof SoundStreamHeadTypeTag) {
-                ret.add(t);
+                ret.add((SoundStreamHeadTypeTag) t);
             }
         }
         return ret;
