@@ -82,7 +82,6 @@ FLit3    = [0-9]+
 Exponent = [eE] [+-]? [0-9]+
 
 HexDigit          = [0-9a-fA-F]
-OctDigit          = [0-7]
 
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
@@ -161,9 +160,9 @@ StringCharacter = [^\r\n\"\\]
   "\\\""                         { string.append('\"'); }
   "\\'"                          { string.append('\''); }
   "\\\\"                         { string.append('\\'); }
-  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
 
   /* error cases */

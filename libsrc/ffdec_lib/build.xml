@@ -37,6 +37,7 @@
     <property name="DISTLIBRARIESDIRNAME" value="lib"/>
     <property name="JAVADOCDIR" value="${basedir}/javadoc"/>             
     <property name="REVFILE" value="${basedir}/revision.txt"/>
+    <property name="LEXERSDIR" value="${basedir}/lexers"/>  
     
     <property name="RUNPARAMS" value=""/>
 

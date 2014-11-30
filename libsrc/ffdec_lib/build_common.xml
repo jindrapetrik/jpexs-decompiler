@@ -41,8 +41,7 @@
         </copy>
     </target>
 
-    <target name="compile">
-        <!--<delete dir="${COMPILEDIR}"/>-->        
+    <target name="compile" depends="lexers">
         <mkdir dir="${COMPILEDIR}"/>
         <mkdir dir="${LIBRARIESDIR}"/>        
         <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true"
@@ -225,5 +224,29 @@
     
     <target name="run">        
         <ant antfile="../../build.xml" target="run" inheritall="false"/>
+    </target>
+            
+    <target name="-lexer" if="lexer">
+        <taskdef classname="jflex.anttask.JFlexTask" classpath="${basedir}/jflex-1.6.0.jar" name="jflex" />
+        <jflex file="${lexer}" destdir="${SOURCEDIR}" nobak="on"></jflex>        
+    </target>
+    
+    <target name="lexers">       
+        <pathconvert pathsep="|" property="lexers">
+            <fileset dir="${LEXERSDIR}" includes="**/*.flex"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="/*"/>
+            </chainedmapper>
+        </pathconvert>
+        
+        <script language="javascript"><![CDATA[
+        var classpath = project.getProperty("lexers");
+        var parts = classpath.split("|");
+        for each (var part in parts) {        
+            project.setProperty("lexer",project.getProperty("LEXERSDIR")+part);
+            self.project.executeTarget("-lexer");
+        }
+    ]]></script>
     </target>
 </project>

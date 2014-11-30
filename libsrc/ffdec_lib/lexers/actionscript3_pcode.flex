@@ -164,6 +164,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   {InstructionName}                   { yybegin(PARAMETERS);
                                         return new ParsedSymbol(ParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
                                       }
+  {Comment}                     {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
 }
 
 <PARAMETERS> {
@@ -284,9 +285,9 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "\\\""                         { string.append('\"'); }
   "\\'"                          { string.append('\''); }
   "\\\\"                         { string.append('\\'); }
-  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
 
   /* error cases */

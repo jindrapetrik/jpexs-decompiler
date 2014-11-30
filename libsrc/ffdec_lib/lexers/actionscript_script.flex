@@ -386,7 +386,9 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "\\\u00A7"                     { string.append('\u00A7'); }
   "\\r"                          { string.append('\r'); }
   "\\\\"                         { string.append('\\'); }
-  \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
   
   /* escape sequences */
@@ -412,8 +414,10 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "\\r"                          { string.append('\r'); }
   "\\\""                         { string.append('\"'); }
   "\\'"                          { string.append('\''); }
-  "\\\\"                         { string.append('\\'); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+  "\\\\"                         { string.append('\\'); }    
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
   
   /* escape sequences */
@@ -441,7 +445,9 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "\\\""                         { string.append('\"'); }
   "\\'"                          { string.append('\''); }
   "\\\\"                         { string.append('\\'); }
-  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
   
   /* escape sequences */
