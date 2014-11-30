@@ -182,7 +182,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return defaultFontName;
     }
 
-    public void shiftGlyphIndices(int fontId, int startIndex) {
+    protected void shiftGlyphIndices(int fontId, int startIndex) {
         for (Tag t : swf.tags) {
             List<TEXTRECORD> textRecords = null;
             if (t instanceof DefineTextTag) {
@@ -197,9 +197,11 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
                     if (tr.styleFlagsHasFont) {
                         curFontId = tr.fontId;
                     }
+                    
                     if (curFontId != fontId) {
                         continue;
                     }
+                    
                     for (GLYPHENTRY en : tr.glyphEntries) {
                         if (en == null) { //Currently edited
                             continue;

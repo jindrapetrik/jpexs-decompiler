@@ -349,6 +349,19 @@ public class DefineTextTag extends TextTag {
                         if (font == null) {
                             throw new TextParseException("Font not defined", lexer.yyline());
                         }
+
+                        for (int i = 0; i < txt.length(); i++) {
+                            char c = txt.charAt(i);
+
+                            if (!font.containsChar(c)) {
+                                if (!missingCharHandler.handle(font, c)) {
+                                    return false;
+                                }
+
+                                return setFormattedText(missingCharHandler, formattedText, texts);
+                            }
+                        }
+                        
                         TEXTRECORD tr = new TEXTRECORD();
                         textRecords.add(tr);
                         if (fontId > -1) {
@@ -380,16 +393,6 @@ public class DefineTextTag extends TextTag {
                                 nextChar = txt.charAt(i + 1);
                             }
 
-                            if (!font.containsChar(c)) {
-                                if (!missingCharHandler.handle(font, c)) {
-                                    return false;
-                                }
-                            }
-                            if (nextChar != null && !font.containsChar(nextChar)) {
-                                if (!missingCharHandler.handle(font, nextChar)) {
-                                    return false;
-                                }
-                            }
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(c);
 
