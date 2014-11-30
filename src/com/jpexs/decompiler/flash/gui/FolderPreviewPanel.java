@@ -60,6 +60,7 @@ public class FolderPreviewPanel extends JPanel {
     private static ExecutorService executor;
     private List<TreeItem> items;
     private int selectedIndex = -1;
+    private boolean repaintQueued;
 
     public Map<Integer, TreeItem> selectedItems = new HashMap<>();
 
@@ -162,6 +163,7 @@ public class FolderPreviewPanel extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        repaintQueued = false;
         Rectangle r = getVisibleRect();
         int width = getWidth();
 
@@ -174,14 +176,16 @@ public class FolderPreviewPanel extends JPanel {
         Font f = l.getFont().deriveFont(AffineTransform.getScaleInstance(0.8, 0.8));
         int finish_y = (int) Math.ceil((r.y + r.height) / (float) CELL_HEIGHT);
         g.setColor(Color.black);
+        Color color = new Color(0xd9, 0xe8, 0xfb);
+        Color selectedColor = new Color(0xfe, 0xca, 0x81);
         for (int y = start_y; y <= finish_y; y++) {
             for (int x = 0; x < cols; x++) {
                 int index = y * cols + x;
                 if (index < items.size()) {
 
-                    g.setColor(new Color(0xd9, 0xe8, 0xfb));
+                    g.setColor(color);
                     if (selectedItems.containsKey(index)) {
-                        g.setColor(new Color(0xfe, 0xca, 0x81));
+                        g.setColor(selectedColor);
                     }
                     g.fillRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                     if (cachedPreviews.contains(index)) {
@@ -213,7 +217,10 @@ public class FolderPreviewPanel extends JPanel {
             }
         }
 
-        setSize(new Dimension(width, height));
+        Dimension size = getSize();
+        if (size.width != width || size.height != height) {
+            setSize(new Dimension(width, height));
+        }
     }
 
     private synchronized void renderImageTask(final int index, final TreeItem treeItem) {
@@ -222,19 +229,19 @@ public class FolderPreviewPanel extends JPanel {
             @Override
             public Void call() throws Exception {
                 cachedPreviews.put(index, renderImage(treeItem.getSwf(), treeItem));
-                View.execInEventDispatch(new Runnable() {
+                if (!repaintQueued) {
+                    repaintQueued = true;
+                    View.execInEventDispatchLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        revalidate();
-                        repaint();
-                    }
-                });
+                        @Override
+                        public void run() {
+                            repaint();
+                        }
+                    });
+                }
                 return null;
             }
-
         });
-
     }
 
     private SerializableImage renderImage(SWF swf, TreeItem treeItem) {
@@ -246,13 +253,26 @@ public class FolderPreviewPanel extends JPanel {
         if (treeItem instanceof Frame) {
             Frame fn = (Frame) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, 0, null, 0, rect, new Matrix(), new ColorTransform(), null, true, 1.0);
-            width = (imgSrc.getWidth());
-            height = (imgSrc.getHeight());
+            double zoom = 1.0;
+            if (rect.getWidth() > 0) {
+                double ratio = (PREVIEW_SIZE - 1) * SWF.unitDivisor / (rect.getWidth());
+                if (ratio < zoom) {
+                    zoom = ratio;
+                }
+            }
+            if (rect.getHeight() > 0) {
+                double ratio = (PREVIEW_SIZE - 1) * SWF.unitDivisor / (rect.getHeight());
+                if (ratio < zoom) {
+                    zoom = ratio;
+                }
+            }
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, 0, null, 0, rect, new Matrix(), new ColorTransform(), null, true, zoom);
+            width = imgSrc.getWidth();
+            height = imgSrc.getHeight();
         } else if (treeItem instanceof ImageTag) {
             imgSrc = ((ImageTag) treeItem).getImage();
-            width = (imgSrc.getWidth());
-            height = (imgSrc.getHeight());
+            width = imgSrc.getWidth();
+            height = imgSrc.getHeight();
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
             RECT rect = boundedTag.getRect(new HashSet<BoundedTag>());
@@ -276,6 +296,10 @@ public class FolderPreviewPanel extends JPanel {
 
         double scale = (double) w / (double) w1;
         if (w1 <= w2 && h1 <= h2) {
+            if (imgSrc != null) {
+                return imgSrc;
+            }
+            
             scale = 1;
         }
 
