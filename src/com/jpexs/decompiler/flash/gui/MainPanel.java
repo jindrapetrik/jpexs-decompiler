@@ -1387,8 +1387,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
 
                 // "configuration items" for the current replace only
-                private final ConfigurationItem<Boolean> doNotShowImportError = new ConfigurationItem<>("doNotShowImportError", true, true);
-                private final ConfigurationItem<Boolean> doNotShowInvalidText = new ConfigurationItem<>("doNotShowInvalidText", true, true);
+                private final ConfigurationItem<Boolean> showAgainImportError = new ConfigurationItem<>("showAgainImportError", true, true);
+                private final ConfigurationItem<Boolean> showAgainInvalidText = new ConfigurationItem<>("showAgainInvalidText", true, true);
 
                 private String getTextTagInfo(TextTag textTag) {
                     String ret = "";
@@ -1403,14 +1403,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowImportError, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
                 }
 
                 @Override
                 public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowInvalidText, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
                 }
             });
 
@@ -1722,8 +1722,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private MissingCharacterHandler getMissingCharacterHandler() {
         return new MissingCharacterHandler() {
+
+            // "configuration items" for the current replace only
+            private final ConfigurationItem<Boolean> showAgainIgnoreMissingCharacters = new ConfigurationItem<>("showAgainIgnoreMissingCharacters", true, true);
+            private boolean ignoreMissingCharacters = false;
+            
             @Override
-            public boolean handle(FontTag font, char character) {
+            public boolean getIgnoreMissingCharacters() {
+                return ignoreMissingCharacters;
+            }
+            
+            @Override
+            public boolean handle(TextTag textTag, FontTag font, char character) {
                 String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
                 if (fontName == null) {
                     fontName = font.getFontName();
@@ -1731,13 +1741,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 Font f = FontTag.installedFontsByName.get(fontName);
                 if (f == null || !f.canDisplay(character)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
-                    logger.log(Level.SEVERE, msg);
-                    View.showMessageDialog(null, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
+                    logger.log(Level.SEVERE, msg + " FontId: " + font.getCharacterId() + " TextId: " + textTag.getCharacterId());
+                    ignoreMissingCharacters = View.showConfirmDialog(null, msg, translate("error"), 
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, 
+                            showAgainIgnoreMissingCharacters, 
+                            ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
                     return false;
                 }
                 font.addCharacter(character, f);
                 return true;
-
             }
         };
     }

@@ -350,18 +350,25 @@ public class DefineTextTag extends TextTag {
                             throw new TextParseException("Font not defined", lexer.yyline());
                         }
 
+                        StringBuilder txtSb = new StringBuilder();
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
 
                             if (!font.containsChar(c)) {
-                                if (!missingCharHandler.handle(font, c)) {
-                                    return false;
+                                if (!missingCharHandler.handle(this, font, c)) {
+                                    if (!missingCharHandler.getIgnoreMissingCharacters()) {
+                                        return false;
+                                    }
+                                } else {
+                                    return setFormattedText(missingCharHandler, formattedText, texts);
                                 }
-
-                                return setFormattedText(missingCharHandler, formattedText, texts);
+                            } else {
+                                txtSb.append(c);
                             }
                         }
                         
+                        txt = txtSb.toString();
+
                         TEXTRECORD tr = new TEXTRECORD();
                         textRecords.add(tr);
                         if (fontId > -1) {
