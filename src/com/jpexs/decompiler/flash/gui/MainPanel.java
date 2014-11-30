@@ -1730,7 +1730,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 Font f = FontTag.installedFontsByName.get(fontName);
                 if (f == null || !f.canDisplay(character)) {
-                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
+                    logger.log(Level.SEVERE, msg);
+                    View.showMessageDialog(null, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
                 font.addCharacter(character, f);

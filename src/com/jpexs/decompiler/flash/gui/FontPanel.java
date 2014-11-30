@@ -127,7 +127,9 @@ public class FontPanel extends javax.swing.JPanel {
             if (oldchars.indexOf((int) c) == -1) {
                 font = font.deriveFont(f.getFontStyle(), 1024);
                 if (!font.canDisplay(c)) {
-                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    String msg = translate("error.font.nocharacter").replace("%char%", "" + c);
+                    Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
+                    View.showMessageDialog(null, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
