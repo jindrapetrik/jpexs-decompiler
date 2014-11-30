@@ -1390,17 +1390,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 private final ConfigurationItem<Boolean> doNotShowImportError = new ConfigurationItem<>("doNotShowImportError", true, true);
                 private final ConfigurationItem<Boolean> doNotShowInvalidText = new ConfigurationItem<>("doNotShowInvalidText", true, true);
 
+                private String getTextTagInfo(TextTag textTag) {
+                    String ret = "";
+                    if (textTag != null) {
+                        ret += " TextId: " + textTag.getCharacterId() + " (" + textTag.getText(", ") + ")";
+                    }
+
+                    return ret;
+                }
+
                 @Override
-                public boolean handle() {
+                public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
-                    logger.log(Level.SEVERE, msg);
+                    logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
                     return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowImportError, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
                 }
 
                 @Override
-                public boolean handle(String message, long line) {
+                public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
-                    logger.log(Level.SEVERE, msg);
+                    logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
                     return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, doNotShowInvalidText, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
                 }
             });

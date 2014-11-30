@@ -58,7 +58,7 @@ public class TextImporter {
                 String[] records = textArr[1].split(recordSeparator);
                 result.put(id, records);
             } else {
-                if (errorHandler.handle()) {
+                if (errorHandler.handle(null)) {
                     return null;
                 }
             }
@@ -175,9 +175,9 @@ public class TextImporter {
                 return true;
             }
 
-            return !errorHandler.handle();
+            return !errorHandler.handle(textTag);
         } catch (TextParseException ex) {
-            return !errorHandler.handle(ex.text, ex.line);
+            return !errorHandler.handle(textTag, ex.text, ex.line);
         }
     }
 }

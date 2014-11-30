@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.tags.base;
  */
 public abstract class TextImportErrorHandler {
 
-    public abstract boolean handle();
+    public abstract boolean handle(TextTag textTag);
 
-    public abstract boolean handle(String message, long line);
+    public abstract boolean handle(TextTag textTag, String message, long line);
 }

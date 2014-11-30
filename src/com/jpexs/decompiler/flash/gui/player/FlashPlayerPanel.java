@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.player;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.javactivex.ActiveX;
-import com.jpexs.javactivex.ActiveXControl;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXEventListener;
 import com.jpexs.javactivex.ActiveXException;
