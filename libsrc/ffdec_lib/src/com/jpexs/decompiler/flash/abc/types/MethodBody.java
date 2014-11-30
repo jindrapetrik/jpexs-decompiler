@@ -173,6 +173,7 @@ public final class MethodBody implements Cloneable {
                 return;
             }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
+            convertException = null;
             try {
                 Callable<Void> callable = new Callable<Void>() {
                     @Override
