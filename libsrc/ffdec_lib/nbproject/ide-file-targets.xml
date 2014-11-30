@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".." name="ffdec_lib-IDE">
+<project basedir="../../../" name="ffdec_lib-IDE">
     <import file="../../../build.xml"/>
     <target name="debug-nb" depends="build">
         <path id="cp">
             <pathelement path="${basedir}/build/classes"/>
-            <pathelement path="${basedir}/../../build/classes"/>
-            <fileset dir="${basedir}/../../lib" includes="**/*.jar"/>
+            <pathelement path="${basedir}/libsrc/ffdec_lib/build/classes"/>
+            <fileset dir="${basedir}/lib" includes="**/*.jar"/>
         </path>
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath refid="cp"/>
