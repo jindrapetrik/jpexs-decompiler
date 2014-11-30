@@ -419,10 +419,12 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
                         				   string.append(val); }
   \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
+  \\{OctDigit}{3}         { char val = (char) Integer.parseInt(yytext().substring(1), 8);
+                        				   string.append(val); }
   
   /* escape sequences */
 
-  \\.                            { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);  }
+  \\.                            { string.append('\\'); /*illegal escape sequence*/  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 
@@ -452,7 +454,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);  }
+  \\.                            { string.append('\\'); /*illegal escape sequence*/  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 

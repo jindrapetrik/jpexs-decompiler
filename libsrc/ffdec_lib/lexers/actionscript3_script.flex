@@ -622,7 +622,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);  }
+  \\.                            { /* ignore illegal character escape */ }
   {LineTerminator}               { yybegin(YYINITIAL); yyline++;}
 }
 
@@ -651,7 +651,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   
   /* escape sequences */
 
-  \\.                            { throw new AVM2ParseException("Illegal escape sequence \""+ yytext() +"\"", yyline + 1);  }
+  \\.                            { /* ignore illegal character escape */ }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 
