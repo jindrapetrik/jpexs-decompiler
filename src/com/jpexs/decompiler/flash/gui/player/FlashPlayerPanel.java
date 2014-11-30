@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.gui.player;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.javactivex.ActiveX;
+import com.jpexs.javactivex.ActiveXControl;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXEventListener;
+import com.jpexs.javactivex.ActiveXException;
 import com.jpexs.javactivex.example.controls.flash.ShockwaveFlash;
 import com.sun.jna.Platform;
 import java.awt.AWTException;
@@ -95,7 +97,14 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public synchronized int getCurrentFrame() {
-        return flash.getFrameNum();
+        if (flash == null) {
+            return 0;
+        }
+        try {
+            return flash.getFrameNum();
+        } catch (ActiveXException ex) { //Can be "Data not available yet exception"
+            return 0;
+        }
     }
 
     @Override
@@ -104,14 +113,22 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             return 0;
         }
         if (flash.getReadyState() == 4) {
-            return flash.getTotalFrames();
+            try {
+                return flash.getTotalFrames();
+            } catch (ActiveXException ex) { //Can be "Data not available yet exception"
+                return 0;
+            }
         }
         return 0;
     }
 
     @Override
     public synchronized void setBackground(Color color) {
-        flash.setBackgroundColor((color.getRed() << 16) + (color.getGreen() << 8) + color.getBlue());
+        try {
+            flash.setBackgroundColor((color.getRed() << 16) + (color.getGreen() << 8) + color.getBlue());
+        } catch (ActiveXException ex) {
+            //ignore
+        }
     }
 
     public FlashPlayerPanel(Component frame) {
@@ -179,22 +196,38 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     @Override
     public void pause() {
-        flash.Stop();
+        try {
+            flash.Stop();
+        } catch (ActiveXException ex) {
+            //ignore
+        }
     }
 
     @Override
     public void rewind() {
-        flash.Rewind();
+        try {
+            flash.Rewind();
+        } catch (ActiveXException ex) {
+            //ignore
+        }
     }
 
     @Override
     public void play() {
-        flash.Play();
+        try {
+            flash.Play();
+        } catch (ActiveXException ex) {
+            //ignore
+        }
     }
 
     @Override
     public boolean isPlaying() {
-        return flash.IsPlaying();
+        try {
+            return flash.IsPlaying();
+        } catch (ActiveXException ex) {
+            return false;
+        }
     }
 
     @Override
@@ -205,7 +238,11 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (frame >= getTotalFrames()) {
             return;
         }
-        flash.GotoFrame(frame);
+        try {
+            flash.GotoFrame(frame);
+        } catch (ActiveXException ex) {
+            //ignore
+        }
     }
 
     @Override
