@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -391,12 +391,11 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      * @return List of sub-items
      */
     @Override
-    public List<ContainerItem> getSubItems() {
-        List<ContainerItem> ret = new ArrayList<>();
+    public List<CLIPACTIONRECORD> getSubItems() {
         if (placeFlagHasClipActions) {
-            ret.addAll(clipActions.clipActionRecords);
+            return clipActions.clipActionRecords;
         }
-        return ret;
+        return new ArrayList<>();
     }
 
     /**

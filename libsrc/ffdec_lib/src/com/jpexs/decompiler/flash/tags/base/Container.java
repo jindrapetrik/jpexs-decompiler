@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -30,7 +31,7 @@ public interface Container extends TreeItem {
      *
      * @return List of sub-items
      */
-    public List<ContainerItem> getSubItems();
+    public List<? extends ContainerItem> getSubItems();
 
     /**
      * Returns number of sub-items

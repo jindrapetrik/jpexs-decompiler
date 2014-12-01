@@ -15,7 +15,6 @@
  * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;

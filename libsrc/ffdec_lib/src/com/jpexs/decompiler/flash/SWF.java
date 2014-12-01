@@ -360,7 +360,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private void parseCharacters(List<ContainerItem> list) {
+    private void parseCharacters(List<? extends ContainerItem> list) {
         for (ContainerItem t : list) {
             if (t instanceof CharacterTag) {
                 characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
@@ -683,16 +683,14 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void findABCTags() {
-        List<ContainerItem> objs = new ArrayList<>(tags.size());
-        objs.addAll(tags);
 
         ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
-        getABCTags(objs, newAbcList);
+        getABCTags(tags, newAbcList);
         isAS3 = (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !newAbcList.isEmpty());
         abcList = newAbcList;
     }
 
-    private static void getABCTags(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {
+    private static void getABCTags(List<? extends ContainerItem> list, List<ABCContainerTag> actionScripts) {
         for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getABCTags(((Container) t).getSubItems(), actionScripts);
@@ -1782,7 +1780,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
     private HashMap<ASMSource, ActionList> actionsMap = new HashMap<>();
 
-    private void getVariables(List<ContainerItem> objs, String path) throws InterruptedException {
+    private void getVariables(List<? extends ContainerItem> objs, String path) throws InterruptedException {
         List<String> processed = new ArrayList<>();
         for (ContainerItem o : objs) {
             if (o instanceof ASMSource) {
@@ -1864,10 +1862,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         allVariableNames = new ArrayList<>();
         allStrings = new HashMap<>();
 
-        List<ContainerItem> objs = new ArrayList<>();
         int ret = 0;
-        objs.addAll(tags);
-        getVariables(objs, "");
+        getVariables(tags, "");
         informListeners("rename", "");
         int fc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {

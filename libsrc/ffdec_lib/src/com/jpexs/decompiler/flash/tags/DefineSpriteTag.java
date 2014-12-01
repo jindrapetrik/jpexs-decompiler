@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -257,10 +256,8 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * @return List of sub-items
      */
     @Override
-    public List<ContainerItem> getSubItems() {
-        List<ContainerItem> ret = new ArrayList<>();
-        ret.addAll(subTags);
-        return ret;
+    public List<Tag> getSubItems() {
+        return subTags;
     }
 
     /**

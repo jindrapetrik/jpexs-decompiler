@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -168,10 +167,8 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      * @return List of sub-items
      */
     @Override
-    public List<ContainerItem> getSubItems() {
-        List<ContainerItem> ret = new ArrayList<>();
-        ret.addAll(actions);
-        return ret;
+    public List<BUTTONCONDACTION> getSubItems() {
+        return actions;
     }
 
     /**

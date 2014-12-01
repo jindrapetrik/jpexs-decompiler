@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -189,8 +188,9 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
                 head.setVirtualCharacterId(containerId);
                 continue;
             }
-            if (t instanceof Container) {
-                populateSoundStreamBlocks(((CharacterIdTag) t).getCharacterId(), ((Container) t).getSubItems(), head, output);
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
+                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubItems(), head, output);
             }
             if (!found) {
                 continue;

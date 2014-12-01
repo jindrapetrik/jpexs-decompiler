@@ -167,9 +167,10 @@ public class TagTreeModel implements TreeModel {
             frames.add(timeline.getFrames().get(i));
         }
 
-        for (int i = 0; i < sounds.size(); i++) {
-            if (sounds.get(i) instanceof SoundStreamHeadTypeTag) {
-                List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sounds.get(i)).getBlocks();
+        for (int i = sounds.size() - 1; i >=0 ; i--) {
+            TreeItem sound = sounds.get(i);
+            if (sound instanceof SoundStreamHeadTypeTag) {
+                List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sound).getBlocks();
                 if (blocks.isEmpty()) {
                     sounds.remove(i);
                     i--;
