@@ -96,6 +96,8 @@ import java.util.logging.Logger;
  */
 public class Action implements GraphSourceItem {
 
+    private static final int INFORM_LISTENER_RESOLUTION = 100;
+    
     private boolean ignored = false;
     /**
      * Action type identifier
@@ -413,17 +415,16 @@ public class Action implements GraphSourceItem {
         HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;
-        int pos = -1;
+        int pos = 0;
         boolean lastPush = false;
         for (GraphSourceItem s : list) {
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progressToString(pos + 2, list.size());
+            if (pos % INFORM_LISTENER_RESOLUTION == 0) {
+                for (DisassemblyListener listener : listeners) {
+                    listener.progressToString(pos + 1, list.size());
+                }
             }
-            Action a = null;
-            if (s instanceof Action) {
-                a = (Action) s;
-            }
-            pos++;
+
+            Action a = (Action) s;
             if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {
                     writer.newLine();
@@ -482,13 +483,8 @@ public class Action implements GraphSourceItem {
                     writer.newLine();
                     lastPush = false;
                 }
-                int len = 0;
-                if (pos + 1 < list.size()) {
-                    len = (int) (((Action) (list.get(pos + 1))).getAddress() - a.getAddress());
-                } else {
-                    len = a.getTotalActionLength();
-                }
                 if (!(a instanceof ActionEnd)) {
+                    int len = a.getTotalActionLength();
                     for (int i = 0; i < len; i++) {
                         writer.appendNoHilight("Nop").newLine();
                     }
@@ -552,7 +548,9 @@ public class Action implements GraphSourceItem {
                 }
                 //}
             }
+
             offset += a.getTotalActionLength();
+            pos++;
         }
         if (lastPush) {
             writer.newLine();
