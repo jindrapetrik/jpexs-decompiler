@@ -1091,7 +1091,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (abcPanel != null) {
             abcPanel.reload();
         }
-        reload(true);
+
         updateClassesList();
     }
 
