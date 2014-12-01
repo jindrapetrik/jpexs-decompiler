@@ -453,14 +453,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {
             if (!classInitializerIsEmpty) {
-                writer.newLine();
                 writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size() + 1);
                 writer.startMethod(abc.class_info.get(class_info).cinit_index);
-                writer.appendNoHilight("{").newLine();
+                writer.startBlock();
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false) + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
-                writer.appendNoHilight("}").newLine();
+                writer.endBlock();
                 writer.endMethod();
                 writer.endTrait();
+                writer.newLine();
             }
         } else {
             //"/*classInitializer*/";
