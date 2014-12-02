@@ -147,22 +147,27 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 
-                    if (!result.stack.isEmpty()) {
-                        ActionPush push = new ActionPush(0);
-                        push.values.clear();
-                        for (GraphTargetItem graphTargetItem : result.stack) {
-                            DirectValueActionItem dv = (DirectValueActionItem) graphTargetItem;
-                            push.values.add(dv.value);
+                    if (result.stack.isEmpty() && prevAction instanceof ActionJump) {
+                        ActionJump jump = (ActionJump) prevAction;
+                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
+                    } else {
+                        if (!result.stack.isEmpty()) {
+                            ActionPush push = new ActionPush(0);
+                            push.values.clear();
+                            for (GraphTargetItem graphTargetItem : result.stack) {
+                                DirectValueActionItem dv = (DirectValueActionItem) graphTargetItem;
+                                push.values.add(dv.value);
+                            }
+                            push.setAddress(prevAction.getAddress());
+                            actions.addAction(i++, push);
+                            prevAction = push;
                         }
-                        push.setAddress(prevAction.getAddress());
-                        actions.addAction(i++, push);
-                        prevAction = push;
-                    }
 
-                    ActionJump jump = new ActionJump(0);
-                    jump.setAddress(prevAction.getAddress());
-                    jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
-                    actions.addAction(i++, jump);
+                        ActionJump jump = new ActionJump(0);
+                        jump.setAddress(prevAction.getAddress());
+                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
+                        actions.addAction(i++, jump);
+                    }
 
                     Action nextAction = actions.size() > i ? actions.get(i) : null;
 
@@ -277,12 +282,11 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     break;
                 }
 
-                Action action = actions.get(idx);
-                instructionsProcessed++;
-
                 if (instructionsProcessed > executionLimit) {
                     break;
                 }
+
+                Action action = actions.get(idx);
 
                 /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
                  for (int j = 0; j < stack.size(); j++) {
@@ -347,6 +351,8 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                         }
                     }
                 }
+
+                instructionsProcessed++;
 
                 if (stack.allItemsFixed()) {
                     result.idx = idx == actions.size() ? idx - 1 : idx;

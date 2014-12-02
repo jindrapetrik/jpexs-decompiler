@@ -18,8 +18,16 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JEditorPane;
+import static javax.swing.JEditorPane.createEditorKitForContentType;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
 import jsyntaxpane.SyntaxDocument;
 
 /**
@@ -30,24 +38,29 @@ public class UndoFixedEditorPane extends JEditorPane {
 
     @Override
     public void setText(String t) {
-        if (getText() != t) {
-            super.setText(t);
-            clearUndos();
-        }
+        setText(t, getContentType());
     }
 
     public void setText(String t, String contentType) {
-        if (getText() != t) {
-            // OK to check reference equals, because the string object should be the same
-            super.setText(null);
-            if (t.length() > Configuration.syntaxHighlightLimit.get()) {
-                setContentType("text/plain");
-            } else {
-                if (!getContentType().equals(contentType)) {
-                    setContentType(contentType);
-                }
+        if (!t.equals(getText())) {
+            boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
+            if (plain) {
+                contentType = "text/plain";
             }
-            super.setText(t);
+            
+            try {
+                setContentType(contentType);
+                Document doc = getDocument();
+                setDocument(new SyntaxDocument(null));
+                doc.remove(0, doc.getLength());
+                Reader r = new StringReader(t);
+                EditorKit kit = createEditorKitForContentType(contentType);
+                kit.read(r, doc, 0);
+                setDocument(doc);
+            } catch (BadLocationException | IOException ex) {
+                Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             clearUndos();
         }
     }
