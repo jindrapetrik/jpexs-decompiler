@@ -288,7 +288,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             }
             if (rec.styleFlagsHasFont) {
                 font = (FontTag) swf.characters.get(rec.fontId);
-                glyphs = font.getGlyphShapeTable();
+                glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
             if (rec.styleFlagsHasXOffset) {
@@ -306,7 +306,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 Matrix matTr = Matrix.getTranslateInstance(x, y);
                 mat = mat.concatenate(matTr);
                 mat = mat.concatenate(Matrix.getScaleInstance(rat));
-                if (entry.glyphIndex != -1) {
+                if (entry.glyphIndex != -1 && glyphs != null) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     BitmapExporter.export(swf, shape, textColor, image, mat, colorTransform);

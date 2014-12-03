@@ -144,22 +144,25 @@ public class DefineFont3Tag extends FontTag {
             fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
         }
         numGlyphs = sis.readUI16("numGlyphs");
+        long[] offsetTable = new long[numGlyphs];
+        long pos = sis.getPos();
         for (int i = 0; i < numGlyphs; i++) { //offsetTable
             if (fontFlagsWideOffsets) {
-                sis.readUI32("offset");
+                offsetTable[i] = sis.readUI32("offset");
             } else {
-                sis.readUI16("offset");
+                offsetTable[i] = sis.readUI16("offset");
             }
         }
         if (numGlyphs > 0) {
             if (fontFlagsWideOffsets) {
-                sis.readUI32("offset"); //codeTableOffset
+                sis.readUI32("codeTableOffset"); //codeTableOffset
             } else {
-                sis.readUI16("offset"); //codeTableOffset
+                sis.readUI16("codeTableOffset"); //codeTableOffset
             }
         }
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
+            sis.seek(pos + offsetTable[i]);
             glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
         }
         codeTable = new ArrayList<>();

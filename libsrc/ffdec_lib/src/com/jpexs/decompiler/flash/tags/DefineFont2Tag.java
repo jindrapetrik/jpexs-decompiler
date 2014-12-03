@@ -231,24 +231,26 @@ public class DefineFont2Tag extends FontTag {
             fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
         }
         numGlyphs = sis.readUI16("numGlyphs");
-        //offsetTable = new long[numGlyphs];
+        long[] offsetTable = new long[numGlyphs];
+        long pos = sis.getPos();
         for (int i = 0; i < numGlyphs; i++) { //offsetTable
             if (fontFlagsWideOffsets) {
-                sis.readUI32("offset");
+                offsetTable[i] = sis.readUI32("offset");
             } else {
-                sis.readUI16("offset");
+                offsetTable[i] = sis.readUI16("offset");
             }
         }
         if (numGlyphs > 0) { //codeTableOffset
             if (fontFlagsWideOffsets) {
-                sis.readUI32("offset");
+                sis.readUI32("codeTableOffset");
             } else {
-                sis.readUI16("offset");
+                sis.readUI16("codeTableOffset");
             }
         }
 
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
+            sis.seek(pos + offsetTable[i]);
             glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
         }
 
@@ -260,6 +262,7 @@ public class DefineFont2Tag extends FontTag {
                 codeTable.add(sis.readUI8("code"));
             }
         }
+
         if (fontFlagsHasLayout) {
             fontAscent = sis.readSI16("fontAscent");
             fontDescent = sis.readSI16("fontDescent");

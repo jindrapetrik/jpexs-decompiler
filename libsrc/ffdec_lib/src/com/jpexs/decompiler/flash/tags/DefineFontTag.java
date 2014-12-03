@@ -160,13 +160,17 @@ public class DefineFontTag extends FontTag {
         glyphShapeTable = new ArrayList<>();
 
         if (sis.available() > 0) {
+            long pos = sis.getPos();
             int firstOffset = sis.readUI16("firstOffset");
             int nGlyphs = firstOffset / 2;
 
+            long[] offsetTable = new long[nGlyphs];
+            offsetTable[0] = firstOffset;
             for (int i = 1; i < nGlyphs; i++) {
-                sis.readUI16("offset"); //offset
+                offsetTable[i] = sis.readUI16("offset");
             }
             for (int i = 0; i < nGlyphs; i++) {
+                sis.seek(pos + offsetTable[i]);
                 glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
             }
         }
