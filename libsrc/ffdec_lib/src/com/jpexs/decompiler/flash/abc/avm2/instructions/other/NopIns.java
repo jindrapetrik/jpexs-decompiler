@@ -15,11 +15,18 @@
  * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import java.util.List;
 
 public class NopIns extends InstructionDefinition {
 
     public NopIns() {
         super(0x02, "nop", new int[]{});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
     }
 }
