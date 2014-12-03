@@ -16,11 +16,18 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.debug;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import java.util.List;
 
 public class DebugLineIns extends InstructionDefinition {
 
     public DebugLineIns() {
         super(0xf0, "debugline", new int[]{AVM2Code.DAT_LINENUM});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
     }
 }
