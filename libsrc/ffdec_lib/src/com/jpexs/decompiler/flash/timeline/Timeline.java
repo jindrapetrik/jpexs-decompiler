@@ -143,7 +143,7 @@ public class Timeline {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
-        this.frameRate = swf.frameRate < 1 ? 1 : swf.frameRate;
+        this.frameRate = swf.frameRate;
         this.timelined = parentTag == null ? swf : (Timelined) parentTag;
         this.parentTag = parentTag;
         this.tags = tags;

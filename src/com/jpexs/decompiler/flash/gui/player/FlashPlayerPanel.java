@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2014 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -74,11 +74,17 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     @Override
     public synchronized void zoom(double zoom) {
         int zoomint = (int) Math.round(100 / (zoom / this.zoom));
-        if (zoom == 1.0) {
+        if (zoomint == 0) {
+            zoomint = 1;
+        }
+        if (zoomint > 32767) {
+            zoomint = 32767;
+        }
+        if (zoomint == 100) {
             zoomint = 0;
         }
+        flash.Zoom(0); // hack, but this call is needed otherwise unzoom will fail for larger zoom values
         flash.Zoom(zoomint);
-
     }
 
     public synchronized String getVariable(String name) throws IOException {

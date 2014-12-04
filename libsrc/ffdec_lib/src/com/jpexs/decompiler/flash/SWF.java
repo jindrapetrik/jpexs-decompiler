@@ -1435,13 +1435,18 @@ public final class SWF implements SWFContainerItem, Timelined {
                         fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0,time);\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-                        fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / ftim.swf.frameRate) + ");\r\n"));
+                        if (ftim.swf.frameRate > 0) {
+                            fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / ftim.swf.frameRate) + ");\r\n"));
+                        }
+                        fos.write(Utf8Helper.getBytes("nextFrame(ctx,ctrans);\r\n"));
                     }
 
+                    boolean packed = false;
                     if (Configuration.packJavaScripts.get()) {
                         try {
                             JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
                             f.delete();
+                            packed = true;
                         } catch (Exception | Error e) { //Something wrong in the packer
                             logger.log(Level.WARNING, "JPacker: Cannot minimize script");
                             f.renameTo(fmin);
@@ -1459,7 +1464,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                         while ((cnt = fis.read(buf)) > 0) {
                             fos.write(buf, 0, cnt);
                         }
-                        if (Configuration.packJavaScripts.get()) {
+                        if (packed) {
                             fos.write(Utf8Helper.getBytes(";"));
                         }
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));

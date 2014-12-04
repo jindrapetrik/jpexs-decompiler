@@ -781,7 +781,7 @@ public class ActionListReader {
         }
 
         Action a;
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = null;
         loopip:
         while (((endip == -1) || (endip > ip)) && (a = actions.get(ip)) != null) {
             if (Thread.currentThread().isInterrupted()) {
@@ -854,6 +854,9 @@ public class ActionListReader {
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
+                            if (sc == null) {
+                                sc = new Scanner(System.in);
+                            }
                             String next = sc.next();
                             switch (next) {
                                 case "j":
