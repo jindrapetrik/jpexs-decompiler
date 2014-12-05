@@ -977,7 +977,6 @@ public final class SWF implements SWFContainerItem, Timelined {
             };
             int currentIndex = index.getAndIncrement();
             synchronized (ABC.class) {
-                long time = stopTime - startTime;
                 informListeners("exporting", "Exporting script " + currentIndex + "/" + count + " " + path);
             }
             new RetryTask(rio, handler).run();

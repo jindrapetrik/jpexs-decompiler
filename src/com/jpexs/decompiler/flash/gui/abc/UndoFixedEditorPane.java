@@ -36,32 +36,36 @@ import jsyntaxpane.SyntaxDocument;
  */
 public class UndoFixedEditorPane extends JEditorPane {
 
+    private static final Object setTextLock = new Object();
+    
     @Override
     public void setText(String t) {
         setText(t, getContentType());
     }
 
-    public synchronized void setText(String t, String contentType) {
-        if (!t.equals(getText())) {
-            boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
-            if (plain) {
-                contentType = "text/plain";
+    public void setText(String t, String contentType) {
+        synchronized (setTextLock) {
+            if (!t.equals(getText())) {
+                boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
+                if (plain) {
+                    contentType = "text/plain";
+                }
+
+                try {
+                    setContentType(contentType);
+                    Document doc = getDocument();
+                    setDocument(new SyntaxDocument(null));
+                    doc.remove(0, doc.getLength());
+                    Reader r = new StringReader(t);
+                    EditorKit kit = createEditorKitForContentType(contentType);
+                    kit.read(r, doc, 0);
+                    setDocument(doc);
+                } catch (BadLocationException | IOException ex) {
+                    Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                clearUndos();
             }
-            
-            try {
-                setContentType(contentType);
-                Document doc = getDocument();
-                setDocument(new SyntaxDocument(null));
-                doc.remove(0, doc.getLength());
-                Reader r = new StringReader(t);
-                EditorKit kit = createEditorKitForContentType(contentType);
-                kit.read(r, doc, 0);
-                setDocument(doc);
-            } catch (BadLocationException | IOException ex) {
-                Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            clearUndos();
         }
     }
 
