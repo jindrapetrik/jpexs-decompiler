@@ -41,8 +41,15 @@ public class DivideIns extends InstructionDefinition {
         Object o2 = lda.operandStack.pop();
         Object o1 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-            Long ret = ((Long) o1) / ((Long) o2);
-            lda.operandStack.push(ret);
+            Long l1 = (Long) o1;
+            Long l2 = (Long) o2;
+            if (l1 % l2 == 0) {
+                Long ret = l1 / l2;
+                lda.operandStack.push(ret);
+            } else {
+                Double ret = l1.doubleValue() / l2.doubleValue();
+                lda.operandStack.push(ret);
+            }
         } else if ((o1 instanceof Double) && ((o2 instanceof Double))) {
             Double ret = ((Double) o1) / ((Double) o2);
             lda.operandStack.push(ret);
