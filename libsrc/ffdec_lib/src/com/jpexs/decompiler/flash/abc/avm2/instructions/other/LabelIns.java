@@ -12,15 +12,23 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import java.util.List;
 
 public class LabelIns extends InstructionDefinition {
 //this can be target of branch
 
     public LabelIns() {
         super(0x09, "label", new int[]{});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
     }
 }
