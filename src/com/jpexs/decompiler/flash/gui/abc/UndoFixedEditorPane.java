@@ -52,7 +52,9 @@ public class UndoFixedEditorPane extends JEditorPane {
                 }
 
                 try {
-                    setContentType(contentType);
+                    if (!getContentType().equals(contentType)) {
+                        setContentType(contentType);
+                    }
                     Document doc = getDocument();
                     setDocument(new SyntaxDocument(null));
                     doc.remove(0, doc.getLength());

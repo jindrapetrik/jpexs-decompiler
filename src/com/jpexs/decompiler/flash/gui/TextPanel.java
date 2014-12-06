@@ -88,7 +88,7 @@ public class TextPanel extends JPanel implements ActionListener {
     }
 
     public void setText(String text) {
-        textValue.setContentType("text/swf_text");
+        textValue.setContentType("text/swftext");
         // textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
         textValue.setText(text);
         textValue.setCaretPosition(0);
