@@ -239,11 +239,10 @@
                 <globmapper from="*" to="/*"/>
             </chainedmapper>
         </pathconvert>
-        
         <script language="javascript"><![CDATA[
         var classpath = project.getProperty("lexers");
-        var parts = classpath.split("|");
-        for each (var part in parts) {        
+        var parts = classpath.split('\\|');
+        for each (var part in parts) {
             project.setProperty("lexer",project.getProperty("LEXERSDIR")+part);
             self.project.executeTarget("-lexer");
         }
