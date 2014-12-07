@@ -221,7 +221,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         }
         this.subTags = subTags;
     }
-    static int c = 0;
 
     /**
      * Gets data bytes

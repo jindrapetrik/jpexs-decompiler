@@ -135,16 +135,16 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
-    static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
-    static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
-    static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
+    private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+    private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+    private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
-    static final String ACTION_ADD_TRAIT = "ADDTRAIT";
+    private static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
     public MainPanel getMainPanel() {
         return mainPanel;

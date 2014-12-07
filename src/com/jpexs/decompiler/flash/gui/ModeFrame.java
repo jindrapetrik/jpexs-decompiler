@@ -33,9 +33,9 @@ import javax.swing.JLabel;
  */
 public class ModeFrame extends AppFrame implements ActionListener {
 
-    static final String ACTION_OPEN = "OPEN";
-    static final String ACTION_PROXY = "PROXY";
-    static final String ACTION_EXIT = "EXIT";
+    private static final String ACTION_OPEN = "OPEN";
+    private static final String ACTION_PROXY = "PROXY";
+    private static final String ACTION_EXIT = "EXIT";
 
     private final JButton openButton = new JButton(translate("button.open"));
     private final JButton proxyButton = new JButton(translate("button.proxy"));

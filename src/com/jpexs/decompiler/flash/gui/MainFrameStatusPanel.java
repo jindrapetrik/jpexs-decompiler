@@ -38,7 +38,7 @@ import javax.swing.border.BevelBorder;
  */
 public class MainFrameStatusPanel extends JPanel implements ActionListener {
 
-    static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
+    private static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
 
     private final MainPanel mainPanel;
 

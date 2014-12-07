@@ -46,10 +46,10 @@ import javax.swing.UIManager;
  */
 public class NewVersionDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
-    Version latestVersion;
+    private Version latestVersion;
 
     public NewVersionDialog(List<Version> versions) {
         setSize(new Dimension(500, 300));

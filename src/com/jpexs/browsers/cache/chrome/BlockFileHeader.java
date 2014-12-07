@@ -25,20 +25,20 @@ import java.io.InputStream;
  */
 public class BlockFileHeader {
 
-    static final int kBlockHeaderSize = 8192;  // Two pages: almost 64k entries
-    static final int kMaxBlocks = (kBlockHeaderSize - 80) * 8;
-    long magic;   // c3 ca 04 c1 
-    long version; // 00 00 02 00
-    int this_file;
-    int next_file;
-    int entry_size;
-    int num_entries;
-    int max_entries;
-    int empty[] = new int[4];
-    int hints[] = new int[4];
-    int updating;
-    int user[] = new int[5];
-    long allocation_map[] = new long[kMaxBlocks / 32];
+    protected static final int kBlockHeaderSize = 8192;  // Two pages: almost 64k entries
+    private static final int kMaxBlocks = (kBlockHeaderSize - 80) * 8;
+    private long magic;   // c3 ca 04 c1 
+    private long version; // 00 00 02 00
+    private int this_file;
+    private int next_file;
+    private int entry_size;
+    private int num_entries;
+    private int max_entries;
+    private int empty[] = new int[4];
+    private int hints[] = new int[4];
+    private int updating;
+    private int user[] = new int[5];
+    private long allocation_map[] = new long[kMaxBlocks / 32];
 
     public BlockFileHeader(InputStream is) throws IOException {
         IndexInputStream iis = new IndexInputStream(is);

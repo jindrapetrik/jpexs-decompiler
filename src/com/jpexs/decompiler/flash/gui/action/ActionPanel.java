@@ -90,15 +90,15 @@ import jsyntaxpane.actions.ActionUtils;
 
 public class ActionPanel extends JPanel implements ActionListener, SearchListener<ActionSearchResult> {
 
-    static final String ACTION_GRAPH = "GRAPH";
-    static final String ACTION_HEX = "HEX";
-    static final String ACTION_HEX_ONLY = "HEXONLY";
-    static final String ACTION_SAVE_ACTION = "SAVEACTION";
-    static final String ACTION_EDIT_ACTION = "EDITACTION";
-    static final String ACTION_CANCEL_ACTION = "CANCELACTION";
-    static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
-    static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
-    static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
+    private static final String ACTION_GRAPH = "GRAPH";
+    private static final String ACTION_HEX = "HEX";
+    private static final String ACTION_HEX_ONLY = "HEXONLY";
+    private static final String ACTION_SAVE_ACTION = "SAVEACTION";
+    private static final String ACTION_EDIT_ACTION = "EDITACTION";
+    private static final String ACTION_CANCEL_ACTION = "CANCELACTION";
+    private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+    private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+    private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
     private MainPanel mainPanel;
     public LineMarkedEditorPane editor;

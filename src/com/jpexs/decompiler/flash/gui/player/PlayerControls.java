@@ -66,17 +66,17 @@ import javax.swing.event.AncestorListener;
  */
 public class PlayerControls extends JPanel implements ActionListener {
 
-    static final String ACTION_PAUSE = "PAUSE";
-    static final String ACTION_STOP = "STOP";
-    static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-    static final String ACTION_ZOOMIN = "ZOOMIN";
-    static final String ACTION_ZOOMOUT = "ZOOMOUT";
-    static final String ACTION_ZOOMFIT = "ZOOMFIT";
-    static final String ACTION_ZOOMNONE = "ZOOMNONE";
-    static final String ACTION_SNAPSHOT = "SNAPSHOT";
-    static final String ACTION_NEXTFRAME = "NEXTFRAME";
-    static final String ACTION_PREVFRAME = "PREVFRAME";
-    static final String ACTION_GOTOFRAME = "SELECTFRAME";
+    private static final String ACTION_PAUSE = "PAUSE";
+    private static final String ACTION_STOP = "STOP";
+    private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+    private static final String ACTION_ZOOMIN = "ZOOMIN";
+    private static final String ACTION_ZOOMOUT = "ZOOMOUT";
+    private static final String ACTION_ZOOMFIT = "ZOOMFIT";
+    private static final String ACTION_ZOOMNONE = "ZOOMNONE";
+    private static final String ACTION_SNAPSHOT = "SNAPSHOT";
+    private static final String ACTION_NEXTFRAME = "NEXTFRAME";
+    private static final String ACTION_PREVFRAME = "PREVFRAME";
+    private static final String ACTION_GOTOFRAME = "SELECTFRAME";
 
     private final JButton pauseButton;
     private boolean paused = false;

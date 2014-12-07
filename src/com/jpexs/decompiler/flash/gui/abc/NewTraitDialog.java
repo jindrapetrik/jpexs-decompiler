@@ -43,8 +43,8 @@ import javax.swing.event.AncestorListener;
  */
 public class NewTraitDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     private static final int modifiers[] = new int[]{
         Namespace.KIND_PACKAGE,

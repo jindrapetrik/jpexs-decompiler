@@ -77,10 +77,10 @@ import javax.swing.table.TableRowSorter;
  */
 public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
-    static final String ACTION_SELECT_PROCESS = "SELECTPROCESS";
-    static final String ACTION_REFRESH_PROCESS_LIST = "REFRESHPROCESSLIST";
-    static final String ACTION_OPEN_SWF = "OPENSWF";
-    static final String ACTION_SAVE = "SAVE";
+    private static final String ACTION_SELECT_PROCESS = "SELECTPROCESS";
+    private static final String ACTION_REFRESH_PROCESS_LIST = "REFRESHPROCESSLIST";
+    private static final String ACTION_OPEN_SWF = "OPENSWF";
+    private static final String ACTION_SAVE = "SAVE";
 
     private MainFrame mainFrame;
     private List<com.jpexs.process.Process> processlist;

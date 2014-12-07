@@ -57,18 +57,18 @@ import javax.swing.filechooser.FileFilter;
  */
 public class LoadFromCacheFrame extends AppFrame implements ActionListener {
 
-    static final String ACTION_OPEN = "OPEN";
-    static final String ACTION_SAVE = "SAVE";
-    static final String ACTION_REFRESH = "REFRESH";
+    private static final String ACTION_OPEN = "OPEN";
+    private static final String ACTION_SAVE = "SAVE";
+    private static final String ACTION_REFRESH = "REFRESH";
 
     private final JList<CacheEntry> list;
     private final JTextField searchField;
     private List<CacheImplementation> caches;
     private List<CacheEntry> entries;
     private final JProgressBar progressBar;
-    JButton saveButton;
-    JButton refreshButton;
-    JButton openButton;
+    private JButton saveButton;
+    private JButton refreshButton;
+    private JButton openButton;
 
     public LoadFromCacheFrame() {
         setSize(900, 600);

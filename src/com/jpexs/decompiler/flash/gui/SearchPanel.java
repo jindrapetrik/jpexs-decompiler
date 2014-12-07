@@ -36,9 +36,9 @@ import jsyntaxpane.actions.DocumentSearchData;
  */
 public class SearchPanel<E> extends JPanel implements ActionListener {
 
-    static final String ACTION_SEARCH_PREV = "SEARCHPREV";
-    static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
-    static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
+    private static final String ACTION_SEARCH_PREV = "SEARCHPREV";
+    private static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
+    private static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
 
     private final SearchListener<E> listener;
 

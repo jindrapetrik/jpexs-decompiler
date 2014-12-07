@@ -38,8 +38,8 @@ import javax.swing.JSlider;
  */
 public class DeobfuscationDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     public JCheckBox processAllCheckbox = new JCheckBox(translate("processallclasses"));
     public JSlider codeProcessingLevel;

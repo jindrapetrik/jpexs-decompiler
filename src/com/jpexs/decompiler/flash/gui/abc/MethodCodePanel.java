@@ -40,9 +40,9 @@ import javax.swing.JToggleButton;
  */
 public class MethodCodePanel extends JPanel implements ActionListener {
 
-    static final String ACTION_GRAPH = "GRAPH";
-    static final String ACTION_HEX = "HEX";
-    static final String ACTION_HEX_ONLY = "HEXONLY";
+    private static final String ACTION_GRAPH = "GRAPH";
+    private static final String ACTION_HEX = "HEX";
+    private static final String ACTION_HEX_ONLY = "HEXONLY";
 
     private final ASMSourceEditorPane sourceTextArea;
     public JPanel buttonsPanel;

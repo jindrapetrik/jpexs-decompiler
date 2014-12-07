@@ -36,8 +36,8 @@ import javax.swing.JRadioButton;
  */
 public class RenameDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     private final JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
     private final JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));

@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8InputStreamReader;
+import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;
 import com.jpexs.proxy.Replacement;
@@ -46,12 +48,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,14 +89,16 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ProxyFrame extends AppFrame implements ActionListener, CatchedListener, MouseListener, ReplacedListener {
 
-    static final String ACTION_SWITCH_STATE = "SWITCHSTATE";
-    static final String ACTION_OPEN = "OPEN";
-    static final String ACTION_CLEAR = "CLEAR";
-    static final String ACTION_RENAME = "RENAME";
-    static final String ACTION_REMOVE = "REMOVE";
-    static final String ACTION_COPYURL = "COPYURL";
-    static final String ACTION_SAVEAS = "SAVEAS";
-    static final String ACTION_REPLACE = "REPLACE";
+    private static final String REPLACEMENTS_NAME = "replacements.cfg";
+
+    private static final String ACTION_SWITCH_STATE = "SWITCHSTATE";
+    private static final String ACTION_OPEN = "OPEN";
+    private static final String ACTION_CLEAR = "CLEAR";
+    private static final String ACTION_RENAME = "RENAME";
+    private static final String ACTION_REMOVE = "REMOVE";
+    private static final String ACTION_COPYURL = "COPYURL";
+    private static final String ACTION_SAVEAS = "SAVEAS";
+    private static final String ACTION_REPLACE = "REPLACE";
 
     private JTable replacementsTable;
     private JButton switchButton = new JButton(translate("proxy.start"));
@@ -142,7 +150,58 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     DefaultTableModel tableModel;
     private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
-    List<Replacement> reps;
+    /**
+     * List of replacements
+     */
+    private static List<Replacement> replacements = new ArrayList<>();
+
+    /**
+     * Saves replacements to file for future use
+     */
+    private static void saveReplacements() {
+        String replacementsFile = getReplacementsFile();
+        if (replacements.isEmpty()) {
+            File rf = new File(replacementsFile);
+            if (rf.exists()) {
+                if (!rf.delete()) {
+                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot delete replacements file");
+                }
+            }
+        } else {
+            try (PrintWriter pw = new PrintWriter(new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(replacementsFile))))) {
+                for (Replacement r : replacements) {
+                    pw.println(r.urlPattern);
+                    pw.println(r.targetFile);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during saving replacements", ex);
+            }
+        }
+    }
+
+    /**
+     * Load replacements from file
+     */
+    private static void loadReplacements() {
+        String replacementsFile = getReplacementsFile();
+        if (!(new File(replacementsFile)).exists()) {
+            return;
+        }
+        replacements = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new Utf8InputStreamReader(new FileInputStream(replacementsFile)))) {
+            String s;
+            while ((s = br.readLine()) != null) {
+                Replacement r = new Replacement(s, br.readLine());
+                replacements.add(r);
+            }
+        } catch (IOException e) {
+            //ignore
+        }
+    }
+
+    private static String getReplacementsFile() {
+        return Configuration.getFFDecHome() + REPLACEMENTS_NAME;
+    }
 
     /**
      * Constructor
@@ -156,12 +215,12 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             translate("column.size"),
             translate("column.url")};
 
-        reps = Configuration.getReplacements();
+        loadReplacements();
 
-        Object data[][] = new Object[reps.size()][3];
+        Object data[][] = new Object[replacements.size()][3];
 
-        for (int i = 0; i < reps.size(); i++) {
-            Replacement r = reps.get(i);
+        for (int i = 0; i < replacements.size(); i++) {
+            Replacement r = replacements.get(i);
             data[i][0] = r.lastAccess == null ? "" : format.format(r.lastAccess.getTime());
             data[i][1] = new SizeItem(r.targetFile);
             data[i][2] = r.urlPattern;
@@ -301,7 +360,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
     private void open() {
         if (replacementsTable.getSelectedRow() > -1) {
-            Replacement r = reps.get(replacementsTable.getRowSorter().convertRowIndexToModel(replacementsTable.getSelectedRow()));
+            Replacement r = replacements.get(replacementsTable.getRowSorter().convertRowIndexToModel(replacementsTable.getSelectedRow()));
             Main.openFile(r.targetFile, r.urlPattern);
         }
     }
@@ -337,7 +396,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 break;
             case ACTION_SAVEAS:
                 if (sel.length == 1) {
-                    Replacement r = reps.get(sel[0]);
+                    Replacement r = replacements.get(sel[0]);
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
                     String n = r.urlPattern;
@@ -369,7 +428,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
-                            Files.copy(new File(r.targetFile).toPath(), file.toPath(), REPLACE_EXISTING);
+                            Files.copy(new File(r.targetFile).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException ex) {
                             View.showMessageDialog(this, translate("error.save.as") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                         }
@@ -378,7 +437,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     GuiAbortRetryIgnoreHandler handler = new GuiAbortRetryIgnoreHandler();
                     File exportDir = new File(selectExportDir());
                     for (int s : sel) {
-                        final Replacement r = reps.get(s);
+                        final Replacement r = replacements.get(s);
                         String n = r.urlPattern;
                         if (n.contains("?")) {
                             n = n.substring(0, n.indexOf('?'));
@@ -404,7 +463,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                             new RetryTask(new RunnableIOEx() {
                                 @Override
                                 public void run() throws IOException {
-                                    Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), REPLACE_EXISTING);
+                                    Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                                 }
                             }, handler).run();
                         } catch (IOException ex) {
@@ -415,7 +474,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 break;
             case ACTION_REPLACE:
                 if (sel.length > 0) {
-                    Replacement r = reps.get(sel[0]);
+                    Replacement r = replacements.get(sel[0]);
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                     String n = r.urlPattern;
@@ -445,7 +504,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
-                            Files.copy(file.toPath(), new File(r.targetFile).toPath(), REPLACE_EXISTING);
+                            Files.copy(file.toPath(), new File(r.targetFile).toPath(), StandardCopyOption.REPLACE_EXISTING);
                             tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
                         } catch (IOException ex) {
                             View.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -456,7 +515,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             case ACTION_COPYURL:
                 String copyText = "";
                 for (int sc : sel) {
-                    Replacement r = reps.get(sc);
+                    Replacement r = replacements.get(sc);
                     if (!copyText.isEmpty()) {
                         copyText += System.lineSeparator();
                     }
@@ -471,7 +530,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 break;
             case ACTION_RENAME:
                 if (sel.length > 0) {
-                    Replacement r = reps.get(sel[0]);
+                    Replacement r = replacements.get(sel[0]);
                     String s = View.showInputDialog("URL", r.urlPattern);
                     if (s != null) {
                         r.urlPattern = s;
@@ -480,7 +539,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 }
                 break;
             case ACTION_CLEAR:
-                for (Replacement r : reps) {
+                for (Replacement r : replacements) {
                     File f;
                     try {
                         f = (new File(Main.tempFile(r.targetFile)));
@@ -492,14 +551,16 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     }
                 }
                 tableModel.setRowCount(0);
-                reps.clear();
+                replacements.clear();
+                saveReplacements();
                 break;
             case ACTION_REMOVE:
 
                 Arrays.sort(sel);
                 for (int i = sel.length - 1; i >= 0; i--) {
                     tableModel.removeRow(sel[i]);
-                    Replacement r = reps.remove(sel[i]);
+                    Replacement r = replacements.remove(sel[i]);
+                    saveReplacements();
                     File f = (new File(r.targetFile));
                     if (f.exists()) {
                         f.delete();
@@ -537,7 +598,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
-            if (!Server.startServer(port, reps, catchedContentTypes, this, this)) {
+            if (!Server.startServer(port, replacements, catchedContentTypes, this, this)) {
                 JOptionPane.showMessageDialog(this, translate("error.start.server").replace("%port%", "" + port), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
@@ -631,7 +692,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         byte[] result = null;
 
         boolean cont = false;
-        for (Replacement r : reps) {
+        for (Replacement r : replacements) {
             if (r.matches(url)) {
                 cont = true;
                 break;
@@ -657,7 +718,8 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
                 Replacement r = new Replacement(url, tempFilePath);
                 r.lastAccess = Calendar.getInstance();
-                reps.add(r);
+                replacements.add(r);
+                saveReplacements();
                 tableModel.addRow(new Object[]{
                     r.lastAccess == null ? "" : format.format(r.lastAccess.getTime()),
                     new SizeItem(r.targetFile),
@@ -697,7 +759,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
     @Override
     public void replaced(Replacement replacement, String url, String contentType) {
-        int index = reps.indexOf(replacement);
+        int index = replacements.indexOf(replacement);
         tableModel.setValueAt(replacement.lastAccess == null ? "" : format.format(replacement.lastAccess.getTime()), index, 0);
         tableModel.setValueAt(new SizeItem(replacement.targetFile), index, 1);
         tableModel.setValueAt(replacement.urlPattern, index, 2);

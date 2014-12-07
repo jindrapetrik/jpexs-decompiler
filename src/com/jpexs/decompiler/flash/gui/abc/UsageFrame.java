@@ -46,8 +46,8 @@ import javax.swing.JScrollPane;
  */
 public class UsageFrame extends AppDialog implements ActionListener, MouseListener {
 
-    static final String ACTION_GOTO = "GOTO";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_GOTO = "GOTO";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
     private final JButton cancelButton = new JButton(translate("button.cancel"));

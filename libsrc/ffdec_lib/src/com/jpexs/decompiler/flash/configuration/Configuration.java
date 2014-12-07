@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8InputStreamReader;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
-import com.jpexs.proxy.Replacement;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -53,14 +52,8 @@ import javax.swing.JOptionPane;
 public class Configuration {
 
     private static final String CONFIG_NAME = "config.bin";
-    private static final String REPLACEMENTS_NAME = "replacements.cfg";
     private static final File unspecifiedFile = new File("unspecified");
     private static File directory = unspecifiedFile;
-
-    /**
-     * List of replacements
-     */
-    private static List<Replacement> replacements = new ArrayList<>();
 
     public static final Level logLevel;
 
@@ -515,57 +508,11 @@ public class Configuration {
         fontPairing.set(sb.toString());
     }
 
-    /**
-     * Saves replacements to file for future use
-     */
-    private static void saveReplacements(String replacementsFile) {
-        if (replacements.isEmpty()) {
-            File rf = new File(replacementsFile);
-            if (rf.exists()) {
-                if (!rf.delete()) {
-                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot delete replacements file");
-                }
-            }
-        } else {
-            try (PrintWriter pw = new PrintWriter(new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(replacementsFile))))) {
-                for (Replacement r : replacements) {
-                    pw.println(r.urlPattern);
-                    pw.println(r.targetFile);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during saving replacements", ex);
-            }
-        }
-    }
-
-    /**
-     * Load replacements from file
-     */
-    private static void loadReplacements(String replacementsFile) {
-        if (!(new File(replacementsFile)).exists()) {
-            return;
-        }
-        replacements = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new Utf8InputStreamReader(new FileInputStream(replacementsFile)))) {
-            String s;
-            while ((s = br.readLine()) != null) {
-                Replacement r = new Replacement(s, br.readLine());
-                replacements.add(r);
-            }
-        } catch (IOException e) {
-            //ignore
-        }
-    }
-
-    private static String getReplacementsFile() throws IOException {
-        return getFFDecHome() + REPLACEMENTS_NAME;
-    }
-
     private static String getConfigFile() throws IOException {
         return getFFDecHome() + CONFIG_NAME;
     }
 
-    private static HashMap<String, Object> loadFromFile(String file, String replacementsFile) {
+    private static HashMap<String, Object> loadFromFile(String file) {
         HashMap<String, Object> config = new HashMap<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
 
@@ -575,17 +522,10 @@ public class Configuration {
         } catch (ClassNotFoundException | IOException ex) {
             //ignore
         }
-        if (replacementsFile != null) {
-            loadReplacements(replacementsFile);
-        }
-        if (config.containsKey("paralelSpeedUp")) {
-            config.put("parallelSpeedUp", config.get("paralelSpeedUp"));
-            config.remove("paralelSpeedUp");
-        }
         return config;
     }
 
-    private static void saveToFile(String file, String replacementsFile) {
+    private static void saveToFile(String file) {
         HashMap<String, Object> config = new HashMap<>();
         for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
             try {
@@ -606,18 +546,11 @@ public class Configuration {
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(Configuration.class.getName()).severe("Configuration directory is read only.");
         }
-        if (replacementsFile != null) {
-            saveReplacements(replacementsFile);
-        }
-    }
-
-    public static List<Replacement> getReplacements() {
-        return replacements;
     }
 
     public static void saveConfig() {
         try {
-            saveToFile(getConfigFile(), getReplacementsFile());
+            saveToFile(getConfigFile());
         } catch (IOException ex) {
             //ignore
         }
@@ -647,7 +580,7 @@ public class Configuration {
     @SuppressWarnings("unchecked")
     public static void setConfigurationFields() {
         try {
-            HashMap<String, Object> config = loadFromFile(getConfigFile(), getReplacementsFile());
+            HashMap<String, Object> config = loadFromFile(getConfigFile());
             for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();

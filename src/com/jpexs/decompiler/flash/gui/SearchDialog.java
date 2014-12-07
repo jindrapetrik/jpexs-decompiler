@@ -44,8 +44,8 @@ import javax.swing.JTextField;
  */
 public class SearchDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     public JTextField searchField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));

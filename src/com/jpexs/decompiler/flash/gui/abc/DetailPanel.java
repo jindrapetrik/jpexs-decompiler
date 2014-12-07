@@ -43,9 +43,9 @@ import javax.swing.border.BevelBorder;
  */
 public class DetailPanel extends JPanel implements ActionListener {
 
-    static final String ACTION_SAVE_DETAIL = "SAVEDETAIL";
-    static final String ACTION_EDIT_DETAIL = "EDITDETAIL";
-    static final String ACTION_CANCEL_DETAIL = "CANCELDETAIL";
+    private static final String ACTION_SAVE_DETAIL = "SAVEDETAIL";
+    private static final String ACTION_EDIT_DETAIL = "EDITDETAIL";
+    private static final String ACTION_CANCEL_DETAIL = "CANCELDETAIL";
 
     public MethodTraitDetailPanel methodTraitPanel;
     public JPanel unsupportedTraitPanel;

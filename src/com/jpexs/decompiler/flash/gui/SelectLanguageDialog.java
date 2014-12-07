@@ -38,8 +38,8 @@ import jsyntaxpane.DefaultSyntaxKit;
  */
 public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
 
     JComboBox<Language> languageCombobox = new JComboBox<>();
     public String languageCode = null;

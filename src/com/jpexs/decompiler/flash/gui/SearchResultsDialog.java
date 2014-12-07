@@ -44,8 +44,8 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
     private final DefaultListModel<E> model;
     private final SearchListener<E> listener;
 
-    static final String ACTION_GOTO = "GOTO";
-    static final String ACTION_CANCEL = "CLOSE";
+    private static final String ACTION_GOTO = "GOTO";
+    private static final String ACTION_CANCEL = "CLOSE";
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
     private final JButton closeButton = new JButton(translate("button.close"));
