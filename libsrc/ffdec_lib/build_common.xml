@@ -241,7 +241,11 @@
         </pathconvert>
         <script language="javascript"><![CDATA[
         var classpath = project.getProperty("lexers");
-        var parts = classpath.split('\\|');
+        // + '' converts from a Java string to a JavaScript string, in order
+        // to have .split() behave predictably on all installations.
+        // Otherwise, some versions of ANT will treat it's argument as a regex
+        // while others will not. See #11.
+        var parts = (classpath + '').split('|');
         for each (var part in parts) {
             project.setProperty("lexer",project.getProperty("LEXERSDIR")+part);
             self.project.executeTarget("-lexer");
