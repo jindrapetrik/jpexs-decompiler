@@ -94,7 +94,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -472,37 +471,38 @@ public class TagTree extends JTree {
             if (d.getSwf() != swf) {
                 continue;
             }
-            if (d instanceof ContainerItem) {
-                ContainerItem n = (ContainerItem) d;
-                TreeNodeType nodeType = TagTree.getTreeNodeType(n);
+
+            if (d instanceof Tag || d instanceof ASMSource) {
+                TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                 if (nodeType == TreeNodeType.IMAGE) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.SHAPE) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.MORPH_SHAPE) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.AS) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.MOVIE) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.SOUND) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.BINARY_DATA) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.TEXT) {
-                    ret.add(n);
+                    ret.add(d);
                 }
                 if (nodeType == TreeNodeType.FONT) {
-                    ret.add(n);
+                    ret.add(d);
                 }
             }
+
             if (d instanceof Frame) {
                 ret.add(d);
             }

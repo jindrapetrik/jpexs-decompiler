@@ -83,7 +83,6 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -897,37 +896,38 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (selectedNodeSwf != swf) {
                     continue;
                 }
-                if (d instanceof ContainerItem) {
-                    ContainerItem n = (ContainerItem) d;
-                    TreeNodeType nodeType = TagTree.getTreeNodeType(n);
+                
+                if (d instanceof Tag || d instanceof ASMSource) {
+                    TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                     if (nodeType == TreeNodeType.IMAGE) {
-                        images.add((Tag) n);
+                        images.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.SHAPE) {
-                        shapes.add((Tag) n);
+                        shapes.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.MORPH_SHAPE) {
-                        morphshapes.add((Tag) n);
+                        morphshapes.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.AS) {
-                        as12scripts.add(n);
+                        as12scripts.add(d);
                     }
                     if (nodeType == TreeNodeType.MOVIE) {
-                        movies.add((Tag) n);
+                        movies.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.SOUND) {
-                        sounds.add((Tag) n);
+                        sounds.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.BINARY_DATA) {
-                        binaryData.add((Tag) n);
+                        binaryData.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.TEXT) {
-                        texts.add((Tag) n);
+                        texts.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.FONT) {
-                        fonts.add((Tag) n);
+                        fonts.add((Tag) d);
                     }
                 }
+
                 if (d instanceof Frame) {
                     Frame fn = (Frame) d;
                     Timelined parent = fn.timeline.timelined;

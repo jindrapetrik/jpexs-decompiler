@@ -22,8 +22,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -51,7 +51,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceObjectTypeTag {
+public class PlaceObject4Tag extends CharacterIdTag implements ASMSourceContainer, PlaceObjectTypeTag {
 
     /**
      * @since SWF 5 has clip actions (sprite characters only)
@@ -396,19 +396,6 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
             return clipActions.clipActionRecords;
         }
         return new ArrayList<>();
-    }
-
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    @Override
-    public int getItemCount() {
-        if (!placeFlagHasClipActions) {
-            return 0;
-        }
-        return clipActions.clipActionRecords.size();
     }
 
     @Override

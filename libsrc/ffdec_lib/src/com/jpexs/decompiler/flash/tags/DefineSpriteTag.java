@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -56,7 +55,7 @@ import java.util.Set;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends CharacterTag implements Container, DrawableTag, Timelined {
+public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timelined {
 
     /**
      * Character ID of sprite
@@ -247,26 +246,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
-    }
-
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    @Override
-    public List<Tag> getSubItems() {
-        return subTags;
-    }
-
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    @Override
-    public int getItemCount() {
-        return subTags.size();
     }
 
     @Override

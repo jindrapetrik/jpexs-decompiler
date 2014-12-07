@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -45,7 +44,7 @@ import java.util.Set;
 /**
  * Represents Tag inside SWF file
  */
-public abstract class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializable {
+public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     /**
      * Identifier of tag type

@@ -76,7 +76,7 @@ public class AS3Package extends AS3ClassTreeItem {
         int res = 0;
         if (child instanceof AS3Package) {
             for (AS3Package pkg : subPackages.values()) {
-                if (pkg.equals(child)) {
+                if (pkg.packageName.equals(((AS3Package) child).packageName)) {
                     break;
                 }
                 res++;

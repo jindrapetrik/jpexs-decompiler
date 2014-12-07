@@ -104,12 +104,11 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -283,7 +282,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void updateCharacters() {
         characters.clear();
-        parseCharacters(new ArrayList<ContainerItem>(tags));
+        parseCharacters(tags);
     }
 
     public int getNextCharacterId() {
@@ -363,13 +362,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private void parseCharacters(List<? extends ContainerItem> list) {
-        for (ContainerItem t : list) {
+    private void parseCharacters(List<Tag> list) {
+        for (Tag t : list) {
             if (t instanceof CharacterTag) {
                 characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
             }
-            if (t instanceof Container) {
-                parseCharacters(((Container) t).getSubItems());
+            if (t instanceof DefineSpriteTag) {
+                parseCharacters(((DefineSpriteTag) t).getSubTags());
             }
         }
     }
@@ -693,10 +692,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         abcList = newAbcList;
     }
 
-    private static void getABCTags(List<? extends ContainerItem> list, List<ABCContainerTag> actionScripts) {
-        for (ContainerItem t : list) {
-            if (t instanceof Container) {
-                getABCTags(((Container) t).getSubItems(), actionScripts);
+    private static void getABCTags(List<Tag> list, List<ABCContainerTag> actionScripts) {
+        for (Tag t : list) {
+            if (t instanceof DefineSpriteTag) {
+                getABCTags(((DefineSpriteTag) t).getSubTags(), actionScripts);
             }
             if (t instanceof ABCContainerTag) {
                 actionScripts.add((ABCContainerTag) t);
@@ -1084,22 +1083,31 @@ public final class SWF implements SWFContainerItem, Timelined {
         return asms;
     }
 
-    private static void getASMs(String path, List<? extends ContainerItem> items, Map<String, ASMSource> asms) {
-        for (ContainerItem item : items) {
-            String subPath = path + "/" + item.toString();
-            if (item instanceof ASMSource) {
-                String npath = subPath;
-                int ppos = 1;
-                while (asms.containsKey(npath)) {
-                    ppos++;
-                    npath = subPath + "[" + ppos + "]";
-                }
-                asms.put(npath, (ASMSource) item);
+    private static void getASMs(String path, List<Tag> items, Map<String, ASMSource> asms) {
+        for (Tag t : items) {
+            String subPath = path + "/" + t.toString();
+            if (t instanceof ASMSource) {
+                addASM(asms, (ASMSource) t, subPath);
             }
-            if (item instanceof Container) {
-                getASMs(subPath, ((Container) item).getSubItems(), asms);
+            if (t instanceof ASMSourceContainer) {
+                for (ASMSource asm : ((ASMSourceContainer) t).getSubItems()) {
+                    addASM(asms, asm, subPath + "/" + asm.toString());
+                }
+            }
+            if (t instanceof DefineSpriteTag) {
+                getASMs(subPath, ((DefineSpriteTag) t).getSubTags(), asms);
             }
         }
+    }
+    
+    private static void addASM(Map<String, ASMSource> asms, ASMSource asm, String path) {
+        String npath = path;
+        int ppos = 1;
+        while (asms.containsKey(npath)) {
+            ppos++;
+            npath = path + "[" + ppos + "]";
+        }
+        asms.put(npath, asm);
     }
 
     private final HashSet<EventListener> listeners = new HashSet<>();
@@ -1142,13 +1150,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         return false;
     }
 
-    public static void populateVideoFrames(int streamId, List<? extends ContainerItem> tags, HashMap<Integer, VideoFrameTag> output) {
-        for (ContainerItem t : tags) {
+    public static void populateVideoFrames(int streamId, List<Tag> tags, HashMap<Integer, VideoFrameTag> output) {
+        for (Tag t : tags) {
             if (t instanceof VideoFrameTag) {
                 output.put(((VideoFrameTag) t).frameNum, (VideoFrameTag) t);
             }
-            if (t instanceof Container) {
-                populateVideoFrames(streamId, ((Container) t).getSubItems(), output);
+            if (t instanceof DefineSpriteTag) {
+                populateVideoFrames(streamId, ((DefineSpriteTag) t).getSubTags(), output);
             }
         }
     }
@@ -1784,25 +1792,35 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
     private HashMap<ASMSource, ActionList> actionsMap = new HashMap<>();
 
-    private void getVariables(List<? extends ContainerItem> objs, String path) throws InterruptedException {
+    private void getVariables(List<Tag> tags, String path) throws InterruptedException {
         List<String> processed = new ArrayList<>();
-        for (ContainerItem o : objs) {
-            if (o instanceof ASMSource) {
-                String infPath = path + "/" + o.toString();
-                int pos = 1;
-                String infPath2 = infPath;
-                while (processed.contains(infPath2)) {
-                    pos++;
-                    infPath2 = infPath + "[" + pos + "]";
-                }
-                processed.add(infPath2);
-                informListeners("getVariables", infPath2);
-                getVariables(allVariableNames, allFunctions, allStrings, usageTypes, (ASMSource) o, path);
+        for (Tag t : tags) {
+            String subPath = path + "/" + t.toString();
+            if (t instanceof ASMSource) {
+                addVariable((ASMSource) t, subPath, processed);
             }
-            if (o instanceof Container) {
-                getVariables(((Container) o).getSubItems(), path + "/" + o.toString());
+            if (t instanceof ASMSourceContainer) {
+                List<String> processed2 = new ArrayList<>();
+                for (ASMSource asm : ((ASMSourceContainer) t).getSubItems()) {
+                    addVariable(asm, subPath + "/" + asm.toString(), processed2);
+                }
+            }
+            if (t instanceof DefineSpriteTag) {
+                getVariables(((DefineSpriteTag) t).getSubTags(), path + "/" + t.toString());
             }
         }
+    }
+
+    private void addVariable(ASMSource asm, String path, List<String> processed) throws InterruptedException {
+        int pos = 1;
+        String infPath2 = path;
+        while (processed.contains(infPath2)) {
+            pos++;
+            infPath2 = path + "[" + pos + "]";
+        }
+        processed.add(infPath2);
+        informListeners("getVariables", infPath2);
+        getVariables(allVariableNames, allFunctions, allStrings, usageTypes, asm, path);
     }
 
     public int deobfuscateAS3Identifiers(RenameType renameType) {

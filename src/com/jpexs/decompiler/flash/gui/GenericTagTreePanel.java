@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.helpers.ByteArrayRange;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -663,10 +664,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
         SWF swf = tag.getSwf();
         try {
             byte[] data = tag.getData();
-            SWFInputStream tagDataStream = new SWFInputStream(swf, data, 0, data.length);
+            SWFInputStream tagDataStream = new SWFInputStream(swf, data, tag.getDataPos(), data.length);
             TagStub copy = new TagStub(swf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
             copy.forceWriteAsLong = tag.forceWriteAsLong;
-            this.editedTag = SWFInputStream.resolveTag(copy, 0, false, true, false);
+            editedTag = SWFInputStream.resolveTag(copy, 0, false, true, false);
         } catch (InterruptedException ex) {
         } catch (IOException ex) {
             Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);

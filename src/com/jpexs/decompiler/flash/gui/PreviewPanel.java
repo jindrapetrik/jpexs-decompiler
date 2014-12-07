@@ -48,7 +48,6 @@ import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -562,8 +561,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     List<Tag> subs = fn.timeline.tags;
                     List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 0;
-                    for (ContainerItem item : subs) {
-                        if (item instanceof ShowFrameTag) {
+                    for (Tag t : subs) {
+                        if (t instanceof ShowFrameTag) {
                             frameCnt++;
                             continue;
                         }
@@ -571,12 +570,11 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             break;
                         }
 
-                        if (item instanceof DoActionTag || item instanceof DoInitActionTag) {
+                        if (t instanceof DoActionTag || t instanceof DoInitActionTag) {
                             // todo: Maybe DoABC tags should be removed, too
                             continue;
                         }
 
-                        Tag t = (Tag) item;
                         Set<Integer> needed = new HashSet<>();
                         t.getNeededCharactersDeep(needed);
                         for (int n : needed) {

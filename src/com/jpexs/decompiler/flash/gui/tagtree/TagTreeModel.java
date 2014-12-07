@@ -27,8 +27,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -252,11 +251,9 @@ public class TagTreeModel implements TreeModel {
                     }
 
                     if (!hasInnerFrames) {
-                        if (tag instanceof Container) {
-                            for (ContainerItem item : ((Container) tag).getSubItems()) {
-                                if (item instanceof ASMSource) {
-                                    tagSubNodes.add(item);
-                                }
+                        if (tag instanceof ASMSourceContainer) {
+                            for (ASMSource asm : ((ASMSourceContainer) tag).getSubItems()) {
+                                tagSubNodes.add(asm);
                             }
                         }
                     }

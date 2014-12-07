@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -180,9 +179,9 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         return streamSoundType;
     }
 
-    public static void populateSoundStreamBlocks(int containerId, List<? extends ContainerItem> tags, SoundStreamHeadTypeTag head, List<SoundStreamBlockTag> output) {
+    public static void populateSoundStreamBlocks(int containerId, List<Tag> tags, SoundStreamHeadTypeTag head, List<SoundStreamBlockTag> output) {
         boolean found = false;
-        for (ContainerItem t : tags) {
+        for (Tag t : tags) {
             if (t == head) {
                 found = true;
                 head.setVirtualCharacterId(containerId);
@@ -190,7 +189,7 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
             }
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
-                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubItems(), head, output);
+                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubTags(), head, output);
             }
             if (!found) {
                 continue;

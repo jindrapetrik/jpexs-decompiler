@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -52,7 +52,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends ButtonTag implements Container {
+public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     /**
      * ID for this character
@@ -169,16 +169,6 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     @Override
     public List<BUTTONCONDACTION> getSubItems() {
         return actions;
-    }
-
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    @Override
-    public int getItemCount() {
-        return actions.size();
     }
 
     @Override
