@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -39,7 +40,6 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
-import javax.imageio.ImageIO;
 
 public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
@@ -92,7 +92,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        SerializableImage image = new SerializableImage(ImageIO.read(new ByteArrayInputStream(data)));
+        SerializableImage image = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(data)));
         ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
         bitmapFormat = FORMAT_32BIT_ARGB;
         bitmapWidth = image.getWidth();

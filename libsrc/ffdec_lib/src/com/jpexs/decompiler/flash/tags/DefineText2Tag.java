@@ -360,9 +360,9 @@ public class DefineText2Tag extends TextTag {
                                 txtSb.append(c);
                             }
                         }
-                        
+
                         txt = txtSb.toString();
-                        
+
                         TEXTRECORD tr = new TEXTRECORD();
                         textRecords.add(tr);
                         if (fontId > -1) {

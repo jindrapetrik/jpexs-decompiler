@@ -28,7 +28,7 @@ public class MissingCharacterHandler {
     public boolean getIgnoreMissingCharacters() {
         return false;
     }
-    
+
     public boolean handle(TextTag textTag, FontTag font, char character) {
         String fontName = font.getFontNameIntag();
         if (!FontTag.installedFontsByFamily.containsKey(fontName)) {

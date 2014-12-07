@@ -85,6 +85,7 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -197,10 +198,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
-import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.xml.bind.DatatypeConverter;
 import net.kroo.elliot.GifSequenceWriter;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
@@ -1280,13 +1279,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                         imageData = Helper.readStream(image.getImageData());
                     } else {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        try {
-                            ImageIO.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                        } catch (IOException ex) {
-                        }
+                        ImageHelper.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
                         imageData = baos.toByteArray();
                     }
-                    String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                    String base64ImgData = Helper.byteArrayToBase64String(imageData);
                     fos.write(Utf8Helper.getBytes("var imageObj" + c + " = document.createElement(\"img\");\r\nimageObj" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
                 }
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
@@ -1534,7 +1530,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                         @Override
                         public void run() throws IOException {
                             File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                            ImageIO.write(frameImages.next(), "PNG", f);
+                            ImageHelper.write(frameImages.next(), "PNG", new FileOutputStream(f));
                             ret.add(f);
                         }
                     }, handler).run();

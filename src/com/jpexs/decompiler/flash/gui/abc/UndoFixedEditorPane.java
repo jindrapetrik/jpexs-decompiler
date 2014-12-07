@@ -37,7 +37,7 @@ import jsyntaxpane.SyntaxDocument;
 public class UndoFixedEditorPane extends JEditorPane {
 
     private static final Object setTextLock = new Object();
-    
+
     @Override
     public void setText(String t) {
         setText(t, getContentType());

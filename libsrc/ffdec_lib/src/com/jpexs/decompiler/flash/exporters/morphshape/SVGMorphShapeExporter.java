@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters.morphshape;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -33,11 +34,8 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
-import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 import org.w3c.dom.Element;
 
 /**
@@ -130,13 +128,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                     imageData = Helper.readStream(image.getImageData());
                 } else {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        ImageIO.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                    } catch (IOException ex) {
-                    }
+                    ImageHelper.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
                     imageData = baos.toByteArray();
                 }
-                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                String base64ImgData = Helper.byteArrayToBase64String(imageData);
                 path.setAttribute("style", "fill:url(#" + patternId + ")");
                 Element pattern = exporter.createElement("pattern");
                 pattern.setAttribute("id", patternId);

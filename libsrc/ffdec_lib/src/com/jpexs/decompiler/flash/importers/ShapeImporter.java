@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
@@ -31,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -43,9 +43,9 @@ public class ShapeImporter {
         SWF swf = st.getSwf();
 
         if (newData[0] == 'B' && newData[1] == 'M') {
-            BufferedImage b = ImageIO.read(new ByteArrayInputStream(newData));
+            BufferedImage b = ImageHelper.read(new ByteArrayInputStream(newData));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(b, "PNG", baos);
+            ImageHelper.write(b, "PNG", baos);
             newData = baos.toByteArray();
         }
 

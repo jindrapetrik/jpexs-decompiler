@@ -299,7 +299,7 @@ public class FolderPreviewPanel extends JPanel {
             if (imgSrc != null) {
                 return imgSrc;
             }
-            
+
             scale = 1;
         }
 

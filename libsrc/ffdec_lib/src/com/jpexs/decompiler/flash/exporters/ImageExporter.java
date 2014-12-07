@@ -22,15 +22,16 @@ import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.helpers.Helper;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -77,7 +78,7 @@ public class ImageExporter {
                             if (ffileFormat.equals("bmp")) {
                                 BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
                             } else {
-                                ImageIO.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                                ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), new FileOutputStream(file));
                             }
                         }
                     }, handler).run();

@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -30,7 +31,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -144,13 +144,13 @@ public class SerializableImage implements Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         try {
-            ImageIO.write(image, "png", out);
+            ImageHelper.write(image, "png", out);
         } catch (Exception ex) {
             //ignore
         }
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        image = ImageIO.read(in);
+        image = ImageHelper.read(in);
     }
 }

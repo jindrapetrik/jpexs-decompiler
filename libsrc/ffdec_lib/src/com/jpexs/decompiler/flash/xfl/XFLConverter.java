@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
@@ -124,7 +125,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.imageio.ImageIO;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -1354,11 +1354,7 @@ public class XFLConverter {
                 // do not store the image in cache during xfl conversion
                 imageTag.clearCache();
                 String format = imageTag.getImageFormat();
-                try {
-                    ImageIO.write(image.getBufferedImage(), format.toUpperCase(), baos);
-                } catch (IOException ex) {
-                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                ImageHelper.write(image.getBufferedImage(), format.toUpperCase(), baos);
                 String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
                 files.put(symbolFile, baos.toByteArray());
                 String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";

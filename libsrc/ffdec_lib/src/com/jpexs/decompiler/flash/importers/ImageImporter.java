@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -25,7 +26,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -36,9 +36,9 @@ public class ImageImporter extends TagImporter {
     public Tag importImage(ImageTag it, byte[] newData) throws IOException {
 
         if (newData[0] == 'B' && newData[1] == 'M') {
-            BufferedImage b = ImageIO.read(new ByteArrayInputStream(newData));
+            BufferedImage b = ImageHelper.read(new ByteArrayInputStream(newData));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(b, "PNG", baos);
+            ImageHelper.write(b, "PNG", baos);
             newData = baos.toByteArray();
         }
 

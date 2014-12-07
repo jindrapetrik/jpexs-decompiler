@@ -1726,12 +1726,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             // "configuration items" for the current replace only
             private final ConfigurationItem<Boolean> showAgainIgnoreMissingCharacters = new ConfigurationItem<>("showAgainIgnoreMissingCharacters", true, true);
             private boolean ignoreMissingCharacters = false;
-            
+
             @Override
             public boolean getIgnoreMissingCharacters() {
                 return ignoreMissingCharacters;
             }
-            
+
             @Override
             public boolean handle(TextTag textTag, FontTag font, char character) {
                 String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
@@ -1742,9 +1742,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (f == null || !f.canDisplay(character)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
                     logger.log(Level.SEVERE, msg + " FontId: " + font.getCharacterId() + " TextId: " + textTag.getCharacterId());
-                    ignoreMissingCharacters = View.showConfirmDialog(null, msg, translate("error"), 
-                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, 
-                            showAgainIgnoreMissingCharacters, 
+                    ignoreMissingCharacters = View.showConfirmDialog(null, msg, translate("error"),
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
+                            showAgainIgnoreMissingCharacters,
                             ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
                     return false;
                 }

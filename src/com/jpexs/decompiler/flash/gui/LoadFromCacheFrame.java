@@ -66,9 +66,9 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     private List<CacheImplementation> caches;
     private List<CacheEntry> entries;
     private final JProgressBar progressBar;
-    private JButton saveButton;
-    private JButton refreshButton;
-    private JButton openButton;
+    private final JButton saveButton;
+    private final JButton refreshButton;
+    private final JButton openButton;
 
     public LoadFromCacheFrame() {
         setSize(900, 600);

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -45,7 +46,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -114,7 +114,7 @@ public class ShapeExporter {
                                 m.scale(settings.zoom);
                                 st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
                                 if (settings.mode == ShapeExportMode.PNG) {
-                                    ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
+                                    ImageHelper.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
                                 } else {
                                     BMPFile.saveBitmap(img.getBufferedImage(), file);
                                 }

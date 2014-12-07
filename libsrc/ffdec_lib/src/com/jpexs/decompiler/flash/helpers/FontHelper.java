@@ -118,14 +118,14 @@ public class FontHelper {
         withKerningAttrs.put(TextAttribute.FONT, font);
         withKerningAttrs.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         Font withKerningFont = Font.getFont(withKerningAttrs);
-        GlyphVector withKerningVector = withKerningFont.layoutGlyphVector((new JPanel()).getFontMetrics(withKerningFont).getFontRenderContext(), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
+        GlyphVector withKerningVector = withKerningFont.layoutGlyphVector(getFontRenderContext(withKerningFont), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         int withKerningX = withKerningVector.getGlyphLogicalBounds(1).getBounds().x;
 
         Map<AttributedCharacterIterator.Attribute, Object> noKerningAttrs = new HashMap<>();
         noKerningAttrs.put(TextAttribute.FONT, font);
         noKerningAttrs.put(TextAttribute.KERNING, 0);
         Font noKerningFont = Font.getFont(noKerningAttrs);
-        GlyphVector noKerningVector = noKerningFont.layoutGlyphVector((new JPanel()).getFontMetrics(noKerningFont).getFontRenderContext(), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
+        GlyphVector noKerningVector = noKerningFont.layoutGlyphVector(getFontRenderContext(noKerningFont), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         int noKerningX = noKerningVector.getGlyphLogicalBounds(1).getBounds().x;
         return withKerningX - noKerningX;
     }
@@ -162,6 +162,18 @@ public class FontHelper {
         return ret;
     }
 
+    public static float getFontAdvance(Font font, char ch) {
+        return createGlyphVector(font, ch).getGlyphMetrics(0).getAdvanceX();
+    }
+
+    public static GlyphVector createGlyphVector(Font font, char ch) {
+        return font.createGlyphVector(getFontRenderContext(font), new char[]{ch});
+    }
+
+    private static FontRenderContext getFontRenderContext(Font font) {
+        return (new JPanel()).getFontMetrics(font).getFontRenderContext();
+    }
+
     private static List<KerningPair> getFontKerningPairsOneChar(List<Character> availableChars, Font font, char firstChar) {
         List<KerningPair> ret = new ArrayList<>();
 
@@ -177,7 +189,7 @@ public class FontHelper {
         withKerningAttrs.put(TextAttribute.FONT, font);
         withKerningAttrs.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         Font withKerningFont = Font.getFont(withKerningAttrs);
-        GlyphVector withKerningVector = withKerningFont.layoutGlyphVector((new JPanel()).getFontMetrics(withKerningFont).getFontRenderContext(), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
+        GlyphVector withKerningVector = withKerningFont.layoutGlyphVector(getFontRenderContext(withKerningFont), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         int withKerningX[] = new int[availableChars.size()];
         for (int i = 0; i < availableChars.size(); i++) {
             withKerningX[i] = withKerningVector.getGlyphLogicalBounds(i * 2 + 1).getBounds().x;
@@ -187,7 +199,7 @@ public class FontHelper {
         noKerningAttrs.put(TextAttribute.FONT, font);
         noKerningAttrs.put(TextAttribute.KERNING, 0);
         Font noKerningFont = Font.getFont(noKerningAttrs);
-        GlyphVector noKerningVector = noKerningFont.layoutGlyphVector((new JPanel()).getFontMetrics(noKerningFont).getFontRenderContext(), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
+        GlyphVector noKerningVector = noKerningFont.layoutGlyphVector(getFontRenderContext(noKerningFont), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         for (int i = 0; i < availableChars.size(); i++) {
             int noKerningX = noKerningVector.getGlyphLogicalBounds(i * 2 + 1).getBounds().x;
             int kerning = withKerningX[i] - noKerningX;

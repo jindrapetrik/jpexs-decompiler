@@ -27,20 +27,21 @@ public class BlockFileHeader {
 
     protected static final int kBlockHeaderSize = 8192;  // Two pages: almost 64k entries
     private static final int kMaxBlocks = (kBlockHeaderSize - 80) * 8;
-    private long magic;   // c3 ca 04 c1 
-    private long version; // 00 00 02 00
-    private int this_file;
-    private int next_file;
-    private int entry_size;
-    private int num_entries;
-    private int max_entries;
+    private final long magic;   // c3 ca 04 c1 
+    private final long version; // 00 00 02 00
+    private final int this_file;
+    private final int next_file;
+    private final int entry_size;
+    private final int num_entries;
+    private final int max_entries;
     private int empty[] = new int[4];
     private int hints[] = new int[4];
-    private int updating;
+    private final int updating;
     private int user[] = new int[5];
-    private long allocation_map[] = new long[kMaxBlocks / 32];
+    private final long allocation_map[];
 
     public BlockFileHeader(InputStream is) throws IOException {
+        this.allocation_map = new long[kMaxBlocks / 32];
         IndexInputStream iis = new IndexInputStream(is);
         magic = iis.readUInt32();
         version = iis.readUInt32();

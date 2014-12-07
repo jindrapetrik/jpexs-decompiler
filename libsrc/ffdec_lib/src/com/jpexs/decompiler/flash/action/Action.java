@@ -97,7 +97,7 @@ import java.util.logging.Logger;
 public class Action implements GraphSourceItem {
 
     private static final int INFORM_LISTENER_RESOLUTION = 100;
-    
+
     private boolean ignored = false;
     /**
      * Action type identifier

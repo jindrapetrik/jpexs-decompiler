@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
@@ -40,7 +41,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JPanel;
 
 public class DefineFont3Tag extends FontTag {
 
@@ -423,10 +423,10 @@ public class DefineFont3Tag extends FontTag {
             Font fnt = new Font(fontName, fontStyle, 1024); //Not multiplied with divider as it causes problems to create font with height around 20k
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds());
-                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
             } else {
                 fontBoundsTable.set(pos, shp.getBounds());
-                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
             }
         }
         if (!exists) {

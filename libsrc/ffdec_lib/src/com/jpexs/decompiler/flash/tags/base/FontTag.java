@@ -197,11 +197,11 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
                     if (tr.styleFlagsHasFont) {
                         curFontId = tr.fontId;
                     }
-                    
+
                     if (curFontId != fontId) {
                         continue;
                     }
-                    
+
                     for (GLYPHENTRY en : tr.glyphEntries) {
                         if (en == null) { //Currently edited
                             continue;

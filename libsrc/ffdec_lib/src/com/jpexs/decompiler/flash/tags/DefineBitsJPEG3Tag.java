@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -31,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.imageio.ImageIO;
 
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
@@ -54,7 +54,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {
-            SerializableImage image = new SerializableImage(ImageIO.read(new ByteArrayInputStream(data)));
+            SerializableImage image = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(data)));
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -94,7 +94,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             } else {
                 stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
             }
-            BufferedImage image = ImageIO.read(stream);
+            BufferedImage image = ImageHelper.read(stream);
             SerializableImage img = image == null ? null : new SerializableImage(image);
             if (bitmapAlphaData.length == 0) {
                 return img;

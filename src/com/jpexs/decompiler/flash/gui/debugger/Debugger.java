@@ -31,10 +31,10 @@ public class Debugger {
 
     private static class DebugHandler extends Thread {
 
-        private Socket s;
-        private int serverPort;
+        private final Socket s;
+        private final int serverPort;
         private static int maxid = 0;
-        private int id;
+        private final int id;
         public boolean finished = false;
 
         public DebugHandler(int serverPort, Socket s) {

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -29,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.imageio.ImageIO;
 
 public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
@@ -89,7 +89,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 } else {
                     baos.write(jpegData.getArray(), jpegData.getPos(), jpegData.getLength());
                 }
-                SerializableImage ret = new SerializableImage(ImageIO.read(new ByteArrayInputStream(baos.toByteArray())));
+                SerializableImage ret = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(baos.toByteArray())));
                 cachedImage = ret;
                 return ret;
             } catch (IOException ex) {

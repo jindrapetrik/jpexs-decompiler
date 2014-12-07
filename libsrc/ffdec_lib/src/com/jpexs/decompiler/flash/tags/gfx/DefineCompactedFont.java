@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -45,7 +46,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JPanel;
 
 /**
  *
@@ -180,7 +180,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         }
 
         Font fnt = cfont.deriveFont(fontStyle, Math.round(font.nominalSize * d));
-        int advance = (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX());
+        int advance = (int) Math.round(FontHelper.getFontAdvance(fnt, character));
         if (!exists) {
             font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
             font.glyphs.add(pos, new GlyphType(shp.shapeRecords));

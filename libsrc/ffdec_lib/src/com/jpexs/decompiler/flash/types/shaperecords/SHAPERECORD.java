@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -41,7 +42,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.JPanel;
 
 /**
  *
@@ -243,7 +243,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
         List<SHAPERECORD> retList = new ArrayList<>();
         Font f = font.deriveFont(fontSize);
-        GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
+        GlyphVector v = FontHelper.createGlyphVector(f, character);
         Shape shp = v.getOutline();
         double[] points = new double[6];
         int lastX = 0;

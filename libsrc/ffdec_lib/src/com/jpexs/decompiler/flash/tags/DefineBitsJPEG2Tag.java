@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -31,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.imageio.ImageIO;
 
 public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
@@ -67,7 +67,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            BufferedImage image = ImageIO.read(getImageData());
+            BufferedImage image = ImageHelper.read(getImageData());
             SerializableImage ret = image == null ? null : new SerializableImage(image);
             cachedImage = ret;
             return ret;

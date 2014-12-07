@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -32,7 +33,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -213,7 +213,7 @@ public class SVGExporter {
     public void addStyle(String fontFace, byte[] data, FontExportMode mode) {
         if (!fontFaces.contains(fontFace)) {
             fontFaces.add(fontFace);
-            String base64Data = DatatypeConverter.printBase64Binary(data);
+            String base64Data = Helper.byteArrayToBase64String(data);
             String value = getStyle().getTextContent();
             value += Helper.newLine;
             value += "      @font-face {" + Helper.newLine;

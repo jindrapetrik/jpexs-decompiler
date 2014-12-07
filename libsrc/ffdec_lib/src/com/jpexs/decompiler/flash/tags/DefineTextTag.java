@@ -366,7 +366,7 @@ public class DefineTextTag extends TextTag {
                                 txtSb.append(c);
                             }
                         }
-                        
+
                         txt = txtSb.toString();
 
                         TEXTRECORD tr = new TEXTRECORD();

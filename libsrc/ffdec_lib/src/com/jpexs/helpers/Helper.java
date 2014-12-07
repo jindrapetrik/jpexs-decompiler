@@ -50,6 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Class with helper method
@@ -797,7 +798,7 @@ public class Helper {
     public static String getDecompilationSkippedComment() {
         return "// " + AppResources.translate("decompilation.skipped");
     }
-    
+
     public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
@@ -861,6 +862,10 @@ public class Helper {
             }
         }
         return area;
+    }
+
+    public static String byteArrayToBase64String(byte[] data) {
+        return DatatypeConverter.printBase64Binary(data);
     }
 
     /**
