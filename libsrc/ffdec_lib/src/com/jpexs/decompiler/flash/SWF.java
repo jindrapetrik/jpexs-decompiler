@@ -318,6 +318,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (checkAll || tag.isModified()) {
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharacters(needed);
+                if (tag instanceof CharacterTag) {
+                    CharacterTag characterTag = (CharacterTag) tag;
+                    needed.remove(characterTag.getCharacterId());
+                }
                 boolean moved = false;
                 for (Integer id : needed) {
                     if (!addedCharacterIds.contains(id)) {

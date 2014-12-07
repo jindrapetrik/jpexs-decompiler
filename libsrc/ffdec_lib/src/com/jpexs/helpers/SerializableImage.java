@@ -43,7 +43,6 @@ public class SerializableImage implements Serializable {
     public static int TYPE_INT_ARGB_PRE = BufferedImage.TYPE_INT_ARGB_PRE;
     public static int TYPE_4BYTE_ABGR = BufferedImage.TYPE_4BYTE_ABGR;
 
-    //private static int imageid = 0;
     private BufferedImage image;
     private transient Graphics graphics;
 
@@ -67,10 +66,6 @@ public class SerializableImage implements Serializable {
     }
 
     public BufferedImage getBufferedImage() {
-        /*try {
-         javax.imageio.ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
-         } catch (IOException ex) {
-         }*/
         return image;
     }
 
