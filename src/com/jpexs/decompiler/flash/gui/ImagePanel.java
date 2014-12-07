@@ -582,7 +582,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             bounds.height /= 20;
                             bounds.x -= rect.Xmin / 20;
                             bounds.y -= rect.Ymin / 20;
-                            //SHAPERECORD.resizeSHAPE(outline, 1/20)
                             gg.setStroke(new BasicStroke(2.0f,
                                     BasicStroke.CAP_BUTT,
                                     BasicStroke.JOIN_MITER,

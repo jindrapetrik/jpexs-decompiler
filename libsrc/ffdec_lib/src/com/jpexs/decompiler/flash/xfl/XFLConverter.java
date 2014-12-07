@@ -210,7 +210,7 @@ public class XFLConverter {
     }
 
     public static String convertLineStyle(LINESTYLE ls, int shapeNum) {
-        return "<SolidStroke weight=\"" + (((float) ls.width) / 20.0) + "\">"
+        return "<SolidStroke weight=\"" + (((float) ls.width) / SWF.unitDivisor) + "\">"
                 + "<fill>"
                 + "<SolidColor color=\"" + ls.color.toHexRGB() + "\""
                 + (shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "")
@@ -257,7 +257,7 @@ public class XFLConverter {
                 break;
         }
 
-        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / 20.0).append("\"");
+        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
         ret.append(params);
         ret.append(">");
         ret.append("<fill>");
@@ -405,8 +405,8 @@ public class XFLConverter {
             m = new Matrix();
         }
         ret.append("<Matrix ");
-        ret.append("tx=\"").append(((float) m.translateX) / 20.0).append("\" ");
-        ret.append("ty=\"").append(((float) m.translateY) / 20.0).append("\" ");
+        ret.append("tx=\"").append(((float) m.translateX) / SWF.unitDivisor).append("\" ");
+        ret.append("ty=\"").append(((float) m.translateY) / SWF.unitDivisor).append("\" ");
         if (m.scaleX != 1.0 || m.scaleY != 1.0) {
             ret.append("a=\"").append(m.scaleX).append("\" ");
             ret.append("d=\"").append(m.scaleY).append("\" ");
