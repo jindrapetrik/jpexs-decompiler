@@ -241,14 +241,14 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
-                Color c = null;
+                int c = 0;
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
-                    c = (multiplyAlpha(colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff].toColor()));
+                    c = multiplyAlpha(colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff].toInt());
                 }
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
-                    c = (multiplyAlpha(bitmapData.bitmapPixelData[pos].toColor()));
+                    c = (multiplyAlpha(bitmapData.bitmapPixelData[pos].toInt()));
                 }
-                bi.setRGB(x, y, c.getRGB());
+                bi.setRGB(x, y, c);
                 pos32aligned++;
                 pos++;
             }

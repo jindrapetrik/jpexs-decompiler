@@ -85,13 +85,16 @@ public class FontHelper {
         } catch (Throwable ex) {
             //ignore            
         }
+        
         if (fonts == null) {
             fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         }
+        
+        List<String> javaFonts = Arrays.asList("Dialog", "DialogInput", "Monospaced", "Serif", "SansSerif"); 
         for (Font f : fonts) {
             String fam = f.getFamily(Locale.ENGLISH);
             //Do not want Java logical fonts
-            if (Arrays.asList("Dialog", "DialogInput", "Monospaced", "Serif", "SansSerif").contains(fam)) {
+            if (javaFonts.contains(fam)) {
                 continue;
             }
             if (!ret.containsKey(fam)) {
@@ -100,6 +103,7 @@ public class FontHelper {
 
             ret.get(fam).put(f.getFontName(Locale.ENGLISH), f);
         }
+        
         return ret;
     }
 

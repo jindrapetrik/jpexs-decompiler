@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.awt.Shape;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,17 +96,16 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         return (int) val;
     }
 
-    protected static Color intToColor(int val) {
-        return new Color(val & 0xff, (val >> 8) & 0xff, (val >> 16) & 0xff, (val >> 24) & 0xff);
-    }
-
-    protected static int colorToInt(Color c) {
-        return (c.getAlpha() << 24) | (c.getBlue() << 16) | (c.getGreen() << 8) | c.getRed();
-    }
-
-    protected static Color multiplyAlpha(Color c) {
-        float multiplier = c.getAlpha() == 0 ? 0 : 255.0f / c.getAlpha();
-        return new Color(max255(c.getRed() * multiplier), max255(c.getGreen() * multiplier), max255(c.getBlue() * multiplier), c.getAlpha());
+    protected static int multiplyAlpha(int value) {
+        int a = (value >> 24) & 0xFF;
+        int r = (value >> 16) & 0xFF;
+        int g = (value >> 8) & 0xFF;
+        int b = value & 0xFF;
+        float multiplier = a == 0 ? 0 : 255.0f / a;
+        r = max255(r * multiplier);
+        g = max255(g * multiplier);
+        b = max255(b * multiplier);
+        return ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8)  | (b & 0xFF);
     }
 
     private SHAPEWITHSTYLE getShape() {

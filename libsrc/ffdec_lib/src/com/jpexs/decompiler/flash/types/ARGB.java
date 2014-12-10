@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -54,6 +55,13 @@ public class ARGB implements Serializable {
 
     public Color toColor() {
         return new Color(red, green, blue, alpha);
+    }
+
+    public int toInt() {
+        return ((alpha & 0xFF) << 24) |
+               ((red & 0xFF) << 16) |
+               ((green & 0xFF) << 8)  |
+               (blue & 0xFF);
     }
 
     public ARGB() {

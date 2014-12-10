@@ -99,17 +99,22 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             BufferedImage image = ImageHelper.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
             SerializableImage img = image == null ? null : new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
+                cachedImage = img;
                 return img;
             }
-            SerializableImage img2 = new SerializableImage(img.getWidth(), img.getHeight(), SerializableImage.TYPE_INT_ARGB);
-            for (int y = 0; y < img.getHeight(); y++) {
-                for (int x = 0; x < img.getWidth(); x++) {
+
+            int width = img.getWidth();
+            int height = img.getHeight();
+            SerializableImage img2 = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
                     int val = img.getRGB(x, y);
-                    int a = bitmapAlphaData.get(x + y * img.getWidth()) & 0xff;
+                    int a = bitmapAlphaData.get(x + y * width) & 0xff;
                     val = (val & 0xffffff) | (a << 24);
-                    img2.setRGB(x, y, colorToInt(multiplyAlpha(intToColor(val))));
+                    img2.setRGB(x, y, multiplyAlpha(val));
                 }
             }
+            
             cachedImage = img2;
             return img2;
         } catch (IOException ex) {

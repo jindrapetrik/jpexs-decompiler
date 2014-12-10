@@ -431,11 +431,12 @@ public class SWFInputStream implements AutoCloseable {
     private int lastPercent = -1;
 
     private int readNoBitReset() throws IOException, EndOfStreamException {
-        informListeners();
         int r = is.read();
         if (r == -1) {
             throw new EndOfStreamException();
         }
+
+        informListeners();
         return r;
     }
 
@@ -727,13 +728,13 @@ public class SWFInputStream implements AutoCloseable {
             return new byte[0];
         }
 
-        informListeners();
         bitPos = 0;
         byte[] ret = new byte[(int) count];
         if (is.read(ret) != count) {
             throw new EndOfStreamException();
         }
 
+        informListeners();
         return ret;
     }
 
@@ -744,10 +745,17 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public void skipBytesEx(long count) throws IOException {
-        bitPos = 0;
-        for (int i = 0; i < count; i++) {
-            readNoBitReset();
+        if (count <= 0) {
+            return;
         }
+
+        bitPos = 0;
+        is.seek(is.getPos() + count);
+        if (is.available() < 0) {
+            throw new EndOfStreamException();
+        }
+
+        informListeners();
     }
 
     /**
