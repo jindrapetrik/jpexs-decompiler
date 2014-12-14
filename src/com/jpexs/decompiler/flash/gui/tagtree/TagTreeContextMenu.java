@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -39,6 +41,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +81,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
     private JMenuItem closeMenuItem;
     private JMenu addTagMenu;
     private JMenu moveTagMenu;
+    private JMenu copyTagMenu;
     private JMenuItem openSWFInsideTagMenuItem;
 
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
@@ -130,6 +134,9 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
         moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
         add(moveTagMenu);
+
+        copyTagMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
+        add(copyTagMenu);
 
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         add(openSWFInsideTagMenuItem);
@@ -213,6 +220,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         closeMenuItem.setVisible(allSelectedIsSwf);
         addTagMenu.setVisible(false);
         moveTagMenu.setVisible(false);
+        copyTagMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
 
         final TreeItem firstItem = items.get(0);
@@ -280,6 +288,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             if (firstItem instanceof Tag && swfs.size() > 1) {
                 final Tag tag = (Tag) firstItem;
                 moveTagMenu.removeAll();
+                copyTagMenu.removeAll();
                 for (SWFList targetSwfList : swfs) {
                     for (final SWF targetSwf : targetSwfList) {
                         if (targetSwf != tag.getSwf()) {
@@ -299,10 +308,35 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                 }
                             });
                             moveTagMenu.add(swfItem);
+
+                            swfItem = new JMenuItem(targetSwf.getShortFileName());
+                            swfItem.addActionListener(new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(ActionEvent ae) {
+                                    try {
+                                        SWF sourceSwf = tag.getSwf();
+                                        byte[] data = tag.getData();
+                                        SWFInputStream tagDataStream = new SWFInputStream(sourceSwf, data, tag.getDataPos(), data.length);
+                                        TagStub copy = new TagStub(sourceSwf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
+                                        copy.forceWriteAsLong = tag.forceWriteAsLong;
+                                        Tag copyTag = SWFInputStream.resolveTag(copy, 0, false, true, false);
+                                        copyTag.setSwf(targetSwf);
+                                        targetSwf.tags.add(copyTag);
+                                        copyTag.setModified(true);
+                                        targetSwf.clearImageCache();
+                                        mainPanel.refreshTree();
+                                    } catch (IOException | InterruptedException ex) {
+                                        Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                            });
+                            copyTagMenu.add(swfItem);
                         }
                     }
                 }
                 moveTagMenu.setVisible(true);
+                copyTagMenu.setVisible(true);
             }
 
             if (tagTree.getModel().getChildCount(firstItem) > 0) {
