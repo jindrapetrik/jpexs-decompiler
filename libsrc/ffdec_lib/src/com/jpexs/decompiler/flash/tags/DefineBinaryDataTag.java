@@ -93,7 +93,7 @@ public class DefineBinaryDataTag extends CharacterTag {
                 innerSwf = bswf;
                 bswf.binaryData = this;
             } catch (IOException | InterruptedException ex) {
-                //ignore
+                // ignore
             }
         }
     }

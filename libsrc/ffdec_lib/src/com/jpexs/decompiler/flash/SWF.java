@@ -624,7 +624,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         sis.setPercentMax(fileSize);
         displayRect = sis.readRECT("displayRect");
         // FIXED8 (16 bit fixed point) frameRate
-        sis.readUI8("tmpFirstByetOfFrameRate"); //tmpFirstByetOfFrameRate
+        sis.readUI8("tmpFirstByetOfFrameRate"); // tmpFirstByetOfFrameRate
         frameRate = sis.readUI8("frameRate");
         frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
@@ -812,11 +812,11 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         String signature = new String(hdr, 0, 3, Utf8Helper.charset);
         if (!Arrays.asList(
-                "FWS", //Uncompressed Flash
-                "CWS", //ZLib compressed Flash
-                "ZWS", //LZMA compressed Flash
-                "GFX", //Uncompressed ScaleForm GFx
-                "CFX" //Compressed ScaleForm GFx
+                "FWS", // Uncompressed Flash
+                "CWS", // ZLib compressed Flash
+                "ZWS", // LZMA compressed Flash
+                "GFX", // Uncompressed ScaleForm GFx
+                "CFX" // Compressed ScaleForm GFx
         ).contains(signature)) {
             throw new IOException("Invalid SWF file");
         }
@@ -1185,12 +1185,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void createWavFromPcmData(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
         ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
-        int audioFormat = 1; //PCM
+        int audioFormat = 1; // PCM
         writeLE(subChunk1Data, audioFormat, 2);
         int numChannels = soundType ? 2 : 1;
         writeLE(subChunk1Data, numChannels, 2);
         int[] rateMap = {5512, 11025, 22050, 44100};
-        int sampleRate = soundRateHz;//rateMap[soundRate];
+        int sampleRate = soundRateHz; // rateMap[soundRate];
         writeLE(subChunk1Data, sampleRate, 4);
         int bitsPerSample = soundSize ? 16 : 8;
         int byteRate = sampleRate * numChannels * bitsPerSample / 8;
@@ -1457,7 +1457,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                             JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
                             f.delete();
                             packed = true;
-                        } catch (Exception | Error e) { //Something wrong in the packer
+                        } catch (Exception | Error e) { // Something wrong in the packer
                             logger.log(Level.WARNING, "JPacker: Cannot minimize script");
                             f.renameTo(fmin);
                         }
@@ -1655,7 +1655,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 usageType = "class";
             }
             if (ins instanceof ActionCallMethod) {
-                usageType = "function"; //can there be method?
+                usageType = "function"; // can there be method?
             }
             if (ins instanceof ActionCallFunction) {
                 usageType = "function";
@@ -1689,7 +1689,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
                 } catch (EmptyStackException ex) {
                 }
-                //ip++;
+
                 continue;
             }
 
@@ -1713,7 +1713,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 usageTypes.put((DirectValueActionItem) name, usageType);
             }
 
-            //for..in return
+            // for..in return
             if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
                 stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
             }
@@ -2029,7 +2029,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             informListeners("rename", "function " + fc + "/" + allFunctions.size());
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;
-                if (f.functionName.isEmpty()) { //anonymous function, leave as is
+                if (f.functionName.isEmpty()) { // anonymous function, leave as is
                     continue;
                 }
                 String changed = deobfuscation.deobfuscateName(false, f.functionName, false, "function", deobfuscated, renameType, selected);
@@ -2040,7 +2040,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
             if (fun instanceof ActionDefineFunction2) {
                 ActionDefineFunction2 f = (ActionDefineFunction2) fun;
-                if (f.functionName.isEmpty()) { //anonymous function, leave as is
+                if (f.functionName.isEmpty()) { // anonymous function, leave as is
                     continue;
                 }
                 String changed = deobfuscation.deobfuscateName(false, f.functionName, false, "function", deobfuscated, renameType, selected);
@@ -2517,7 +2517,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             ColorTransform clrTrans = colorTransform.clone();
-            if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
+            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
                 clrTrans = colorTransform.merge(layer.colorTransForm);
             }
 
@@ -2664,7 +2664,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             ColorTransform clrTrans = colorTransform.clone();
-            if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
+            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
                 clrTrans = colorTransform.merge(layer.colorTransForm);
             }
 
@@ -2762,7 +2762,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     case 1:
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
-                    case 2://Layer
+                    case 2: // Layer
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
                     case 3:
@@ -2801,7 +2801,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     case 14:
                         g.setComposite(BlendComposite.HardLight);
                         break;
-                    default: //Not implemented
+                    default: // Not implemented
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
                 }
@@ -2817,7 +2817,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     gm.fillRect(0, 0, image.getWidth(), image.getHeight());
                     gm.setTransform(trans);
                     gm.drawImage(img.getBufferedImage(), 0, 0, null);
-                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); //Maybe we can get current outline instead converting from image (?)
+                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); // Maybe we can get current outline instead converting from image (?)
                     clips.add(clip);
                     prevClips.add(g.getClip());
                     g.setTransform(AffineTransform.getTranslateInstance(0, 0));

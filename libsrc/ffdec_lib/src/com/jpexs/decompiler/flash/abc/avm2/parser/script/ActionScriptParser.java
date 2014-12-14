@@ -1560,7 +1560,7 @@ public class ActionScriptParser {
                                     try {
                                         ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
                                     } catch (CompilationException ex) {
-                                        //ignore
+                                        // ignore
                                     }
                                     ui.setSlotNumber(e.getSlotNumber());
                                     ui.setSlotScope(e.getSlotScope());
@@ -1583,7 +1583,7 @@ public class ActionScriptParser {
                                     try {
                                         ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
                                     } catch (CompilationException ex) {
-                                        //ignore
+                                        // ignore
                                     }
                                     ui.setSlotNumber(e.getSlotNumber());
                                     ui.setSlotScope(e.getSlotScope());

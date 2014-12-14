@@ -37,7 +37,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public Boolean inMethod;
     public Integer forInLevel;
 
-    //TODO: handle AVM2 separately
+    // TODO: handle AVM2 separately
     public List<ABCException> exceptions = new ArrayList<>();
     public List<Integer> finallyCatches = new ArrayList<>();
     public Map<Integer, Integer> finallyCounter = new HashMap<>();

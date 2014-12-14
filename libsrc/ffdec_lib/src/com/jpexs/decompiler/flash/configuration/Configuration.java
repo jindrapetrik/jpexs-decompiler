@@ -516,7 +516,7 @@ public class Configuration {
             HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
             config = cfg;
         } catch (ClassNotFoundException | IOException ex) {
-            //ignore
+            // ignore
         }
         return config;
     }
@@ -548,7 +548,7 @@ public class Configuration {
         try {
             saveToFile(getConfigFile());
         } catch (IOException ex) {
-            //ignore
+            // ignore
         }
     }
 

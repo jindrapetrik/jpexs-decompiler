@@ -254,7 +254,7 @@ public class ABC {
         Set<Integer> stringUsages = getStringUsages();
         Set<Integer> namespaceUsages = getNsStringUsages();
         int strIndex = constants.getMultiname(multinameIndex).name_index;
-        if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //name is used elsewhere as string literal            
+        if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // name is used elsewhere as string literal            
             strIndex = constants.getStringId(newname, true);
             constants.getMultiname(multinameIndex).name_index = strIndex;
         } else {
@@ -291,13 +291,13 @@ public class ABC {
         }
         for (int i = 1; i < constants.getNamespaceCount(); i++) {
             informListeners("deobfuscate", "namespace " + i + "/" + constants.getNamespaceCount());
-            if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { //only packages
+            if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { // only packages
                 continue;
             }
             constants.getNamespace(i).name_index = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(i).name_index, renameType);
         }
 
-        //process reflection using getDefinitionByName too
+        // process reflection using getDefinitionByName too
         for (MethodBody body : bodies) {
             for (int ip = 0; ip < body.getCode().code.size(); ip++) {
                 if (body.getCode().code.get(ip).definition instanceof CallPropertyIns) {
@@ -350,7 +350,7 @@ public class ABC {
         deobfuscation = new AVM2Deobfuscation(constants);
         ais.newDumpLevel("constant_pool", "cpool_info");
 
-        //constant integers
+        // constant integers
         int constant_int_pool_count = ais.readU30("int_count");
         constants.constant_int = new ArrayList<>(constant_int_pool_count);
         if (constant_int_pool_count > 0) {
@@ -358,13 +358,13 @@ public class ABC {
         }
         if (constant_int_pool_count > 1) {
             ais.newDumpLevel("integers", "integer[]");
-            for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1         
+            for (int i = 1; i < constant_int_pool_count; i++) { // index 0 not used. Values 1..n-1         
                 constants.addInt(ais.readS32("int"));
             }
             ais.endDumpLevel();
         }
 
-        //constant unsigned integers
+        // constant unsigned integers
         int constant_uint_pool_count = ais.readU30("uint_count");
         constants.constant_uint = new ArrayList<>(constant_uint_pool_count);
         if (constant_uint_pool_count > 0) {
@@ -372,13 +372,13 @@ public class ABC {
         }
         if (constant_uint_pool_count > 1) {
             ais.newDumpLevel("uintegers", "uinteger[]");
-            for (int i = 1; i < constant_uint_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_uint_pool_count; i++) { // index 0 not used. Values 1..n-1
                 constants.addUInt(ais.readU32("uint"));
             }
             ais.endDumpLevel();
         }
 
-        //constant double
+        // constant double
         int constant_double_pool_count = ais.readU30("double_count");
         constants.constant_double = new ArrayList<>(constant_double_pool_count);
         if (constant_double_pool_count > 0) {
@@ -386,13 +386,13 @@ public class ABC {
         }
         if (constant_double_pool_count > 1) {
             ais.newDumpLevel("doubles", "double[]");
-            for (int i = 1; i < constant_double_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_double_pool_count; i++) { // index 0 not used. Values 1..n-1
                 constants.addDouble(ais.readDouble("double"));
             }
             ais.endDumpLevel();
         }
 
-        //constant decimal
+        // constant decimal
         if (minor_version >= MINORwithDECIMAL) {
             int constant_decimal_pool_count = ais.readU30("decimal_count");
             constants.constant_decimal = new ArrayList<>(constant_decimal_pool_count);
@@ -401,7 +401,7 @@ public class ABC {
             }
             if (constant_decimal_pool_count > 1) {
                 ais.newDumpLevel("decimals", "decimal[]");
-                for (int i = 1; i < constant_decimal_pool_count; i++) { //index 0 not used. Values 1..n-1
+                for (int i = 1; i < constant_decimal_pool_count; i++) { // index 0 not used. Values 1..n-1
                     constants.addDecimal(ais.readDecimal("decimal"));
                 }
                 ais.endDumpLevel();
@@ -410,7 +410,7 @@ public class ABC {
             constants.constant_decimal = new ArrayList<>(0);
         }
 
-        //constant string
+        // constant string
         int constant_string_pool_count = ais.readU30("string_count");
         constants.constant_string = new ArrayList<>(constant_string_pool_count);
         stringOffsets = new long[constant_string_pool_count];
@@ -419,7 +419,7 @@ public class ABC {
         }
         if (constant_string_pool_count > 1) {
             ais.newDumpLevel("strings", "string[]");
-            for (int i = 1; i < constant_string_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_string_pool_count; i++) { // index 0 not used. Values 1..n-1
                 long pos = ais.getPosition();
                 constants.addString(ais.readString("string"));
                 stringOffsets[i] = pos;
@@ -427,7 +427,7 @@ public class ABC {
             ais.endDumpLevel();
         }
 
-        //constant namespace
+        // constant namespace
         int constant_namespace_pool_count = ais.readU30("namespace_count");
         constants.constant_namespace = new ArrayList<>(constant_namespace_pool_count);
         if (constant_namespace_pool_count > 0) {
@@ -435,13 +435,13 @@ public class ABC {
         }
         if (constant_namespace_pool_count > 1) {
             ais.newDumpLevel("namespaces", "namespace[]");
-            for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_namespace_pool_count; i++) { // index 0 not used. Values 1..n-1
                 constants.addNamespace(ais.readNamespace("namespace"));
             }
             ais.endDumpLevel();
         }
 
-        //constant namespace set
+        // constant namespace set
         int constant_namespace_set_pool_count = ais.readU30("ns_set_count");
         constants.constant_namespace_set = new ArrayList<>(constant_namespace_set_pool_count);
         if (constant_namespace_set_pool_count > 0) {
@@ -449,7 +449,7 @@ public class ABC {
         }
         if (constant_namespace_set_pool_count > 1) {
             ais.newDumpLevel("ns_sets", "ns_set[]");
-            for (int i = 1; i < constant_namespace_set_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_namespace_set_pool_count; i++) { // index 0 not used. Values 1..n-1
                 ais.newDumpLevel("ns_set_infos", "ns_set_info[]");
                 constants.addNamespaceSet(new NamespaceSet());
                 int namespace_count = ais.readU30("count");
@@ -462,7 +462,7 @@ public class ABC {
             ais.endDumpLevel();
         }
 
-        //constant multiname
+        // constant multiname
         int constant_multiname_pool_count = ais.readU30("multiname_count");
         constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
         if (constant_multiname_pool_count > 0) {
@@ -470,24 +470,24 @@ public class ABC {
         }
         if (constant_multiname_pool_count > 1) {
             ais.newDumpLevel("multiname", "multinames[]");
-            for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
+            for (int i = 1; i < constant_multiname_pool_count; i++) { // index 0 not used. Values 1..n-1
                 constants.addMultiname(ais.readMultiname("multiname"));
             }
             ais.endDumpLevel();
         }
 
-        ais.endDumpLevel(); //cpool_info
+        ais.endDumpLevel(); // cpool_info
 
-        //method info
+        // method info
         int methods_count = ais.readU30("methods_count");
-        method_info = new ArrayList<>(methods_count); //MethodInfo[methods_count];
-        bodyIdxFromMethodIdx = new ArrayList<>(methods_count); //[methods_count];
+        method_info = new ArrayList<>(methods_count); // MethodInfo[methods_count];
+        bodyIdxFromMethodIdx = new ArrayList<>(methods_count);
         for (int i = 0; i < methods_count; i++) {
             method_info.add(ais.readMethodInfo("method"));
             bodyIdxFromMethodIdx.add(-1);
         }
 
-        //metadata info
+        // metadata info
         int metadata_count = ais.readU30("metadata_count");
         metadata_info = new ArrayList<>(metadata_count);
         for (int i = 0; i < metadata_count; i++) {
@@ -505,11 +505,11 @@ public class ABC {
         }
 
         int class_count = ais.readU30("class_count");
-        instance_info = new ArrayList<>(class_count); //InstanceInfo[class_count];
+        instance_info = new ArrayList<>(class_count);
         for (int i = 0; i < class_count; i++) {
             instance_info.add(ais.readInstanceInfo("instance"));
         }
-        class_info = new ArrayList<>(class_count); //ClassInfo[class_count];
+        class_info = new ArrayList<>(class_count);
         for (int i = 0; i < class_count; i++) {
             ais.newDumpLevel("class", "class_info");
             ClassInfo ci = new ClassInfo();
@@ -519,7 +519,7 @@ public class ABC {
             ais.endDumpLevel();
         }
         int script_count = ais.readU30("script_count");
-        script_info = new ArrayList<>(script_count); //ScriptInfo[script_count];
+        script_info = new ArrayList<>(script_count);
         for (int i = 0; i < script_count; i++) {
             ais.newDumpLevel("script", "script_info");
             ScriptInfo si = new ScriptInfo();
@@ -530,7 +530,7 @@ public class ABC {
         }
 
         int bodies_count = ais.readU30("bodies_count");
-        bodies = new ArrayList<>(bodies_count); //MethodBody[bodies_count];
+        bodies = new ArrayList<>(bodies_count);
         for (int i = 0; i < bodies_count; i++) {
             ais.newDumpLevel("method_body", "method_body_info");
             MethodBody mb = new MethodBody();
@@ -737,7 +737,7 @@ public class ABC {
         } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
             return false;
         } else {
-            return true; //Can be class or instance initializer
+            return true; // Can be class or instance initializer
         }
     }
 
@@ -754,7 +754,7 @@ public class ABC {
                 traitId -= staticTraits.size();
                 return instanceTraits.get(traitId);
             } else {
-                return null; //Can be class or instance initializer
+                return null; // Can be class or instance initializer
             }
         }
     }
@@ -801,7 +801,7 @@ public class ABC {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst s = ((TraitSlotConst) t);
                     if (s.isNamespace()) {
-                        String key = constants.getNamespace(s.value_index).getName(constants, true); //assume not null
+                        String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
                         String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
                         namespaceMap.put(key, val);
                     }
@@ -1219,10 +1219,10 @@ public class ABC {
             }
         }
         ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName, newClassIndex);
-        //Move newly added script to its position
+        // Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);
-        pack(); //removes old classes/methods
+        pack(); // removes old classes/methods
         ((Tag) parentTag).setModified(true);
     }
 

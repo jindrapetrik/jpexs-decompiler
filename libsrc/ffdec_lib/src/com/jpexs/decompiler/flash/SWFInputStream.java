@@ -1083,7 +1083,7 @@ public class SWFInputStream implements AutoCloseable {
                 doParse = true;
             } else {
                 switch (tag.getId()) {
-                    case FileAttributesTag.ID: //FileAttributes
+                    case FileAttributesTag.ID: // FileAttributes
                         if (tag instanceof TagStub) {
                             tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, true);
                         }
@@ -1106,7 +1106,7 @@ public class SWFInputStream implements AutoCloseable {
                     case PlaceObject2Tag.ID:
                     case RemoveObjectTag.ID:
                     case RemoveObject2Tag.ID:
-                    case PlaceObject3Tag.ID: //?
+                    case PlaceObject3Tag.ID: // ?
                     case StartSoundTag.ID:
                     case FrameLabelTag.ID:
                     case SoundStreamHeadTag.ID:
@@ -1401,7 +1401,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new PlaceObject4Tag(sis, data);
                     break;
                 default:
-                    if (swf.gfx) {   //GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
+                    if (swf.gfx) { // GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
                         switch (tag.getId()) {
                             case 1000:
                                 ret = new ExporterInfo(sis, data);
@@ -1563,7 +1563,7 @@ public class SWFInputStream implements AutoCloseable {
                 actionLength = readUI16("actionLength");
             }
             switch (actionCode) {
-                //SWF3 Actions
+                // SWF3 Actions
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);
                 case 0x83:
@@ -1586,7 +1586,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionSetTarget(actionLength, this, swf.version);
                 case 0x8C:
                     return new ActionGoToLabel(actionLength, this, swf.version);
-                //SWF4 Actions
+                // SWF4 Actions
                 case 0x96:
                     return new ActionPush(actionLength, this, swf.version);
                 case 0x17:
@@ -1669,7 +1669,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionGetTime();
                 case 0x30:
                     return new ActionRandomNumber();
-                //SWF5 Actions
+                // SWF5 Actions
                 case 0x3D:
                     return new ActionCallFunction();
                 case 0x52:
@@ -1742,7 +1742,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionStackSwap();
                 case 0x87:
                     return new ActionStoreRegister(actionLength, this);
-                //SWF6 Actions
+                // SWF6 Actions
                 case 0x54:
                     return new ActionInstanceOf();
                 case 0x55:
@@ -1753,7 +1753,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionGreater();
                 case 0x68:
                     return new ActionStringGreater();
-                //SWF7 Actions
+                // SWF7 Actions
                 case 0x8E:
                     return new ActionDefineFunction2(actionLength, this, swf.version);
                 case 0x69:
@@ -1774,8 +1774,8 @@ public class SWFInputStream implements AutoCloseable {
                     Action r = new ActionNop();
                     r.actionCode = actionCode;
                     r.actionLength = actionLength;
+                    logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
                     return r;
-                //return new Action(actionCode, actionLength);
             }
         } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
             return null;
@@ -2127,7 +2127,7 @@ public class SWFInputStream implements AutoCloseable {
     public BEVELFILTER readBEVELFILTER(String name) throws IOException {
         BEVELFILTER ret = new BEVELFILTER();
         newDumpLevel(name, "BEVELFILTER");
-        ret.highlightColor = readRGBA("highlightColor"); //Highlight color first. It it opposite of the documentation
+        ret.highlightColor = readRGBA("highlightColor"); // Highlight color first. It it opposite of the documentation
         ret.shadowColor = readRGBA("shadowColor");
         ret.blurX = readFIXED("blurX");
         ret.blurY = readFIXED("blurY");
@@ -2642,7 +2642,7 @@ public class SWFInputStream implements AutoCloseable {
                 }
                 ret = scr;
             }
-        } else {//typeFlag==1
+        } else { // typeFlag==1
             int straightFlag = (int) readUB(1, "straightFlag");
             if (straightFlag == 1) {
                 StraightEdgeRecord ser = new StraightEdgeRecord();
@@ -2826,13 +2826,13 @@ public class SWFInputStream implements AutoCloseable {
     public TEXTRECORD readTEXTRECORD(boolean inDefineText2, int glyphBits, int advanceBits, String name) throws IOException {
         TEXTRECORD ret = new TEXTRECORD();
         newDumpLevel(name, "TEXTRECORD");
-        int first = (int) readUB(1, "first"); //always 1
-        readUB(3, "styleFlagsHasReserved"); //always 0
+        int first = (int) readUB(1, "first"); // always 1
+        readUB(3, "styleFlagsHasReserved"); // always 0
         ret.styleFlagsHasFont = readUB(1, "styleFlagsHasFont") == 1;
         ret.styleFlagsHasColor = readUB(1, "styleFlagsHasColor") == 1;
         ret.styleFlagsHasYOffset = readUB(1, "styleFlagsHasYOffset") == 1;
         ret.styleFlagsHasXOffset = readUB(1, "styleFlagsHasXOffset") == 1;
-        if ((!ret.styleFlagsHasFont) && (!ret.styleFlagsHasColor) && (!ret.styleFlagsHasYOffset) && (!ret.styleFlagsHasXOffset) && (first == 0)) { //final text record
+        if ((!ret.styleFlagsHasFont) && (!ret.styleFlagsHasColor) && (!ret.styleFlagsHasYOffset) && (!ret.styleFlagsHasXOffset) && (first == 0)) { // final text record
             endDumpLevel();
             return null;
         }
@@ -2893,7 +2893,7 @@ public class SWFInputStream implements AutoCloseable {
     public MORPHGRADIENT readMORPHGRADIENT(String name) throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
         newDumpLevel(name, "MORPHGRADIENT");
-        //Despite of documentation (UI8 1-8), there are two fields 
+        // Despite of documentation (UI8 1-8), there are two fields 
         // spreadMode and interPolationMode which are same as in GRADIENT
         ret.spreadMode = (int) readUB(2, "spreadMode");
         ret.interPolationMode = (int) readUB(2, "interPolationMode");

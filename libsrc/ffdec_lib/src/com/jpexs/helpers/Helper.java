@@ -476,7 +476,7 @@ public class Helper {
                 }
             }
         } catch (IOException ex) {
-            //ignore
+            // ignore
         }
     }
 
@@ -486,7 +486,7 @@ public class Helper {
                 fos.write(d);
             }
         } catch (IOException ex) {
-            //ignore
+            // ignore
         }
     }
 

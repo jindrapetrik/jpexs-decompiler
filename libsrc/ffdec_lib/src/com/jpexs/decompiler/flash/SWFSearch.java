@@ -69,11 +69,11 @@ public class SWFSearch {
                 setProgress(p);
             }
         },
-                "FWS".getBytes(), //Uncompressed Flash
-                "CWS".getBytes(), //ZLib compressed Flash
-                "ZWS".getBytes(), //LZMA compressed Flash
-                "GFX".getBytes(), //Uncompressed ScaleForm GFx
-                "CFX".getBytes());   //Compressed ScaleForm GFx
+                "FWS".getBytes(), // Uncompressed Flash
+                "CWS".getBytes(), // ZLib compressed Flash
+                "ZWS".getBytes(), // LZMA compressed Flash
+                "GFX".getBytes(), // Uncompressed ScaleForm GFx
+                "CFX".getBytes()); // Compressed ScaleForm GFx
         int pos = 0;
         long biggestSize = 0;
         long smallestSize = Long.MAX_VALUE;

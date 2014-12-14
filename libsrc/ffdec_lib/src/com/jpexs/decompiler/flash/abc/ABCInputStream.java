@@ -309,10 +309,10 @@ public class ABCInputStream implements AutoCloseable {
         } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
             namespace_set_index = readU30("namespace_set_index");
         } else if (kind == Multiname.TYPENAME) {
-            qname_index = readU30("qname_index"); //Multiname index!!!
+            qname_index = readU30("qname_index"); // Multiname index!!!
             int paramsLength = readU30("paramsLength");
             for (int i = 0; i < paramsLength; i++) {
-                params.add(readU30("param")); //multiname indices!
+                params.add(readU30("param")); // multiname indices!
             }
         } else {
             throw new IOException("Unknown kind of Multiname:0x" + Integer.toHexString(kind));
@@ -333,9 +333,9 @@ public class ABCInputStream implements AutoCloseable {
         int name_index = readU30("name_index");
         int flags = read("flags");
 
-        //// 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional (16=ignore_rest, 32=explicit,) 64=setsdxns, 128=has_paramnames
+        // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional (16=ignore_rest, 32=explicit,) 64=setsdxns, 128=has_paramnames
         ValueKind[] optional = new ValueKind[0];
-        if ((flags & 8) == 8) { //if has_optional
+        if ((flags & 8) == 8) { // if has_optional
             int optional_count = readU30("optional_count");
             optional = new ValueKind[optional_count];
             for (int i = 0; i < optional_count; i++) {
@@ -344,7 +344,7 @@ public class ABCInputStream implements AutoCloseable {
         }
 
         int[] param_names = new int[param_count];
-        if ((flags & 128) == 128) { //if has_paramnames
+        if ((flags & 128) == 128) { // if has_paramnames
             for (int i = 0; i < param_count; i++) {
                 param_names[i] = readU30("param_name");
             }
@@ -365,8 +365,8 @@ public class ABCInputStream implements AutoCloseable {
         Trait trait;
 
         switch (kindType) {
-            case 0: //slot
-            case 6: //const
+            case 0: // slot
+            case 6: // const
                 TraitSlotConst t1 = new TraitSlotConst();
                 t1.slot_id = readU30("slot_id");
                 t1.type_index = readU30("type_index");
@@ -376,21 +376,21 @@ public class ABCInputStream implements AutoCloseable {
                 }
                 trait = t1;
                 break;
-            case 1: //method
-            case 2: //getter
-            case 3: //setter
+            case 1: // method
+            case 2: // getter
+            case 3: // setter
                 TraitMethodGetterSetter t2 = new TraitMethodGetterSetter();
                 t2.disp_id = readU30("disp_id");
                 t2.method_info = readU30("method_info");
                 trait = t2;
                 break;
-            case 4: //class
+            case 4: // class
                 TraitClass t3 = new TraitClass();
                 t3.slot_id = readU30("slot_id");
                 t3.class_info = readU30("class_info");
                 trait = t3;
                 break;
-            case 5: //function
+            case 5: // function
                 TraitFunction t4 = new TraitFunction();
                 t4.slot_id = readU30("slot_id");
                 t4.method_info = readU30("method_info");

@@ -133,7 +133,7 @@ public class SerializableImage implements Serializable {
         try {
             ImageHelper.write(image, "png", out);
         } catch (Exception ex) {
-            //ignore
+            // ignore
         }
     }
 

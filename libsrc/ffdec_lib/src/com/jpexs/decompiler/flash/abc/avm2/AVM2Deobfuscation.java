@@ -231,8 +231,8 @@ public class AVM2Deobfuscation {
             } else {
                 newname = fooString(namesMap, constants.getString(strIndex), firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
             }
-            if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //this name is already referenced as String
-                strIndex = constants.addString(s); //add new index
+            if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
+                strIndex = constants.addString(s); // add new index
             }
             constants.setString(strIndex, newname);
             if (!namesMap.containsKey(s)) {

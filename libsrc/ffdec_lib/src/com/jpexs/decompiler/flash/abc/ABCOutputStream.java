@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Decimal;
@@ -183,10 +184,10 @@ public class ABCOutputStream extends OutputStream {
             writeU30(m.name_index);
             writeU30(m.namespace_set_index);
         }
-        if ((m.kind == 0xf) || (m.kind == 0x10)) { //CONSTANT_RTQName and CONSTANT_RTQNameA
+        if ((m.kind == 0xf) || (m.kind == 0x10)) { // CONSTANT_RTQName and CONSTANT_RTQNameA
             writeU30(m.name_index);
         }
-        if ((m.kind == 0x1B) || (m.kind == 0x1C)) { //CONSTANT_MultinameL and CONSTANT_MultinameLA
+        if ((m.kind == 0x1B) || (m.kind == 0x1C)) { // CONSTANT_MultinameL and CONSTANT_MultinameLA
             writeU30(m.namespace_set_index);
         }
         if (m.kind == 0x1D) {
@@ -196,7 +197,7 @@ public class ABCOutputStream extends OutputStream {
                 writeU30(m.params.get(i));
             }
         }
-        //kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
+        // kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
     }
 
     public void writeMethodInfo(MethodInfo mi) throws IOException {
@@ -215,7 +216,7 @@ public class ABCOutputStream extends OutputStream {
             }
         }
 
-        if ((mi.flags & 128) == 128) { //if has_paramnames
+        if ((mi.flags & 128) == 128) { // if has_paramnames
             for (int i = 0; i < mi.paramNames.length; i++) {
                 writeU30(mi.paramNames[i]);
             }

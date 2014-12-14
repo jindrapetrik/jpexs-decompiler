@@ -94,7 +94,7 @@ import java.util.logging.Logger;
 /**
  * Represents one ACTIONRECORD, also has some static method to work with Actions
  */
-public class Action implements GraphSourceItem {
+public abstract class Action implements GraphSourceItem {
 
     private static final int INFORM_LISTENER_RESOLUTION = 100;
 
@@ -946,7 +946,7 @@ public class Action implements GraphSourceItem {
              try {
              action.translate(localData, stack, output);
              } catch (Exception ex) {
-             //ignore
+             // ignore
              }
              }
              } */ /*else if (action instanceof ActionStrictEquals) {
@@ -1065,7 +1065,7 @@ public class Action implements GraphSourceItem {
                     if ((nti.value instanceof GetMemberActionItem) || (nti.value instanceof GetVariableActionItem)) {
                         if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedActionItem)) {
                             if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
-                                //ignore
+                                // ignore
                             } else {
                                 List<GraphTargetItem> parts = it.onTrue;
                                 className = getWithoutGlobal(nti.value);

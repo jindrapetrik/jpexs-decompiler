@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.flv;
 
 import java.io.ByteArrayOutputStream;
@@ -65,7 +66,7 @@ public class AUDIODATA extends DATA {
             flv.writeUB(1, soundType ? 1 : 0);
             flv.write(soundData);
         } catch (IOException ex) {
-            //ignore
+            // ignore
         }
         return baos.toByteArray();
     }

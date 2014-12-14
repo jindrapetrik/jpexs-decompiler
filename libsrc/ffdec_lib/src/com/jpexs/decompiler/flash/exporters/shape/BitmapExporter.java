@@ -383,11 +383,12 @@ public class BitmapExporter extends ShapeExporterBase {
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
-        //Do not scale strokes automatically:
+        
+        // Do not scale strokes automatically:
         try {
             lineStroke = new TransformedStroke(lineStroke, graphics.getTransform());
         } catch (NoninvertibleTransformException net) {
-            //ignore
+            // ignore
         }
     }
 
@@ -424,8 +425,21 @@ public class BitmapExporter extends ShapeExporterBase {
                     graphics.setClip(path);
                     Matrix inverse = null;
                     try {
+                        double scx = fillTransform.getScaleX(); 
+                        double scy = fillTransform.getScaleY(); 
+                        double shx = fillTransform.getShearX(); 
+                        double shy = fillTransform.getShearY(); 
+                        double det = scx * scy - shx * shy;
+                        if (Math.abs(det) <= Double.MIN_VALUE) {
+                            // use only the translate values
+                            // todo: make it better
+                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
+                        }
+
                         inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                        
                     } catch (NoninvertibleTransformException ex) {
+                        // it should never happen as we already checked the determinant of the matrix
                     }
 
                     fillTransform.preConcatenate(oldAf);
@@ -446,8 +460,20 @@ public class BitmapExporter extends ShapeExporterBase {
                     graphics.setClip(path);
                     Matrix inverse = null;
                     try {
+                        double scx = fillTransform.getScaleX(); 
+                        double scy = fillTransform.getScaleY(); 
+                        double shx = fillTransform.getShearX(); 
+                        double shy = fillTransform.getShearY(); 
+                        double det = scx * scy - shx * shy;
+                        if (Math.abs(det) <= Double.MIN_VALUE) {
+                            // use only the translate values
+                            // todo: make it better
+                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
+                        }
+
                         inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
                     } catch (NoninvertibleTransformException ex) {
+                        // it should never happen as we already checked the determinant of the matrix
                     }
 
                     fillTransform.preConcatenate(oldAf);

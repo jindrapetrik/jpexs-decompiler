@@ -71,7 +71,7 @@ public class BMPFile extends Component {
             try {
                 b.fo.close();
             } catch (Exception ex) {
-                //ignore
+                // ignore
             }
         }
     }

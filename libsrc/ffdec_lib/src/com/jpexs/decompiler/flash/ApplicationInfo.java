@@ -60,7 +60,7 @@ public class ApplicationInfo {
                 version = version + " nightly build " + version_build;
             }
         } catch (IOException | NullPointerException | NumberFormatException ex) {
-            //ignore
+            // ignore
             version = "unknown";
         }
 

@@ -287,7 +287,7 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0x9b, "add_d", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; //?
+                return -2 + 1; // ?
             }
         },
         new AddIIns(),
@@ -314,16 +314,16 @@ public class AVM2Code implements Cloneable {
         new CheckFilterIns(),
         new CoerceIns(),
         new CoerceAIns(),
-        new InstructionDefinition(0x81, "coerce_b", new int[]{}), //stack:-1+1
-        new InstructionDefinition(0x84, "coerce_d", new int[]{}), //stack:-1+1
-        new InstructionDefinition(0x83, "coerce_i", new int[]{}), //stack:-1+1
-        new InstructionDefinition(0x89, "coerce_o", new int[]{}), //stack:-1+1
+        new InstructionDefinition(0x81, "coerce_b", new int[]{}), // stack:-1+1
+        new InstructionDefinition(0x84, "coerce_d", new int[]{}), // stack:-1+1
+        new InstructionDefinition(0x83, "coerce_i", new int[]{}), // stack:-1+1
+        new InstructionDefinition(0x89, "coerce_o", new int[]{}), // stack:-1+1
         new CoerceSIns(),
-        new InstructionDefinition(0x88, "coerce_u", new int[]{}), //stack:-1+1
+        new InstructionDefinition(0x88, "coerce_u", new int[]{}), // stack:-1+1
         new InstructionDefinition(0x9a, "concat", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; //?
+                return -2 + 1; // ?
             }
         },
         new ConstructIns(),
@@ -335,7 +335,7 @@ public class AVM2Code implements Cloneable {
         new ConvertOIns(),
         new ConvertUIns(),
         new ConvertSIns(),
-        new InstructionDefinition(0x79, "convert_m", new int[]{}), //-1 +1
+        new InstructionDefinition(0x79, "convert_m", new int[]{}), // -1 +1
         new InstructionDefinition(0x7a, "convert_m_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
@@ -366,7 +366,7 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0xb8, "divide_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; //?
+                return -2 + 1; // ?
             }
         },
         new DupIns(),
@@ -376,7 +376,7 @@ public class AVM2Code implements Cloneable {
         new EscXAttrIns(),
         new EscXElemIns(),
         new FindDefIns(),
-        /* //Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
+        /* // Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
          new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
 
          @Override
@@ -469,7 +469,7 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0xb9, "modulo_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; //?
+                return -2 + 1; // ?
             }
         },
         new MultiplyIns(),
@@ -477,7 +477,7 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0xb7, "multiply_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; //?
+                return -2 + 1; // ?
             }
         },
         new NegateIns(),
@@ -509,19 +509,19 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0x22, "pushconstant", new int[]{AVM2Code.DAT_STRING_INDEX}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; //?
+                return 1; // ?
             }
         },
         new InstructionDefinition(0x33, "pushdecimal", new int[]{AVM2Code.DAT_DECIMAL_INDEX}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; //?
+                return 1; // ?
             }
         },
         new InstructionDefinition(0x34, "pushdnan", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; //?
+                return 1; // ?
             }
         },
         new PushDoubleIns(),
@@ -725,7 +725,8 @@ public class AVM2Code implements Cloneable {
             }
         }
     };
-    //endoflist
+    // endoflist
+    
     public static InstructionDefinition[] instructionSetByCode = buildInstructionSetByCode();
     public boolean hideTemporaryRegisters = true;
 
@@ -800,7 +801,7 @@ public class AVM2Code implements Cloneable {
             if (codeMap.containsKey(address)) {
                 continue;
             }
-            if (address < startPos) //no jump outside block
+            if (address < startPos) // no jump outside block
             {
                 continue;
             }
@@ -816,7 +817,7 @@ public class AVM2Code implements Cloneable {
                     }
                     if (instr != null) {
                         int[] actualOperands = null;
-                        if (instructionCode == 0x1b) { //switch
+                        if (instructionCode == 0x1b) { // switch
                             int firstOperand = ais.readS24("default_offset");
                             int case_count = ais.readU30("case_count");
                             actualOperands = new int[case_count + 3];
@@ -1155,13 +1156,13 @@ public class AVM2Code implements Cloneable {
                                 for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
                                     writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
                                 }
-                                if (fixBranch == 0) { //jump
+                                if (fixBranch == 0) { // jump
                                     writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]));
                                 } else {
-                                    //nojump, ignore
+                                    // nojump, ignore
                                 }
                             }
-                            //TODO: lookupswitch ?
+                            // TODO: lookupswitch ?
                         } else {
                             if (ins.changeJumpTo > -1) {
                                 writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
@@ -1245,7 +1246,7 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
                     String v = abc.constants.getString(ins.operands[1]);
-                    //Same name already exists, it may be wrong names inserted by obfuscator
+                    // Same name already exists, it may be wrong names inserted by obfuscator
                     if (localRegNames.values().contains(v)) {
                         return new HashMap<>();
                     }
@@ -1254,7 +1255,7 @@ public class AVM2Code implements Cloneable {
             }
         }
 
-        //TODO: Make this immune to using existing multinames (?)
+        // TODO: Make this immune to using existing multinames (?)
         return localRegNames;
     }
 
@@ -1278,7 +1279,7 @@ public class AVM2Code implements Cloneable {
             }
 
         } catch (InterruptedException ex) {
-            //ignored
+            // ignored
         }
     }
 
@@ -1415,7 +1416,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
-            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
+            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
@@ -1428,7 +1429,7 @@ public class AVM2Code implements Cloneable {
                 SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
                 stack.push(slt.getValue());
                 ip++;
-            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { // set_local_x,get_local_x..kill x
                 AVM2Instruction insAfter = code.get(ip + 1);
                 if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                     GraphTargetItem before = stack.peek();
@@ -1449,7 +1450,7 @@ public class AVM2Code implements Cloneable {
                     if (ip - 1 >= start) {
                         insBefore = code.get(ip - 1);
                     }
-                    if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
+                    if (insAfter.definition instanceof ConvertBIns) { // SWF compiled with debug contain convert_b
                         ip++;
                         //addr = pos2adr(ip);
                         insAfter = code.get(ip + 1);
@@ -1463,7 +1464,7 @@ public class AVM2Code implements Cloneable {
                         //stack.add("(" + stack.pop() + ")||");
                         isAnd = false;
                     } else if (insAfter.definition instanceof SetLocalTypeIns) {
-                        //chained assignments
+                        // chained assignments
                         int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
                         for (int t = ip + 1; t <= end - 1; t++) {
                             if (code.get(t).definition instanceof KillIns) {
@@ -1490,7 +1491,7 @@ public class AVM2Code implements Cloneable {
                             for (int i = ip; i >= start; i--) {
                                 if (code.get(i).definition instanceof DupIns) {
                                     if (stack.isEmpty()) {
-                                        break;//FIXME?o
+                                        break; // FIXME?o
                                     }
                                     GraphTargetItem v = stack.pop();
                                     stack.push(new LocalRegAVM2Item(ins, reg, v));
@@ -1537,9 +1538,9 @@ public class AVM2Code implements Cloneable {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
                                                     functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames, true);
-                                                    scopeStack.pop();//with
-                                                    output.remove(output.size() - 1); //with
-                                                    ip = ip + plus + 4; //+1 below
+                                                    scopeStack.pop();// with
+                                                    output.remove(output.size() - 1); // with
+                                                    ip = ip + plus + 4; // +1 below
                                                 }
                                             }
                                         }
@@ -1549,7 +1550,7 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 }
-                //What to do when hasDup is false?
+                // What to do when hasDup is false?
                 ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
                 NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                 nft.functionName = functionName;
@@ -1763,7 +1764,7 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 } else {
-                    //In obfuscated code, SetLocal instructions comes first
+                    // In obfuscated code, SetLocal instructions comes first
                     //break;
                 }
             }
@@ -1784,7 +1785,7 @@ public class AVM2Code implements Cloneable {
                 return list;
             }
         }
-        //Declarations        
+        // Declarations        
         injectDeclarations(list, new boolean[regCount], new ArrayList<Slot>(), abc, body);
 
         int lastPos = list.size() - 1;
@@ -1982,7 +1983,7 @@ public class AVM2Code implements Cloneable {
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
             if (stats.instructionStats[pos].seen) {
-                //check stack mismatch here
+                // check stack mismatch here
                 return true;
             }
 
@@ -2032,11 +2033,11 @@ public class AVM2Code implements Cloneable {
                 }
             }
             if (ins.definition instanceof ReturnValueIns) {
-                //check stack=1
+                // check stack=1
                 return true;
             }
             if (ins.definition instanceof ReturnVoidIns) {
-                //check stack=0
+                // check stack=0
                 return true;
             }
             if (ins.definition instanceof JumpIns) {
@@ -2098,7 +2099,7 @@ public class AVM2Code implements Cloneable {
                     return null;
                 }
                 int maxIp = 0;
-                //searching for visited instruction in second run which has maximum position
+                // searching for visited instruction in second run which has maximum position
                 for (int i = 0; i < stats.instructionStats.length; i++) {
                     if (stats.instructionStats[i].seen && !visited.contains(i)) {
                         maxIp = i;
@@ -2118,7 +2119,7 @@ public class AVM2Code implements Cloneable {
                         for (int i = 0; i < stats.instructionStats.length; i++) {
                             stats.instructionStats[i].seen = false;
                         }
-                        //Rerun rest with new scopePos, stackPos
+                        // Rerun rest with new scopePos, stackPos
                         if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc)) {
                             return null;
                         }
@@ -2127,7 +2128,7 @@ public class AVM2Code implements Cloneable {
                 }
                 prevStart = ex.start;
             } catch (ConvertException ex1) {
-                //ignore
+                // ignore
             }
         }
         //stats.maxscope+=initScope;
@@ -2753,7 +2754,7 @@ public class AVM2Code implements Cloneable {
              }*/
 
             AVM2Instruction ins = code.get(ip);
-            //Errorneous code inserted by some obfuscators
+            // Errorneous code inserted by some obfuscators
             if (ins.definition instanceof NewObjectIns) {
                 if (ins.operands[0] > stack.size()) {
                     ins.setIgnored(true, 0);

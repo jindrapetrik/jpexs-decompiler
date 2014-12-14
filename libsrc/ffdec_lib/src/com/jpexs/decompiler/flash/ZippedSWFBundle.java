@@ -96,7 +96,7 @@ public class ZippedSWFBundle implements SWFBundle {
 
     @Override
     public Map<String, SeekableInputStream> getAll() throws IOException {
-        for (String key : getKeys()) { //cache everything first
+        for (String key : getKeys()) { // cache everything first
             getSWF(key);
         }
         return cachedSWFs;

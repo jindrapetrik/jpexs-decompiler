@@ -48,27 +48,27 @@ public class IdentifiersDeobfuscation {
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
-    //http://help.adobe.com/en_US/AS2LCR/Flash_10.0/help.html?content=00000477.html
+    // http://help.adobe.com/en_US/AS2LCR/Flash_10.0/help.html?content=00000477.html
     public static final String[] reservedWordsAS2 = {
-        //is "add" really a keyword? documentation says yes, but I can create "add" variable in CS6...
-        //"add",
+        // is "add" really a keyword? documentation says yes, but I can create "add" variable in CS6...
+        // "add",
         "and", "break", "case", "catch", "class", "continue", "default", "delete", "do", "dynamic", "else",
         "eq", "extends", "false", "finally", "for", "function", "ge", "get", "gt", "if", "ifFrameLoaded", "implements",
         "import", "in", "instanceof", "interface", "intrinsic", "le",
-        //is "it" really a keyword? documentation says yes, but I can create "it" variable in CS6...
-        //"it",
+        // is "it" really a keyword? documentation says yes, but I can create "it" variable in CS6...
+        // "it",
         "ne", "new", "not", "null", "on", "onClipEvent",
         "or", "private", "public", "return", "set", "static", "super", "switch", "tellTarget", "this", "throw", "try",
         "typeof", "undefined", "var", "void", "while", "with"
     };
 
-    //http://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/syntax.html
+    // http://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/syntax.html
     public static final String[] reservedWordsAS3 = {
         "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else",
         "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
         "interface", "internal", "is", "new", "null", "package", "private", "protected", "public",
         "return", "super", "switch", "this", "throw",
-        //is "to" really a keyword? documentation says yes, but I can create "to" variable...
+        // is "to" really a keyword? documentation says yes, but I can create "to" variable...
         // "to",   
         "true", "try", "typeof", "use", "var",
         "void", "while", "with"
@@ -232,11 +232,11 @@ public class IdentifiersDeobfuscation {
             return false;
         }
 
-        //simple fast test
+        // simple fast test
         if (s.matches("^[a-zA-Z_\\$][a-zA-Z0-9_\\$]*$")) {
             return true;
         }
-        //unicode test
+        // unicode test
         if (IDENTIFIER_PATTERN.matcher(s).matches()) {
             return true;
         }
@@ -303,7 +303,7 @@ public class IdentifiersDeobfuscation {
      * @return
      */
     public static String printIdentifier(boolean as3, String s, String... validExceptions) {
-        if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { //Assuming already printed - TODO:detect better
+        if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
             return s;
         }
 

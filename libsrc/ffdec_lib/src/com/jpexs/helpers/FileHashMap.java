@@ -213,7 +213,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
             try {
                 oos.close();
             } catch (IOException ex) {
-                //ignore
+                // ignore
             }
         }
         return value;

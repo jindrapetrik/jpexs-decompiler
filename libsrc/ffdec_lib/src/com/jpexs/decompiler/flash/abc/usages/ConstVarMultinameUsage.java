@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -50,7 +51,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         try {
             ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
         } catch (InterruptedException ex) {
-            //ignore
+            // ignore
         }
 
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
@@ -65,7 +66,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         try {
             ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         } catch (InterruptedException ex) {
-            //ignore
+            // ignore
         }
         return writer.toString();
     }

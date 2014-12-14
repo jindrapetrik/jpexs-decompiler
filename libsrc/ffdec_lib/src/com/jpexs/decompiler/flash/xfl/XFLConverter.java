@@ -2141,7 +2141,7 @@ public class XFLConverter {
                         DefineSoundTag s = (DefineSoundTag) ta;
                         if (s.soundId == startSound.soundId) {
                             if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat())) { //Sound was not exported
-                                startSound = null; //ignore
+                                startSound = null; // ignore
                             }
                             break;
                         }
@@ -2152,7 +2152,7 @@ public class XFLConverter {
             if (t instanceof SoundStreamHeadTypeTag) {
                 soundStreamHead = (SoundStreamHeadTypeTag) t;
                 if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat())) { //Sound was not exported
-                    soundStreamHead = null; //ignore
+                    soundStreamHead = null; // ignore
                 }
             }
             if (t instanceof ShowFrameTag) {

@@ -531,9 +531,9 @@ public class SWFOutputStream extends OutputStream {
      * @return Number of bits
      */
     public static int getNeededBitsF(float value) {
-        //0.26213074  16bits
-        //0.5 17bits
-        //1.3476715 18bits
+        // 0.26213074  16bits
+        // 0.5 17bits
+        // 1.3476715 18bits
         int k = (int) value;
         return getNeededBitsS(k) + 16;
     }
@@ -741,7 +741,7 @@ public class SWFOutputStream extends OutputStream {
             sos.write(value.actionBytes);
         }
         byte[] data = baos.toByteArray();
-        writeUI32(data.length);     //actionRecordSize
+        writeUI32(data.length); // actionRecordSize
         write(data);
     }
 
@@ -1323,8 +1323,8 @@ public class SWFOutputStream extends OutputStream {
         for (SHAPERECORD sh : value) {
             if (sh instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) sh;
-                writeUB(1, 1); //typeFlag
-                writeUB(1, 0);//curvedEdge
+                writeUB(1, 1); // typeFlag
+                writeUB(1, 0); // curvedEdge
                 cer.numBits = Math.max(getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2, 0);
                 writeUB(4, cer.numBits);
                 writeSB(cer.numBits + 2, cer.controlDeltaX);
@@ -1333,8 +1333,8 @@ public class SWFOutputStream extends OutputStream {
                 writeSB(cer.numBits + 2, cer.anchorDeltaY);
             } else if (sh instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) sh;
-                writeUB(1, 1); //typeFlag
-                writeUB(1, 1);//straightEdge
+                writeUB(1, 1); // typeFlag
+                writeUB(1, 1); // straightEdge
                 ser.numBits = Math.max(getNeededBitsS(ser.deltaX, ser.deltaY) - 2, 0);
                 writeUB(4, ser.numBits);
                 writeUB(1, ser.generalLineFlag ? 1 : 0);
@@ -1349,7 +1349,7 @@ public class SWFOutputStream extends OutputStream {
                 }
             } else if (sh instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) sh;
-                writeUB(1, 0); //typeFlag
+                writeUB(1, 0); // typeFlag
                 writeUB(1, scr.stateNewStyles ? 1 : 0);
                 writeUB(1, scr.stateLineStyle ? 1 : 0);
                 writeUB(1, scr.stateFillStyle1 ? 1 : 0);
@@ -1382,8 +1382,8 @@ public class SWFOutputStream extends OutputStream {
                 }
 
             } else if (sh instanceof EndShapeRecord) {
-                writeUB(1, 0); //typeFlag
-                writeUB(5, 0); //end of shape flag
+                writeUB(1, 0); // typeFlag
+                writeUB(5, 0); // end of shape flag
             }
         }
         alignByte();
@@ -1548,7 +1548,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        //Despite of documentation (UI8 1-8), there are two fields 
+        // Despite of documentation (UI8 1-8), there are two fields 
         // spreadMode and interPolationMode which are same as in GRADIENT
         writeUB(2, value.spreadMode);
         writeUB(2, value.interPolationMode);

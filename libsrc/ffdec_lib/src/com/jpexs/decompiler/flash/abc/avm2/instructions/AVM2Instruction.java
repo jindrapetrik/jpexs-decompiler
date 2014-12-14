@@ -86,7 +86,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 }
             }
         } catch (IOException ex) {
-            //ignored
+            // ignored
         }
         return bos.toByteArray();
     }

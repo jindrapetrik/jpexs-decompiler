@@ -83,7 +83,7 @@ public class FontHelper {
 
             fonts = (Font[]) clFm.getDeclaredMethod("getAllInstalledFonts").invoke(fm);
         } catch (Throwable ex) {
-            //ignore            
+            // ignore            
         }
         
         if (fonts == null) {
@@ -148,7 +148,7 @@ public class FontHelper {
             try {
                 return k.loadFromTTF(fontFile, size);
             } catch (IOException | FontFormatException ex) {
-                //ignore
+                // ignore
             }
         }
         List<KerningPair> ret = new ArrayList<>();
