@@ -545,11 +545,26 @@ public class Filtering {
     }
 
     public static SerializableImage colorMatrix(SerializableImage src, float[][] matrix) {
-        BandCombineOp changeColors = new BandCombineOp(matrix, new RenderingHints(null));
+        /*BandCombineOp changeColors = new BandCombineOp(matrix, new RenderingHints(null));
         Raster sourceRaster = src.getRaster();
         WritableRaster displayRaster = sourceRaster.createCompatibleWritableRaster();
         changeColors.filter(sourceRaster, displayRaster);
-        return new SerializableImage(src.getColorModel(), displayRaster, true, null);
+        return new SerializableImage(src.getColorModel(), displayRaster, true, null);*/
+        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
+        int rgb[] = getRGB(src.getBufferedImage()).clone();
+        for (int i = 0; i < rgb.length; i++) {
+            int a = (rgb[i] >> 24) & 0xff;
+            int r = (rgb[i] >> 16) & 0xff;
+            int g = (rgb[i] >> 8) & 0xff;
+            int b = (rgb[i]) & 0xff;
+            r = cut(matrix[0][0] * r + matrix[0][1] * g + matrix[0][2] * b + matrix[0][3] * a + matrix[0][4]);
+            g = cut(matrix[1][0] * r + matrix[1][1] * g + matrix[1][2] * b + matrix[1][3] * a + matrix[1][4]);
+            b = cut(matrix[2][0] * r + matrix[2][1] * g + matrix[2][2] * b + matrix[2][3] * a + matrix[2][4]);
+            a = cut(matrix[3][0] * r + matrix[3][1] * g + matrix[3][2] * b + matrix[3][3] * a + matrix[3][4]);
+            rgb[i] = (a << 24) | (r << 16) | (g << 8) | (b);
+        }
+        setRGB(dst, src.getWidth(), src.getHeight(), rgb);
+        return new SerializableImage(dst);
     }
 
     private static int cut(double val) {
