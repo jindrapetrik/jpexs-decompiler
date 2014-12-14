@@ -32,7 +32,19 @@ import javax.imageio.ImageIO;
 public class ImageHelper {
 
     public static BufferedImage read(InputStream input) throws IOException {
-        return ImageIO.read(input);
+        BufferedImage in = ImageIO.read(input);
+        int type = in.getType();
+        if (type != BufferedImage.TYPE_INT_ARGB && type != BufferedImage.TYPE_INT_RGB) {
+            // convert to ARGB
+            int width = in.getWidth();
+            int height = in.getHeight();
+            int[] imgData = in.getRGB(0, 0, width, height, null, 0, width);
+            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            newImage.getRaster().setDataElements(0, 0, width, height, imgData);
+            return newImage;
+        }
+        
+        return in;
     }
 
     public static void write(BufferedImage image, String formatName, OutputStream output) throws IOException {

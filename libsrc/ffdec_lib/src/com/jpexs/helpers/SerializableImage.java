@@ -112,16 +112,8 @@ public class SerializableImage implements Serializable {
         return image.getRGB(i, i1);
     }
 
-    public int[] getRGB(int i, int i1, int i2, int i3, int[] ints, int i4, int i5) {
-        return image.getRGB(i, i1, i2, i3, ints, i4, i5);
-    }
-
     public synchronized void setRGB(int i, int i1, int i2) {
         image.setRGB(i, i1, i2);
-    }
-
-    public void setRGB(int i, int i1, int i2, int i3, int[] ints, int i4, int i5) {
-        image.setRGB(i, i1, i2, i3, ints, i4, i5);
     }
 
     public ColorModel getColorModel() {

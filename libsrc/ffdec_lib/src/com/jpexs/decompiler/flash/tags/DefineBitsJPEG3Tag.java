@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -102,20 +103,14 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
                 return img;
             }
             
-            int width = img.getWidth();
-            int height = img.getHeight();
-            SerializableImage img2 = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int val = img.getRGB(x, y);
-                    int a = bitmapAlphaData[x + y * width] & 0xff;
-                    val = (val & 0xffffff) | (a << 24);
-                    img2.setRGB(x, y, multiplyAlpha(val));
-                }
+            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData(); 
+            for (int i = 0; i < pixels.length; i++) {
+                int a = bitmapAlphaData[i] & 0xff;
+                pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
             }
-            
-            cachedImage = img2;
-            return img2;
+
+            cachedImage = img;
+            return img;
         } catch (IOException ex) {
         }
         return null;

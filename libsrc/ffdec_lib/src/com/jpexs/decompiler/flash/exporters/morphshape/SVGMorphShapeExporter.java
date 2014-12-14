@@ -60,10 +60,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     @Override
     public void beginFill(RGB color, RGB colorEnd) {
         if (color == null) {
-            color = new RGB(defaultColor == null ? Color.BLACK : defaultColor);
+            color = new RGB(defaultColor == null ? Color.black : defaultColor);
         }
         if (colorEnd == null) {
-            colorEnd = new RGB(defaultColor == null ? Color.BLACK : defaultColor);
+            colorEnd = new RGB(defaultColor == null ? Color.black : defaultColor);
         }
         finalizePath();
         path.setAttribute("stroke", "none");

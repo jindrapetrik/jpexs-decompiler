@@ -65,7 +65,12 @@ public class RGBA extends RGB implements Serializable {
 
     public RGBA(Color color) {
         super(color);
-        this.alpha = color.getAlpha();
+        alpha = color.getAlpha();
+    }
+
+    public RGBA(int rgb) {
+        super(rgb);
+        alpha = (rgb >> 24) & 0xFF;
     }
 
     public RGBA() {
@@ -78,6 +83,10 @@ public class RGBA extends RGB implements Serializable {
 
     @Override
     public int toInt() {
+        return toInt(red, green, blue, alpha);
+    }
+
+    public static int toInt(int red, int green, int blue, int alpha) {
         return ((alpha & 0xFF) << 24) |
                ((red & 0xFF) << 16) |
                ((green & 0xFF) << 8)  |

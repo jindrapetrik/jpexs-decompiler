@@ -33,7 +33,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -97,34 +97,35 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) throws IOException {
         SerializableImage image = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(data)));
-        bitmapFormat = FORMAT_24BIT_RGB;
-        bitmapWidth = image.getWidth();
-        bitmapHeight = image.getHeight();
+        int width = image.getWidth();
+        int height = image.getHeight();
         bitmapData = new BITMAPDATA();
-        bitmapData.bitmapPixelDataPix24 = new PIX24[bitmapWidth * bitmapHeight];
-        int pos = 0;
-        for (int y = 0; y < bitmapHeight; y++) {
-            for (int x = 0; x < bitmapWidth; x++) {
-                int argb = image.getRGB(x, y);
-                //int a = (argb >> 24) & 0xff;
-                int r = (argb >> 16) & 0xff;
-                int g = (argb >> 8) & 0xff;
-                int b = (argb) & 0xff;
-                bitmapData.bitmapPixelDataPix24[pos] = new PIX24();
-                bitmapData.bitmapPixelDataPix24[pos].red = r;
-                bitmapData.bitmapPixelDataPix24[pos].green = g;
-                bitmapData.bitmapPixelDataPix24[pos].blue = b;
-                bitmapData.bitmapPixelDataPix24[pos].reserved = 0xff; //documentation says 0, but image is sometimes broken with 0, so there is 0xff, which works (maybe alpha?)
-                pos++;
-            }
+        bitmapData.bitmapPixelDataPix24 = new PIX24[width * height];
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); 
+        for (int pos = 0; pos < pixels.length; pos++) {
+            int argb = pixels[pos];
+            //int a = (argb >> 24) & 0xff;
+            int r = (argb >> 16) & 0xff;
+            int g = (argb >> 8) & 0xff;
+            int b = (argb) & 0xff;
+            bitmapData.bitmapPixelDataPix24[pos] = new PIX24();
+            bitmapData.bitmapPixelDataPix24[pos].red = r;
+            bitmapData.bitmapPixelDataPix24[pos].green = g;
+            bitmapData.bitmapPixelDataPix24[pos].blue = b;
+            bitmapData.bitmapPixelDataPix24[pos].reserved = 0xff; //documentation says 0, but image is sometimes broken with 0, so there is 0xff, which works (maybe alpha?)
         }
+
+        int format = FORMAT_24BIT_RGB;
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
-        sos.writeBITMAPDATA(bitmapData, bitmapFormat, bitmapWidth, bitmapHeight);
+        sos.writeBITMAPDATA(bitmapData, format, width, height);
         ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
         SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = new ByteArrayRange(zlibOS.toByteArray());
+        bitmapFormat = format;
+        bitmapWidth = width;
+        bitmapHeight = height;
         decompressed = false;
         clearCache();
         setModified(true);
@@ -153,18 +154,18 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
-                Color c = null;
+                int c = 0;
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
                     RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff];
-                    c = (new Color(color.red, color.green, color.blue));
+                    c = color.toInt();
                 }
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
-                    c = (new Color(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8));
+                    c = new RGB(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8).toInt();
                 }
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
-                    c = (new Color(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue));
+                    c = new RGB(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue).toInt();
                 }
-                bi.setRGB(x, y, c.getRGB());
+                bi.setRGB(x, y, c);
                 pos32aligned++;
                 pos++;
             }

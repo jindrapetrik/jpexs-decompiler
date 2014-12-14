@@ -369,7 +369,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     } else {
                         // We should never get here
-                        lineStyle(1, new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
+                        lineStyle(1, new RGB(Color.black), false, "NORMAL", 0, 0, 0, 3);
                     }
                 }
                 if (!e.getFrom().equals(pos)) {

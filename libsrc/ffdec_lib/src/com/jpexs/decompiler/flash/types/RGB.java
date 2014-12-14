@@ -74,6 +74,10 @@ public class RGB implements Serializable {
     }
 
     public int toInt() {
+        return toInt(red, green, blue);
+    }
+
+    public static int toInt(int red, int green, int blue) {
         return (0xFF << 24) |
                ((red & 0xFF) << 16) |
                ((green & 0xFF) << 8)  |
@@ -81,9 +85,15 @@ public class RGB implements Serializable {
     }
 
     public RGB(Color color) {
-        this.red = color.getRed();
-        this.green = color.getGreen();
-        this.blue = color.getBlue();
+        red = color.getRed();
+        green = color.getGreen();
+        blue = color.getBlue();
+    }
+
+    public RGB(int rgb) {
+        red = (rgb >> 16) & 0xFF;
+        green = (rgb >> 8) & 0xFF;
+        blue = rgb & 0xFF;
     }
 
     @Override

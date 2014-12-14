@@ -58,20 +58,10 @@ public class ARGB implements Serializable {
     }
 
     public int toInt() {
-        return ((alpha & 0xFF) << 24) |
-               ((red & 0xFF) << 16) |
-               ((green & 0xFF) << 8)  |
-               (blue & 0xFF);
+        return RGBA.toInt(red, green, blue, alpha);
     }
 
     public ARGB() {
 
-    }
-
-    public ARGB(Color color) {
-        this.alpha = color.getAlpha();
-        this.red = color.getRed();
-        this.green = color.getGreen();
-        this.blue = color.getBlue();
     }
 }

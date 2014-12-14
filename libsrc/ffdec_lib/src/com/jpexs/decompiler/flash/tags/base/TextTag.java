@@ -272,7 +272,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     }
 
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
-        Color textColor = new Color(0, 0, 0);
+        int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
         int x = 0;
@@ -281,9 +281,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toColor());
+                    textColor = colorTransform.apply(rec.textColorA.toInt());
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toColor());
+                    textColor = colorTransform.apply(rec.textColor.toInt());
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -300,6 +300,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
             double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
 
+            Color textColor2 = new Color(textColor);
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = transformation.clone();
                 mat = mat.concatenate(new Matrix(textMatrix));
@@ -309,7 +310,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 if (entry.glyphIndex != -1 && glyphs != null) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    BitmapExporter.export(swf, shape, textColor, image, mat, colorTransform);
+                    BitmapExporter.export(swf, shape, textColor2, image, mat, colorTransform);
                     x += entry.glyphAdvance;
                 }
             }
@@ -317,7 +318,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     }
 
     public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
-        Color textColor = new Color(0, 0, 0);
+        int textColor = 0;
         String ret = "";
         FontTag font = null;
         int fontId = -1;
@@ -329,9 +330,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toColor());
+                    textColor = colorTransform.apply(rec.textColorA.toInt());
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toColor());
+                    textColor = colorTransform.apply(rec.textColor.toInt());
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -366,7 +367,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     }
 
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
-        Color textColor = new Color(0, 0, 0);
+        int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
         int x = 0;
@@ -375,9 +376,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toColor());
+                    textColor = colorTransform.apply(rec.textColorA.toInt());
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toColor());
+                    textColor = colorTransform.apply(rec.textColor.toInt());
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -422,12 +423,10 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setTextContent(text.toString());
 
-                if (textColor != null) {
-                    RGBA colorA = new RGBA(textColor);
-                    textElement.setAttribute("fill", colorA.toHexRGB());
-                    if (colorA.alpha != 255) {
-                        textElement.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
-                    }
+                RGBA colorA = new RGBA(textColor);
+                textElement.setAttribute("fill", colorA.toHexRGB());
+                if (colorA.alpha != 255) {
+                    textElement.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
                 }
 
                 exporter.addToGroup(textElement);
@@ -467,13 +466,12 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                         }
 
                         Element charImage = exporter.addUse(mat, bounds, charId);
-                        if (textColor != null) {
-                            RGBA colorA = new RGBA(textColor);
-                            charImage.setAttribute("fill", colorA.toHexRGB());
-                            if (colorA.alpha != 255) {
-                                charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
-                            }
+                        RGBA colorA = new RGBA(textColor);
+                        charImage.setAttribute("fill", colorA.toHexRGB());
+                        if (colorA.alpha != 255) {
+                            charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
                         }
+
                         x += entry.glyphAdvance;
                     }
                 }

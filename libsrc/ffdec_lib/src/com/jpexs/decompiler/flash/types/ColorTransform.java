@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.awt.image.RescaleOp;
 
 /**
@@ -36,7 +35,7 @@ public class ColorTransform implements Cloneable {
         return Filtering.colorEffect(src, getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti());
     }
 
-    public Color apply(Color color) {
+    public int apply(int color) {
         return Filtering.colorEffect(color, getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti());
     }
 
@@ -44,14 +43,14 @@ public class ColorTransform implements Cloneable {
         if (color == null) {
             return null;
         }
-        return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
+        return new RGBA(Filtering.colorEffect(color.toInt(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
     public RGBA apply(RGBA color) {
         if (color == null) {
             return null;
         }
-        return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
+        return new RGBA(Filtering.colorEffect(color.toInt(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
     public GRADRECORD[] apply(GRADRECORD[] gradRecords) {
@@ -84,19 +83,19 @@ public class ColorTransform implements Cloneable {
     }
 
     public int getRedMulti() {
-        return 255;
+        return 256;
     }
 
     public int getGreenMulti() {
-        return 255;
+        return 256;
     }
 
     public int getBlueMulti() {
-        return 255;
+        return 256;
     }
 
     public int getAlphaMulti() {
-        return 255;
+        return 256;
     }
 
     public ColorTransform merge(final ColorTransform c) {

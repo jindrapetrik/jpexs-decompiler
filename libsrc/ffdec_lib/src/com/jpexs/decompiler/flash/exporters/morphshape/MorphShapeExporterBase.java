@@ -448,7 +448,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         }
                     } else {
                         // We should never get here
-                        lineStyle(1, 1, new RGB(Color.BLACK), new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
+                        lineStyle(1, 1, new RGB(Color.black), new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
                     }
                 }
                 if (!e.getFrom().equals(pos)) {

@@ -37,7 +37,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
-import com.jpexs.helpers.ByteArrayRange;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -29,6 +30,7 @@ import java.awt.image.BandCombineOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
+import java.awt.image.DataBufferInt;
 import java.awt.image.Kernel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
@@ -217,16 +219,17 @@ public class Filtering {
     }
 
     public static SerializableImage blur(SerializableImage src, int hRadius, int vRadius, int iterations) {
-        return new SerializableImage(blur(src.getBufferedImage(), hRadius, vRadius, iterations, null));
-    }
-
-    private static BufferedImage blur(BufferedImage src, int hRadius, int vRadius, int iterations, int[] mask) {
+        int[] pixels = (int[]) getRGB(src.getBufferedImage()).clone();
         int width = src.getWidth();
         int height = src.getHeight();
+        blur(pixels, width, height, hRadius, vRadius, iterations, null);
+        BufferedImage ret = new BufferedImage(width, height, src.getType());
+        setRGB(ret, width, height, pixels);
+        return new SerializableImage(ret);
+    }
 
-        BufferedImage dst = new BufferedImage(width, height, src.getType());
-
-        int[] inPixels = getRGB(src, 0, 0, width, height);
+    private static void blur(int[] src, int width, int height, int hRadius, int vRadius, int iterations, int[] mask) {
+        int[] inPixels = src;
         premultiply(inPixels);
 
         for (int i = 0; i < iterations; i++) {
@@ -234,8 +237,6 @@ public class Filtering {
             boxBlurVertical(inPixels, mask, width, height, vRadius / 2);
         }
         unpremultiply(inPixels);
-        setRGB(dst, 0, 0, width, height, inPixels);
-        return dst;
     }
 
     public static SerializableImage bevel(SerializableImage src, int blurX, int blurY, float strength, int type, Color highlightColor, Color shadowColor, float angle, float distance, boolean knockout, int iterations) {
@@ -255,7 +256,7 @@ public class Filtering {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage retImg = new BufferedImage(width, height, src.getType());
-        int srcPixels[] = getRGB(src, 0, 0, width, height);
+        int srcPixels[] = getRGB(src);
 
         int revPixels[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
@@ -269,7 +270,7 @@ public class Filtering {
         Point p2 = new Point(511, 0);
         gg.setPaint(new LinearGradientPaint(p1, p2, ratios, colors));
         gg.fill(new Rectangle(512, 1));
-        int[] gradientPixels = getRGB(gradient, 0, 0, gradient.getWidth(), gradient.getHeight());
+        int[] gradientPixels = getRGB(gradient);
 
         BufferedImage shadowInner = null;
         BufferedImage hilightInner = null;
@@ -290,6 +291,7 @@ public class Filtering {
             shadowInner = s2;
             hilightInner = h2;
         }
+        
         BufferedImage shadowOuter = null;
         BufferedImage hilightOuter = null;
         if (type != INNER) {
@@ -348,11 +350,8 @@ public class Filtering {
         retc.drawImage(shadowIm, 0, 0, null);
         retc.drawImage(hilightIm, 0, 0, null);
 
-        /*if(true)
-         return retImg;
-         */
-        retImg = blur(retImg, blurX, blurY, iterations, mask);
-        int ret[] = getRGB(retImg, 0, 0, width, height);
+        int ret[] = getRGB(retImg);
+        blur(ret, width, height, blurX, blurY, iterations, mask);
 
         for (int i = 0; i < srcPixels.length; i++) {
             int ah = (int) (new Color(ret[i]).getRed() * strength);
@@ -360,7 +359,8 @@ public class Filtering {
             int ra = cut(ah - as, -255, 255);
             ret[i] = gradientPixels[255 + ra];
         }
-        setRGB(retImg, 0, 0, width, height, ret);
+        
+        setRGB(retImg, width, height, ret);
 
         if (!knockout) {
             Graphics2D g = retImg.createGraphics();
@@ -391,7 +391,7 @@ public class Filtering {
     private static BufferedImage dropShadow(BufferedImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout) {
         int width = src.getWidth();
         int height = src.getHeight();
-        int[] srcPixels = getRGB(src, 0, 0, width, height);
+        int[] srcPixels = getRGB(src);
         int shadow[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             int alpha = (srcPixels[i] >> 24) & 0xff;
@@ -400,6 +400,7 @@ public class Filtering {
             }
             shadow[i] = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255 * strength)).getRGB();
         }
+        
         Color colorFirst = Color.BLACK;
         Color colorAlpha = new Color(0, 0, 0, 0);
         double angleRad = angle / 180 * Math.PI;
@@ -407,12 +408,9 @@ public class Filtering {
         double moveY = (distance * Math.sin(angleRad));
         shadow = moveRGB(width, height, shadow, moveX, moveY, inner ? colorFirst : colorAlpha);
 
-        BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
-        setRGB(retCanvas, 0, 0, width, height, shadow);
         if (blurX > 0 || blurY > 0) {
-            retCanvas = blur(retCanvas, blurX, blurY, iterations, null);
+            blur(shadow, width, height, blurX, blurY, iterations, null);
         }
-        shadow = getRGB(retCanvas, 0, 0, width, height);
 
         for (int i = 0; i < shadow.length; i++) {
             int mask = (srcPixels[i] >> 24) & 0xff;
@@ -421,7 +419,9 @@ public class Filtering {
             }
             shadow[i] = shadow[i] & 0xffffff + ((mask * ((shadow[i] >> 24) & 0xff) / 255) << 24);
         }
-        setRGB(retCanvas, 0, 0, width, height, shadow);
+        
+        BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
+        setRGB(retCanvas, width, height, shadow);
 
         if (!knockout) {
             Graphics2D g = retCanvas.createGraphics();
@@ -440,35 +440,31 @@ public class Filtering {
 
         int width = src.getWidth();
         int height = src.getHeight();
-        BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
-        Graphics2D retImg = retCanvas.createGraphics();
-
         BufferedImage gradCanvas = new BufferedImage(256, 1, src.getType());
-
         Graphics2D gg = gradCanvas.createGraphics();
 
         Point p1 = new Point(0, 0);
         Point p2 = new Point(255, 0);
         gg.setPaint(new LinearGradientPaint(p1, p2, ratios, colors));
         gg.fill(new Rectangle(256, 1));
-        int[] gradientPixels = getRGB(gradCanvas, 0, 0, gradCanvas.getWidth(), gradCanvas.getHeight());
+        int[] gradientPixels = getRGB(gradCanvas);
 
         double angleRad = angle / 180 * Math.PI;
         double moveX = (distance * Math.cos(angleRad));
         double moveY = (distance * Math.sin(angleRad));
-        int srcPixels[] = getRGB(src, 0, 0, width, height);
+        int srcPixels[] = getRGB(src);
         int revPixels[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
         }
+        
         int shadow[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             shadow[i] = 0 + ((cut(strength * ((srcPixels[i] >> 24) & 0xff))) << 24);
         }
+        
         Color colorAlpha = new Color(0, 0, 0, 0);
         shadow = moveRGB(width, height, shadow, moveX, moveY, colorAlpha);
-
-        setRGB(retCanvas, 0, 0, width, height, shadow);
 
         int mask[] = null;
         if (type == INNER) {
@@ -478,8 +474,7 @@ public class Filtering {
             mask = revPixels;
         }
 
-        retCanvas = blur(retCanvas, blurX, blurY, iterations, mask);
-        shadow = getRGB(retCanvas, 0, 0, width, height);
+        blur(shadow, width, height, blurX, blurY, iterations, mask);
 
         if (mask != null) {
             for (int i = 0; i < mask.length; i++) {
@@ -495,10 +490,11 @@ public class Filtering {
             shadow[i] = gradientPixels[a];
         }
 
-        setRGB(retCanvas, 0, 0, width, height, shadow);
+        BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
+        setRGB(retCanvas, width, height, shadow);
 
         if (!knockout) {
-            retImg = retCanvas.createGraphics();
+            Graphics2D retImg = retCanvas.createGraphics();
             retImg.setComposite(AlphaComposite.DstOver);
             retImg.drawImage(src, 0, 0, null);
         }
@@ -506,26 +502,27 @@ public class Filtering {
         return retCanvas;
     }
 
-    private static int[] getRGB(BufferedImage image, int x, int y, int width, int height) {
+    private static int[] getRGB(BufferedImage image) {
         int type = image.getType();
         if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
-            return (int[]) image.getRaster().getDataElements(x, y, width, height, null);
+            return ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); 
         }
-        return image.getRGB(x, y, width, height, null, 0, width);
+        int width = image.getWidth();
+        return image.getRGB(0, 0, width, image.getHeight(), null, 0, width);
     }
 
-    private static void setRGB(BufferedImage image, int x, int y, int width, int height, int[] pixels) {
+    private static void setRGB(BufferedImage image, int width, int height, int[] pixels) {
         int type = image.getType();
         if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
-            image.getRaster().setDataElements(x, y, width, height, pixels);
+            image.getRaster().setDataElements(0, 0, width, height, pixels);
         } else {
-            image.setRGB(x, y, width, height, pixels, 0, width);
+            image.setRGB(0, 0, width, height, pixels, 0, width);
         }
     }
 
     private static int[] moveRGB(int width, int height, int[] rgb, double deltaX, double deltaY, Color fill) {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        setRGB(img, 0, 0, width, height, rgb);
+        setRGB(img, width, height, rgb);
         BufferedImage retImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) retImg.getGraphics();
         g.setPaint(fill);
@@ -537,7 +534,7 @@ public class Filtering {
         g.setTransform(AffineTransform.getTranslateInstance(deltaX, deltaY));
         g.setComposite(AlphaComposite.Src);
         g.drawImage(img, 0, 0, null);
-        return getRGB(retImg, 0, 0, width, height);
+        return getRGB(retImg);
     }
 
     public static SerializableImage convolution(SerializableImage src, float[] matrix, int w, int h) {
@@ -566,26 +563,25 @@ public class Filtering {
         return i;
     }
 
-    public static Color colorEffect(Color color,
+    public static int colorEffect(int rgb,
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
-        int rgb = color.getRGB();
         int a = (rgb >> 24) & 0xff;
         int r = (rgb >> 16) & 0xff;
         int g = (rgb >> 8) & 0xff;
         int b = (rgb) & 0xff;
-        r = Math.max(0, Math.min(((r * redMultTerm) / 255) + redAddTerm, 255));
-        g = Math.max(0, Math.min(((g * greenMultTerm) / 255) + greenAddTerm, 255));
-        b = Math.max(0, Math.min(((b * blueMultTerm) / 255) + blueAddTerm, 255));
-        a = Math.max(0, Math.min(((a * alphaMultTerm) / 255) + alphaAddTerm, 255));
-        return new Color(r, g, b, a);
+        r = cut(((r * redMultTerm) / 255) + redAddTerm);
+        g = cut(((g * greenMultTerm) / 255) + greenAddTerm);
+        b = cut(((b * blueMultTerm) / 255) + blueAddTerm);
+        a = cut(((a * alphaMultTerm) / 255) + alphaAddTerm);
+        return RGBA.toInt(r, g, b, a);
     }
 
     public static SerializableImage colorEffect(SerializableImage src,
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        int rgb[] = getRGB(src.getBufferedImage(), 0, 0, src.getWidth(), src.getHeight());
+        int rgb[] = getRGB(src.getBufferedImage()).clone();
         for (int i = 0; i < rgb.length; i++) {
             int a = (rgb[i] >> 24) & 0xff;
             int r = (rgb[i] >> 16) & 0xff;
@@ -597,7 +593,7 @@ public class Filtering {
             a = Math.max(0, Math.min(((a * alphaMultTerm) / 256) + alphaAddTerm, 255));
             rgb[i] = (a << 24) | (r << 16) | (g << 8) | (b);
         }
-        setRGB(dst, 0, 0, src.getWidth(), src.getHeight(), rgb);
+        setRGB(dst, src.getWidth(), src.getHeight(), rgb);
         return new SerializableImage(dst);
     }
 }

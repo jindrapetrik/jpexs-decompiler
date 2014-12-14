@@ -52,7 +52,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
     public JCheckBox ignoreCaseCheckbox, regExpCheckbox, wrapCheckbox;
     public JLabel statusLabel;
 
-    private final Markers.SimpleMarker marker = new Markers.SimpleMarker(Color.PINK);
+    private final Markers.SimpleMarker marker = new Markers.SimpleMarker(Color.pink);
     private WeakReference<JTextComponent> target;
     private WeakReference<DocumentSearchData> dsd;
     private int oldCaretPosition;
@@ -86,7 +86,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         pan1.add(jLabel1);
 
         findTextField.setColumns(30);
-        findTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        findTextField.setBorder(javax.swing.BorderFactory.createLineBorder(Color.black));
         findTextField.setMaximumSize(new java.awt.Dimension(200, 24));
         findTextField.setMinimumSize(new java.awt.Dimension(60, 24));
         pan1.add(findTextField);
@@ -135,7 +135,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         wrapCheckbox.addActionListener(this);
 
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getStyle() | java.awt.Font.BOLD, statusLabel.getFont().getSize() - 2));
-        statusLabel.setForeground(java.awt.Color.red);
+        statusLabel.setForeground(Color.red);
         pan2.add(statusLabel);
 
         add(pan1);

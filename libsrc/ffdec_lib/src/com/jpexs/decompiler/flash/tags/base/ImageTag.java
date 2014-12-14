@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
@@ -105,7 +106,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         r = max255(r * multiplier);
         g = max255(g * multiplier);
         b = max255(b * multiplier);
-        return ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8)  | (b & 0xFF);
+        return RGBA.toInt(r, g, b, a);
     }
 
     private SHAPEWITHSTYLE getShape() {

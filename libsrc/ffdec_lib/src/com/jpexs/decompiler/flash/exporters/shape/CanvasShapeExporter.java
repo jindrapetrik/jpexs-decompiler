@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 
 /**
  *
@@ -225,8 +224,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         fillData += "\tctx.fillStyle = grd;\r\n";
     }
 
-    public static String color(Color color) {
-        return color(new RGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()));
+    public static String color(int color) {
+        return color(new RGBA(color));
     }
 
     public static String color(RGB rgb) {
