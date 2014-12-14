@@ -642,7 +642,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             isWelcomeScreen = false;
         }
 
-        mainMenu.updateComponents(swf, abcList);
+        mainMenu.updateComponents(swf);
     }
 
     private void updateUi() {
@@ -653,7 +653,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
-        mainMenu.updateComponents(null, null);
+        mainMenu.updateComponents(null);
     }
 
     public void closeAll() {

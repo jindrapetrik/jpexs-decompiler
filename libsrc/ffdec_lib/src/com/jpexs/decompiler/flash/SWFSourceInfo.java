@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.Path;
@@ -29,7 +30,7 @@ import java.io.InputStream;
 public class SWFSourceInfo {
 
     private final InputStream inputStream;
-    private final String file;
+    private String file;
     private final String fileTitle;
 
     public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
@@ -44,6 +45,10 @@ public class SWFSourceInfo {
 
     public String getFile() {
         return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 
     public String getFileTitle() {

@@ -369,8 +369,10 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
-        if (mode == SaveFileMode.SAVEAS) {
+        if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle) {
             swf.file = outfile;
+            swf.fileTitle = null;
+            swf.swfList.sourceInfo.setFile(outfile);
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");

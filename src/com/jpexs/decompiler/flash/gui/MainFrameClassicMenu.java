@@ -335,8 +335,9 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
     }
 
     @Override
-    public void updateComponents(SWF swf, List<ABCContainerTag> abcList) {
+    public void updateComponents(SWF swf) {
         boolean swfLoaded = swf != null;
+        List<ABCContainerTag> abcList = swfLoaded ? swf.abcList : null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
 
         /*saveCommandButton.setEnabled(swfLoaded);
@@ -358,9 +359,8 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
-            swf.fileTitle = null;
             mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-            saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
+            updateComponents(mainFrame.panel.getCurrentSwf());
             return true;
         }
         return false;

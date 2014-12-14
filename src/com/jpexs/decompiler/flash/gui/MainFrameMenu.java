@@ -28,5 +28,5 @@ public interface MainFrameMenu {
 
     public boolean isInternalFlashViewerSelected();
 
-    public void updateComponents(SWF swf, List<ABCContainerTag> abcList);
+    public void updateComponents(SWF swf);
 }
