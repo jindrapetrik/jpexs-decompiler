@@ -172,7 +172,6 @@ public class TagTreeModel implements TreeModel {
                 List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sound).getBlocks();
                 if (blocks.isEmpty()) {
                     sounds.remove(i);
-                    i--;
                 }
             }
         }
