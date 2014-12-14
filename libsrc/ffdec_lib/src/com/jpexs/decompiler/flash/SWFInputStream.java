@@ -3235,19 +3235,20 @@ public class SWFInputStream implements AutoCloseable {
     public BITMAPDATA readBITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         BITMAPDATA ret = new BITMAPDATA();
         newDumpLevel(name, "BITMAPDATA");
-        List<PIX15> pix15 = new ArrayList<>();
-        List<PIX24> pix24 = new ArrayList<>();
+        int pixelCount = bitmapWidth * bitmapHeight;
+        PIX15[] pix15 = bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB ? new PIX15[pixelCount] : null;
+        PIX24[] pix24 = bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB ? new PIX24[pixelCount] : null;
         int dataLen = 0;
+        int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
-            int x = 0;
-            for (; x < bitmapWidth; x++) {
+            for (int x = 0; x < bitmapWidth; x++) {
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
                     dataLen += 2;
-                    pix15.add(readPIX15("pix15"));
+                    pix15[pos++] = readPIX15("pix15");
                 }
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
                     dataLen += 4;
-                    pix24.add(readPIX24("pix24"));
+                    pix24[pos++] = readPIX24("pix24");
                 }
             }
             while ((dataLen % 4) != 0) {
@@ -3256,9 +3257,9 @@ public class SWFInputStream implements AutoCloseable {
             }
         }
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
-            ret.bitmapPixelDataPix15 = pix15.toArray(new PIX15[pix15.size()]);
+            ret.bitmapPixelDataPix15 = pix15;
         } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
-            ret.bitmapPixelDataPix24 = pix24.toArray(new PIX24[pix24.size()]);
+            ret.bitmapPixelDataPix24 = pix24;
         }
         endDumpLevel();
         return ret;

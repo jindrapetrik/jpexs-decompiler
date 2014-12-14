@@ -302,6 +302,10 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                     tag.setSwf(targetSwf);
                                     targetSwf.tags.add(tag);
                                     tag.setModified(true);
+                                    sourceSwf.assignExportNamesToSymbols();
+                                    targetSwf.assignExportNamesToSymbols();
+                                    sourceSwf.assignClassesToSymbols();
+                                    targetSwf.assignClassesToSymbols();
                                     sourceSwf.clearImageCache();
                                     targetSwf.clearImageCache();
                                     mainPanel.refreshTree();
@@ -324,6 +328,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                         copyTag.setSwf(targetSwf);
                                         targetSwf.tags.add(copyTag);
                                         copyTag.setModified(true);
+                                        targetSwf.assignExportNamesToSymbols();
+                                        targetSwf.assignClassesToSymbols();
                                         targetSwf.clearImageCache();
                                         mainPanel.refreshTree();
                                     } catch (IOException | InterruptedException ex) {

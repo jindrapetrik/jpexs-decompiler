@@ -715,7 +715,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private void assignExportNamesToSymbols() {
+    public void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof ExportAssetsTag) {

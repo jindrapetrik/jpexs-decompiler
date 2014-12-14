@@ -154,19 +154,23 @@ public class Timeline {
         int frameIdx = 0;
         Frame frame = new Frame(this, frameIdx++);
         frame.layersChanged = true;
-        boolean tagAdded = false;
+        boolean newFrameNeeded = false;
         for (Tag t : tags) {
-            tagAdded = true;
             if (ShowFrameTag.isNestedTagType(t.getId())) {
+                newFrameNeeded = true;
                 frame.innerTags.add(t);
             }
             if (t instanceof StartSoundTag) {
+                newFrameNeeded = true;
                 frame.sounds.add(((StartSoundTag) t).soundId);
             } else if (t instanceof StartSound2Tag) {
+                newFrameNeeded = true;
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
             } else if (t instanceof SetBackgroundColorTag) {
+                newFrameNeeded = true;
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
             } else if (t instanceof PlaceObjectTypeTag) {
+                newFrameNeeded = true;
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
                 if (!frame.layers.containsKey(depth)) {
@@ -228,25 +232,27 @@ public class Timeline {
                 }
                 fl.key = true;
             } else if (t instanceof RemoveTag) {
+                newFrameNeeded = true;
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
                 frame.layersChanged = true;
             } else if (t instanceof DoActionTag) {
+                newFrameNeeded = true;
                 frame.actions.add((DoActionTag) t);
                 actionFrames.put((DoActionTag) t, frame.frame);
             } else if (t instanceof ShowFrameTag) {
                 frame.showFrameTag = (ShowFrameTag) t;
                 frames.add(frame);
                 frame = new Frame(frame, frameIdx++);
-                tagAdded = false;
+                newFrameNeeded = false;
             } else if (t instanceof ASMSource) {
                 asmSources.add((ASMSource) t);
             } else {
                 otherTags.add(t);
             }
         }
-        if (tagAdded) {
+        if (newFrameNeeded) {
             frames.add(frame);
         }
 
