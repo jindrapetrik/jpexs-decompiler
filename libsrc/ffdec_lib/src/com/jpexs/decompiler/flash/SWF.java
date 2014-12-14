@@ -2970,16 +2970,25 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (t instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(t.getId())) {
             List<Tag> tags;
             if (timelined instanceof DefineSpriteTag) {
-                tags = ((DefineSpriteTag) timelined).getSubTags();
+                DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+                tags = sprite.getSubTags();
             } else {
                 tags = this.tags;
             }
             tags.remove(t);
+            if (timelined instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+                sprite.setModified(true);
+            }
             timelined.getTimeline().reset();
         } else {
             // timeline should be always the swf here
             if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(t, timelined.getTimeline());
+                if (timelined instanceof DefineSpriteTag) {
+                    DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+                    sprite.setModified(true);
+                }
             } else {
                 removeTagFromTimeline(t, timeline);
             }
