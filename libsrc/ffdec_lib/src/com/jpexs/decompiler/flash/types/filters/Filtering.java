@@ -551,19 +551,24 @@ public class Filtering {
         changeColors.filter(sourceRaster, displayRaster);
         return new SerializableImage(src.getColorModel(), displayRaster, true, null);*/
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        int rgb[] = getRGB(src.getBufferedImage()).clone();
-        for (int i = 0; i < rgb.length; i++) {
-            int a = (rgb[i] >> 24) & 0xff;
-            int r = (rgb[i] >> 16) & 0xff;
-            int g = (rgb[i] >> 8) & 0xff;
-            int b = (rgb[i]) & 0xff;
-            r = cut(matrix[0][0] * r + matrix[0][1] * g + matrix[0][2] * b + matrix[0][3] * a + matrix[0][4]);
-            g = cut(matrix[1][0] * r + matrix[1][1] * g + matrix[1][2] * b + matrix[1][3] * a + matrix[1][4]);
-            b = cut(matrix[2][0] * r + matrix[2][1] * g + matrix[2][2] * b + matrix[2][3] * a + matrix[2][4]);
-            a = cut(matrix[3][0] * r + matrix[3][1] * g + matrix[3][2] * b + matrix[3][3] * a + matrix[3][4]);
-            rgb[i] = (a << 24) | (r << 16) | (g << 8) | (b);
+        int pixels[] = getRGB(src.getBufferedImage()).clone();
+        for (int i = 0; i < pixels.length; i++) {
+            int rgb = pixels[i];
+            int a = (rgb >> 24) & 0xff;
+            int r = (rgb >> 16) & 0xff;
+            int g = (rgb >> 8) & 0xff;
+            int b = rgb & 0xff;
+            float[] mr = matrix[0];
+            r = cut(mr[0] * r + mr[1] * g + mr[2] * b + mr[3] * a + mr[4]);
+            float[] mg = matrix[1];
+            g = cut(mg[0] * r + mg[1] * g + mg[2] * b + mg[3] * a + mg[4]);
+            float[] mb = matrix[2];
+            b = cut(mb[0] * r + mb[1] * g + mb[2] * b + mb[3] * a + mb[4]);
+            float[] ma = matrix[3];
+            a = cut(ma[0] * r + ma[1] * g + ma[2] * b + ma[3] * a + ma[4]);
+            pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
         }
-        setRGB(dst, src.getWidth(), src.getHeight(), rgb);
+        setRGB(dst, src.getWidth(), src.getHeight(), pixels);
         return new SerializableImage(dst);
     }
 
@@ -584,31 +589,32 @@ public class Filtering {
         int a = (rgb >> 24) & 0xff;
         int r = (rgb >> 16) & 0xff;
         int g = (rgb >> 8) & 0xff;
-        int b = (rgb) & 0xff;
+        int b = rgb & 0xff;
         r = cut(((r * redMultTerm) / 256) + redAddTerm);
         g = cut(((g * greenMultTerm) / 256) + greenAddTerm);
         b = cut(((b * blueMultTerm) / 256) + blueAddTerm);
         a = cut(((a * alphaMultTerm) / 256) + alphaAddTerm);
-        return RGBA.toInt(r, g, b, a);
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
     public static SerializableImage colorEffect(SerializableImage src,
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        int rgb[] = getRGB(src.getBufferedImage()).clone();
-        for (int i = 0; i < rgb.length; i++) {
-            int a = (rgb[i] >> 24) & 0xff;
-            int r = (rgb[i] >> 16) & 0xff;
-            int g = (rgb[i] >> 8) & 0xff;
-            int b = (rgb[i]) & 0xff;
+        int pixels[] = getRGB(src.getBufferedImage()).clone();
+        for (int i = 0; i < pixels.length; i++) {
+            int rgb = pixels[i];
+            int a = (rgb >> 24) & 0xff;
+            int r = (rgb >> 16) & 0xff;
+            int g = (rgb >> 8) & 0xff;
+            int b = rgb & 0xff;
             r = cut(((r * redMultTerm) / 256) + redAddTerm);
             g = cut(((g * greenMultTerm) / 256) + greenAddTerm);
             b = cut(((b * blueMultTerm) / 256) + blueAddTerm);
             a = cut(((a * alphaMultTerm) / 256) + alphaAddTerm);
-            rgb[i] = (a << 24) | (r << 16) | (g << 8) | (b);
+            pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
         }
-        setRGB(dst, src.getWidth(), src.getHeight(), rgb);
+        setRGB(dst, src.getWidth(), src.getHeight(), pixels);
         return new SerializableImage(dst);
     }
 }
