@@ -570,10 +570,10 @@ public class Filtering {
         int r = (rgb >> 16) & 0xff;
         int g = (rgb >> 8) & 0xff;
         int b = (rgb) & 0xff;
-        r = cut(((r * redMultTerm) / 255) + redAddTerm);
-        g = cut(((g * greenMultTerm) / 255) + greenAddTerm);
-        b = cut(((b * blueMultTerm) / 255) + blueAddTerm);
-        a = cut(((a * alphaMultTerm) / 255) + alphaAddTerm);
+        r = cut(((r * redMultTerm) / 256) + redAddTerm);
+        g = cut(((g * greenMultTerm) / 256) + greenAddTerm);
+        b = cut(((b * blueMultTerm) / 256) + blueAddTerm);
+        a = cut(((a * alphaMultTerm) / 256) + alphaAddTerm);
         return RGBA.toInt(r, g, b, a);
     }
 
@@ -587,10 +587,10 @@ public class Filtering {
             int r = (rgb[i] >> 16) & 0xff;
             int g = (rgb[i] >> 8) & 0xff;
             int b = (rgb[i]) & 0xff;
-            r = Math.max(0, Math.min(((r * redMultTerm) / 256) + redAddTerm, 255));
-            g = Math.max(0, Math.min(((g * greenMultTerm) / 256) + greenAddTerm, 255));
-            b = Math.max(0, Math.min(((b * blueMultTerm) / 256) + blueAddTerm, 255));
-            a = Math.max(0, Math.min(((a * alphaMultTerm) / 256) + alphaAddTerm, 255));
+            r = cut(((r * redMultTerm) / 256) + redAddTerm);
+            g = cut(((g * greenMultTerm) / 256) + greenAddTerm);
+            b = cut(((b * blueMultTerm) / 256) + blueAddTerm);
+            a = cut(((a * alphaMultTerm) / 256) + alphaAddTerm);
             rgb[i] = (a << 24) | (r << 16) | (g << 8) | (b);
         }
         setRGB(dst, src.getWidth(), src.getHeight(), rgb);

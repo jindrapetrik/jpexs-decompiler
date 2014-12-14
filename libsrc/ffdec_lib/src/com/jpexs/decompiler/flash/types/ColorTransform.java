@@ -124,22 +124,22 @@ public class ColorTransform implements Cloneable {
 
             @Override
             public int getRedMulti() {
-                return (int) ((float) t.getRedMulti() / 255f * c.getRedMulti());
+                return (int) ((float) t.getRedMulti() / 256f * c.getRedMulti());
             }
 
             @Override
             public int getGreenMulti() {
-                return (int) ((float) t.getGreenMulti() / 255f * c.getGreenMulti());
+                return (int) ((float) t.getGreenMulti() / 256f * c.getGreenMulti());
             }
 
             @Override
             public int getBlueMulti() {
-                return (int) ((float) t.getBlueMulti() / 255f * c.getBlueMulti());
+                return (int) ((float) t.getBlueMulti() / 256f * c.getBlueMulti());
             }
 
             @Override
             public int getAlphaMulti() {
-                return (int) ((float) t.getAlphaMulti() / 255f * c.getAlphaMulti());
+                return (int) ((float) t.getAlphaMulti() / 256f * c.getAlphaMulti());
             }
         };
     }
