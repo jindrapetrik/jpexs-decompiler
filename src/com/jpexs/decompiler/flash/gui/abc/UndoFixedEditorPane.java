@@ -24,7 +24,6 @@ import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
-import static javax.swing.JEditorPane.createEditorKitForContentType;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
@@ -43,7 +42,7 @@ public class UndoFixedEditorPane extends JEditorPane {
         setText(t, getContentType());
     }
 
-    public void setText(String t, String contentType) {
+    private void setText(String t, String contentType) {
         synchronized (setTextLock) {
             if (!t.equals(getText())) {
                 boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();

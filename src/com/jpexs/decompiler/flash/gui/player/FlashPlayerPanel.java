@@ -107,9 +107,9 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         }
         try {
             return flash.getFrameNum();
-        } catch (ActiveXException ex) { //Can be "Data not available yet exception"
-            return 0;
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
+        return 0;
     }
 
     @Override
@@ -117,12 +117,11 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (flash == null) {
             return 0;
         }
-        if (flash.getReadyState() == 4) {
-            try {
+        try {
+            if (flash.getReadyState() == 4) {
                 return flash.getTotalFrames();
-            } catch (ActiveXException ex) { //Can be "Data not available yet exception"
-                return 0;
             }
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
         return 0;
     }
@@ -131,8 +130,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public synchronized void setBackground(Color color) {
         try {
             flash.setBackgroundColor((color.getRed() << 16) + (color.getGreen() << 8) + color.getBlue());
-        } catch (ActiveXException ex) {
-            //ignore
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -207,8 +205,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public void pause() {
         try {
             flash.Stop();
-        } catch (ActiveXException ex) {
-            //ignore
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -216,8 +213,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public void rewind() {
         try {
             flash.Rewind();
-        } catch (ActiveXException ex) {
-            //ignore
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -225,8 +221,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public void play() {
         try {
             flash.Play();
-        } catch (ActiveXException ex) {
-            //ignore
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -234,7 +229,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public boolean isPlaying() {
         try {
             return flash.IsPlaying();
-        } catch (ActiveXException ex) {
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
             return false;
         }
     }
@@ -249,8 +244,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         }
         try {
             flash.GotoFrame(frame);
-        } catch (ActiveXException ex) {
-            //ignore
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
         }
     }
 

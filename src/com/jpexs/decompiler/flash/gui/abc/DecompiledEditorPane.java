@@ -657,7 +657,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             traitHighlights = cd.getTraitHighlights();
             methodHighlights = cd.getMethodHighlights();
             classHighlights = cd.getClassHighlights();
-            setContentType("text/actionscript");
             setText(hilightedCode);
         }
         fireScript();

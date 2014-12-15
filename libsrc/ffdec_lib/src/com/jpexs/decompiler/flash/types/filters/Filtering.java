@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -26,14 +25,11 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BandCombineOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Kernel;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 
 /**
  *

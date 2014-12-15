@@ -275,14 +275,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         setCaretPosition(0); //scroll to top
     }
 
-    @Override
-    public void setText(String t, String contentType) {
-        lastLine = -1;
-        error = true;
-        super.setText(t, contentType);
-        setCaretPosition(0); //scroll to top                
-    }
-
     public static class UnderLinePainter extends DefaultHighlighter.DefaultHighlightPainter {
 
         public UnderLinePainter(Color color) {

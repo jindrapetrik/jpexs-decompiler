@@ -399,6 +399,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 }
             }
         });
+
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
 

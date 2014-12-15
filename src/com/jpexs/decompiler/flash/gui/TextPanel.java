@@ -21,12 +21,14 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
@@ -48,12 +50,15 @@ public class TextPanel extends JPanel implements ActionListener {
     public TextPanel(MainPanel mainPanel) {
         super(new BorderLayout());
 
+        DefaultSyntaxKit.initKit();
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);
         add(textSearchPanel, BorderLayout.NORTH);
         textValue = new LineMarkedEditorPane();
         add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setEditable(false);
+        textValue.setFont(new Font("Monospaced", Font.PLAIN, textValue.getFont().getSize()));
+        textValue.setContentType("text/swftext");
 
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout());
@@ -88,8 +93,6 @@ public class TextPanel extends JPanel implements ActionListener {
     }
 
     public void setText(String text) {
-        textValue.setContentType("text/swftext");
-        // textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
         textValue.setText(text);
         textValue.setCaretPosition(0);
     }

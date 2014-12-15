@@ -262,7 +262,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             @Override
             public void run() {
                 ignoreCarret = true;
-                decompiledEditor.setText(text, "text/actionscript");
+                decompiledEditor.setText(text);
                 ignoreCarret = false;
             }
         });
@@ -274,7 +274,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             @Override
             public void run() {
                 ignoreCarret = true;
-                editor.setText(text, contentType);
+                editor.setContentType(contentType);
+                editor.setText(text);
                 ignoreCarret = false;
             }
         });
@@ -561,8 +562,10 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 Configuration.guiActionSplitPaneDividerLocation.set((int) pce.getNewValue());
             }
         });
+
         editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
         decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
+        decompiledEditor.setContentType("text/actionscript");
 
         //tagTree.addTreeSelectionListener(this);
         editor.addCaretListener(new CaretListener() {
