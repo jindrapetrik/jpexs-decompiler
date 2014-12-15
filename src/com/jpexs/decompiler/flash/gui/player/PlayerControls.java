@@ -334,6 +334,9 @@ public class PlayerControls extends JPanel implements ActionListener {
                 frameControls.setVisible(display.screenAvailable());
                 int totalFrames = display.getTotalFrames();
                 int currentFrame = display.getCurrentFrame();
+                if (currentFrame >= totalFrames) {
+                    currentFrame = totalFrames - 1;
+                }
                 int frameRate = display.getFrameRate();
                 if (totalFrames == 0) {
                     progress.setIndeterminate(true);

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.helpers.SoundPlayer;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -29,8 +28,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -40,10 +42,11 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SoundTagPlayer implements MediaDisplay {
 
-    private final SoundPlayer player;
+    private final Clip clip;
 
-    private Thread thr;
-    private int actualPos = 0;
+    private int loopCount;
+    private boolean paused = true;
+    private final Object playLock = new Object();
     private final SoundTag tag;
     private final List<PlayerListener> listeners = new ArrayList<>();
 
@@ -63,13 +66,9 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private static final int FRAME_DIVISOR = 8000;
 
-    private int loops;
-    private boolean paused = true;
-    private final Object playLock = new Object();
-
     public SoundTagPlayer(SoundTag tag, int loops) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         this.tag = tag;
-        this.loops = loops;
+        this.loopCount = loops;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         List<byte[]> soundData = tag.getRawSoundData();
         SWF swf = ((Tag) tag).getSwf();
@@ -78,107 +77,70 @@ public class SoundTagPlayer implements MediaDisplay {
             siss.add(new SWFInputStream(swf, data));
         }
         tag.getSoundFormat().createWav(siss, baos);
-        player = new SoundPlayer(new ByteArrayInputStream(baos.toByteArray()));
-    }
+        clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
+        clip.open(AudioSystem.getAudioInputStream(new ByteArrayInputStream(baos.toByteArray())));
 
-    @Override
-    public synchronized int getCurrentFrame() {
-
-        synchronized (playLock) {
-            if (isPlaying()) {
-                actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-            }
-            return actualPos;
-        }
-    }
-
-    @Override
-    public synchronized int getTotalFrames() {
-
-        int ret = (int) (player.samplesCount() / FRAME_DIVISOR);
-        return ret;
-    }
-
-    @Override
-    public synchronized void pause() {
-        if (!isPlaying()) {
-            paused = true;
-            return;
-        }
-
-        synchronized (playLock) {
-            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-        }
-
-        waitStop();
-    }
-
-    private void waitStop() {
-        synchronized (playLock) {
-            if (!paused) {
-                paused = true;
-                player.stop();
-                try {
-                    playLock.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    public void play(boolean async) {
-
-        waitStop();
-        Runnable r = new Runnable() {
+        clip.addLineListener(new LineListener() {
 
             @Override
-            public void run() {
-                boolean playAgain = true;
-                while (playAgain) {
-                    int startPos;
+            public void update(LineEvent event) {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    //clip.close();
                     synchronized (playLock) {
-                        startPos = actualPos * FRAME_DIVISOR;
-                    }
-                    player.setPosition(startPos);
-                    player.play();
-
-                    synchronized (playLock) {
-                        playAgain = !paused && loops > 0;
                         if (!paused) {
-                            if (loops == 0) {
-                                paused = true;
-                            } else if (loops != Integer.MAX_VALUE) {
-                                loops--;
+                            decreaseLoopCount();
+                
+                            if (loopCount > 0) {
+                                clip.setFramePosition(0);
+                                clip.start();
+                            } else {
+                                fireFinished();
                             }
                         }
-                        if (playAgain) {
-                            actualPos = 0;
-                        }
                     }
                 }
-
-                fireFinished();
-                synchronized (playLock) {
-                    playLock.notifyAll();
-                }
             }
-        };
-        synchronized (playLock) {
-            paused = false;
-        }
-        if (async) {
-            thr = new Thread(r);
-            thr.start();
-        } else {
-            r.run();
-        }
-
+        });
     }
 
     @Override
-    public synchronized void play() {
-        play(true);
+    public int getCurrentFrame() {
+
+        synchronized (playLock) {
+            return (int) (clip.getMicrosecondPosition() / FRAME_DIVISOR);
+        }
+    }
+
+    @Override
+    public int getTotalFrames() {
+
+        synchronized (playLock) {
+            return (int) (clip.getMicrosecondLength() / FRAME_DIVISOR);
+        }
+    }
+
+    @Override
+    public void pause() {
+
+        synchronized (playLock) {
+            paused = true;
+            clip.stop();
+        }
+    }
+
+    @Override
+    public void play() {
+        synchronized (playLock) {
+            paused = false;
+            if (!clip.isActive()) {
+                if (clip.getMicrosecondLength() == clip.getMicrosecondPosition()) {
+                    decreaseLoopCount();
+                    clip.setFramePosition(0);
+                }
+                
+                clip.start();
+            }
+        }
     }
 
     @Override
@@ -188,7 +150,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public boolean isPlaying() {
-        return player.isPlaying();
+        return clip.isActive();
     }
 
     @Override
@@ -217,10 +179,17 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
-    public synchronized void gotoFrame(int frame) {
-        pause();
+    public void gotoFrame(int frame) {
         synchronized (playLock) {
-            actualPos = frame;
+            boolean active = clip.isActive();
+            if (active) {
+                clip.stop();
+            }
+            clip.setMicrosecondPosition(frame * FRAME_DIVISOR);
+            
+            if (active) {
+                clip.start();
+            }
         }
     }
 
@@ -231,10 +200,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public int getFrameRate() {
-        if (player == null) {
-            return 1;
-        }
-        return (int) (player.getFrameRate() / FRAME_DIVISOR);
+        return (int) (1000000L / FRAME_DIVISOR);
     }
 
     @Override
@@ -247,4 +213,21 @@ public class SoundTagPlayer implements MediaDisplay {
         return null;
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            if (clip != null) {
+                clip.close();
+            }
+        } finally {
+            super.finalize();
+        }
+    }
+    
+    private void decreaseLoopCount() {
+        // this method should be called from synchronized (playLock) block
+        if (loopCount > 0 && loopCount != Integer.MAX_VALUE) {
+            loopCount--;
+        }
+    }
 }

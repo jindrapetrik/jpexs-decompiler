@@ -61,6 +61,8 @@ public class FolderPreviewPanel extends JPanel {
     private List<TreeItem> items;
     private int selectedIndex = -1;
     private boolean repaintQueued;
+    private int lastWidth;
+    private int lastHeight;
 
     public Map<Integer, TreeItem> selectedItems = new HashMap<>();
 
@@ -217,8 +219,9 @@ public class FolderPreviewPanel extends JPanel {
             }
         }
 
-        Dimension size = getSize();
-        if (size.width != width || size.height != height) {
+        if (lastWidth != width || lastHeight != height) {
+            lastWidth = width;
+            lastHeight = height;
             setSize(new Dimension(width, height));
         }
     }
