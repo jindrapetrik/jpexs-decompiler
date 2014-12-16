@@ -72,6 +72,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private boolean stillFrame = false;
     private Timer timer;
     private int frame = -1;
+    private int counter = 0;
     private SWF swf;
     private boolean loaded;
     private int mouseButton;
@@ -210,7 +211,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         iconPanel.removeMouseMotionListener(l);
     }
 
-    private void updatePos(Timelined timelined, int frame) {
+    private void updatePos(Timelined timelined, int counter) {
         MouseEvent e;
         synchronized (ImagePanel.class) {
             e = lastMouseEvent;        }
@@ -236,7 +237,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             String ret = "";
 
             synchronized (ImagePanel.class) {
-                if (timelined == this.timelined && frame == this.frame) {
+                if (counter == this.counter) {
                     p = p == null ? null : iconPanel.toImagePoint(p);
                     if (p != null) {
                         int x = p.x;
@@ -270,7 +271,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             }
             
             synchronized (ImagePanel.class) {
-                if (timelined == this.timelined && frame == this.frame) {
+                if (counter == this.counter) {
                     debugLabel.setText(ret);
 
                     if (handCursor) {
@@ -343,7 +344,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2), timelined, frame);
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2), counter);
                         }
                     }
                 }
@@ -358,7 +359,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3), timelined, frame);
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3), counter);
                         }
                     }
                 }
@@ -377,7 +378,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1), timelined, frame);
+                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1), counter);
                             }
                         }
                     }
@@ -387,7 +388,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             ButtonTag b = (ButtonTag) swf.characters.get(lastUnderCur.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0), timelined, frame);
+                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0), counter);
                             }
                         }
                     }
@@ -461,8 +462,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (drawable instanceof ButtonTag) {
             frame = ButtonTag.FRAME_UP;
         }
+        
         this.timelined = drawable;
         this.swf = swf;
+        counter++;
         if (frame > -1) {
             this.frame = frame;
             this.stillFrame = true;
@@ -470,6 +473,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             this.frame = 0;
             this.stillFrame = false;
         }
+        
         loaded = true;
 
         iconPanel.setImg(null);
@@ -526,10 +530,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         soundPlayers.clear();
     }
 
-    private void nextFrame() {
-        drawFrame();
+    private void nextFrame(int counter) {
+        drawFrame(counter);
         synchronized (ImagePanel.class) {
-            if (timelined != null) {
+            if (timelined != null && counter == this.counter) {
                 int newframe = (frame + 1) % timelined.getTimeline().getFrameCount();
                 if (stillFrame) {
                     newframe = frame;
@@ -610,7 +614,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         return img;
     }
 
-    private void drawFrame() {
+    private void drawFrame(int counter) {
         Timelined timelined;
         int frame;
         int time;
@@ -639,7 +643,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             return;
         }
 
-        getOutlines(timelined, frame, time, zoom, stateUnderCursor, mouseButton);
+        getOutlines(timelined, frame, time, zoom, stateUnderCursor, mouseButton, counter);
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
@@ -661,18 +665,18 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
-                playSound(st, timelined, frame);
+                playSound(st, counter);
             }
         }
 
         synchronized (ImagePanel.class) {
-            if (timelined == this.timelined && frame == this.frame) {
+            if (counter == this.counter) {
                 iconPanel.setImg(img);
             }
         }
     }
 
-    private void playSound(SoundTag st, Timelined timelined, int frame) {
+    private void playSound(SoundTag st, int counter) {
         final SoundTagPlayer sp;
         try {
             sp = new SoundTagPlayer(st, 1, false);
@@ -687,7 +691,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             });
 
             synchronized (ImagePanel.class) {
-                if (timer != null && timelined == this.timelined && frame == this.frame) {
+                if (timer != null && counter == this.counter) {
                     soundPlayers.add(sp);
                     sp.play();
                 }
@@ -697,7 +701,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
-    private void getOutlines(Timelined timelined, int frame, int time, double zoom, DepthState stateUnderCursor, int mouseButton) {
+    private void getOutlines(Timelined timelined, int frame, int time, double zoom, DepthState stateUnderCursor, int mouseButton, int counter) {
         List<DepthState> objs = new ArrayList<>();
         List<Shape> outlines = new ArrayList<>();
         Matrix m = new Matrix();
@@ -712,7 +716,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         
         synchronized (ImagePanel.class) {
-            if (timelined == this.timelined && frame == this.frame) {
+            if (counter == this.counter) {
                 iconPanel.setOutlines(objs, outlines);
             }
         }
@@ -733,34 +737,40 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined != null) {
             timer = new Timer();
             int frameRate = timelined.getTimeline().frameRate;
-            int msPerFrame = frameRate == 0 ? 0 : 1000 / frameRate;
-            if (msPerFrame < 1000) {
-                msPerFrame = 1000;
-            }
-            timer.schedule(new TimerTask() {
-                boolean first = true;
+            int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
+            
+            final int cnt = counter;
+            TimerTask task = new TimerTask() {
+                public int counter = cnt;
+                private boolean first = true;
 
                 @Override
                 public void run() {
                     try {
-                        if (timer == null) {
-                            return;
-                        }
+                        Timeline timeline;
+                        synchronized (ImagePanel.class) {
+                            if (timer == null) {
+                                return;
+                            }
 
-                        Timeline timeline = timelined.getTimeline();
+                            timeline = timelined.getTimeline();
+                        }
+                        
                         if (timeline.getFrameCount() <= 1 && timeline.isSingleFrame()) {
                             if (first) {
-                                drawFrame();
+                                drawFrame(counter);
                                 first = false;
                             }
                         } else {
-                            nextFrame();
+                            nextFrame(counter);
                         }
                     } catch (Exception ex) {
                         Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            }, 0, msPerFrame);
+            };
+            
+            timer.schedule(task, 0, msPerFrame);
         }
     }
 
