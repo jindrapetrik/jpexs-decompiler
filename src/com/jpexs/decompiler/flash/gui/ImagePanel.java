@@ -210,13 +210,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         iconPanel.removeMouseMotionListener(l);
     }
 
-    private void updatePos() {
+    private void updatePos(Timelined timelined, int frame) {
         MouseEvent e;
-        Timelined timelined;
         synchronized (ImagePanel.class) {
-            e = lastMouseEvent;
-            timelined = this.timelined;
-        }
+            e = lastMouseEvent;        }
         
         boolean handCursor = false;
         DepthState newStateUnderCursor = null;
@@ -239,7 +236,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             String ret = "";
 
             synchronized (ImagePanel.class) {
-                if (timelined == this.timelined) {
+                if (timelined == this.timelined && frame == this.frame) {
                     p = p == null ? null : iconPanel.toImagePoint(p);
                     if (p != null) {
                         int x = p.x;
@@ -273,7 +270,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             }
             
             synchronized (ImagePanel.class) {
-                if (timelined == this.timelined) {
+                if (timelined == this.timelined && frame == this.frame) {
                     debugLabel.setText(ret);
 
                     if (handCursor) {
@@ -346,7 +343,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2));
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2), timelined, frame);
                         }
                     }
                 }
@@ -361,7 +358,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3));
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3), timelined, frame);
                         }
                     }
                 }
@@ -380,7 +377,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1));
+                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1), timelined, frame);
                             }
                         }
                     }
@@ -390,7 +387,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                             ButtonTag b = (ButtonTag) swf.characters.get(lastUnderCur.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0));
+                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0), timelined, frame);
                             }
                         }
                     }
@@ -646,7 +643,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
-        updatePos();
+        updatePos(timelined, frame);
         SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoom);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
@@ -664,18 +661,18 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
-                playSound(st);
+                playSound(st, timelined, frame);
             }
         }
 
         synchronized (ImagePanel.class) {
-            if (timelined == this.timelined) {
+            if (timelined == this.timelined && frame == this.frame) {
                 iconPanel.setImg(img);
             }
         }
     }
 
-    private void playSound(SoundTag st) {
+    private void playSound(SoundTag st, Timelined timelined, int frame) {
         final SoundTagPlayer sp;
         try {
             sp = new SoundTagPlayer(st, 1, false);
@@ -690,7 +687,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             });
 
             synchronized (ImagePanel.class) {
-                if (timer != null) {
+                if (timer != null && timelined == this.timelined && frame == this.frame) {
                     soundPlayers.add(sp);
                     sp.play();
                 }
@@ -715,7 +712,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         
         synchronized (ImagePanel.class) {
-            if (timelined == this.timelined) {
+            if (timelined == this.timelined && frame == this.frame) {
                 iconPanel.setOutlines(objs, outlines);
             }
         }
