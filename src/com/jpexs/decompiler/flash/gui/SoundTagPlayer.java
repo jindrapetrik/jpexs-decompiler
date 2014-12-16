@@ -28,6 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.Line;
@@ -45,7 +47,7 @@ public class SoundTagPlayer implements MediaDisplay {
     private final Clip clip;
 
     private int loopCount;
-    private boolean paused = true;
+    private boolean paused = false;
     private final Object playLock = new Object();
     private final SoundTag tag;
     private final List<PlayerListener> listeners = new ArrayList<>();
@@ -66,20 +68,10 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private static final int FRAME_DIVISOR = 8000;
 
-    public SoundTagPlayer(SoundTag tag, int loops) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+    public SoundTagPlayer(final SoundTag tag, int loops, boolean async) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         this.tag = tag;
         this.loopCount = loops;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<byte[]> soundData = tag.getRawSoundData();
-        SWF swf = ((Tag) tag).getSwf();
-        List<SWFInputStream> siss = new ArrayList<>();
-        for (byte[] data : soundData) {
-            siss.add(new SWFInputStream(swf, data));
-        }
-        tag.getSoundFormat().createWav(siss, baos);
         clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-        clip.open(AudioSystem.getAudioInputStream(new ByteArrayInputStream(baos.toByteArray())));
-
         clip.addLineListener(new LineListener() {
 
             @Override
@@ -101,8 +93,48 @@ public class SoundTagPlayer implements MediaDisplay {
                 }
             }
         });
+
+        if (!async) {
+            paused = true;
+            openSound(tag);
+        } else {
+            new Thread() {
+
+                @Override
+                public void run() {
+                    try {
+                        openSound(tag);
+                    } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
+                        Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    synchronized (playLock) {
+                        if (!paused) {
+                            play();
+                        }
+                    }
+                }
+
+            }.start();
+        }
     }
 
+    private void openSound(SoundTag tag) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        List<byte[]> soundData = tag.getRawSoundData();
+        SWF swf = ((Tag) tag).getSwf();
+        List<SWFInputStream> siss = new ArrayList<>();
+        for (byte[] data : soundData) {
+            siss.add(new SWFInputStream(swf, data));
+        }
+
+        tag.getSoundFormat().createWav(siss, baos);
+        byte[] wavData = baos.toByteArray();
+
+        synchronized (playLock) {
+            clip.open(AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavData)));
+        }
+    }
+    
     @Override
     public int getCurrentFrame() {
 
@@ -142,7 +174,7 @@ public class SoundTagPlayer implements MediaDisplay {
             }
         }
     }
-
+    
     @Override
     public void rewind() {
         gotoFrame(0);
@@ -150,7 +182,9 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public boolean isPlaying() {
-        return clip.isActive();
+        synchronized (playLock) {
+            return clip.isActive();
+        }
     }
 
     @Override

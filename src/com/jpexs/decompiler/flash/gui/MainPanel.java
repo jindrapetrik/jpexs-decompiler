@@ -234,8 +234,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private CancellableWorker setSourceWorker;
     public TreeItem oldItem;
 
-    private SoundTagPlayer soundThread = null;
-
     public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     public static final String ACTION_REPLACE = "REPLACE";
 
@@ -2152,9 +2150,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         folderPreviewPanel.setItems(new ArrayList<TreeItem>());
         previewPanel.clear();
-        if (soundThread != null) {
-            soundThread.pause();
-        }
         stopFlashPlayer();
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
@@ -2296,9 +2291,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag);
             try {
-                soundThread = new SoundTagPlayer((SoundTag) treeItem, Integer.MAX_VALUE);
+                SoundTagPlayer soundThread = new SoundTagPlayer((SoundTag) treeItem, Integer.MAX_VALUE, true);
                 previewPanel.setMedia(soundThread);
-                soundThread.play();
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }

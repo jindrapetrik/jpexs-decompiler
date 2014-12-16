@@ -124,6 +124,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     private ImagePanel imagePanel;
     private PlayerControls imagePlayControls;
+    private MediaDisplay media;
 
     private BinaryPanel binaryPanel;
     private GenericTagPanel genericTagPanel;
@@ -389,6 +390,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     }
 
     public void setMedia(MediaDisplay media) {
+        this.media = media;
         imagePlayControls.setMedia(media);
     }
 
@@ -439,6 +441,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     public void clear() {
         imagePanel.stop();
+        if (media != null) {
+            media.pause();
+        }
+        
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         fontPanel.clear();
