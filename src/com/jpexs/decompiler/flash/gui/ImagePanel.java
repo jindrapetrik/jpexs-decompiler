@@ -705,7 +705,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         pause();
         if (timelined != null) {
             timer = new Timer();
-            int frameRate = 1000 / timelined.getTimeline().frameRate;
+            int frameRate = timelined.getTimeline().frameRate;
+            int framesPerSec = frameRate == 0 ? 0 : 1000 / frameRate;
             timer.schedule(new TimerTask() {
                 boolean first = true;
 
@@ -727,7 +728,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         }
                     }
                 }
-            }, 0, frameRate == 0 ? Integer.MAX_VALUE : frameRate);
+            }, 0, framesPerSec == 0 ? Integer.MAX_VALUE : framesPerSec);
         }
     }
 

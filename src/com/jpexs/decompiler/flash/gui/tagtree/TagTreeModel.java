@@ -264,6 +264,9 @@ public class TagTreeModel implements TreeModel {
                         } else {
                             subNodes.add(ts);
                         }
+                    } else if (tag instanceof ASMSource) {
+                        TagScript ts = new TagScript(swf, tag, tagSubNodes);
+                        subNodes.add(ts);
                     }
                 }
             }

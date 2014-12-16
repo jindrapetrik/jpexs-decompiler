@@ -2141,8 +2141,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         // show the preview of the tag when the user clicks to the tagname inside the scripts node, too
         // this is a little bit inconsistent, beacuse the frames (FrameScript) are not shown
+        boolean preferScript = false;
         if (treeItem instanceof TagScript) {
             treeItem = ((TagScript) treeItem).getTag();
+            preferScript = true;
         }
 
         if (flashPanel != null) {
@@ -2216,6 +2218,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         previewPanel.setImageReplaceButtonVisible(false);
+        
+        boolean internalViewer = isInternalFlashViewerSelected();
 
         if (treeItem instanceof HeaderItem) {
             showCard(CARDHEADER);
@@ -2226,7 +2230,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             showCard(CARDPREVIEWPANEL);
-            if (isInternalFlashViewerSelected()) {
+            if (internalViewer) {
                 previewPanel.showImagePanel(swf, swf, -1);
             } else {
                 previewPanel.setParametersPanelVisible(false);
@@ -2239,7 +2243,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             showCard(CARDPREVIEWPANEL);
             previewPanel.showBinaryPanel(binaryTag);
-        } else if (treeItem instanceof ASMSource) {
+        } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {
             ensureActionPanel();
             showCard(CARDACTIONSCRIPTPANEL);
             getActionPanel().setSource((ASMSource) treeItem, !forceReload);
@@ -2248,7 +2252,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             previewPanel.setImageReplaceButtonVisible(imageTag.importSupported());
             showCard(CARDPREVIEWPANEL);
             previewPanel.showImagePanel(imageTag.getImage());
-        } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && (isInternalFlashViewerSelected())) {
+        } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
             showCard(CARDPREVIEWPANEL);
             DrawableTag d = (DrawableTag) tag;
@@ -2261,15 +2265,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             previewPanel.setParametersPanelVisible(false);
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1);
-        } else if ((treeItem instanceof FontTag) && (isInternalFlashViewerSelected())) {
+        } else if ((treeItem instanceof FontTag) && internalViewer) {
             FontTag fontTag = (FontTag) treeItem;
             showCard(CARDPREVIEWPANEL);
             showFontTag(fontTag);
-        } else if ((treeItem instanceof TextTag) && (isInternalFlashViewerSelected())) {
+        } else if ((treeItem instanceof TextTag) && internalViewer) {
             TextTag textTag = (TextTag) treeItem;
             showCard(CARDPREVIEWPANEL);
             showTextTag(textTag);
-        } else if (treeItem instanceof Frame && isInternalFlashViewerSelected()) {
+        } else if (treeItem instanceof Frame && internalViewer) {
             showCard(CARDPREVIEWPANEL);
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
