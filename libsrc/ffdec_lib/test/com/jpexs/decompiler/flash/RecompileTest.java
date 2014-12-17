@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
@@ -148,6 +150,27 @@ public class RecompileTest {
         }
     }
 
+    @Test(dataProvider = "provideFiles")
+    public void testTagEditing(String filename) throws IOException, InterruptedException {
+        try {
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+            for (Tag tag : swf.tags) {
+                if (!(tag instanceof TagStub)) {
+                    byte[] data = tag.getData();
+                    SWFInputStream tagDataStream = new SWFInputStream(swf, data, tag.getDataPos(), data.length);
+                    TagStub copy = new TagStub(swf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
+                    copy.forceWriteAsLong = tag.forceWriteAsLong;
+                    Tag tag2 = SWFInputStream.resolveTag(copy, 0, false, true, false);
+                    if (tag2 instanceof TagStub) {
+                        fail("Recompile failed. Tag: " + tag.getId() + " " + tag.getName());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            // ignore
+        }
+    }
+    
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {
         File dir = new File(TESTDATADIR);

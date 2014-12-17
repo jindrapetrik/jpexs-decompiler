@@ -1376,7 +1376,7 @@ public class SWFOutputStream extends OutputStream {
                     scr.numFillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
                     scr.numLineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
                     fillBits = scr.numFillBits;
-                    fillBits = scr.numLineBits;
+                    lineBits = scr.numLineBits;
                     writeUB(4, scr.numFillBits);
                     writeUB(4, scr.numLineBits);
                 }
@@ -1501,13 +1501,17 @@ public class SWFOutputStream extends OutputStream {
             writeRGBA(value.endColor);
         }
         if ((value.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
-                || (value.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+                || (value.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)
+                || (value.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
             writeMatrix(value.startGradientMatrix);
             writeMatrix(value.endGradientMatrix);
         }
         if ((value.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
                 || (value.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
             writeMORPHGRADIENT(value.gradient, shapeNum);
+        }
+        if (value.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+            writeMORPHFOCALGRADIENT((MORPHFOCALGRADIENT) value.gradient, shapeNum);
         }
 
         if ((value.fillStyleType == MORPHFILLSTYLE.REPEATING_BITMAP)

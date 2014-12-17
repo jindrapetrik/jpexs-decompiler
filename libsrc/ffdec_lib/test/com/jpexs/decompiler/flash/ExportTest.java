@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -67,18 +68,20 @@ public class ExportTest {
     @DataProvider(name = "swfFiles")
     public Object[][] createData() {
         File dir = new File(TESTDATADIR);
-        if (!dir.exists()) {
-            return new Object[0][0];
+        File[] files = new File[0];
+        if (dir.exists()) {
+            files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".swf");
+                }
+            });
         }
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".swf");
-            }
-        });
-        Object[][] ret = new Object[files.length][1];
-        for (int i = 0; i < files.length; i++) {
-            ret[i][0] = files[i];
+        Object[][] ret = new Object[files.length + 2][1];
+        ret[0][0] = new File(TESTDATADIR + File.separator + "../as2/as2.swf");
+        ret[1][0] = new File(TESTDATADIR + File.separator + "../as3/as3.swf");
+        for (int f = 0; f < files.length; f++) {
+            ret[f + 2][0] = files[f];
         }
         return ret;
     }

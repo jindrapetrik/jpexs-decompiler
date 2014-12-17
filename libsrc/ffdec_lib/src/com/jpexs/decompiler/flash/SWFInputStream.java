@@ -1441,7 +1441,7 @@ public class SWFInputStream implements AutoCloseable {
                     }
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Error during tag reading", ex);
+            logger.log(Level.SEVERE, "Error during tag reading. ID: " + tag.getId() + " name: " + tag.getName() + " pos: " + data.getPos(), ex);
             ret = new TagStub(swf, tag.getId(), "ErrorTag", data, null);
         }
         ret.forceWriteAsLong = tag.forceWriteAsLong;
@@ -2631,7 +2631,7 @@ public class SWFInputStream implements AutoCloseable {
                 }
                 if (stateNewStyles) {
                     if (morphShape) {
-                        // This should never happen
+                        // This should never happen in a valid SWF
                         throw new IOException("MorphShape should not have new styles.");
                     } else {
                         scr.fillStyles = readFILLSTYLEARRAY(shapeNum, "fillStyles");
