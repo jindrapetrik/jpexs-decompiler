@@ -750,6 +750,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
             
             final int cnt = counter;
+            shouldDraw.set(true);
             TimerTask task = new TimerTask() {
                 public int counter = cnt;
                 private final AtomicBoolean first = shouldDraw;

@@ -223,6 +223,7 @@ public class TagTree extends JTree {
                 setHashColor(Color.gray);
             }
         };
+        
         setUI(treeUI);
     }
 
