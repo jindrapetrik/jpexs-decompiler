@@ -86,6 +86,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private int time = 0;
     private int selectedDepth = -1;
     private double zoom = 1.0;
+    private final Object delayObject = new Object();
+    private boolean drawReady;
+    private final int drawWaitLimit = 50; // ms
 
     public synchronized void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -461,34 +464,50 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         return timelined != null;
     }
 
-    public synchronized void setTimelined(final Timelined drawable, final SWF swf, int frame) {
-        pause();
-        if (drawable instanceof ButtonTag) {
-            frame = ButtonTag.FRAME_UP;
-        }
-        
-        this.timelined = drawable;
-        this.swf = swf;
-        counter++;
-        if (frame > -1) {
-            this.frame = frame;
-            this.stillFrame = true;
-        } else {
-            this.frame = 0;
-            this.stillFrame = false;
-        }
-        
-        loaded = true;
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
+        synchronized (ImagePanel.class) {
+            pause();
+            if (drawable instanceof ButtonTag) {
+                frame = ButtonTag.FRAME_UP;
+            }
 
-        iconPanel.setImg(null);
-        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+            this.timelined = drawable;
+            this.swf = swf;
+            counter++;
+            if (frame > -1) {
+                this.frame = frame;
+                this.stillFrame = true;
+            } else {
+                this.frame = 0;
+                this.stillFrame = false;
+            }
 
-        if (drawable.getTimeline().getFrames().isEmpty()) {
-            return;
+            loaded = true;
+
+            if (drawable.getTimeline().getFrames().isEmpty()) {
+                clearImagePanel();
+                return;
+            }
+
+            time = 0;
+            drawReady = false;
+            play();
         }
         
-        time = 0;
-        play();
+        
+        synchronized (delayObject) {
+            try {
+                delayObject.wait(drawWaitLimit);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        synchronized (ImagePanel.class) {
+            if (!drawReady) {
+                clearImagePanel();
+            }
+        }
     }
 
     public synchronized void setImage(SerializableImage image) {
@@ -503,8 +522,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stillFrame = true;
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        drawReady = true;
     }
 
+    private synchronized void clearImagePanel() {
+        iconPanel.setImg(null);
+        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+    }
+    
     @Override
     public synchronized int getCurrentFrame() {
         return frame;
@@ -682,6 +707,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         synchronized (ImagePanel.class) {
             if (counter == this.counter) {
                 iconPanel.setImg(img);
+                drawReady = true;
+                synchronized (delayObject) {
+                    delayObject.notify();
+                }
             }
         }
     }
