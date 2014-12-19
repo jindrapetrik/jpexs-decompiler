@@ -319,12 +319,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                 @Override
                                 public void actionPerformed(ActionEvent ae) {
                                     try {
-                                        SWF sourceSwf = tag.getSwf();
-                                        byte[] data = tag.getData();
-                                        SWFInputStream tagDataStream = new SWFInputStream(sourceSwf, data, tag.getDataPos(), data.length);
-                                        TagStub copy = new TagStub(sourceSwf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
-                                        copy.forceWriteAsLong = tag.forceWriteAsLong;
-                                        Tag copyTag = SWFInputStream.resolveTag(copy, 0, false, true, false);
+                                        Tag copyTag = tag.cloneTag();
                                         copyTag.setSwf(targetSwf);
                                         targetSwf.tags.add(copyTag);
                                         copyTag.setModified(true);

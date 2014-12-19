@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -74,6 +75,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private boolean stillFrame = false;
     private Timer timer;
     private int frame = -1;
+    private boolean zoomAvailable = false;
     private int counter = 0;
     private AtomicBoolean shouldDraw = new AtomicBoolean();
     private SWF swf;
@@ -90,6 +92,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private final Object delayObject = new Object();
     private boolean drawReady;
     private final int drawWaitLimit = 50; // ms
+    private TextTag textTag;
+    private TextTag newTextTag;
 
     public synchronized void selectDepth(int depth) {
         if (depth != selectedDepth) {
@@ -417,6 +421,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     public synchronized void zoom(Zoom zoom) {
         this.zoom = zoom;
         shouldDraw.set(true);
+        if (textTag != null) {
+            setText(textTag, newTextTag);
+        }
     }
 
     @Override
@@ -468,7 +475,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     @Override
     public synchronized boolean zoomAvailable() {
-        return timelined != null;
+        return zoomAvailable;
     }
 
     public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
@@ -480,6 +487,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             this.timelined = drawable;
             this.swf = swf;
+            zoomAvailable = true;
             counter++;
             if (frame > -1) {
                 this.frame = frame;
@@ -520,14 +528,63 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     public synchronized void setImage(SerializableImage image) {
         setBackground(View.swfBackgroundColor);
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+        clear();
         
         timelined = null;
         loaded = true;
         stillFrame = true;
+        zoomAvailable = false;
+        iconPanel.setImg(image);
+        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        drawReady = true;
+    }
+
+    public synchronized void setText(TextTag textTag, TextTag newTextTag) {
+        setBackground(View.swfBackgroundColor);
+        clear();
+        
+        timelined = null;
+        loaded = true;
+        stillFrame = true;
+        zoomAvailable = true;
+
+        this.textTag = textTag;
+        this.newTextTag = newTextTag;
+        
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        
+        RECT rect = textTag.getRect(new HashSet<BoundedTag>());
+        int width = (int) (rect.getWidth() * zoomDouble);
+        int height = (int) (rect.getHeight() * zoomDouble);
+        SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
+                (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+        image.fillTransparent();
+        Matrix m = new Matrix();
+        m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
+        m.scale(zoomDouble);
+        textTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform() {
+
+            @Override
+            public int getBlueAdd() {
+                return 192;
+            }
+
+            @Override
+            public int getGreenAdd() {
+                return 192;
+            }
+
+            @Override
+            public int getRedAdd() {
+                return 192;
+            }
+            
+        });
+        
+        if (newTextTag != null) {
+            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform());
+        }
+        
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
         drawReady = true;
@@ -565,6 +622,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             pl.pause();
         }
         soundPlayers.clear();
+    }
+    
+    private void clear() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     private void nextFrame(int counter) {
@@ -771,11 +835,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     public synchronized void stop() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-
+        clear();
         stopAllSounds();
     }
 

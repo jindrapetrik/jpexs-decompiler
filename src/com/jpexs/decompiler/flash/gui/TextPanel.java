@@ -17,7 +17,10 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -25,9 +28,12 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
@@ -47,7 +53,7 @@ public class TextPanel extends JPanel implements ActionListener {
     private final JButton textEditButton;
     private final JButton textCancelButton;
 
-    public TextPanel(MainPanel mainPanel) {
+    public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
 
         DefaultSyntaxKit.initKit();
@@ -59,6 +65,23 @@ public class TextPanel extends JPanel implements ActionListener {
         textValue.setEditable(false);
         textValue.setFont(new Font("Monospaced", Font.PLAIN, textValue.getFont().getSize()));
         textValue.setContentType("text/swftext");
+        textValue.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                textChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                textChanged();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                textChanged();
+            }
+        });
 
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout());
@@ -120,6 +143,7 @@ public class TextPanel extends JPanel implements ActionListener {
         switch (e.getActionCommand()) {
             case ACTION_EDIT_TEXT:
                 setEditText(true);
+                textChanged();
                 break;
             case ACTION_CANCEL_TEXT:
                 setEditText(false);
@@ -136,6 +160,35 @@ public class TextPanel extends JPanel implements ActionListener {
                     }
                 }
                 break;
+        }
+    }
+
+    private void textChanged() {
+        if (textValue.isEditable()) {
+            TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+            if (item instanceof TextTag) {
+                TextTag textTag = (TextTag) item;
+                boolean ok = false;
+                try {
+                    TextTag copyTextTag = (TextTag) textTag.cloneTag();
+                    if (copyTextTag.setFormattedText(new MissingCharacterHandler() {
+
+                        @Override
+                        public boolean handle(TextTag textTag, FontTag font, char character) {
+                            return false;
+                        }
+
+                    }, textValue.getText(), null)) {
+                        ok = true;
+                        mainPanel.showTextTagWithNewValue(textTag, copyTextTag);
+                    }
+                } catch (TextParseException | InterruptedException | IOException ex) {
+                }
+                
+                if (!ok) {
+                    mainPanel.showTextTagWithNewValue(textTag, null);
+                }
+            }
         }
     }
 }

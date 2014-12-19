@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -335,6 +336,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         } else {
             sos.write(originalRange.getArray(), originalRange.getPos(), originalRange.getLength());
         }
+    }
+    
+    public Tag cloneTag() throws InterruptedException, IOException {
+        byte[] data = getData();
+        SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
+        TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
+        copy.forceWriteAsLong = forceWriteAsLong;
+        return SWFInputStream.resolveTag(copy, 0, false, true, false);
     }
 
     /**

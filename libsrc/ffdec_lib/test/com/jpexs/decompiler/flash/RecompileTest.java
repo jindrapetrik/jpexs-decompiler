@@ -156,11 +156,7 @@ public class RecompileTest {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
             for (Tag tag : swf.tags) {
                 if (!(tag instanceof TagStub)) {
-                    byte[] data = tag.getData();
-                    SWFInputStream tagDataStream = new SWFInputStream(swf, data, tag.getDataPos(), data.length);
-                    TagStub copy = new TagStub(swf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
-                    copy.forceWriteAsLong = tag.forceWriteAsLong;
-                    Tag tag2 = SWFInputStream.resolveTag(copy, 0, false, true, false);
+                    Tag tag2 = tag.cloneTag();
                     if (tag2 instanceof TagStub) {
                         fail("Recompile failed. Tag: " + tag.getId() + " " + tag.getName());
                     }

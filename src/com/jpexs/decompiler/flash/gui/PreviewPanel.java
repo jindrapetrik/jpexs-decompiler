@@ -388,6 +388,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         imagePlayControls.setMedia(imagePanel);
         imagePanel.setImage(image);
     }
+    
+    public void showTextComparePanel(TextTag textTag, TextTag newTextTag) {
+        imagePanel.setText(textTag, newTextTag);
+    }
 
     public void setMedia(MediaDisplay media) {
         this.media = media;

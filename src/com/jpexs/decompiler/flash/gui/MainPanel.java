@@ -2330,6 +2330,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.showTextPanel(textTag);
     }
 
+    public void showTextTagWithNewValue(TextTag textTag, TextTag newTextTag) {
+
+        previewPanel.showTextComparePanel(textTag, newTextTag);
+    }
+
     private void showFolderPreview(TreeItem treeNode) {
         List<TreeItem> folderPreviewItems = new ArrayList<>();
         FolderItem item = (FolderItem) treeNode;

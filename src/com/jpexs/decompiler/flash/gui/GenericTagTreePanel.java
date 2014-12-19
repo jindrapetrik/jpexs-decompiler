@@ -662,11 +662,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         this.tag = tag;
         SWF swf = tag.getSwf();
         try {
-            byte[] data = tag.getData();
-            SWFInputStream tagDataStream = new SWFInputStream(swf, data, tag.getDataPos(), data.length);
-            TagStub copy = new TagStub(swf, tag.getId(), "Unresolved", tag.getOriginalRange(), tagDataStream);
-            copy.forceWriteAsLong = tag.forceWriteAsLong;
-            editedTag = SWFInputStream.resolveTag(copy, 0, false, true, false);
+            editedTag = tag.cloneTag();
         } catch (InterruptedException ex) {
         } catch (IOException ex) {
             Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
