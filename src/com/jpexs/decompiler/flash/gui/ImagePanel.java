@@ -629,6 +629,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             timer.cancel();
             timer = null;
         }
+        
+        textTag = null;
+        newTextTag = null;
     }
 
     private void nextFrame(int counter) {
