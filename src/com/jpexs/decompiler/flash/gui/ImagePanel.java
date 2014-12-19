@@ -415,6 +415,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     @Override
     public synchronized void zoom(double zoom) {
         this.zoom = zoom;
+        shouldDraw.set(true);
     }
 
     @Override
@@ -491,6 +492,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             time = 0;
             drawReady = false;
+            shouldDraw.set(true);
             play();
         }
         

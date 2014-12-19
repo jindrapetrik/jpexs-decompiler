@@ -553,7 +553,7 @@ public class FontPanel extends javax.swing.JPanel {
             SWF swf = f.getSwf();
             String selectedName = ((FontFace) fontFaceSelection.getSelectedItem()).font.getFontName(Locale.ENGLISH);
             swf.sourceFontNamesMap.put(f.getFontId(), selectedName);
-            Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedName);
+            Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontNameIntag(), selectedName);
         }
     }
 
