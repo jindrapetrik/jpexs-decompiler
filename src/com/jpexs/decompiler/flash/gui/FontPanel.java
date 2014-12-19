@@ -198,7 +198,7 @@ public class FontPanel extends javax.swing.JPanel {
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
         setAllowSave(false);
-        String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontName();
+        String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontNameIntag();
 
         String selectedFont;
 
