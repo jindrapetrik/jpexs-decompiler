@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import java.awt.Color;
@@ -193,8 +194,7 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
-    public void zoom(double zoom) {
-
+    public void zoom(Zoom zoom) {
     }
 
     @Override
@@ -208,8 +208,8 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
-    public double getZoom() {
-        return 0;
+    public Zoom getZoom() {
+        return null;
     }
 
     @Override

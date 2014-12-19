@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -85,7 +86,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private final IconPanel iconPanel;
     private int time = 0;
     private int selectedDepth = -1;
-    private double zoom = 1.0;
+    private Zoom zoom = new Zoom();
     private final Object delayObject = new Object();
     private boolean drawReady;
     private final int drawWaitLimit = 50; // ms
@@ -413,7 +414,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     @Override
-    public synchronized void zoom(double zoom) {
+    public synchronized void zoom(Zoom zoom) {
         this.zoom = zoom;
         shouldDraw.set(true);
     }
@@ -446,6 +447,11 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             } else {
                 w = w2;
             }
+            
+            if (w1 <= Double.MIN_NORMAL) {
+                return 1.0;
+            }
+            
             return (double) w / (double) w1;
         }
 
@@ -653,7 +659,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         DepthState stateUnderCursor;
         int mouseButton;
         int selectedDepth;
-        double zoom;
+        Zoom zoom;
         SWF swf;
         
         synchronized (ImagePanel.class) {
@@ -681,11 +687,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             return;
         }
 
-        getOutlines(timelined, frame, time, zoom, stateUnderCursor, mouseButton, counter);
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        getOutlines(timelined, frame, time, zoomDouble, stateUnderCursor, mouseButton, counter);
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
-        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoom);
+        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoomDouble);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
@@ -868,7 +875,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     @Override
-    public synchronized double getZoom() {
+    public synchronized Zoom getZoom() {
         return zoom;
     }
 }

@@ -16,44 +16,17 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
 /**
  *
  * @author JPEXS
  */
-public interface MediaDisplay {
+public class Zoom {
 
-    public int getCurrentFrame();
+    public double value = 1.0;
+    
+    public boolean fit = false;
 
-    public int getTotalFrames();
-
-    public void zoom(Zoom zoom);
-
-    public void pause();
-
-    public void play();
-
-    public void rewind();
-
-    public boolean isPlaying();
-
-    public void gotoFrame(int frame);
-
-    public void setBackground(Color color);
-
-    public int getFrameRate();
-
-    public boolean isLoaded();
-
-    public BufferedImage printScreen();
-
-    public boolean screenAvailable();
-
-    public boolean zoomAvailable();
-
-    public double getZoomToFit();
-
-    public Zoom getZoom();
+    public Zoom() {
+    }
+    
 }

@@ -95,6 +95,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     private final JPanel graphicControls;
     private final JPanel playbackControls;
     private final JPanel frameControls;
+    private boolean zoomToFit = false;
     private double realZoom = 1.0;
 
     private final JButton zoomFitButton;
@@ -324,9 +325,10 @@ public class PlayerControls extends JPanel implements ActionListener {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                double zoom = display.getZoom();
-                zoomFitButton.setVisible(zoom != 0.0);
-                percentLabel.setVisible(zoom != 0.0);
+                updateZoom();
+                Zoom zoom = display.getZoom();
+                zoomFitButton.setVisible(zoom != null);
+                percentLabel.setVisible(zoom != null);
                 zoomPanel.setVisible(display.zoomAvailable());
                 graphicControls.setVisible(display.screenAvailable());
                 totalFrameLabel.setVisible(display.screenAvailable());
@@ -385,14 +387,25 @@ public class PlayerControls extends JPanel implements ActionListener {
     }
 
     private void updateZoom() {
-        double pctzoom = roundZoom(realZoom * 100, 3);
+        double pctzoom = roundZoom(getRealZoom() * 100, 3);
         String r = Double.toString(pctzoom);
         double zoom = pctzoom / 100.0;
         if (r.endsWith(".0")) {
             r = r.substring(0, r.length() - 2);
         }
-        percentLabel.setText(r + "%");
-        display.zoom(zoom);
+        
+        r += "%";
+        
+        if (zoomToFit) {
+            percentLabel.setText(AppStrings.translate("fit") + " (" + r + ")");
+        } else {
+            percentLabel.setText(r);
+        }
+        
+        Zoom zoomObj = new Zoom();
+        zoomObj.value = zoom;
+        zoomObj.fit = zoomToFit;
+        display.zoom(zoomObj);
     }
 
     @Override
@@ -476,19 +489,23 @@ public class PlayerControls extends JPanel implements ActionListener {
                 });
                 break;
             case ACTION_ZOOMIN:
-                realZoom *= ZOOM_MULTIPLIER;
+                realZoom = getRealZoom() * ZOOM_MULTIPLIER;
+                zoomToFit = false;
                 updateZoom();
                 break;
             case ACTION_ZOOMOUT:
-                realZoom /= ZOOM_MULTIPLIER;
+                realZoom = getRealZoom() / ZOOM_MULTIPLIER;
+                zoomToFit = false;
                 updateZoom();
                 break;
             case ACTION_ZOOMNONE:
                 realZoom = 1.0;
+                zoomToFit = false;
                 updateZoom();
                 break;
             case ACTION_ZOOMFIT:
-                realZoom = display.getZoomToFit();
+                realZoom = 1.0;
+                zoomToFit = true;
                 updateZoom();
                 break;
             case ACTION_SNAPSHOT:
@@ -497,6 +514,14 @@ public class PlayerControls extends JPanel implements ActionListener {
         }
     }
 
+    private double getRealZoom() {
+        if (zoomToFit) {
+            return display.getZoomToFit();
+        }
+        
+        return realZoom;
+    }
+    
     private class TransferableImage implements Transferable {
 
         Image img;

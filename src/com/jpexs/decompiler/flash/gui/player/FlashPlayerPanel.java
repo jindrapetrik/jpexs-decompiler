@@ -65,15 +65,16 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     @Override
-    public double getZoom() {
-        return 0;
+    public Zoom getZoom() {
+        return null;
     }
 
     private double zoom = 1.0;
 
     @Override
-    public synchronized void zoom(double zoom) {
-        int zoomint = (int) Math.round(100 / (zoom / this.zoom));
+    public synchronized void zoom(Zoom zoom) {
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        int zoomint = (int) Math.round(100 / (zoomDouble / this.zoom));
         if (zoomint == 0) {
             zoomint = 1;
         }
