@@ -322,6 +322,11 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
+    public void setAdvanceValues(Font font) {
+        throw new UnsupportedOperationException("Setting the advance values for DefineFontTag is not supported.");
+    }
+    
+    @Override
     public String getCharacters(List<Tag> tags) {
         StringBuilder ret = new StringBuilder();
         ensureFontInfo();

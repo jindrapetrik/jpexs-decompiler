@@ -420,7 +420,7 @@ public class DefineFont3Tag extends FontTag {
         }
         if (fontFlagsHasLayout) {
 
-            Font fnt = new Font(fontName, fontStyle, 1024); //Not multiplied with divider as it causes problems to create font with height around 20k
+            Font fnt = new Font(fontName, fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds());
                 fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
@@ -436,6 +436,26 @@ public class DefineFont3Tag extends FontTag {
         setModified(true);
     }
 
+    @Override
+    public void setAdvanceValues(Font font) {
+        boolean hasLayout = fontFlagsHasLayout;
+        fontFlagsHasLayout = true;
+        fontAdvanceTable = new ArrayList<>();
+        if (!hasLayout) {
+            fontBoundsTable = new ArrayList<>();
+            fontKerningTable = new ArrayList<>();
+        }
+    
+        for (Integer character : codeTable) {
+            char ch = (char) (int) character;
+            SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
+            fontBoundsTable.add(shp.getBounds());
+            int fontStyle = getFontStyle();
+            Font fnt = new Font(font.getFontName(), fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
+            fontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, ch)));
+        }
+    }
+    
     @Override
     public String getCharacters(List<Tag> tags) {
         StringBuilder ret = new StringBuilder();

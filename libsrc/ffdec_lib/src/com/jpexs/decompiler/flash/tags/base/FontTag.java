@@ -67,6 +67,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract void addCharacter(char character, Font font);
 
+    public abstract void setAdvanceValues(Font font);
+
     public abstract char glyphToChar(int glyphIndex);
 
     public abstract int charToGlyph(char c);

@@ -434,6 +434,26 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
+    public void setAdvanceValues(Font font) {
+        boolean hasLayout = fontFlagsHasLayout;
+        fontFlagsHasLayout = true;
+        fontAdvanceTable = new ArrayList<>();
+        if (!hasLayout) {
+            fontBoundsTable = new ArrayList<>();
+            fontKerningTable = new ArrayList<>();
+        }
+    
+        for (Integer character : codeTable) {
+            char ch = (char) (int) character;
+            SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
+            fontBoundsTable.add(shp.getBounds());
+            int fontStyle = getFontStyle();
+            Font fnt = new Font(font.getFontName(), fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
+            fontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, ch)));
+        }
+    }
+    
+    @Override
     public String getCharacters(List<Tag> tags) {
         StringBuilder ret = new StringBuilder();
         for (int i : codeTable) {

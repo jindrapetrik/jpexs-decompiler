@@ -196,6 +196,11 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
+    public void setAdvanceValues(Font font) {
+        throw new UnsupportedOperationException("Setting the advance values for DefineCompactedFont is not supported.");
+    }
+    
+    @Override
     public char glyphToChar(int glyphIndex) {
         return (char) fonts.get(0).glyphInfo.get(glyphIndex).glyphCode;
     }

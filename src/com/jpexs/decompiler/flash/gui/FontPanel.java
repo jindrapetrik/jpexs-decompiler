@@ -271,6 +271,7 @@ public class FontPanel extends javax.swing.JPanel {
         buttonSave = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
         buttonPreviewFont = new javax.swing.JButton();
+        buttonSetAdvanceValues = new javax.swing.JButton();
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -457,6 +458,14 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
+        buttonSetAdvanceValues.setText(AppStrings.translate("button.setAdvanceValues")); // NOI18N
+        buttonSetAdvanceValues.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSetAdvanceValuesActionPerformed(evt);
+            }
+        });
+
         TableLayout tlAddCharsPanel;
         addCharsPanel.setLayout(tlAddCharsPanel = new TableLayout(new double[][]{
             {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED},
@@ -473,6 +482,7 @@ public class FontPanel extends javax.swing.JPanel {
         addCharsPanel.add(fontFamilyNameSelection, "1,1");
         addCharsPanel.add(fontFaceSelection, "2,1");
         addCharsPanel.add(buttonPreviewFont, "3,1");
+        addCharsPanel.add(buttonSetAdvanceValues, "4,1");
 
         addCharsPanel.add(updateTextsCheckBox, "0,2,2,2");
 
@@ -590,6 +600,10 @@ public class FontPanel extends javax.swing.JPanel {
         new FontPreviewDialog(null, true, ((FontFace) fontFaceSelection.getSelectedItem()).font).setVisible(true);
     }
 
+    private void buttonSetAdvanceValuesActionPerformed(java.awt.event.ActionEvent evt) {
+        fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
+    }
+
     private void formComponentResized(java.awt.event.ComponentEvent evt) {
         fontParamsPanel.updateUI();
     }
@@ -650,6 +664,7 @@ public class FontPanel extends javax.swing.JPanel {
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonEdit;
     private javax.swing.JButton buttonPreviewFont;
+    private javax.swing.JButton buttonSetAdvanceValues;
     private javax.swing.JButton buttonSave;
     private javax.swing.JTextField fontAddCharactersField;
     private javax.swing.JButton fontAddCharsButton;
