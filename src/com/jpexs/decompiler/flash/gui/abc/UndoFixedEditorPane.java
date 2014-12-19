@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.View;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
@@ -36,10 +37,17 @@ import jsyntaxpane.SyntaxDocument;
 public class UndoFixedEditorPane extends JEditorPane {
 
     private static final Object setTextLock = new Object();
+    private String originalContentType;
 
     @Override
-    public void setText(String t) {
-        setText(t, getContentType());
+    public void setText(final String t) {
+        View.execInEventDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+                setText(t, getContentType());
+            }
+        });
     }
 
     private void setText(String t, String contentType) {
@@ -48,12 +56,16 @@ public class UndoFixedEditorPane extends JEditorPane {
                 boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
                 if (plain) {
                     contentType = "text/plain";
+                    originalContentType = getContentType();
+                    setContentType(contentType);
+                } else {
+                    if (originalContentType != null) {
+                        setContentType(originalContentType);
+                        originalContentType = null;
+                    }
                 }
 
                 try {
-                    if (!getContentType().equals(contentType)) {
-                        setContentType(contentType);
-                    }
                     Document doc = getDocument();
                     setDocument(new SyntaxDocument(null));
                     doc.remove(0, doc.getLength());
