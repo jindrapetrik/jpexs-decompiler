@@ -563,7 +563,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         //Opening files with drag&drop to main window
         enableDrop(true);
     }
-
+    
     public void load(SWFList newSwfs, boolean first) {
 
         previewPanel.clear();
@@ -1101,10 +1101,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void searchAs() {
+    public void searchInActionScriptOrText(boolean searhInText) {
         if (searchDialog == null) {
             searchDialog = new SearchDialog(getMainFrame().getWindow());
         }
+
+        if (searhInText) {
+            searchDialog.searchInTextsRadioButton.setSelected(true);
+        } else {
+            searchDialog.searchInASRadioButton.setSelected(true);
+        }
+        
         searchDialog.setVisible(true);
         if (searchDialog.result) {
             final String txt = searchDialog.searchField.getText();

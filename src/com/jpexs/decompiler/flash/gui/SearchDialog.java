@@ -57,6 +57,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
     public SearchDialog(Window owner) {
         super(owner);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        ignoreCaseCheckBox.setSelected(true);
         Container cnt = getContentPane();
         setSize(400, 150);
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));

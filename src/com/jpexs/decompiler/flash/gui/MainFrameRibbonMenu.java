@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.ProcessTools;
@@ -34,14 +33,11 @@ import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -73,7 +69,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
  *
  * @author JPEXS
  */
-public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
+public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener {
 
     private static final String ACTION_RELOAD = "RELOAD";
     private static final String ACTION_ADVANCED_SETTINGS = "ADVANCEDSETTINGS";
@@ -177,6 +173,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     RibbonApplicationMenuEntryPrimary closeAllFilesMenu;
 
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
+        super(mainFrame);
         this.mainFrame = mainFrame;
 
         ribbon.addTask(createFileRibbonTask());
@@ -194,10 +191,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     @Override
     public boolean isInternalFlashViewerSelected() {
         return miInternalViewer.isSelected();
-    }
-
-    private String translate(String key) {
-        return mainFrame.translate(key);
     }
 
     private void assignListener(AbstractCommandButton b, final String command) {
@@ -628,6 +621,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
     @Override
     public void updateComponents(SWF swf) {
+        super.updateComponents(swf);
         boolean swfLoaded = swf != null;
         List<ABCContainerTag> abcList = swfLoaded ? swf.abcList : null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
@@ -667,22 +661,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
     }
 
-    private boolean saveAs(SWF swf, SaveFileMode mode) {
-        if (Main.saveFileDialog(swf, mode)) {
-            mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-            updateComponents(mainFrame.panel.getCurrentSwf());
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_DEBUGGER_SWITCH:
                 if (debuggerSwitchGroup.getSelected() == null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
                     Main.switchDebugger();
-                    mainFrame.panel.refreshDecompiled();
+                    mainFrame.getPanel().refreshDecompiled();
                 } else {
                     if (debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton) {
                         debuggerSwitchGroup.setSelected(debuggerSwitchCommandButton, false);
@@ -698,7 +683,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 rtd.setVisible(true);
                 if (rtd.getValue() != null) {
                     Main.replaceTraceCalls(rtd.getValue());
-                    mainFrame.panel.refreshDecompiled();
+                    mainFrame.getPanel().refreshDecompiled();
                     Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
                 }
                 break;
@@ -735,7 +720,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_DISABLE_DECOMPILATION:
                 Configuration.decompile.set(!miDecompile.isSelected());
-                mainFrame.panel.disableDecompilationChanged();
+                mainFrame.getPanel().disableDecompilationChanged();
                 break;
             case ACTION_ASSOCIATE:
                 if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
@@ -752,7 +737,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 }, 1000); //It takes some time registry change to apply
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS:
-                mainFrame.panel.gotoDocumentClass(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().gotoDocumentClass(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_PARALLEL_SPEED_UP:
                 String confStr = translate("message.confirm.parallel") + "\r\n";
@@ -769,36 +754,36 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_INTERNAL_VIEWER_SWITCH:
                 Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
-                mainFrame.panel.reload(true);
+                mainFrame.getPanel().reload(true);
                 break;
 
             case ACTION_VIEWMODE_RESOURCES:
                 Configuration.dumpView.set(false);
-                mainFrame.panel.showView(MainPanel.VIEW_RESOURCES);
+                mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
                 timeLineToggleGroup.setSelected(timeLineToggleButton, false);
                 viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
                 break;
             case ACTION_VIEWMODE_HEX:
                 Configuration.dumpView.set(true);
-                mainFrame.panel.showView(MainPanel.VIEW_DUMP);
+                mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
                 timeLineToggleGroup.setSelected(timeLineToggleButton, false);
                 viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
                 break;
             case ACTION_DEOBFUSCATION_MODE_OLD:
                 Configuration.deobfuscationMode.set(0);
-                mainFrame.panel.autoDeobfuscateChanged();
+                mainFrame.getPanel().autoDeobfuscateChanged();
                 break;
             case ACTION_DEOBFUSCATION_MODE_NEW:
                 Configuration.deobfuscationMode.set(1);
-                mainFrame.panel.autoDeobfuscateChanged();
+                mainFrame.getPanel().autoDeobfuscateChanged();
                 break;
             case ACTION_SEARCH:
-                mainFrame.panel.searchAs();
+                search(false);
                 break;
             case ACTION_TIMELINE:
                 timeLineToggleGroup.setSelected(timeLineToggleButton, timeLineToggleGroup.getSelected() == timeLineToggleButton);
                 if (timeLineToggleGroup.getSelected() == timeLineToggleButton) {
-                    if (!mainFrame.panel.showView(MainPanel.VIEW_TIMELINE)) {
+                    if (!mainFrame.getPanel().showView(MainPanel.VIEW_TIMELINE)) {
                         timeLineToggleGroup.setSelected(timeLineToggleButton, false);
                     } else {
                         viewModeToggleGroup.setSelected(viewModeHexToggleButton, false);
@@ -807,18 +792,18 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 } else {
                     if (Configuration.dumpView.get()) {
                         viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
-                        mainFrame.panel.showView(MainPanel.VIEW_DUMP);
+                        mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
                     } else {
                         viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
-                        mainFrame.panel.showView(MainPanel.VIEW_RESOURCES);
+                        mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
                     }
 
                 }
                 break;
             case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    mainFrame.panel.autoDeobfuscateChanged();
+                    mainFrame.getPanel().autoDeobfuscateChanged();
                 } else {
                     miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
                 }
@@ -827,7 +812,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.recentFiles.set(null);
                 break;
             case ACTION_EXIT:
-                mainFrame.panel.setVisible(false);
+                mainFrame.getPanel().setVisible(false);
                 if (Main.proxyFrame != null) {
                     if (Main.proxyFrame.isVisible()) {
                         return;
@@ -843,7 +828,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
         switch (e.getActionCommand()) {
             case ACTION_RENAME_ONE_IDENTIFIER:
-                mainFrame.panel.renameOneIdentifier(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().renameOneIdentifier(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_ABOUT:
                 Main.about();
@@ -856,70 +841,42 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                     Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
                 }
                 break;
-            case ACTION_SAVE: {
-                SWF swf = mainFrame.panel.getCurrentSwf();
-                if (swf != null) {
-                    boolean saved = false;
-                    if (swf.binaryData != null) {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        try {
-                            swf.saveTo(baos);
-                            swf.binaryData.binaryData = new ByteArrayRange(baos.toByteArray());
-                            swf.binaryData.setModified(true);
-                            saved = true;
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
-                        }
-                    } else if (swf.file == null) {
-                        saved = saveAs(swf, SaveFileMode.SAVEAS);
-                    } else {
-                        try {
-                            Main.saveFile(swf, swf.file);
-                            saved = true;
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, null, ex);
-                            View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                    if (saved) {
-                        swf.clearModified();
-                    }
-                }
-            }
-            break;
+            case ACTION_SAVE: 
+                save();
+                break;
             case ACTION_SAVE_AS: {
-                SWF swf = mainFrame.panel.getCurrentSwf();
+                SWF swf = mainFrame.getPanel().getCurrentSwf();
                 if (swf != null && saveAs(swf, SaveFileMode.SAVEAS)) {
                     swf.clearModified();
                 }
             }
             break;
             case ACTION_SAVE_AS_EXE: {
-                SWF swf = mainFrame.panel.getCurrentSwf();
+                SWF swf = mainFrame.getPanel().getCurrentSwf();
                 if (swf != null) {
                     saveAs(swf, SaveFileMode.EXE);
                 }
             }
             break;
             case ACTION_OPEN:
-                Main.openFileDialog();
+                open();
                 break;
             case ACTION_CLOSE:
-                Main.closeFile(mainFrame.panel.getCurrentSwfList());
+                Main.closeFile(mainFrame.getPanel().getCurrentSwfList());
                 break;
             case ACTION_CLOSE_ALL:
                 Main.closeAll();
                 break;
             case ACTION_EXPORT_FLA:
-                mainFrame.panel.exportFla(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().exportFla(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_IMPORT_TEXT:
-                mainFrame.panel.importText(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().importText(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_EXPORT_SEL:
             case ACTION_EXPORT:
                 boolean onlySel = e.getActionCommand().endsWith("SEL");
-                mainFrame.panel.export(onlySel);
+                mainFrame.getPanel().export(onlySel);
                 break;
             case ACTION_CHECK_UPDATES:
                 if (!Main.checkForUpdates()) {
@@ -941,20 +898,20 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             case ACTION_RESTORE_CONTROL_FLOW:
             case ACTION_RESTORE_CONTROL_FLOW_ALL:
                 boolean all = e.getActionCommand().endsWith("ALL");
-                mainFrame.panel.restoreControlFlow(all);
+                mainFrame.getPanel().restoreControlFlow(all);
                 break;
             case ACTION_RENAME_IDENTIFIERS:
-                mainFrame.panel.renameIdentifiers(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().renameIdentifiers(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_DEOBFUSCATE:
             case ACTION_DEOBFUSCATE_ALL:
-                mainFrame.panel.deobfuscate();
+                mainFrame.getPanel().deobfuscate();
                 break;
             case ACTION_REMOVE_NON_SCRIPTS:
-                mainFrame.panel.removeNonScripts(mainFrame.panel.getCurrentSwf());
+                mainFrame.getPanel().removeNonScripts(mainFrame.getPanel().getCurrentSwf());
                 break;
             case ACTION_REFRESH_DECOMPILED:
-                mainFrame.panel.refreshDecompiled();
+                mainFrame.getPanel().refreshDecompiled();
                 break;
             case ACTION_CHECK_RESOURCES:
                 ByteArrayOutputStream os = new ByteArrayOutputStream();

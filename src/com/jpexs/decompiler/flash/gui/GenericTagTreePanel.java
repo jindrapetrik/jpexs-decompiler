@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
@@ -25,7 +24,6 @@ import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ReflectionTools;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -26,7 +25,6 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
