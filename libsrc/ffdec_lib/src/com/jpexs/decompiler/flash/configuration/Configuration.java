@@ -94,6 +94,10 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> useHexColorFormat = null;
 
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static final ConfigurationItem<Boolean> showOldTextDuringTextEditing = null;
+
+    @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
 

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -164,6 +165,10 @@ public class TextPanel extends JPanel implements ActionListener {
     }
 
     private void textChanged() {
+        if (!Configuration.showOldTextDuringTextEditing.get()) {
+            return;
+        }
+        
         if (textValue.isEditable()) {
             TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
             if (item instanceof TextTag) {

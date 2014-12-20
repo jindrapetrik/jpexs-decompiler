@@ -169,7 +169,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         w = w2;
                     }
                 }
-
+                
                 rect = new Rectangle(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2, w, h);
             } else {
                 rect = null;
@@ -565,24 +565,19 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         textTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform() {
 
             @Override
-            public int getBlueAdd() {
-                return 192;
+            public int apply(int color) {
+                return 0xFFC0C0C0;
             }
-
-            @Override
-            public int getGreenAdd() {
-                return 192;
-            }
-
-            @Override
-            public int getRedAdd() {
-                return 192;
-            }
-            
         });
         
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform());
+            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform() {
+
+                @Override
+                public int apply(int color) {
+                    return 0xFF000000;
+                }
+            });
         }
         
         iconPanel.setImg(image);
