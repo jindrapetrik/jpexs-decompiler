@@ -53,7 +53,7 @@ import jsyntaxpane.actions.ActionUtils;
  */
 public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHandler {
 
-    private static final int truncateLimit = 8192;
+    private static final int truncateLimit = 2 * 1024 * 1024;
     private int lastLine = -1;
     private boolean error = false;
 

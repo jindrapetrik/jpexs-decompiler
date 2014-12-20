@@ -242,7 +242,7 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
 
-    @ConfigurationDefaultInt(1024 * 100/*100KB*/)
+    @ConfigurationDefaultInt(1024 * 1024/*1MiB*/)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
     public static final ConfigurationItem<Integer> guiFontPreviewSampleText = null;
