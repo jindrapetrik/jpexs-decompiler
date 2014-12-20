@@ -19,14 +19,23 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.ScrollPane;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -50,12 +59,12 @@ public abstract class MainFrameMenu {
         return mainFrame.translate(key);
     }
 
-    protected void open() {
+    protected boolean open() {
         Main.openFileDialog();
+        return true;
     }
     
-    protected void save() {
-        SWF swf = mainFrame.getPanel().getCurrentSwf();
+    protected boolean save() {
         if (swf != null) {
             boolean saved = false;
             if (swf.binaryData != null) {
@@ -82,20 +91,202 @@ public abstract class MainFrameMenu {
             if (saved) {
                 swf.clearModified();
             }
+            
+            return true;
         }
+        
+        return false;
     }
     
-    protected boolean saveAs(SWF swf, SaveFileMode mode) {
+    protected boolean saveAs() {
+        if (swf != null) {
+            if (saveAs(swf, SaveFileMode.SAVEAS)) {
+                swf.clearModified();
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
             mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-            updateComponents(mainFrame.getPanel().getCurrentSwf());
+            updateComponents(swf);
             return true;
         }
         return false;
     }
 
-    protected void search(boolean searhInText) {
-        mainFrame.getPanel().searchInActionScriptOrText(searhInText);
+    protected void saveAsExe() {
+        if (swf != null) {
+            saveAs(swf, SaveFileMode.EXE);
+        }
+    }
+    
+    protected void close() {
+        Main.closeFile(mainFrame.getPanel().getCurrentSwfList());
+    }
+    
+    protected boolean closeAll() {
+        if (swf != null) {
+            Main.closeAll();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    protected void importText() {
+        mainFrame.getPanel().importText(swf);
+    }
+    
+    protected boolean export(boolean onlySelected) {
+        if (swf != null) {
+            mainFrame.getPanel().export(onlySelected);
+            return true;
+        }
+
+        return false;
+    }
+    
+    protected void exportFla() {
+        mainFrame.getPanel().exportFla(swf);
+    }
+    
+    protected boolean search(boolean searhInText) {
+        if (swf != null) {
+            mainFrame.getPanel().searchInActionScriptOrText(searhInText);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    protected void restoreControlFlow(boolean all) {
+        mainFrame.getPanel().restoreControlFlow(all);
+    }
+    
+    protected void showProxy() {
+        Main.showProxy();
+    }
+    
+    protected boolean clearLog() {
+        ErrorLogFrame.getInstance().clearLog();
+        return true;
+    }
+    
+    protected void renameOneIdentifier() {
+        mainFrame.getPanel().renameOneIdentifier(swf);
+    }
+    
+    protected void renameIdentifiers() {
+        mainFrame.getPanel().renameIdentifiers(swf);
+    }
+    
+    protected void deobfuscate() {
+        mainFrame.getPanel().deobfuscate();
+    }
+    
+    protected void setSubLimiter(boolean value) {
+        Main.setSubLimiter(value);
+    }
+    
+    protected void removeNonScripts() {
+        mainFrame.getPanel().removeNonScripts(swf);
+    }
+    
+    protected void refreshDecompiled() {
+        mainFrame.getPanel().refreshDecompiled();
+    }
+    
+    protected void checkResources() {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PrintStream stream = new PrintStream(os);
+        CheckResources.checkResources(stream);
+        final String str = new String(os.toByteArray(), Utf8Helper.charset);
+        JDialog dialog = new JDialog() {
+
+            @Override
+            public void setVisible(boolean bln) {
+                setSize(new Dimension(800, 600));
+                Container cnt = getContentPane();
+                cnt.setLayout(new BorderLayout());
+                ScrollPane scrollPane = new ScrollPane();
+                JEditorPane editor = new JEditorPane();
+                editor.setEditable(false);
+                editor.setText(str);
+                scrollPane.add(editor);
+                this.add(scrollPane, BorderLayout.CENTER);
+                this.setModal(true);
+                View.centerScreen(this);
+                super.setVisible(bln);
+            }
+        };
+        dialog.setVisible(true);
+    }
+    
+    protected void checkUpdates() {
+        if (!Main.checkForUpdates()) {
+            View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    protected void helpUs() {
+        String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
+        if (!View.navigateUrl(helpUsURL)) {
+            View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
+        }
+    }
+    
+    protected void homePage() {
+        String homePageURL = ApplicationInfo.PROJECT_PAGE;
+        if (!View.navigateUrl(homePageURL)) {
+            View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
+        }
+    }
+    
+    protected void about() {
+        Main.about();
+    }
+    
+    protected boolean reload() {
+        if (swf != null) {
+            if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                Main.reloadApp();
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    protected void advancedSettings() {
+        Main.advancedSettings();
+    }
+    
+    protected void loadFromMemory() {
+        Main.loadFromMemory();
+    }
+    
+    protected void loadFromCache() {
+        Main.loadFromCache();
+    }
+    
+    protected void setLanguage() {
+        new SelectLanguageDialog().display();
+    }
+    
+    protected void exit() {
+        mainFrame.getPanel().setVisible(false);
+        if (Main.proxyFrame != null) {
+            if (Main.proxyFrame.isVisible()) {
+                return;
+            }
+        }
+        Main.exit();
     }
     
     public void updateComponents(SWF swf) {
@@ -110,30 +301,27 @@ public abstract class MainFrameMenu {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (((JFrame) mainFrame).isActive()) {
+                    int code = e.getKeyCode();
                     if (e.isControlDown() && e.isShiftDown()) {
-                        int code = e.getKeyCode();
                         switch (code) {
                             case KeyEvent.VK_O:
-                                open();
-                                return true;
+                                return open();
                             case KeyEvent.VK_S:
-                                if (swf != null) {
-                                    save();
-                                    return true;
-                                }
-                                break;
+                                return save();
+                            case KeyEvent.VK_A:
+                                return saveAs();
                             case KeyEvent.VK_F:
-                                if (swf != null) {
-                                    search(false);
-                                    return true;
-                                }
-                                break;
+                                return search(false);
                             case KeyEvent.VK_T:
-                                if (swf != null) {
-                                    search(true);
-                                    return true;
-                                }
-                                break;
+                                return search(true);
+                            case KeyEvent.VK_R:
+                                return reload();
+                            case KeyEvent.VK_X:
+                                return closeAll();
+                            case KeyEvent.VK_D:
+                                return clearLog();
+                            case KeyEvent.VK_E:
+                                return export(false);
                         }
                     }
                 }

@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
@@ -53,7 +52,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
     private static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
     private static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
     private static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
-    private static final String ACTION_SEARCH_AS = "SEARCHAS";
+    private static final String ACTION_SEARCH = "SEARCH";
     private static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
     private static final String ACTION_EXIT = "EXIT";
 
@@ -97,8 +96,8 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
     private JMenuItem exportSelectionCommandButton;
 
     private JMenuItem reloadCommandButton;
-    private JMenuItem renameinvalidCommandButton;
-    private JMenuItem globalrenameCommandButton;
+    private JMenuItem renameInvalidCommandButton;
+    private JMenuItem globalRenameCommandButton;
     private JMenuItem deobfuscationCommandButton;
     private JMenuItem searchCommandButton;
     private JMenuItem gotoDocumentClassCommandButton;
@@ -214,7 +213,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
 
         JMenuItem miSearchScript = new JMenuItem(translate("menu.tools.searchas"));
         miSearchScript.addActionListener(this);
-        miSearchScript.setActionCommand(ACTION_SEARCH_AS);
+        miSearchScript.setActionCommand(ACTION_SEARCH);
         miSearchScript.setIcon(View.getIcon("search16"));
 
         menuTools.add(miSearchScript);
@@ -341,8 +340,8 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
          exportSelectionCommandButton.setEnabled(swfLoaded);
          reloadCommandButton.setEnabled(swfLoaded);
 
-         renameinvalidCommandButton.setEnabled(swfLoaded);
-         globalrenameCommandButton.setEnabled(swfLoaded);
+         renameInvalidCommandButton.setEnabled(swfLoaded);
+         globalRenameCommandButton.setEnabled(swfLoaded);
          deobfuscationCommandButton.setEnabled(swfLoaded);
          searchCommandButton.setEnabled(swfLoaded);
 
@@ -354,18 +353,16 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_RELOAD:
-                if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Main.reloadApp();
-                }
+                reload();
                 break;
             case ACTION_ADVANCED_SETTINGS:
-                Main.advancedSettings();
+                advancedSettings();
                 break;
             case ACTION_LOAD_MEMORY:
-                Main.loadFromMemory();
+                loadFromMemory();
                 break;
             case ACTION_LOAD_CACHE:
-                Main.loadFromCache();
+                loadFromCache();
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
                 Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
@@ -382,7 +379,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 }
                 break;
             case ACTION_SET_LANGUAGE:
-                new SelectLanguageDialog().display();
+                setLanguage();
                 break;
             case ACTION_DISABLE_DECOMPILATION:
                 Configuration.decompile.set(!miDecompile.isSelected());
@@ -394,13 +391,13 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 }
                 ContextMenuTools.addToContextMenu(miAssociate.isSelected(), false);
 
-                //Update checkbox menuitem accordingly (User can cancel rights elevation)
+                // Update checkbox menuitem accordingly (User can cancel rights elevation)
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
                         miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
                     }
-                }, 1000); //It takes some time registry change to apply
+                }, 1000); // It takes some time registry change to apply
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS:
                 mainFrame.getPanel().gotoDocumentClass(mainFrame.getPanel().getCurrentSwf());
@@ -422,7 +419,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
                 mainFrame.getPanel().reload(true);
                 break;
-            case ACTION_SEARCH_AS:
+            case ACTION_SEARCH:
                 search(false);
                 break;
             case ACTION_AUTO_DEOBFUSCATE:
@@ -434,13 +431,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 }
                 break;
             case ACTION_EXIT:
-                mainFrame.getPanel().setVisible(false);
-                if (Main.proxyFrame != null) {
-                    if (Main.proxyFrame.isVisible()) {
-                        return;
-                    }
-                }
-                Main.exit();
+                exit();
                 break;
         }
 
@@ -450,81 +441,63 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
 
         switch (e.getActionCommand()) {
             case ACTION_RENAME_ONE_IDENTIFIER:
-                mainFrame.getPanel().renameOneIdentifier(mainFrame.getPanel().getCurrentSwf());
-                break;
-            case ACTION_ABOUT:
-                Main.about();
+                renameOneIdentifier();
                 break;
             case ACTION_SHOW_PROXY:
-                Main.showProxy();
+                showProxy();
                 break;
             case ACTION_SUB_LIMITER:
-                if (e.getSource() instanceof JCheckBoxMenuItem) {
-                    Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
-                }
+                setSubLimiter(((JCheckBoxMenuItem) e.getSource()).isSelected());
                 break;
             case ACTION_SAVE:
                 save();
                 break;
-            case ACTION_SAVE_AS: {
-                SWF swf = mainFrame.getPanel().getCurrentSwf();
-                if (swf != null && saveAs(swf, SaveFileMode.SAVEAS)) {
-                    swf.clearModified();
-                }
-            }
-            break;
-            case ACTION_SAVE_AS_EXE: {
-                SWF swf = mainFrame.getPanel().getCurrentSwf();
-                if (swf != null) {
-                    saveAs(swf, SaveFileMode.EXE);
-                }
-            }
-            break;
+            case ACTION_SAVE_AS:
+                saveAs();
+                break;
+            case ACTION_SAVE_AS_EXE:
+                saveAsExe();
+                break;
             case ACTION_OPEN:
                 open();
                 break;
-            case ACTION_EXPORT_FLA:
-                mainFrame.getPanel().exportFla(mainFrame.getPanel().getCurrentSwf());
-                break;
             case ACTION_EXPORT_SEL:
             case ACTION_EXPORT:
-                boolean onlySel = e.getActionCommand().endsWith("SEL");
-                mainFrame.getPanel().export(onlySel);
+                boolean onlySel = e.getActionCommand().equals(ACTION_EXPORT_SEL);
+                export(onlySel);
+                break;
+            case ACTION_EXPORT_FLA:
+                exportFla();
                 break;
             case ACTION_CHECK_UPDATES:
-                if (!Main.checkForUpdates()) {
-                    View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
-                }
+                checkUpdates();
                 break;
             case ACTION_HELP_US:
-                String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
-                if (!View.navigateUrl(helpUsURL)) {
-                    View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
-                }
+                helpUs();
                 break;
             case ACTION_HOMEPAGE:
-                String homePageURL = ApplicationInfo.PROJECT_PAGE;
-                if (!View.navigateUrl(homePageURL)) {
-                    View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
-                }
+                homePage();
+                break;
+            case ACTION_ABOUT:
+                about();
                 break;
             case ACTION_RESTORE_CONTROL_FLOW:
             case ACTION_RESTORE_CONTROL_FLOW_ALL:
-                boolean all = e.getActionCommand().endsWith("ALL");
-                mainFrame.getPanel().restoreControlFlow(all);
+                boolean all = e.getActionCommand().equals(ACTION_RESTORE_CONTROL_FLOW_ALL);
+                restoreControlFlow(all);
                 break;
             case ACTION_RENAME_IDENTIFIERS:
-                mainFrame.getPanel().renameIdentifiers(mainFrame.getPanel().getCurrentSwf());
+                renameIdentifiers();
                 break;
             case ACTION_DEOBFUSCATE:
             case ACTION_DEOBFUSCATE_ALL:
-                mainFrame.getPanel().deobfuscate();
+                deobfuscate();
                 break;
             case ACTION_REMOVE_NON_SCRIPTS:
-                mainFrame.getPanel().removeNonScripts(mainFrame.getPanel().getCurrentSwf());
+                removeNonScripts();
                 break;
             case ACTION_REFRESH_DECOMPILED:
-                mainFrame.getPanel().refreshDecompiled();
+                refreshDecompiled();
                 break;
         }
     }

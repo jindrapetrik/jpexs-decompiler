@@ -126,10 +126,7 @@ public class ErrorLogFrame extends AppFrame {
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                logViewInner.removeAll();
-                Main.clearLogFile();
-                revalidate();
-                repaint();
+                clearLog();
             }
         });
         buttonsPanel.add(clearButton);
@@ -158,6 +155,13 @@ public class ErrorLogFrame extends AppFrame {
             }
         };
         handler.setLevel(Level.WARNING);
+    }
+    
+    public void clearLog() {
+        logViewInner.removeAll();
+        Main.clearLogFile();
+        revalidate();
+        repaint();
     }
 
     public void clearErrorState() {
