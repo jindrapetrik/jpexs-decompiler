@@ -346,6 +346,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return SWFInputStream.resolveTag(copy, 0, false, true, false);
     }
 
+    public Tag getOriginalTag() throws InterruptedException, IOException {
+        byte[] data = getOriginalData();
+        SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
+        TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
+        copy.forceWriteAsLong = forceWriteAsLong;
+        return SWFInputStream.resolveTag(copy, 0, false, true, false);
+    }
+
     /**
      * Returns string representation of the object
      *

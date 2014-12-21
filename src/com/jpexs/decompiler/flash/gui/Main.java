@@ -481,9 +481,6 @@ public class Main {
 
     public static boolean reloadSWFs() {
         CancellableWorker.cancelBackgroundThreads();
-        if (mainFrame != null) {
-            mainFrame.getPanel().closeAll();
-        }
         if (Main.sourceInfos.isEmpty()) {
             Helper.freeMem();
             showModeFrame();
@@ -520,6 +517,7 @@ public class Main {
         }
         if (mainFrame != null) {
             mainFrame.setVisible(false);
+            mainFrame.getPanel().closeAll();
             mainFrame = null;
         }
         FontTag.reload();

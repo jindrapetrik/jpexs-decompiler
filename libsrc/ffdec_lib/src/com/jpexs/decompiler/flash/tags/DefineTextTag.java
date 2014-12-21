@@ -570,6 +570,15 @@ public class DefineTextTag extends TextTag {
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, colorTransform);
+        /*try {
+            DefineTextTag originalTag = (DefineTextTag) getOriginalTag();
+            if (isModified()) {
+                originalTag.toImage(frame, time, ratio, stateUnderCursor, mouseButton, image, transformation, new ConstantColorColorTransform(0xFFC0C0C0));
+            }
+            staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, new ConstantColorColorTransform(0xFF000000));
+        } catch (InterruptedException | IOException ex) {
+            Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
     }
 
     @Override

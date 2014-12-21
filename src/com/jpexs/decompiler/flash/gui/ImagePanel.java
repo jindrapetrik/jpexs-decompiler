@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
@@ -562,22 +563,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform() {
-
-            @Override
-            public int apply(int color) {
-                return 0xFFC0C0C0;
-            }
-        });
+        textTag.toImage(0, 0, 0, null, 0, image, m, new ConstantColorColorTransform(0xFFC0C0C0));
         
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ColorTransform() {
-
-                @Override
-                public int apply(int color) {
-                    return 0xFF000000;
-                }
-            });
+            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ConstantColorColorTransform(0xFF000000));
         }
         
         iconPanel.setImg(image);

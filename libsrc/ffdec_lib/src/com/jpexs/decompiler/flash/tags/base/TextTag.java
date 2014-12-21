@@ -354,14 +354,16 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     RECT glyphBounds = shape.getBounds();
-                    ExportRectangle rect = mat.transform(new ExportRectangle(glyphBounds));
-                    if (result == null) {
-                        result = rect;
-                    } else {
-                        result.xMin = Math.min(result.xMin, rect.xMin);
-                        result.yMin = Math.min(result.yMin, rect.yMin);
-                        result.xMax = Math.max(result.xMax, rect.xMax);
-                        result.yMax = Math.max(result.yMax, rect.yMax);
+                    if (!shape.shapeRecords.isEmpty() && !(shape.shapeRecords.get(0) instanceof EndShapeRecord)) {
+                        ExportRectangle rect = mat.transform(new ExportRectangle(glyphBounds));
+                        if (result == null) {
+                            result = rect;
+                        } else {
+                            result.xMin = Math.min(result.xMin, rect.xMin);
+                            result.yMin = Math.min(result.yMin, rect.yMin);
+                            result.xMax = Math.max(result.xMax, rect.xMax);
+                            result.yMax = Math.max(result.yMax, rect.yMax);
+                        }
                     }
                     x += entry.glyphAdvance;
                 }
@@ -375,20 +377,22 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get(); 
         if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
             ExportRectangle newBounds = calculateTextBounds();
-            int xMin = (int) Math.floor(newBounds.xMin);
-            int yMin = (int) Math.floor(newBounds.yMin);
-            int xMax = (int) Math.ceil(newBounds.xMax);
-            int yMax = (int) Math.ceil(newBounds.yMax);
-            if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY)) {
-                textBounds.Xmin = Math.min(xMin, textBounds.Xmin);
-                textBounds.Ymin = Math.min(yMin, textBounds.Ymin);
-                textBounds.Xmax = Math.max(xMax, textBounds.Xmax);
-                textBounds.Ymax = Math.max(yMax, textBounds.Ymax);
-            } else if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
-                textBounds.Xmin = xMin;
-                textBounds.Ymin = yMin;
-                textBounds.Xmax = xMax;
-                textBounds.Ymax = yMax;
+            if (newBounds != null) {
+                int xMin = (int) Math.floor(newBounds.xMin);
+                int yMin = (int) Math.floor(newBounds.yMin);
+                int xMax = (int) Math.ceil(newBounds.xMax);
+                int yMax = (int) Math.ceil(newBounds.yMax);
+                if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY)) {
+                    textBounds.Xmin = Math.min(xMin, textBounds.Xmin);
+                    textBounds.Ymin = Math.min(yMin, textBounds.Ymin);
+                    textBounds.Xmax = Math.max(xMax, textBounds.Xmax);
+                    textBounds.Ymax = Math.max(yMax, textBounds.Ymax);
+                } else if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
+                    textBounds.Xmin = xMin;
+                    textBounds.Ymin = yMin;
+                    textBounds.Xmax = xMax;
+                    textBounds.Ymax = yMax;
+                }
             }
         }
     }
