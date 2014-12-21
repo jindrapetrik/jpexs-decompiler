@@ -763,8 +763,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 actionPanel.initSplits();
             }
 
-            final MainPanel t = this;
-
             View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {
