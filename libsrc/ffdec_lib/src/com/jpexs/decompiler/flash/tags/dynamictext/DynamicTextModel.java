@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.dynamictext;
 
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -64,11 +65,11 @@ public class DynamicTextModel {
         }
     }
 
-    public int calculateTexWidths() {
+    public int calculateTextWidths() {
 
         int width = 0;
         for (Paragraph p : paragraphs) {
-            width += p.calculateTexWidths();
+            width += p.calculateTextWidths();
         }
         this.width = width;
         return width;

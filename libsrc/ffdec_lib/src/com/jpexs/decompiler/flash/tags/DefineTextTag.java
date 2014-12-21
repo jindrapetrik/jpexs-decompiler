@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -440,6 +441,7 @@ public class DefineTextTag extends TextTag {
             throw ex;
         }
 
+        updateTextBounds(textBounds);
         return true;
     }
 
@@ -573,6 +575,11 @@ public class DefineTextTag extends TextTag {
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
         staticTextToSVG(swf, textRecords, 1, exporter, getRect(new HashSet<BoundedTag>()), getTextMatrix(), colorTransform, zoom);
+    }
+
+    @Override
+    public ExportRectangle calculateTextBounds() {
+        return calculateTextBounds(swf, textRecords, getTextMatrix());
     }
 
     @Override

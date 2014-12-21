@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
+import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -304,6 +305,9 @@ public class Configuration {
     @ConfigurationDefaultString("--- RECORDSEPARATOR ---")
     @ConfigurationCategory("export")
     public static final ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
+
+    @ConfigurationCategory("import")
+    public static final ConfigurationItem<TextImportResizeTextBoundsMode> textImportResizeTextBoundsMode = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")

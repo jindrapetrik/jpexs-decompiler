@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 JPEXS, All rights reserved.
+ *  Copyright (C) 2014 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -14,33 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags.dynamictext;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.jpexs.decompiler.flash.importers;
 
 /**
  *
- *
  * @author JPEXS
  */
-public class SameStyleTextRecord {
-
-    public TextStyle style;
-
-    public int xOffset;
-
-    public int width;
-
-    public List<GlyphCharacter> glyphEntries = new ArrayList<>();
-
-    public int calculateTextWidths() {
-
-        int width = 0;
-        for (GlyphCharacter gc : glyphEntries) {
-            width += gc.glyphEntry.glyphAdvance;
-        }
-        this.width = width;
-        return width;
-    }
+public enum TextImportResizeTextBoundsMode {
+    
+    NO_RESIZE, GROW_ONLY, GROW_AND_SHRINK
 }

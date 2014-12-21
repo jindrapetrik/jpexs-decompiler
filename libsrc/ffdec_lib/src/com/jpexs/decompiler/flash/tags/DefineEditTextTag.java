@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -794,14 +795,15 @@ public class DefineEditTextTag extends TextTag {
     }
 
     private String render(boolean canvas, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        if (image == null) {
-            return ""; //TODO: handle Html Canvas conversion 
-        }
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
-            drawBorder(swf, image, borderColor, fillColor, getRect(new HashSet<BoundedTag>()), getTextMatrix(), transformation, colorTransform);
+            if (!canvas) {
+                drawBorder(swf, image, borderColor, fillColor, getRect(new HashSet<BoundedTag>()), getTextMatrix(), transformation, colorTransform);
+            } else {
+                // TODO: draw border
+            }
         }
         if (hasText) {
             DynamicTextModel textModel = new DynamicTextModel();
@@ -858,7 +860,7 @@ public class DefineEditTextTag extends TextTag {
                 prevChar = c;
             }
 
-            textModel.calculateTexWidths();
+            textModel.calculateTextWidths();
             List<List<SameStyleTextRecord>> lines;
             if (multiline && wordWrap) {
                 lines = new ArrayList<>();
@@ -913,7 +915,7 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
-            textModel.calculateTexWidths();
+            textModel.calculateTextWidths();
 
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
             int yOffset = 0;
@@ -970,14 +972,24 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
-            staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+            if (canvas) {
+                return staticTextToHtmlCanvas(1, swf, allTextRecords, 2, getBounds(), getTextMatrix(), colorTransform);
+            } else {
+                staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+            }
         }
-        return ""; //TODO: Return HTML Canvas converted
+        
+        return "";
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public ExportRectangle calculateTextBounds() {
+        return null;
     }
 
     private FontTag getFontTag() {

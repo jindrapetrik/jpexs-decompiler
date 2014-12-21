@@ -60,7 +60,7 @@ public class ErrorLogFrame extends AppFrame {
     private static ErrorLogFrame instance;
 
     private final JPanel logView = new JPanel();
-    private JPanel logViewInner = new JPanel();
+    private final JPanel logViewInner = new JPanel();
     private final Handler handler;
     private final ImageIcon expandIcon;
     private final ImageIcon collapseIcon;

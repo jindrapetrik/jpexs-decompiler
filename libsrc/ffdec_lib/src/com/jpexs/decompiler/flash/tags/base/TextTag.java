@@ -17,13 +17,16 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -89,6 +92,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     public abstract RECT getBounds();
 
     public abstract void setBounds(RECT r);
+
+    public abstract ExportRectangle calculateTextBounds();
 
     private static void updateRect(RECT ret, int x, int y) {
         if (x < ret.Xmin) {
@@ -317,6 +322,77 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         }
     }
 
+    public static ExportRectangle calculateTextBounds(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix) {
+        FontTag font = null;
+        int textHeight = 12;
+        int x = 0;
+        int y = 0;
+        List<SHAPE> glyphs = new ArrayList<>();
+        ExportRectangle result = null;
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasFont) {
+                font = (FontTag) swf.characters.get(rec.fontId);
+                glyphs = font == null ? null : font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+
+            double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
+
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                Matrix mat = new Matrix();
+                mat = mat.concatenate(new Matrix(textMatrix));
+                Matrix matTr = Matrix.getTranslateInstance(x, y);
+                mat = mat.concatenate(matTr);
+                mat = mat.concatenate(Matrix.getScaleInstance(rat));
+                if (entry.glyphIndex != -1 && glyphs != null) {
+                    // shapeNum: 1
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    RECT glyphBounds = shape.getBounds();
+                    ExportRectangle rect = mat.transform(new ExportRectangle(glyphBounds));
+                    if (result == null) {
+                        result = rect;
+                    } else {
+                        result.xMin = Math.min(result.xMin, rect.xMin);
+                        result.yMin = Math.min(result.yMin, rect.yMin);
+                        result.xMax = Math.max(result.xMax, rect.xMax);
+                        result.yMax = Math.max(result.yMax, rect.yMax);
+                    }
+                    x += entry.glyphAdvance;
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public void updateTextBounds(RECT textBounds) {
+        TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get(); 
+        if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
+            ExportRectangle newBounds = calculateTextBounds();
+            int xMin = (int) Math.floor(newBounds.xMin);
+            int yMin = (int) Math.floor(newBounds.yMin);
+            int xMax = (int) Math.ceil(newBounds.xMax);
+            int yMax = (int) Math.ceil(newBounds.yMax);
+            if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY)) {
+                textBounds.Xmin = Math.min(xMin, textBounds.Xmin);
+                textBounds.Ymin = Math.min(yMin, textBounds.Ymin);
+                textBounds.Xmax = Math.max(xMax, textBounds.Xmax);
+                textBounds.Ymax = Math.max(yMax, textBounds.Ymax);
+            } else if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
+                textBounds.Xmin = xMin;
+                textBounds.Ymin = yMin;
+                textBounds.Xmax = xMax;
+                textBounds.Ymax = yMax;
+            }
+        }
+    }
+    
     public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         int textColor = 0;
         String ret = "";

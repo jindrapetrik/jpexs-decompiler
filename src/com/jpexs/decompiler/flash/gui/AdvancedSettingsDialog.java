@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,6 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -192,7 +194,6 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                             val = "";
                         }
                         if (itemType == Calendar.class) {
-
                             tf.setText(new SimpleDateFormat().format(((Calendar) item.get()).getTime()));
                         } else {
                             tf.setText(val.toString());
@@ -200,12 +201,32 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                         tf.setToolTipText(description);
                         tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
                         c = tf;
-                    }
-                    if (itemType == Boolean.class) {
+                    } else if (itemType == Boolean.class) {
                         JCheckBox cb = new JCheckBox();
                         cb.setSelected((Boolean) item.get());
                         cb.setToolTipText(description);
                         c = cb;
+                    } else if (itemType.isEnum()) {
+                        JComboBox<String> cb = new JComboBox<>();
+                        @SuppressWarnings("unchecked")
+                        EnumSet enumValues = EnumSet.allOf(itemType);
+                        String stringValue = null;
+                        for (Object enumValue : enumValues) {
+                            String enumValueStr = enumValue.toString();
+                            if (stringValue == null) {
+                                stringValue = enumValueStr;
+                            }
+                            cb.addItem(enumValueStr);
+                        }
+                        if (item.get() != null) {
+                            stringValue = item.get().toString();
+                        }
+                        cb.setToolTipText(description);
+                        cb.setSelectedItem(stringValue);
+                        cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));
+                        c = cb;
+                    } else {
+                        throw new UnsupportedOperationException("Configuration ttem type '" + itemType.getName() + "' is not supported");
                     }
                     componentsMap.put(name, c);
                     l.setLabelFor(c);
@@ -223,7 +244,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
             tabs.put(cat, new JScrollPane(configPanel));
         }
 
-        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "limit", "update", "debug", "other"};
+        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "limit", "update", "debug", "other"};
 
         for (String cat : catOrder) {
             if (!tabs.containsKey(cat)) {
@@ -290,6 +311,11 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                             return;
                         }
                         value = cal;
+                    }
+                    
+                    if (itemType.isEnum()) {
+                        String stringValue = (String) ((JComboBox<String>) c).getSelectedItem();
+                        value = Enum.valueOf(itemType, stringValue);
                     }
 
                     try {
