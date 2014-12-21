@@ -568,7 +568,11 @@ public class DefineEditTextTag extends TextTag {
                         }
                         break;
                     case TEXT:
-                        formattedText += (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
+                        String s2 = (String) s.values[0];
+                        if (s2 == null) {
+                            s2 = "";
+                        }
+                        formattedText += (texts == null || textIdx >= texts.length) ? s2 : texts[textIdx++];
                         break;
                 }
             }
