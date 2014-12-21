@@ -155,9 +155,18 @@ public abstract class MainFrameMenu {
         mainFrame.getPanel().exportFla(swf);
     }
     
-    protected boolean search(boolean searhInText) {
+    protected boolean search(boolean searchInText) {
         if (swf != null) {
-            mainFrame.getPanel().searchInActionScriptOrText(searhInText);
+            mainFrame.getPanel().searchInActionScriptOrText(searchInText);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    protected boolean replace() {
+        if (swf != null) {
+            mainFrame.getPanel().replaceText();
             return true;
         }
         

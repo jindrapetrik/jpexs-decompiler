@@ -726,7 +726,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 break;
             case ACTION_HEX:
             case ACTION_HEX_ONLY:
-                if (e.getActionCommand() == ACTION_HEX) {
+                if (e.getActionCommand().equals(ACTION_HEX)) {
                     hexOnlyButton.setSelected(false);
                 } else {
                     hexButton.setSelected(false);

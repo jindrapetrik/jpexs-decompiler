@@ -74,6 +74,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
     private static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
     private static final String ACTION_SEARCH = "SEARCH";
+    private static final String ACTION_REPLACE = "REPLACE";
     private static final String ACTION_TIMELINE = "TIMELINE";
     private static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
     private static final String ACTION_EXIT = "EXIT";
@@ -139,6 +140,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private JCommandButton globalRenameCommandButton;
     private JCommandButton deobfuscationCommandButton;
     private JCommandButton searchCommandButton;
+    private JCommandButton replaceCommandButton;
     private JCommandToggleButton timeLineToggleButton;
     private CommandToggleButtonGroup timeLineToggleGroup;
     private JCommandButton gotoDocumentClassCommandButton;
@@ -404,6 +406,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, ACTION_SEARCH);
 
+        // todo: change icon
+        replaceCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.replace")), View.getResizableIcon("replace32"));
+        assignListener(replaceCommandButton, ACTION_REPLACE);
+
         timeLineToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
         assignListener(timeLineToggleButton, ACTION_TIMELINE);
 
@@ -423,6 +429,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
 
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(replaceCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(timeLineToggleButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
@@ -630,6 +637,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         globalRenameCommandButton.setEnabled(swfLoaded);
         deobfuscationCommandButton.setEnabled(swfLoaded);
         searchCommandButton.setEnabled(swfLoaded);
+        replaceCommandButton.setEnabled(swfLoaded);
         timeLineToggleButton.setEnabled(swfLoaded);
 
         gotoDocumentClassCommandButton.setEnabled(hasAbc);
@@ -758,6 +766,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 break;
             case ACTION_SEARCH:
                 search(false);
+                break;
+            case ACTION_REPLACE:
+                replace();
                 break;
             case ACTION_TIMELINE:
                 timeLineToggleGroup.setSelected(timeLineToggleButton, timeLineToggleGroup.getSelected() == timeLineToggleButton);

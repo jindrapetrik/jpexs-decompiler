@@ -233,6 +233,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeItem oldItem;
+    private SearchDialog searchDialog;
+    private SearchDialog replaceDialog;
 
     public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     public static final String ACTION_REPLACE = "REPLACE";
@@ -858,7 +860,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public boolean confirmExperimental() {
         return View.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
-    private SearchDialog searchDialog;
 
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
 
@@ -1102,12 +1103,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void searchInActionScriptOrText(boolean searhInText) {
+    public void searchInActionScriptOrText(boolean searchInText) {
         if (searchDialog == null) {
-            searchDialog = new SearchDialog(getMainFrame().getWindow());
+            searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
         }
 
-        if (searhInText) {
+        if (searchInText) {
             searchDialog.searchInTextsRadioButton.setSelected(true);
         } else {
             searchDialog.searchInASRadioButton.setSelected(true);
@@ -1150,6 +1151,36 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             if (searchText(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected(), swf)) {
                                 found = true;
                             }
+                        }
+
+                        if (!found) {
+                            View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        }
+
+                        return null;
+                    }
+                }.execute();
+            }
+        }
+    }
+
+    public void replaceText() {
+        if (replaceDialog == null) {
+            replaceDialog = new SearchDialog(getMainFrame().getWindow(), true);
+        }
+
+        replaceDialog.setVisible(true);
+        if (replaceDialog.result) {
+            final String txt = replaceDialog.searchField.getText();
+            if (!txt.isEmpty()) {
+                final SWF swf = getCurrentSwf();
+
+                new CancellableWorker() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        boolean found = false;
+                        if (searchText(txt, replaceDialog.ignoreCaseCheckBox.isSelected(), replaceDialog.regexpCheckBox.isSelected(), swf)) {
+                            found = true;
                         }
 
                         if (!found) {

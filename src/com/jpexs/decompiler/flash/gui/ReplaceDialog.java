@@ -42,20 +42,17 @@ import javax.swing.JTextField;
  *
  * @author JPEXS
  */
-public class SearchDialog extends AppDialog implements ActionListener {
+public class ReplaceDialog extends AppDialog implements ActionListener {
 
     private static final String ACTION_OK = "OK";
     private static final String ACTION_CANCEL = "CANCEL";
 
     public JTextField searchField = new MyTextField();
-    public JTextField replaceField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
-    public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
-    public JRadioButton searchInASRadioButton = new JRadioButton(translate("checkbox.searchAS"));
-    public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
+    //public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
     public boolean result = false;
 
-    public SearchDialog(Window owner, boolean replace) {
+    public ReplaceDialog(Window owner) {
         super(owner);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ignoreCaseCheckBox.setSelected(true);
@@ -76,44 +73,23 @@ public class SearchDialog extends AppDialog implements ActionListener {
         panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
-        
-        if (replace) {
-            panField = new JPanel(new FlowLayout());
-            replaceField.setPreferredSize(new Dimension(250, replaceField.getPreferredSize().height));
-            panField.add(new JLabel(translate("label.replacementtext")));
-            panField.add(replaceField);
-            cnt.add(panField);
-        }
 
         JPanel checkPanel = new JPanel(new FlowLayout());
         checkPanel.add(ignoreCaseCheckBox);
-        checkPanel.add(regexpCheckBox);
+        //checkPanel.add(regexpCheckBox);
         cnt.add(checkPanel);
-
-        if (!replace) {
-            ButtonGroup group = new ButtonGroup();
-            group.add(searchInASRadioButton);
-            group.add(searchInTextsRadioButton);
-
-            JPanel rbPanel = new JPanel(new FlowLayout());
-            searchInASRadioButton.setSelected(true);
-            searchInTextsRadioButton.setSelected(false);
-            rbPanel.add(searchInASRadioButton);
-            rbPanel.add(searchInTextsRadioButton);
-            cnt.add(rbPanel);
-        }
 
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);
         //View.setWindowIcon(this);
-        setIconImage(View.loadImage(replace ? "replace16" : "search16"));
-        setTitle(replace ? translate("dialog.title.replace") : translate("dialog.title"));
+        setIconImage(View.loadImage("search16"));
+        setTitle(translate("dialog.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
         pack();
         List<Image> images = new ArrayList<>();
-        images.add(View.loadImage(replace ? "replace16" : "search16"));
-        images.add(View.loadImage(replace ? "replace32" : "search32"));
+        images.add(View.loadImage("search16"));
+        images.add(View.loadImage("search32"));
         setIconImages(images);
     }
 
@@ -129,14 +105,14 @@ public class SearchDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(ACTION_OK)) {
-            if (regexpCheckBox.isSelected()) {
+            /*if (regexpCheckBox.isSelected()) {
                 try {
                     Pattern pat = Pattern.compile(searchField.getText());
                 } catch (PatternSyntaxException ex) {
                     View.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-            }
+            }*/
             result = true;
         } else {
             result = false;
