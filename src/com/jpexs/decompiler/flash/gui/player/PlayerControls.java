@@ -56,7 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
@@ -429,7 +428,7 @@ public class PlayerControls extends JPanel implements ActionListener {
                     @Override
                     public void ancestorAdded(AncestorEvent event) {
                         final AncestorListener al = this;
-                        SwingUtilities.invokeLater(new Runnable() {
+                        View.execInEventDispatchLater(new Runnable() {
 
                             @Override
                             public void run() {

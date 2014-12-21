@@ -77,7 +77,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract MATRIX getTextMatrix();
 
-    public abstract String getText(String separator);
+    public abstract List<String> getTexts();
 
     public abstract List<Integer> getFontIds();
 

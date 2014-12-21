@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -109,7 +108,7 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
 
     private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
-            SwingUtilities.invokeLater(new Runnable() {
+            View.execInEventDispatchLater(new Runnable() {
 
                 @Override
                 public void run() {

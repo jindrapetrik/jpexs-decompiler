@@ -86,7 +86,7 @@ public class TextExporter {
 
         if (settings.singleFile) {
             String fileName = Configuration.overrideTextExportFileName.get();
-            if (fileName != null) {
+            if (fileName != null && !fileName.isEmpty()) {
                 String swfName = Path.getFileNameWithoutExtension(new File(tags.get(0).getSwf().getShortFileName()));
                 fileName = fileName.replace("{fileName}", swfName);
             } else {
@@ -104,7 +104,10 @@ public class TextExporter {
                                 if (settings.mode == TextExportMode.FORMATTED) {
                                     fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
                                 } else {
-                                    fos.write(Utf8Helper.getBytes(textTag.getText(Configuration.textExportSingleFileRecordSeparator.get())));
+                                    String separator = Configuration.textExportSingleFileRecordSeparator.get();
+                                    separator = Helper.newLine + separator + Helper.newLine;
+                                    List<String> texts = textTag.getTexts();
+                                    fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
                                 }
                                 fos.write(Utf8Helper.getBytes(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine));
                             }
@@ -125,7 +128,10 @@ public class TextExporter {
                                 if (settings.mode == TextExportMode.FORMATTED) {
                                     fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
                                 } else {
-                                    fos.write(Utf8Helper.getBytes(textTag.getText(Configuration.textExportSingleFileRecordSeparator.get())));
+                                    String separator = Configuration.textExportSingleFileRecordSeparator.get();
+                                    separator = Helper.newLine + separator + Helper.newLine;
+                                    List<String> texts = textTag.getTexts();
+                                    fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
                                 }
                             }
                         }

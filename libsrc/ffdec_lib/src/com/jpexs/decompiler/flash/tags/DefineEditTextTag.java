@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -191,7 +192,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String getText(String separator) {
+    public List<String> getTexts() {
         String ret = "";
         if (hasText) {
             ret = initialText;
@@ -200,7 +201,7 @@ public class DefineEditTextTag extends TextTag {
             ret = stripTags(ret);
             ret = entitiesReplace(ret);
         }
-        return ret;
+        return Arrays.asList(ret);
     }
 
     private List<CharacterWithStyle> getTextWithStyle() {

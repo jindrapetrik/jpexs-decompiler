@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -200,7 +199,7 @@ public class ErrorLogFrame extends AppFrame {
 
     private void log(final Level level, final String msg, final String detail) {
         if (logItemCount.getAndIncrement() < MAX_LOG_ITEM_COUNT) {
-            SwingUtilities.invokeLater(new Runnable() {
+            View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {
                     notifyMainFrame(level);

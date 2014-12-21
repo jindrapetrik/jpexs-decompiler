@@ -25,7 +25,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import jsyntaxpane.actions.DocumentSearchData;
 
@@ -117,7 +116,7 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
     }
 
     private void doUpdate() {
-        SwingUtilities.invokeLater(new Runnable() {
+        View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
                 searchPos.setText((foundPos + 1) + "/" + found.size());

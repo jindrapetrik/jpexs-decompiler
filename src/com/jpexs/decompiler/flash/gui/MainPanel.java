@@ -174,7 +174,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -766,7 +765,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             final MainPanel t = this;
 
-            SwingUtilities.invokeLater(new Runnable() {
+            View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {
                     splitPane1.setDividerLocation(Configuration.guiSplitPane1DividerLocation.get(getWidth() / 3));
@@ -1173,20 +1172,40 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (replaceDialog.result) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {
+                final String replacement = replaceDialog.replaceField.getText();
                 final SWF swf = getCurrentSwf();
 
                 new CancellableWorker() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        boolean found = false;
-                        if (searchText(txt, replaceDialog.ignoreCaseCheckBox.isSelected(), replaceDialog.regexpCheckBox.isSelected(), swf)) {
-                            found = true;
+                        int findCount = 0;
+                        Pattern pat = Pattern.compile(Pattern.quote(txt), replaceDialog.ignoreCaseCheckBox.isSelected() ? Pattern.CASE_INSENSITIVE : 0);
+                        List<TextTag> textTags = new ArrayList<>();
+                        for (Tag tag : swf.tags) {
+                            if (tag instanceof TextTag) {
+                                textTags.add((TextTag) tag);
+                            }
+                        }
+                        for (TextTag textTag : textTags) {
+                            List<String> texts = textTag.getTexts();
+                            boolean found = false;
+                            for (int i = 0; i < texts.size(); i++) {
+                                String text = texts.get(i);
+                                if (pat.matcher(text).find()) {
+                                    texts.set(i, text.replaceAll(txt, replacement));
+                                    found = true;
+                                    findCount++;
+                                }
+                            }
+                            if (found) {
+                                String[] textArray = texts.toArray(new String[texts.size()]);
+                                textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText(), textArray);
+                            }
                         }
 
-                        if (!found) {
-                            View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        if (findCount > 0) {
+                            refreshTree();
                         }
-
                         return null;
                     }
                 }.execute();
@@ -1195,7 +1214,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
-        if ((txt != null) && (!txt.isEmpty())) {
+        if (txt != null && !txt.isEmpty()) {
             SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
             textSearchPanel.setOptions(ignoreCase, regexp);
             List<TextTag> found = new ArrayList<>();
@@ -1430,7 +1449,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 private String getTextTagInfo(TextTag textTag) {
                     String ret = "";
                     if (textTag != null) {
-                        ret += " TextId: " + textTag.getCharacterId() + " (" + textTag.getText(", ") + ")";
+                        ret += " TextId: " + textTag.getCharacterId() + " (" + String.join(", ", textTag.getTexts()) + ")";
                     }
 
                     return ret;
@@ -1770,12 +1789,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             @Override
-            public boolean handle(TextTag textTag, FontTag font, char character) {
+            public boolean handle(TextTag textTag, final FontTag font, final char character) {
                 String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
                 if (fontName == null) {
                     fontName = font.getFontName();
                 }
-                Font f = FontTag.installedFontsByName.get(fontName);
+                final Font f = FontTag.installedFontsByName.get(fontName);
                 if (f == null || !f.canDisplay(character)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
                     logger.log(Level.SEVERE, msg + " FontId: " + font.getCharacterId() + " TextId: " + textTag.getCharacterId());
@@ -1785,7 +1804,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
                     return false;
                 }
-                font.addCharacter(character, f);
+                View.execInEventDispatch(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        font.addCharacter(character, f);
+                    }
+                });
+                        
                 return true;
             }
         };

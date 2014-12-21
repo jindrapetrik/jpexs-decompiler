@@ -102,7 +102,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Highlighter;
@@ -686,7 +685,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         final TreePath tp = ttm.getTagPath(pack);
-        SwingUtilities.invokeLater(new Runnable() {
+        View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
                 mainPanel.tagTree.setSelectionPath(tp);

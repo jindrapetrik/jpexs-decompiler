@@ -311,7 +311,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return jtt;
     }
-
+    
     public void fixCharactersOrder(boolean checkAll) {
         Set<Integer> addedCharacterIds = new HashSet<>();
         Set<CharacterTag> movedTags = new HashSet<>();

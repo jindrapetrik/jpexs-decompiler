@@ -86,15 +86,10 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public String getText(String separator) {
+    public List<String> getTexts() {
         FontTag fnt = null;
-        String ret = "";
-        boolean first = true;
+        List<String> ret = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
-            if (!first) {
-                ret += Helper.newLine + separator + Helper.newLine;
-            }
-            first = false;
             if (rec.styleFlagsHasFont) {
                 for (Tag t : swf.tags) {
                     if (t instanceof FontTag) {
@@ -110,7 +105,7 @@ public class DefineTextTag extends TextTag {
                  ret += "\r\n";
                  }*/
             }
-            ret += rec.getText(fnt);
+            ret.add(rec.getText(fnt));
         }
         return ret;
     }
