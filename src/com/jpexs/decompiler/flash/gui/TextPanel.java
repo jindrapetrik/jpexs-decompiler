@@ -157,7 +157,7 @@ public class TextPanel extends JPanel implements ActionListener {
                     if (mainPanel.saveText(textTag, textValue.getText(), null)) {
                         setEditText(false);
                         item.getSwf().clearImageCache();
-                        mainPanel.reload(true);
+                        mainPanel.refreshTree();
                     }
                 }
                 break;
