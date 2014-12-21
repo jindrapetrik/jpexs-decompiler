@@ -1185,23 +1185,32 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                         }
                         for (TextTag textTag : textTags) {
-                            List<String> texts = textTag.getTexts();
-                            boolean found = false;
-                            for (int i = 0; i < texts.size(); i++) {
-                                String text = texts.get(i);
+                            if (!replaceDialog.replaceInParametersCheckBox.isSelected()) {
+                                List<String> texts = textTag.getTexts();
+                                boolean found = false;
+                                for (int i = 0; i < texts.size(); i++) {
+                                    String text = texts.get(i);
+                                    if (pat.matcher(text).find()) {
+                                        texts.set(i, text.replaceAll(txt, replacement));
+                                        found = true;
+                                        findCount++;
+                                    }
+                                }
+                                if (found) {
+                                    String[] textArray = texts.toArray(new String[texts.size()]);
+                                    textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText(), textArray);
+                                }
+                            } else {
+                                String text = textTag.getFormattedText();
                                 if (pat.matcher(text).find()) {
-                                    texts.set(i, text.replaceAll(txt, replacement));
-                                    found = true;
+                                    textTag.setFormattedText(getMissingCharacterHandler(), text.replaceAll(txt, replacement), null);
                                     findCount++;
                                 }
-                            }
-                            if (found) {
-                                String[] textArray = texts.toArray(new String[texts.size()]);
-                                textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText(), textArray);
                             }
                         }
 
                         if (findCount > 0) {
+                            swf.clearImageCache();
                             refreshTree();
                         }
                         return null;

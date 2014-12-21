@@ -51,6 +51,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
     public JTextField replaceField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
     public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
+    public JCheckBox replaceInParametersCheckBox = new JCheckBox(translate("checkbox.replaceInParameters"));
     public JRadioButton searchInASRadioButton = new JRadioButton(translate("checkbox.searchAS"));
     public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
     public boolean result = false;
@@ -89,6 +90,8 @@ public class SearchDialog extends AppDialog implements ActionListener {
         checkPanel.add(ignoreCaseCheckBox);
         if (!replace) {
             checkPanel.add(regexpCheckBox);
+        } else {
+            checkPanel.add(replaceInParametersCheckBox);
         }
         
         cnt.add(checkPanel);
