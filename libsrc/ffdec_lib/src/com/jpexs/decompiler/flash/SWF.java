@@ -547,6 +547,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public boolean isModified() {
+        for (Tag tag : tags) {
+            if (tag.isModified()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void clearModified() {
         for (Tag tag : tags) {
             if (tag.isModified()) {

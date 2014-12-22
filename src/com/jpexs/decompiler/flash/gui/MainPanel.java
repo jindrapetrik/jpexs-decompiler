@@ -657,6 +657,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void closeAll() {
+        boolean modified = false;
+        for (SWFList swfList: swfs) {
+            for (SWF swf : swfList) {
+                if (swf.isModified()) {
+                    modified = true;
+                }
+            }
+        }
+        
+        if (modified) {
+            if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
+        
         swfs.clear();
         oldItem = null;
         previewPanel.clear();
@@ -672,6 +687,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void close(SWFList swfList) {
+        boolean modified = false;
+        for (SWF swf : swfList) {
+            if (swf.isModified()) {
+                modified = true;
+            }
+        }
+        
+        if (modified) {
+            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}",swfList.name), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
+
         swfs.remove(swfList);
         if (abcPanel != null) {
             for (SWF swf : swfList) {

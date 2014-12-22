@@ -366,6 +366,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> showCloseConfirmation = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
