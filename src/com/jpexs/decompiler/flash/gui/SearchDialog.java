@@ -88,9 +88,8 @@ public class SearchDialog extends AppDialog implements ActionListener {
 
         JPanel checkPanel = new JPanel(new FlowLayout());
         checkPanel.add(ignoreCaseCheckBox);
-        if (!replace) {
-            checkPanel.add(regexpCheckBox);
-        } else {
+        checkPanel.add(regexpCheckBox);
+        if (replace) {
             checkPanel.add(replaceInParametersCheckBox);
         }
         

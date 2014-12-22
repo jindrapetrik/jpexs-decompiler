@@ -156,6 +156,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -1170,14 +1171,24 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (replaceDialog.result) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {
-                final String replacement = replaceDialog.replaceField.getText();
                 final SWF swf = getCurrentSwf();
 
                 new CancellableWorker() {
                     @Override
                     protected Void doInBackground() throws Exception {
                         int findCount = 0;
-                        Pattern pat = Pattern.compile(Pattern.quote(txt), replaceDialog.ignoreCaseCheckBox.isSelected() ? Pattern.CASE_INSENSITIVE : 0);
+                        boolean ignoreCase = replaceDialog.ignoreCaseCheckBox.isSelected();
+                        boolean regexp = replaceDialog.regexpCheckBox.isSelected();
+                        String replacement = replaceDialog.replaceField.getText();
+                        if (!regexp) {
+                            replacement = Matcher.quoteReplacement(replacement);
+                        }
+                        Pattern pat;
+                        if (regexp) {
+                            pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                        } else {
+                            pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                        }
                         List<TextTag> textTags = new ArrayList<>();
                         for (Tag tag : swf.tags) {
                             if (tag instanceof TextTag) {
