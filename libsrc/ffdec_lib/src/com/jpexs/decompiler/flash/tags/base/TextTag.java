@@ -316,6 +316,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     BitmapExporter.export(swf, shape, textColor2, image, mat, colorTransform);
+                    if (SHAPERECORD.DRAW_BOUNDING_BOX){
+                        RGB borderColor = new RGBA(Color.black);
+                        RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
+                        RECT bounds = shape.getBounds();
+                        mat = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
+                        TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
+                    }
                     x += entry.glyphAdvance;
                 }
             }

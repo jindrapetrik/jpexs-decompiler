@@ -50,7 +50,7 @@ import java.util.Set;
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;
-    private static final boolean DRAW_BOUNDING_BOX = false;
+    public static final boolean DRAW_BOUNDING_BOX = false;
 
     public abstract void calculateBits();
 
@@ -78,25 +78,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         int min_y = Integer.MAX_VALUE;
         boolean started = false;
         for (SHAPERECORD r : records) {
-            x = r.changeX(x);
-            y = r.changeY(y);
-            if (x > max_x) {
-                max_x = x;
-            }
-            if (y > max_y) {
-                max_y = y;
-            }
-            if (r.isMove()) {
-                started = true;
-            }
-            if (started) {
-                if (y < min_y) {
-                    min_y = y;
-                }
-                if (x < min_x) {
-                    min_x = x;
-                }
-            }
             if (r instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord curverEdge = (CurvedEdgeRecord) r;
                 int x2 = x + curverEdge.controlDeltaX;
@@ -114,6 +95,26 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     if (x2 < min_x) {
                         min_x = x2;
                     }
+                }
+            }
+            
+            x = r.changeX(x);
+            y = r.changeY(y);
+            if (x > max_x) {
+                max_x = x;
+            }
+            if (y > max_y) {
+                max_y = y;
+            }
+            if (r.isMove()) {
+                started = true;
+            }
+            if (started) {
+                if (y < min_y) {
+                    min_y = y;
+                }
+                if (x < min_x) {
+                    min_x = x;
                 }
             }
         }

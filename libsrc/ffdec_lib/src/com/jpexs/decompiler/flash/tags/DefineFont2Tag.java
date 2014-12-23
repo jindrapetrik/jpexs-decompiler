@@ -99,7 +99,10 @@ public class DefineFont2Tag extends FontTag {
 
     @Override
     public RECT getGlyphBounds(int glyphIndex) {
-        return fontBoundsTable.get(glyphIndex);
+        if (fontFlagsHasLayout) {
+            return fontBoundsTable.get(glyphIndex);
+        }
+        return super.getGlyphBounds(glyphIndex);
     }
 
     @Override
