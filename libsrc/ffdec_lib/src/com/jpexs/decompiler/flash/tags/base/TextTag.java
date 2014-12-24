@@ -361,6 +361,12 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     RECT glyphBounds = shape.getBounds();
+                    int glyphWidth = glyphBounds.getWidth();
+                    int glyphHeight = glyphBounds.getHeight();
+                    glyphBounds.Xmin -= glyphWidth / 2;
+                    glyphBounds.Ymin -= glyphHeight / 2;
+                    glyphBounds.Xmax += glyphWidth;
+                    glyphBounds.Ymax += glyphHeight;
                     if (glyphBounds.Xmax > glyphBounds.Xmin && glyphBounds.Ymax > glyphBounds.Ymin) {
                         ExportRectangle rect = mat.transform(new ExportRectangle(glyphBounds));
                         if (result == null) {
