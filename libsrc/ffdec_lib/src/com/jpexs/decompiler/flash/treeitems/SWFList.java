@@ -44,7 +44,11 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     @Override
     public String toString() {
-        return name;
+        if (isBundle) {
+            return name;
+        } else {
+            return swfs.get(0).getFileTitle();
+        }
     }
 
     @Override

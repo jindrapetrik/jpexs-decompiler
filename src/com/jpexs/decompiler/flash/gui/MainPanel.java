@@ -695,7 +695,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         
         if (modified) {
-            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}",swfList.name), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
                 return;
             }
         }

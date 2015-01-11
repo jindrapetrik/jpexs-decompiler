@@ -156,7 +156,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         finalizePath();
         thickness *= zoom / SWF.unitDivisor;
         path.setAttribute("fill", "none");
-        path.setAttribute("stroke", color.toHexRGB());
+        if (color != null) {
+            path.setAttribute("stroke", color.toHexRGB());
+        }
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
