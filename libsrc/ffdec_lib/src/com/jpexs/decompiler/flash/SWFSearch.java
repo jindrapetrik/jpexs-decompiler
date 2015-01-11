@@ -89,7 +89,7 @@ public class SWFSearch {
                 boolean valid = swf.fileSize > 0
                         && swf.version > 0
                         && (!swf.tags.isEmpty() || noCheck)
-                        && swf.version < 25; // Needs to be fixed when SWF versions reaches this value
+                        && swf.version < 30; // Needs to be fixed when SWF versions reaches this value
                 if (valid) {
                     long limit = pmi.getPos();
                     MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
