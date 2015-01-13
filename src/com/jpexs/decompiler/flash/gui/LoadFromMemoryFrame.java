@@ -73,7 +73,7 @@ import javax.swing.table.TableRowSorter;
 
 /**
  *
- * @author petrik
+ * @author JPEXS
  */
 public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 

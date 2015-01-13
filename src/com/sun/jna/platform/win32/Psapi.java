@@ -22,7 +22,7 @@ import com.sun.jna.win32.StdCallLibrary;
 
 /**
  *
- * @author petrik
+ * @author JPEXS
  */
 public interface Psapi extends StdCallLibrary {
 
