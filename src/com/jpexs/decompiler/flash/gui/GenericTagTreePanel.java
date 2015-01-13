@@ -394,7 +394,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 }
 
                 if (color != null) {
-                    colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">●</cite> ";
+                    colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">\u25cf</cite> ";
                 }
 
                 valStr += " = " + colorAdd + val.toString();

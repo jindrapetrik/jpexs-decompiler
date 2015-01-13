@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -89,7 +90,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     @Test
     public void frame24_unicodeTest() {
         compareSrc(24, "trace(\"unicodeTest\");\r\n"
-                + "var k = \"היפופוטמי, או א\";\r\n"
+                + "var k = \"\u05d4\u05d9\u05e4\u05d5\u05e4\u05d5\u05d8\u05de\u05d9, \u05d0\u05d5 \u05d0\";\r\n"
                 + "trace(k);\r\n"
         );
     }
