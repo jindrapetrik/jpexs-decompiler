@@ -72,7 +72,7 @@ public class Replacement {
         }
 
         if (lastAccess == null) {
-            return "        "+" | " + sizeS + " | " + urlPattern;
+            return "        " + " | " + sizeS + " | " + urlPattern;
         } else {
             return format.format(lastAccess.getTime()) + " | " + sizeS + " | " + urlPattern;
         }
