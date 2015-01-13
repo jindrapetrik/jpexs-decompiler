@@ -139,13 +139,13 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (!Platform.isWindows()) {
             throw new FlashUnsupportedException();
         }
-        
+
         try {
             flash = ActiveX.createObject(ShockwaveFlash.class, this);
         } catch (ActiveXException ex) {
             throw new FlashUnsupportedException();
         }
-        
+
         flash.setAllowScriptAccess("always");
         flash.setAllowNetworking("all");
         flash.addFlashCallListener(new ActiveXEventListener() {

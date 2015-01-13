@@ -168,7 +168,7 @@ public class TextPanel extends JPanel implements ActionListener {
         if (!Configuration.showOldTextDuringTextEditing.get()) {
             return;
         }
-        
+
         if (textValue.isEditable()) {
             TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
             if (item instanceof TextTag) {
@@ -189,7 +189,7 @@ public class TextPanel extends JPanel implements ActionListener {
                     }
                 } catch (TextParseException | InterruptedException | IOException ex) {
                 }
-                
+
                 if (!ok) {
                     mainPanel.showTextTagWithNewValue(textTag, null);
                 }

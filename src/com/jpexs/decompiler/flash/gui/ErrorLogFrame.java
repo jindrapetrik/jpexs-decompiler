@@ -155,7 +155,7 @@ public class ErrorLogFrame extends AppFrame {
         };
         handler.setLevel(Level.WARNING);
     }
-    
+
     public void clearLog() {
         logViewInner.removeAll();
         Main.clearLogFile();

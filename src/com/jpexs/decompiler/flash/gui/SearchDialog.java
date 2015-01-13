@@ -77,7 +77,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
         panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
-        
+
         if (replace) {
             panField = new JPanel(new FlowLayout());
             replaceField.setPreferredSize(new Dimension(250, replaceField.getPreferredSize().height));
@@ -92,7 +92,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
         if (replace) {
             checkPanel.add(replaceInParametersCheckBox);
         }
-        
+
         cnt.add(checkPanel);
 
         if (!replace) {

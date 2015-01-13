@@ -47,14 +47,14 @@ public abstract class MainFrameMenu {
 
     private final MainFrame mainFrame;
     private SWF swf;
-    
+
     public abstract boolean isInternalFlashViewerSelected();
 
     public MainFrameMenu(MainFrame mainFrame) {
         registerHotKeys();
         this.mainFrame = mainFrame;
     }
-    
+
     protected String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -63,7 +63,7 @@ public abstract class MainFrameMenu {
         Main.openFileDialog();
         return true;
     }
-    
+
     protected boolean save() {
         if (swf != null) {
             boolean saved = false;
@@ -91,25 +91,25 @@ public abstract class MainFrameMenu {
             if (saved) {
                 swf.clearModified();
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
-    
+
     protected boolean saveAs() {
         if (swf != null) {
             if (saveAs(swf, SaveFileMode.SAVEAS)) {
                 swf.clearModified();
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
-    
+
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
             mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
@@ -124,24 +124,24 @@ public abstract class MainFrameMenu {
             saveAs(swf, SaveFileMode.EXE);
         }
     }
-    
+
     protected void close() {
         Main.closeFile(mainFrame.getPanel().getCurrentSwfList());
     }
-    
+
     protected boolean closeAll() {
         if (swf != null) {
             Main.closeAll();
             return true;
         }
-        
+
         return false;
     }
-    
+
     protected void importText() {
         mainFrame.getPanel().importText(swf);
     }
-    
+
     protected boolean export(boolean onlySelected) {
         if (swf != null) {
             mainFrame.getPanel().export(onlySelected);
@@ -150,66 +150,66 @@ public abstract class MainFrameMenu {
 
         return false;
     }
-    
+
     protected void exportFla() {
         mainFrame.getPanel().exportFla(swf);
     }
-    
+
     protected boolean search(boolean searchInText) {
         if (swf != null) {
             mainFrame.getPanel().searchInActionScriptOrText(searchInText);
             return true;
         }
-        
+
         return false;
     }
-    
+
     protected boolean replace() {
         if (swf != null) {
             mainFrame.getPanel().replaceText();
             return true;
         }
-        
+
         return false;
     }
-    
+
     protected void restoreControlFlow(boolean all) {
         mainFrame.getPanel().restoreControlFlow(all);
     }
-    
+
     protected void showProxy() {
         Main.showProxy();
     }
-    
+
     protected boolean clearLog() {
         ErrorLogFrame.getInstance().clearLog();
         return true;
     }
-    
+
     protected void renameOneIdentifier() {
         mainFrame.getPanel().renameOneIdentifier(swf);
     }
-    
+
     protected void renameIdentifiers() {
         mainFrame.getPanel().renameIdentifiers(swf);
     }
-    
+
     protected void deobfuscate() {
         mainFrame.getPanel().deobfuscate();
     }
-    
+
     protected void setSubLimiter(boolean value) {
         Main.setSubLimiter(value);
     }
-    
+
     protected void removeNonScripts() {
         mainFrame.getPanel().removeNonScripts(swf);
     }
-    
+
     protected void refreshDecompiled() {
         mainFrame.getPanel().refreshDecompiled();
     }
-    
+
     protected void checkResources() {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PrintStream stream = new PrintStream(os);
@@ -235,59 +235,59 @@ public abstract class MainFrameMenu {
         };
         dialog.setVisible(true);
     }
-    
+
     protected void checkUpdates() {
         if (!Main.checkForUpdates()) {
             View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
         }
     }
-    
+
     protected void helpUs() {
         String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
         if (!View.navigateUrl(helpUsURL)) {
             View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
         }
     }
-    
+
     protected void homePage() {
         String homePageURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(homePageURL)) {
             View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
         }
     }
-    
+
     protected void about() {
         Main.about();
     }
-    
+
     protected boolean reload() {
         if (swf != null) {
             if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
-    
+
     protected void advancedSettings() {
         Main.advancedSettings();
     }
-    
+
     protected void loadFromMemory() {
         Main.loadFromMemory();
     }
-    
+
     protected void loadFromCache() {
         Main.loadFromCache();
     }
-    
+
     protected void setLanguage() {
         new SelectLanguageDialog().display();
     }
-    
+
     protected void exit() {
         mainFrame.getPanel().setVisible(false);
         if (Main.proxyFrame != null) {
@@ -297,13 +297,13 @@ public abstract class MainFrameMenu {
         }
         Main.exit();
     }
-    
+
     public void updateComponents(SWF swf) {
         this.swf = swf;
     }
-    
+
     private void registerHotKeys() {
-        
+
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
 

@@ -565,7 +565,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         //Opening files with drag&drop to main window
         enableDrop(true);
     }
-    
+
     public void load(SWFList newSwfs, boolean first) {
 
         previewPanel.clear();
@@ -658,20 +658,20 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void closeAll() {
         boolean modified = false;
-        for (SWFList swfList: swfs) {
+        for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
                 if (swf.isModified()) {
                     modified = true;
                 }
             }
         }
-        
+
         if (modified) {
             if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
                 return;
             }
         }
-        
+
         swfs.clear();
         oldItem = null;
         previewPanel.clear();
@@ -693,7 +693,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 modified = true;
             }
         }
-        
+
         if (modified) {
             if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
                 return;
@@ -922,7 +922,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (selectedNodeSwf != swf) {
                     continue;
                 }
-                
+
                 if (d instanceof Tag || d instanceof ASMSource) {
                     TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                     if (nodeType == TreeNodeType.IMAGE) {
@@ -1139,7 +1139,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else {
             searchDialog.searchInASRadioButton.setSelected(true);
         }
-        
+
         searchDialog.setVisible(true);
         if (searchDialog.result) {
             final String txt = searchDialog.searchField.getText();
@@ -1857,7 +1857,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         font.addCharacter(character, f);
                     }
                 });
-                        
+
                 return true;
             }
         };
@@ -2324,7 +2324,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         previewPanel.setImageReplaceButtonVisible(false);
-        
+
         boolean internalViewer = isInternalFlashViewerSelected();
 
         if (treeItem instanceof HeaderItem) {

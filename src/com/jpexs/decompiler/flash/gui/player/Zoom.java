@@ -23,10 +23,10 @@ package com.jpexs.decompiler.flash.gui.player;
 public class Zoom {
 
     public double value = 1.0;
-    
+
     public boolean fit = false;
 
     public Zoom() {
     }
-    
+
 }

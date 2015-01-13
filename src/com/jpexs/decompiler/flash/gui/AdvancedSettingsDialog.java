@@ -312,7 +312,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                         }
                         value = cal;
                     }
-                    
+
                     if (itemType.isEnum()) {
                         String stringValue = (String) ((JComboBox<String>) c).getSelectedItem();
                         value = Enum.valueOf(itemType, stringValue);

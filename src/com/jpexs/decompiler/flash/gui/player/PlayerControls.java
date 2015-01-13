@@ -392,15 +392,15 @@ public class PlayerControls extends JPanel implements ActionListener {
         if (r.endsWith(".0")) {
             r = r.substring(0, r.length() - 2);
         }
-        
+
         r += "%";
-        
+
         if (zoomToFit) {
             percentLabel.setText(AppStrings.translate("fit") + " (" + r + ")");
         } else {
             percentLabel.setText(r);
         }
-        
+
         Zoom zoomObj = new Zoom();
         zoomObj.value = zoom;
         zoomObj.fit = zoomToFit;
@@ -517,10 +517,10 @@ public class PlayerControls extends JPanel implements ActionListener {
         if (zoomToFit) {
             return display.getZoomToFit();
         }
-        
+
         return realZoom;
     }
-    
+
     private class TransferableImage implements Transferable {
 
         Image img;

@@ -82,7 +82,7 @@ public class SoundTagPlayer implements MediaDisplay {
                     synchronized (playLock) {
                         if (!paused) {
                             decreaseLoopCount();
-                
+
                             if (loopCount > 0) {
                                 clip.setFramePosition(0);
                                 clip.start();
@@ -135,7 +135,7 @@ public class SoundTagPlayer implements MediaDisplay {
             clip.open(AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavData)));
         }
     }
-    
+
     @Override
     public int getCurrentFrame() {
 
@@ -170,12 +170,12 @@ public class SoundTagPlayer implements MediaDisplay {
                     decreaseLoopCount();
                     clip.setFramePosition(0);
                 }
-                
+
                 clip.start();
             }
         }
     }
-    
+
     @Override
     public void rewind() {
         gotoFrame(0);
@@ -220,7 +220,7 @@ public class SoundTagPlayer implements MediaDisplay {
                 clip.stop();
             }
             clip.setMicrosecondPosition(frame * FRAME_DIVISOR);
-            
+
             if (active) {
                 clip.start();
             }
@@ -257,7 +257,7 @@ public class SoundTagPlayer implements MediaDisplay {
             super.finalize();
         }
     }
-    
+
     private void decreaseLoopCount() {
         // this method should be called from synchronized (playLock) block
         if (loopCount > 0 && loopCount != Integer.MAX_VALUE) {

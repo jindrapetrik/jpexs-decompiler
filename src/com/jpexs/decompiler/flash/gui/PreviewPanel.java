@@ -388,7 +388,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         imagePlayControls.setMedia(imagePanel);
         imagePanel.setImage(image);
     }
-    
+
     public void showTextComparePanel(TextTag textTag, TextTag newTextTag) {
         imagePanel.setText(textTag, newTextTag);
     }
@@ -448,7 +448,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         if (media != null) {
             media.pause();
         }
-        
+
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         fontPanel.clear();
