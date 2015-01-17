@@ -219,6 +219,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Tags inside of file
      */
     public List<Tag> tags = new ArrayList<>();
+    @Internal
     public boolean hasEndTag;
     /**
      * ExportRectangle for the display
@@ -695,8 +696,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
         if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
-            hasEndTag = true;
             tags.remove(tags.size() - 1);
+        } else {
+            hasEndTag = false;
         }
         this.tags = tags;
         if (!checkOnly) {

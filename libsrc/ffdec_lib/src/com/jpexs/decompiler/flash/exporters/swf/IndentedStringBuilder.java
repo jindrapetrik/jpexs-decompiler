@@ -22,13 +22,13 @@ import com.jpexs.helpers.Helper;
  *
  * @author JPEXS
  */
-public class IndenetedStringBuilder {
+public class IndentedStringBuilder {
     
     private final StringBuilder builder = new StringBuilder();
     private final String indentString;
     private int indent;
 
-    public IndenetedStringBuilder(String indentString) {
+    public IndentedStringBuilder(String indentString) {
         super();
         this.indentString = indentString;
     }

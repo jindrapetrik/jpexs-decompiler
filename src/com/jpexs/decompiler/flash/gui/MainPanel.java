@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -1643,6 +1644,25 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (selFile != null) {
                     try {
                         new SwfJavaExporter().exportJavaCode(swf, selFile);
+                        Main.stopWork();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }
+    
+    public void exportSwfXml() {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        for (TreeItem item : sel) {
+            if (item instanceof SWF) {
+                SWF swf = (SWF) item;
+                final String selFile = selectExportDir();
+                if (selFile != null) {
+                    try {
+                        new SwfXmlExporter().exportXml(swf, selFile);
+                        Main.stopWork();
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
@@ -2000,9 +2020,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         switch (e.getActionCommand()) {
 
-            case MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE: {
+            case MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE:
                 exportJavaSource();
-            }
+                break;
+            case MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML:
+                exportSwfXml();
+                break;
             case MainFrameRibbonMenu.ACTION_EXPORT_SEL:
                 export(true);
                 break;

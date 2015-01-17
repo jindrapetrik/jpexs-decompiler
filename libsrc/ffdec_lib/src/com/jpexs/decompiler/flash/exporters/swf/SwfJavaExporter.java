@@ -89,7 +89,7 @@ public class SwfJavaExporter {
         writer.append("public class SwfFile {").newLine();
         writer.newLine();
         writer.indent();
-        IndenetedStringBuilder sb = new IndenetedStringBuilder(javaIndentString);
+        IndentedStringBuilder sb = new IndentedStringBuilder(javaIndentString);
         generateJavaCode(writer, sb, objectNames, swf, 0);            
         writer.unindent();
         writer.append("    public SWF getSwf() {").newLine();
@@ -128,7 +128,7 @@ public class SwfJavaExporter {
         return sb.toString();
     }
     
-    private static Object generateJavaCode(GraphTextWriter writer, IndenetedStringBuilder sb, Map<String, Integer> objectNames, Object obj, int level){
+    private static Object generateJavaCode(GraphTextWriter writer, IndentedStringBuilder sb, Map<String, Integer> objectNames, Object obj, int level){
         if (obj == null) {
             return null;
         }
@@ -216,7 +216,7 @@ public class SwfJavaExporter {
             boolean isSwf = level == 0;
             String resultName = isSwf ? "swf" : "result";
             String tagObjName = isSwf ? "swf" : getNextId(objectNames, "obj" + className);
-            IndenetedStringBuilder sb2 = new IndenetedStringBuilder(javaIndentString);
+            IndentedStringBuilder sb2 = new IndentedStringBuilder(javaIndentString);
             sb2.indent();
             sb2.indent();
             String indent = getIndent(writer.getIndent() + 1, javaIndentString);

@@ -77,6 +77,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
     private JMenuItem rawEditMenuItem;
     private JMenuItem jumpToCharacterMenuItem;
     private JMenuItem exportJavaSourceMenuItem;
+    private JMenuItem exportSwfXmlMenuItem;
     private JMenuItem closeMenuItem;
     private JMenu addTagMenu;
     private JMenu moveTagMenu;
@@ -127,6 +128,11 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         exportJavaSourceMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE);
         exportJavaSourceMenuItem.addActionListener(mainPanel);
         add(exportJavaSourceMenuItem);
+
+        exportSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportSwfXml"));
+        exportSwfXmlMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML);
+        exportSwfXmlMenuItem.addActionListener(mainPanel);
+        add(exportSwfXmlMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.setActionCommand(ACTION_CLOSE_SWF);
@@ -469,6 +475,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                     }
                 }
             }
+            break;
         }
     }
 }

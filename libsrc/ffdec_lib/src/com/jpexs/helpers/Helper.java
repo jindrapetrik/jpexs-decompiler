@@ -869,6 +869,18 @@ public class Helper {
         return text;
     }
 
+    public static String escapeXML(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (i > 31 || i == 9 || i == 10 || i == 13) {
+                sb.append(ch);
+            }
+        }
+        
+        return escapeHTML(sb.toString());
+    }
+
     public static Shape imageToShape(BufferedImage image) {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
