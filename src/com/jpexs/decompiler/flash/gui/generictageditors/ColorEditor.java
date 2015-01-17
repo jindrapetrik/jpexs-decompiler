@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.helpers.ReflectionTools;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;

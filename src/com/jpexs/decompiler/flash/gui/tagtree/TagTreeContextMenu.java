@@ -78,6 +78,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
     private JMenuItem jumpToCharacterMenuItem;
     private JMenuItem exportJavaSourceMenuItem;
     private JMenuItem exportSwfXmlMenuItem;
+    private JMenuItem importSwfXmlMenuItem;
     private JMenuItem closeMenuItem;
     private JMenu addTagMenu;
     private JMenu moveTagMenu;
@@ -133,6 +134,11 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         exportSwfXmlMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML);
         exportSwfXmlMenuItem.addActionListener(mainPanel);
         add(exportSwfXmlMenuItem);
+
+        importSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.importSwfXml"));
+        importSwfXmlMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_IMPORT_SWF_XML);
+        importSwfXmlMenuItem.addActionListener(mainPanel);
+        add(importSwfXmlMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.setActionCommand(ACTION_CLOSE_SWF);
@@ -227,6 +233,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         replaceMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
+        exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
+        exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
         closeMenuItem.setVisible(allSelectedIsSwf);
         addTagMenu.setVisible(false);
         moveTagMenu.setVisible(false);

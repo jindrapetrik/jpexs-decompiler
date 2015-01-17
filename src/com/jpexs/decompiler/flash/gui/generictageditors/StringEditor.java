@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ReflectionTools;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.FocusAdapter;

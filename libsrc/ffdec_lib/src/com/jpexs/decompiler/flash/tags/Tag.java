@@ -38,8 +38,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -134,6 +136,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private static final Object lockObject = new Object();
     private volatile static List<Integer> knownTagIds;
+    private volatile static Map<Integer, Class> knownTagClasses;
     private volatile static List<Integer> requiredTagIds;
 
     public static List<Integer> getKnownTags() {
@@ -225,6 +228,97 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
         }
         return knownTagIds;
+    }
+
+    public static Map<Integer, Class> getKnownClasses() {
+        if (knownTagClasses == null) {
+            synchronized (lockObject) {
+                if (knownTagClasses == null) {
+                    Map<Integer, Class> map = new HashMap<>();
+                    map.put(CSMTextSettingsTag.ID, CSMTextSettingsTag.class);
+                    map.put(DebugIDTag.ID, DebugIDTag.class);
+                    map.put(DefineBinaryDataTag.ID, DefineBinaryDataTag.class);
+                    map.put(DefineBitsJPEG2Tag.ID, DefineBitsJPEG2Tag.class);
+                    map.put(DefineBitsJPEG3Tag.ID, DefineBitsJPEG3Tag.class);
+                    map.put(DefineBitsJPEG4Tag.ID, DefineBitsJPEG4Tag.class);
+                    map.put(DefineBitsLossless2Tag.ID, DefineBitsLossless2Tag.class);
+                    map.put(DefineBitsLosslessTag.ID, DefineBitsLosslessTag.class);
+                    map.put(DefineBitsTag.ID, DefineBitsTag.class);
+                    map.put(DefineButton2Tag.ID, DefineButton2Tag.class);
+                    map.put(DefineButtonCxformTag.ID, DefineButtonCxformTag.class);
+                    map.put(DefineButtonSoundTag.ID, DefineButtonSoundTag.class);
+                    map.put(DefineButtonTag.ID, DefineButtonTag.class);
+                    map.put(DefineEditTextTag.ID, DefineEditTextTag.class);
+                    map.put(DefineFont2Tag.ID, DefineFont2Tag.class);
+                    map.put(DefineFont3Tag.ID, DefineFont3Tag.class);
+                    map.put(DefineFont4Tag.ID, DefineFont4Tag.class);
+                    map.put(DefineFontAlignZonesTag.ID, DefineFontAlignZonesTag.class);
+                    map.put(DefineFontInfo2Tag.ID, DefineFontInfo2Tag.class);
+                    map.put(DefineFontInfoTag.ID, DefineFontInfoTag.class);
+                    map.put(DefineFontNameTag.ID, DefineFontNameTag.class);
+                    map.put(DefineFontTag.ID, DefineFontTag.class);
+                    map.put(DefineMorphShape2Tag.ID, DefineMorphShape2Tag.class);
+                    map.put(DefineMorphShapeTag.ID, DefineMorphShapeTag.class);
+                    map.put(DefineScalingGridTag.ID, DefineScalingGridTag.class);
+                    map.put(DefineSceneAndFrameLabelDataTag.ID, DefineSceneAndFrameLabelDataTag.class);
+                    map.put(DefineShape2Tag.ID, DefineShape2Tag.class);
+                    map.put(DefineShape3Tag.ID, DefineShape3Tag.class);
+                    map.put(DefineShape4Tag.ID, DefineShape4Tag.class);
+                    map.put(DefineShapeTag.ID, DefineShapeTag.class);
+                    map.put(DefineSoundTag.ID, DefineSoundTag.class);
+                    map.put(DefineSpriteTag.ID, DefineSpriteTag.class);
+                    map.put(DefineText2Tag.ID, DefineText2Tag.class);
+                    map.put(DefineTextTag.ID, DefineTextTag.class);
+                    map.put(DefineVideoStreamTag.ID, DefineVideoStreamTag.class);
+                    map.put(DoABCDefineTag.ID, DoABCDefineTag.class);
+                    map.put(DoABCTag.ID, DoABCTag.class);
+                    map.put(DoActionTag.ID, DoActionTag.class);
+                    map.put(DoInitActionTag.ID, DoInitActionTag.class);
+                    map.put(EnableDebugger2Tag.ID, EnableDebugger2Tag.class);
+                    map.put(EnableDebuggerTag.ID, EnableDebuggerTag.class);
+                    map.put(EnableTelemetryTag.ID, EnableTelemetryTag.class);
+                    map.put(EndTag.ID, EndTag.class);
+                    map.put(ExportAssetsTag.ID, ExportAssetsTag.class);
+                    map.put(FileAttributesTag.ID, FileAttributesTag.class);
+                    map.put(FrameLabelTag.ID, FrameLabelTag.class);
+                    map.put(ImportAssets2Tag.ID, ImportAssets2Tag.class);
+                    map.put(ImportAssetsTag.ID, ImportAssetsTag.class);
+                    map.put(JPEGTablesTag.ID, JPEGTablesTag.class);
+                    map.put(MetadataTag.ID, MetadataTag.class);
+                    map.put(PlaceObject2Tag.ID, PlaceObject2Tag.class);
+                    map.put(PlaceObject3Tag.ID, PlaceObject3Tag.class);
+                    map.put(PlaceObject4Tag.ID, PlaceObject4Tag.class);
+                    map.put(PlaceObjectTag.ID, PlaceObjectTag.class);
+                    map.put(ProductInfoTag.ID, ProductInfoTag.class);
+                    map.put(ProtectTag.ID, ProtectTag.class);
+                    map.put(RemoveObject2Tag.ID, RemoveObject2Tag.class);
+                    map.put(RemoveObjectTag.ID, RemoveObjectTag.class);
+                    map.put(ScriptLimitsTag.ID, ScriptLimitsTag.class);
+                    map.put(SetBackgroundColorTag.ID, SetBackgroundColorTag.class);
+                    map.put(SetTabIndexTag.ID, SetTabIndexTag.class);
+                    map.put(ShowFrameTag.ID, ShowFrameTag.class);
+                    map.put(SoundStreamBlockTag.ID, SoundStreamBlockTag.class);
+                    map.put(SoundStreamHead2Tag.ID, SoundStreamHead2Tag.class);
+                    map.put(SoundStreamHeadTag.ID, SoundStreamHeadTag.class);
+                    map.put(StartSound2Tag.ID, StartSound2Tag.class);
+                    map.put(StartSoundTag.ID, StartSoundTag.class);
+                    map.put(SymbolClassTag.ID, SymbolClassTag.class);
+                    map.put(VideoFrameTag.ID, VideoFrameTag.class);
+                    map.put(DefineCompactedFont.ID, DefineCompactedFont.class);
+                    map.put(DefineExternalGradient.ID, DefineExternalGradient.class);
+                    map.put(DefineExternalImage.ID, DefineExternalImage.class);
+                    map.put(DefineExternalImage2.ID, DefineExternalImage2.class);
+                    map.put(DefineExternalSound.ID, DefineExternalSound.class);
+                    map.put(DefineExternalStreamSound.ID, DefineExternalStreamSound.class);
+                    map.put(DefineGradientMap.ID, DefineGradientMap.class);
+                    map.put(DefineSubImage.ID, DefineSubImage.class);
+                    map.put(ExporterInfo.ID, ExporterInfo.class);
+                    map.put(FontTextureInfo.ID, FontTextureInfo.class);
+                    knownTagClasses = map;
+                }
+            }
+        }
+        return knownTagClasses;
     }
 
     public static List<Integer> getRequiredTags() {

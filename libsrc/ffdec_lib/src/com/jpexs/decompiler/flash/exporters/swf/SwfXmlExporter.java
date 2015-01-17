@@ -92,10 +92,10 @@ public class SwfXmlExporter {
     }
 
     public void exportXml(SWF swf, Document doc, Node node) throws IOException {
-        generateXml(doc, node, "swf", swf, 0);            
+        generateXml(doc, node, "swf", swf, false, 0);            
     }
     
-    private static void generateXml(Document doc, Node node, String name, Object obj, int level){
+    private static void generateXml(Document doc, Node node, String name, Object obj, boolean addAsChildNode, int level){
         if (obj == null) {
             return;
         }
@@ -117,7 +117,13 @@ public class SwfXmlExporter {
                     value = Helper.escapeXML((String) value);
                 }
 
-                ((Element) node).setAttribute(name, value.toString());
+                if (addAsChildNode) {
+                    Element childNode = doc.createElement(name);
+                    childNode.setTextContent(value.toString());
+                    node.appendChild(childNode);
+                } else {
+                    ((Element) node).setAttribute(name, value.toString());
+                } 
         } else if (cls.isEnum()) {
             ((Element) node).setAttribute(name, obj.toString());
         } else if (obj instanceof ByteArrayRange) {
@@ -134,7 +140,7 @@ public class SwfXmlExporter {
             Element listNode = doc.createElement(name);
             node.appendChild(listNode);
             for (int i = 0; i < list.size(); i++) {
-                generateXml(doc, listNode, "item", list.get(i), level + 1);
+                generateXml(doc, listNode, "item", list.get(i), true, level + 1);
             }
         } else if (cls.isArray()) {
             String arrayType = cls.getComponentType().getSimpleName();
@@ -142,7 +148,7 @@ public class SwfXmlExporter {
             node.appendChild(arrayNode);
             int length = Array.getLength(obj);
             for (int i = 0; i < length; i++) {
-                generateXml(doc, arrayNode, "item", Array.get(obj, i), level + 1);
+                generateXml(doc, arrayNode, "item", Array.get(obj, i), true, level + 1);
             }
         } else {
             if (obj instanceof LazyObject) {
@@ -167,7 +173,7 @@ public class SwfXmlExporter {
 
                 try {
                     f.setAccessible(true);
-                    generateXml(doc, objNode, f.getName(), f.get(obj), level + 1);
+                    generateXml(doc, objNode, f.getName(), f.get(obj), false, level + 1);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }

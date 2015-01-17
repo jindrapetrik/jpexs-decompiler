@@ -695,7 +695,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         frameRate = sis.readUI8("frameRate");
         frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
-        if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
+        if (tags.size() > 0 && tags.get(tags.size() - 1).getId() == EndTag.ID) {
             tags.remove(tags.size() - 1);
         } else {
             hasEndTag = false;
@@ -2201,6 +2201,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearAllCache() {
+        characters = null;
+        abcList = null;
         clearImageCache();
         clearScriptCache();
         Cache.clearAll();

@@ -74,6 +74,7 @@ import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
+import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -1671,6 +1672,27 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
     
+    public void importSwfXml() {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        for (TreeItem item : sel) {
+            if (item instanceof SWF) {
+                SWF swf = (SWF) item;
+                File selectedFile = showImportFileChooser("filter.xml|*.xml");
+                if (selectedFile != null) {
+                    File selfile = Helper.fixDialogFile(selectedFile);
+                    String xml = Helper.readTextFile(selfile.getPath());
+                    try {
+                        new SwfXmlImporter().importSwf(swf, xml);
+                        swf.clearAllCache();
+                        refreshTree();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }
+    
     public void restoreControlFlow(final boolean all) {
         Main.startWork(translate("work.restoringControlFlow"));
         if ((!all) || confirmExperimental()) {
@@ -1936,7 +1958,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (item instanceof DefineSoundTag) {
                     File selectedFile = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
                     if (selectedFile != null) {
-                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(selectedFile);
                         DefineSoundTag ds = (DefineSoundTag) item;
                         int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
@@ -1961,7 +1982,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (it.importSupported()) {
                         File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
                         if (selectedFile != null) {
-                            Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
                             File selfile = Helper.fixDialogFile(selectedFile);
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
@@ -1983,7 +2003,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     ShapeTag st = (ShapeTag) item;
                     File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
                     if (selectedFile != null) {
-                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(selectedFile);
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         try {
@@ -2004,7 +2023,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
                     File selectedFile = showImportFileChooser("");
                     if (selectedFile != null) {
-                        Configuration.lastOpenDir.set(Helper.fixDialogFile(selectedFile).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(selectedFile);
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         new BinaryDataImporter().importData(bt, data);
@@ -2025,6 +2043,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 break;
             case MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML:
                 exportSwfXml();
+                break;
+            case MainFrameRibbonMenu.ACTION_IMPORT_SWF_XML:
+                importSwfXml();
                 break;
             case MainFrameRibbonMenu.ACTION_EXPORT_SEL:
                 export(true);
@@ -2078,7 +2099,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-            return fc.getSelectedFile();
+            File result = fc.getSelectedFile(); 
+            Configuration.lastOpenDir.set(Helper.fixDialogFile(result).getParentFile().getAbsolutePath());
+            return result;
         }
 
         return null;

@@ -96,6 +96,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
     public static final String ACTION_EXPORT_JAVA_SOURCE = "EXPORTJAVASOURCE";
     public static final String ACTION_EXPORT_SWF_XML = "EXPORTSWFXML";
+    public static final String ACTION_IMPORT_SWF_XML = "IMPORTSWFXML";
     private static final String ACTION_EXPORT = "EXPORT";
     private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
