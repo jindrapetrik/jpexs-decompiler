@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -353,11 +354,11 @@ public class Timeline {
         for (int depth : frameObj.layers.keySet()) {
             DepthState layer = frameObj.layers.get(depth);
             if (layer.characterId != -1) {
-                if (!swf.characters.containsKey(layer.characterId)) {
+                if (!swf.getCharacters().containsKey(layer.characterId)) {
                     continue;
                 }
                 usedCharacters.add(layer.characterId);
-                swf.characters.get(layer.characterId).getNeededCharactersDeep(usedCharacters);
+                swf.getCharacter(layer.characterId).getNeededCharactersDeep(usedCharacters);
             }
         }
     }
@@ -391,7 +392,7 @@ public class Timeline {
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
-                CharacterTag c = swf.characters.get(ds.characterId);
+                CharacterTag c = swf.getCharacter(ds.characterId);
                 if (c instanceof Timelined) {
                     int frameCount = ((Timelined) c).getTimeline().frames.size();
                     if (frameCount == 0) {
@@ -437,7 +438,7 @@ public class Timeline {
             if (!ds.isVisible) {
                 continue;
             }
-            CharacterTag c = swf.characters.get(ds.characterId);
+            CharacterTag c = swf.getCharacter(ds.characterId);
             if (c instanceof DrawableTag) {
                 Matrix m = new Matrix(ds.matrix);
                 m = m.preConcatenate(transformation);
@@ -507,7 +508,7 @@ public class Timeline {
             if (!ds.isVisible) {
                 continue;
             }
-            CharacterTag c = swf.characters.get(ds.characterId);
+            CharacterTag c = swf.getCharacter(ds.characterId);
             if (c instanceof DrawableTag) {
                 Matrix m = new Matrix(ds.matrix);
                 m = m.preConcatenate(transformation);
@@ -567,13 +568,13 @@ public class Timeline {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!swf.characters.containsKey(layer.characterId)) {
+            if (!swf.getCharacters().containsKey(layer.characterId)) {
                 continue;
             }
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = swf.characters.get(layer.characterId);
+            CharacterTag character = swf.getCharacter(layer.characterId);
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
                 if (!drawable.isSingleFrame()) {

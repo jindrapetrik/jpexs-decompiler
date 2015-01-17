@@ -142,7 +142,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     flPrev = timeLine.getFrames().get(f - 1).layers.get(d);
                 }
 
-                CharacterTag cht = fl == null ? null : timeLine.swf.characters.get(fl.characterId);
+                CharacterTag cht = fl == null ? null : timeLine.swf.getCharacter(fl.characterId);
                 boolean shapeTween = cht != null && (cht instanceof MorphShapeTag);
                 boolean motionTweenStart = (!motionTween) && (flNext != null && flNext.motionTween);
                 boolean motionTweenEnd = (!motionTween) && (flPrev != null && flPrev.motionTween);

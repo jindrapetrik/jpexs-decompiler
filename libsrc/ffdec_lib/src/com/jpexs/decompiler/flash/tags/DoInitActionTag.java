@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -27,7 +28,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -49,7 +50,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * List of actions to perform
      */
     //public List<Action> actions = new ArrayList<Action>();
-    @Internal
+    @HideInRawEdit
     public ByteArrayRange actionBytes;
     public static final int ID = 59;
 

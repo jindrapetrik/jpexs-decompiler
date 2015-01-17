@@ -263,7 +263,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     ret += ", ";
                 }
                 first = false;
-                CharacterTag c = tim.swf.characters.get(ds.characterId);
+                CharacterTag c = tim.swf.getCharacter(ds.characterId);
                 if (c instanceof ButtonTag) {
                     newStateUnderCursor = ds;
                     handCursor = true;
@@ -298,7 +298,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (selectedDepth > -1 && frame > -1) {
             DepthState ds = timelined.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
             if (ds != null) {
-                CharacterTag cht = timelined.getTimeline().swf.characters.get(ds.characterId);
+                CharacterTag cht = timelined.getTimeline().swf.getCharacter(ds.characterId);
                 if (cht != null) {
                     debugLabel.setText(cht.getName());
                 }
@@ -351,10 +351,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     lastMouseEvent = e;
                     shouldDraw.set(true);
                     if (stateUnderCursor != null) {
-                        ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                        ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2), counter);
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), counter);
                         }
                     }
                 }
@@ -367,10 +367,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     lastMouseEvent = e;
                     shouldDraw.set(true);
                     if (stateUnderCursor != null) {
-                        ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                        ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
-                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3), counter);
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), counter);
                         }
                     }
                 }
@@ -387,20 +387,20 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     if (stateUnderCursor != null) {
                         if (lastUnderCur == null || lastUnderCur.instanceId != stateUnderCursor.instanceId) {
                             // New mouse entered
-                            ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                            ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1), counter);
+                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), counter);
                             }
                         }
                     }
                     if (lastUnderCur != null) {
                         if (stateUnderCursor == null || stateUnderCursor.instanceId != lastUnderCur.instanceId) {
                             // Old mouse leave
-                            ButtonTag b = (ButtonTag) swf.characters.get(lastUnderCur.characterId);
+                            ButtonTag b = (ButtonTag) swf.getCharacter(lastUnderCur.characterId);
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
-                                playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0), counter);
+                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), counter);
                             }
                         }
                     }
@@ -666,7 +666,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 List<Shape> os = new ArrayList<>();
                 DepthState ds = drawable.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
                 if (ds != null) {
-                    CharacterTag cht = swf.characters.get(ds.characterId);
+                    CharacterTag cht = swf.getCharacter(ds.characterId);
                     if (cht != null) {
                         if (cht instanceof DrawableTag) {
                             DrawableTag dt = (DrawableTag) cht;
@@ -746,8 +746,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
-        for (int cid : swf.characters.keySet()) {
-            CharacterTag c = swf.characters.get(cid);
+        for (int cid : swf.getCharacters().keySet()) {
+            CharacterTag c = swf.getCharacter(cid);
             for (String cls : soundClasses) {
                 if (cls.equals(c.getClassName())) {
                     sounds.add(cid);
@@ -756,7 +756,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
 
         for (int sndId : sounds) {
-            CharacterTag c = swf.characters.get(sndId);
+            CharacterTag c = swf.getCharacter(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
                 playSound(st, counter);

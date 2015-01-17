@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -38,7 +39,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
@@ -74,7 +75,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * Actions to perform
      */
     //public List<Action> actions;
-    @Internal
+    @HideInRawEdit
     public ByteArrayRange actionBytes;
     public static final int ID = 7;
 
@@ -253,7 +254,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         }
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
-            CharacterTag ch = swf.characters.get(r.characterId);
+            CharacterTag ch = swf.getCharacter(r.characterId);
             if (ch instanceof BoundedTag) {
                 BoundedTag bt = (BoundedTag) ch;
                 if (!added.contains(bt)) {

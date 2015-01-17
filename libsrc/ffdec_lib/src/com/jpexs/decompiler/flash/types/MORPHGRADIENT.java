@@ -12,10 +12,10 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
-import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
@@ -35,8 +35,6 @@ public class MORPHGRADIENT implements Serializable {
      */
     @SWFType(value = BasicType.UB, count = 2)
     public int interPolationMode;
-    @Internal
-    public int numGradients;
 
     public MORPHGRADRECORD[] gradientRecords;
 

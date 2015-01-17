@@ -125,7 +125,7 @@ public class Main {
     public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
 
     private static ABCContainerTag getDebuggerABCTag(SWF swf) {
-        for (ABCContainerTag ac : swf.abcList) {
+        for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
             for (MyEntry<ClassPath, ScriptPack> m : a.getScriptPacks()) {
                 if (isDebuggerClass(m.getKey().packageStr, null)) {
@@ -308,7 +308,6 @@ public class Main {
                     }
                 }, Configuration.parallelSpeedUp.get());
                 swf.fileTitle = streamEntry.getKey();
-                swf.readOnly = true;
                 result.add(swf);
             }
         } else {
@@ -1177,7 +1176,7 @@ public class Main {
         if (hasDebugger(swf)) {
             String debuggerPkg = getDebuggerPackage(swf);
             //change trace to fname
-            for (ABCContainerTag ct : swf.abcList) {
+            for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
@@ -1197,10 +1196,10 @@ public class Main {
         ABCContainerTag found = getDebuggerABCTag(swf);
         if (found != null) {
             swf.tags.remove((Tag) found);
-            swf.abcList.remove(found);
+            swf.getAbcList().remove(found);
 
             //Change all debugger calls to normal trace
-            for (ABCContainerTag ct : swf.abcList) {
+            for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
@@ -1223,7 +1222,7 @@ public class Main {
                 //load debug swf
                 SWF debugSWF = new SWF(Main.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/gui/debugger/debug.swf"), false);
 
-                ABCContainerTag firstAbc = swf.abcList.get(0);
+                ABCContainerTag firstAbc = swf.getAbcList().get(0);
                 String newdebuggerpkg = DEBUGGER_PACKAGE;
 
                 if (Configuration.randomDebuggerPackage.get()) {
@@ -1231,7 +1230,7 @@ public class Main {
                 }
 
                 //add debug ABC tags to main SWF
-                for (ABCContainerTag ds : debugSWF.abcList) {
+                for (ABCContainerTag ds : debugSWF.getAbcList()) {
                     ABC a = ds.getABC();
                     //Append random hex to Debugger package name
                     for (int i = 1; i < a.constants.constant_namespace.size(); i++) {
@@ -1248,12 +1247,12 @@ public class Main {
                     //Add to target SWF
                     ((Tag) ds).setSwf(swf);
                     swf.tags.add(swf.tags.indexOf(firstAbc), (Tag) ds);
-                    swf.abcList.add(swf.abcList.indexOf(firstAbc), ds);
+                    swf.getAbcList().add(swf.getAbcList().indexOf(firstAbc), ds);
                     ((Tag) ds).setModified(true);
                 }
 
             } catch (Exception ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error while attaching debugger", ex);
+                logger.log(Level.SEVERE, "Error while attaching debugger", ex);
                 //ignore
             }
 

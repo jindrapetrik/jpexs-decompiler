@@ -329,7 +329,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
     public void updateComponents(SWF swf) {
         super.updateComponents(swf);
         boolean swfLoaded = swf != null;
-        List<ABCContainerTag> abcList = swfLoaded ? swf.abcList : null;
+        List<ABCContainerTag> abcList = swfLoaded ? swf.getAbcList() : null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
 
         /*saveCommandButton.setEnabled(swfLoaded);

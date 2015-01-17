@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -38,8 +39,8 @@ public class StraightEdgeRecord extends SHAPERECORD {
      ser.deltaY = (int) readSB(ser.numBits + 2);
      }
      */
-    public boolean typeFlag = true;
-    public boolean straightFlag = true;
+    public static final boolean typeFlag = true;
+    public static final boolean straightFlag = true;
 
     @Calculated
     @SWFType(value = BasicType.UB, count = 4)

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -415,10 +416,18 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     public long getPos() {
+        if (originalRange == null) {
+            return -1;
+        }
+        
         return originalRange.getPos();
     }
 
     public long getDataPos() {
+        if (originalRange == null) {
+            return -1;
+        }
+        
         return originalRange.getPos() + (isLongOriginal() ? 6 : 2);
     }
 
@@ -474,8 +483,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             for (Integer characterId : needed2) {
                 if (!visited.contains(characterId)) {
                     visited.add(characterId);
-                    if (swf.characters.containsKey(characterId)) {
-                        swf.characters.get(characterId).getNeededCharacters(needed2);
+                    if (swf.getCharacters().containsKey(characterId)) {
+                        swf.getCharacter(characterId).getNeededCharacters(needed2);
                         break;
                     }
                 }
@@ -483,7 +492,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
 
         for (Integer characterId : needed2) {
-            if (swf.characters.containsKey(characterId)) {
+            if (swf.getCharacters().containsKey(characterId)) {
                 needed.add(characterId);
             }
         }

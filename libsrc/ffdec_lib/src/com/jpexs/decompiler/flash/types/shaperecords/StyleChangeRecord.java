@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
 
-    public boolean typeFlag = false;
+    public static final boolean typeFlag = false;
     public boolean stateNewStyles;
     public boolean stateLineStyle;
     public boolean stateFillStyle1;

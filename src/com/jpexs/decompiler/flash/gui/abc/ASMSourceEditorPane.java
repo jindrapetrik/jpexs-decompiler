@@ -76,7 +76,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public void setHex(ScriptExportMode exportMode, boolean force) {
-        if (this.exportMode == exportMode & !force) {
+        if (this.exportMode == exportMode && !force) {
             return;
         }
         this.exportMode = exportMode;
@@ -274,9 +274,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 lineStart = i + 1;
             }
         }
-        if (lineCnt == -1) {
-            //lineEnd = text.length() - 1;
-        }
+        //if (lineCnt == -1) {
+        //    lineEnd = text.length() - 1;
+        //}
         //select(lineStart, lineEnd);
         setCaretPosition(lineStart);
         //requestFocus();

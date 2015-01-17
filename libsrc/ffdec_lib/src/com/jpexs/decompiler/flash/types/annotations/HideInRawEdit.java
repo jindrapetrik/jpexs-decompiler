@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.types.annotations;
 
-import com.jpexs.decompiler.flash.abc.ABC;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Field is internal
  *
  * @author JPEXS
  */
-public interface ABCContainerTag extends Comparable<ABCContainerTag> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface HideInRawEdit {
 
-    public ABC getABC();
 }

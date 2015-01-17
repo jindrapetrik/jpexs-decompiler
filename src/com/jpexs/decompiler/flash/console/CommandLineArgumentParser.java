@@ -514,8 +514,8 @@ public class CommandLineArgumentParser {
         }
 
         public boolean contains(int index) {
-            Integer minimum = min == null ? Integer.MIN_VALUE : min;
-            Integer maximum = max == null ? Integer.MAX_VALUE : max;
+            int minimum = min == null ? Integer.MIN_VALUE : min;
+            int maximum = max == null ? Integer.MAX_VALUE : max;
 
             return index >= minimum && index <= maximum;
         }
@@ -1216,8 +1216,8 @@ public class CommandLineArgumentParser {
             fmts = new String[]{fmtStr};
         }
         Map<String, String> ret = new HashMap<>();
-        for (int i = 0; i < fmts.length; i++) {
-            String parts[] = fmts[i].split(":");
+        for (String fmt : fmts) {
+            String[] parts = fmt.split(":");
             ret.put(parts[0].toLowerCase(), parts[1].toLowerCase());
         }
         return ret;
@@ -1327,12 +1327,12 @@ public class CommandLineArgumentParser {
                             System.err.println("CharacterId should be integer");
                             System.exit(1);
                         }
-                        if (!swf.characters.containsKey(characterId)) {
+                        if (!swf.getCharacters().containsKey(characterId)) {
                             System.err.println("CharacterId does not exist");
                             System.exit(1);
                         }
 
-                        CharacterTag characterTag = swf.characters.get(characterId);
+                        CharacterTag characterTag = swf.getCharacter(characterId);
                         String repFile = args.remove();
                         byte[] data = Helper.readFile(repFile);
                         if (characterTag instanceof DefineBinaryDataTag) {

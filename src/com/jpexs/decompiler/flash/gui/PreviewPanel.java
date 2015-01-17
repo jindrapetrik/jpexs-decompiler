@@ -589,7 +589,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         t.getNeededCharactersDeep(needed);
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
-                                classicTag(swf.characters.get(n)).writeTag(sos2);
+                                classicTag(swf.getCharacter(n)).writeTag(sos2);
                                 doneCharacters.add(n);
                             }
                         }
@@ -649,7 +649,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             if (isSprite && chtId == n) {
                                 continue;
                             }
-                            classicTag(swf.characters.get(n)).writeTag(sos2);
+                            classicTag(swf.getCharacter(n)).writeTag(sos2);
                         }
                     }
 

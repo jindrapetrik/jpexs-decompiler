@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -23,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -42,7 +44,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class ShapeTag extends CharacterTag implements DrawableTag {
+public abstract class ShapeTag extends CharacterTag implements DrawableTag, LazyObject {
 
     private final int markerSize = 10;
 
@@ -51,6 +53,11 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag {
     }
 
     public abstract SHAPEWITHSTYLE getShapes();
+    
+    @Override
+    public void load() {
+        getShapes();
+    }
 
     public abstract int getShapeNum();
 

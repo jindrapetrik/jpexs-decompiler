@@ -257,16 +257,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         this.swf = null;
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
-        navigator.clearABC();
+        navigator.clearAbc();
     }
 
     public void setSwf(SWF swf) {
         if (this.swf != swf) {
             this.swf = swf;
-            if (swf.abcList.size() > 0) {
-                this.abc = swf.abcList.get(0).getABC();
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (abcList.size() > 0) {
+                this.abc = abcList.get(0).getABC();
             }
-            navigator.setABC(swf.abcList, abc);
+            navigator.setAbc(abcList, abc);
         }
     }
 
@@ -394,7 +395,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 if (!directEditing) {
-                    Configuration.guiAvm2SplitPaneDividerLocation.set((int) pce.getNewValue());
+                    Configuration.guiAvm2SplitPaneDividerLocation.set((Integer) pce.getNewValue());
                 }
             }
         });
@@ -407,7 +408,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             public void actionPerformed(ActionEvent e) {
                 int multinameIndex = decompiledTextArea.getMultinameUnderCaret();
                 if (multinameIndex > -1) {
-                    UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, false);
+                    UsageFrame usageFrame = new UsageFrame(swf.getAbcList(), abc, multinameIndex, ABCPanel.this, false);
                     usageFrame.setVisible(true);
                 }
             }
@@ -471,7 +472,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         }
                         int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                         if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(t.swf.abcList, abc, multinameIndex, t, false);
+                            UsageFrame usageFrame = new UsageFrame(t.swf.getAbcList(), abc, multinameIndex, t, false);
                             usageFrame.setVisible(true);
                         }
                     }
@@ -505,19 +506,19 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (multinameIndex == 0) {
                 return false;
             }
-            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
+            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.getAbcList(), multinameIndex);
 
             Multiname m = abc.constants.constant_multiname.get(multinameIndex);
             //search other ABC tags if this is not private multiname
             if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
-                for (ABCContainerTag at : swf.abcList) {
+                for (ABCContainerTag at : swf.getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
                         continue;
                     }
                     int mid = a.constants.getMultinameId(m, false);
                     if (mid > 0) {
-                        usages.addAll(a.findMultinameDefinition(swf.abcList, mid));
+                        usages.addAll(a.findMultinameDefinition(swf.getAbcList(), mid));
                     }
                 }
             }
@@ -539,32 +540,32 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         Reference<Integer> multinameIndexRef = new Reference<>(0);
 
         if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef)) {
-            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(swf.abcList, swf.abcList.get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), classIndex.getVal(), traitIndex.getVal(), classTrait.getVal(), null, -1) {
+            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(swf.getAbcList(), swf.getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), classIndex.getVal(), traitIndex.getVal(), classTrait.getVal(), null, -1) {
             });
             return;
         }
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
         if (multinameIndex > -1) {
-            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList, multinameIndex);
+            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.getAbcList(), multinameIndex);
 
             Multiname m = abc.constants.constant_multiname.get(multinameIndex);
             //search other ABC tags if this is not private multiname
             if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
-                for (ABCContainerTag at : swf.abcList) {
+                for (ABCContainerTag at : swf.getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
                         continue;
                     }
                     int mid = a.constants.getMultinameId(m, false);
                     if (mid > 0) {
-                        usages.addAll(a.findMultinameDefinition(swf.abcList, mid));
+                        usages.addAll(a.findMultinameDefinition(swf.getAbcList(), mid));
                     }
                 }
             }
 
             //more than one? display list
             if (usages.size() > 1) {
-                UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this, true);
+                UsageFrame usageFrame = new UsageFrame(swf.getAbcList(), abc, multinameIndex, ABCPanel.this, true);
                 usageFrame.setVisible(true);
                 return;
             } else if (!usages.isEmpty()) { //one
@@ -699,7 +700,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public void updateSearchPos(ABCPanelSearchResult item) {
         ScriptPack pack = item.scriptPack;
         setAbc(pack.abc);
-        decompiledTextArea.setScript(pack, swf.abcList);
+        decompiledTextArea.setScript(pack, swf.getAbcList());
         hilightScript(pack);
         decompiledTextArea.setCaretPosition(0);
 

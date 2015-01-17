@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -77,6 +78,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -628,7 +630,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
 
-        List<ABCContainerTag> abcList = swf.abcList;
+        List<ABCContainerTag> abcList = swf.getAbcList();
 
         boolean hasAbc = !abcList.isEmpty();
 
@@ -1001,8 +1003,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
                         new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom())));
             }
-            List<ABCContainerTag> abcList = swf.abcList;
-            if (swf.isAS3) {
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (swf.isAS3()) {
                 for (int i = 0; i < as3scripts.size(); i++) {
                     ScriptPack tls = as3scripts.get(i);
                     Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
@@ -1151,7 +1153,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     protected Void doInBackground() throws Exception {
                         boolean found = false;
                         if (searchDialog.searchInASRadioButton.isSelected()) {
-                            if (swf.isAS3) {
+                            if (swf.isAS3()) {
                                 if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
                                     View.execInEventDispatch(new Runnable() {
@@ -1326,9 +1328,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf == null) {
             return;
         }
-        if (swf.fileAttributes != null && swf.fileAttributes.actionScript3) {
+        
+        FileAttributesTag fileAttributes = swf.getFileAttributes();
+        if (fileAttributes != null && fileAttributes.actionScript3) {
             final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret();
-            final List<ABCContainerTag> abcList = swf.abcList;
+            final List<ABCContainerTag> abcList = swf.getAbcList();
             if (multiName > 0) {
                 new CancellableWorker() {
                     @Override
@@ -1389,9 +1393,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         List<FileFilter> flaFilters = new ArrayList<>();
         List<FileFilter> xflFilters = new ArrayList<>();
         List<FLAVersion> versions = new ArrayList<>();
+        boolean isAS3 = swf.isAS3();
         for (int i = FLAVersion.values().length - 1; i >= 0; i--) {
             final FLAVersion v = FLAVersion.values()[i];
-            if (!swf.isAS3 && v.minASVersion() > 2) {
+            if (!isAS3 && v.minASVersion() > 2) {
                 // This version does not support AS1/2
             } else {
                 versions.add(v);
@@ -1594,7 +1599,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                         new FontExportSettings(export.getValue(FontExportMode.class)));
                                 swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null,
                                         new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom()));
-                                for (CharacterTag c : swf.characters.values()) {
+                                for (CharacterTag c : swf.getCharacters().values()) {
                                     if (c instanceof DefineSpriteTag) {
                                         swf.exportFrames(errorHandler, selFile + File.separator + "frames", c.getCharacterId(), null,
                                                 new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom()));
@@ -1629,6 +1634,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    public void exportJavaSource() {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        for (TreeItem item : sel) {
+            if (item instanceof SWF) {
+                SWF swf = (SWF) item;
+                final String selFile = selectExportDir();
+                if (selFile != null) {
+                    try {
+                        new SwfJavaExporter().exportJavaCode(swf, selFile);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }
+    
     public void restoreControlFlow(final boolean all) {
         Main.startWork(translate("work.restoringControlFlow"));
         if ((!all) || confirmExperimental()) {
@@ -1637,7 +1659,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     int cnt = 0;
                     if (all) {
-                        for (ABCContainerTag tag : getABCPanel().swf.abcList) {
+                        for (ABCContainerTag tag : getABCPanel().swf.getAbcList()) {
                             tag.getABC().restoreControlFlow();
                         }
                     } else {
@@ -1725,7 +1747,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     try {
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : getABCPanel().swf.abcList) {
+                            for (ABCContainerTag tag : getABCPanel().swf.getAbcList()) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
@@ -1978,6 +2000,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         switch (e.getActionCommand()) {
 
+            case MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE: {
+                exportJavaSource();
+            }
             case MainFrameRibbonMenu.ACTION_EXPORT_SEL:
                 export(true);
                 break;
@@ -2264,7 +2289,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         stopFlashPlayer();
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
-            final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
+            final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.getAbcList();
             if (setSourceWorker != null) {
                 setSourceWorker.cancel(true);
                 setSourceWorker = null;
@@ -2283,7 +2308,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                         }
                         getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.clear();
-                        getABCPanel().navigator.setABC(abcList, scriptLeaf.abc);
+                        getABCPanel().navigator.setAbc(abcList, scriptLeaf.abc);
                         getABCPanel().navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         getABCPanel().setAbc(scriptLeaf.abc);
                         getABCPanel().decompiledTextArea.setScript(scriptLeaf, abcList);

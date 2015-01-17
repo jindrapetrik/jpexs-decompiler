@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -31,7 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
@@ -123,7 +124,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements ASMSourceContaine
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional("placeFlagHasClipActions")
-    @Internal //TODO: make editable
+    @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
     public static final int ID = 26;
 

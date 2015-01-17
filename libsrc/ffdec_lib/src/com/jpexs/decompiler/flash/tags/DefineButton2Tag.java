@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -202,7 +203,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
-            CharacterTag ch = swf.characters.get(r.characterId);
+            CharacterTag ch = swf.getCharacter(r.characterId);
             if (ch instanceof BoundedTag) {
                 BoundedTag bt = (BoundedTag) ch;
                 if (!added.contains(bt)) {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -291,7 +292,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.characters.get(rec.fontId);
+                font = (FontTag) swf.getCharacter(rec.fontId);
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -337,7 +338,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         ExportRectangle result = null;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.characters.get(rec.fontId);
+                font = (FontTag) swf.getCharacter(rec.fontId);
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -428,7 +429,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.characters.get(rec.fontId);
+                font = (FontTag) swf.getCharacter(rec.fontId);
                 fontId = rec.fontId;
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
@@ -474,7 +475,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.characters.get(rec.fontId);
+                font = (FontTag) swf.getCharacter(rec.fontId);
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }

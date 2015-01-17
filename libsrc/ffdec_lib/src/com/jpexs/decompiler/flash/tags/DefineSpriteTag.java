@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -96,7 +97,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
         for (int c : characters) {
-            Tag t = swf.characters.get(c);
+            Tag t = swf.getCharacter(c);
             RECT r = null;
             if (t instanceof BoundedTag) {
                 BoundedTag bt = (BoundedTag) t;

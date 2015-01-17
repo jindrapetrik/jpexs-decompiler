@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -387,7 +388,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         ret.codeTable = new ArrayList<>();
         ret.glyphShapeTable = new ArrayList<>();
         List<SHAPE> shp = getGlyphShapeTable();
-        ret.numGlyphs = shp.size();
         for (int g = 0; g < shp.size(); g++) {
             ret.fontAdvanceTable.add(resize(getGlyphAdvance(g)));
             ret.codeTable.add((int) glyphToChar(g));

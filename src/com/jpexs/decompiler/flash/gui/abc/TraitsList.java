@@ -55,13 +55,13 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         setBackground(Color.white);
     }
 
-    public void clearABC() {
+    public void clearAbc() {
         this.abc = null;
         this.abcTags = null;
         setModel(new DefaultListModel<>());
     }
 
-    public void setABC(List<ABCContainerTag> abcTags, ABC abc) {
+    public void setAbc(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
         this.abcTags = abcTags;
         setModel(new DefaultListModel<>());

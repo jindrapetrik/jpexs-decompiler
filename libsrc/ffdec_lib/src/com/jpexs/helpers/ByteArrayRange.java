@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 /**
@@ -37,6 +38,16 @@ public class ByteArrayRange {
         this.array = array;
         this.pos = pos;
         this.length = length;
+    }
+
+    public ByteArrayRange(String hexString) {
+        byte[] array = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length() / 2; i++) {
+            array[i] = (byte) Integer.parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+        }
+        this.array = array;
+        this.pos = 0;
+        this.length = array.length;
     }
 
     public byte[] getArray() {

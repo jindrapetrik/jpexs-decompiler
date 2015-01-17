@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags;
-
-import com.jpexs.decompiler.flash.abc.ABC;
+package com.jpexs.decompiler.flash.helpers;
 
 /**
  *
  * @author JPEXS
  */
-public interface ABCContainerTag extends Comparable<ABCContainerTag> {
+public interface LazyObject {
 
-    public ABC getABC();
+    public void load();
 }

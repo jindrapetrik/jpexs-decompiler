@@ -227,8 +227,8 @@ public class TagTreeModel implements TreeModel {
             nodeList.add(otherNode);
         }
 
-        if (swf.isAS3) {
-            if (!swf.abcList.isEmpty()) {
+        if (swf.isAS3()) {
+            if (!swf.getAbcList().isEmpty()) {
                 nodeList.add(new ClassesListTreeModel(swf));
             }
         } else {

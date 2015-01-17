@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
@@ -826,6 +827,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
             f.setAccessible(true);
             Internal inter = f.getAnnotation(Internal.class);
             if (inter != null) {
+                continue;
+            }
+            HideInRawEdit hide = f.getAnnotation(HideInRawEdit.class);
+            if (hide != null) {
                 continue;
             }
             ret.add(f);

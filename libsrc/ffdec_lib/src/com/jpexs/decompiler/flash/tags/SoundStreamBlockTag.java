@@ -12,13 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class SoundStreamBlockTag extends Tag {
 
     public static final int ID = 19;
 
-    @Internal
+    @HideInRawEdit
     public ByteArrayRange streamSoundData;
 
     /**

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -28,7 +29,6 @@ import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
@@ -56,8 +56,6 @@ public class DefineFont3Tag extends FontTag {
     public boolean fontFlagsBold;
     public LANGCODE languageCode;
     public String fontName;
-    @Internal
-    public int numGlyphs;
 
     public List<SHAPE> glyphShapeTable;
 
@@ -142,7 +140,7 @@ public class DefineFont3Tag extends FontTag {
         } else {
             fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
         }
-        numGlyphs = sis.readUI16("numGlyphs");
+        int numGlyphs = sis.readUI16("numGlyphs");
         long[] offsetTable = new long[numGlyphs];
         long pos = sis.getPos();
         for (int i = 0; i < numGlyphs; i++) { //offsetTable
@@ -209,6 +207,7 @@ public class DefineFont3Tag extends FontTag {
             List<Long> offsetTable = new ArrayList<>();
             ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
             SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            int numGlyphs = glyphShapeTable.size();
             for (int i = 0; i < numGlyphs; i++) {
                 offsetTable.add(sos3.getPos());
                 sos3.writeSHAPE(glyphShapeTable.get(i), 1);
@@ -427,9 +426,6 @@ public class DefineFont3Tag extends FontTag {
                 fontBoundsTable.set(pos, shp.getBounds());
                 fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
             }
-        }
-        if (!exists) {
-            numGlyphs++;
         }
 
         setModified(true);

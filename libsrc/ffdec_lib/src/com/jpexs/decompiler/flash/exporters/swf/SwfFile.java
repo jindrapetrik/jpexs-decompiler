@@ -14,15 +14,25 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.exporters.swf;
 
-import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.SWF;
+import java.io.IOException;
 
 /**
  *
  * @author JPEXS
  */
-public interface ABCContainerTag extends Comparable<ABCContainerTag> {
+public class SwfFile {
 
-    public ABC getABC();
+    public SWF getSwf() {
+        return null;
+    }
+
+    public void saveTo(String fileName) throws IOException {
+        /*SWF swf = getSwf();
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            swf.saveTo(fos, SWFCompression.ZLIB);
+        }*/
+    }
 }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -81,10 +82,10 @@ public class RecompileTest {
         Configuration.autoDeobfuscate.set(false);
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
-            if (swf.isAS3) {
+            if (swf.isAS3()) {
                 boolean dotest = false;
                 List<ABC> allAbcs = new ArrayList<>();
-                for (ABCContainerTag ct : swf.abcList) {
+                for (ABCContainerTag ct : swf.getAbcList()) {
                     allAbcs.add(ct.getABC());
                 }
                 for (ABC abc : allAbcs) {                   
@@ -101,7 +102,7 @@ public class RecompileTest {
                         }
 
                         System.out.println("Recompiling:" + en.getKey().toString() + "...");
-                        en.getValue().toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                        en.getValue().toSource(htw, swf.getAbcList(), abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
                         com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, abc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
                         //remove last compiled script:

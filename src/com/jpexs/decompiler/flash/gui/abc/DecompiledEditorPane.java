@@ -85,8 +85,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public void fireScript() {
-        for (int i = 0; i < scriptListeners.size(); i++) {
-            scriptListeners.get(i).run();
+        for (Runnable scriptListener : scriptListeners) {
+            scriptListener.run();
         }
     }
 

@@ -14,47 +14,44 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.types.shaperecords;
+package com.jpexs.decompiler.flash.exporters.swf;
 
-import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.Helper;
 
 /**
  *
  * @author JPEXS
  */
-public class EndShapeRecord extends SHAPERECORD {
+public class IndenetedStringBuilder {
+    
+    private final StringBuilder builder = new StringBuilder();
+    private final String indentString;
+    private int indent;
 
-    public static final boolean typeFlag = false;
-
-    @SWFType(value = BasicType.UB, count = 5)
-    public int endOfShape = 0;
+    public IndenetedStringBuilder(String indentString) {
+        super();
+        this.indentString = indentString;
+    }
+    
+    public void indent() {
+        indent++;
+    }
+    
+    public void unindent() {
+        indent--;
+    }
+    
+    public void appendLine(String str) {
+        for (int i = 0; i < indent; i++) {
+            builder.append(indentString);
+        }
+        
+        builder.append(str);
+        builder.append(Helper.newLine);
+    }
 
     @Override
     public String toString() {
-        return "[EndShapeRecord]";
-    }
-
-    @Override
-    public int changeX(int x) {
-        return x;
-    }
-
-    @Override
-    public int changeY(int y) {
-        return y;
-    }
-
-    @Override
-    public void flip() {
-    }
-
-    @Override
-    public boolean isMove() {
-        return false;
-    }
-
-    @Override
-    public void calculateBits() {
+        return builder.toString();
     }
 }

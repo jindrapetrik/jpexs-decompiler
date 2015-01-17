@@ -76,6 +76,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
     private JMenuItem replaceMenuItem;
     private JMenuItem rawEditMenuItem;
     private JMenuItem jumpToCharacterMenuItem;
+    private JMenuItem exportJavaSourceMenuItem;
     private JMenuItem closeMenuItem;
     private JMenu addTagMenu;
     private JMenu moveTagMenu;
@@ -121,6 +122,11 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         jumpToCharacterMenuItem.addActionListener(this);
         jumpToCharacterMenuItem.setVisible(false);
         add(jumpToCharacterMenuItem);
+
+        exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
+        exportJavaSourceMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE);
+        exportJavaSourceMenuItem.addActionListener(mainPanel);
+        add(exportJavaSourceMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.setActionCommand(ACTION_CLOSE_SWF);
@@ -398,7 +404,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 }
 
                 CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
-                mainPanel.setTagTreeSelectedNode(itemj.getSwf().characters.get(characterIdTag.getCharacterId()));
+                mainPanel.setTagTreeSelectedNode(itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
             }
             break;
             case ACTION_EXPAND_RECURSIVE: {

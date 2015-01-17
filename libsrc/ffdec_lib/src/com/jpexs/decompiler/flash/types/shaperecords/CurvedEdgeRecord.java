@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -26,8 +27,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
  */
 public class CurvedEdgeRecord extends SHAPERECORD {
 
-    public boolean typeFlag = true;
-    public boolean straightFlag = false;
+    public static final boolean typeFlag = true;
+    public static final boolean straightFlag = false;
 
     @Calculated
     @SWFType(value = BasicType.UB, count = 4)

@@ -94,6 +94,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private static final String ACTION_CLOSE_ALL = "CLOSEALL";
     private static final String ACTION_EXPORT_FLA = "EXPORTFLA";
     public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
+    public static final String ACTION_EXPORT_JAVA_SOURCE = "EXPORTJAVASOURCE";
     private static final String ACTION_EXPORT = "EXPORT";
     private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
@@ -611,7 +612,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     public void updateComponents(SWF swf) {
         super.updateComponents(swf);
         boolean swfLoaded = swf != null;
-        List<ABCContainerTag> abcList = swfLoaded ? swf.abcList : null;
+        List<ABCContainerTag> abcList = swfLoaded ? swf.getAbcList() : null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
         boolean hasDebugger = hasAbc && Main.hasDebugger(swf);
 

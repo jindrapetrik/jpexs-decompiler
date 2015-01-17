@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -2679,7 +2680,7 @@ public class XFLConverter {
 
     public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException {
 
-        FileAttributesTag fa = swf.fileAttributes;
+        FileAttributesTag fa = swf.getFileAttributes();
 
         boolean useAS3 = false;
         boolean useNetwork = false;

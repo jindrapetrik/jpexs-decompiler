@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.types.COLORMAPDATA;
 import com.jpexs.decompiler.flash.types.PIX24;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -65,9 +67,9 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     public static final int FORMAT_15BIT_RGB = 4;
     public static final int FORMAT_24BIT_RGB = 5;
 
-    @Internal
+    @HideInRawEdit
     private COLORMAPDATA colorMapData;
-    @Internal
+    @HideInRawEdit
     private BITMAPDATA bitmapData;
     @Internal
     private boolean decompressed = false;

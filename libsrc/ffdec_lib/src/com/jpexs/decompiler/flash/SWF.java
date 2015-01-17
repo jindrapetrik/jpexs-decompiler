@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Decoder;
@@ -128,6 +129,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
@@ -250,46 +252,98 @@ public final class SWF implements SWFContainerItem, Timelined {
      * LZMA Properties
      */
     public byte[] lzmaProperties;
+    @Internal
     public byte[] uncompressedData;
+    @Internal
     public byte[] originalUncompressedData;
-    public FileAttributesTag fileAttributes;
     /**
      * ScaleForm GFx
      */
     public boolean gfx = false;
 
+    @Internal
     public SWFList swfList;
+    @Internal
     public String file;
+    @Internal
     public String fileTitle;
-    public boolean readOnly;
-    public boolean isAS3;
-    public Map<Integer, CharacterTag> characters = new HashMap<>();
-    public List<ABCContainerTag> abcList;
+    @Internal
+    private Map<Integer, CharacterTag> characters;
+    @Internal
+    private List<ABCContainerTag> abcList;
+    @Internal
     private JPEGTablesTag jtt;
+    @Internal
     public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
     public static final double unitDivisor = 20;
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
 
+    @Internal
     private Timeline timeline;
 
+    @Internal
     public DumpInfoSwfNode dumpInfo;
+    @Internal
     public DefineBinaryDataTag binaryData;
 
+    @Internal
     private final HashMap<String, String> deobfuscated = new HashMap<>();
+    @Internal
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
+    @Internal
     private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, "frame");
+    @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, "as2");
+    @Internal
     private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, "as3");
 
     public void updateCharacters() {
-        characters.clear();
-        parseCharacters(tags);
+        characters = null;
+    }
+    
+    public Map<Integer, CharacterTag> getCharacters() {
+        if (characters == null) {
+            Map<Integer, CharacterTag> chars = new HashMap<>();
+            parseCharacters(tags, chars);
+            characters = chars; 
+        }
+        
+        return characters;
+    }
+    
+    public CharacterTag getCharacter(int characterId) {
+        return getCharacters().get(characterId);
+    }
+
+    public List<ABCContainerTag> getAbcList() {
+        if (abcList == null) {
+            ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
+            getAbcTags(tags, newAbcList);
+            abcList = newAbcList;
+        }
+
+        return abcList;
+    }
+            
+    public boolean isAS3() {
+        FileAttributesTag fileAttributes = getFileAttributes();
+        return (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !getAbcList().isEmpty());
+    }
+
+    public FileAttributesTag getFileAttributes() {
+        for (Tag t : tags) {
+            if (t instanceof FileAttributesTag) {
+                return (FileAttributesTag) t;
+            }
+        }
+        
+        return null;
     }
 
     public int getNextCharacterId() {
         int max = -1;
-        for (int characterId : characters.keySet()) {
+        for (int characterId : getCharacters().keySet()) {
             if (characterId > max) {
                 max = characterId;
             }
@@ -326,7 +380,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 boolean moved = false;
                 for (Integer id : needed) {
                     if (!addedCharacterIds.contains(id)) {
-                        CharacterTag neededCharacter = characters.get(id);
+                        CharacterTag neededCharacter = getCharacter(id);
                         if (neededCharacter == null) {
                             continue;
                         }
@@ -364,13 +418,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private void parseCharacters(List<Tag> list) {
+    private void parseCharacters(List<Tag> list, Map<Integer, CharacterTag> characters) {
         for (Tag t : list) {
             if (t instanceof CharacterTag) {
                 characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
             }
             if (t instanceof DefineSpriteTag) {
-                parseCharacters(((DefineSpriteTag) t).getSubTags());
+                parseCharacters(((DefineSpriteTag) t).getSubTags(), characters);
             }
         }
     }
@@ -573,6 +627,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public SWF() {
+        
+    }
+    
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
         this(is, null, parallelRead, false);
     }
@@ -643,11 +701,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         this.tags = tags;
         if (!checkOnly) {
             checkInvalidSprites();
-            updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
-            findFileAttributes();
-            findABCTags();
 
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
@@ -695,30 +750,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         return new File(title).getName();
     }
 
-    private void findABCTags() {
-
-        ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
-        getABCTags(tags, newAbcList);
-        isAS3 = (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !newAbcList.isEmpty());
-        abcList = newAbcList;
-    }
-
-    private static void getABCTags(List<Tag> list, List<ABCContainerTag> actionScripts) {
+    private static void getAbcTags(List<Tag> list, List<ABCContainerTag> actionScripts) {
         for (Tag t : list) {
             if (t instanceof DefineSpriteTag) {
-                getABCTags(((DefineSpriteTag) t).getSubTags(), actionScripts);
+                getAbcTags(((DefineSpriteTag) t).getSubTags(), actionScripts);
             }
             if (t instanceof ABCContainerTag) {
                 actionScripts.add((ABCContainerTag) t);
-            }
-        }
-    }
-
-    private void findFileAttributes() {
-        for (Tag t : tags) {
-            if (t instanceof FileAttributesTag) {
-                fileAttributes = (FileAttributesTag) t;
-                break;
             }
         }
     }
@@ -905,6 +943,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public boolean exportAS3Class(String className, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
         boolean exported = false;
 
+        List<ABCContainerTag> abcList = getAbcList();
         for (int i = 0; i < abcList.size(); i++) {
             ABC abc = abcList.get(i).getABC();
             List<ScriptPack> scrs = abc.findScriptPacksByPath(className);
@@ -941,7 +980,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public List<MyEntry<ClassPath, ScriptPack>> getAS3Packs() {
         List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
-        for (ABCContainerTag abcTag : abcList) {
+        for (ABCContainerTag abcTag : getAbcList()) {
             packs.addAll(abcTag.getABC().getScriptPacks());
         }
         return uniqueAS3Packs(packs);
@@ -1025,7 +1064,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     @Override
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcList, exportMode, parallel);
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, getAbcList(), exportMode, parallel);
                             ret.add(task.call());
                         }
                         return null;
@@ -1040,7 +1079,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, abcList, exportMode, parallel));
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, getAbcList(), exportMode, parallel));
                 futureResults.add(future);
             }
 
@@ -1080,7 +1119,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         };
 
-        if (isAS3) {
+        if (isAS3()) {
             ret.addAll(exportActionScript3(handler, outdir, exportMode, parallel));
         } else {
             ret.addAll(exportActionScript2(handler, outdir, exportMode, parallel, evl));
@@ -1286,7 +1325,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void writeLibrary(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
         for (int c : library) {
-            CharacterTag ch = fswf.characters.get(c);
+            CharacterTag ch = fswf.getCharacter(c);
             if (ch instanceof FontTag) {
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
                 fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
@@ -1327,8 +1366,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (containerId == 0) {
             tim = getTimeline();
         } else {
-            tim = ((Timelined) characters.get(containerId)).getTimeline();
-            path = File.separator + Helper.makeFileName(characters.get(containerId).getExportFileName());
+            tim = ((Timelined) getCharacter(containerId)).getTimeline();
+            path = File.separator + Helper.makeFileName(getCharacter(containerId).getExportFileName());
         }
         if (frames == null) {
             int frameCnt = tim.getFrames().size();
@@ -1411,7 +1450,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
                         writeLibrary(fswf, library, fos);
 
-                        String currentName = ftim.id == 0 ? "main" : getTypePrefix(fswf.characters.get(ftim.id)) + ftim.id;
+                        String currentName = ftim.id == 0 ? "main" : getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
 
                         fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
@@ -1856,7 +1895,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
-        findFileAttributes();
+        FileAttributesTag fileAttributes = getFileAttributes();
         if (fileAttributes == null) {
             int cnt = 0;
             cnt += deobfuscateAS2Identifiers(renameType);
@@ -2217,7 +2256,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         boolean parallel = Configuration.parallelSpeedUp.get();
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        pack.toSource(writer, swf.abcList, script.traits.traits, ScriptExportMode.AS, parallel);
+        pack.toSource(writer, swf.getAbcList(), script.traits.traits, ScriptExportMode.AS, parallel);
         HighlightedText hilightedCode = new HighlightedText(writer);
         CachedDecompilation res = new CachedDecompilation(hilightedCode);
         swf.as3Cache.put(pack, res);
@@ -2298,13 +2337,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                     continue;
                 }
                 DepthState layer = frameObj.layers.get(i);
-                if (!timeline.swf.characters.containsKey(layer.characterId)) {
+                if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
                     continue;
                 }
                 if (!layer.isVisible) {
                     continue;
                 }
-                CharacterTag character = timeline.swf.characters.get(layer.characterId);
+                CharacterTag character = timeline.swf.getCharacter(layer.characterId);
 
                 if (colorTransform == null) {
                     colorTransform = new ColorTransform();
@@ -2512,13 +2551,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!timeline.swf.characters.containsKey(layer.characterId)) {
+            if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
                 continue;
             }
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = timeline.swf.characters.get(layer.characterId);
+            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
 
             if (colorTransform == null) {
                 colorTransform = new ColorTransform();
@@ -2657,13 +2696,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!timeline.swf.characters.containsKey(layer.characterId)) {
+            if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
                 continue;
             }
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = timeline.swf.characters.get(layer.characterId);
+            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
 
