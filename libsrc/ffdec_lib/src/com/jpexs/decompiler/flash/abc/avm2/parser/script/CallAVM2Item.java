@@ -12,15 +12,19 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -133,8 +137,14 @@ public class CallAVM2Item extends AVM2Item {
             if (obj == null) {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex});
             }
+            
+            boolean isSuper = (obj instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) obj).getVariableName());
+            
+            InstructionDefinition insDef = isSuper ?
+                    (needsReturn ? new CallSuperIns() : new CallSuperVoidIns()) :
+                    (needsReturn ? new CallPropertyIns() : new CallPropVoidIns());
             return toSourceMerge(localData, generator, obj, arguments,
-                    ins(needsReturn ? new CallPropertyIns() : new CallPropVoidIns(), propIndex, arguments.size())
+                    ins(insDef, propIndex, arguments.size())
             );
         }
 

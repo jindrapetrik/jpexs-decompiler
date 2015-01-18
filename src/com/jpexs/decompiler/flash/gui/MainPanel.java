@@ -81,7 +81,6 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -1094,19 +1093,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf == null) {
             return;
         }
-        String documentClass = null;
-        loopdc:
-        for (Tag t : swf.tags) {
-            if (t instanceof SymbolClassTag) {
-                SymbolClassTag sc = (SymbolClassTag) t;
-                for (int i = 0; i < sc.tags.length; i++) {
-                    if (sc.tags[i] == 0) {
-                        documentClass = sc.names[i];
-                        break loopdc;
-                    }
-                }
-            }
-        }
+        String documentClass = swf.getDocumentClass();
         if (documentClass != null && !Configuration.dumpView.get()) {
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);

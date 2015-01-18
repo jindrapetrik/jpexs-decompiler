@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
@@ -1193,20 +1194,8 @@ public class ABC {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = script_info.size();
-        String documentClass = "";
-        loopt:
-        for (Tag t : swf.tags) {
-            if (t instanceof SymbolClassTag) {
-                SymbolClassTag sc = (SymbolClassTag) t;
-                for (int i = 0; i < sc.tags.length; i++) {
-                    if (sc.tags[i] == 0) {
-                        documentClass = sc.names[i];
-                        break loopt;
-                    }
-                }
-            }
-        }
-        boolean isDocumentClass = documentClass.equals(pack.getClassPath().toString());
+        String documentClass = swf.getDocumentClass();
+        boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
 
         ScriptInfo si = script_info.get(oldIndex);
         si.delete(this, true);

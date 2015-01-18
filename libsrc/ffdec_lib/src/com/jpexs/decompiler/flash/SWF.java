@@ -366,6 +366,21 @@ public final class SWF implements SWFContainerItem, Timelined {
         return jtt;
     }
     
+    public String getDocumentClass() {
+        for (Tag t : tags) {
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sc = (SymbolClassTag) t;
+                for (int i = 0; i < sc.tags.length; i++) {
+                    if (sc.tags[i] == 0) {
+                        return sc.names[i];
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     public void fixCharactersOrder(boolean checkAll) {
         Set<Integer> addedCharacterIds = new HashSet<>();
         Set<CharacterTag> movedTags = new HashSet<>();

@@ -1492,14 +1492,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (AssignableAVM2Item an : subvariables) {
             if (an instanceof NameAVM2Item) {
                 NameAVM2Item n = (NameAVM2Item) an;
-                if (n.getVariableName() != null) {
-                    if (!n.getVariableName().equals("this") && needsActivation) {
+                String variableName = n.getVariableName();
+                if (variableName != null) {
+                    boolean isThisOrSuper = variableName.equals("this") || variableName.equals("super");
+                    if (!isThisOrSuper && needsActivation) {
                         if (n.getSlotNumber() <= 0) {
-                            n.setSlotNumber(slotNames.indexOf(n.getVariableName()));
+                            n.setSlotNumber(slotNames.indexOf(variableName));
                             n.setSlotScope(slotScope);
                         }
                     } else {
-                        n.setRegNumber(registerNames.indexOf(n.getVariableName()));
+                        if (isThisOrSuper) {
+                            n.setRegNumber(0);
+                        } else {
+                            n.setRegNumber(registerNames.indexOf(variableName));
+                        }
                     }
                 }
             }
@@ -1553,7 +1559,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
 
-                if ("this".equals(n.getVariableName()) || paramNames.contains(n.getVariableName()) || "argmuments".equals(n.getVariableName())) {
+                String variableName = n.getVariableName();
+                if ("this".equals(variableName) || "super".equals(variableName) || paramNames.contains(variableName) || "argmuments".equals(variableName)) {
                     continue;
                 }
 

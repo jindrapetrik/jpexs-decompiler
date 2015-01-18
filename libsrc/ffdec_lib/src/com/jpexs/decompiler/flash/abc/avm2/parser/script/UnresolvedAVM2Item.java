@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -22,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -427,7 +429,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
 
-        if (parts.get(0).equals("this")) {
+        if (parts.get(0).equals("this") || parts.get(0).equals("super")) {
             if (thisType == null) {
                 throw new CompilationException("Cannot use this in that context", line);
             }
