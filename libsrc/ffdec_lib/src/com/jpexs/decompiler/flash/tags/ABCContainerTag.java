@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 
 /**
@@ -25,4 +26,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 public interface ABCContainerTag extends Comparable<ABCContainerTag> {
 
     public ABC getABC();
+
+    public SWF getSwf();
 }

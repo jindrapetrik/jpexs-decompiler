@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -54,7 +55,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     @Override
     public SWF getSwf() {
-        return abc.swf;
+        return abc.getSwf();
     }
 
     public ClassPath getClassPath() {

@@ -106,11 +106,4 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     public int compareTo(ABCContainerTag o) {
         return 0;
     }
-
-    @Override
-    public void setSwf(SWF swf) {
-        super.setSwf(swf);
-        abc.swf = swf;
-    }
-
 }

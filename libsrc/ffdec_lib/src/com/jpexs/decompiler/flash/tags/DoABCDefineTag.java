@@ -38,16 +38,13 @@ import java.io.OutputStream;
  */
 public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
-    @Override
-    public ABC getABC() {
-        return abc;
-    }
     /**
      * ActionScript 3 bytecodes
      */
     @HideInRawEdit
     @SWFField
     private final ABC abc;
+
     /**
      * A 32-bit flags value, which may contain the following bits set:
      * kDoAbcLazyInitializeFlag = 1: Indicates that the ABC block should not be
@@ -56,11 +53,17 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      */
     @SWFType(BasicType.UI32)
     public long flags;
+
     /**
      * The name assigned to the bytecode.
      */
     public String name;
     public static final int ID = 82;
+
+    @Override
+    public ABC getABC() {
+        return abc;
+    }
 
     @Override
     public String getName() {
@@ -94,12 +97,6 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         // put it to the dumpview:
         sis.readByteRangeEx(sis.available(), "abcBytes");
         abc = new ABC(ais, swf, this);
-    }
-
-    @Override
-    public void setSwf(SWF swf) {
-        super.setSwf(swf);
-        abc.swf = swf;
     }
 
     /**

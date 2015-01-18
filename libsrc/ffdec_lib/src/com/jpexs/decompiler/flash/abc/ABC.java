@@ -90,8 +90,6 @@ public class ABC {
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
     private AVM2Deobfuscation deobfuscation;
     @Internal
-    public SWF swf;
-    @Internal
     public ABCContainerTag parentTag;
 
     /* Map from multiname index of namespace value to namespace name**/
@@ -99,7 +97,6 @@ public class ABC {
 
     public ABC(SWF swf) {
         this.deobfuscation = null;
-        this.swf = swf;
         constants.constant_double.add(null);
         constants.constant_int.add(null);
         constants.constant_uint.add(null);
@@ -109,6 +106,10 @@ public class ABC {
         constants.constant_namespace_set.add(null);
     }
 
+    public SWF getSwf() {
+        return parentTag.getSwf();
+    }
+    
     public int addMethodBody(MethodBody body) {
         bodies.add(body);
         bodyIdxFromMethodIdx = null;
@@ -339,7 +340,6 @@ public class ABC {
     }
 
     public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag) throws IOException {
-        this.swf = swf;
         this.parentTag = tag;
         minor_version = ais.readU16("minor_version");
         major_version = ais.readU16("major_version");
@@ -1207,7 +1207,7 @@ public class ABC {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = script_info.size();
-        String documentClass = swf.getDocumentClass();
+        String documentClass = getSwf().getDocumentClass();
         boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
 
         ScriptInfo si = script_info.get(oldIndex);
