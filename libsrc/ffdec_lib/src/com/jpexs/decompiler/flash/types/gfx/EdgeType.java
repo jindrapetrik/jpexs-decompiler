@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
@@ -28,26 +29,47 @@ import java.io.Serializable;
 public class EdgeType implements Serializable {
 
     private static final int sizes[] = new int[]{1, 2, 1, 2, 1, 2, 3, 4, 2, 3, 4, 5, 6, 7, 8, 9};
+
     private static final int Edge_H12 = 0;  //  2 bytes
+
     private static final int Edge_H20 = 1;  //  3 bytes
+
     private static final int Edge_V12 = 2;  //  2 bytes
+
     private static final int Edge_V20 = 3;  //  3 bytes
+
     private static final int Edge_L6 = 4;  //  2 bytes
+
     private static final int Edge_L10 = 5;  //  3 bytes
+
     private static final int Edge_L14 = 6;  //  4 bytes
+
     private static final int Edge_L18 = 7;  //  5 bytes
+
     private static final int Edge_C5 = 8;  //  3 bytes
+
     private static final int Edge_C7 = 9;  //  4 bytes
+
     private static final int Edge_C9 = 10; //  5 bytes
+
     private static final int Edge_C11 = 11; //  6 bytes
+
     private static final int Edge_C13 = 12; //  7 bytes
+
     private static final int Edge_C15 = 13; //  8 bytes
+
     private static final int Edge_C17 = 14; //  9 bytes
+
     private static final int Edge_C19 = 15;  // 10 bytes
+
     private static final int Edge_HLine = 0;
+
     private static final int Edge_VLine = 1;
+
     private static final int Edge_Line = 2;
+
     private static final int Edge_Quad = 3;
+
     public int data[];
 
     public EdgeType(boolean vertical, int v) {
@@ -81,7 +103,7 @@ public class EdgeType implements Serializable {
          data[1] = 0;
          }
          if((raw[0]&0xf) == Edge_C17){
-         //System.out.println("========== 17 : "+toString())    ;        
+         //System.out.println("========== 17 : "+toString())    ;
          data[1] = 0;
          data[2] = 0;
          data[3] = 0;

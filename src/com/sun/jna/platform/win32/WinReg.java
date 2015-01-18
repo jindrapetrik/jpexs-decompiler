@@ -1,14 +1,14 @@
 /* Copyright (c) 2010 Daniel Doubrovkine, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.  
+ * Lesser General Public License for more details.
  */
 package com.sun.jna.platform.win32;
 
@@ -68,13 +68,22 @@ public interface WinReg extends StdCallLibrary {
             return h;
         }
     }
+
     HKEY HKEY_CLASSES_ROOT = new HKEY(0x80000000);
+
     HKEY HKEY_CURRENT_USER = new HKEY(0x80000001);
+
     HKEY HKEY_LOCAL_MACHINE = new HKEY(0x80000002);
+
     HKEY HKEY_USERS = new HKEY(0x80000003);
+
     HKEY HKEY_PERFORMANCE_DATA = new HKEY(0x80000004);
+
     HKEY HKEY_PERFORMANCE_TEXT = new HKEY(0x80000050);
+
     HKEY HKEY_PERFORMANCE_NLSTEXT = new HKEY(0x80000060);
+
     HKEY HKEY_CURRENT_CONFIG = new HKEY(0x80000005);
+
     HKEY HKEY_DYN_DATA = new HKEY(0x80000006);
 }

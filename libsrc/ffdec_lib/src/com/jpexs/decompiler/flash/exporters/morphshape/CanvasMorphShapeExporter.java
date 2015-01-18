@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -40,29 +41,49 @@ import com.jpexs.helpers.SerializableImage;
 public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     protected static final String DRAW_COMMAND_M = "M";
+
     protected static final String DRAW_COMMAND_L = "L";
+
     protected static final String DRAW_COMMAND_Q = "Q";
+
     protected String currentDrawCommand = "";
+
     protected double deltaX = 0;
+
     protected double deltaY = 0;
+
     protected String pathData = "";
+
     protected String fillData = "";
+
     protected double unitDivisor;
+
     protected String shapeData = "";
+
     protected String strokeData = "";
+
     protected Matrix fillMatrix = null;
+
     protected Matrix fillMatrixEnd = null;
+
     protected String lastRadColor = null;
+
     protected int repeatCnt = 0;
+
     protected SWF swf;
 
     protected String lineFillData = null;
+
     protected String lineLastRadColor = null;
+
     protected Matrix lineFillMatrix = null;
+
     protected Matrix lineFillMatrixEnd = null;
+
     protected int lineRepeatCnt = 0;
 
     protected int fillWidth;
+
     protected int fillHeight;
 
     public CanvasMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
@@ -138,7 +159,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
         finalizePath();
 
-        //TODO: How many repeats is ideal?        
+        //TODO: How many repeats is ideal?
         final int REPEAT_CNT = 5;
 
         repeatCnt = spreadMethod == GRADIENT.SPREAD_PAD_MODE ? 0 : REPEAT_CNT;
@@ -302,7 +323,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
         lineFillData = "";
 
-        //TODO: How many repeats is ideal?        
+        //TODO: How many repeats is ideal?
         final int REPEAT_CNT = 5;
 
         lineRepeatCnt = spreadMethod == GRADIENT.SPREAD_PAD_MODE ? 0 : REPEAT_CNT;
@@ -543,5 +564,4 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     private String useRatioColor(RGB color, RGB colorEnd) {
         return "tocolor(ctrans.apply([" + useRatioInt(color.red, colorEnd.red) + "," + useRatioInt(color.green, colorEnd.green) + "," + useRatioInt(color.blue, colorEnd.blue) + ",((" + useRatioInt((color instanceof RGBA) ? ((RGBA) color).alpha : 255, (colorEnd instanceof RGBA) ? ((RGBA) colorEnd).alpha : 255) + ")/255)]))";
     }
-
 }

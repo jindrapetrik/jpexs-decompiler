@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -29,20 +30,28 @@ public class ProductInfoTag extends Tag {
 
     @SWFType(BasicType.UI32)
     public long productID;
+
     @SWFType(BasicType.UI32)
     public long edition;
+
     @SWFType(BasicType.UI8)
     public int majorVersion;
+
     @SWFType(BasicType.UI8)
     public int minorVersion;
+
     @SWFType(BasicType.UI32)
     public long buildLow;
+
     @SWFType(BasicType.UI32)
     public long buildHigh;
+
     @SWFType(BasicType.UI32)
     public long compilationDateLow;
+
     @SWFType(BasicType.UI32)
     public long compilationDateHigh;
+
     public static final int ID = 41;
 
     /**
@@ -101,5 +110,4 @@ public class ProductInfoTag extends Tag {
         }
         return baos.toByteArray();
     }
-
 }

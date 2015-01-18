@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -83,6 +83,7 @@ import javax.swing.tree.TreePath;
 public class GenericTagTreePanel extends GenericTagPanel {
 
     private JTree tree;
+
     private Tag editedTag;
 
     private class MyTree extends JTree {
@@ -108,7 +109,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private class MyTreeCellEditor extends AbstractCellEditor implements TreeCellEditor {
 
         private GenericTagEditor editor = null;
+
         private final JTree tree;
+
         private FieldNode fnode;
 
         public MyTreeCellEditor(JTree tree) {
@@ -205,14 +208,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
             /*List<FieldNode> depends = ((MyTreeModel) tree.getModel()).getDependentFields(fnode);
              boolean dep = false;
              if (!depends.isEmpty()) {
-             dep = true;            
+             dep = true;
              }     */
             editor.save();
             ((MyTreeModel) tree.getModel()).vchanged(tree.getSelectionPath());
             refreshTree();
             return true;
         }
-
     }
 
     public GenericTagTreePanel() {
@@ -350,7 +352,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
             setBackgroundNonSelectionColor(Color.white);
             return this;
         }
-
     }
 
     @Override
@@ -361,7 +362,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private static class FieldNode extends DefaultMutableTreeNode {
 
         private Object obj;
+
         private Field field;
+
         private int index;
 
         public FieldNode(Object obj, Field field, int index) {
@@ -486,8 +489,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private static class MyTreeModel extends DefaultTreeModel {
 
         private final Object mtroot;
+
         private final List<TreeModelListener> listeners = new ArrayList<>();
+
         private final Map<String, Object> nodeCache = new HashMap<>();
+
         // it is much faster to store the reverse mappings, too
         private final Map<Object, String> nodeCacheReverse = new HashMap<>();
 

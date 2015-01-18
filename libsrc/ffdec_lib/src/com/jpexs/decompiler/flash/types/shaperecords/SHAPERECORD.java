@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -49,6 +50,7 @@ import java.util.Set;
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;
+
     public static final boolean DRAW_BOUNDING_BOX = false;
 
     public abstract void calculateBits();
@@ -96,7 +98,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     }
                 }
             }
-            
+
             x = r.changeX(x);
             y = r.changeY(y);
             if (x > max_x) {

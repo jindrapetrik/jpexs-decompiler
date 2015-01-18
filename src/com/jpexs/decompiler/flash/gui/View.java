@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -99,12 +99,15 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
 public class View {
 
     public static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
+
     public static Color swfBackgroundColor = DEFAULT_BACKGROUND_COLOR;
 
     private static final BufferedImage transparentTexture;
+
     public static final TexturePaint transparentPaint;
 
     private static final Color transparentColor1 = new Color(0x99, 0x99, 0x99);
+
     private static final Color transparentColor2 = new Color(0x66, 0x66, 0x66);
 
     static {
@@ -160,10 +163,15 @@ public class View {
                         private final FontSet fontSet = new FontSet() {
 
                             private FontUIResource controlFont;
+
                             private FontUIResource menuFont;
+
                             private FontUIResource titleFont;
+
                             private FontUIResource windowTitleFont;
+
                             private FontUIResource smallFont;
+
                             private FontUIResource messageFont;
 
                             @Override
@@ -305,7 +313,9 @@ public class View {
     public static ImageIcon getIcon(String name) {
         return new ImageIcon(View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
     }
+
     private static final KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+
     private static final String dispatchWindowClosingActionMapKey = "com.jpexs.dispatch:WINDOW_CLOSING";
 
     public static void installEscapeCloseOperation(final JDialog dialog) {

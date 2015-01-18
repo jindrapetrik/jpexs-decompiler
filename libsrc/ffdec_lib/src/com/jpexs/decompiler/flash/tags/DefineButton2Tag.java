@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -68,19 +68,23 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      * Track as menu button
      */
     public boolean trackAsMenu;
+
     /**
      * Characters that make up the button
      */
     public List<BUTTONRECORD> characters;
+
     /**
      * Actions to execute at particular button events
      */
     public List<BUTTONCONDACTION> actions = new ArrayList<>();
+
     public static final int ID = 34;
 
     private Timeline timeline;
 
     private boolean isSingleFrameInitialized;
+
     private boolean isSingleFrame;
 
     @Override

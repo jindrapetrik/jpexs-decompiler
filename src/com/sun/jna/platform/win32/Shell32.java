@@ -1,5 +1,5 @@
 /* Copyright (c) 2007 Timothy Wall, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -8,7 +8,7 @@
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.  
+ * Lesser General Public License for more details.
  */
 package com.sun.jna.platform.win32;
 
@@ -36,6 +36,8 @@ public interface Shell32 extends StdCallLibrary {
     UINT ExtractIconEx(String lpszFile, int nIconIndex, PointerByReference phiconLarge, PointerByReference phiconSmall, UINT nIcons);
 
     DWORD_PTR SHGetFileInfo(String pszPath, int dwFileAttributes, SHFILEINFO psfi, int cbFileInfo, int uFlags);
+
     public static final int SHGFI_ICON = 0x000000100;
+
     public static final int SHGFI_SMALLICON = 0x000000001;
 }

@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import java.awt.Composite;
@@ -47,19 +48,33 @@ public final class BlendComposite implements Composite {
         ALPHA,
         ERASE
     }
+
     public static final BlendComposite Alpha = new BlendComposite(BlendingMode.ALPHA);
+
     public static final BlendComposite Erase = new BlendComposite(BlendingMode.ERASE);
+
     public static final BlendComposite Invert = new BlendComposite(BlendingMode.INVERT);
+
     public static final BlendComposite Multiply = new BlendComposite(BlendingMode.MULTIPLY);
+
     public static final BlendComposite Screen = new BlendComposite(BlendingMode.SCREEN);
+
     public static final BlendComposite Darken = new BlendComposite(BlendingMode.DARKEN);
+
     public static final BlendComposite Lighten = new BlendComposite(BlendingMode.LIGHTEN);
+
     public static final BlendComposite Overlay = new BlendComposite(BlendingMode.OVERLAY);
+
     public static final BlendComposite HardLight = new BlendComposite(BlendingMode.HARD_LIGHT);
+
     public static final BlendComposite Difference = new BlendComposite(BlendingMode.DIFFERENCE);
+
     public static final BlendComposite Add = new BlendComposite(BlendingMode.ADD);
+
     public static final BlendComposite Subtract = new BlendComposite(BlendingMode.SUBTRACT);
+
     private final float alpha;
+
     private final BlendingMode mode;
 
     private BlendComposite(BlendingMode mode) {
@@ -140,6 +155,7 @@ public final class BlendComposite implements Composite {
     private static final class BlendingContext implements CompositeContext {
 
         private final Blender blender;
+
         private final BlendComposite composite;
 
         private BlendingContext(BlendComposite composite) {

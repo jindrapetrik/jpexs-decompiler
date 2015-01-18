@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -161,6 +162,7 @@ public class ActionScriptParser {
     }
 
     private long uniqLast = 0;
+
     private final boolean debugMode = false;
 
     private String uniqId() {
@@ -829,7 +831,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem gtpFrame = expression(registerVars, inFunction, inMethod, true, variables);
                 s = lex();
-                if (s.type == SymbolType.COMMA) { //Handle scene?                    
+                if (s.type == SymbolType.COMMA) { //Handle scene?
                     s = lex();
                     gtpFrame = expression(registerVars, inFunction, inMethod, true, variables);
                 } else {
@@ -1212,7 +1214,7 @@ public class ActionScriptParser {
             System.out.println("/command");
         }
         lexer.removeListener(buf);
-        if (ret == null) {  //can be popped expression            
+        if (ret == null) {  //can be popped expression
             buf.pushAllBack(lexer);
             ret = expression(registerVars, inFunction, inMethod, true, variables);
         }
@@ -1741,7 +1743,9 @@ public class ActionScriptParser {
         }
         return new DirectValueActionItem(null, 0, new ConstantIndex(index), constantPool);
     }
+
     private ActionScriptLexer lexer = null;
+
     private List<String> constantPool;
 
     public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException {

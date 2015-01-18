@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
@@ -25,43 +26,81 @@ import java.io.OutputStream;
 public class GFxOutputStream extends OutputStream {
 
     public static final int MaxUInt6 = (1 << 6) - 1;
+
     public static final int MaxUInt7 = (1 << 7) - 1;
+
     public static final int MaxUInt14 = (1 << 14) - 1;
+
     public static final int MaxUInt22 = (1 << 22) - 1;
+
     public static final int MaxUInt30 = (1 << 30) - 1;
+
     public static final int MinSInt5 = -(1 << 4);
+
     public static final int MaxSInt5 = (1 << 4) - 1;
+
     public static final int MinSInt6 = -(1 << 5);
+
     public static final int MaxSInt6 = (1 << 5) - 1;
+
     public static final int MinSInt7 = -(1 << 6);
+
     public static final int MaxSInt7 = (1 << 6) - 1;
+
     public static final int MinSInt8 = -(1 << 7);
+
     public static final int MaxSInt8 = (1 << 7) - 1;
+
     public static final int MinSInt9 = -(1 << 8);
+
     public static final int MaxSInt9 = (1 << 8) - 1;
+
     public static final int MinSInt10 = -(1 << 9);
+
     public static final int MaxSInt10 = (1 << 9) - 1;
+
     public static final int MinSInt11 = -(1 << 10);
+
     public static final int MaxSInt11 = (1 << 10) - 1;
+
     public static final int MinSInt12 = -(1 << 11);
+
     public static final int MaxSInt12 = (1 << 11) - 1;
+
     public static final int MinSInt13 = -(1 << 12);
+
     public static final int MaxSInt13 = (1 << 12) - 1;
+
     public static final int MinSInt14 = -(1 << 13);
+
     public static final int MaxSInt14 = (1 << 13) - 1;
+
     public static final int MinSInt15 = -(1 << 14);
+
     public static final int MaxSInt15 = (1 << 14) - 1;
+
     public static final int MinSInt17 = -(1 << 16);
+
     public static final int MaxSInt17 = (1 << 16) - 1;
+
     public static final int MinSInt18 = -(1 << 17);
+
     public static final int MaxSInt18 = (1 << 17) - 1;
+
     public static final int MinSInt19 = -(1 << 18);
+
     public static final int MaxSInt19 = (1 << 18) - 1;
+
     public static final int MinSInt20 = -(1 << 19);
+
     public static final int MaxSInt20 = (1 << 19) - 1;
+
     public static final int MinSInt22 = -(1 << 21);
+
     public static final int MaxSInt22 = (1 << 21) - 1;
+
     private final OutputStream os;
+
     private long pos = 0;
 
     public GFxOutputStream(OutputStream os) {

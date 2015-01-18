@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -53,21 +53,37 @@ import javax.swing.tree.TreePath;
 public class TagTreeModel implements TreeModel {
 
     public static final String FOLDER_SHAPES = "shapes";
+
     public static final String FOLDER_MORPHSHAPES = "morphshapes";
+
     public static final String FOLDER_SPRITES = "sprites";
+
     public static final String FOLDER_TEXTS = "texts";
+
     public static final String FOLDER_IMAGES = "images";
+
     public static final String FOLDER_MOVIES = "movies";
+
     public static final String FOLDER_SOUNDS = "sounds";
+
     public static final String FOLDER_BUTTONS = "buttons";
+
     public static final String FOLDER_FONTS = "fonts";
+
     public static final String FOLDER_BINARY_DATA = "binaryData";
+
     public static final String FOLDER_FRAMES = "frames";
+
     public static final String FOLDER_OTHERS = "others";
+
     public static final String FOLDER_SCRIPTS = "scripts";
+
     private final TagTreeRoot root = new TagTreeRoot();
+
     private final List<SWFContainerItem> swfs;
+
     private final Map<SWF, List<TreeItem>> swfFolders;
+
     private final boolean addAllFolders;
 
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {

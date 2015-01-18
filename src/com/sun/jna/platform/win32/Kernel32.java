@@ -1,5 +1,5 @@
 /* Copyright (c) 2007 Timothy Wall, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -81,6 +81,7 @@ public interface Kernel32 extends WinNT {
             WinBase.OVERLAPPED lpOverlapped);
 
     boolean ReadFile(HANDLE hFile, byte[] lpBuffer, int nNumberOfBytesToRead, IntByReference lpNumberOfBytesRead, WinBase.OVERLAPPED lpOverlapped);
+
     //
     // Define the NamedPipe definitions
     //
@@ -88,38 +89,59 @@ public interface Kernel32 extends WinNT {
     // Define the dwOpenMode values for CreateNamedPipe
     //
     public static final int PIPE_ACCESS_INBOUND = 0x00000001;
+
     public static final int PIPE_ACCESS_OUTBOUND = 0x00000002;
+
     public static final int PIPE_ACCESS_DUPLEX = 0x00000003;
+
     //
     // Define the Named Pipe End flags for GetNamedPipeInfo
     //
     public static final int PIPE_CLIENT_END = 0x00000000;
+
     public static final int PIPE_SERVER_END = 0x00000001;
+
     //
     // Define the dwPipeMode values for CreateNamedPipe
     //
     public static final int PIPE_WAIT = 0x00000000;
+
     public static final int PIPE_NOWAIT = 0x00000001;
+
     public static final int PIPE_READMODE_BYTE = 0x00000000;
+
     public static final int PIPE_READMODE_MESSAGE = 0x00000002;
+
     public static final int PIPE_TYPE_BYTE = 0x00000000;
+
     public static final int PIPE_TYPE_MESSAGE = 0x00000004;
+
     public static final int PIPE_ACCEPT_REMOTE_CLIENTS = 0x00000000;
+
     public static final int PIPE_REJECT_REMOTE_CLIENTS = 0x00000008;
+
     //
     // Define the well known values for CreateNamedPipe nMaxInstances
     //
     public static final int PIPE_UNLIMITED_INSTANCES = 255;
+
     //
     // Define the values for process priority
     //
     public static final int ABOVE_NORMAL_PRIORITY_CLASS = 0x00008000;
+
     public static final int BELOW_NORMAL_PRIORITY_CLASS = 0x00004000;
+
     public static final int HIGH_PRIORITY_CLASS = 0x00000080;
+
     public static final int IDLE_PRIORITY_CLASS = 0x00000040;
+
     public static final int NORMAL_PRIORITY_CLASS = 0x00000020;
+
     public static final int PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+
     public static final int PROCESS_MODE_BACKGROUND_END = 0x00200000;
+
     public static final int REALTIME_PRIORITY_CLASS = 0x00000100;
 
 //	__out
@@ -206,9 +228,13 @@ public interface Kernel32 extends WinNT {
      * information.
      */
     void GetSystemInfo(SYSTEM_INFO lpSystemInfo);
+
     public static final int PROCESS_VM_READ = 0x0010;
+
     public static final int PROCESS_VM_WRITE = 0x0020;
+
     public static final int PROCESS_QUERY_INFORMATION = 0x0400;
+
     public static final int PROCESS_VM_OPERATION = 0x0008;
 
     SIZE_T VirtualQueryEx(HANDLE hProcess, Pointer lpAddress, MEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength);
@@ -221,11 +247,17 @@ public interface Kernel32 extends WinNT {
      * @return The return value is the calling thread's last-error code value.
      */
     int GetLastError();
+
     public static int MEM_COMMIT = 0x1000;
+
     public static int MEM_FREE = 0x10000;
+
     public static int MEM_RESERVE = 0x2000;
+
     public static int MEM_IMAGE = 0x1000000;
+
     public static int MEM_MAPPED = 0x40000;
+
     public static int MEM_PRIVATE = 0x20000;
 
     boolean ReadProcessMemory(HANDLE hProcess, Pointer inBaseAddress, Pointer outputBuffer, NativeLong nSize, NativeLongByReference outNumberOfBytesRead);
@@ -290,6 +322,7 @@ public interface Kernel32 extends WinNT {
      * the snapshot does not contain process information.
      */
     boolean Process32Next(HANDLE hSnapshot, PROCESSENTRY32 lppe);
+
     public static int TH32CS_SNAPPROCESS = 0x00000002;
 
     //Needed for some Windows 7 Versions
@@ -301,6 +334,7 @@ public interface Kernel32 extends WinNT {
     boolean VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, int flNewProtect, IntByReference lpflOldProtect);
 
     public static final int LOCALE_SISO3166CTRYNAME = 90;
+
     public static final int LOCALE_SISO639LANGNAME = 89;
 
     int GetLocaleInfo(int Locale, int LCType, char[] lpLCData, int cchData);

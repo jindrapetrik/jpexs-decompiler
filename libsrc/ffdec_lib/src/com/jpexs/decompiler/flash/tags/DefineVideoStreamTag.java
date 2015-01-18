@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -62,9 +63,13 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     public int codecID;
 
     public static final int CODEC_SORENSON_H263 = 2;
+
     public static final int CODEC_SCREEN_VIDEO = 3;
+
     public static final int CODEC_VP6 = 4;
+
     public static final int CODEC_VP6_ALPHA = 5;
+
     public static final int ID = 60;
 
     @Override

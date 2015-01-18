@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -66,40 +66,67 @@ import javax.swing.event.AncestorListener;
 public class PlayerControls extends JPanel implements ActionListener {
 
     private static final String ACTION_PAUSE = "PAUSE";
+
     private static final String ACTION_STOP = "STOP";
+
     private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+
     private static final String ACTION_ZOOMIN = "ZOOMIN";
+
     private static final String ACTION_ZOOMOUT = "ZOOMOUT";
+
     private static final String ACTION_ZOOMFIT = "ZOOMFIT";
+
     private static final String ACTION_ZOOMNONE = "ZOOMNONE";
+
     private static final String ACTION_SNAPSHOT = "SNAPSHOT";
+
     private static final String ACTION_NEXTFRAME = "NEXTFRAME";
+
     private static final String ACTION_PREVFRAME = "PREVFRAME";
+
     private static final String ACTION_GOTOFRAME = "SELECTFRAME";
 
     private final JButton pauseButton;
+
     private boolean paused = false;
+
     private MediaDisplay display;
+
     private JProgressBar progress;
+
     private final Timer timer;
+
     private final JLabel timeLabel;
+
     private final JLabel frameLabel;
+
     private final JLabel totalTimeLabel;
+
     private final JLabel totalFrameLabel;
+
     private static final Icon pauseIcon = View.getIcon("pause16");
+
     private static final Icon playIcon = View.getIcon("play16");
 
     private final JLabel percentLabel = new JLabel("100%");
+
     private final JPanel zoomPanel;
+
     private final JPanel graphicControls;
+
     private final JPanel playbackControls;
+
     private final JPanel frameControls;
+
     private boolean zoomToFit = false;
+
     private double realZoom = 1.0;
 
     private final JButton zoomFitButton;
 
     public static final int ZOOM_DECADE_STEPS = 10;
+
     public static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
 
     private static String underline(String s) {
@@ -107,6 +134,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     }
 
     private static Font underlinedFont = null;
+
     private static Font notUnderlinedFont = null;
 
     static {

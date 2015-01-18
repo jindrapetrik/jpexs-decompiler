@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -33,14 +34,23 @@ import java.util.TreeMap;
 public class Frame implements TreeItem {
 
     public final int frame;
+
     public TreeMap<Integer, DepthState> layers = new TreeMap<>();
+
     public RGB backgroundColor = new RGBA(0, 0, 0, 0);
+
     public Timeline timeline;
+
     public List<Integer> sounds = new ArrayList<>();
+
     public List<String> soundClasses = new ArrayList<>();
+
     public List<DoActionTag> actions = new ArrayList<>();
+
     public List<Tag> innerTags = new ArrayList<>();
+
     public ShowFrameTag showFrameTag = null; // can be null for the last frame
+
     public boolean layersChanged;
 
     public Frame(Timeline timeline, int frame) {

@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -34,87 +35,106 @@ public class CLIPEVENTFLAGS implements Serializable {
      * Key up event
      */
     public boolean clipEventKeyUp;
+
     /**
      * Key down event
      */
     public boolean clipEventKeyDown;
+
     /**
      * Mouse up event
      */
     public boolean clipEventMouseUp;
+
     /**
      * Mouse down event
      */
     public boolean clipEventMouseDown;
+
     /**
      * Mouse move event
      */
     public boolean clipEventMouseMove;
+
     /**
      * Clip unload event
      */
     public boolean clipEventUnload;
+
     /**
      * Frame event
      */
     public boolean clipEventEnterFrame;
+
     /**
      * Clip load event
      */
     public boolean clipEventLoad;
+
     /**
      * @since SWF 6 Mouse drag over event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventDragOver;
+
     /**
      * @since SWF 6 Mouse rollout event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventRollOut;
+
     /**
      * @since SWF 6 Mouse rollover event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventRollOver;
+
     /**
      * @since SWF 6 Mouse release outside event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventReleaseOutside;
+
     /**
      * @since SWF 6 Mouse release inside event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventRelease;
+
     /**
      * @since SWF 6 Mouse press event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventPress;
+
     /**
      * @since SWF 6 Initialize event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventInitialize;
+
     /**
      * Data received event
      */
     public boolean clipEventData;
+
     @Reserved
     @SWFType(value = BasicType.UB, count = 5)
     @Conditional(minSwfVersion = 6)
     public int reserved;
+
     /**
      * @since SWF 7 Construct event
      */
     @Conditional(minSwfVersion = 7) //in v 6 always 0
     public boolean clipEventConstruct = false;
+
     /**
      * @since SWF 6 Key press event
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventKeyPress = false;
+
     /**
      * @since SWF 6 Mouse drag out event
      */

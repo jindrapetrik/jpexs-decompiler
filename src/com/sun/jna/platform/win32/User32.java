@@ -1,5 +1,5 @@
 /* Copyright (c) 2007, 2013 Timothy Wall, Markus Karg, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -39,30 +39,37 @@ public interface User32 extends StdCallLibrary, WinUser {
      */
     User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class,
             W32APIOptions.DEFAULT_OPTIONS);
+
     /**
      * Handle for message-only window.
      */
     public static final HWND HWND_MESSAGE = new HWND(Pointer.createConstant(-3));
+
     /**
      * The cs globalclass.
      */
     int CS_GLOBALCLASS = 0x4000;
+
     /**
      * The ws ex topmost.
      */
     int WS_EX_TOPMOST = 0x00000008;
+
     /**
      * The ws overlapped.
      */
     int WS_OVERLAPPED = 0x00000000;
+
     /**
      * The hRecipient parameter is a window handle.
      */
     int DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
+
     /**
      * The hRecipient parameter is a service status handle.
      */
     int DEVICE_NOTIFY_SERVICE_HANDLE = 0x00000001;
+
     /**
      * The device notify all interface classes.
      */
@@ -1508,10 +1515,15 @@ public interface User32 extends StdCallLibrary, WinUser {
     boolean DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, int diFlags);
 
     HWND GetDesktopWindow();
+
     public static final int DI_MASK = 1;
+
     public static final int DI_IMAGE = 2;
+
     public static final int DI_NORMAL = 3;
+
     public static final int DI_COMPAT = 4;
+
     public static final int DI_DEFAULTSIZE = 8;
 
     int FillRect(HDC hDC, RECT lprc, HANDLE hbr);

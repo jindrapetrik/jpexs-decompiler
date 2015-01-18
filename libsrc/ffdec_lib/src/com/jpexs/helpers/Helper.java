@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -60,6 +60,7 @@ import javax.xml.bind.DatatypeConverter;
 public class Helper {
 
     public static String newLine = System.getProperty("line.separator");
+
     public static String decompilationErrorAdd = null;
 
     /**
@@ -217,8 +218,8 @@ public class Helper {
     }
 
     public static String getValidHtmlId(String text) {
-        // ID and NAME tokens must begin with a letter ([A-Za-z]) and 
-        // may be followed by any number of letters, digits ([0-9]), 
+        // ID and NAME tokens must begin with a letter ([A-Za-z]) and
+        // may be followed by any number of letters, digits ([0-9]),
         // hyphens ("-"), underscores ("_"), colons (":"), and periods (".").
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
@@ -236,6 +237,7 @@ public class Helper {
     }
 
     private final static String SPACES12 = "            ";
+
     private final static String ZEROS8 = "00000000";
 
     public static String formatHex(int value, int width) {
@@ -547,7 +549,9 @@ public class Helper {
         }
         return f;
     }
+
     private static final BitSet fileNameInvalidChars;
+
     private static final List<String> invalidFilenamesParts;
 
     static {
@@ -877,10 +881,10 @@ public class Helper {
                 sb.append(ch);
             }
         }
-        
+
         return sb.toString();
     }
-    
+
     public static Shape imageToShape(BufferedImage image) {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
@@ -939,5 +943,4 @@ public class Helper {
         String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
-
 }

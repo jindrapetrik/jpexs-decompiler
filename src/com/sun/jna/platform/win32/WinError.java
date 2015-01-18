@@ -1,14 +1,14 @@
 /* Copyright (c) 2011 Daniel Doubrovkine, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.  
+ * Lesser General Public License for more details.
  */
 package com.sun.jna.platform.win32;
 
@@ -51,50 +51,95 @@ public interface WinError {
     // Define the facility codes
     //
     short FACILITY_WINRM = 51;
+
     short FACILITY_WINDOWSUPDATE = 36;
+
     short FACILITY_WINDOWS_DEFENDER = 80;
+
     short FACILITY_WINDOWS_CE = 24;
+
     short FACILITY_WINDOWS = 8;
+
     short FACILITY_URT = 19;
+
     short FACILITY_UMI = 22;
+
     short FACILITY_TPM_SOFTWARE = 41;
+
     short FACILITY_TPM_SERVICES = 40;
+
     short FACILITY_SXS = 23;
+
     short FACILITY_STORAGE = 3;
+
     short FACILITY_STATE_MANAGEMENT = 34;
+
     short FACILITY_SSPI = 9;
+
     short FACILITY_SCARD = 16;
+
     short FACILITY_SHELL = 39;
+
     short FACILITY_SETUPAPI = 15;
+
     short FACILITY_SECURITY = 9;
+
     short FACILITY_RPC = 1;
+
     short FACILITY_PLA = 48;
+
     short FACILITY_WIN32 = 7;
+
     short FACILITY_CONTROL = 10;
+
     short FACILITY_NULL = 0;
+
     short FACILITY_NDIS = 52;
+
     short FACILITY_METADIRECTORY = 35;
+
     short FACILITY_MSMQ = 14;
+
     short FACILITY_MEDIASERVER = 13;
+
     short FACILITY_INTERNET = 12;
+
     short FACILITY_ITF = 4;
+
     short FACILITY_USERMODE_HYPERVISOR = 53;
+
     short FACILITY_HTTP = 25;
+
     short FACILITY_GRAPHICS = 38;
+
     short FACILITY_FWP = 50;
+
     short FACILITY_FVE = 49;
+
     short FACILITY_USERMODE_FILTER_MANAGER = 31;
+
     short FACILITY_DPLAY = 21;
+
     short FACILITY_DISPATCH = 2;
+
     short FACILITY_DIRECTORYSERVICE = 37;
+
     short FACILITY_CONFIGURATION = 33;
+
     short FACILITY_COMPLUS = 17;
+
     short FACILITY_USERMODE_COMMONLOG = 26;
+
     short FACILITY_CMI = 54;
+
     short FACILITY_CERT = 11;
+
     short FACILITY_BACKGROUNDCOPY = 32;
+
     short FACILITY_ACS = 20;
+
     short FACILITY_AAF = 18;
+
     //
     // Define the severity codes
     //
@@ -106,8 +151,11 @@ public interface WinError {
     // The operation completed successfully.
     //
     int ERROR_SUCCESS = 0;
+
     int NO_ERROR = 0; // dderror
+
     int SEC_E_OK = 0;
+
     //
     // MessageId: ERROR_INVALID_FUNCTION
     //
@@ -123,7 +171,9 @@ public interface WinError {
     //
     // The system cannot find the file specified.
     //
+
     int ERROR_FILE_NOT_FOUND = 2;
+
     //
     // MessageId: ERROR_PATH_NOT_FOUND
     //
@@ -132,6 +182,7 @@ public interface WinError {
     // The system cannot find the path specified.
     //
     int ERROR_PATH_NOT_FOUND = 3;
+
     //
     // MessageId: ERROR_TOO_MANY_OPEN_FILES
     //
@@ -140,6 +191,7 @@ public interface WinError {
     // The system cannot open the file.
     //
     int ERROR_TOO_MANY_OPEN_FILES = 4;
+
     //
     // MessageId: ERROR_ACCESS_DENIED
     //
@@ -148,6 +200,7 @@ public interface WinError {
     // Access is denied.
     //
     int ERROR_ACCESS_DENIED = 5;
+
     //
     // MessageId: ERROR_INVALID_HANDLE
     //
@@ -156,6 +209,7 @@ public interface WinError {
     // The handle is invalid.
     //
     int ERROR_INVALID_HANDLE = 6;
+
     //
     // MessageId: ERROR_ARENA_TRASHED
     //
@@ -164,6 +218,7 @@ public interface WinError {
     // The storage control blocks were destroyed.
     //
     int ERROR_ARENA_TRASHED = 7;
+
     //
     // MessageId: ERROR_NOT_ENOUGH_MEMORY
     //
@@ -179,7 +234,9 @@ public interface WinError {
     //
     // The storage control block address is invalid.
     //
+
     int ERROR_INVALID_BLOCK = 9;
+
     //
     // MessageId: ERROR_BAD_ENVIRONMENT
     //
@@ -188,6 +245,7 @@ public interface WinError {
     // The environment is incorrect.
     //
     int ERROR_BAD_ENVIRONMENT = 10;
+
     //
     // MessageId: ERROR_BAD_FORMAT
     //
@@ -196,6 +254,7 @@ public interface WinError {
     // An attempt was made to load a program with an incorrect format.
     //
     int ERROR_BAD_FORMAT = 11;
+
     //
     // MessageId: ERROR_INVALID_ACCESS
     //
@@ -204,6 +263,7 @@ public interface WinError {
     // The access code is invalid.
     //
     int ERROR_INVALID_ACCESS = 12;
+
     //
     // MessageId: ERROR_INVALID_DATA
     //
@@ -212,6 +272,7 @@ public interface WinError {
     // The data is invalid.
     //
     int ERROR_INVALID_DATA = 13;
+
     //
     // MessageId: ERROR_OUTOFMEMORY
     //
@@ -220,6 +281,7 @@ public interface WinError {
     // Not enough storage is available to complete this operation.
     //
     int ERROR_OUTOFMEMORY = 14;
+
     //
     // MessageId: ERROR_INVALID_DRIVE
     //
@@ -228,6 +290,7 @@ public interface WinError {
     // The system cannot find the drive specified.
     //
     int ERROR_INVALID_DRIVE = 15;
+
     //
     // MessageId: ERROR_CURRENT_DIRECTORY
     //
@@ -236,6 +299,7 @@ public interface WinError {
     // The directory cannot be removed.
     //
     int ERROR_CURRENT_DIRECTORY = 16;
+
     //
     // MessageId: ERROR_NOT_SAME_DEVICE
     //
@@ -244,6 +308,7 @@ public interface WinError {
     // The system cannot move the file to a different disk drive.
     //
     int ERROR_NOT_SAME_DEVICE = 17;
+
     //
     // MessageId: ERROR_NO_MORE_FILES
     //
@@ -252,6 +317,7 @@ public interface WinError {
     // There are no more files.
     //
     int ERROR_NO_MORE_FILES = 18;
+
     //
     // MessageId: ERROR_WRITE_PROTECT
     //
@@ -260,6 +326,7 @@ public interface WinError {
     // The media is write protected.
     //
     int ERROR_WRITE_PROTECT = 19;
+
     //
     // MessageId: ERROR_BAD_UNIT
     //
@@ -268,6 +335,7 @@ public interface WinError {
     // The system cannot find the device specified.
     //
     int ERROR_BAD_UNIT = 20;
+
     //
     // MessageId: ERROR_NOT_READY
     //
@@ -276,6 +344,7 @@ public interface WinError {
     // The device is not ready.
     //
     int ERROR_NOT_READY = 21;
+
     //
     // MessageId: ERROR_BAD_COMMAND
     //
@@ -284,6 +353,7 @@ public interface WinError {
     // The device does not recognize the command.
     //
     int ERROR_BAD_COMMAND = 22;
+
     //
     // MessageId: ERROR_CRC
     //
@@ -292,6 +362,7 @@ public interface WinError {
     // Data error (cyclic redundancy check).
     //
     int ERROR_CRC = 23;
+
     //
     // MessageId: ERROR_BAD_LENGTH
     //
@@ -300,6 +371,7 @@ public interface WinError {
     // The program issued a command but the command length is incorrect.
     //
     int ERROR_BAD_LENGTH = 24;
+
     //
     // MessageId: ERROR_SEEK
     //
@@ -308,6 +380,7 @@ public interface WinError {
     // The drive cannot locate a specific area or track on the disk.
     //
     int ERROR_SEEK = 25;
+
     //
     // MessageId: ERROR_NOT_DOS_DISK
     //
@@ -316,6 +389,7 @@ public interface WinError {
     // The specified disk or diskette cannot be accessed.
     //
     int ERROR_NOT_DOS_DISK = 26;
+
     //
     // MessageId: ERROR_SECTOR_NOT_FOUND
     //
@@ -324,6 +398,7 @@ public interface WinError {
     // The drive cannot find the sector requested.
     //
     int ERROR_SECTOR_NOT_FOUND = 27;
+
     //
     // MessageId: ERROR_OUT_OF_PAPER
     //
@@ -332,6 +407,7 @@ public interface WinError {
     // The printer is out of paper.
     //
     int ERROR_OUT_OF_PAPER = 28;
+
     //
     // MessageId: ERROR_WRITE_FAULT
     //
@@ -340,6 +416,7 @@ public interface WinError {
     // The system cannot write to the specified device.
     //
     int ERROR_WRITE_FAULT = 29;
+
     //
     // MessageId: ERROR_READ_FAULT
     //
@@ -348,6 +425,7 @@ public interface WinError {
     // The system cannot read from the specified device.
     //
     int ERROR_READ_FAULT = 30;
+
     //
     // MessageId: ERROR_GEN_FAILURE
     //
@@ -356,6 +434,7 @@ public interface WinError {
     // A device attached to the system is not functioning.
     //
     int ERROR_GEN_FAILURE = 31;
+
     //
     // MessageId: ERROR_SHARING_VIOLATION
     //
@@ -365,6 +444,7 @@ public interface WinError {
     // process.
     //
     int ERROR_SHARING_VIOLATION = 32;
+
     //
     // MessageId: ERROR_LOCK_VIOLATION
     //
@@ -374,6 +454,7 @@ public interface WinError {
     // portion of the file.
     //
     int ERROR_LOCK_VIOLATION = 33;
+
     //
     // MessageId: ERROR_WRONG_DISK
     //
@@ -383,6 +464,7 @@ public interface WinError {
     // Insert %2 (Volume Serial Number: %3) into drive %1.
     //
     int ERROR_WRONG_DISK = 34;
+
     //
     // MessageId: ERROR_SHARING_BUFFER_EXCEEDED
     //
@@ -391,6 +473,7 @@ public interface WinError {
     // Too many files opened for sharing.
     //
     int ERROR_SHARING_BUFFER_EXCEEDED = 36;
+
     //
     // MessageId: ERROR_HANDLE_EOF
     //
@@ -399,6 +482,7 @@ public interface WinError {
     // Reached the end of the file.
     //
     int ERROR_HANDLE_EOF = 38;
+
     //
     // MessageId: ERROR_HANDLE_DISK_FULL
     //
@@ -407,6 +491,7 @@ public interface WinError {
     // The disk is full.
     //
     int ERROR_HANDLE_DISK_FULL = 39;
+
     //
     // MessageId: ERROR_NOT_SUPPORTED
     //
@@ -415,6 +500,7 @@ public interface WinError {
     // The request is not supported.
     //
     int ERROR_NOT_SUPPORTED = 50;
+
     //
     // MessageId: ERROR_REM_NOT_LIST
     //
@@ -426,6 +512,7 @@ public interface WinError {
     // administrator.
     //
     int ERROR_REM_NOT_LIST = 51;
+
     //
     // MessageId: ERROR_DUP_NAME
     //
@@ -437,6 +524,7 @@ public interface WinError {
     // name.
     //
     int ERROR_DUP_NAME = 52;
+
     //
     // MessageId: ERROR_BAD_NETPATH
     //
@@ -445,6 +533,7 @@ public interface WinError {
     // The network path was not found.
     //
     int ERROR_BAD_NETPATH = 53;
+
     //
     // MessageId: ERROR_NETWORK_BUSY
     //
@@ -453,6 +542,7 @@ public interface WinError {
     // The network is busy.
     //
     int ERROR_NETWORK_BUSY = 54;
+
     //
     // MessageId: ERROR_DEV_NOT_EXIST
     //
@@ -468,7 +558,9 @@ public interface WinError {
     //
     // The network BIOS command limit has been reached.
     //
+
     int ERROR_TOO_MANY_CMDS = 56;
+
     //
     // MessageId: ERROR_ADAP_HDW_ERR
     //
@@ -477,6 +569,7 @@ public interface WinError {
     // A network adapter hardware error occurred.
     //
     int ERROR_ADAP_HDW_ERR = 57;
+
     //
     // MessageId: ERROR_BAD_NET_RESP
     //
@@ -485,6 +578,7 @@ public interface WinError {
     // The specified server cannot perform the requested operation.
     //
     int ERROR_BAD_NET_RESP = 58;
+
     //
     // MessageId: ERROR_UNEXP_NET_ERR
     //
@@ -493,6 +587,7 @@ public interface WinError {
     // An unexpected network error occurred.
     //
     int ERROR_UNEXP_NET_ERR = 59;
+
     //
     // MessageId: ERROR_BAD_REM_ADAP
     //
@@ -501,6 +596,7 @@ public interface WinError {
     // The remote adapter is not compatible.
     //
     int ERROR_BAD_REM_ADAP = 60;
+
     //
     // MessageId: ERROR_PRINTQ_FULL
     //
@@ -509,6 +605,7 @@ public interface WinError {
     // The printer queue is full.
     //
     int ERROR_PRINTQ_FULL = 61;
+
     //
     // MessageId: ERROR_NO_SPOOL_SPACE
     //
@@ -518,6 +615,7 @@ public interface WinError {
     // server.
     //
     int ERROR_NO_SPOOL_SPACE = 62;
+
     //
     // MessageId: ERROR_PRINT_CANCELLED
     //
@@ -526,6 +624,7 @@ public interface WinError {
     // Your file waiting to be printed was deleted.
     //
     int ERROR_PRINT_CANCELLED = 63;
+
     //
     // MessageId: ERROR_NETNAME_DELETED
     //
@@ -534,6 +633,7 @@ public interface WinError {
     // The specified network name is no longer available.
     //
     int ERROR_NETNAME_DELETED = 64;
+
     //
     // MessageId: ERROR_NETWORK_ACCESS_DENIED
     //
@@ -542,6 +642,7 @@ public interface WinError {
     // Network access is denied.
     //
     int ERROR_NETWORK_ACCESS_DENIED = 65;
+
     //
     // MessageId: ERROR_BAD_DEV_TYPE
     //
@@ -550,6 +651,7 @@ public interface WinError {
     // The network resource type is not correct.
     //
     int ERROR_BAD_DEV_TYPE = 66;
+
     //
     // MessageId: ERROR_BAD_NET_NAME
     //
@@ -558,6 +660,7 @@ public interface WinError {
     // The network name cannot be found.
     //
     int ERROR_BAD_NET_NAME = 67;
+
     //
     // MessageId: ERROR_TOO_MANY_NAMES
     //
@@ -566,6 +669,7 @@ public interface WinError {
     // The name limit for the local computer network adapter card was exceeded.
     //
     int ERROR_TOO_MANY_NAMES = 68;
+
     //
     // MessageId: ERROR_TOO_MANY_SESS
     //
@@ -574,6 +678,7 @@ public interface WinError {
     // The network BIOS session limit was exceeded.
     //
     int ERROR_TOO_MANY_SESS = 69;
+
     //
     // MessageId: ERROR_SHARING_PAUSED
     //
@@ -582,6 +687,7 @@ public interface WinError {
     // The remote server has been paused or is in the process of being started.
     //
     int ERROR_SHARING_PAUSED = 70;
+
     //
     // MessageId: ERROR_REQ_NOT_ACCEP
     //
@@ -591,6 +697,7 @@ public interface WinError {
     // because there are already as many connections as the computer can accept.
     //
     int ERROR_REQ_NOT_ACCEP = 71;
+
     //
     // MessageId: ERROR_REDIR_PAUSED
     //
@@ -599,6 +706,7 @@ public interface WinError {
     // The specified printer or disk device has been paused.
     //
     int ERROR_REDIR_PAUSED = 72;
+
     //
     // MessageId: ERROR_FILE_EXISTS
     //
@@ -607,6 +715,7 @@ public interface WinError {
     // The file exists.
     //
     int ERROR_FILE_EXISTS = 80;
+
     //
     // MessageId: ERROR_CANNOT_MAKE
     //
@@ -615,6 +724,7 @@ public interface WinError {
     // The directory or file cannot be created.
     //
     int ERROR_CANNOT_MAKE = 82;
+
     //
     // MessageId: ERROR_FAIL_I24
     //
@@ -623,6 +733,7 @@ public interface WinError {
     // Fail on INT=24.
     //
     int ERROR_FAIL_I24 = 83;
+
     //
     // MessageId: ERROR_OUT_OF_STRUCTURES
     //
@@ -631,6 +742,7 @@ public interface WinError {
     // Storage to process this request is not available.
     //
     int ERROR_OUT_OF_STRUCTURES = 84;
+
     //
     // MessageId: ERROR_ALREADY_ASSIGNED
     //
@@ -639,6 +751,7 @@ public interface WinError {
     // The local device name is already in use.
     //
     int ERROR_ALREADY_ASSIGNED = 85;
+
     //
     // MessageId: ERROR_INVALID_PASSWORD
     //
@@ -647,6 +760,7 @@ public interface WinError {
     // The specified network password is not correct.
     //
     int ERROR_INVALID_PASSWORD = 86;
+
     //
     // MessageId: ERROR_INVALID_PARAMETER
     //
@@ -662,7 +776,9 @@ public interface WinError {
     //
     // A write fault occurred on the network.
     //
+
     int ERROR_NET_WRITE_FAULT = 88;
+
     //
     // MessageId: ERROR_NO_PROC_SLOTS
     //
@@ -671,6 +787,7 @@ public interface WinError {
     // The system cannot start another process at this time.
     //
     int ERROR_NO_PROC_SLOTS = 89;
+
     //
     // MessageId: ERROR_TOO_MANY_SEMAPHORES
     //
@@ -679,6 +796,7 @@ public interface WinError {
     // Cannot create another system semaphore.
     //
     int ERROR_TOO_MANY_SEMAPHORES = 100;
+
     //
     // MessageId: ERROR_EXCL_SEM_ALREADY_OWNED
     //
@@ -687,6 +805,7 @@ public interface WinError {
     // The exclusive semaphore is owned by another process.
     //
     int ERROR_EXCL_SEM_ALREADY_OWNED = 101;
+
     //
     // MessageId: ERROR_SEM_IS_SET
     //
@@ -695,6 +814,7 @@ public interface WinError {
     // The semaphore is set and cannot be closed.
     //
     int ERROR_SEM_IS_SET = 102;
+
     //
     // MessageId: ERROR_TOO_MANY_SEM_REQUESTS
     //
@@ -703,6 +823,7 @@ public interface WinError {
     // The semaphore cannot be set again.
     //
     int ERROR_TOO_MANY_SEM_REQUESTS = 103;
+
     //
     // MessageId: ERROR_INVALID_AT_INTERRUPT_TIME
     //
@@ -711,6 +832,7 @@ public interface WinError {
     // Cannot request exclusive semaphores at interrupt time.
     //
     int ERROR_INVALID_AT_INTERRUPT_TIME = 104;
+
     //
     // MessageId: ERROR_SEM_OWNER_DIED
     //
@@ -719,6 +841,7 @@ public interface WinError {
     // The previous ownership of this semaphore has ended.
     //
     int ERROR_SEM_OWNER_DIED = 105;
+
     //
     // MessageId: ERROR_SEM_USER_LIMIT
     //
@@ -727,6 +850,7 @@ public interface WinError {
     // Insert the diskette for drive %1.
     //
     int ERROR_SEM_USER_LIMIT = 106;
+
     //
     // MessageId: ERROR_DISK_CHANGE
     //
@@ -735,6 +859,7 @@ public interface WinError {
     // The program stopped because an alternate diskette was not inserted.
     //
     int ERROR_DISK_CHANGE = 107;
+
     //
     // MessageId: ERROR_DRIVE_LOCKED
     //
@@ -743,6 +868,7 @@ public interface WinError {
     // The disk is in use or locked by another process.
     //
     int ERROR_DRIVE_LOCKED = 108;
+
     //
     // MessageId: ERROR_BROKEN_PIPE
     //
@@ -751,6 +877,7 @@ public interface WinError {
     // The pipe has been ended.
     //
     int ERROR_BROKEN_PIPE = 109;
+
     //
     // MessageId: ERROR_OPEN_FAILED
     //
@@ -759,6 +886,7 @@ public interface WinError {
     // The system cannot open the device or file specified.
     //
     int ERROR_OPEN_FAILED = 110;
+
     //
     // MessageId: ERROR_BUFFER_OVERFLOW
     //
@@ -767,6 +895,7 @@ public interface WinError {
     // The file name is too long.
     //
     int ERROR_BUFFER_OVERFLOW = 111;
+
     //
     // MessageId: ERROR_DISK_FULL
     //
@@ -775,6 +904,7 @@ public interface WinError {
     // There is not enough space on the disk.
     //
     int ERROR_DISK_FULL = 112;
+
     //
     // MessageId: ERROR_NO_MORE_SEARCH_HANDLES
     //
@@ -783,6 +913,7 @@ public interface WinError {
     // No more internal file identifiers available.
     //
     int ERROR_NO_MORE_SEARCH_HANDLES = 113;
+
     //
     // MessageId: ERROR_INVALID_TARGET_HANDLE
     //
@@ -791,6 +922,7 @@ public interface WinError {
     // The target internal file identifier is incorrect.
     //
     int ERROR_INVALID_TARGET_HANDLE = 114;
+
     //
     // MessageId: ERROR_INVALID_CATEGORY
     //
@@ -799,6 +931,7 @@ public interface WinError {
     // The IOCTL call made by the application program is not correct.
     //
     int ERROR_INVALID_CATEGORY = 117;
+
     //
     // MessageId: ERROR_INVALID_VERIFY_SWITCH
     //
@@ -807,6 +940,7 @@ public interface WinError {
     // The verify-on-write switch parameter value is not correct.
     //
     int ERROR_INVALID_VERIFY_SWITCH = 118;
+
     //
     // MessageId: ERROR_BAD_DRIVER_LEVEL
     //
@@ -815,6 +949,7 @@ public interface WinError {
     // The system does not support the command requested.
     //
     int ERROR_BAD_DRIVER_LEVEL = 119;
+
     //
     // MessageId: ERROR_CALL_NOT_IMPLEMENTED
     //
@@ -823,6 +958,7 @@ public interface WinError {
     // This function is not supported on this system.
     //
     int ERROR_CALL_NOT_IMPLEMENTED = 120;
+
     //
     // MessageId: ERROR_SEM_TIMEOUT
     //
@@ -831,6 +967,7 @@ public interface WinError {
     // The semaphore timeout period has expired.
     //
     int ERROR_SEM_TIMEOUT = 121;
+
     //
     // MessageId: ERROR_INSUFFICIENT_BUFFER
     //
@@ -846,6 +983,7 @@ public interface WinError {
     //
     // The filename, directory name, or volume label syntax is incorrect.
     //
+
     int ERROR_INVALID_NAME = 123; // dderror
     //
     // MessageId: ERROR_INVALID_LEVEL
@@ -854,7 +992,9 @@ public interface WinError {
     //
     // The system call level is not correct.
     //
+
     int ERROR_INVALID_LEVEL = 124;
+
     //
     // MessageId: ERROR_NO_VOLUME_LABEL
     //
@@ -863,6 +1003,7 @@ public interface WinError {
     // The disk has no volume label.
     //
     int ERROR_NO_VOLUME_LABEL = 125;
+
     //
     // MessageId: ERROR_MOD_NOT_FOUND
     //
@@ -871,6 +1012,7 @@ public interface WinError {
     // The specified module could not be found.
     //
     int ERROR_MOD_NOT_FOUND = 126;
+
     //
     // MessageId: ERROR_PROC_NOT_FOUND
     //
@@ -879,6 +1021,7 @@ public interface WinError {
     // The specified procedure could not be found.
     //
     int ERROR_PROC_NOT_FOUND = 127;
+
     //
     // MessageId: ERROR_WAIT_NO_CHILDREN
     //
@@ -887,6 +1030,7 @@ public interface WinError {
     // There are no child processes to wait for.
     //
     int ERROR_WAIT_NO_CHILDREN = 128;
+
     //
     // MessageId: ERROR_CHILD_NOT_COMPLETE
     //
@@ -895,6 +1039,7 @@ public interface WinError {
     // The %1 application cannot be run in Win32 mode.
     //
     int ERROR_CHILD_NOT_COMPLETE = 129;
+
     //
     // MessageId: ERROR_DIRECT_ACCESS_HANDLE
     //
@@ -904,6 +1049,7 @@ public interface WinError {
     // other than raw disk I/O.
     //
     int ERROR_DIRECT_ACCESS_HANDLE = 130;
+
     //
     // MessageId: ERROR_NEGATIVE_SEEK
     //
@@ -913,6 +1059,7 @@ public interface WinError {
     // file.
     //
     int ERROR_NEGATIVE_SEEK = 131;
+
     //
     // MessageId: ERROR_SEEK_ON_DEVICE
     //
@@ -921,6 +1068,7 @@ public interface WinError {
     // The file pointer cannot be set on the specified device or file.
     //
     int ERROR_SEEK_ON_DEVICE = 132;
+
     //
     // MessageId: ERROR_IS_JOIN_TARGET
     //
@@ -930,6 +1078,7 @@ public interface WinError {
     // previously joined drives.
     //
     int ERROR_IS_JOIN_TARGET = 133;
+
     //
     // MessageId: ERROR_IS_JOINED
     //
@@ -939,6 +1088,7 @@ public interface WinError {
     // already been joined.
     //
     int ERROR_IS_JOINED = 134;
+
     //
     // MessageId: ERROR_IS_SUBSTED
     //
@@ -948,6 +1098,7 @@ public interface WinError {
     // already been substituted.
     //
     int ERROR_IS_SUBSTED = 135;
+
     //
     // MessageId: ERROR_NOT_JOINED
     //
@@ -956,6 +1107,7 @@ public interface WinError {
     // The system tried to delete the JOIN of a drive that is not joined.
     //
     int ERROR_NOT_JOINED = 136;
+
     //
     // MessageId: ERROR_NOT_SUBSTED
     //
@@ -965,6 +1117,7 @@ public interface WinError {
     // substituted.
     //
     int ERROR_NOT_SUBSTED = 137;
+
     //
     // MessageId: ERROR_JOIN_TO_JOIN
     //
@@ -973,6 +1126,7 @@ public interface WinError {
     // The system tried to join a drive to a directory on a joined drive.
     //
     int ERROR_JOIN_TO_JOIN = 138;
+
     //
     // MessageId: ERROR_SUBST_TO_SUBST
     //
@@ -982,6 +1136,7 @@ public interface WinError {
     // drive.
     //
     int ERROR_SUBST_TO_SUBST = 139;
+
     //
     // MessageId: ERROR_JOIN_TO_SUBST
     //
@@ -990,6 +1145,7 @@ public interface WinError {
     // The system tried to join a drive to a directory on a substituted drive.
     //
     int ERROR_JOIN_TO_SUBST = 140;
+
     //
     // MessageId: ERROR_SUBST_TO_JOIN
     //
@@ -998,6 +1154,7 @@ public interface WinError {
     // The system tried to SUBST a drive to a directory on a joined drive.
     //
     int ERROR_SUBST_TO_JOIN = 141;
+
     //
     // MessageId: ERROR_BUSY_DRIVE
     //
@@ -1006,6 +1163,7 @@ public interface WinError {
     // The system cannot perform a JOIN or SUBST at this time.
     //
     int ERROR_BUSY_DRIVE = 142;
+
     //
     // MessageId: ERROR_SAME_DRIVE
     //
@@ -1015,6 +1173,7 @@ public interface WinError {
     // same drive.
     //
     int ERROR_SAME_DRIVE = 143;
+
     //
     // MessageId: ERROR_DIR_NOT_ROOT
     //
@@ -1023,6 +1182,7 @@ public interface WinError {
     // The directory is not a subdirectory of the root directory.
     //
     int ERROR_DIR_NOT_ROOT = 144;
+
     //
     // MessageId: ERROR_DIR_NOT_EMPTY
     //
@@ -1031,6 +1191,7 @@ public interface WinError {
     // The directory is not empty.
     //
     int ERROR_DIR_NOT_EMPTY = 145;
+
     //
     // MessageId: ERROR_IS_SUBST_PATH
     //
@@ -1039,6 +1200,7 @@ public interface WinError {
     // The path specified is being used in a substitute.
     //
     int ERROR_IS_SUBST_PATH = 146;
+
     //
     // MessageId: ERROR_IS_JOIN_PATH
     //
@@ -1047,6 +1209,7 @@ public interface WinError {
     // Not enough resources are available to process this command.
     //
     int ERROR_IS_JOIN_PATH = 147;
+
     //
     // MessageId: ERROR_PATH_BUSY
     //
@@ -1055,6 +1218,7 @@ public interface WinError {
     // The path specified cannot be used at this time.
     //
     int ERROR_PATH_BUSY = 148;
+
     //
     // MessageId: ERROR_IS_SUBST_TARGET
     //
@@ -1064,6 +1228,7 @@ public interface WinError {
     // on the drive is the target of a previous substitute.
     //
     int ERROR_IS_SUBST_TARGET = 149;
+
     //
     // MessageId: ERROR_SYSTEM_TRACE
     //
@@ -1073,6 +1238,7 @@ public interface WinError {
     // tracing is disallowed.
     //
     int ERROR_SYSTEM_TRACE = 150;
+
     //
     // MessageId: ERROR_INVALID_EVENT_COUNT
     //
@@ -1082,6 +1248,7 @@ public interface WinError {
     // correct.
     //
     int ERROR_INVALID_EVENT_COUNT = 151;
+
     //
     // MessageId: ERROR_TOO_MANY_MUXWAITERS
     //
@@ -1090,6 +1257,7 @@ public interface WinError {
     // DosMuxSemWait did not execute; too many semaphores are already set.
     //
     int ERROR_TOO_MANY_MUXWAITERS = 152;
+
     //
     // MessageId: ERROR_INVALID_LIST_FORMAT
     //
@@ -1098,6 +1266,7 @@ public interface WinError {
     // The DosMuxSemWait list is not correct.
     //
     int ERROR_INVALID_LIST_FORMAT = 153;
+
     //
     // MessageId: ERROR_LABEL_TOO_LONG
     //
@@ -1107,6 +1276,7 @@ public interface WinError {
     // target file system.
     //
     int ERROR_LABEL_TOO_LONG = 154;
+
     //
     // MessageId: ERROR_TOO_MANY_TCBS
     //
@@ -1115,6 +1285,7 @@ public interface WinError {
     // Cannot create another thread.
     //
     int ERROR_TOO_MANY_TCBS = 155;
+
     //
     // MessageId: ERROR_SIGNAL_REFUSED
     //
@@ -1123,6 +1294,7 @@ public interface WinError {
     // The recipient process has refused the signal.
     //
     int ERROR_SIGNAL_REFUSED = 156;
+
     //
     // MessageId: ERROR_DISCARDED
     //
@@ -1131,6 +1303,7 @@ public interface WinError {
     // The segment is already discarded and cannot be locked.
     //
     int ERROR_DISCARDED = 157;
+
     //
     // MessageId: ERROR_NOT_LOCKED
     //
@@ -1139,6 +1312,7 @@ public interface WinError {
     // The segment is already unlocked.
     //
     int ERROR_NOT_LOCKED = 158;
+
     //
     // MessageId: ERROR_BAD_THREADID_ADDR
     //
@@ -1147,6 +1321,7 @@ public interface WinError {
     // The address for the thread ID is not correct.
     //
     int ERROR_BAD_THREADID_ADDR = 159;
+
     //
     // MessageId: ERROR_BAD_ARGUMENTS
     //
@@ -1155,6 +1330,7 @@ public interface WinError {
     // One or more arguments are not correct.
     //
     int ERROR_BAD_ARGUMENTS = 160;
+
     //
     // MessageId: ERROR_BAD_PATHNAME
     //
@@ -1163,6 +1339,7 @@ public interface WinError {
     // The specified path is invalid.
     //
     int ERROR_BAD_PATHNAME = 161;
+
     //
     // MessageId: ERROR_SIGNAL_PENDING
     //
@@ -1171,6 +1348,7 @@ public interface WinError {
     // A signal is already pending.
     //
     int ERROR_SIGNAL_PENDING = 162;
+
     //
     // MessageId: ERROR_MAX_THRDS_REACHED
     //
@@ -1179,6 +1357,7 @@ public interface WinError {
     // No more threads can be created in the system.
     //
     int ERROR_MAX_THRDS_REACHED = 164;
+
     //
     // MessageId: ERROR_LOCK_FAILED
     //
@@ -1187,6 +1366,7 @@ public interface WinError {
     // Unable to lock a region of a file.
     //
     int ERROR_LOCK_FAILED = 167;
+
     //
     // MessageId: ERROR_BUSY
     //
@@ -1202,7 +1382,9 @@ public interface WinError {
     //
     // A lock request was not outstanding for the supplied cancel region.
     //
+
     int ERROR_CANCEL_VIOLATION = 173;
+
     //
     // MessageId: ERROR_ATOMIC_LOCKS_NOT_SUPPORTED
     //
@@ -1211,6 +1393,7 @@ public interface WinError {
     // The file system does not support atomic changes to the lock type.
     //
     int ERROR_ATOMIC_LOCKS_NOT_SUPPORTED = 174;
+
     //
     // MessageId: ERROR_INVALID_SEGMENT_NUMBER
     //
@@ -1219,6 +1402,7 @@ public interface WinError {
     // The system detected a segment number that was not correct.
     //
     int ERROR_INVALID_SEGMENT_NUMBER = 180;
+
     //
     // MessageId: ERROR_INVALID_ORDINAL
     //
@@ -1227,6 +1411,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_ORDINAL = 182;
+
     //
     // MessageId: ERROR_ALREADY_EXISTS
     //
@@ -1235,6 +1420,7 @@ public interface WinError {
     // Cannot create a file when that file already exists.
     //
     int ERROR_ALREADY_EXISTS = 183;
+
     //
     // MessageId: ERROR_INVALID_FLAG_NUMBER
     //
@@ -1243,6 +1429,7 @@ public interface WinError {
     // The flag passed is not correct.
     //
     int ERROR_INVALID_FLAG_NUMBER = 186;
+
     //
     // MessageId: ERROR_SEM_NOT_FOUND
     //
@@ -1251,6 +1438,7 @@ public interface WinError {
     // The specified system semaphore name was not found.
     //
     int ERROR_SEM_NOT_FOUND = 187;
+
     //
     // MessageId: ERROR_INVALID_STARTING_CODESEG
     //
@@ -1259,6 +1447,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_STARTING_CODESEG = 188;
+
     //
     // MessageId: ERROR_INVALID_STACKSEG
     //
@@ -1267,6 +1456,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_STACKSEG = 189;
+
     //
     // MessageId: ERROR_INVALID_MODULETYPE
     //
@@ -1275,6 +1465,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_MODULETYPE = 190;
+
     //
     // MessageId: ERROR_INVALID_EXE_SIGNATURE
     //
@@ -1283,6 +1474,7 @@ public interface WinError {
     // Cannot run %1 in Win32 mode.
     //
     int ERROR_INVALID_EXE_SIGNATURE = 191;
+
     //
     // MessageId: ERROR_EXE_MARKED_INVALID
     //
@@ -1291,6 +1483,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_EXE_MARKED_INVALID = 192;
+
     //
     // MessageId: ERROR_BAD_EXE_FORMAT
     //
@@ -1299,6 +1492,7 @@ public interface WinError {
     // %1 is not a valid Win32 application.
     //
     int ERROR_BAD_EXE_FORMAT = 193;
+
     //
     // MessageId: ERROR_ITERATED_DATA_EXCEEDS_64k
     //
@@ -1307,6 +1501,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_ITERATED_DATA_EXCEEDS_64k = 194;
+
     //
     // MessageId: ERROR_INVALID_MINALLOCSIZE
     //
@@ -1315,6 +1510,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_MINALLOCSIZE = 195;
+
     //
     // MessageId: ERROR_DYNLINK_FROM_INVALID_RING
     //
@@ -1323,6 +1519,7 @@ public interface WinError {
     // The operating system cannot run this application program.
     //
     int ERROR_DYNLINK_FROM_INVALID_RING = 196;
+
     //
     // MessageId: ERROR_IOPL_NOT_ENABLED
     //
@@ -1331,6 +1528,7 @@ public interface WinError {
     // The operating system is not presently configured to run this application.
     //
     int ERROR_IOPL_NOT_ENABLED = 197;
+
     //
     // MessageId: ERROR_INVALID_SEGDPL
     //
@@ -1339,6 +1537,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INVALID_SEGDPL = 198;
+
     //
     // MessageId: ERROR_AUTODATASEG_EXCEEDS_64k
     //
@@ -1347,6 +1546,7 @@ public interface WinError {
     // The operating system cannot run this application program.
     //
     int ERROR_AUTODATASEG_EXCEEDS_64k = 199;
+
     //
     // MessageId: ERROR_RING2SEG_MUST_BE_MOVABLE
     //
@@ -1355,6 +1555,7 @@ public interface WinError {
     // The code segment cannot be greater than or equal to=64K.
     //
     int ERROR_RING2SEG_MUST_BE_MOVABLE = 200;
+
     //
     // MessageId: ERROR_RELOC_CHAIN_XEEDS_SEGLIM
     //
@@ -1363,6 +1564,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_RELOC_CHAIN_XEEDS_SEGLIM = 201;
+
     //
     // MessageId: ERROR_INFLOOP_IN_RELOC_CHAIN
     //
@@ -1371,6 +1573,7 @@ public interface WinError {
     // The operating system cannot run %1.
     //
     int ERROR_INFLOOP_IN_RELOC_CHAIN = 202;
+
     //
     // MessageId: ERROR_ENVVAR_NOT_FOUND
     //
@@ -1379,6 +1582,7 @@ public interface WinError {
     // The system could not find the environment option that was entered.
     //
     int ERROR_ENVVAR_NOT_FOUND = 203;
+
     //
     // MessageId: ERROR_NO_SIGNAL_SENT
     //
@@ -1387,6 +1591,7 @@ public interface WinError {
     // No process in the command subtree has a signal handler.
     //
     int ERROR_NO_SIGNAL_SENT = 205;
+
     //
     // MessageId: ERROR_FILENAME_EXCED_RANGE
     //
@@ -1395,6 +1600,7 @@ public interface WinError {
     // The filename or extension is too long.
     //
     int ERROR_FILENAME_EXCED_RANGE = 206;
+
     //
     // MessageId: ERROR_RING2_STACK_IN_USE
     //
@@ -1403,6 +1609,7 @@ public interface WinError {
     // The ring=2 stack is in use.
     //
     int ERROR_RING2_STACK_IN_USE = 207;
+
     //
     // MessageId: ERROR_META_EXPANSION_TOO_LONG
     //
@@ -1412,6 +1619,7 @@ public interface WinError {
     // many global filename characters are specified.
     //
     int ERROR_META_EXPANSION_TOO_LONG = 208;
+
     //
     // MessageId: ERROR_INVALID_SIGNAL_NUMBER
     //
@@ -1420,6 +1628,7 @@ public interface WinError {
     // The signal being posted is not correct.
     //
     int ERROR_INVALID_SIGNAL_NUMBER = 209;
+
     //
     // MessageId: ERROR_THREAD_1_INACTIVE
     //
@@ -1428,6 +1637,7 @@ public interface WinError {
     // The signal handler cannot be set.
     //
     int ERROR_THREAD_1_INACTIVE = 210;
+
     //
     // MessageId: ERROR_LOCKED
     //
@@ -1436,6 +1646,7 @@ public interface WinError {
     // The segment is locked and cannot be reallocated.
     //
     int ERROR_LOCKED = 212;
+
     //
     // MessageId: ERROR_TOO_MANY_MODULES
     //
@@ -1445,6 +1656,7 @@ public interface WinError {
     // dynamic-link module.
     //
     int ERROR_TOO_MANY_MODULES = 214;
+
     //
     // MessageId: ERROR_NESTING_NOT_ALLOWED
     //
@@ -1453,6 +1665,7 @@ public interface WinError {
     // Cannot nest calls to LoadModule.
     //
     int ERROR_NESTING_NOT_ALLOWED = 215;
+
     //
     // MessageId: ERROR_EXE_MACHINE_TYPE_MISMATCH
     //
@@ -1464,6 +1677,7 @@ public interface WinError {
     // the software publisher.
     //
     int ERROR_EXE_MACHINE_TYPE_MISMATCH = 216;
+
     //
     // MessageId: ERROR_EXE_CANNOT_MODIFY_SIGNED_BINARY
     //
@@ -1472,6 +1686,7 @@ public interface WinError {
     // The image file %1 is signed, unable to modify.
     //
     int ERROR_EXE_CANNOT_MODIFY_SIGNED_BINARY = 217;
+
     //
     // MessageId: ERROR_EXE_CANNOT_MODIFY_STRONG_SIGNED_BINARY
     //
@@ -1480,6 +1695,7 @@ public interface WinError {
     // The image file %1 is strong signed, unable to modify.
     //
     int ERROR_EXE_CANNOT_MODIFY_STRONG_SIGNED_BINARY = 218;
+
     //
     // MessageId: ERROR_FILE_CHECKED_OUT
     //
@@ -1488,6 +1704,7 @@ public interface WinError {
     // This file is checked out or locked for editing by another user.
     //
     int ERROR_FILE_CHECKED_OUT = 220;
+
     //
     // MessageId: ERROR_CHECKOUT_REQUIRED
     //
@@ -1496,6 +1713,7 @@ public interface WinError {
     // The file must be checked out before saving changes.
     //
     int ERROR_CHECKOUT_REQUIRED = 221;
+
     //
     // MessageId: ERROR_BAD_FILE_TYPE
     //
@@ -1504,6 +1722,7 @@ public interface WinError {
     // The file type being saved or retrieved has been blocked.
     //
     int ERROR_BAD_FILE_TYPE = 222;
+
     //
     // MessageId: ERROR_FILE_TOO_LARGE
     //
@@ -1512,6 +1731,7 @@ public interface WinError {
     // The file size exceeds the limit allowed and cannot be saved.
     //
     int ERROR_FILE_TOO_LARGE = 223;
+
     //
     // MessageId: ERROR_FORMS_AUTH_REQUIRED
     //
@@ -1521,6 +1741,7 @@ public interface WinError {
     // browse to the web site and select the option to login automatically.
     //
     int ERROR_FORMS_AUTH_REQUIRED = 224;
+
     //
     // MessageId: ERROR_VIRUS_INFECTED
     //
@@ -1530,6 +1751,7 @@ public interface WinError {
     // virus.
     //
     int ERROR_VIRUS_INFECTED = 225;
+
     //
     // MessageId: ERROR_VIRUS_DELETED
     //
@@ -1539,6 +1761,7 @@ public interface WinError {
     // this virus, the file has been removed from this location.
     //
     int ERROR_VIRUS_DELETED = 226;
+
     //
     // MessageId: ERROR_PIPE_LOCAL
     //
@@ -1547,6 +1770,7 @@ public interface WinError {
     // The pipe is local.
     //
     int ERROR_PIPE_LOCAL = 229;
+
     //
     // MessageId: ERROR_BAD_PIPE
     //
@@ -1555,6 +1779,7 @@ public interface WinError {
     // The pipe state is invalid.
     //
     int ERROR_BAD_PIPE = 230;
+
     //
     // MessageId: ERROR_PIPE_BUSY
     //
@@ -1563,6 +1788,7 @@ public interface WinError {
     // All pipe instances are busy.
     //
     int ERROR_PIPE_BUSY = 231;
+
     //
     // MessageId: ERROR_NO_DATA
     //
@@ -1571,6 +1797,7 @@ public interface WinError {
     // The pipe is being closed.
     //
     int ERROR_NO_DATA = 232;
+
     //
     // MessageId: ERROR_PIPE_NOT_CONNECTED
     //
@@ -1579,6 +1806,7 @@ public interface WinError {
     // No process is on the other end of the pipe.
     //
     int ERROR_PIPE_NOT_CONNECTED = 233;
+
     //
     // MessageId: ERROR_MORE_DATA
     //
@@ -1594,7 +1822,9 @@ public interface WinError {
     //
     // The session was canceled.
     //
+
     int ERROR_VC_DISCONNECTED = 240;
+
     //
     // MessageId: ERROR_INVALID_EA_NAME
     //
@@ -1603,6 +1833,7 @@ public interface WinError {
     // The specified extended attribute name was invalid.
     //
     int ERROR_INVALID_EA_NAME = 254;
+
     //
     // MessageId: ERROR_EA_LIST_INCONSISTENT
     //
@@ -1611,6 +1842,7 @@ public interface WinError {
     // The extended attributes are inconsistent.
     //
     int ERROR_EA_LIST_INCONSISTENT = 255;
+
     //
     // MessageId: WAIT_TIMEOUT
     //
@@ -1626,7 +1858,9 @@ public interface WinError {
     //
     // No more data is available.
     //
+
     int ERROR_NO_MORE_ITEMS = 259;
+
     //
     // MessageId: ERROR_CANNOT_COPY
     //
@@ -1635,6 +1869,7 @@ public interface WinError {
     // The copy functions cannot be used.
     //
     int ERROR_CANNOT_COPY = 266;
+
     //
     // MessageId: ERROR_DIRECTORY
     //
@@ -1643,6 +1878,7 @@ public interface WinError {
     // The directory name is invalid.
     //
     int ERROR_DIRECTORY = 267;
+
     //
     // MessageId: ERROR_EAS_DIDNT_FIT
     //
@@ -1651,6 +1887,7 @@ public interface WinError {
     // The extended attributes did not fit in the buffer.
     //
     int ERROR_EAS_DIDNT_FIT = 275;
+
     //
     // MessageId: ERROR_EA_FILE_CORRUPT
     //
@@ -1659,6 +1896,7 @@ public interface WinError {
     // The extended attribute file on the mounted file system is corrupt.
     //
     int ERROR_EA_FILE_CORRUPT = 276;
+
     //
     // MessageId: ERROR_EA_TABLE_FULL
     //
@@ -1667,6 +1905,7 @@ public interface WinError {
     // The extended attribute table file is full.
     //
     int ERROR_EA_TABLE_FULL = 277;
+
     //
     // MessageId: ERROR_INVALID_EA_HANDLE
     //
@@ -1675,6 +1914,7 @@ public interface WinError {
     // The specified extended attribute handle is invalid.
     //
     int ERROR_INVALID_EA_HANDLE = 278;
+
     //
     // MessageId: ERROR_EAS_NOT_SUPPORTED
     //
@@ -1683,6 +1923,7 @@ public interface WinError {
     // The mounted file system does not support extended attributes.
     //
     int ERROR_EAS_NOT_SUPPORTED = 282;
+
     //
     // MessageId: ERROR_NOT_OWNER
     //
@@ -1691,6 +1932,7 @@ public interface WinError {
     // Attempt to release mutex not owned by caller.
     //
     int ERROR_NOT_OWNER = 288;
+
     //
     // MessageId: ERROR_TOO_MANY_POSTS
     //
@@ -1699,6 +1941,7 @@ public interface WinError {
     // Too many posts were made to a semaphore.
     //
     int ERROR_TOO_MANY_POSTS = 298;
+
     //
     // MessageId: ERROR_PARTIAL_COPY
     //
@@ -1708,6 +1951,7 @@ public interface WinError {
     // completed.
     //
     int ERROR_PARTIAL_COPY = 299;
+
     //
     // MessageId: ERROR_OPLOCK_NOT_GRANTED
     //
@@ -1716,6 +1960,7 @@ public interface WinError {
     // The oplock request is denied.
     //
     int ERROR_OPLOCK_NOT_GRANTED = 300;
+
     //
     // MessageId: ERROR_INVALID_OPLOCK_PROTOCOL
     //
@@ -1724,6 +1969,7 @@ public interface WinError {
     // An invalid oplock acknowledgment was received by the system.
     //
     int ERROR_INVALID_OPLOCK_PROTOCOL = 301;
+
     //
     // MessageId: ERROR_DISK_TOO_FRAGMENTED
     //
@@ -1732,6 +1978,7 @@ public interface WinError {
     // The volume is too fragmented to complete this operation.
     //
     int ERROR_DISK_TOO_FRAGMENTED = 302;
+
     //
     // MessageId: ERROR_DELETE_PENDING
     //
@@ -1740,6 +1987,7 @@ public interface WinError {
     // The file cannot be opened because it is in the process of being deleted.
     //
     int ERROR_DELETE_PENDING = 303;
+
     //
     // MessageId: ERROR_MR_MID_NOT_FOUND
     //
@@ -1749,6 +1997,7 @@ public interface WinError {
     // message file for %2.
     //
     int ERROR_MR_MID_NOT_FOUND = 317;
+
     //
     // MessageId: ERROR_SCOPE_NOT_FOUND
     //
@@ -1757,6 +2006,7 @@ public interface WinError {
     // The scope specified was not found.
     //
     int ERROR_SCOPE_NOT_FOUND = 318;
+
     //
     // MessageId: ERROR_FAIL_NOACTION_REBOOT
     //
@@ -1765,6 +2015,7 @@ public interface WinError {
     // No action was taken as a system reboot is required.
     //
     int ERROR_FAIL_NOACTION_REBOOT = 350;
+
     //
     // MessageId: ERROR_FAIL_SHUTDOWN
     //
@@ -1773,6 +2024,7 @@ public interface WinError {
     // The shutdown operation failed.
     //
     int ERROR_FAIL_SHUTDOWN = 351;
+
     //
     // MessageId: ERROR_FAIL_RESTART
     //
@@ -1781,6 +2033,7 @@ public interface WinError {
     // The restart operation failed.
     //
     int ERROR_FAIL_RESTART = 352;
+
     //
     // MessageId: ERROR_MAX_SESSIONS_REACHED
     //
@@ -1789,6 +2042,7 @@ public interface WinError {
     // The maximum number of sessions has been reached.
     //
     int ERROR_MAX_SESSIONS_REACHED = 353;
+
     //
     // MessageId: ERROR_THREAD_MODE_ALREADY_BACKGROUND
     //
@@ -1797,6 +2051,7 @@ public interface WinError {
     // The thread is already in background processing mode.
     //
     int ERROR_THREAD_MODE_ALREADY_BACKGROUND = 400;
+
     //
     // MessageId: ERROR_THREAD_MODE_NOT_BACKGROUND
     //
@@ -1805,6 +2060,7 @@ public interface WinError {
     // The thread is not in background processing mode.
     //
     int ERROR_THREAD_MODE_NOT_BACKGROUND = 401;
+
     //
     // MessageId: ERROR_PROCESS_MODE_ALREADY_BACKGROUND
     //
@@ -1813,6 +2069,7 @@ public interface WinError {
     // The process is already in background processing mode.
     //
     int ERROR_PROCESS_MODE_ALREADY_BACKGROUND = 402;
+
     //
     // MessageId: ERROR_PROCESS_MODE_NOT_BACKGROUND
     //
@@ -1821,6 +2078,7 @@ public interface WinError {
     // The process is not in background processing mode.
     //
     int ERROR_PROCESS_MODE_NOT_BACKGROUND = 403;
+
     //
     // MessageId: ERROR_INVALID_ADDRESS
     //
@@ -1829,6 +2087,7 @@ public interface WinError {
     // Attempt to access invalid address.
     //
     int ERROR_INVALID_ADDRESS = 487;
+
     //
     // MessageId: ERROR_USER_PROFILE_LOAD
     //
@@ -1837,6 +2096,7 @@ public interface WinError {
     // User profile cannot be loaded.
     //
     int ERROR_USER_PROFILE_LOAD = 500;
+
     //
     // MessageId: ERROR_ARITHMETIC_OVERFLOW
     //
@@ -1845,6 +2105,7 @@ public interface WinError {
     // Arithmetic result exceeded=32 bits.
     //
     int ERROR_ARITHMETIC_OVERFLOW = 534;
+
     //
     // MessageId: ERROR_PIPE_CONNECTED
     //
@@ -1853,6 +2114,7 @@ public interface WinError {
     // There is a process on other end of the pipe.
     //
     int ERROR_PIPE_CONNECTED = 535;
+
     //
     // MessageId: ERROR_PIPE_LISTENING
     //
@@ -1861,6 +2123,7 @@ public interface WinError {
     // Waiting for a process to open the other end of the pipe.
     //
     int ERROR_PIPE_LISTENING = 536;
+
     //
     // MessageId: ERROR_VERIFIER_STOP
     //
@@ -1869,6 +2132,7 @@ public interface WinError {
     // Application verifier has found an error in the current process.
     //
     int ERROR_VERIFIER_STOP = 537;
+
     //
     // MessageId: ERROR_ABIOS_ERROR
     //
@@ -1877,6 +2141,7 @@ public interface WinError {
     // An error occurred in the ABIOS subsystem.
     //
     int ERROR_ABIOS_ERROR = 538;
+
     //
     // MessageId: ERROR_WX86_WARNING
     //
@@ -1885,6 +2150,7 @@ public interface WinError {
     // A warning occurred in the WX86 subsystem.
     //
     int ERROR_WX86_WARNING = 539;
+
     //
     // MessageId: ERROR_WX86_ERROR
     //
@@ -1893,6 +2159,7 @@ public interface WinError {
     // An error occurred in the WX86 subsystem.
     //
     int ERROR_WX86_ERROR = 540;
+
     //
     // MessageId: ERROR_TIMER_NOT_CANCELED
     //
@@ -1903,6 +2170,7 @@ public interface WinError {
     // with an associated APC routine.
     //
     int ERROR_TIMER_NOT_CANCELED = 541;
+
     //
     // MessageId: ERROR_UNWIND
     //
@@ -1911,6 +2179,7 @@ public interface WinError {
     // Unwind exception code.
     //
     int ERROR_UNWIND = 542;
+
     //
     // MessageId: ERROR_BAD_STACK
     //
@@ -1919,6 +2188,7 @@ public interface WinError {
     // An invalid or unaligned stack was encountered during an unwind operation.
     //
     int ERROR_BAD_STACK = 543;
+
     //
     // MessageId: ERROR_INVALID_UNWIND_TARGET
     //
@@ -1927,6 +2197,7 @@ public interface WinError {
     // An invalid unwind target was encountered during an unwind operation.
     //
     int ERROR_INVALID_UNWIND_TARGET = 544;
+
     //
     // MessageId: ERROR_INVALID_PORT_ATTRIBUTES
     //
@@ -1936,6 +2207,7 @@ public interface WinError {
     // Attributes specified to NtConnectPort
     //
     int ERROR_INVALID_PORT_ATTRIBUTES = 545;
+
     //
     // MessageId: ERROR_PORT_MESSAGE_TOO_LONG
     //
@@ -1945,6 +2217,7 @@ public interface WinError {
     // longer than the maximum message allowed by the port.
     //
     int ERROR_PORT_MESSAGE_TOO_LONG = 546;
+
     //
     // MessageId: ERROR_INVALID_QUOTA_LOWER
     //
@@ -1953,6 +2226,7 @@ public interface WinError {
     // An attempt was made to lower a quota limit below the current usage.
     //
     int ERROR_INVALID_QUOTA_LOWER = 547;
+
     //
     // MessageId: ERROR_DEVICE_ALREADY_ATTACHED
     //
@@ -1962,6 +2236,7 @@ public interface WinError {
     // another device.
     //
     int ERROR_DEVICE_ALREADY_ATTACHED = 548;
+
     //
     // MessageId: ERROR_INSTRUCTION_MISALIGNMENT
     //
@@ -1971,6 +2246,7 @@ public interface WinError {
     // the host system does not support unaligned instruction references.
     //
     int ERROR_INSTRUCTION_MISALIGNMENT = 549;
+
     //
     // MessageId: ERROR_PROFILING_NOT_STARTED
     //
@@ -1979,6 +2255,7 @@ public interface WinError {
     // Profiling not started.
     //
     int ERROR_PROFILING_NOT_STARTED = 550;
+
     //
     // MessageId: ERROR_PROFILING_NOT_STOPPED
     //
@@ -1987,6 +2264,7 @@ public interface WinError {
     // Profiling not stopped.
     //
     int ERROR_PROFILING_NOT_STOPPED = 551;
+
     //
     // MessageId: ERROR_COULD_NOT_INTERPRET
     //
@@ -1995,6 +2273,7 @@ public interface WinError {
     // The passed ACL did not contain the minimum required information.
     //
     int ERROR_COULD_NOT_INTERPRET = 552;
+
     //
     // MessageId: ERROR_PROFILING_AT_LIMIT
     //
@@ -2004,6 +2283,7 @@ public interface WinError {
     // be started.
     //
     int ERROR_PROFILING_AT_LIMIT = 553;
+
     //
     // MessageId: ERROR_CANT_WAIT
     //
@@ -2013,6 +2293,7 @@ public interface WinError {
     // I/O.
     //
     int ERROR_CANT_WAIT = 554;
+
     //
     // MessageId: ERROR_CANT_TERMINATE_SELF
     //
@@ -2023,6 +2304,7 @@ public interface WinError {
     // process.
     //
     int ERROR_CANT_TERMINATE_SELF = 555;
+
     //
     // MessageId: ERROR_UNEXPECTED_MM_CREATE_ERR
     //
@@ -2035,6 +2317,7 @@ public interface WinError {
     // the exception.
     //
     int ERROR_UNEXPECTED_MM_CREATE_ERR = 556;
+
     //
     // MessageId: ERROR_UNEXPECTED_MM_MAP_ERROR
     //
@@ -2047,6 +2330,7 @@ public interface WinError {
     // the exception.
     //
     int ERROR_UNEXPECTED_MM_MAP_ERROR = 557;
+
     //
     // MessageId: ERROR_UNEXPECTED_MM_EXTEND_ERR
     //
@@ -2059,6 +2343,7 @@ public interface WinError {
     // the exception.
     //
     int ERROR_UNEXPECTED_MM_EXTEND_ERR = 558;
+
     //
     // MessageId: ERROR_BAD_FUNCTION_TABLE
     //
@@ -2067,6 +2352,7 @@ public interface WinError {
     // A malformed function table was encountered during an unwind operation.
     //
     int ERROR_BAD_FUNCTION_TABLE = 559;
+
     //
     // MessageId: ERROR_NO_GUID_TRANSLATION
     //
@@ -2079,6 +2365,7 @@ public interface WinError {
     // creation attempt to fail.
     //
     int ERROR_NO_GUID_TRANSLATION = 560;
+
     //
     // MessageId: ERROR_INVALID_LDT_SIZE
     //
@@ -2088,6 +2375,7 @@ public interface WinError {
     // that the size was not an even number of selectors.
     //
     int ERROR_INVALID_LDT_SIZE = 561;
+
     //
     // MessageId: ERROR_INVALID_LDT_OFFSET
     //
@@ -2097,6 +2385,7 @@ public interface WinError {
     // integral multiple of the selector size.
     //
     int ERROR_INVALID_LDT_OFFSET = 563;
+
     //
     // MessageId: ERROR_INVALID_LDT_DESCRIPTOR
     //
@@ -2106,6 +2395,7 @@ public interface WinError {
     // up Ldt descriptors.
     //
     int ERROR_INVALID_LDT_DESCRIPTOR = 564;
+
     //
     // MessageId: ERROR_TOO_MANY_THREADS
     //
@@ -2116,6 +2406,7 @@ public interface WinError {
     // process has zero or one threads.
     //
     int ERROR_TOO_MANY_THREADS = 565;
+
     //
     // MessageId: ERROR_THREAD_NOT_IN_PROCESS
     //
@@ -2125,6 +2416,7 @@ public interface WinError {
     // the thread specified is not in the process specified.
     //
     int ERROR_THREAD_NOT_IN_PROCESS = 566;
+
     //
     // MessageId: ERROR_PAGEFILE_QUOTA_EXCEEDED
     //
@@ -2133,6 +2425,7 @@ public interface WinError {
     // Page file quota was exceeded.
     //
     int ERROR_PAGEFILE_QUOTA_EXCEEDED = 567;
+
     //
     // MessageId: ERROR_LOGON_SERVER_CONFLICT
     //
@@ -2142,6 +2435,7 @@ public interface WinError {
     // running in the domain conflicts with the specified role.
     //
     int ERROR_LOGON_SERVER_CONFLICT = 568;
+
     //
     // MessageId: ERROR_SYNCHRONIZATION_REQUIRED
     //
@@ -2152,6 +2446,7 @@ public interface WinError {
     // synchronization is required.
     //
     int ERROR_SYNCHRONIZATION_REQUIRED = 569;
+
     //
     // MessageId: ERROR_NET_OPEN_FAILED
     //
@@ -2162,6 +2457,7 @@ public interface WinError {
     // to use in its internal error mapping routines.
     //
     int ERROR_NET_OPEN_FAILED = 570;
+
     //
     // MessageId: ERROR_IO_PRIVILEGE_FAILED
     //
@@ -2171,6 +2467,7 @@ public interface WinError {
     // The I/O permissions for the process could not be changed.
     //
     int ERROR_IO_PRIVILEGE_FAILED = 571;
+
     //
     // MessageId: ERROR_CONTROL_C_EXIT
     //
@@ -2188,7 +2485,9 @@ public interface WinError {
     // {Missing System File}
     // The required system file %hs is bad or missing.
     //
+
     int ERROR_MISSING_SYSTEMFILE = 573;
+
     //
     // MessageId: ERROR_UNHANDLED_EXCEPTION
     //
@@ -2199,6 +2498,7 @@ public interface WinError {
     // 0x%08;x.
     //
     int ERROR_UNHANDLED_EXCEPTION = 574;
+
     //
     // MessageId: ERROR_APP_INIT_FAILURE
     //
@@ -2209,6 +2509,7 @@ public interface WinError {
     // terminate the application.
     //
     int ERROR_APP_INIT_FAILURE = 575;
+
     //
     // MessageId: ERROR_PAGEFILE_CREATE_FAILED
     //
@@ -2219,6 +2520,7 @@ public interface WinError {
     // %ld.
     //
     int ERROR_PAGEFILE_CREATE_FAILED = 576;
+
     //
     // MessageId: ERROR_INVALID_IMAGE_HASH
     //
@@ -2230,6 +2532,7 @@ public interface WinError {
     // unknown source.
     //
     int ERROR_INVALID_IMAGE_HASH = 577;
+
     //
     // MessageId: ERROR_NO_PAGEFILE
     //
@@ -2239,6 +2542,7 @@ public interface WinError {
     // No paging file was specified in the system configuration.
     //
     int ERROR_NO_PAGEFILE = 578;
+
     //
     // MessageId: ERROR_ILLEGAL_FLOAT_CONTEXT
     //
@@ -2249,6 +2553,7 @@ public interface WinError {
     // floating-point hardware is not present.
     //
     int ERROR_ILLEGAL_FLOAT_CONTEXT = 579;
+
     //
     // MessageId: ERROR_NO_EVENT_PAIR
     //
@@ -2259,6 +2564,7 @@ public interface WinError {
     // associated with the thread.
     //
     int ERROR_NO_EVENT_PAIR = 580;
+
     //
     // MessageId: ERROR_DOMAIN_CTRLR_CONFIG_ERROR
     //
@@ -2267,6 +2573,7 @@ public interface WinError {
     // A Windows Server has an incorrect configuration.
     //
     int ERROR_DOMAIN_CTRLR_CONFIG_ERROR = 581;
+
     //
     // MessageId: ERROR_ILLEGAL_CHARACTER
     //
@@ -2277,6 +2584,7 @@ public interface WinError {
     // character set this includes the characters 0xFFFF and 0xFFFE.
     //
     int ERROR_ILLEGAL_CHARACTER = 582;
+
     //
     // MessageId: ERROR_UNDEFINED_CHARACTER
     //
@@ -2286,6 +2594,7 @@ public interface WinError {
     // installed on the system.
     //
     int ERROR_UNDEFINED_CHARACTER = 583;
+
     //
     // MessageId: ERROR_FLOPPY_VOLUME
     //
@@ -2294,6 +2603,7 @@ public interface WinError {
     // The paging file cannot be created on a floppy diskette.
     //
     int ERROR_FLOPPY_VOLUME = 584;
+
     //
     // MessageId: ERROR_BIOS_FAILED_TO_CONNECT_INTERRUPT
     //
@@ -2303,6 +2613,7 @@ public interface WinError {
     // for which the device is connected.
     //
     int ERROR_BIOS_FAILED_TO_CONNECT_INTERRUPT = 585;
+
     //
     // MessageId: ERROR_BACKUP_CONTROLLER
     //
@@ -2312,6 +2623,7 @@ public interface WinError {
     // domain.
     //
     int ERROR_BACKUP_CONTROLLER = 586;
+
     //
     // MessageId: ERROR_MUTANT_LIMIT_EXCEEDED
     //
@@ -2321,6 +2633,7 @@ public interface WinError {
     // have been exceeded.
     //
     int ERROR_MUTANT_LIMIT_EXCEEDED = 587;
+
     //
     // MessageId: ERROR_FS_DRIVER_REQUIRED
     //
@@ -2330,6 +2643,7 @@ public interface WinError {
     // that has not yet been loaded.
     //
     int ERROR_FS_DRIVER_REQUIRED = 588;
+
     //
     // MessageId: ERROR_CANNOT_LOAD_REGISTRY_FILE
     //
@@ -2342,6 +2656,7 @@ public interface WinError {
     // It is corrupt, absent, or not writable.
     //
     int ERROR_CANNOT_LOAD_REGISTRY_FILE = 589;
+
     //
     // MessageId: ERROR_DEBUG_ATTACH_FAILED
     //
@@ -2353,6 +2668,7 @@ public interface WinError {
     // the error.
     //
     int ERROR_DEBUG_ATTACH_FAILED = 590;
+
     //
     // MessageId: ERROR_SYSTEM_PROCESS_TERMINATED
     //
@@ -2364,6 +2680,7 @@ public interface WinError {
     // The system has been shut down.
     //
     int ERROR_SYSTEM_PROCESS_TERMINATED = 591;
+
     //
     // MessageId: ERROR_DATA_NOT_ACCEPTED
     //
@@ -2373,6 +2690,7 @@ public interface WinError {
     // The TDI client could not handle the data received during an indication.
     //
     int ERROR_DATA_NOT_ACCEPTED = 592;
+
     //
     // MessageId: ERROR_VDM_HARD_ERROR
     //
@@ -2381,6 +2699,7 @@ public interface WinError {
     // NTVDM encountered a hard error.
     //
     int ERROR_VDM_HARD_ERROR = 593;
+
     //
     // MessageId: ERROR_DRIVER_CANCEL_TIMEOUT
     //
@@ -2391,6 +2710,7 @@ public interface WinError {
     // time.
     //
     int ERROR_DRIVER_CANCEL_TIMEOUT = 594;
+
     //
     // MessageId: ERROR_REPLY_MESSAGE_MISMATCH
     //
@@ -2401,6 +2721,7 @@ public interface WinError {
     // by the client ID in the message was not waiting on that message.
     //
     int ERROR_REPLY_MESSAGE_MISMATCH = 595;
+
     //
     // MessageId: ERROR_LOST_WRITEBEHIND_DATA
     //
@@ -2413,6 +2734,7 @@ public interface WinError {
     // network connection. Please try to save this file elsewhere.
     //
     int ERROR_LOST_WRITEBEHIND_DATA = 596;
+
     //
     // MessageId: ERROR_CLIENT_SERVER_PARAMETERS_INVALID
     //
@@ -2423,6 +2745,7 @@ public interface WinError {
     // window.
     //
     int ERROR_CLIENT_SERVER_PARAMETERS_INVALID = 597;
+
     //
     // MessageId: ERROR_NOT_TINY_STREAM
     //
@@ -2431,6 +2754,7 @@ public interface WinError {
     // The stream is not a tiny stream.
     //
     int ERROR_NOT_TINY_STREAM = 598;
+
     //
     // MessageId: ERROR_STACK_OVERFLOW_READ
     //
@@ -2439,6 +2763,7 @@ public interface WinError {
     // The request must be handled by the stack overflow code.
     //
     int ERROR_STACK_OVERFLOW_READ = 599;
+
     //
     // MessageId: ERROR_CONVERT_TO_LARGE
     //
@@ -2449,6 +2774,7 @@ public interface WinError {
     // extent stream is converted to a large stream.
     //
     int ERROR_CONVERT_TO_LARGE = 600;
+
     //
     // MessageId: ERROR_FOUND_OUT_OF_SCOPE
     //
@@ -2458,6 +2784,7 @@ public interface WinError {
     // volume but it is out of the scope of the handle used for the operation.
     //
     int ERROR_FOUND_OUT_OF_SCOPE = 601;
+
     //
     // MessageId: ERROR_ALLOCATE_BUCKET
     //
@@ -2466,6 +2793,7 @@ public interface WinError {
     // The bucket array must be grown. Retry transaction after doing so.
     //
     int ERROR_ALLOCATE_BUCKET = 602;
+
     //
     // MessageId: ERROR_MARSHALL_OVERFLOW
     //
@@ -2474,6 +2802,7 @@ public interface WinError {
     // The user/kernel marshalling buffer has overflowed.
     //
     int ERROR_MARSHALL_OVERFLOW = 603;
+
     //
     // MessageId: ERROR_INVALID_VARIANT
     //
@@ -2482,6 +2811,7 @@ public interface WinError {
     // The supplied variant structure contains invalid data.
     //
     int ERROR_INVALID_VARIANT = 604;
+
     //
     // MessageId: ERROR_BAD_COMPRESSION_BUFFER
     //
@@ -2490,6 +2820,7 @@ public interface WinError {
     // The specified buffer contains ill-formed data.
     //
     int ERROR_BAD_COMPRESSION_BUFFER = 605;
+
     //
     // MessageId: ERROR_AUDIT_FAILED
     //
@@ -2499,6 +2830,7 @@ public interface WinError {
     // An attempt to generate a security audit failed.
     //
     int ERROR_AUDIT_FAILED = 606;
+
     //
     // MessageId: ERROR_TIMER_RESOLUTION_NOT_SET
     //
@@ -2507,6 +2839,7 @@ public interface WinError {
     // The timer resolution was not previously set by the current process.
     //
     int ERROR_TIMER_RESOLUTION_NOT_SET = 607;
+
     //
     // MessageId: ERROR_INSUFFICIENT_LOGON_INFO
     //
@@ -2515,6 +2848,7 @@ public interface WinError {
     // There is insufficient account information to log you on.
     //
     int ERROR_INSUFFICIENT_LOGON_INFO = 608;
+
     //
     // MessageId: ERROR_BAD_DLL_ENTRYPOINT
     //
@@ -2528,6 +2862,7 @@ public interface WinError {
     // cause the application to operate incorrectly.
     //
     int ERROR_BAD_DLL_ENTRYPOINT = 609;
+
     //
     // MessageId: ERROR_BAD_SERVICE_ENTRYPOINT
     //
@@ -2541,6 +2876,7 @@ public interface WinError {
     // service process may operate incorrectly.
     //
     int ERROR_BAD_SERVICE_ENTRYPOINT = 610;
+
     //
     // MessageId: ERROR_IP_ADDRESS_CONFLICT1
     //
@@ -2549,6 +2885,7 @@ public interface WinError {
     // There is an IP address conflict with another system on the network
     //
     int ERROR_IP_ADDRESS_CONFLICT1 = 611;
+
     //
     // MessageId: ERROR_IP_ADDRESS_CONFLICT2
     //
@@ -2557,6 +2894,7 @@ public interface WinError {
     // There is an IP address conflict with another system on the network
     //
     int ERROR_IP_ADDRESS_CONFLICT2 = 612;
+
     //
     // MessageId: ERROR_REGISTRY_QUOTA_LIMIT
     //
@@ -2567,6 +2905,7 @@ public interface WinError {
     // the registry. Additional storage requests will be ignored.
     //
     int ERROR_REGISTRY_QUOTA_LIMIT = 613;
+
     //
     // MessageId: ERROR_NO_CALLBACK_ACTIVE
     //
@@ -2576,6 +2915,7 @@ public interface WinError {
     // active.
     //
     int ERROR_NO_CALLBACK_ACTIVE = 614;
+
     //
     // MessageId: ERROR_PWD_TOO_SHORT
     //
@@ -2586,6 +2926,7 @@ public interface WinError {
     // Please choose a longer password.
     //
     int ERROR_PWD_TOO_SHORT = 615;
+
     //
     // MessageId: ERROR_PWD_TOO_RECENT
     //
@@ -2599,6 +2940,7 @@ public interface WinError {
     // administrator immediately to have a new one assigned.
     //
     int ERROR_PWD_TOO_RECENT = 616;
+
     //
     // MessageId: ERROR_PWD_HISTORY_CONFLICT
     //
@@ -2610,6 +2952,7 @@ public interface WinError {
     // password that you have not previously used.
     //
     int ERROR_PWD_HISTORY_CONFLICT = 617;
+
     //
     // MessageId: ERROR_UNSUPPORTED_COMPRESSION
     //
@@ -2618,6 +2961,7 @@ public interface WinError {
     // The specified compression format is unsupported.
     //
     int ERROR_UNSUPPORTED_COMPRESSION = 618;
+
     //
     // MessageId: ERROR_INVALID_HW_PROFILE
     //
@@ -2626,6 +2970,7 @@ public interface WinError {
     // The specified hardware profile configuration is invalid.
     //
     int ERROR_INVALID_HW_PROFILE = 619;
+
     //
     // MessageId: ERROR_INVALID_PLUGPLAY_DEVICE_PATH
     //
@@ -2634,6 +2979,7 @@ public interface WinError {
     // The specified Plug and Play registry device path is invalid.
     //
     int ERROR_INVALID_PLUGPLAY_DEVICE_PATH = 620;
+
     //
     // MessageId: ERROR_QUOTA_LIST_INCONSISTENT
     //
@@ -2642,6 +2988,7 @@ public interface WinError {
     // The specified quota list is internally inconsistent with its descriptor.
     //
     int ERROR_QUOTA_LIST_INCONSISTENT = 621;
+
     //
     // MessageId: ERROR_EVALUATION_EXPIRATION
     //
@@ -2654,6 +3001,7 @@ public interface WinError {
     // of this product.
     //
     int ERROR_EVALUATION_EXPIRATION = 622;
+
     //
     // MessageId: ERROR_ILLEGAL_DLL_RELOCATION
     //
@@ -2667,6 +3015,7 @@ public interface WinError {
     // contacted for a new DLL.
     //
     int ERROR_ILLEGAL_DLL_RELOCATION = 623;
+
     //
     // MessageId: ERROR_DLL_INIT_FAILED_LOGOFF
     //
@@ -2677,6 +3026,7 @@ public interface WinError {
     // shutting down.
     //
     int ERROR_DLL_INIT_FAILED_LOGOFF = 624;
+
     //
     // MessageId: ERROR_VALIDATE_CONTINUE
     //
@@ -2685,6 +3035,7 @@ public interface WinError {
     // The validation process needs to continue on to the next step.
     //
     int ERROR_VALIDATE_CONTINUE = 625;
+
     //
     // MessageId: ERROR_NO_MORE_MATCHES
     //
@@ -2693,6 +3044,7 @@ public interface WinError {
     // There are no more matches for the current index enumeration.
     //
     int ERROR_NO_MORE_MATCHES = 626;
+
     //
     // MessageId: ERROR_RANGE_LIST_CONFLICT
     //
@@ -2701,6 +3053,7 @@ public interface WinError {
     // The range could not be added to the range list because of a conflict.
     //
     int ERROR_RANGE_LIST_CONFLICT = 627;
+
     //
     // MessageId: ERROR_SERVER_SID_MISMATCH
     //
@@ -2710,6 +3063,7 @@ public interface WinError {
     // client.
     //
     int ERROR_SERVER_SID_MISMATCH = 628;
+
     //
     // MessageId: ERROR_CANT_ENABLE_DENY_ONLY
     //
@@ -2718,6 +3072,7 @@ public interface WinError {
     // A group marked use for deny only cannot be enabled.
     //
     int ERROR_CANT_ENABLE_DENY_ONLY = 629;
+
     //
     // MessageId: ERROR_FLOAT_MULTIPLE_FAULTS
     //
@@ -2735,6 +3090,7 @@ public interface WinError {
     // {EXCEPTION}
     // Multiple floating point traps.
     //
+
     int ERROR_FLOAT_MULTIPLE_TRAPS = 631; // winnt
     //
     // MessageId: ERROR_NOINTERFACE
@@ -2743,7 +3099,9 @@ public interface WinError {
     //
     // The requested interface is not supported.
     //
+
     int ERROR_NOINTERFACE = 632;
+
     //
     // MessageId: ERROR_DRIVER_FAILED_SLEEP
     //
@@ -2754,6 +3112,7 @@ public interface WinError {
     // allow the system to go to standby mode.
     //
     int ERROR_DRIVER_FAILED_SLEEP = 633;
+
     //
     // MessageId: ERROR_CORRUPT_SYSTEM_FILE
     //
@@ -2762,6 +3121,7 @@ public interface WinError {
     // The system file %1 has become corrupt and has been replaced.
     //
     int ERROR_CORRUPT_SYSTEM_FILE = 634;
+
     //
     // MessageId: ERROR_COMMITMENT_MINIMUM
     //
@@ -2774,6 +3134,7 @@ public interface WinError {
     // For more information, see Help.
     //
     int ERROR_COMMITMENT_MINIMUM = 635;
+
     //
     // MessageId: ERROR_PNP_RESTART_ENUMERATION
     //
@@ -2782,6 +3143,7 @@ public interface WinError {
     // A device was removed so enumeration must be restarted.
     //
     int ERROR_PNP_RESTART_ENUMERATION = 636;
+
     //
     // MessageId: ERROR_SYSTEM_IMAGE_BAD_SIGNATURE
     //
@@ -2793,6 +3155,7 @@ public interface WinError {
     // The system has been shut down.
     //
     int ERROR_SYSTEM_IMAGE_BAD_SIGNATURE = 637;
+
     //
     // MessageId: ERROR_PNP_REBOOT_REQUIRED
     //
@@ -2801,6 +3164,7 @@ public interface WinError {
     // Device will not start without a reboot.
     //
     int ERROR_PNP_REBOOT_REQUIRED = 638;
+
     //
     // MessageId: ERROR_INSUFFICIENT_POWER
     //
@@ -2809,6 +3173,7 @@ public interface WinError {
     // There is not enough power to complete the requested operation.
     //
     int ERROR_INSUFFICIENT_POWER = 639;
+
     //
     // MessageId: ERROR_MULTIPLE_FAULT_VIOLATION
     //
@@ -2817,6 +3182,7 @@ public interface WinError {
     // ERROR_MULTIPLE_FAULT_VIOLATION
     //
     int ERROR_MULTIPLE_FAULT_VIOLATION = 640;
+
     //
     // MessageId: ERROR_SYSTEM_SHUTDOWN
     //
@@ -2825,6 +3191,7 @@ public interface WinError {
     // The system is in the process of shutting down.
     //
     int ERROR_SYSTEM_SHUTDOWN = 641;
+
     //
     // MessageId: ERROR_PORT_NOT_SET
     //
@@ -2834,6 +3201,7 @@ public interface WinError {
     // already associated with the process.
     //
     int ERROR_PORT_NOT_SET = 642;
+
     //
     // MessageId: ERROR_DS_VERSION_CHECK_FAILURE
     //
@@ -2843,6 +3211,7 @@ public interface WinError {
     // directory forest, domain or domain controller.
     //
     int ERROR_DS_VERSION_CHECK_FAILURE = 643;
+
     //
     // MessageId: ERROR_RANGE_NOT_FOUND
     //
@@ -2851,6 +3220,7 @@ public interface WinError {
     // The specified range could not be found in the range list.
     //
     int ERROR_RANGE_NOT_FOUND = 644;
+
     //
     // MessageId: ERROR_NOT_SAFE_MODE_DRIVER
     //
@@ -2859,6 +3229,7 @@ public interface WinError {
     // The driver was not loaded because the system is booting into safe mode.
     //
     int ERROR_NOT_SAFE_MODE_DRIVER = 646;
+
     //
     // MessageId: ERROR_FAILED_DRIVER_ENTRY
     //
@@ -2867,6 +3238,7 @@ public interface WinError {
     // The driver was not loaded because it failed it's initialization call.
     //
     int ERROR_FAILED_DRIVER_ENTRY = 647;
+
     //
     // MessageId: ERROR_DEVICE_ENUMERATION_ERROR
     //
@@ -2877,6 +3249,7 @@ public interface WinError {
     // This may be caused by a failure of your hardware or by a poor connection.
     //
     int ERROR_DEVICE_ENUMERATION_ERROR = 648;
+
     //
     // MessageId: ERROR_MOUNT_POINT_NOT_RESOLVED
     //
@@ -2887,6 +3260,7 @@ public interface WinError {
     // not attached.
     //
     int ERROR_MOUNT_POINT_NOT_RESOLVED = 649;
+
     //
     // MessageId: ERROR_INVALID_DEVICE_OBJECT_PARAMETER
     //
@@ -2896,6 +3270,7 @@ public interface WinError {
     // attached to the volume specified by the file name.
     //
     int ERROR_INVALID_DEVICE_OBJECT_PARAMETER = 650;
+
     //
     // MessageId: ERROR_MCA_OCCURED
     //
@@ -2905,6 +3280,7 @@ public interface WinError {
     // additional information.
     //
     int ERROR_MCA_OCCURED = 651;
+
     //
     // MessageId: ERROR_DRIVER_DATABASE_ERROR
     //
@@ -2913,6 +3289,7 @@ public interface WinError {
     // There was error [%2] processing the driver database.
     //
     int ERROR_DRIVER_DATABASE_ERROR = 652;
+
     //
     // MessageId: ERROR_SYSTEM_HIVE_TOO_LARGE
     //
@@ -2921,6 +3298,7 @@ public interface WinError {
     // System hive size has exceeded its limit.
     //
     int ERROR_SYSTEM_HIVE_TOO_LARGE = 653;
+
     //
     // MessageId: ERROR_DRIVER_FAILED_PRIOR_UNLOAD
     //
@@ -2930,6 +3308,7 @@ public interface WinError {
     // is still in memory.
     //
     int ERROR_DRIVER_FAILED_PRIOR_UNLOAD = 654;
+
     //
     // MessageId: ERROR_VOLSNAP_PREPARE_HIBERNATE
     //
@@ -2940,6 +3319,7 @@ public interface WinError {
     // hibernation.
     //
     int ERROR_VOLSNAP_PREPARE_HIBERNATE = 655;
+
     //
     // MessageId: ERROR_HIBERNATION_FAILURE
     //
@@ -2949,6 +3329,7 @@ public interface WinError {
     // will be disabled until the system is restarted.
     //
     int ERROR_HIBERNATION_FAILURE = 656;
+
     //
     // MessageId: ERROR_FILE_SYSTEM_LIMITATION
     //
@@ -2958,6 +3339,7 @@ public interface WinError {
     // limitation
     //
     int ERROR_FILE_SYSTEM_LIMITATION = 665;
+
     //
     // MessageId: ERROR_ASSERTION_FAILURE
     //
@@ -2966,6 +3348,7 @@ public interface WinError {
     // An assertion failure has occurred.
     //
     int ERROR_ASSERTION_FAILURE = 668;
+
     //
     // MessageId: ERROR_ACPI_ERROR
     //
@@ -2974,6 +3357,7 @@ public interface WinError {
     // An error occurred in the ACPI subsystem.
     //
     int ERROR_ACPI_ERROR = 669;
+
     //
     // MessageId: ERROR_WOW_ASSERTION
     //
@@ -2982,6 +3366,7 @@ public interface WinError {
     // WOW Assertion Error.
     //
     int ERROR_WOW_ASSERTION = 670;
+
     //
     // MessageId: ERROR_PNP_BAD_MPS_TABLE
     //
@@ -2992,6 +3377,7 @@ public interface WinError {
     // Please contact your system vendor for system BIOS update.
     //
     int ERROR_PNP_BAD_MPS_TABLE = 671;
+
     //
     // MessageId: ERROR_PNP_TRANSLATION_FAILED
     //
@@ -3000,6 +3386,7 @@ public interface WinError {
     // A translator failed to translate resources.
     //
     int ERROR_PNP_TRANSLATION_FAILED = 672;
+
     //
     // MessageId: ERROR_PNP_IRQ_TRANSLATION_FAILED
     //
@@ -3008,6 +3395,7 @@ public interface WinError {
     // A IRQ translator failed to translate resources.
     //
     int ERROR_PNP_IRQ_TRANSLATION_FAILED = 673;
+
     //
     // MessageId: ERROR_PNP_INVALID_ID
     //
@@ -3016,6 +3404,7 @@ public interface WinError {
     // Driver %2 returned invalid ID for a child device (%3).
     //
     int ERROR_PNP_INVALID_ID = 674;
+
     //
     // MessageId: ERROR_WAKE_SYSTEM_DEBUGGER
     //
@@ -3025,6 +3414,7 @@ public interface WinError {
     // the system debugger was awakened by an interrupt.
     //
     int ERROR_WAKE_SYSTEM_DEBUGGER = 675;
+
     //
     // MessageId: ERROR_HANDLES_CLOSED
     //
@@ -3035,6 +3425,7 @@ public interface WinError {
     // requested operation.
     //
     int ERROR_HANDLES_CLOSED = 676;
+
     //
     // MessageId: ERROR_EXTRANEOUS_INFORMATION
     //
@@ -3045,6 +3436,7 @@ public interface WinError {
     // was expected.
     //
     int ERROR_EXTRANEOUS_INFORMATION = 677;
+
     //
     // MessageId: ERROR_RXACT_COMMIT_NECESSARY
     //
@@ -3057,6 +3449,7 @@ public interface WinError {
     // (so it may still be committed if desired).
     //
     int ERROR_RXACT_COMMIT_NECESSARY = 678;
+
     //
     // MessageId: ERROR_MEDIA_CHECK
     //
@@ -3066,6 +3459,7 @@ public interface WinError {
     // The media may have changed.
     //
     int ERROR_MEDIA_CHECK = 679;
+
     //
     // MessageId: ERROR_GUID_SUBSTITUTION_MADE
     //
@@ -3078,6 +3472,7 @@ public interface WinError {
     // However, this may provide a more restrictive access than intended.
     //
     int ERROR_GUID_SUBSTITUTION_MADE = 680;
+
     //
     // MessageId: ERROR_STOPPED_ON_SYMLINK
     //
@@ -3086,6 +3481,7 @@ public interface WinError {
     // The create operation stopped after reaching a symbolic link
     //
     int ERROR_STOPPED_ON_SYMLINK = 681;
+
     //
     // MessageId: ERROR_LONGJUMP
     //
@@ -3094,6 +3490,7 @@ public interface WinError {
     // A long jump has been executed.
     //
     int ERROR_LONGJUMP = 682;
+
     //
     // MessageId: ERROR_PLUGPLAY_QUERY_VETOED
     //
@@ -3102,6 +3499,7 @@ public interface WinError {
     // The Plug and Play query operation was not successful.
     //
     int ERROR_PLUGPLAY_QUERY_VETOED = 683;
+
     //
     // MessageId: ERROR_UNWIND_CONSOLIDATE
     //
@@ -3110,6 +3508,7 @@ public interface WinError {
     // A frame consolidation has been executed.
     //
     int ERROR_UNWIND_CONSOLIDATE = 684;
+
     //
     // MessageId: ERROR_REGISTRY_HIVE_RECOVERED
     //
@@ -3121,6 +3520,7 @@ public interface WinError {
     // was corrupted and it has been recovered. Some data might have been lost.
     //
     int ERROR_REGISTRY_HIVE_RECOVERED = 685;
+
     //
     // MessageId: ERROR_DLL_MIGHT_BE_INSECURE
     //
@@ -3131,6 +3531,7 @@ public interface WinError {
     // application use the secure module %hs?
     //
     int ERROR_DLL_MIGHT_BE_INSECURE = 686;
+
     //
     // MessageId: ERROR_DLL_MIGHT_BE_INCOMPATIBLE
     //
@@ -3142,6 +3543,7 @@ public interface WinError {
     // secure module %hs?
     //
     int ERROR_DLL_MIGHT_BE_INCOMPATIBLE = 687;
+
     //
     // MessageId: ERROR_DBG_EXCEPTION_NOT_HANDLED
     //
@@ -3157,7 +3559,9 @@ public interface WinError {
     //
     // Debugger will reply later.
     //
+
     int ERROR_DBG_REPLY_LATER = 689;
+
     //
     // MessageId: ERROR_DBG_UNABLE_TO_PROVIDE_HANDLE
     //
@@ -3166,6 +3570,7 @@ public interface WinError {
     // Debugger cannot provide handle.
     //
     int ERROR_DBG_UNABLE_TO_PROVIDE_HANDLE = 690;
+
     //
     // MessageId: ERROR_DBG_TERMINATE_THREAD
     //
@@ -3181,6 +3586,7 @@ public interface WinError {
     //
     // Debugger terminated process.
     //
+
     int ERROR_DBG_TERMINATE_PROCESS = 692; // winnt
     //
     // MessageId: ERROR_DBG_CONTROL_C
@@ -3189,6 +3595,7 @@ public interface WinError {
     //
     // Debugger got control C.
     //
+
     int ERROR_DBG_CONTROL_C = 693; // winnt
     //
     // MessageId: ERROR_DBG_PRINTEXCEPTION_C
@@ -3197,7 +3604,9 @@ public interface WinError {
     //
     // Debugger printed exception on control C.
     //
+
     int ERROR_DBG_PRINTEXCEPTION_C = 694;
+
     //
     // MessageId: ERROR_DBG_RIPEXCEPTION
     //
@@ -3206,6 +3615,7 @@ public interface WinError {
     // Debugger received RIP exception.
     //
     int ERROR_DBG_RIPEXCEPTION = 695;
+
     //
     // MessageId: ERROR_DBG_CONTROL_BREAK
     //
@@ -3221,6 +3631,7 @@ public interface WinError {
     //
     // Debugger command communication exception.
     //
+
     int ERROR_DBG_COMMAND_EXCEPTION = 697; // winnt
     //
     // MessageId: ERROR_OBJECT_NAME_EXISTS
@@ -3231,7 +3642,9 @@ public interface WinError {
     // An attempt was made to create an object and the object name already
     // existed.
     //
+
     int ERROR_OBJECT_NAME_EXISTS = 698;
+
     //
     // MessageId: ERROR_THREAD_WAS_SUSPENDED
     //
@@ -3242,6 +3655,7 @@ public interface WinError {
     // was resumed, and termination proceeded.
     //
     int ERROR_THREAD_WAS_SUSPENDED = 699;
+
     //
     // MessageId: ERROR_IMAGE_NOT_AT_BASE
     //
@@ -3252,6 +3666,7 @@ public interface WinError {
     // file. Local fixups must be performed on this image.
     //
     int ERROR_IMAGE_NOT_AT_BASE = 700;
+
     //
     // MessageId: ERROR_RXACT_STATE_CREATED
     //
@@ -3261,6 +3676,7 @@ public interface WinError {
     // sub-tree transaction state did not yet exist and had to be created.
     //
     int ERROR_RXACT_STATE_CREATED = 701;
+
     //
     // MessageId: ERROR_SEGMENT_NOTIFICATION
     //
@@ -3282,7 +3698,9 @@ public interface WinError {
     // The process cannot switch to the startup current directory %hs.
     // Select OK to set current directory to %hs, or select CANCEL to exit.
     //
+
     int ERROR_BAD_CURRENT_DIRECTORY = 703;
+
     //
     // MessageId: ERROR_FT_READ_RECOVERY_FROM_BACKUP
     //
@@ -3296,6 +3714,7 @@ public interface WinError {
     // of the device.
     //
     int ERROR_FT_READ_RECOVERY_FROM_BACKUP = 704;
+
     //
     // MessageId: ERROR_FT_WRITE_RECOVERY
     //
@@ -3309,6 +3728,7 @@ public interface WinError {
     // area of the device.
     //
     int ERROR_FT_WRITE_RECOVERY = 705;
+
     //
     // MessageId: ERROR_IMAGE_MACHINE_TYPE_MISMATCH
     //
@@ -3319,6 +3739,7 @@ public interface WinError {
     // current machine. Select OK to continue, or CANCEL to fail the DLL load.
     //
     int ERROR_IMAGE_MACHINE_TYPE_MISMATCH = 706;
+
     //
     // MessageId: ERROR_RECEIVE_PARTIAL
     //
@@ -3329,6 +3750,7 @@ public interface WinError {
     // data will be sent later.
     //
     int ERROR_RECEIVE_PARTIAL = 707;
+
     //
     // MessageId: ERROR_RECEIVE_EXPEDITED
     //
@@ -3339,6 +3761,7 @@ public interface WinError {
     // expedited by the remote system.
     //
     int ERROR_RECEIVE_EXPEDITED = 708;
+
     //
     // MessageId: ERROR_RECEIVE_PARTIAL_EXPEDITED
     //
@@ -3350,6 +3773,7 @@ public interface WinError {
     // sent later.
     //
     int ERROR_RECEIVE_PARTIAL_EXPEDITED = 709;
+
     //
     // MessageId: ERROR_EVENT_DONE
     //
@@ -3359,6 +3783,7 @@ public interface WinError {
     // The TDI indication has completed successfully.
     //
     int ERROR_EVENT_DONE = 710;
+
     //
     // MessageId: ERROR_EVENT_PENDING
     //
@@ -3368,6 +3793,7 @@ public interface WinError {
     // The TDI indication has entered the pending state.
     //
     int ERROR_EVENT_PENDING = 711;
+
     //
     // MessageId: ERROR_CHECKING_FILE_SYSTEM
     //
@@ -3376,6 +3802,7 @@ public interface WinError {
     // Checking file system on %wZ
     //
     int ERROR_CHECKING_FILE_SYSTEM = 712;
+
     //
     // MessageId: ERROR_FATAL_APP_EXIT
     //
@@ -3385,6 +3812,7 @@ public interface WinError {
     // %hs
     //
     int ERROR_FATAL_APP_EXIT = 713;
+
     //
     // MessageId: ERROR_PREDEFINED_HANDLE
     //
@@ -3393,6 +3821,7 @@ public interface WinError {
     // The specified registry key is referenced by a predefined handle.
     //
     int ERROR_PREDEFINED_HANDLE = 714;
+
     //
     // MessageId: ERROR_WAS_UNLOCKED
     //
@@ -3403,6 +3832,7 @@ public interface WinError {
     // page was unlocked from memory and from the process.
     //
     int ERROR_WAS_UNLOCKED = 715;
+
     //
     // MessageId: ERROR_SERVICE_NOTIFICATION
     //
@@ -3411,6 +3841,7 @@ public interface WinError {
     // %hs
     //
     int ERROR_SERVICE_NOTIFICATION = 716;
+
     //
     // MessageId: ERROR_WAS_LOCKED
     //
@@ -3420,6 +3851,7 @@ public interface WinError {
     // One of the pages to lock was already locked.
     //
     int ERROR_WAS_LOCKED = 717;
+
     //
     // MessageId: ERROR_LOG_HARD_ERROR
     //
@@ -3428,6 +3860,7 @@ public interface WinError {
     // Application popup: %1 : %2
     //
     int ERROR_LOG_HARD_ERROR = 718;
+
     //
     // MessageId: ERROR_ALREADY_WIN32
     //
@@ -3436,6 +3869,7 @@ public interface WinError {
     // ERROR_ALREADY_WIN32
     //
     int ERROR_ALREADY_WIN32 = 719;
+
     //
     // MessageId: ERROR_IMAGE_MACHINE_TYPE_MISMATCH_EXE
     //
@@ -3446,6 +3880,7 @@ public interface WinError {
     // current machine.
     //
     int ERROR_IMAGE_MACHINE_TYPE_MISMATCH_EXE = 720;
+
     //
     // MessageId: ERROR_NO_YIELD_PERFORMED
     //
@@ -3454,6 +3889,7 @@ public interface WinError {
     // A yield execution was performed and no thread was available to run.
     //
     int ERROR_NO_YIELD_PERFORMED = 721;
+
     //
     // MessageId: ERROR_TIMER_RESUME_IGNORED
     //
@@ -3462,6 +3898,7 @@ public interface WinError {
     // The resumable flag to a timer API was ignored.
     //
     int ERROR_TIMER_RESUME_IGNORED = 722;
+
     //
     // MessageId: ERROR_ARBITRATION_UNHANDLED
     //
@@ -3470,6 +3907,7 @@ public interface WinError {
     // The arbiter has deferred arbitration of these resources to its parent
     //
     int ERROR_ARBITRATION_UNHANDLED = 723;
+
     //
     // MessageId: ERROR_CARDBUS_NOT_SUPPORTED
     //
@@ -3479,6 +3917,7 @@ public interface WinError {
     // error on "%hs".
     //
     int ERROR_CARDBUS_NOT_SUPPORTED = 724;
+
     //
     // MessageId: ERROR_MP_PROCESSOR_MISMATCH
     //
@@ -3491,6 +3930,7 @@ public interface WinError {
     // of processors is supported.
     //
     int ERROR_MP_PROCESSOR_MISMATCH = 725;
+
     //
     // MessageId: ERROR_HIBERNATED
     //
@@ -3499,6 +3939,7 @@ public interface WinError {
     // The system was put into hibernation.
     //
     int ERROR_HIBERNATED = 726;
+
     //
     // MessageId: ERROR_RESUME_HIBERNATION
     //
@@ -3507,6 +3948,7 @@ public interface WinError {
     // The system was resumed from hibernation.
     //
     int ERROR_RESUME_HIBERNATION = 727;
+
     //
     // MessageId: ERROR_FIRMWARE_UPDATED
     //
@@ -3516,6 +3958,7 @@ public interface WinError {
     // [previous firmware date =%2, current firmware date %3].
     //
     int ERROR_FIRMWARE_UPDATED = 728;
+
     //
     // MessageId: ERROR_DRIVERS_LEAKING_LOCKED_PAGES
     //
@@ -3526,6 +3969,7 @@ public interface WinError {
     // catch the culprit.
     //
     int ERROR_DRIVERS_LEAKING_LOCKED_PAGES = 729;
+
     //
     // MessageId: ERROR_WAKE_SYSTEM
     //
@@ -3534,6 +3978,7 @@ public interface WinError {
     // The system has awoken
     //
     int ERROR_WAKE_SYSTEM = 730;
+
     //
     // MessageId: ERROR_WAIT_1
     //
@@ -3542,6 +3987,7 @@ public interface WinError {
     // ERROR_WAIT_1
     //
     int ERROR_WAIT_1 = 731;
+
     //
     // MessageId: ERROR_WAIT_2
     //
@@ -3550,6 +3996,7 @@ public interface WinError {
     // ERROR_WAIT_2
     //
     int ERROR_WAIT_2 = 732;
+
     //
     // MessageId: ERROR_WAIT_3
     //
@@ -3558,6 +4005,7 @@ public interface WinError {
     // ERROR_WAIT_3
     //
     int ERROR_WAIT_3 = 733;
+
     //
     // MessageId: ERROR_WAIT_63
     //
@@ -3566,6 +4014,7 @@ public interface WinError {
     // ERROR_WAIT_63
     //
     int ERROR_WAIT_63 = 734;
+
     //
     // MessageId: ERROR_ABANDONED_WAIT_0
     //
@@ -3581,7 +4030,9 @@ public interface WinError {
     //
     // ERROR_ABANDONED_WAIT_63
     //
+
     int ERROR_ABANDONED_WAIT_63 = 736;
+
     //
     // MessageId: ERROR_USER_APC
     //
@@ -3597,7 +4048,9 @@ public interface WinError {
     //
     // ERROR_KERNEL_APC
     //
+
     int ERROR_KERNEL_APC = 738;
+
     //
     // MessageId: ERROR_ALERTED
     //
@@ -3606,6 +4059,7 @@ public interface WinError {
     // ERROR_ALERTED
     //
     int ERROR_ALERTED = 739;
+
     //
     // MessageId: ERROR_ELEVATION_REQUIRED
     //
@@ -3614,6 +4068,7 @@ public interface WinError {
     // The requested operation requires elevation.
     //
     int ERROR_ELEVATION_REQUIRED = 740;
+
     //
     // MessageId: ERROR_REPARSE
     //
@@ -3623,6 +4078,7 @@ public interface WinError {
     // file resulted in a symbolic link.
     //
     int ERROR_REPARSE = 741;
+
     //
     // MessageId: ERROR_OPLOCK_BREAK_IN_PROGRESS
     //
@@ -3631,6 +4087,7 @@ public interface WinError {
     // An open/create operation completed while an oplock break is underway.
     //
     int ERROR_OPLOCK_BREAK_IN_PROGRESS = 742;
+
     //
     // MessageId: ERROR_VOLUME_MOUNTED
     //
@@ -3639,6 +4096,7 @@ public interface WinError {
     // A new volume has been mounted by a file system.
     //
     int ERROR_VOLUME_MOUNTED = 743;
+
     //
     // MessageId: ERROR_RXACT_COMMITTED
     //
@@ -3650,6 +4108,7 @@ public interface WinError {
     // The commit has now been completed.
     //
     int ERROR_RXACT_COMMITTED = 744;
+
     //
     // MessageId: ERROR_NOTIFY_CLEANUP
     //
@@ -3659,6 +4118,7 @@ public interface WinError {
     // closing the handle which made the notify change request.
     //
     int ERROR_NOTIFY_CLEANUP = 745;
+
     //
     // MessageId: ERROR_PRIMARY_TRANSPORT_CONNECT_FAILED
     //
@@ -3670,6 +4130,7 @@ public interface WinError {
     // The computer WAS able to connect on a secondary transport.
     //
     int ERROR_PRIMARY_TRANSPORT_CONNECT_FAILED = 746;
+
     //
     // MessageId: ERROR_PAGE_FAULT_TRANSITION
     //
@@ -3678,6 +4139,7 @@ public interface WinError {
     // Page fault was a transition fault.
     //
     int ERROR_PAGE_FAULT_TRANSITION = 747;
+
     //
     // MessageId: ERROR_PAGE_FAULT_DEMAND_ZERO
     //
@@ -3686,6 +4148,7 @@ public interface WinError {
     // Page fault was a demand zero fault.
     //
     int ERROR_PAGE_FAULT_DEMAND_ZERO = 748;
+
     //
     // MessageId: ERROR_PAGE_FAULT_COPY_ON_WRITE
     //
@@ -3694,6 +4157,7 @@ public interface WinError {
     // Page fault was a demand zero fault.
     //
     int ERROR_PAGE_FAULT_COPY_ON_WRITE = 749;
+
     //
     // MessageId: ERROR_PAGE_FAULT_GUARD_PAGE
     //
@@ -3702,6 +4166,7 @@ public interface WinError {
     // Page fault was a demand zero fault.
     //
     int ERROR_PAGE_FAULT_GUARD_PAGE = 750;
+
     //
     // MessageId: ERROR_PAGE_FAULT_PAGING_FILE
     //
@@ -3710,6 +4175,7 @@ public interface WinError {
     // Page fault was satisfied by reading from a secondary storage device.
     //
     int ERROR_PAGE_FAULT_PAGING_FILE = 751;
+
     //
     // MessageId: ERROR_CACHE_PAGE_LOCKED
     //
@@ -3718,6 +4184,7 @@ public interface WinError {
     // Cached page was locked during operation.
     //
     int ERROR_CACHE_PAGE_LOCKED = 752;
+
     //
     // MessageId: ERROR_CRASH_DUMP
     //
@@ -3726,6 +4193,7 @@ public interface WinError {
     // Crash dump exists in paging file.
     //
     int ERROR_CRASH_DUMP = 753;
+
     //
     // MessageId: ERROR_BUFFER_ALL_ZEROS
     //
@@ -3734,6 +4202,7 @@ public interface WinError {
     // Specified buffer contains all zeros.
     //
     int ERROR_BUFFER_ALL_ZEROS = 754;
+
     //
     // MessageId: ERROR_REPARSE_OBJECT
     //
@@ -3743,6 +4212,7 @@ public interface WinError {
     // file resulted in a symbolic link.
     //
     int ERROR_REPARSE_OBJECT = 755;
+
     //
     // MessageId: ERROR_RESOURCE_REQUIREMENTS_CHANGED
     //
@@ -3752,6 +4222,7 @@ public interface WinError {
     // changed.
     //
     int ERROR_RESOURCE_REQUIREMENTS_CHANGED = 756;
+
     //
     // MessageId: ERROR_TRANSLATION_COMPLETE
     //
@@ -3761,6 +4232,7 @@ public interface WinError {
     // no further translations should be performed.
     //
     int ERROR_TRANSLATION_COMPLETE = 757;
+
     //
     // MessageId: ERROR_NOTHING_TO_TERMINATE
     //
@@ -3769,6 +4241,7 @@ public interface WinError {
     // A process being terminated has no threads to terminate.
     //
     int ERROR_NOTHING_TO_TERMINATE = 758;
+
     //
     // MessageId: ERROR_PROCESS_NOT_IN_JOB
     //
@@ -3777,6 +4250,7 @@ public interface WinError {
     // The specified process is not part of a job.
     //
     int ERROR_PROCESS_NOT_IN_JOB = 759;
+
     //
     // MessageId: ERROR_PROCESS_IN_JOB
     //
@@ -3785,6 +4259,7 @@ public interface WinError {
     // The specified process is part of a job.
     //
     int ERROR_PROCESS_IN_JOB = 760;
+
     //
     // MessageId: ERROR_VOLSNAP_HIBERNATE_READY
     //
@@ -3794,6 +4269,7 @@ public interface WinError {
     // The system is now ready for hibernation.
     //
     int ERROR_VOLSNAP_HIBERNATE_READY = 761;
+
     //
     // MessageId: ERROR_FSFILTER_OP_COMPLETED_SUCCESSFULLY
     //
@@ -3803,6 +4279,7 @@ public interface WinError {
     // FsFilter operation.
     //
     int ERROR_FSFILTER_OP_COMPLETED_SUCCESSFULLY = 762;
+
     //
     // MessageId: ERROR_INTERRUPT_VECTOR_ALREADY_CONNECTED
     //
@@ -3811,6 +4288,7 @@ public interface WinError {
     // The specified interrupt vector was already connected.
     //
     int ERROR_INTERRUPT_VECTOR_ALREADY_CONNECTED = 763;
+
     //
     // MessageId: ERROR_INTERRUPT_STILL_CONNECTED
     //
@@ -3819,6 +4297,7 @@ public interface WinError {
     // The specified interrupt vector is still connected.
     //
     int ERROR_INTERRUPT_STILL_CONNECTED = 764;
+
     //
     // MessageId: ERROR_WAIT_FOR_OPLOCK
     //
@@ -3827,6 +4306,7 @@ public interface WinError {
     // An operation is blocked waiting for an oplock.
     //
     int ERROR_WAIT_FOR_OPLOCK = 765;
+
     //
     // MessageId: ERROR_DBG_EXCEPTION_HANDLED
     //
@@ -3842,6 +4322,7 @@ public interface WinError {
     //
     // Debugger continued
     //
+
     int ERROR_DBG_CONTINUE = 767; // winnt
     //
     // MessageId: ERROR_CALLBACK_POP_STACK
@@ -3851,7 +4332,9 @@ public interface WinError {
     // An exception occurred in a user mode callback and the kernel callback
     // frame should be removed.
     //
+
     int ERROR_CALLBACK_POP_STACK = 768;
+
     //
     // MessageId: ERROR_COMPRESSION_DISABLED
     //
@@ -3860,6 +4343,7 @@ public interface WinError {
     // Compression is disabled for this volume.
     //
     int ERROR_COMPRESSION_DISABLED = 769;
+
     //
     // MessageId: ERROR_CANTFETCHBACKWARDS
     //
@@ -3868,6 +4352,7 @@ public interface WinError {
     // The data provider cannot fetch backwards through a result set.
     //
     int ERROR_CANTFETCHBACKWARDS = 770;
+
     //
     // MessageId: ERROR_CANTSCROLLBACKWARDS
     //
@@ -3876,6 +4361,7 @@ public interface WinError {
     // The data provider cannot scroll backwards through a result set.
     //
     int ERROR_CANTSCROLLBACKWARDS = 771;
+
     //
     // MessageId: ERROR_ROWSNOTRELEASED
     //
@@ -3885,6 +4371,7 @@ public interface WinError {
     // before asking for more data.
     //
     int ERROR_ROWSNOTRELEASED = 772;
+
     //
     // MessageId: ERROR_BAD_ACCESSOR_FLAGS
     //
@@ -3894,6 +4381,7 @@ public interface WinError {
     // binding in an accessor.
     //
     int ERROR_BAD_ACCESSOR_FLAGS = 773;
+
     //
     // MessageId: ERROR_ERRORS_ENCOUNTERED
     //
@@ -3902,6 +4390,7 @@ public interface WinError {
     // One or more errors occurred while processing the request.
     //
     int ERROR_ERRORS_ENCOUNTERED = 774;
+
     //
     // MessageId: ERROR_NOT_CAPABLE
     //
@@ -3910,6 +4399,7 @@ public interface WinError {
     // The implementation is not capable of performing the request.
     //
     int ERROR_NOT_CAPABLE = 775;
+
     //
     // MessageId: ERROR_REQUEST_OUT_OF_SEQUENCE
     //
@@ -3919,6 +4409,7 @@ public interface WinError {
     // the state of the component instance.
     //
     int ERROR_REQUEST_OUT_OF_SEQUENCE = 776;
+
     //
     // MessageId: ERROR_VERSION_PARSE_ERROR
     //
@@ -3927,6 +4418,7 @@ public interface WinError {
     // A version number could not be parsed.
     //
     int ERROR_VERSION_PARSE_ERROR = 777;
+
     //
     // MessageId: ERROR_BADSTARTPOSITION
     //
@@ -3935,6 +4427,7 @@ public interface WinError {
     // The iterator's start position is invalid.
     //
     int ERROR_BADSTARTPOSITION = 778;
+
     //
     // MessageId: ERROR_MEMORY_HARDWARE
     //
@@ -3943,6 +4436,7 @@ public interface WinError {
     // The hardware has reported an uncorrectable memory error.
     //
     int ERROR_MEMORY_HARDWARE = 779;
+
     //
     // MessageId: ERROR_DISK_REPAIR_DISABLED
     //
@@ -3951,6 +4445,7 @@ public interface WinError {
     // The attempted operation required self healing to be enabled.
     //
     int ERROR_DISK_REPAIR_DISABLED = 780;
+
     //
     // MessageId: ERROR_INSUFFICIENT_RESOURCE_FOR_SPECIFIED_SHARED_SECTION_SIZE
     //
@@ -3960,6 +4455,7 @@ public interface WinError {
     // There is more information in the system event log.
     //
     int ERROR_INSUFFICIENT_RESOURCE_FOR_SPECIFIED_SHARED_SECTION_SIZE = 781;
+
     //
     // MessageId: ERROR_SYSTEM_POWERSTATE_TRANSITION
     //
@@ -3968,6 +4464,7 @@ public interface WinError {
     // The system powerstate is transitioning from %2 to %3.
     //
     int ERROR_SYSTEM_POWERSTATE_TRANSITION = 782;
+
     //
     // MessageId: ERROR_SYSTEM_POWERSTATE_COMPLEX_TRANSITION
     //
@@ -3976,6 +4473,7 @@ public interface WinError {
     // The system powerstate is transitioning from %2 to %3 but could enter %4.
     //
     int ERROR_SYSTEM_POWERSTATE_COMPLEX_TRANSITION = 783;
+
     //
     // MessageId: ERROR_MCA_EXCEPTION
     //
@@ -3984,6 +4482,7 @@ public interface WinError {
     // A thread is getting dispatched with MCA EXCEPTION because of MCA.
     //
     int ERROR_MCA_EXCEPTION = 784;
+
     //
     // MessageId: ERROR_ACCESS_AUDIT_BY_POLICY
     //
@@ -3992,6 +4491,7 @@ public interface WinError {
     // Access to %1 is monitored by policy rule %2.
     //
     int ERROR_ACCESS_AUDIT_BY_POLICY = 785;
+
     //
     // MessageId: ERROR_ACCESS_DISABLED_NO_SAFER_UI_BY_POLICY
     //
@@ -4000,6 +4500,7 @@ public interface WinError {
     // Access to %1 has been restricted by your Administrator by policy rule %2.
     //
     int ERROR_ACCESS_DISABLED_NO_SAFER_UI_BY_POLICY = 786;
+
     //
     // MessageId: ERROR_ABANDON_HIBERFILE
     //
@@ -4008,6 +4509,7 @@ public interface WinError {
     // A valid hibernation file has been invalidated and should be abandoned.
     //
     int ERROR_ABANDON_HIBERFILE = 787;
+
     //
     // MessageId: ERROR_LOST_WRITEBEHIND_DATA_NETWORK_DISCONNECTED
     //
@@ -4020,6 +4522,7 @@ public interface WinError {
     // save this file elsewhere.
     //
     int ERROR_LOST_WRITEBEHIND_DATA_NETWORK_DISCONNECTED = 788;
+
     //
     // MessageId: ERROR_LOST_WRITEBEHIND_DATA_NETWORK_SERVER_ERROR
     //
@@ -4032,6 +4535,7 @@ public interface WinError {
     // try to save this file elsewhere.
     //
     int ERROR_LOST_WRITEBEHIND_DATA_NETWORK_SERVER_ERROR = 789;
+
     //
     // MessageId: ERROR_LOST_WRITEBEHIND_DATA_LOCAL_DISK_ERROR
     //
@@ -4044,6 +4548,7 @@ public interface WinError {
     // write-protected.
     //
     int ERROR_LOST_WRITEBEHIND_DATA_LOCAL_DISK_ERROR = 790;
+
     //
     // MessageId: ERROR_BAD_MCFG_TABLE
     //
@@ -4052,6 +4557,7 @@ public interface WinError {
     // The resources required for this device conflict with the MCFG table.
     //
     int ERROR_BAD_MCFG_TABLE = 791;
+
     //
     // MessageId: ERROR_EA_ACCESS_DENIED
     //
@@ -4060,6 +4566,7 @@ public interface WinError {
     // Access to the extended attribute was denied.
     //
     int ERROR_EA_ACCESS_DENIED = 994;
+
     //
     // MessageId: ERROR_OPERATION_ABORTED
     //
@@ -4069,6 +4576,7 @@ public interface WinError {
     // application request.
     //
     int ERROR_OPERATION_ABORTED = 995;
+
     //
     // MessageId: ERROR_IO_INCOMPLETE
     //
@@ -4077,6 +4585,7 @@ public interface WinError {
     // Overlapped I/O event is not in a signaled state.
     //
     int ERROR_IO_INCOMPLETE = 996;
+
     //
     // MessageId: ERROR_IO_PENDING
     //
@@ -4092,7 +4601,9 @@ public interface WinError {
     //
     // Invalid access to memory location.
     //
+
     int ERROR_NOACCESS = 998;
+
     //
     // MessageId: ERROR_SWAPERROR
     //
@@ -4101,6 +4612,7 @@ public interface WinError {
     // Error performing inpage operation.
     //
     int ERROR_SWAPERROR = 999;
+
     //
     // MessageId: ERROR_STACK_OVERFLOW
     //
@@ -4109,6 +4621,7 @@ public interface WinError {
     // Recursion too deep; the stack overflowed.
     //
     int ERROR_STACK_OVERFLOW = 1001;
+
     //
     // MessageId: ERROR_INVALID_MESSAGE
     //
@@ -4117,6 +4630,7 @@ public interface WinError {
     // The window cannot act on the sent message.
     //
     int ERROR_INVALID_MESSAGE = 1002;
+
     //
     // MessageId: ERROR_CAN_NOT_COMPLETE
     //
@@ -4125,6 +4639,7 @@ public interface WinError {
     // Cannot complete this function.
     //
     int ERROR_CAN_NOT_COMPLETE = 1003;
+
     //
     // MessageId: ERROR_INVALID_FLAGS
     //
@@ -4133,6 +4648,7 @@ public interface WinError {
     // Invalid flags.
     //
     int ERROR_INVALID_FLAGS = 1004;
+
     //
     // MessageId: ERROR_UNRECOGNIZED_VOLUME
     //
@@ -4143,6 +4659,7 @@ public interface WinError {
     // that the volume is not corrupted.
     //
     int ERROR_UNRECOGNIZED_VOLUME = 1005;
+
     //
     // MessageId: ERROR_FILE_INVALID
     //
@@ -4152,6 +4669,7 @@ public interface WinError {
     // is no longer valid.
     //
     int ERROR_FILE_INVALID = 1006;
+
     //
     // MessageId: ERROR_FULLSCREEN_MODE
     //
@@ -4160,6 +4678,7 @@ public interface WinError {
     // The requested operation cannot be performed in full-screen mode.
     //
     int ERROR_FULLSCREEN_MODE = 1007;
+
     //
     // MessageId: ERROR_NO_TOKEN
     //
@@ -4168,6 +4687,7 @@ public interface WinError {
     // An attempt was made to reference a token that does not exist.
     //
     int ERROR_NO_TOKEN = 1008;
+
     //
     // MessageId: ERROR_BADDB
     //
@@ -4176,6 +4696,7 @@ public interface WinError {
     // The configuration registry database is corrupt.
     //
     int ERROR_BADDB = 1009;
+
     //
     // MessageId: ERROR_BADKEY
     //
@@ -4184,6 +4705,7 @@ public interface WinError {
     // The configuration registry key is invalid.
     //
     int ERROR_BADKEY = 1010;
+
     //
     // MessageId: ERROR_CANTOPEN
     //
@@ -4192,6 +4714,7 @@ public interface WinError {
     // The configuration registry key could not be opened.
     //
     int ERROR_CANTOPEN = 1011;
+
     //
     // MessageId: ERROR_CANTREAD
     //
@@ -4200,6 +4723,7 @@ public interface WinError {
     // The configuration registry key could not be read.
     //
     int ERROR_CANTREAD = 1012;
+
     //
     // MessageId: ERROR_CANTWRITE
     //
@@ -4208,6 +4732,7 @@ public interface WinError {
     // The configuration registry key could not be written.
     //
     int ERROR_CANTWRITE = 1013;
+
     //
     // MessageId: ERROR_REGISTRY_RECOVERED
     //
@@ -4217,6 +4742,7 @@ public interface WinError {
     // log or alternate copy. The recovery was successful.
     //
     int ERROR_REGISTRY_RECOVERED = 1014;
+
     //
     // MessageId: ERROR_REGISTRY_CORRUPT
     //
@@ -4228,6 +4754,7 @@ public interface WinError {
     // or log was absent or corrupted.
     //
     int ERROR_REGISTRY_CORRUPT = 1015;
+
     //
     // MessageId: ERROR_REGISTRY_IO_FAILED
     //
@@ -4238,6 +4765,7 @@ public interface WinError {
     // contain the system's image of the registry.
     //
     int ERROR_REGISTRY_IO_FAILED = 1016;
+
     //
     // MessageId: ERROR_NOT_REGISTRY_FILE
     //
@@ -4247,6 +4775,7 @@ public interface WinError {
     // the specified file is not in a registry file format.
     //
     int ERROR_NOT_REGISTRY_FILE = 1017;
+
     //
     // MessageId: ERROR_KEY_DELETED
     //
@@ -4256,6 +4785,7 @@ public interface WinError {
     // deletion.
     //
     int ERROR_KEY_DELETED = 1018;
+
     //
     // MessageId: ERROR_NO_LOG_SPACE
     //
@@ -4264,6 +4794,7 @@ public interface WinError {
     // System could not allocate the required space in a registry log.
     //
     int ERROR_NO_LOG_SPACE = 1019;
+
     //
     // MessageId: ERROR_KEY_HAS_CHILDREN
     //
@@ -4273,6 +4804,7 @@ public interface WinError {
     // or values.
     //
     int ERROR_KEY_HAS_CHILDREN = 1020;
+
     //
     // MessageId: ERROR_CHILD_MUST_BE_VOLATILE
     //
@@ -4281,6 +4813,7 @@ public interface WinError {
     // Cannot create a stable subkey under a volatile parent key.
     //
     int ERROR_CHILD_MUST_BE_VOLATILE = 1021;
+
     //
     // MessageId: ERROR_NOTIFY_ENUM_DIR
     //
@@ -4291,6 +4824,7 @@ public interface WinError {
     // the files to find the changes.
     //
     int ERROR_NOTIFY_ENUM_DIR = 1022;
+
     //
     // MessageId: ERROR_DEPENDENT_SERVICES_RUNNING
     //
@@ -4300,6 +4834,7 @@ public interface WinError {
     // dependent on.
     //
     int ERROR_DEPENDENT_SERVICES_RUNNING = 1051;
+
     //
     // MessageId: ERROR_INVALID_SERVICE_CONTROL
     //
@@ -4308,6 +4843,7 @@ public interface WinError {
     // The requested control is not valid for this service.
     //
     int ERROR_INVALID_SERVICE_CONTROL = 1052;
+
     //
     // MessageId: ERROR_SERVICE_REQUEST_TIMEOUT
     //
@@ -4317,6 +4853,7 @@ public interface WinError {
     // fashion.
     //
     int ERROR_SERVICE_REQUEST_TIMEOUT = 1053;
+
     //
     // MessageId: ERROR_SERVICE_NO_THREAD
     //
@@ -4325,6 +4862,7 @@ public interface WinError {
     // A thread could not be created for the service.
     //
     int ERROR_SERVICE_NO_THREAD = 1054;
+
     //
     // MessageId: ERROR_SERVICE_DATABASE_LOCKED
     //
@@ -4333,6 +4871,7 @@ public interface WinError {
     // The service database is locked.
     //
     int ERROR_SERVICE_DATABASE_LOCKED = 1055;
+
     //
     // MessageId: ERROR_SERVICE_ALREADY_RUNNING
     //
@@ -4341,6 +4880,7 @@ public interface WinError {
     // An instance of the service is already running.
     //
     int ERROR_SERVICE_ALREADY_RUNNING = 1056;
+
     //
     // MessageId: ERROR_INVALID_SERVICE_ACCOUNT
     //
@@ -4350,6 +4890,7 @@ public interface WinError {
     // for the account name specified.
     //
     int ERROR_INVALID_SERVICE_ACCOUNT = 1057;
+
     //
     // MessageId: ERROR_SERVICE_DISABLED
     //
@@ -4359,6 +4900,7 @@ public interface WinError {
     // it has no enabled devices associated with it.
     //
     int ERROR_SERVICE_DISABLED = 1058;
+
     //
     // MessageId: ERROR_CIRCULAR_DEPENDENCY
     //
@@ -4367,6 +4909,7 @@ public interface WinError {
     // Circular service dependency was specified.
     //
     int ERROR_CIRCULAR_DEPENDENCY = 1059;
+
     //
     // MessageId: ERROR_SERVICE_DOES_NOT_EXIST
     //
@@ -4375,6 +4918,7 @@ public interface WinError {
     // The specified service does not exist as an installed service.
     //
     int ERROR_SERVICE_DOES_NOT_EXIST = 1060;
+
     //
     // MessageId: ERROR_SERVICE_CANNOT_ACCEPT_CTRL
     //
@@ -4383,6 +4927,7 @@ public interface WinError {
     // The service cannot accept control messages at this time.
     //
     int ERROR_SERVICE_CANNOT_ACCEPT_CTRL = 1061;
+
     //
     // MessageId: ERROR_SERVICE_NOT_ACTIVE
     //
@@ -4391,6 +4936,7 @@ public interface WinError {
     // The service has not been started.
     //
     int ERROR_SERVICE_NOT_ACTIVE = 1062;
+
     //
     // MessageId: ERROR_FAILED_SERVICE_CONTROLLER_CONNECT
     //
@@ -4399,6 +4945,7 @@ public interface WinError {
     // The service process could not connect to the service controller.
     //
     int ERROR_FAILED_SERVICE_CONTROLLER_CONNECT = 1063;
+
     //
     // MessageId: ERROR_EXCEPTION_IN_SERVICE
     //
@@ -4407,6 +4954,7 @@ public interface WinError {
     // An exception occurred in the service when handling the control request.
     //
     int ERROR_EXCEPTION_IN_SERVICE = 1064;
+
     //
     // MessageId: ERROR_DATABASE_DOES_NOT_EXIST
     //
@@ -4415,6 +4963,7 @@ public interface WinError {
     // The database specified does not exist.
     //
     int ERROR_DATABASE_DOES_NOT_EXIST = 1065;
+
     //
     // MessageId: ERROR_SERVICE_SPECIFIC_ERROR
     //
@@ -4423,6 +4972,7 @@ public interface WinError {
     // The service has returned a service-specific error code.
     //
     int ERROR_SERVICE_SPECIFIC_ERROR = 1066;
+
     //
     // MessageId: ERROR_PROCESS_ABORTED
     //
@@ -4431,6 +4981,7 @@ public interface WinError {
     // The process terminated unexpectedly.
     //
     int ERROR_PROCESS_ABORTED = 1067;
+
     //
     // MessageId: ERROR_SERVICE_DEPENDENCY_FAIL
     //
@@ -4439,6 +4990,7 @@ public interface WinError {
     // The dependency service or group failed to start.
     //
     int ERROR_SERVICE_DEPENDENCY_FAIL = 1068;
+
     //
     // MessageId: ERROR_SERVICE_LOGON_FAILED
     //
@@ -4447,6 +4999,7 @@ public interface WinError {
     // The service did not start due to a logon failure.
     //
     int ERROR_SERVICE_LOGON_FAILED = 1069;
+
     //
     // MessageId: ERROR_SERVICE_START_HANG
     //
@@ -4455,6 +5008,7 @@ public interface WinError {
     // After starting, the service hung in a start-pending state.
     //
     int ERROR_SERVICE_START_HANG = 1070;
+
     //
     // MessageId: ERROR_INVALID_SERVICE_LOCK
     //
@@ -4463,6 +5017,7 @@ public interface WinError {
     // The specified service database lock is invalid.
     //
     int ERROR_INVALID_SERVICE_LOCK = 1071;
+
     //
     // MessageId: ERROR_SERVICE_MARKED_FOR_DELETE
     //
@@ -4471,6 +5026,7 @@ public interface WinError {
     // The specified service has been marked for deletion.
     //
     int ERROR_SERVICE_MARKED_FOR_DELETE = 1072;
+
     //
     // MessageId: ERROR_SERVICE_EXISTS
     //
@@ -4479,6 +5035,7 @@ public interface WinError {
     // The specified service already exists.
     //
     int ERROR_SERVICE_EXISTS = 1073;
+
     //
     // MessageId: ERROR_ALREADY_RUNNING_LKG
     //
@@ -4487,6 +5044,7 @@ public interface WinError {
     // The system is currently running with the last-known-good configuration.
     //
     int ERROR_ALREADY_RUNNING_LKG = 1074;
+
     //
     // MessageId: ERROR_SERVICE_DEPENDENCY_DELETED
     //
@@ -4495,6 +5053,7 @@ public interface WinError {
     // The dependency service does not exist or has been marked for deletion.
     //
     int ERROR_SERVICE_DEPENDENCY_DELETED = 1075;
+
     //
     // MessageId: ERROR_BOOT_ALREADY_ACCEPTED
     //
@@ -4504,6 +5063,7 @@ public interface WinError {
     // control set.
     //
     int ERROR_BOOT_ALREADY_ACCEPTED = 1076;
+
     //
     // MessageId: ERROR_SERVICE_NEVER_STARTED
     //
@@ -4512,6 +5072,7 @@ public interface WinError {
     // No attempts to start the service have been made since the last boot.
     //
     int ERROR_SERVICE_NEVER_STARTED = 1077;
+
     //
     // MessageId: ERROR_DUPLICATE_SERVICE_NAME
     //
@@ -4521,6 +5082,7 @@ public interface WinError {
     // name.
     //
     int ERROR_DUPLICATE_SERVICE_NAME = 1078;
+
     //
     // MessageId: ERROR_DIFFERENT_SERVICE_ACCOUNT
     //
@@ -4530,6 +5092,7 @@ public interface WinError {
     // specified for other services running in the same process.
     //
     int ERROR_DIFFERENT_SERVICE_ACCOUNT = 1079;
+
     //
     // MessageId: ERROR_CANNOT_DETECT_DRIVER_FAILURE
     //
@@ -4538,6 +5101,7 @@ public interface WinError {
     // Failure actions can only be set for Win32 services, not for drivers.
     //
     int ERROR_CANNOT_DETECT_DRIVER_FAILURE = 1080;
+
     //
     // MessageId: ERROR_CANNOT_DETECT_PROCESS_ABORT
     //
@@ -4548,6 +5112,7 @@ public interface WinError {
     // service's process terminates unexpectedly.
     //
     int ERROR_CANNOT_DETECT_PROCESS_ABORT = 1081;
+
     //
     // MessageId: ERROR_NO_RECOVERY_PROGRAM
     //
@@ -4556,6 +5121,7 @@ public interface WinError {
     // No recovery program has been configured for this service.
     //
     int ERROR_NO_RECOVERY_PROGRAM = 1082;
+
     //
     // MessageId: ERROR_SERVICE_NOT_IN_EXE
     //
@@ -4565,6 +5131,7 @@ public interface WinError {
     // implement the service.
     //
     int ERROR_SERVICE_NOT_IN_EXE = 1083;
+
     //
     // MessageId: ERROR_NOT_SAFEBOOT_SERVICE
     //
@@ -4573,6 +5140,7 @@ public interface WinError {
     // This service cannot be started in Safe Mode
     //
     int ERROR_NOT_SAFEBOOT_SERVICE = 1084;
+
     //
     // MessageId: ERROR_END_OF_MEDIA
     //
@@ -4581,6 +5149,7 @@ public interface WinError {
     // The physical end of the tape has been reached.
     //
     int ERROR_END_OF_MEDIA = 1100;
+
     //
     // MessageId: ERROR_FILEMARK_DETECTED
     //
@@ -4589,6 +5158,7 @@ public interface WinError {
     // A tape access reached a filemark.
     //
     int ERROR_FILEMARK_DETECTED = 1101;
+
     //
     // MessageId: ERROR_BEGINNING_OF_MEDIA
     //
@@ -4597,6 +5167,7 @@ public interface WinError {
     // The beginning of the tape or a partition was encountered.
     //
     int ERROR_BEGINNING_OF_MEDIA = 1102;
+
     //
     // MessageId: ERROR_SETMARK_DETECTED
     //
@@ -4605,6 +5176,7 @@ public interface WinError {
     // A tape access reached the end of a set of files.
     //
     int ERROR_SETMARK_DETECTED = 1103;
+
     //
     // MessageId: ERROR_NO_DATA_DETECTED
     //
@@ -4613,6 +5185,7 @@ public interface WinError {
     // No more data is on the tape.
     //
     int ERROR_NO_DATA_DETECTED = 1104;
+
     //
     // MessageId: ERROR_PARTITION_FAILURE
     //
@@ -4621,6 +5194,7 @@ public interface WinError {
     // Tape could not be partitioned.
     //
     int ERROR_PARTITION_FAILURE = 1105;
+
     //
     // MessageId: ERROR_INVALID_BLOCK_LENGTH
     //
@@ -4630,6 +5204,7 @@ public interface WinError {
     // size is incorrect.
     //
     int ERROR_INVALID_BLOCK_LENGTH = 1106;
+
     //
     // MessageId: ERROR_DEVICE_NOT_PARTITIONED
     //
@@ -4638,6 +5213,7 @@ public interface WinError {
     // Tape partition information could not be found when loading a tape.
     //
     int ERROR_DEVICE_NOT_PARTITIONED = 1107;
+
     //
     // MessageId: ERROR_UNABLE_TO_LOCK_MEDIA
     //
@@ -4646,6 +5222,7 @@ public interface WinError {
     // Unable to lock the media eject mechanism.
     //
     int ERROR_UNABLE_TO_LOCK_MEDIA = 1108;
+
     //
     // MessageId: ERROR_UNABLE_TO_UNLOAD_MEDIA
     //
@@ -4654,6 +5231,7 @@ public interface WinError {
     // Unable to unload the media.
     //
     int ERROR_UNABLE_TO_UNLOAD_MEDIA = 1109;
+
     //
     // MessageId: ERROR_MEDIA_CHANGED
     //
@@ -4662,6 +5240,7 @@ public interface WinError {
     // The media in the drive may have changed.
     //
     int ERROR_MEDIA_CHANGED = 1110;
+
     //
     // MessageId: ERROR_BUS_RESET
     //
@@ -4670,6 +5249,7 @@ public interface WinError {
     // The I/O bus was reset.
     //
     int ERROR_BUS_RESET = 1111;
+
     //
     // MessageId: ERROR_NO_MEDIA_IN_DRIVE
     //
@@ -4678,6 +5258,7 @@ public interface WinError {
     // No media in drive.
     //
     int ERROR_NO_MEDIA_IN_DRIVE = 1112;
+
     //
     // MessageId: ERROR_NO_UNICODE_TRANSLATION
     //
@@ -4687,6 +5268,7 @@ public interface WinError {
     // page.
     //
     int ERROR_NO_UNICODE_TRANSLATION = 1113;
+
     //
     // MessageId: ERROR_DLL_INIT_FAILED
     //
@@ -4695,6 +5277,7 @@ public interface WinError {
     // A dynamic link library (DL; initialization routine failed.
     //
     int ERROR_DLL_INIT_FAILED = 1114;
+
     //
     // MessageId: ERROR_SHUTDOWN_IN_PROGRESS
     //
@@ -4703,6 +5286,7 @@ public interface WinError {
     // A system shutdown is in progress.
     //
     int ERROR_SHUTDOWN_IN_PROGRESS = 1115;
+
     //
     // MessageId: ERROR_NO_SHUTDOWN_IN_PROGRESS
     //
@@ -4711,6 +5295,7 @@ public interface WinError {
     // Unable to abort the system shutdown because no shutdown was in progress.
     //
     int ERROR_NO_SHUTDOWN_IN_PROGRESS = 1116;
+
     //
     // MessageId: ERROR_IO_DEVICE
     //
@@ -4719,6 +5304,7 @@ public interface WinError {
     // The request could not be performed because of an I/O device error.
     //
     int ERROR_IO_DEVICE = 1117;
+
     //
     // MessageId: ERROR_SERIAL_NO_DEVICE
     //
@@ -4728,6 +5314,7 @@ public interface WinError {
     // unload.
     //
     int ERROR_SERIAL_NO_DEVICE = 1118;
+
     //
     // MessageId: ERROR_IRQ_BUSY
     //
@@ -4738,6 +5325,7 @@ public interface WinError {
     // opened.
     //
     int ERROR_IRQ_BUSY = 1119;
+
     //
     // MessageId: ERROR_MORE_WRITES
     //
@@ -4747,6 +5335,7 @@ public interface WinError {
     // (The IOCTL_SERIAL_XOFF_COUNTER reached zero.)
     //
     int ERROR_MORE_WRITES = 1120;
+
     //
     // MessageId: ERROR_COUNTER_TIMEOUT
     //
@@ -4756,6 +5345,7 @@ public interface WinError {
     // (The IOCTL_SERIAL_XOFF_COUNTER did not reach zero.)
     //
     int ERROR_COUNTER_TIMEOUT = 1121;
+
     //
     // MessageId: ERROR_FLOPPY_ID_MARK_NOT_FOUND
     //
@@ -4764,6 +5354,7 @@ public interface WinError {
     // No ID address mark was found on the floppy disk.
     //
     int ERROR_FLOPPY_ID_MARK_NOT_FOUND = 1122;
+
     //
     // MessageId: ERROR_FLOPPY_WRONG_CYLINDER
     //
@@ -4773,6 +5364,7 @@ public interface WinError {
     // controller track address.
     //
     int ERROR_FLOPPY_WRONG_CYLINDER = 1123;
+
     //
     // MessageId: ERROR_FLOPPY_UNKNOWN_ERROR
     //
@@ -4782,6 +5374,7 @@ public interface WinError {
     // the floppy disk driver.
     //
     int ERROR_FLOPPY_UNKNOWN_ERROR = 1124;
+
     //
     // MessageId: ERROR_FLOPPY_BAD_REGISTERS
     //
@@ -4791,6 +5384,7 @@ public interface WinError {
     // registers.
     //
     int ERROR_FLOPPY_BAD_REGISTERS = 1125;
+
     //
     // MessageId: ERROR_DISK_RECALIBRATE_FAILED
     //
@@ -4800,6 +5394,7 @@ public interface WinError {
     // retries.
     //
     int ERROR_DISK_RECALIBRATE_FAILED = 1126;
+
     //
     // MessageId: ERROR_DISK_OPERATION_FAILED
     //
@@ -4809,6 +5404,7 @@ public interface WinError {
     // retries.
     //
     int ERROR_DISK_OPERATION_FAILED = 1127;
+
     //
     // MessageId: ERROR_DISK_RESET_FAILED
     //
@@ -4818,6 +5414,7 @@ public interface WinError {
     // even that failed.
     //
     int ERROR_DISK_RESET_FAILED = 1128;
+
     //
     // MessageId: ERROR_EOM_OVERFLOW
     //
@@ -4826,6 +5423,7 @@ public interface WinError {
     // Physical end of tape encountered.
     //
     int ERROR_EOM_OVERFLOW = 1129;
+
     //
     // MessageId: ERROR_NOT_ENOUGH_SERVER_MEMORY
     //
@@ -4834,6 +5432,7 @@ public interface WinError {
     // Not enough server storage is available to process this command.
     //
     int ERROR_NOT_ENOUGH_SERVER_MEMORY = 1130;
+
     //
     // MessageId: ERROR_POSSIBLE_DEADLOCK
     //
@@ -4842,6 +5441,7 @@ public interface WinError {
     // A potential deadlock condition has been detected.
     //
     int ERROR_POSSIBLE_DEADLOCK = 1131;
+
     //
     // MessageId: ERROR_MAPPED_ALIGNMENT
     //
@@ -4851,6 +5451,7 @@ public interface WinError {
     // alignment.
     //
     int ERROR_MAPPED_ALIGNMENT = 1132;
+
     //
     // MessageId: ERROR_SET_POWER_STATE_VETOED
     //
@@ -4860,6 +5461,7 @@ public interface WinError {
     // application or driver.
     //
     int ERROR_SET_POWER_STATE_VETOED = 1140;
+
     //
     // MessageId: ERROR_SET_POWER_STATE_FAILED
     //
@@ -4868,6 +5470,7 @@ public interface WinError {
     // The system BIOS failed an attempt to change the system power state.
     //
     int ERROR_SET_POWER_STATE_FAILED = 1141;
+
     //
     // MessageId: ERROR_TOO_MANY_LINKS
     //
@@ -4877,6 +5480,7 @@ public interface WinError {
     // supports.
     //
     int ERROR_TOO_MANY_LINKS = 1142;
+
     //
     // MessageId: ERROR_OLD_WIN_VERSION
     //
@@ -4885,6 +5489,7 @@ public interface WinError {
     // The specified program requires a newer version of Windows.
     //
     int ERROR_OLD_WIN_VERSION = 1150;
+
     //
     // MessageId: ERROR_APP_WRONG_OS
     //
@@ -4893,6 +5498,7 @@ public interface WinError {
     // The specified program is not a Windows or MS-DOS program.
     //
     int ERROR_APP_WRONG_OS = 1151;
+
     //
     // MessageId: ERROR_SINGLE_INSTANCE_APP
     //
@@ -4901,6 +5507,7 @@ public interface WinError {
     // Cannot start more than one instance of the specified program.
     //
     int ERROR_SINGLE_INSTANCE_APP = 1152;
+
     //
     // MessageId: ERROR_RMODE_APP
     //
@@ -4909,6 +5516,7 @@ public interface WinError {
     // The specified program was written for an earlier version of Windows.
     //
     int ERROR_RMODE_APP = 1153;
+
     //
     // MessageId: ERROR_INVALID_DLL
     //
@@ -4917,6 +5525,7 @@ public interface WinError {
     // One of the library files needed to run this application is damaged.
     //
     int ERROR_INVALID_DLL = 1154;
+
     //
     // MessageId: ERROR_NO_ASSOCIATION
     //
@@ -4925,6 +5534,7 @@ public interface WinError {
     // No application is associated with the specified file for this operation.
     //
     int ERROR_NO_ASSOCIATION = 1155;
+
     //
     // MessageId: ERROR_DDE_FAIL
     //
@@ -4933,6 +5543,7 @@ public interface WinError {
     // An error occurred in sending the command to the application.
     //
     int ERROR_DDE_FAIL = 1156;
+
     //
     // MessageId: ERROR_DLL_NOT_FOUND
     //
@@ -4941,6 +5552,7 @@ public interface WinError {
     // One of the library files needed to run this application cannot be found.
     //
     int ERROR_DLL_NOT_FOUND = 1157;
+
     //
     // MessageId: ERROR_NO_MORE_USER_HANDLES
     //
@@ -4950,6 +5562,7 @@ public interface WinError {
     // Window Manager objects.
     //
     int ERROR_NO_MORE_USER_HANDLES = 1158;
+
     //
     // MessageId: ERROR_MESSAGE_SYNC_ONLY
     //
@@ -4958,6 +5571,7 @@ public interface WinError {
     // The message can be used only with synchronous operations.
     //
     int ERROR_MESSAGE_SYNC_ONLY = 1159;
+
     //
     // MessageId: ERROR_SOURCE_ELEMENT_EMPTY
     //
@@ -4966,6 +5580,7 @@ public interface WinError {
     // The indicated source element has no media.
     //
     int ERROR_SOURCE_ELEMENT_EMPTY = 1160;
+
     //
     // MessageId: ERROR_DESTINATION_ELEMENT_FULL
     //
@@ -4974,6 +5589,7 @@ public interface WinError {
     // The indicated destination element already contains media.
     //
     int ERROR_DESTINATION_ELEMENT_FULL = 1161;
+
     //
     // MessageId: ERROR_ILLEGAL_ELEMENT_ADDRESS
     //
@@ -4982,6 +5598,7 @@ public interface WinError {
     // The indicated element does not exist.
     //
     int ERROR_ILLEGAL_ELEMENT_ADDRESS = 1162;
+
     //
     // MessageId: ERROR_MAGAZINE_NOT_PRESENT
     //
@@ -4990,6 +5607,7 @@ public interface WinError {
     // The indicated element is part of a magazine that is not present.
     //
     int ERROR_MAGAZINE_NOT_PRESENT = 1163;
+
     //
     // MessageId: ERROR_DEVICE_REINITIALIZATION_NEEDED
     //
@@ -5006,7 +5624,9 @@ public interface WinError {
     // The device has indicated that cleaning is required before further
     // operations are attempted.
     //
+
     int ERROR_DEVICE_REQUIRES_CLEANING = 1165;
+
     //
     // MessageId: ERROR_DEVICE_DOOR_OPEN
     //
@@ -5015,6 +5635,7 @@ public interface WinError {
     // The device has indicated that its door is open.
     //
     int ERROR_DEVICE_DOOR_OPEN = 1166;
+
     //
     // MessageId: ERROR_DEVICE_NOT_CONNECTED
     //
@@ -5023,6 +5644,7 @@ public interface WinError {
     // The device is not connected.
     //
     int ERROR_DEVICE_NOT_CONNECTED = 1167;
+
     //
     // MessageId: ERROR_NOT_FOUND
     //
@@ -5031,6 +5653,7 @@ public interface WinError {
     // Element not found.
     //
     int ERROR_NOT_FOUND = 1168;
+
     //
     // MessageId: ERROR_NO_MATCH
     //
@@ -5039,6 +5662,7 @@ public interface WinError {
     // There was no match for the specified key in the index.
     //
     int ERROR_NO_MATCH = 1169;
+
     //
     // MessageId: ERROR_SET_NOT_FOUND
     //
@@ -5047,6 +5671,7 @@ public interface WinError {
     // The property set specified does not exist on the object.
     //
     int ERROR_SET_NOT_FOUND = 1170;
+
     //
     // MessageId: ERROR_POINT_NOT_FOUND
     //
@@ -5055,6 +5680,7 @@ public interface WinError {
     // The point passed to GetMouseMovePoints is not in the buffer.
     //
     int ERROR_POINT_NOT_FOUND = 1171;
+
     //
     // MessageId: ERROR_NO_TRACKING_SERVICE
     //
@@ -5063,6 +5689,7 @@ public interface WinError {
     // The tracking (workstation) service is not running.
     //
     int ERROR_NO_TRACKING_SERVICE = 1172;
+
     //
     // MessageId: ERROR_NO_VOLUME_ID
     //
@@ -5071,6 +5698,7 @@ public interface WinError {
     // The Volume ID could not be found.
     //
     int ERROR_NO_VOLUME_ID = 1173;
+
     //
     // MessageId: ERROR_UNABLE_TO_REMOVE_REPLACED
     //
@@ -5079,6 +5707,7 @@ public interface WinError {
     // Unable to remove the file to be replaced.
     //
     int ERROR_UNABLE_TO_REMOVE_REPLACED = 1175;
+
     //
     // MessageId: ERROR_UNABLE_TO_MOVE_REPLACEMENT
     //
@@ -5088,6 +5717,7 @@ public interface WinError {
     // to be replaced has retained its original name.
     //
     int ERROR_UNABLE_TO_MOVE_REPLACEMENT = 1176;
+
     //
     // MessageId: ERROR_UNABLE_TO_MOVE_REPLACEMENT_2
     //
@@ -5097,6 +5727,7 @@ public interface WinError {
     // to be replaced has been renamed using the backup name.
     //
     int ERROR_UNABLE_TO_MOVE_REPLACEMENT_2 = 1177;
+
     //
     // MessageId: ERROR_JOURNAL_DELETE_IN_PROGRESS
     //
@@ -5105,6 +5736,7 @@ public interface WinError {
     // The volume change journal is being deleted.
     //
     int ERROR_JOURNAL_DELETE_IN_PROGRESS = 1178;
+
     //
     // MessageId: ERROR_JOURNAL_NOT_ACTIVE
     //
@@ -5113,6 +5745,7 @@ public interface WinError {
     // The volume change journal is not active.
     //
     int ERROR_JOURNAL_NOT_ACTIVE = 1179;
+
     //
     // MessageId: ERROR_POTENTIAL_FILE_FOUND
     //
@@ -5121,6 +5754,7 @@ public interface WinError {
     // A file was found, but it may not be the correct file.
     //
     int ERROR_POTENTIAL_FILE_FOUND = 1180;
+
     //
     // MessageId: ERROR_JOURNAL_ENTRY_DELETED
     //
@@ -5129,6 +5763,7 @@ public interface WinError {
     // The journal entry has been deleted from the journal.
     //
     int ERROR_JOURNAL_ENTRY_DELETED = 1181;
+
     //
     // MessageId: ERROR_SHUTDOWN_IS_SCHEDULED
     //
@@ -5137,6 +5772,7 @@ public interface WinError {
     // A system shutdown has already been scheduled.
     //
     int ERROR_SHUTDOWN_IS_SCHEDULED = 1190;
+
     //
     // MessageId: ERROR_SHUTDOWN_USERS_LOGGED_ON
     //
@@ -5146,6 +5782,7 @@ public interface WinError {
     // logged on to the computer.
     //
     int ERROR_SHUTDOWN_USERS_LOGGED_ON = 1191;
+
     //
     // MessageId: ERROR_BAD_DEVICE
     //
@@ -5154,6 +5791,7 @@ public interface WinError {
     // The specified device name is invalid.
     //
     int ERROR_BAD_DEVICE = 1200;
+
     //
     // MessageId: ERROR_CONNECTION_UNAVAIL
     //
@@ -5162,6 +5800,7 @@ public interface WinError {
     // The device is not currently connected but it is a remembered connection.
     //
     int ERROR_CONNECTION_UNAVAIL = 1201;
+
     //
     // MessageId: ERROR_DEVICE_ALREADY_REMEMBERED
     //
@@ -5171,6 +5810,7 @@ public interface WinError {
     // resource.
     //
     int ERROR_DEVICE_ALREADY_REMEMBERED = 1202;
+
     //
     // MessageId: ERROR_NO_NET_OR_BAD_PATH
     //
@@ -5181,6 +5821,7 @@ public interface WinError {
     // or contact your network administrator.
     //
     int ERROR_NO_NET_OR_BAD_PATH = 1203;
+
     //
     // MessageId: ERROR_BAD_PROVIDER
     //
@@ -5189,6 +5830,7 @@ public interface WinError {
     // The specified network provider name is invalid.
     //
     int ERROR_BAD_PROVIDER = 1204;
+
     //
     // MessageId: ERROR_CANNOT_OPEN_PROFILE
     //
@@ -5197,6 +5839,7 @@ public interface WinError {
     // Unable to open the network connection profile.
     //
     int ERROR_CANNOT_OPEN_PROFILE = 1205;
+
     //
     // MessageId: ERROR_BAD_PROFILE
     //
@@ -5205,6 +5848,7 @@ public interface WinError {
     // The network connection profile is corrupted.
     //
     int ERROR_BAD_PROFILE = 1206;
+
     //
     // MessageId: ERROR_NOT_CONTAINER
     //
@@ -5213,6 +5857,7 @@ public interface WinError {
     // Cannot enumerate a noncontainer.
     //
     int ERROR_NOT_CONTAINER = 1207;
+
     //
     // MessageId: ERROR_EXTENDED_ERROR
     //
@@ -5221,6 +5866,7 @@ public interface WinError {
     // An extended error has occurred.
     //
     int ERROR_EXTENDED_ERROR = 1208;
+
     //
     // MessageId: ERROR_INVALID_GROUPNAME
     //
@@ -5229,6 +5875,7 @@ public interface WinError {
     // The format of the specified group name is invalid.
     //
     int ERROR_INVALID_GROUPNAME = 1209;
+
     //
     // MessageId: ERROR_INVALID_COMPUTERNAME
     //
@@ -5237,6 +5884,7 @@ public interface WinError {
     // The format of the specified computer name is invalid.
     //
     int ERROR_INVALID_COMPUTERNAME = 1210;
+
     //
     // MessageId: ERROR_INVALID_EVENTNAME
     //
@@ -5245,6 +5893,7 @@ public interface WinError {
     // The format of the specified event name is invalid.
     //
     int ERROR_INVALID_EVENTNAME = 1211;
+
     //
     // MessageId: ERROR_INVALID_DOMAINNAME
     //
@@ -5253,6 +5902,7 @@ public interface WinError {
     // The format of the specified domain name is invalid.
     //
     int ERROR_INVALID_DOMAINNAME = 1212;
+
     //
     // MessageId: ERROR_INVALID_SERVICENAME
     //
@@ -5261,6 +5911,7 @@ public interface WinError {
     // The format of the specified service name is invalid.
     //
     int ERROR_INVALID_SERVICENAME = 1213;
+
     //
     // MessageId: ERROR_INVALID_NETNAME
     //
@@ -5269,6 +5920,7 @@ public interface WinError {
     // The format of the specified network name is invalid.
     //
     int ERROR_INVALID_NETNAME = 1214;
+
     //
     // MessageId: ERROR_INVALID_SHARENAME
     //
@@ -5277,6 +5929,7 @@ public interface WinError {
     // The format of the specified share name is invalid.
     //
     int ERROR_INVALID_SHARENAME = 1215;
+
     //
     // MessageId: ERROR_INVALID_PASSWORDNAME
     //
@@ -5285,6 +5938,7 @@ public interface WinError {
     // The format of the specified password is invalid.
     //
     int ERROR_INVALID_PASSWORDNAME = 1216;
+
     //
     // MessageId: ERROR_INVALID_MESSAGENAME
     //
@@ -5293,6 +5947,7 @@ public interface WinError {
     // The format of the specified message name is invalid.
     //
     int ERROR_INVALID_MESSAGENAME = 1217;
+
     //
     // MessageId: ERROR_INVALID_MESSAGEDEST
     //
@@ -5301,6 +5956,7 @@ public interface WinError {
     // The format of the specified message destination is invalid.
     //
     int ERROR_INVALID_MESSAGEDEST = 1218;
+
     //
     // MessageId: ERROR_SESSION_CREDENTIAL_CONFLICT
     //
@@ -5311,6 +5967,7 @@ public interface WinError {
     // connections to the server or shared resource and try again.
     //
     int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
+
     //
     // MessageId: ERROR_REMOTE_SESSION_LIMIT_EXCEEDED
     //
@@ -5320,6 +5977,7 @@ public interface WinError {
     // are already too many sessions established to that server.
     //
     int ERROR_REMOTE_SESSION_LIMIT_EXCEEDED = 1220;
+
     //
     // MessageId: ERROR_DUP_DOMAINNAME
     //
@@ -5329,6 +5987,7 @@ public interface WinError {
     // network.
     //
     int ERROR_DUP_DOMAINNAME = 1221;
+
     //
     // MessageId: ERROR_NO_NETWORK
     //
@@ -5337,6 +5996,7 @@ public interface WinError {
     // The network is not present or not started.
     //
     int ERROR_NO_NETWORK = 1222;
+
     //
     // MessageId: ERROR_CANCELLED
     //
@@ -5345,6 +6005,7 @@ public interface WinError {
     // The operation was canceled by the user.
     //
     int ERROR_CANCELLED = 1223;
+
     //
     // MessageId: ERROR_USER_MAPPED_FILE
     //
@@ -5354,6 +6015,7 @@ public interface WinError {
     // section open.
     //
     int ERROR_USER_MAPPED_FILE = 1224;
+
     //
     // MessageId: ERROR_CONNECTION_REFUSED
     //
@@ -5362,6 +6024,7 @@ public interface WinError {
     // The remote computer refused the network connection.
     //
     int ERROR_CONNECTION_REFUSED = 1225;
+
     //
     // MessageId: ERROR_GRACEFUL_DISCONNECT
     //
@@ -5370,6 +6033,7 @@ public interface WinError {
     // The network connection was gracefully closed.
     //
     int ERROR_GRACEFUL_DISCONNECT = 1226;
+
     //
     // MessageId: ERROR_ADDRESS_ALREADY_ASSOCIATED
     //
@@ -5378,6 +6042,7 @@ public interface WinError {
     // The network transport endpoint already has an address associated with it.
     //
     int ERROR_ADDRESS_ALREADY_ASSOCIATED = 1227;
+
     //
     // MessageId: ERROR_ADDRESS_NOT_ASSOCIATED
     //
@@ -5386,6 +6051,7 @@ public interface WinError {
     // An address has not yet been associated with the network endpoint.
     //
     int ERROR_ADDRESS_NOT_ASSOCIATED = 1228;
+
     //
     // MessageId: ERROR_CONNECTION_INVALID
     //
@@ -5394,6 +6060,7 @@ public interface WinError {
     // An operation was attempted on a nonexistent network connection.
     //
     int ERROR_CONNECTION_INVALID = 1229;
+
     //
     // MessageId: ERROR_CONNECTION_ACTIVE
     //
@@ -5402,6 +6069,7 @@ public interface WinError {
     // An invalid operation was attempted on an active network connection.
     //
     int ERROR_CONNECTION_ACTIVE = 1230;
+
     //
     // MessageId: ERROR_NETWORK_UNREACHABLE
     //
@@ -5411,6 +6079,7 @@ public interface WinError {
     // troubleshooting, see Windows Help.
     //
     int ERROR_NETWORK_UNREACHABLE = 1231;
+
     //
     // MessageId: ERROR_HOST_UNREACHABLE
     //
@@ -5420,6 +6089,7 @@ public interface WinError {
     // troubleshooting, see Windows Help.
     //
     int ERROR_HOST_UNREACHABLE = 1232;
+
     //
     // MessageId: ERROR_PROTOCOL_UNREACHABLE
     //
@@ -5429,6 +6099,7 @@ public interface WinError {
     // troubleshooting, see Windows Help.
     //
     int ERROR_PROTOCOL_UNREACHABLE = 1233;
+
     //
     // MessageId: ERROR_PORT_UNREACHABLE
     //
@@ -5438,6 +6109,7 @@ public interface WinError {
     // system.
     //
     int ERROR_PORT_UNREACHABLE = 1234;
+
     //
     // MessageId: ERROR_REQUEST_ABORTED
     //
@@ -5446,6 +6118,7 @@ public interface WinError {
     // The request was aborted.
     //
     int ERROR_REQUEST_ABORTED = 1235;
+
     //
     // MessageId: ERROR_CONNECTION_ABORTED
     //
@@ -5454,6 +6127,7 @@ public interface WinError {
     // The network connection was aborted by the local system.
     //
     int ERROR_CONNECTION_ABORTED = 1236;
+
     //
     // MessageId: ERROR_RETRY
     //
@@ -5462,6 +6136,7 @@ public interface WinError {
     // The operation could not be completed. A retry should be performed.
     //
     int ERROR_RETRY = 1237;
+
     //
     // MessageId: ERROR_CONNECTION_COUNT_LIMIT
     //
@@ -5471,6 +6146,7 @@ public interface WinError {
     // number of concurrent connections for this account has been reached.
     //
     int ERROR_CONNECTION_COUNT_LIMIT = 1238;
+
     //
     // MessageId: ERROR_LOGIN_TIME_RESTRICTION
     //
@@ -5479,6 +6155,7 @@ public interface WinError {
     // Attempting to log in during an unauthorized time of day for this account.
     //
     int ERROR_LOGIN_TIME_RESTRICTION = 1239;
+
     //
     // MessageId: ERROR_LOGIN_WKSTA_RESTRICTION
     //
@@ -5487,6 +6164,7 @@ public interface WinError {
     // The account is not authorized to log in from this station.
     //
     int ERROR_LOGIN_WKSTA_RESTRICTION = 1240;
+
     //
     // MessageId: ERROR_INCORRECT_ADDRESS
     //
@@ -5495,6 +6173,7 @@ public interface WinError {
     // The network address could not be used for the operation requested.
     //
     int ERROR_INCORRECT_ADDRESS = 1241;
+
     //
     // MessageId: ERROR_ALREADY_REGISTERED
     //
@@ -5503,6 +6182,7 @@ public interface WinError {
     // The service is already registered.
     //
     int ERROR_ALREADY_REGISTERED = 1242;
+
     //
     // MessageId: ERROR_SERVICE_NOT_FOUND
     //
@@ -5511,6 +6191,7 @@ public interface WinError {
     // The specified service does not exist.
     //
     int ERROR_SERVICE_NOT_FOUND = 1243;
+
     //
     // MessageId: ERROR_NOT_AUTHENTICATED
     //
@@ -5520,6 +6201,7 @@ public interface WinError {
     // been authenticated.
     //
     int ERROR_NOT_AUTHENTICATED = 1244;
+
     //
     // MessageId: ERROR_NOT_LOGGED_ON
     //
@@ -5530,6 +6212,7 @@ public interface WinError {
     // The specified service does not exist.
     //
     int ERROR_NOT_LOGGED_ON = 1245;
+
     //
     // MessageId: ERROR_CONTINUE
     //
@@ -5546,7 +6229,9 @@ public interface WinError {
     // An attempt was made to perform an initialization operation when
     // initialization has already been completed.
     //
+
     int ERROR_ALREADY_INITIALIZED = 1247;
+
     //
     // MessageId: ERROR_NO_MORE_DEVICES
     //
@@ -5562,7 +6247,9 @@ public interface WinError {
     //
     // The specified site does not exist.
     //
+
     int ERROR_NO_SUCH_SITE = 1249;
+
     //
     // MessageId: ERROR_DOMAIN_CONTROLLER_EXISTS
     //
@@ -5571,6 +6258,7 @@ public interface WinError {
     // A domain controller with the specified name already exists.
     //
     int ERROR_DOMAIN_CONTROLLER_EXISTS = 1250;
+
     //
     // MessageId: ERROR_ONLY_IF_CONNECTED
     //
@@ -5579,6 +6267,7 @@ public interface WinError {
     // This operation is supported only when you are connected to the server.
     //
     int ERROR_ONLY_IF_CONNECTED = 1251;
+
     //
     // MessageId: ERROR_OVERRIDE_NOCHANGES
     //
@@ -5588,6 +6277,7 @@ public interface WinError {
     // changes.
     //
     int ERROR_OVERRIDE_NOCHANGES = 1252;
+
     //
     // MessageId: ERROR_BAD_USER_PROFILE
     //
@@ -5596,6 +6286,7 @@ public interface WinError {
     // The specified user does not have a valid profile.
     //
     int ERROR_BAD_USER_PROFILE = 1253;
+
     //
     // MessageId: ERROR_NOT_SUPPORTED_ON_SBS
     //
@@ -5605,6 +6296,7 @@ public interface WinError {
     // for Small Business Server
     //
     int ERROR_NOT_SUPPORTED_ON_SBS = 1254;
+
     //
     // MessageId: ERROR_SERVER_SHUTDOWN_IN_PROGRESS
     //
@@ -5613,6 +6305,7 @@ public interface WinError {
     // The server machine is shutting down.
     //
     int ERROR_SERVER_SHUTDOWN_IN_PROGRESS = 1255;
+
     //
     // MessageId: ERROR_HOST_DOWN
     //
@@ -5622,6 +6315,7 @@ public interface WinError {
     // troubleshooting, see Windows Help.
     //
     int ERROR_HOST_DOWN = 1256;
+
     //
     // MessageId: ERROR_NON_ACCOUNT_SID
     //
@@ -5630,6 +6324,7 @@ public interface WinError {
     // The security identifier provided is not from an account domain.
     //
     int ERROR_NON_ACCOUNT_SID = 1257;
+
     //
     // MessageId: ERROR_NON_DOMAIN_SID
     //
@@ -5638,6 +6333,7 @@ public interface WinError {
     // The security identifier provided does not have a domain component.
     //
     int ERROR_NON_DOMAIN_SID = 1258;
+
     //
     // MessageId: ERROR_APPHELP_BLOCK
     //
@@ -5646,6 +6342,7 @@ public interface WinError {
     // AppHelp dialog canceled thus preventing the application from starting.
     //
     int ERROR_APPHELP_BLOCK = 1259;
+
     //
     // MessageId: ERROR_ACCESS_DISABLED_BY_POLICY
     //
@@ -5655,6 +6352,7 @@ public interface WinError {
     // your system administrator.
     //
     int ERROR_ACCESS_DISABLED_BY_POLICY = 1260;
+
     //
     // MessageId: ERROR_REG_NAT_CONSUMPTION
     //
@@ -5664,6 +6362,7 @@ public interface WinError {
     // uninitialized register. This error is Itanium specific.
     //
     int ERROR_REG_NAT_CONSUMPTION = 1261;
+
     //
     // MessageId: ERROR_CSCSHARE_OFFLINE
     //
@@ -5672,6 +6371,7 @@ public interface WinError {
     // The share is currently offline or does not exist.
     //
     int ERROR_CSCSHARE_OFFLINE = 1262;
+
     //
     // MessageId: ERROR_PKINIT_FAILURE
     //
@@ -5682,6 +6382,7 @@ public interface WinError {
     // system event log.
     //
     int ERROR_PKINIT_FAILURE = 1263;
+
     //
     // MessageId: ERROR_SMARTCARD_SUBSYSTEM_FAILURE
     //
@@ -5691,6 +6392,7 @@ public interface WinError {
     // the smartcard subsystem.
     //
     int ERROR_SMARTCARD_SUBSYSTEM_FAILURE = 1264;
+
     //
     // MessageId: ERROR_DOWNGRADE_DETECTED
     //
@@ -5700,6 +6402,7 @@ public interface WinError {
     // ensure that you can contact the server that authenticated you.
     //
     int ERROR_DOWNGRADE_DETECTED = 1265;
+
     //
     // Do not use ID's=1266 -=1270 as the symbolicNames have been moved to
     // SEC_E_*
@@ -5712,6 +6415,7 @@ public interface WinError {
     // The machine is locked and cannot be shut down without the force option.
     //
     int ERROR_MACHINE_LOCKED = 1271;
+
     //
     // MessageId: ERROR_CALLBACK_SUPPLIED_INVALID_DATA
     //
@@ -5720,6 +6424,7 @@ public interface WinError {
     // An application-defined callback gave invalid data when called.
     //
     int ERROR_CALLBACK_SUPPLIED_INVALID_DATA = 1273;
+
     //
     // MessageId: ERROR_SYNC_FOREGROUND_REFRESH_REQUIRED
     //
@@ -5729,6 +6434,7 @@ public interface WinError {
     // foreground policy refresh.
     //
     int ERROR_SYNC_FOREGROUND_REFRESH_REQUIRED = 1274;
+
     //
     // MessageId: ERROR_DRIVER_BLOCKED
     //
@@ -5737,6 +6443,7 @@ public interface WinError {
     // This driver has been blocked from loading
     //
     int ERROR_DRIVER_BLOCKED = 1275;
+
     //
     // MessageId: ERROR_INVALID_IMPORT_OF_NON_DLL
     //
@@ -5746,6 +6453,7 @@ public interface WinError {
     // nor the process's executable image.
     //
     int ERROR_INVALID_IMPORT_OF_NON_DLL = 1276;
+
     //
     // MessageId: ERROR_ACCESS_DISABLED_WEBBLADE
     //
@@ -5754,6 +6462,7 @@ public interface WinError {
     // Windows cannot open this program since it has been disabled.
     //
     int ERROR_ACCESS_DISABLED_WEBBLADE = 1277;
+
     //
     // MessageId: ERROR_ACCESS_DISABLED_WEBBLADE_TAMPER
     //
@@ -5763,6 +6472,7 @@ public interface WinError {
     // has been tampered with or become corrupted.
     //
     int ERROR_ACCESS_DISABLED_WEBBLADE_TAMPER = 1278;
+
     //
     // MessageId: ERROR_RECOVERY_FAILURE
     //
@@ -5771,6 +6481,7 @@ public interface WinError {
     // A transaction recover failed.
     //
     int ERROR_RECOVERY_FAILURE = 1279;
+
     //
     // MessageId: ERROR_ALREADY_FIBER
     //
@@ -5779,6 +6490,7 @@ public interface WinError {
     // The current thread has already been converted to a fiber.
     //
     int ERROR_ALREADY_FIBER = 1280;
+
     //
     // MessageId: ERROR_ALREADY_THREAD
     //
@@ -5787,6 +6499,7 @@ public interface WinError {
     // The current thread has already been converted from a fiber.
     //
     int ERROR_ALREADY_THREAD = 1281;
+
     //
     // MessageId: ERROR_STACK_BUFFER_OVERRUN
     //
@@ -5797,6 +6510,7 @@ public interface WinError {
     // gain control of this application.
     //
     int ERROR_STACK_BUFFER_OVERRUN = 1282;
+
     //
     // MessageId: ERROR_PARAMETER_QUOTA_EXCEEDED
     //
@@ -5806,6 +6520,7 @@ public interface WinError {
     // operate on.
     //
     int ERROR_PARAMETER_QUOTA_EXCEEDED = 1283;
+
     //
     // MessageId: ERROR_DEBUGGER_INACTIVE
     //
@@ -5815,6 +6530,7 @@ public interface WinError {
     // is in the process of being deleted.
     //
     int ERROR_DEBUGGER_INACTIVE = 1284;
+
     //
     // MessageId: ERROR_DELAY_LOAD_FAILED
     //
@@ -5824,6 +6540,7 @@ public interface WinError {
     // delay-loaded .dll failed.
     //
     int ERROR_DELAY_LOAD_FAILED = 1285;
+
     //
     // MessageId: ERROR_VDM_DISALLOWED
     //
@@ -5833,6 +6550,7 @@ public interface WinError {
     // applications. Check your permissions with your system administrator.
     //
     int ERROR_VDM_DISALLOWED = 1286;
+
     //
     // MessageId: ERROR_UNIDENTIFIED_ERROR
     //
@@ -5841,6 +6559,7 @@ public interface WinError {
     // Insufficient information exists to identify the cause of failure.
     //
     int ERROR_UNIDENTIFIED_ERROR = 1287;
+
     //
     // MessageId: ERROR_INVALID_CRUNTIME_PARAMETER
     //
@@ -5849,6 +6568,7 @@ public interface WinError {
     // The parameter passed to a C runtime function is incorrect.
     //
     int ERROR_INVALID_CRUNTIME_PARAMETER = 1288;
+
     //
     // MessageId: ERROR_BEYOND_VDL
     //
@@ -5857,6 +6577,7 @@ public interface WinError {
     // The operation occurred beyond the valid data length of the file.
     //
     int ERROR_BEYOND_VDL = 1289;
+
     //
     // MessageId: ERROR_INCOMPATIBLE_SERVICE_SID_TYPE
     //
@@ -5870,6 +6591,7 @@ public interface WinError {
     // this service.
     //
     int ERROR_INCOMPATIBLE_SERVICE_SID_TYPE = 1290;
+
     //
     // MessageId: ERROR_DRIVER_PROCESS_TERMINATED
     //
@@ -5878,6 +6600,7 @@ public interface WinError {
     // The process hosting the driver for this device has been terminated.
     //
     int ERROR_DRIVER_PROCESS_TERMINATED = 1291;
+
     //
     // MessageId: ERROR_IMPLEMENTATION_LIMIT
     //
@@ -5886,6 +6609,7 @@ public interface WinError {
     // An operation attempted to exceed an implementation-defined limit.
     //
     int ERROR_IMPLEMENTATION_LIMIT = 1292;
+
     //
     // MessageId: ERROR_PROCESS_IS_PROTECTED
     //
@@ -5895,6 +6619,7 @@ public interface WinError {
     // a protected process.
     //
     int ERROR_PROCESS_IS_PROTECTED = 1293;
+
     //
     // MessageId: ERROR_SERVICE_NOTIFY_CLIENT_LAGGING
     //
@@ -5904,6 +6629,7 @@ public interface WinError {
     // state of services in the machine.
     //
     int ERROR_SERVICE_NOTIFY_CLIENT_LAGGING = 1294;
+
     //
     // MessageId: ERROR_DISK_QUOTA_EXCEEDED
     //
@@ -5916,6 +6642,7 @@ public interface WinError {
     // administrator.
     //
     int ERROR_DISK_QUOTA_EXCEEDED = 1295;
+
     //
     // MessageId: ERROR_CONTENT_BLOCKED
     //
@@ -5926,6 +6653,7 @@ public interface WinError {
     // administrator.
     //
     int ERROR_CONTENT_BLOCKED = 1296;
+
     //
     // MessageId: ERROR_INCOMPATIBLE_SERVICE_PRIVILEGE
     //
@@ -5938,6 +6666,7 @@ public interface WinError {
     // to view the service configuration and the account configuration.
     //
     int ERROR_INCOMPATIBLE_SERVICE_PRIVILEGE = 1297;
+
     // /////////////////////////////////////////////////
     // =//
     // =SECURITY Error codes=//
@@ -5953,6 +6682,7 @@ public interface WinError {
     // object.
     //
     int ERROR_INVALID_LABEL = 1299;
+
     //
     // MessageId: ERROR_NOT_ALL_ASSIGNED
     //
@@ -5961,6 +6691,7 @@ public interface WinError {
     // Not all privileges or groups referenced are assigned to the caller.
     //
     int ERROR_NOT_ALL_ASSIGNED = 1300;
+
     //
     // MessageId: ERROR_SOME_NOT_MAPPED
     //
@@ -5969,6 +6700,7 @@ public interface WinError {
     // Some mapping between account names and security IDs was not done.
     //
     int ERROR_SOME_NOT_MAPPED = 1301;
+
     //
     // MessageId: ERROR_NO_QUOTAS_FOR_ACCOUNT
     //
@@ -5977,6 +6709,7 @@ public interface WinError {
     // No system quota limits are specifically set for this account.
     //
     int ERROR_NO_QUOTAS_FOR_ACCOUNT = 1302;
+
     //
     // MessageId: ERROR_LOCAL_USER_SESSION_KEY
     //
@@ -5985,6 +6718,7 @@ public interface WinError {
     // No encryption key is available. A well-known encryption key was returned.
     //
     int ERROR_LOCAL_USER_SESSION_KEY = 1303;
+
     //
     // MessageId: ERROR_NULL_LM_PASSWORD
     //
@@ -5994,6 +6728,7 @@ public interface WinError {
     // The LAN Manager password returned is a NULL string.
     //
     int ERROR_NULL_LM_PASSWORD = 1304;
+
     //
     // MessageId: ERROR_UNKNOWN_REVISION
     //
@@ -6002,6 +6737,7 @@ public interface WinError {
     // The revision level is unknown.
     //
     int ERROR_UNKNOWN_REVISION = 1305;
+
     //
     // MessageId: ERROR_REVISION_MISMATCH
     //
@@ -6010,6 +6746,7 @@ public interface WinError {
     // Indicates two revision levels are incompatible.
     //
     int ERROR_REVISION_MISMATCH = 1306;
+
     //
     // MessageId: ERROR_INVALID_OWNER
     //
@@ -6018,6 +6755,7 @@ public interface WinError {
     // This security ID may not be assigned as the owner of this object.
     //
     int ERROR_INVALID_OWNER = 1307;
+
     //
     // MessageId: ERROR_INVALID_PRIMARY_GROUP
     //
@@ -6026,6 +6764,7 @@ public interface WinError {
     // This security ID may not be assigned as the primary group of an object.
     //
     int ERROR_INVALID_PRIMARY_GROUP = 1308;
+
     //
     // MessageId: ERROR_NO_IMPERSONATION_TOKEN
     //
@@ -6035,6 +6774,7 @@ public interface WinError {
     // that is not currently impersonating a client.
     //
     int ERROR_NO_IMPERSONATION_TOKEN = 1309;
+
     //
     // MessageId: ERROR_CANT_DISABLE_MANDATORY
     //
@@ -6043,6 +6783,7 @@ public interface WinError {
     // The group may not be disabled.
     //
     int ERROR_CANT_DISABLE_MANDATORY = 1310;
+
     //
     // MessageId: ERROR_NO_LOGON_SERVERS
     //
@@ -6052,6 +6793,7 @@ public interface WinError {
     // request.
     //
     int ERROR_NO_LOGON_SERVERS = 1311;
+
     //
     // MessageId: ERROR_NO_SUCH_LOGON_SESSION
     //
@@ -6061,6 +6803,7 @@ public interface WinError {
     // terminated.
     //
     int ERROR_NO_SUCH_LOGON_SESSION = 1312;
+
     //
     // MessageId: ERROR_NO_SUCH_PRIVILEGE
     //
@@ -6069,6 +6812,7 @@ public interface WinError {
     // A specified privilege does not exist.
     //
     int ERROR_NO_SUCH_PRIVILEGE = 1313;
+
     //
     // MessageId: ERROR_PRIVILEGE_NOT_HELD
     //
@@ -6077,6 +6821,7 @@ public interface WinError {
     // A required privilege is not held by the client.
     //
     int ERROR_PRIVILEGE_NOT_HELD = 1314;
+
     //
     // MessageId: ERROR_INVALID_ACCOUNT_NAME
     //
@@ -6085,6 +6830,7 @@ public interface WinError {
     // The name provided is not a properly formed account name.
     //
     int ERROR_INVALID_ACCOUNT_NAME = 1315;
+
     //
     // MessageId: ERROR_USER_EXISTS
     //
@@ -6093,6 +6839,7 @@ public interface WinError {
     // The specified account already exists.
     //
     int ERROR_USER_EXISTS = 1316;
+
     //
     // MessageId: ERROR_NO_SUCH_USER
     //
@@ -6101,6 +6848,7 @@ public interface WinError {
     // The specified account does not exist.
     //
     int ERROR_NO_SUCH_USER = 1317;
+
     //
     // MessageId: ERROR_GROUP_EXISTS
     //
@@ -6109,6 +6857,7 @@ public interface WinError {
     // The specified group already exists.
     //
     int ERROR_GROUP_EXISTS = 1318;
+
     //
     // MessageId: ERROR_NO_SUCH_GROUP
     //
@@ -6117,6 +6866,7 @@ public interface WinError {
     // The specified group does not exist.
     //
     int ERROR_NO_SUCH_GROUP = 1319;
+
     //
     // MessageId: ERROR_MEMBER_IN_GROUP
     //
@@ -6127,6 +6877,7 @@ public interface WinError {
     // member.
     //
     int ERROR_MEMBER_IN_GROUP = 1320;
+
     //
     // MessageId: ERROR_MEMBER_NOT_IN_GROUP
     //
@@ -6136,6 +6887,7 @@ public interface WinError {
     // account.
     //
     int ERROR_MEMBER_NOT_IN_GROUP = 1321;
+
     //
     // MessageId: ERROR_LAST_ADMIN
     //
@@ -6144,6 +6896,7 @@ public interface WinError {
     // The last remaining administration account cannot be disabled or deleted.
     //
     int ERROR_LAST_ADMIN = 1322;
+
     //
     // MessageId: ERROR_WRONG_PASSWORD
     //
@@ -6153,6 +6906,7 @@ public interface WinError {
     // is incorrect.
     //
     int ERROR_WRONG_PASSWORD = 1323;
+
     //
     // MessageId: ERROR_ILL_FORMED_PASSWORD
     //
@@ -6162,6 +6916,7 @@ public interface WinError {
     // contains values that are not allowed in passwords.
     //
     int ERROR_ILL_FORMED_PASSWORD = 1324;
+
     //
     // MessageId: ERROR_PASSWORD_RESTRICTION
     //
@@ -6172,6 +6927,7 @@ public interface WinError {
     // domain.
     //
     int ERROR_PASSWORD_RESTRICTION = 1325;
+
     //
     // MessageId: ERROR_LOGON_FAILURE
     //
@@ -6180,6 +6936,7 @@ public interface WinError {
     // Logon failure: unknown user name or bad password.
     //
     int ERROR_LOGON_FAILURE = 1326;
+
     //
     // MessageId: ERROR_ACCOUNT_RESTRICTION
     //
@@ -6190,6 +6947,7 @@ public interface WinError {
     // has been enforced.
     //
     int ERROR_ACCOUNT_RESTRICTION = 1327;
+
     //
     // MessageId: ERROR_INVALID_LOGON_HOURS
     //
@@ -6198,6 +6956,7 @@ public interface WinError {
     // Logon failure: account logon time restriction violation.
     //
     int ERROR_INVALID_LOGON_HOURS = 1328;
+
     //
     // MessageId: ERROR_INVALID_WORKSTATION
     //
@@ -6206,6 +6965,7 @@ public interface WinError {
     // Logon failure: user not allowed to log on to this computer.
     //
     int ERROR_INVALID_WORKSTATION = 1329;
+
     //
     // MessageId: ERROR_PASSWORD_EXPIRED
     //
@@ -6214,6 +6974,7 @@ public interface WinError {
     // Logon failure: the specified account password has expired.
     //
     int ERROR_PASSWORD_EXPIRED = 1330;
+
     //
     // MessageId: ERROR_ACCOUNT_DISABLED
     //
@@ -6222,6 +6983,7 @@ public interface WinError {
     // Logon failure: account currently disabled.
     //
     int ERROR_ACCOUNT_DISABLED = 1331;
+
     //
     // MessageId: ERROR_NONE_MAPPED
     //
@@ -6230,6 +6992,7 @@ public interface WinError {
     // No mapping between account names and security IDs was done.
     //
     int ERROR_NONE_MAPPED = 1332;
+
     //
     // MessageId: ERROR_TOO_MANY_LUIDS_REQUESTED
     //
@@ -6238,6 +7001,7 @@ public interface WinError {
     // Too many local user identifiers (LUIDs) were requested at one time.
     //
     int ERROR_TOO_MANY_LUIDS_REQUESTED = 1333;
+
     //
     // MessageId: ERROR_LUIDS_EXHAUSTED
     //
@@ -6246,6 +7010,7 @@ public interface WinError {
     // No more local user identifiers (LUIDs) are available.
     //
     int ERROR_LUIDS_EXHAUSTED = 1334;
+
     //
     // MessageId: ERROR_INVALID_SUB_AUTHORITY
     //
@@ -6255,6 +7020,7 @@ public interface WinError {
     // use.
     //
     int ERROR_INVALID_SUB_AUTHORITY = 1335;
+
     //
     // MessageId: ERROR_INVALID_ACL
     //
@@ -6263,6 +7029,7 @@ public interface WinError {
     // The access control list (AC; structure is invalid.
     //
     int ERROR_INVALID_ACL = 1336;
+
     //
     // MessageId: ERROR_INVALID_SID
     //
@@ -6271,6 +7038,7 @@ public interface WinError {
     // The security ID structure is invalid.
     //
     int ERROR_INVALID_SID = 1337;
+
     //
     // MessageId: ERROR_INVALID_SECURITY_DESCR
     //
@@ -6279,6 +7047,7 @@ public interface WinError {
     // The security descriptor structure is invalid.
     //
     int ERROR_INVALID_SECURITY_DESCR = 1338;
+
     //
     // MessageId: ERROR_BAD_INHERITANCE_ACL
     //
@@ -6288,6 +7057,7 @@ public interface WinError {
     // could not be built.
     //
     int ERROR_BAD_INHERITANCE_ACL = 1340;
+
     //
     // MessageId: ERROR_SERVER_DISABLED
     //
@@ -6296,6 +7066,7 @@ public interface WinError {
     // The server is currently disabled.
     //
     int ERROR_SERVER_DISABLED = 1341;
+
     //
     // MessageId: ERROR_SERVER_NOT_DISABLED
     //
@@ -6304,6 +7075,7 @@ public interface WinError {
     // The server is currently enabled.
     //
     int ERROR_SERVER_NOT_DISABLED = 1342;
+
     //
     // MessageId: ERROR_INVALID_ID_AUTHORITY
     //
@@ -6312,6 +7084,7 @@ public interface WinError {
     // The value provided was an invalid value for an identifier authority.
     //
     int ERROR_INVALID_ID_AUTHORITY = 1343;
+
     //
     // MessageId: ERROR_ALLOTTED_SPACE_EXCEEDED
     //
@@ -6320,6 +7093,7 @@ public interface WinError {
     // No more memory is available for security information updates.
     //
     int ERROR_ALLOTTED_SPACE_EXCEEDED = 1344;
+
     //
     // MessageId: ERROR_INVALID_GROUP_ATTRIBUTES
     //
@@ -6329,6 +7103,7 @@ public interface WinError {
     // for the group as a whole.
     //
     int ERROR_INVALID_GROUP_ATTRIBUTES = 1345;
+
     //
     // MessageId: ERROR_BAD_IMPERSONATION_LEVEL
     //
@@ -6338,6 +7113,7 @@ public interface WinError {
     // impersonation level is invalid.
     //
     int ERROR_BAD_IMPERSONATION_LEVEL = 1346;
+
     //
     // MessageId: ERROR_CANT_OPEN_ANONYMOUS
     //
@@ -6346,6 +7122,7 @@ public interface WinError {
     // Cannot open an anonymous level security token.
     //
     int ERROR_CANT_OPEN_ANONYMOUS = 1347;
+
     //
     // MessageId: ERROR_BAD_VALIDATION_CLASS
     //
@@ -6354,6 +7131,7 @@ public interface WinError {
     // The validation information class requested was invalid.
     //
     int ERROR_BAD_VALIDATION_CLASS = 1348;
+
     //
     // MessageId: ERROR_BAD_TOKEN_TYPE
     //
@@ -6362,6 +7140,7 @@ public interface WinError {
     // The type of the token is inappropriate for its attempted use.
     //
     int ERROR_BAD_TOKEN_TYPE = 1349;
+
     //
     // MessageId: ERROR_NO_SECURITY_ON_OBJECT
     //
@@ -6371,6 +7150,7 @@ public interface WinError {
     // associated security.
     //
     int ERROR_NO_SECURITY_ON_OBJECT = 1350;
+
     //
     // MessageId: ERROR_CANT_ACCESS_DOMAIN_INFO
     //
@@ -6380,6 +7160,7 @@ public interface WinError {
     // either because the machine is unavailable, or access has been denied.
     //
     int ERROR_CANT_ACCESS_DOMAIN_INFO = 1351;
+
     //
     // MessageId: ERROR_INVALID_SERVER_STATE
     //
@@ -6389,6 +7170,7 @@ public interface WinError {
     // server was in the wrong state to perform the security operation.
     //
     int ERROR_INVALID_SERVER_STATE = 1352;
+
     //
     // MessageId: ERROR_INVALID_DOMAIN_STATE
     //
@@ -6397,6 +7179,7 @@ public interface WinError {
     // The domain was in the wrong state to perform the security operation.
     //
     int ERROR_INVALID_DOMAIN_STATE = 1353;
+
     //
     // MessageId: ERROR_INVALID_DOMAIN_ROLE
     //
@@ -6406,6 +7189,7 @@ public interface WinError {
     // domain.
     //
     int ERROR_INVALID_DOMAIN_ROLE = 1354;
+
     //
     // MessageId: ERROR_NO_SUCH_DOMAIN
     //
@@ -6414,6 +7198,7 @@ public interface WinError {
     // The specified domain either does not exist or could not be contacted.
     //
     int ERROR_NO_SUCH_DOMAIN = 1355;
+
     //
     // MessageId: ERROR_DOMAIN_EXISTS
     //
@@ -6422,6 +7207,7 @@ public interface WinError {
     // The specified domain already exists.
     //
     int ERROR_DOMAIN_EXISTS = 1356;
+
     //
     // MessageId: ERROR_DOMAIN_LIMIT_EXCEEDED
     //
@@ -6431,6 +7217,7 @@ public interface WinError {
     // server.
     //
     int ERROR_DOMAIN_LIMIT_EXCEEDED = 1357;
+
     //
     // MessageId: ERROR_INTERNAL_DB_CORRUPTION
     //
@@ -6440,6 +7227,7 @@ public interface WinError {
     // catastrophic media failure or a data structure corruption on the disk.
     //
     int ERROR_INTERNAL_DB_CORRUPTION = 1358;
+
     //
     // MessageId: ERROR_INTERNAL_ERROR
     //
@@ -6448,6 +7236,7 @@ public interface WinError {
     // An internal error occurred.
     //
     int ERROR_INTERNAL_ERROR = 1359;
+
     //
     // MessageId: ERROR_GENERIC_NOT_MAPPED
     //
@@ -6457,6 +7246,7 @@ public interface WinError {
     // already be mapped to nongeneric types.
     //
     int ERROR_GENERIC_NOT_MAPPED = 1360;
+
     //
     // MessageId: ERROR_BAD_DESCRIPTOR_FORMAT
     //
@@ -6466,6 +7256,7 @@ public interface WinError {
     // self-relative).
     //
     int ERROR_BAD_DESCRIPTOR_FORMAT = 1361;
+
     //
     // MessageId: ERROR_NOT_LOGON_PROCESS
     //
@@ -6475,6 +7266,7 @@ public interface WinError {
     // calling process has not registered as a logon process.
     //
     int ERROR_NOT_LOGON_PROCESS = 1362;
+
     //
     // MessageId: ERROR_LOGON_SESSION_EXISTS
     //
@@ -6483,6 +7275,7 @@ public interface WinError {
     // Cannot start a new logon session with an ID that is already in use.
     //
     int ERROR_LOGON_SESSION_EXISTS = 1363;
+
     //
     // MessageId: ERROR_NO_SUCH_PACKAGE
     //
@@ -6491,6 +7284,7 @@ public interface WinError {
     // A specified authentication package is unknown.
     //
     int ERROR_NO_SUCH_PACKAGE = 1364;
+
     //
     // MessageId: ERROR_BAD_LOGON_SESSION_STATE
     //
@@ -6500,6 +7294,7 @@ public interface WinError {
     // operation.
     //
     int ERROR_BAD_LOGON_SESSION_STATE = 1365;
+
     //
     // MessageId: ERROR_LOGON_SESSION_COLLISION
     //
@@ -6508,6 +7303,7 @@ public interface WinError {
     // The logon session ID is already in use.
     //
     int ERROR_LOGON_SESSION_COLLISION = 1366;
+
     //
     // MessageId: ERROR_INVALID_LOGON_TYPE
     //
@@ -6516,6 +7312,7 @@ public interface WinError {
     // A logon request contained an invalid logon type value.
     //
     int ERROR_INVALID_LOGON_TYPE = 1367;
+
     //
     // MessageId: ERROR_CANNOT_IMPERSONATE
     //
@@ -6525,6 +7322,7 @@ public interface WinError {
     // that pipe.
     //
     int ERROR_CANNOT_IMPERSONATE = 1368;
+
     //
     // MessageId: ERROR_RXACT_INVALID_STATE
     //
@@ -6534,6 +7332,7 @@ public interface WinError {
     // requested operation.
     //
     int ERROR_RXACT_INVALID_STATE = 1369;
+
     //
     // MessageId: ERROR_RXACT_COMMIT_FAILURE
     //
@@ -6542,6 +7341,7 @@ public interface WinError {
     // An internal security database corruption has been encountered.
     //
     int ERROR_RXACT_COMMIT_FAILURE = 1370;
+
     //
     // MessageId: ERROR_SPECIAL_ACCOUNT
     //
@@ -6550,6 +7350,7 @@ public interface WinError {
     // Cannot perform this operation on built-in accounts.
     //
     int ERROR_SPECIAL_ACCOUNT = 1371;
+
     //
     // MessageId: ERROR_SPECIAL_GROUP
     //
@@ -6558,6 +7359,7 @@ public interface WinError {
     // Cannot perform this operation on this built-in special group.
     //
     int ERROR_SPECIAL_GROUP = 1372;
+
     //
     // MessageId: ERROR_SPECIAL_USER
     //
@@ -6566,6 +7368,7 @@ public interface WinError {
     // Cannot perform this operation on this built-in special user.
     //
     int ERROR_SPECIAL_USER = 1373;
+
     //
     // MessageId: ERROR_MEMBERS_PRIMARY_GROUP
     //
@@ -6575,6 +7378,7 @@ public interface WinError {
     // the user's primary group.
     //
     int ERROR_MEMBERS_PRIMARY_GROUP = 1374;
+
     //
     // MessageId: ERROR_TOKEN_ALREADY_IN_USE
     //
@@ -6583,6 +7387,7 @@ public interface WinError {
     // The token is already in use as a primary token.
     //
     int ERROR_TOKEN_ALREADY_IN_USE = 1375;
+
     //
     // MessageId: ERROR_NO_SUCH_ALIAS
     //
@@ -6591,6 +7396,7 @@ public interface WinError {
     // The specified local group does not exist.
     //
     int ERROR_NO_SUCH_ALIAS = 1376;
+
     //
     // MessageId: ERROR_MEMBER_NOT_IN_ALIAS
     //
@@ -6599,6 +7405,7 @@ public interface WinError {
     // The specified account name is not a member of the group.
     //
     int ERROR_MEMBER_NOT_IN_ALIAS = 1377;
+
     //
     // MessageId: ERROR_MEMBER_IN_ALIAS
     //
@@ -6607,6 +7414,7 @@ public interface WinError {
     // The specified account name is already a member of the group.
     //
     int ERROR_MEMBER_IN_ALIAS = 1378;
+
     //
     // MessageId: ERROR_ALIAS_EXISTS
     //
@@ -6615,6 +7423,7 @@ public interface WinError {
     // The specified local group already exists.
     //
     int ERROR_ALIAS_EXISTS = 1379;
+
     //
     // MessageId: ERROR_LOGON_NOT_GRANTED
     //
@@ -6624,6 +7433,7 @@ public interface WinError {
     // this computer.
     //
     int ERROR_LOGON_NOT_GRANTED = 1380;
+
     //
     // MessageId: ERROR_TOO_MANY_SECRETS
     //
@@ -6633,6 +7443,7 @@ public interface WinError {
     // been exceeded.
     //
     int ERROR_TOO_MANY_SECRETS = 1381;
+
     //
     // MessageId: ERROR_SECRET_TOO_LONG
     //
@@ -6641,6 +7452,7 @@ public interface WinError {
     // The length of a secret exceeds the maximum length allowed.
     //
     int ERROR_SECRET_TOO_LONG = 1382;
+
     //
     // MessageId: ERROR_INTERNAL_DB_ERROR
     //
@@ -6649,6 +7461,7 @@ public interface WinError {
     // The local security authority database contains an internal inconsistency.
     //
     int ERROR_INTERNAL_DB_ERROR = 1383;
+
     //
     // MessageId: ERROR_TOO_MANY_CONTEXT_IDS
     //
@@ -6658,6 +7471,7 @@ public interface WinError {
     // security IDs.
     //
     int ERROR_TOO_MANY_CONTEXT_IDS = 1384;
+
     //
     // MessageId: ERROR_LOGON_TYPE_NOT_GRANTED
     //
@@ -6667,6 +7481,7 @@ public interface WinError {
     // this computer.
     //
     int ERROR_LOGON_TYPE_NOT_GRANTED = 1385;
+
     //
     // MessageId: ERROR_NT_CROSS_ENCRYPTION_REQUIRED
     //
@@ -6675,6 +7490,7 @@ public interface WinError {
     // A cross-encrypted password is necessary to change a user password.
     //
     int ERROR_NT_CROSS_ENCRYPTION_REQUIRED = 1386;
+
     //
     // MessageId: ERROR_NO_SUCH_MEMBER
     //
@@ -6684,6 +7500,7 @@ public interface WinError {
     // the member does not exist.
     //
     int ERROR_NO_SUCH_MEMBER = 1387;
+
     //
     // MessageId: ERROR_INVALID_MEMBER
     //
@@ -6693,6 +7510,7 @@ public interface WinError {
     // the wrong account type.
     //
     int ERROR_INVALID_MEMBER = 1388;
+
     //
     // MessageId: ERROR_TOO_MANY_SIDS
     //
@@ -6701,6 +7519,7 @@ public interface WinError {
     // Too many security IDs have been specified.
     //
     int ERROR_TOO_MANY_SIDS = 1389;
+
     //
     // MessageId: ERROR_LM_CROSS_ENCRYPTION_REQUIRED
     //
@@ -6709,6 +7528,7 @@ public interface WinError {
     // A cross-encrypted password is necessary to change this user password.
     //
     int ERROR_LM_CROSS_ENCRYPTION_REQUIRED = 1390;
+
     //
     // MessageId: ERROR_NO_INHERITANCE
     //
@@ -6717,6 +7537,7 @@ public interface WinError {
     // Indicates an ACL contains no inheritable components.
     //
     int ERROR_NO_INHERITANCE = 1391;
+
     //
     // MessageId: ERROR_FILE_CORRUPT
     //
@@ -6725,6 +7546,7 @@ public interface WinError {
     // The file or directory is corrupted and unreadable.
     //
     int ERROR_FILE_CORRUPT = 1392;
+
     //
     // MessageId: ERROR_DISK_CORRUPT
     //
@@ -6733,6 +7555,7 @@ public interface WinError {
     // The disk structure is corrupted and unreadable.
     //
     int ERROR_DISK_CORRUPT = 1393;
+
     //
     // MessageId: ERROR_NO_USER_SESSION_KEY
     //
@@ -6741,6 +7564,7 @@ public interface WinError {
     // There is no user session key for the specified logon session.
     //
     int ERROR_NO_USER_SESSION_KEY = 1394;
+
     //
     // MessageId: ERROR_LICENSE_QUOTA_EXCEEDED
     //
@@ -6752,6 +7576,7 @@ public interface WinError {
     // are already as many connections as the service can accept.
     //
     int ERROR_LICENSE_QUOTA_EXCEEDED = 1395;
+
     //
     // MessageId: ERROR_WRONG_TARGET_NAME
     //
@@ -6760,6 +7585,7 @@ public interface WinError {
     // Logon Failure: The target account name is incorrect.
     //
     int ERROR_WRONG_TARGET_NAME = 1396;
+
     //
     // MessageId: ERROR_MUTUAL_AUTH_FAILED
     //
@@ -6769,6 +7595,7 @@ public interface WinError {
     // domain controller.
     //
     int ERROR_MUTUAL_AUTH_FAILED = 1397;
+
     //
     // MessageId: ERROR_TIME_SKEW
     //
@@ -6777,6 +7604,7 @@ public interface WinError {
     // There is a time and/or date difference between the client and server.
     //
     int ERROR_TIME_SKEW = 1398;
+
     //
     // MessageId: ERROR_CURRENT_DOMAIN_NOT_ALLOWED
     //
@@ -6785,6 +7613,7 @@ public interface WinError {
     // This operation cannot be performed on the current domain.
     //
     int ERROR_CURRENT_DOMAIN_NOT_ALLOWED = 1399;
+
     // /////////////////////////////////////////////////
     // =//
     // =WinUser Error codes=//
@@ -6799,6 +7628,7 @@ public interface WinError {
     // Invalid window handle.
     //
     int ERROR_INVALID_WINDOW_HANDLE = 1400;
+
     //
     // MessageId: ERROR_INVALID_MENU_HANDLE
     //
@@ -6807,6 +7637,7 @@ public interface WinError {
     // Invalid menu handle.
     //
     int ERROR_INVALID_MENU_HANDLE = 1401;
+
     //
     // MessageId: ERROR_INVALID_CURSOR_HANDLE
     //
@@ -6815,6 +7646,7 @@ public interface WinError {
     // Invalid cursor handle.
     //
     int ERROR_INVALID_CURSOR_HANDLE = 1402;
+
     //
     // MessageId: ERROR_INVALID_ACCEL_HANDLE
     //
@@ -6823,6 +7655,7 @@ public interface WinError {
     // Invalid accelerator table handle.
     //
     int ERROR_INVALID_ACCEL_HANDLE = 1403;
+
     //
     // MessageId: ERROR_INVALID_HOOK_HANDLE
     //
@@ -6831,6 +7664,7 @@ public interface WinError {
     // Invalid hook handle.
     //
     int ERROR_INVALID_HOOK_HANDLE = 1404;
+
     //
     // MessageId: ERROR_INVALID_DWP_HANDLE
     //
@@ -6839,6 +7673,7 @@ public interface WinError {
     // Invalid handle to a multiple-window position structure.
     //
     int ERROR_INVALID_DWP_HANDLE = 1405;
+
     //
     // MessageId: ERROR_TLW_WITH_WSCHILD
     //
@@ -6847,6 +7682,7 @@ public interface WinError {
     // Cannot create a top-level child window.
     //
     int ERROR_TLW_WITH_WSCHILD = 1406;
+
     //
     // MessageId: ERROR_CANNOT_FIND_WND_CLASS
     //
@@ -6855,6 +7691,7 @@ public interface WinError {
     // Cannot find window class.
     //
     int ERROR_CANNOT_FIND_WND_CLASS = 1407;
+
     //
     // MessageId: ERROR_WINDOW_OF_OTHER_THREAD
     //
@@ -6863,6 +7700,7 @@ public interface WinError {
     // Invalid window; it belongs to other thread.
     //
     int ERROR_WINDOW_OF_OTHER_THREAD = 1408;
+
     //
     // MessageId: ERROR_HOTKEY_ALREADY_REGISTERED
     //
@@ -6871,6 +7709,7 @@ public interface WinError {
     // Hot key is already registered.
     //
     int ERROR_HOTKEY_ALREADY_REGISTERED = 1409;
+
     //
     // MessageId: ERROR_CLASS_ALREADY_EXISTS
     //
@@ -6879,6 +7718,7 @@ public interface WinError {
     // Class already exists.
     //
     int ERROR_CLASS_ALREADY_EXISTS = 1410;
+
     //
     // MessageId: ERROR_CLASS_DOES_NOT_EXIST
     //
@@ -6887,6 +7727,7 @@ public interface WinError {
     // Class does not exist.
     //
     int ERROR_CLASS_DOES_NOT_EXIST = 1411;
+
     //
     // MessageId: ERROR_CLASS_HAS_WINDOWS
     //
@@ -6895,6 +7736,7 @@ public interface WinError {
     // Class still has open windows.
     //
     int ERROR_CLASS_HAS_WINDOWS = 1412;
+
     //
     // MessageId: ERROR_INVALID_INDEX
     //
@@ -6903,6 +7745,7 @@ public interface WinError {
     // Invalid index.
     //
     int ERROR_INVALID_INDEX = 1413;
+
     //
     // MessageId: ERROR_INVALID_ICON_HANDLE
     //
@@ -6911,6 +7754,7 @@ public interface WinError {
     // Invalid icon handle.
     //
     int ERROR_INVALID_ICON_HANDLE = 1414;
+
     //
     // MessageId: ERROR_PRIVATE_DIALOG_INDEX
     //
@@ -6919,6 +7763,7 @@ public interface WinError {
     // Using private DIALOG window words.
     //
     int ERROR_PRIVATE_DIALOG_INDEX = 1415;
+
     //
     // MessageId: ERROR_LISTBOX_ID_NOT_FOUND
     //
@@ -6927,6 +7772,7 @@ public interface WinError {
     // The list box identifier was not found.
     //
     int ERROR_LISTBOX_ID_NOT_FOUND = 1416;
+
     //
     // MessageId: ERROR_NO_WILDCARD_CHARACTERS
     //
@@ -6935,6 +7781,7 @@ public interface WinError {
     // No wildcards were found.
     //
     int ERROR_NO_WILDCARD_CHARACTERS = 1417;
+
     //
     // MessageId: ERROR_CLIPBOARD_NOT_OPEN
     //
@@ -6943,6 +7790,7 @@ public interface WinError {
     // Thread does not have a clipboard open.
     //
     int ERROR_CLIPBOARD_NOT_OPEN = 1418;
+
     //
     // MessageId: ERROR_HOTKEY_NOT_REGISTERED
     //
@@ -6951,6 +7799,7 @@ public interface WinError {
     // Hot key is not registered.
     //
     int ERROR_HOTKEY_NOT_REGISTERED = 1419;
+
     //
     // MessageId: ERROR_WINDOW_NOT_DIALOG
     //
@@ -6959,6 +7808,7 @@ public interface WinError {
     // The window is not a valid dialog window.
     //
     int ERROR_WINDOW_NOT_DIALOG = 1420;
+
     //
     // MessageId: ERROR_CONTROL_ID_NOT_FOUND
     //
@@ -6967,6 +7817,7 @@ public interface WinError {
     // Control ID not found.
     //
     int ERROR_CONTROL_ID_NOT_FOUND = 1421;
+
     //
     // MessageId: ERROR_INVALID_COMBOBOX_MESSAGE
     //
@@ -6975,6 +7826,7 @@ public interface WinError {
     // Invalid message for a combo box because it does not have an edit control.
     //
     int ERROR_INVALID_COMBOBOX_MESSAGE = 1422;
+
     //
     // MessageId: ERROR_WINDOW_NOT_COMBOBOX
     //
@@ -6983,6 +7835,7 @@ public interface WinError {
     // The window is not a combo box.
     //
     int ERROR_WINDOW_NOT_COMBOBOX = 1423;
+
     //
     // MessageId: ERROR_INVALID_EDIT_HEIGHT
     //
@@ -6991,6 +7844,7 @@ public interface WinError {
     // Height must be less than=256.
     //
     int ERROR_INVALID_EDIT_HEIGHT = 1424;
+
     //
     // MessageId: ERROR_DC_NOT_FOUND
     //
@@ -6999,6 +7853,7 @@ public interface WinError {
     // Invalid device context (DC) handle.
     //
     int ERROR_DC_NOT_FOUND = 1425;
+
     //
     // MessageId: ERROR_INVALID_HOOK_FILTER
     //
@@ -7007,6 +7862,7 @@ public interface WinError {
     // Invalid hook procedure type.
     //
     int ERROR_INVALID_HOOK_FILTER = 1426;
+
     //
     // MessageId: ERROR_INVALID_FILTER_PROC
     //
@@ -7015,6 +7871,7 @@ public interface WinError {
     // Invalid hook procedure.
     //
     int ERROR_INVALID_FILTER_PROC = 1427;
+
     //
     // MessageId: ERROR_HOOK_NEEDS_HMOD
     //
@@ -7023,6 +7880,7 @@ public interface WinError {
     // Cannot set nonlocal hook without a module handle.
     //
     int ERROR_HOOK_NEEDS_HMOD = 1428;
+
     //
     // MessageId: ERROR_GLOBAL_ONLY_HOOK
     //
@@ -7031,6 +7889,7 @@ public interface WinError {
     // This hook procedure can only be set globally.
     //
     int ERROR_GLOBAL_ONLY_HOOK = 1429;
+
     //
     // MessageId: ERROR_JOURNAL_HOOK_SET
     //
@@ -7039,6 +7898,7 @@ public interface WinError {
     // The journal hook procedure is already installed.
     //
     int ERROR_JOURNAL_HOOK_SET = 1430;
+
     //
     // MessageId: ERROR_HOOK_NOT_INSTALLED
     //
@@ -7047,6 +7907,7 @@ public interface WinError {
     // The hook procedure is not installed.
     //
     int ERROR_HOOK_NOT_INSTALLED = 1431;
+
     //
     // MessageId: ERROR_INVALID_LB_MESSAGE
     //
@@ -7055,6 +7916,7 @@ public interface WinError {
     // Invalid message for single-selection list box.
     //
     int ERROR_INVALID_LB_MESSAGE = 1432;
+
     //
     // MessageId: ERROR_SETCOUNT_ON_BAD_LB
     //
@@ -7063,6 +7925,7 @@ public interface WinError {
     // LB_SETCOUNT sent to non-lazy list box.
     //
     int ERROR_SETCOUNT_ON_BAD_LB = 1433;
+
     //
     // MessageId: ERROR_LB_WITHOUT_TABSTOPS
     //
@@ -7071,6 +7934,7 @@ public interface WinError {
     // This list box does not support tab stops.
     //
     int ERROR_LB_WITHOUT_TABSTOPS = 1434;
+
     //
     // MessageId: ERROR_DESTROY_OBJECT_OF_OTHER_THREAD
     //
@@ -7079,6 +7943,7 @@ public interface WinError {
     // Cannot destroy object created by another thread.
     //
     int ERROR_DESTROY_OBJECT_OF_OTHER_THREAD = 1435;
+
     //
     // MessageId: ERROR_CHILD_WINDOW_MENU
     //
@@ -7087,6 +7952,7 @@ public interface WinError {
     // Child windows cannot have menus.
     //
     int ERROR_CHILD_WINDOW_MENU = 1436;
+
     //
     // MessageId: ERROR_NO_SYSTEM_MENU
     //
@@ -7095,6 +7961,7 @@ public interface WinError {
     // The window does not have a system menu.
     //
     int ERROR_NO_SYSTEM_MENU = 1437;
+
     //
     // MessageId: ERROR_INVALID_MSGBOX_STYLE
     //
@@ -7103,6 +7970,7 @@ public interface WinError {
     // Invalid message box style.
     //
     int ERROR_INVALID_MSGBOX_STYLE = 1438;
+
     //
     // MessageId: ERROR_INVALID_SPI_VALUE
     //
@@ -7111,6 +7979,7 @@ public interface WinError {
     // Invalid system-wide (SPI_*) parameter.
     //
     int ERROR_INVALID_SPI_VALUE = 1439;
+
     //
     // MessageId: ERROR_SCREEN_ALREADY_LOCKED
     //
@@ -7119,6 +7988,7 @@ public interface WinError {
     // Screen already locked.
     //
     int ERROR_SCREEN_ALREADY_LOCKED = 1440;
+
     //
     // MessageId: ERROR_HWNDS_HAVE_DIFF_PARENT
     //
@@ -7128,6 +7998,7 @@ public interface WinError {
     // the same parent.
     //
     int ERROR_HWNDS_HAVE_DIFF_PARENT = 1441;
+
     //
     // MessageId: ERROR_NOT_CHILD_WINDOW
     //
@@ -7136,6 +8007,7 @@ public interface WinError {
     // The window is not a child window.
     //
     int ERROR_NOT_CHILD_WINDOW = 1442;
+
     //
     // MessageId: ERROR_INVALID_GW_COMMAND
     //
@@ -7144,6 +8016,7 @@ public interface WinError {
     // Invalid GW_* command.
     //
     int ERROR_INVALID_GW_COMMAND = 1443;
+
     //
     // MessageId: ERROR_INVALID_THREAD_ID
     //
@@ -7152,6 +8025,7 @@ public interface WinError {
     // Invalid thread identifier.
     //
     int ERROR_INVALID_THREAD_ID = 1444;
+
     //
     // MessageId: ERROR_NON_MDICHILD_WINDOW
     //
@@ -7161,6 +8035,7 @@ public interface WinError {
     // interface (MDI) window.
     //
     int ERROR_NON_MDICHILD_WINDOW = 1445;
+
     //
     // MessageId: ERROR_POPUP_ALREADY_ACTIVE
     //
@@ -7169,6 +8044,7 @@ public interface WinError {
     // Popup menu already active.
     //
     int ERROR_POPUP_ALREADY_ACTIVE = 1446;
+
     //
     // MessageId: ERROR_NO_SCROLLBARS
     //
@@ -7177,6 +8053,7 @@ public interface WinError {
     // The window does not have scroll bars.
     //
     int ERROR_NO_SCROLLBARS = 1447;
+
     //
     // MessageId: ERROR_INVALID_SCROLLBAR_RANGE
     //
@@ -7185,6 +8062,7 @@ public interface WinError {
     // Scroll bar range cannot be greater than MAXLONG.
     //
     int ERROR_INVALID_SCROLLBAR_RANGE = 1448;
+
     //
     // MessageId: ERROR_INVALID_SHOWWIN_COMMAND
     //
@@ -7193,6 +8071,7 @@ public interface WinError {
     // Cannot show or remove the window in the way specified.
     //
     int ERROR_INVALID_SHOWWIN_COMMAND = 1449;
+
     //
     // MessageId: ERROR_NO_SYSTEM_RESOURCES
     //
@@ -7201,6 +8080,7 @@ public interface WinError {
     // Insufficient system resources exist to complete the requested service.
     //
     int ERROR_NO_SYSTEM_RESOURCES = 1450;
+
     //
     // MessageId: ERROR_NONPAGED_SYSTEM_RESOURCES
     //
@@ -7209,6 +8089,7 @@ public interface WinError {
     // Insufficient system resources exist to complete the requested service.
     //
     int ERROR_NONPAGED_SYSTEM_RESOURCES = 1451;
+
     //
     // MessageId: ERROR_PAGED_SYSTEM_RESOURCES
     //
@@ -7217,6 +8098,7 @@ public interface WinError {
     // Insufficient system resources exist to complete the requested service.
     //
     int ERROR_PAGED_SYSTEM_RESOURCES = 1452;
+
     //
     // MessageId: ERROR_WORKING_SET_QUOTA
     //
@@ -7225,6 +8107,7 @@ public interface WinError {
     // Insufficient quota to complete the requested service.
     //
     int ERROR_WORKING_SET_QUOTA = 1453;
+
     //
     // MessageId: ERROR_PAGEFILE_QUOTA
     //
@@ -7233,6 +8116,7 @@ public interface WinError {
     // Insufficient quota to complete the requested service.
     //
     int ERROR_PAGEFILE_QUOTA = 1454;
+
     //
     // MessageId: ERROR_COMMITMENT_LIMIT
     //
@@ -7241,6 +8125,7 @@ public interface WinError {
     // The paging file is too small for this operation to complete.
     //
     int ERROR_COMMITMENT_LIMIT = 1455;
+
     //
     // MessageId: ERROR_MENU_ITEM_NOT_FOUND
     //
@@ -7249,6 +8134,7 @@ public interface WinError {
     // A menu item was not found.
     //
     int ERROR_MENU_ITEM_NOT_FOUND = 1456;
+
     //
     // MessageId: ERROR_INVALID_KEYBOARD_HANDLE
     //
@@ -7257,6 +8143,7 @@ public interface WinError {
     // Invalid keyboard layout handle.
     //
     int ERROR_INVALID_KEYBOARD_HANDLE = 1457;
+
     //
     // MessageId: ERROR_HOOK_TYPE_NOT_ALLOWED
     //
@@ -7265,6 +8152,7 @@ public interface WinError {
     // Hook type not allowed.
     //
     int ERROR_HOOK_TYPE_NOT_ALLOWED = 1458;
+
     //
     // MessageId: ERROR_REQUIRES_INTERACTIVE_WINDOWSTATION
     //
@@ -7273,6 +8161,7 @@ public interface WinError {
     // This operation requires an interactive window station.
     //
     int ERROR_REQUIRES_INTERACTIVE_WINDOWSTATION = 1459;
+
     //
     // MessageId: ERROR_TIMEOUT
     //
@@ -7281,6 +8170,7 @@ public interface WinError {
     // This operation returned because the timeout period expired.
     //
     int ERROR_TIMEOUT = 1460;
+
     //
     // MessageId: ERROR_INVALID_MONITOR_HANDLE
     //
@@ -7289,6 +8179,7 @@ public interface WinError {
     // Invalid monitor handle.
     //
     int ERROR_INVALID_MONITOR_HANDLE = 1461;
+
     //
     // MessageId: ERROR_INCORRECT_SIZE
     //
@@ -7297,6 +8188,7 @@ public interface WinError {
     // Incorrect size argument.
     //
     int ERROR_INCORRECT_SIZE = 1462;
+
     //
     // MessageId: ERROR_SYMLINK_CLASS_DISABLED
     //
@@ -7305,6 +8197,7 @@ public interface WinError {
     // The symbolic link cannot be followed because its type is disabled.
     //
     int ERROR_SYMLINK_CLASS_DISABLED = 1463;
+
     //
     // MessageId: ERROR_SYMLINK_NOT_SUPPORTED
     //
@@ -7314,6 +8207,7 @@ public interface WinError {
     // links.
     //
     int ERROR_SYMLINK_NOT_SUPPORTED = 1464;
+
     //
     // MessageId: ERROR_XML_PARSE_ERROR
     //
@@ -7322,6 +8216,7 @@ public interface WinError {
     // Windows was unable to parse the requested XML data.
     //
     int ERROR_XML_PARSE_ERROR = 1465;
+
     //
     // MessageId: ERROR_XMLDSIG_ERROR
     //
@@ -7330,6 +8225,7 @@ public interface WinError {
     // An error was encountered while processing an XML digital signature.
     //
     int ERROR_XMLDSIG_ERROR = 1466;
+
     //
     // MessageId: ERROR_RESTART_APPLICATION
     //
@@ -7338,6 +8234,7 @@ public interface WinError {
     // This application must be restarted.
     //
     int ERROR_RESTART_APPLICATION = 1467;
+
     //
     // MessageId: ERROR_WRONG_COMPARTMENT
     //
@@ -7346,6 +8243,7 @@ public interface WinError {
     // The caller made the connection request in the wrong routing compartment.
     //
     int ERROR_WRONG_COMPARTMENT = 1468;
+
     //
     // MessageId: ERROR_AUTHIP_FAILURE
     //
@@ -7355,6 +8253,7 @@ public interface WinError {
     // host.
     //
     int ERROR_AUTHIP_FAILURE = 1469;
+
     // /////////////////////////////////////////////////
     // =//
     // =EventLog Error codes=//
@@ -7369,6 +8268,7 @@ public interface WinError {
     // The event log file is corrupted.
     //
     int ERROR_EVENTLOG_FILE_CORRUPT = 1500;
+
     //
     // MessageId: ERROR_EVENTLOG_CANT_START
     //
@@ -7378,6 +8278,7 @@ public interface WinError {
     // start.
     //
     int ERROR_EVENTLOG_CANT_START = 1501;
+
     //
     // MessageId: ERROR_LOG_FILE_FULL
     //
@@ -7386,6 +8287,7 @@ public interface WinError {
     // The event log file is full.
     //
     int ERROR_LOG_FILE_FULL = 1502;
+
     //
     // MessageId: ERROR_EVENTLOG_FILE_CHANGED
     //
@@ -7394,6 +8296,7 @@ public interface WinError {
     // The event log file has changed between read operations.
     //
     int ERROR_EVENTLOG_FILE_CHANGED = 1503;
+
     // /////////////////////////////////////////////////
     // =//
     // =Class Scheduler Error codes=//
@@ -7408,6 +8311,7 @@ public interface WinError {
     // The specified task name is invalid.
     //
     int ERROR_INVALID_TASK_NAME = 1550;
+
     //
     // MessageId: ERROR_INVALID_TASK_INDEX
     //
@@ -7416,6 +8320,7 @@ public interface WinError {
     // The specified task index is invalid.
     //
     int ERROR_INVALID_TASK_INDEX = 1551;
+
     //
     // MessageId: ERROR_THREAD_ALREADY_IN_TASK
     //
@@ -7424,6 +8329,7 @@ public interface WinError {
     // The specified thread is already joining a task.
     //
     int ERROR_THREAD_ALREADY_IN_TASK = 1552;
+
     // /////////////////////////////////////////////////
     // =//
     // =MSI Error codes=//
@@ -7440,6 +8346,7 @@ public interface WinError {
     // personnel for assistance.
     //
     int ERROR_INSTALL_SERVICE_FAILURE = 1601;
+
     //
     // MessageId: ERROR_INSTALL_USEREXIT
     //
@@ -7448,6 +8355,7 @@ public interface WinError {
     // User cancelled installation.
     //
     int ERROR_INSTALL_USEREXIT = 1602;
+
     //
     // MessageId: ERROR_INSTALL_FAILURE
     //
@@ -7456,6 +8364,7 @@ public interface WinError {
     // Fatal error during installation.
     //
     int ERROR_INSTALL_FAILURE = 1603;
+
     //
     // MessageId: ERROR_INSTALL_SUSPEND
     //
@@ -7464,6 +8373,7 @@ public interface WinError {
     // Installation suspended, incomplete.
     //
     int ERROR_INSTALL_SUSPEND = 1604;
+
     //
     // MessageId: ERROR_UNKNOWN_PRODUCT
     //
@@ -7472,6 +8382,7 @@ public interface WinError {
     // This action is only valid for products that are currently installed.
     //
     int ERROR_UNKNOWN_PRODUCT = 1605;
+
     //
     // MessageId: ERROR_UNKNOWN_FEATURE
     //
@@ -7480,6 +8391,7 @@ public interface WinError {
     // Feature ID not registered.
     //
     int ERROR_UNKNOWN_FEATURE = 1606;
+
     //
     // MessageId: ERROR_UNKNOWN_COMPONENT
     //
@@ -7488,6 +8400,7 @@ public interface WinError {
     // Component ID not registered.
     //
     int ERROR_UNKNOWN_COMPONENT = 1607;
+
     //
     // MessageId: ERROR_UNKNOWN_PROPERTY
     //
@@ -7496,6 +8409,7 @@ public interface WinError {
     // Unknown property.
     //
     int ERROR_UNKNOWN_PROPERTY = 1608;
+
     //
     // MessageId: ERROR_INVALID_HANDLE_STATE
     //
@@ -7504,6 +8418,7 @@ public interface WinError {
     // Handle is in an invalid state.
     //
     int ERROR_INVALID_HANDLE_STATE = 1609;
+
     //
     // MessageId: ERROR_BAD_CONFIGURATION
     //
@@ -7513,6 +8428,7 @@ public interface WinError {
     // personnel.
     //
     int ERROR_BAD_CONFIGURATION = 1610;
+
     //
     // MessageId: ERROR_INDEX_ABSENT
     //
@@ -7521,6 +8437,7 @@ public interface WinError {
     // Component qualifier not present.
     //
     int ERROR_INDEX_ABSENT = 1611;
+
     //
     // MessageId: ERROR_INSTALL_SOURCE_ABSENT
     //
@@ -7530,6 +8447,7 @@ public interface WinError {
     // the source exists and that you can access it.
     //
     int ERROR_INSTALL_SOURCE_ABSENT = 1612;
+
     //
     // MessageId: ERROR_INSTALL_PACKAGE_VERSION
     //
@@ -7540,6 +8458,7 @@ public interface WinError {
     // version of the Windows Installer service.
     //
     int ERROR_INSTALL_PACKAGE_VERSION = 1613;
+
     //
     // MessageId: ERROR_PRODUCT_UNINSTALLED
     //
@@ -7548,6 +8467,7 @@ public interface WinError {
     // Product is uninstalled.
     //
     int ERROR_PRODUCT_UNINSTALLED = 1614;
+
     //
     // MessageId: ERROR_BAD_QUERY_SYNTAX
     //
@@ -7556,6 +8476,7 @@ public interface WinError {
     // SQL query syntax invalid or unsupported.
     //
     int ERROR_BAD_QUERY_SYNTAX = 1615;
+
     //
     // MessageId: ERROR_INVALID_FIELD
     //
@@ -7564,6 +8485,7 @@ public interface WinError {
     // Record field does not exist.
     //
     int ERROR_INVALID_FIELD = 1616;
+
     //
     // MessageId: ERROR_DEVICE_REMOVED
     //
@@ -7572,6 +8494,7 @@ public interface WinError {
     // The device has been removed.
     //
     int ERROR_DEVICE_REMOVED = 1617;
+
     //
     // MessageId: ERROR_INSTALL_ALREADY_RUNNING
     //
@@ -7581,6 +8504,7 @@ public interface WinError {
     // before proceeding with this install.
     //
     int ERROR_INSTALL_ALREADY_RUNNING = 1618;
+
     //
     // MessageId: ERROR_INSTALL_PACKAGE_OPEN_FAILED
     //
@@ -7591,6 +8515,7 @@ public interface WinError {
     // verify that this is a valid Windows Installer package.
     //
     int ERROR_INSTALL_PACKAGE_OPEN_FAILED = 1619;
+
     //
     // MessageId: ERROR_INSTALL_PACKAGE_INVALID
     //
@@ -7600,6 +8525,7 @@ public interface WinError {
     // vendor to verify that this is a valid Windows Installer package.
     //
     int ERROR_INSTALL_PACKAGE_INVALID = 1620;
+
     //
     // MessageId: ERROR_INSTALL_UI_FAILURE
     //
@@ -7609,6 +8535,7 @@ public interface WinError {
     // Contact your support personnel.
     //
     int ERROR_INSTALL_UI_FAILURE = 1621;
+
     //
     // MessageId: ERROR_INSTALL_LOG_FAILURE
     //
@@ -7618,6 +8545,7 @@ public interface WinError {
     // location exists and that you can write to it.
     //
     int ERROR_INSTALL_LOG_FAILURE = 1622;
+
     //
     // MessageId: ERROR_INSTALL_LANGUAGE_UNSUPPORTED
     //
@@ -7627,6 +8555,7 @@ public interface WinError {
     // system.
     //
     int ERROR_INSTALL_LANGUAGE_UNSUPPORTED = 1623;
+
     //
     // MessageId: ERROR_INSTALL_TRANSFORM_FAILURE
     //
@@ -7636,6 +8565,7 @@ public interface WinError {
     // valid.
     //
     int ERROR_INSTALL_TRANSFORM_FAILURE = 1624;
+
     //
     // MessageId: ERROR_INSTALL_PACKAGE_REJECTED
     //
@@ -7645,6 +8575,7 @@ public interface WinError {
     // administrator.
     //
     int ERROR_INSTALL_PACKAGE_REJECTED = 1625;
+
     //
     // MessageId: ERROR_FUNCTION_NOT_CALLED
     //
@@ -7653,6 +8584,7 @@ public interface WinError {
     // Function could not be executed.
     //
     int ERROR_FUNCTION_NOT_CALLED = 1626;
+
     //
     // MessageId: ERROR_FUNCTION_FAILED
     //
@@ -7661,6 +8593,7 @@ public interface WinError {
     // Function failed during execution.
     //
     int ERROR_FUNCTION_FAILED = 1627;
+
     //
     // MessageId: ERROR_INVALID_TABLE
     //
@@ -7669,6 +8602,7 @@ public interface WinError {
     // Invalid or unknown table specified.
     //
     int ERROR_INVALID_TABLE = 1628;
+
     //
     // MessageId: ERROR_DATATYPE_MISMATCH
     //
@@ -7677,6 +8611,7 @@ public interface WinError {
     // Data supplied is of wrong type.
     //
     int ERROR_DATATYPE_MISMATCH = 1629;
+
     //
     // MessageId: ERROR_UNSUPPORTED_TYPE
     //
@@ -7685,6 +8620,7 @@ public interface WinError {
     // Data of this type is not supported.
     //
     int ERROR_UNSUPPORTED_TYPE = 1630;
+
     //
     // MessageId: ERROR_CREATE_FAILED
     //
@@ -7694,6 +8630,7 @@ public interface WinError {
     // personnel.
     //
     int ERROR_CREATE_FAILED = 1631;
+
     //
     // MessageId: ERROR_INSTALL_TEMP_UNWRITABLE
     //
@@ -7704,6 +8641,7 @@ public interface WinError {
     // folder.
     //
     int ERROR_INSTALL_TEMP_UNWRITABLE = 1632;
+
     //
     // MessageId: ERROR_INSTALL_PLATFORM_UNSUPPORTED
     //
@@ -7713,6 +8651,7 @@ public interface WinError {
     // Contact your product vendor.
     //
     int ERROR_INSTALL_PLATFORM_UNSUPPORTED = 1633;
+
     //
     // MessageId: ERROR_INSTALL_NOTUSED
     //
@@ -7721,6 +8660,7 @@ public interface WinError {
     // Component not used on this computer.
     //
     int ERROR_INSTALL_NOTUSED = 1634;
+
     //
     // MessageId: ERROR_PATCH_PACKAGE_OPEN_FAILED
     //
@@ -7731,6 +8671,7 @@ public interface WinError {
     // verify that this is a valid Windows Installer update package.
     //
     int ERROR_PATCH_PACKAGE_OPEN_FAILED = 1635;
+
     //
     // MessageId: ERROR_PATCH_PACKAGE_INVALID
     //
@@ -7740,6 +8681,7 @@ public interface WinError {
     // to verify that this is a valid Windows Installer update package.
     //
     int ERROR_PATCH_PACKAGE_INVALID = 1636;
+
     //
     // MessageId: ERROR_PATCH_PACKAGE_UNSUPPORTED
     //
@@ -7750,6 +8692,7 @@ public interface WinError {
     // the Windows Installer service.
     //
     int ERROR_PATCH_PACKAGE_UNSUPPORTED = 1637;
+
     //
     // MessageId: ERROR_PRODUCT_VERSION
     //
@@ -7760,6 +8703,7 @@ public interface WinError {
     // of this product, use Add/Remove Programs on the Control Panel.
     //
     int ERROR_PRODUCT_VERSION = 1638;
+
     //
     // MessageId: ERROR_INVALID_COMMAND_LINE
     //
@@ -7769,6 +8713,7 @@ public interface WinError {
     // detailed command line help.
     //
     int ERROR_INVALID_COMMAND_LINE = 1639;
+
     //
     // MessageId: ERROR_INSTALL_REMOTE_DISALLOWED
     //
@@ -7780,6 +8725,7 @@ public interface WinError {
     // administrator.
     //
     int ERROR_INSTALL_REMOTE_DISALLOWED = 1640;
+
     //
     // MessageId: ERROR_SUCCESS_REBOOT_INITIATED
     //
@@ -7789,6 +8735,7 @@ public interface WinError {
     // restarted so the changes can take effect.
     //
     int ERROR_SUCCESS_REBOOT_INITIATED = 1641;
+
     //
     // MessageId: ERROR_PATCH_TARGET_NOT_FOUND
     //
@@ -7800,6 +8747,7 @@ public interface WinError {
     // exists on your computer and that you have the correct upgrade.
     //
     int ERROR_PATCH_TARGET_NOT_FOUND = 1642;
+
     //
     // MessageId: ERROR_PATCH_PACKAGE_REJECTED
     //
@@ -7808,6 +8756,7 @@ public interface WinError {
     // The update package is not permitted by software restriction policy.
     //
     int ERROR_PATCH_PACKAGE_REJECTED = 1643;
+
     //
     // MessageId: ERROR_INSTALL_TRANSFORM_REJECTED
     //
@@ -7817,6 +8766,7 @@ public interface WinError {
     // policy.
     //
     int ERROR_INSTALL_TRANSFORM_REJECTED = 1644;
+
     //
     // MessageId: ERROR_INSTALL_REMOTE_PROHIBITED
     //
@@ -7826,6 +8776,7 @@ public interface WinError {
     // Connection.
     //
     int ERROR_INSTALL_REMOTE_PROHIBITED = 1645;
+
     //
     // MessageId: ERROR_PATCH_REMOVAL_UNSUPPORTED
     //
@@ -7834,6 +8785,7 @@ public interface WinError {
     // Uninstallation of the update package is not supported.
     //
     int ERROR_PATCH_REMOVAL_UNSUPPORTED = 1646;
+
     //
     // MessageId: ERROR_UNKNOWN_PATCH
     //
@@ -7842,6 +8794,7 @@ public interface WinError {
     // The update is not applied to this product.
     //
     int ERROR_UNKNOWN_PATCH = 1647;
+
     //
     // MessageId: ERROR_PATCH_NO_SEQUENCE
     //
@@ -7850,6 +8803,7 @@ public interface WinError {
     // No valid sequence could be found for the set of updates.
     //
     int ERROR_PATCH_NO_SEQUENCE = 1648;
+
     //
     // MessageId: ERROR_PATCH_REMOVAL_DISALLOWED
     //
@@ -7858,6 +8812,7 @@ public interface WinError {
     // Update removal was disallowed by policy.
     //
     int ERROR_PATCH_REMOVAL_DISALLOWED = 1649;
+
     //
     // MessageId: ERROR_INVALID_PATCH_XML
     //
@@ -7866,6 +8821,7 @@ public interface WinError {
     // The XML update data is invalid.
     //
     int ERROR_INVALID_PATCH_XML = 1650;
+
     //
     // MessageId: ERROR_PATCH_MANAGED_ADVERTISED_PRODUCT
     //
@@ -7876,6 +8832,7 @@ public interface WinError {
     // applying the update.
     //
     int ERROR_PATCH_MANAGED_ADVERTISED_PRODUCT = 1651;
+
     //
     // MessageId: ERROR_INSTALL_SERVICE_SAFEBOOT
     //
@@ -7886,6 +8843,7 @@ public interface WinError {
     // Restore to return your machine to a previous good state.
     //
     int ERROR_INSTALL_SERVICE_SAFEBOOT = 1652;
+
     // /////////////////////////////////////////////////
     // =//
     // =RPC Error codes=//
@@ -7900,6 +8858,7 @@ public interface WinError {
     // The string binding is invalid.
     //
     int RPC_S_INVALID_STRING_BINDING = 1700;
+
     //
     // MessageId: RPC_S_WRONG_KIND_OF_BINDING
     //
@@ -7908,6 +8867,7 @@ public interface WinError {
     // The binding handle is not the correct type.
     //
     int RPC_S_WRONG_KIND_OF_BINDING = 1701;
+
     //
     // MessageId: RPC_S_INVALID_BINDING
     //
@@ -7916,6 +8876,7 @@ public interface WinError {
     // The binding handle is invalid.
     //
     int RPC_S_INVALID_BINDING = 1702;
+
     //
     // MessageId: RPC_S_PROTSEQ_NOT_SUPPORTED
     //
@@ -7924,6 +8885,7 @@ public interface WinError {
     // The RPC protocol sequence is not supported.
     //
     int RPC_S_PROTSEQ_NOT_SUPPORTED = 1703;
+
     //
     // MessageId: RPC_S_INVALID_RPC_PROTSEQ
     //
@@ -7932,6 +8894,7 @@ public interface WinError {
     // The RPC protocol sequence is invalid.
     //
     int RPC_S_INVALID_RPC_PROTSEQ = 1704;
+
     //
     // MessageId: RPC_S_INVALID_STRING_UUID
     //
@@ -7940,6 +8903,7 @@ public interface WinError {
     // The string universal unique identifier (UUID) is invalid.
     //
     int RPC_S_INVALID_STRING_UUID = 1705;
+
     //
     // MessageId: RPC_S_INVALID_ENDPOINT_FORMAT
     //
@@ -7948,6 +8912,7 @@ public interface WinError {
     // The endpoint format is invalid.
     //
     int RPC_S_INVALID_ENDPOINT_FORMAT = 1706;
+
     //
     // MessageId: RPC_S_INVALID_NET_ADDR
     //
@@ -7956,6 +8921,7 @@ public interface WinError {
     // The network address is invalid.
     //
     int RPC_S_INVALID_NET_ADDR = 1707;
+
     //
     // MessageId: RPC_S_NO_ENDPOINT_FOUND
     //
@@ -7964,6 +8930,7 @@ public interface WinError {
     // No endpoint was found.
     //
     int RPC_S_NO_ENDPOINT_FOUND = 1708;
+
     //
     // MessageId: RPC_S_INVALID_TIMEOUT
     //
@@ -7972,6 +8939,7 @@ public interface WinError {
     // The timeout value is invalid.
     //
     int RPC_S_INVALID_TIMEOUT = 1709;
+
     //
     // MessageId: RPC_S_OBJECT_NOT_FOUND
     //
@@ -7980,6 +8948,7 @@ public interface WinError {
     // The object universal unique identifier (UUID) was not found.
     //
     int RPC_S_OBJECT_NOT_FOUND = 1710;
+
     //
     // MessageId: RPC_S_ALREADY_REGISTERED
     //
@@ -7989,6 +8958,7 @@ public interface WinError {
     // registered.
     //
     int RPC_S_ALREADY_REGISTERED = 1711;
+
     //
     // MessageId: RPC_S_TYPE_ALREADY_REGISTERED
     //
@@ -7997,6 +8967,7 @@ public interface WinError {
     // The type universal unique identifier (UUID) has already been registered.
     //
     int RPC_S_TYPE_ALREADY_REGISTERED = 1712;
+
     //
     // MessageId: RPC_S_ALREADY_LISTENING
     //
@@ -8005,6 +8976,7 @@ public interface WinError {
     // The RPC server is already listening.
     //
     int RPC_S_ALREADY_LISTENING = 1713;
+
     //
     // MessageId: RPC_S_NO_PROTSEQS_REGISTERED
     //
@@ -8013,6 +8985,7 @@ public interface WinError {
     // No protocol sequences have been registered.
     //
     int RPC_S_NO_PROTSEQS_REGISTERED = 1714;
+
     //
     // MessageId: RPC_S_NOT_LISTENING
     //
@@ -8021,6 +8994,7 @@ public interface WinError {
     // The RPC server is not listening.
     //
     int RPC_S_NOT_LISTENING = 1715;
+
     //
     // MessageId: RPC_S_UNKNOWN_MGR_TYPE
     //
@@ -8029,6 +9003,7 @@ public interface WinError {
     // The manager type is unknown.
     //
     int RPC_S_UNKNOWN_MGR_TYPE = 1716;
+
     //
     // MessageId: RPC_S_UNKNOWN_IF
     //
@@ -8037,6 +9012,7 @@ public interface WinError {
     // The interface is unknown.
     //
     int RPC_S_UNKNOWN_IF = 1717;
+
     //
     // MessageId: RPC_S_NO_BINDINGS
     //
@@ -8045,6 +9021,7 @@ public interface WinError {
     // There are no bindings.
     //
     int RPC_S_NO_BINDINGS = 1718;
+
     //
     // MessageId: RPC_S_NO_PROTSEQS
     //
@@ -8053,6 +9030,7 @@ public interface WinError {
     // There are no protocol sequences.
     //
     int RPC_S_NO_PROTSEQS = 1719;
+
     //
     // MessageId: RPC_S_CANT_CREATE_ENDPOINT
     //
@@ -8061,6 +9039,7 @@ public interface WinError {
     // The endpoint cannot be created.
     //
     int RPC_S_CANT_CREATE_ENDPOINT = 1720;
+
     //
     // MessageId: RPC_S_OUT_OF_RESOURCES
     //
@@ -8069,6 +9048,7 @@ public interface WinError {
     // Not enough resources are available to complete this operation.
     //
     int RPC_S_OUT_OF_RESOURCES = 1721;
+
     //
     // MessageId: RPC_S_SERVER_UNAVAILABLE
     //
@@ -8077,6 +9057,7 @@ public interface WinError {
     // The RPC server is unavailable.
     //
     int RPC_S_SERVER_UNAVAILABLE = 1722;
+
     //
     // MessageId: RPC_S_SERVER_TOO_BUSY
     //
@@ -8085,6 +9066,7 @@ public interface WinError {
     // The RPC server is too busy to complete this operation.
     //
     int RPC_S_SERVER_TOO_BUSY = 1723;
+
     //
     // MessageId: RPC_S_INVALID_NETWORK_OPTIONS
     //
@@ -8093,6 +9075,7 @@ public interface WinError {
     // The network options are invalid.
     //
     int RPC_S_INVALID_NETWORK_OPTIONS = 1724;
+
     //
     // MessageId: RPC_S_NO_CALL_ACTIVE
     //
@@ -8101,6 +9084,7 @@ public interface WinError {
     // There are no remote procedure calls active on this thread.
     //
     int RPC_S_NO_CALL_ACTIVE = 1725;
+
     //
     // MessageId: RPC_S_CALL_FAILED
     //
@@ -8109,6 +9093,7 @@ public interface WinError {
     // The remote procedure call failed.
     //
     int RPC_S_CALL_FAILED = 1726;
+
     //
     // MessageId: RPC_S_CALL_FAILED_DNE
     //
@@ -8117,6 +9102,7 @@ public interface WinError {
     // The remote procedure call failed and did not execute.
     //
     int RPC_S_CALL_FAILED_DNE = 1727;
+
     //
     // MessageId: RPC_S_PROTOCOL_ERROR
     //
@@ -8125,6 +9111,7 @@ public interface WinError {
     // A remote procedure call (RPC) protocol error occurred.
     //
     int RPC_S_PROTOCOL_ERROR = 1728;
+
     //
     // MessageId: RPC_S_PROXY_ACCESS_DENIED
     //
@@ -8133,6 +9120,7 @@ public interface WinError {
     // Access to the HTTP proxy is denied.
     //
     int RPC_S_PROXY_ACCESS_DENIED = 1729;
+
     //
     // MessageId: RPC_S_UNSUPPORTED_TRANS_SYN
     //
@@ -8141,6 +9129,7 @@ public interface WinError {
     // The transfer syntax is not supported by the RPC server.
     //
     int RPC_S_UNSUPPORTED_TRANS_SYN = 1730;
+
     //
     // MessageId: RPC_S_UNSUPPORTED_TYPE
     //
@@ -8149,6 +9138,7 @@ public interface WinError {
     // The universal unique identifier (UUID) type is not supported.
     //
     int RPC_S_UNSUPPORTED_TYPE = 1732;
+
     //
     // MessageId: RPC_S_INVALID_TAG
     //
@@ -8157,6 +9147,7 @@ public interface WinError {
     // The tag is invalid.
     //
     int RPC_S_INVALID_TAG = 1733;
+
     //
     // MessageId: RPC_S_INVALID_BOUND
     //
@@ -8165,6 +9156,7 @@ public interface WinError {
     // The array bounds are invalid.
     //
     int RPC_S_INVALID_BOUND = 1734;
+
     //
     // MessageId: RPC_S_NO_ENTRY_NAME
     //
@@ -8173,6 +9165,7 @@ public interface WinError {
     // The binding does not contain an entry name.
     //
     int RPC_S_NO_ENTRY_NAME = 1735;
+
     //
     // MessageId: RPC_S_INVALID_NAME_SYNTAX
     //
@@ -8181,6 +9174,7 @@ public interface WinError {
     // The name syntax is invalid.
     //
     int RPC_S_INVALID_NAME_SYNTAX = 1736;
+
     //
     // MessageId: RPC_S_UNSUPPORTED_NAME_SYNTAX
     //
@@ -8189,6 +9183,7 @@ public interface WinError {
     // The name syntax is not supported.
     //
     int RPC_S_UNSUPPORTED_NAME_SYNTAX = 1737;
+
     //
     // MessageId: RPC_S_UUID_NO_ADDRESS
     //
@@ -8198,6 +9193,7 @@ public interface WinError {
     // identifier (UUID).
     //
     int RPC_S_UUID_NO_ADDRESS = 1739;
+
     //
     // MessageId: RPC_S_DUPLICATE_ENDPOINT
     //
@@ -8206,6 +9202,7 @@ public interface WinError {
     // The endpoint is a duplicate.
     //
     int RPC_S_DUPLICATE_ENDPOINT = 1740;
+
     //
     // MessageId: RPC_S_UNKNOWN_AUTHN_TYPE
     //
@@ -8214,6 +9211,7 @@ public interface WinError {
     // The authentication type is unknown.
     //
     int RPC_S_UNKNOWN_AUTHN_TYPE = 1741;
+
     //
     // MessageId: RPC_S_MAX_CALLS_TOO_SMALL
     //
@@ -8222,6 +9220,7 @@ public interface WinError {
     // The maximum number of calls is too small.
     //
     int RPC_S_MAX_CALLS_TOO_SMALL = 1742;
+
     //
     // MessageId: RPC_S_STRING_TOO_LONG
     //
@@ -8230,6 +9229,7 @@ public interface WinError {
     // The string is too long.
     //
     int RPC_S_STRING_TOO_LONG = 1743;
+
     //
     // MessageId: RPC_S_PROTSEQ_NOT_FOUND
     //
@@ -8238,6 +9238,7 @@ public interface WinError {
     // The RPC protocol sequence was not found.
     //
     int RPC_S_PROTSEQ_NOT_FOUND = 1744;
+
     //
     // MessageId: RPC_S_PROCNUM_OUT_OF_RANGE
     //
@@ -8246,6 +9247,7 @@ public interface WinError {
     // The procedure number is out of range.
     //
     int RPC_S_PROCNUM_OUT_OF_RANGE = 1745;
+
     //
     // MessageId: RPC_S_BINDING_HAS_NO_AUTH
     //
@@ -8254,6 +9256,7 @@ public interface WinError {
     // The binding does not contain any authentication information.
     //
     int RPC_S_BINDING_HAS_NO_AUTH = 1746;
+
     //
     // MessageId: RPC_S_UNKNOWN_AUTHN_SERVICE
     //
@@ -8262,6 +9265,7 @@ public interface WinError {
     // The authentication service is unknown.
     //
     int RPC_S_UNKNOWN_AUTHN_SERVICE = 1747;
+
     //
     // MessageId: RPC_S_UNKNOWN_AUTHN_LEVEL
     //
@@ -8270,6 +9274,7 @@ public interface WinError {
     // The authentication level is unknown.
     //
     int RPC_S_UNKNOWN_AUTHN_LEVEL = 1748;
+
     //
     // MessageId: RPC_S_INVALID_AUTH_IDENTITY
     //
@@ -8278,6 +9283,7 @@ public interface WinError {
     // The security context is invalid.
     //
     int RPC_S_INVALID_AUTH_IDENTITY = 1749;
+
     //
     // MessageId: RPC_S_UNKNOWN_AUTHZ_SERVICE
     //
@@ -8286,6 +9292,7 @@ public interface WinError {
     // The authorization service is unknown.
     //
     int RPC_S_UNKNOWN_AUTHZ_SERVICE = 1750;
+
     //
     // MessageId: EPT_S_INVALID_ENTRY
     //
@@ -8294,6 +9301,7 @@ public interface WinError {
     // The entry is invalid.
     //
     int EPT_S_INVALID_ENTRY = 1751;
+
     //
     // MessageId: EPT_S_CANT_PERFORM_OP
     //
@@ -8302,6 +9310,7 @@ public interface WinError {
     // The server endpoint cannot perform the operation.
     //
     int EPT_S_CANT_PERFORM_OP = 1752;
+
     //
     // MessageId: EPT_S_NOT_REGISTERED
     //
@@ -8310,6 +9319,7 @@ public interface WinError {
     // There are no more endpoints available from the endpoint mapper.
     //
     int EPT_S_NOT_REGISTERED = 1753;
+
     //
     // MessageId: RPC_S_NOTHING_TO_EXPORT
     //
@@ -8318,6 +9328,7 @@ public interface WinError {
     // No interfaces have been exported.
     //
     int RPC_S_NOTHING_TO_EXPORT = 1754;
+
     //
     // MessageId: RPC_S_INCOMPLETE_NAME
     //
@@ -8326,6 +9337,7 @@ public interface WinError {
     // The entry name is incomplete.
     //
     int RPC_S_INCOMPLETE_NAME = 1755;
+
     //
     // MessageId: RPC_S_INVALID_VERS_OPTION
     //
@@ -8334,6 +9346,7 @@ public interface WinError {
     // The version option is invalid.
     //
     int RPC_S_INVALID_VERS_OPTION = 1756;
+
     //
     // MessageId: RPC_S_NO_MORE_MEMBERS
     //
@@ -8342,6 +9355,7 @@ public interface WinError {
     // There are no more members.
     //
     int RPC_S_NO_MORE_MEMBERS = 1757;
+
     //
     // MessageId: RPC_S_NOT_ALL_OBJS_UNEXPORTED
     //
@@ -8350,6 +9364,7 @@ public interface WinError {
     // There is nothing to unexport.
     //
     int RPC_S_NOT_ALL_OBJS_UNEXPORTED = 1758;
+
     //
     // MessageId: RPC_S_INTERFACE_NOT_FOUND
     //
@@ -8358,6 +9373,7 @@ public interface WinError {
     // The interface was not found.
     //
     int RPC_S_INTERFACE_NOT_FOUND = 1759;
+
     //
     // MessageId: RPC_S_ENTRY_ALREADY_EXISTS
     //
@@ -8366,6 +9382,7 @@ public interface WinError {
     // The entry already exists.
     //
     int RPC_S_ENTRY_ALREADY_EXISTS = 1760;
+
     //
     // MessageId: RPC_S_ENTRY_NOT_FOUND
     //
@@ -8374,6 +9391,7 @@ public interface WinError {
     // The entry is not found.
     //
     int RPC_S_ENTRY_NOT_FOUND = 1761;
+
     //
     // MessageId: RPC_S_NAME_SERVICE_UNAVAILABLE
     //
@@ -8382,6 +9400,7 @@ public interface WinError {
     // The name service is unavailable.
     //
     int RPC_S_NAME_SERVICE_UNAVAILABLE = 1762;
+
     //
     // MessageId: RPC_S_INVALID_NAF_ID
     //
@@ -8390,6 +9409,7 @@ public interface WinError {
     // The network address family is invalid.
     //
     int RPC_S_INVALID_NAF_ID = 1763;
+
     //
     // MessageId: RPC_S_CANNOT_SUPPORT
     //
@@ -8398,6 +9418,7 @@ public interface WinError {
     // The requested operation is not supported.
     //
     int RPC_S_CANNOT_SUPPORT = 1764;
+
     //
     // MessageId: RPC_S_NO_CONTEXT_AVAILABLE
     //
@@ -8406,6 +9427,7 @@ public interface WinError {
     // No security context is available to allow impersonation.
     //
     int RPC_S_NO_CONTEXT_AVAILABLE = 1765;
+
     //
     // MessageId: RPC_S_INTERNAL_ERROR
     //
@@ -8414,6 +9436,7 @@ public interface WinError {
     // An internal error occurred in a remote procedure call (RPC).
     //
     int RPC_S_INTERNAL_ERROR = 1766;
+
     //
     // MessageId: RPC_S_ZERO_DIVIDE
     //
@@ -8422,6 +9445,7 @@ public interface WinError {
     // The RPC server attempted an integer division by zero.
     //
     int RPC_S_ZERO_DIVIDE = 1767;
+
     //
     // MessageId: RPC_S_ADDRESS_ERROR
     //
@@ -8430,6 +9454,7 @@ public interface WinError {
     // An addressing error occurred in the RPC server.
     //
     int RPC_S_ADDRESS_ERROR = 1768;
+
     //
     // MessageId: RPC_S_FP_DIV_ZERO
     //
@@ -8438,6 +9463,7 @@ public interface WinError {
     // A floating-point operation at the RPC server caused a division by zero.
     //
     int RPC_S_FP_DIV_ZERO = 1769;
+
     //
     // MessageId: RPC_S_FP_UNDERFLOW
     //
@@ -8446,6 +9472,7 @@ public interface WinError {
     // A floating-point underflow occurred at the RPC server.
     //
     int RPC_S_FP_UNDERFLOW = 1770;
+
     //
     // MessageId: RPC_S_FP_OVERFLOW
     //
@@ -8454,6 +9481,7 @@ public interface WinError {
     // A floating-point overflow occurred at the RPC server.
     //
     int RPC_S_FP_OVERFLOW = 1771;
+
     //
     // MessageId: RPC_X_NO_MORE_ENTRIES
     //
@@ -8463,6 +9491,7 @@ public interface WinError {
     // been exhausted.
     //
     int RPC_X_NO_MORE_ENTRIES = 1772;
+
     //
     // MessageId: RPC_X_SS_CHAR_TRANS_OPEN_FAIL
     //
@@ -8471,6 +9500,7 @@ public interface WinError {
     // Unable to open the character translation table file.
     //
     int RPC_X_SS_CHAR_TRANS_OPEN_FAIL = 1773;
+
     //
     // MessageId: RPC_X_SS_CHAR_TRANS_SHORT_FILE
     //
@@ -8480,6 +9510,7 @@ public interface WinError {
     // bytes.
     //
     int RPC_X_SS_CHAR_TRANS_SHORT_FILE = 1774;
+
     //
     // MessageId: RPC_X_SS_IN_NULL_CONTEXT
     //
@@ -8489,6 +9520,7 @@ public interface WinError {
     // remote procedure call.
     //
     int RPC_X_SS_IN_NULL_CONTEXT = 1775;
+
     //
     // MessageId: RPC_X_SS_CONTEXT_DAMAGED
     //
@@ -8497,6 +9529,7 @@ public interface WinError {
     // The context handle changed during a remote procedure call.
     //
     int RPC_X_SS_CONTEXT_DAMAGED = 1777;
+
     //
     // MessageId: RPC_X_SS_HANDLES_MISMATCH
     //
@@ -8505,6 +9538,7 @@ public interface WinError {
     // The binding handles passed to a remote procedure call do not match.
     //
     int RPC_X_SS_HANDLES_MISMATCH = 1778;
+
     //
     // MessageId: RPC_X_SS_CANNOT_GET_CALL_HANDLE
     //
@@ -8513,6 +9547,7 @@ public interface WinError {
     // The stub is unable to get the remote procedure call handle.
     //
     int RPC_X_SS_CANNOT_GET_CALL_HANDLE = 1779;
+
     //
     // MessageId: RPC_X_NULL_REF_POINTER
     //
@@ -8521,6 +9556,7 @@ public interface WinError {
     // A null reference pointer was passed to the stub.
     //
     int RPC_X_NULL_REF_POINTER = 1780;
+
     //
     // MessageId: RPC_X_ENUM_VALUE_OUT_OF_RANGE
     //
@@ -8529,6 +9565,7 @@ public interface WinError {
     // The enumeration value is out of range.
     //
     int RPC_X_ENUM_VALUE_OUT_OF_RANGE = 1781;
+
     //
     // MessageId: RPC_X_BYTE_COUNT_TOO_SMALL
     //
@@ -8537,6 +9574,7 @@ public interface WinError {
     // The byte count is too small.
     //
     int RPC_X_BYTE_COUNT_TOO_SMALL = 1782;
+
     //
     // MessageId: RPC_X_BAD_STUB_DATA
     //
@@ -8545,6 +9583,7 @@ public interface WinError {
     // The stub received bad data.
     //
     int RPC_X_BAD_STUB_DATA = 1783;
+
     //
     // MessageId: ERROR_INVALID_USER_BUFFER
     //
@@ -8553,6 +9592,7 @@ public interface WinError {
     // The supplied user buffer is not valid for the requested operation.
     //
     int ERROR_INVALID_USER_BUFFER = 1784;
+
     //
     // MessageId: ERROR_UNRECOGNIZED_MEDIA
     //
@@ -8561,6 +9601,7 @@ public interface WinError {
     // The disk media is not recognized. It may not be formatted.
     //
     int ERROR_UNRECOGNIZED_MEDIA = 1785;
+
     //
     // MessageId: ERROR_NO_TRUST_LSA_SECRET
     //
@@ -8569,6 +9610,7 @@ public interface WinError {
     // The workstation does not have a trust secret.
     //
     int ERROR_NO_TRUST_LSA_SECRET = 1786;
+
     //
     // MessageId: ERROR_NO_TRUST_SAM_ACCOUNT
     //
@@ -8578,6 +9620,7 @@ public interface WinError {
     // this workstation trust relationship.
     //
     int ERROR_NO_TRUST_SAM_ACCOUNT = 1787;
+
     //
     // MessageId: ERROR_TRUSTED_DOMAIN_FAILURE
     //
@@ -8587,6 +9630,7 @@ public interface WinError {
     // failed.
     //
     int ERROR_TRUSTED_DOMAIN_FAILURE = 1788;
+
     //
     // MessageId: ERROR_TRUSTED_RELATIONSHIP_FAILURE
     //
@@ -8596,6 +9640,7 @@ public interface WinError {
     // failed.
     //
     int ERROR_TRUSTED_RELATIONSHIP_FAILURE = 1789;
+
     //
     // MessageId: ERROR_TRUST_FAILURE
     //
@@ -8604,6 +9649,7 @@ public interface WinError {
     // The network logon failed.
     //
     int ERROR_TRUST_FAILURE = 1790;
+
     //
     // MessageId: RPC_S_CALL_IN_PROGRESS
     //
@@ -8612,6 +9658,7 @@ public interface WinError {
     // A remote procedure call is already in progress for this thread.
     //
     int RPC_S_CALL_IN_PROGRESS = 1791;
+
     //
     // MessageId: ERROR_NETLOGON_NOT_STARTED
     //
@@ -8621,6 +9668,7 @@ public interface WinError {
     // started.
     //
     int ERROR_NETLOGON_NOT_STARTED = 1792;
+
     //
     // MessageId: ERROR_ACCOUNT_EXPIRED
     //
@@ -8629,6 +9677,7 @@ public interface WinError {
     // The user's account has expired.
     //
     int ERROR_ACCOUNT_EXPIRED = 1793;
+
     //
     // MessageId: ERROR_REDIRECTOR_HAS_OPEN_HANDLES
     //
@@ -8637,6 +9686,7 @@ public interface WinError {
     // The redirector is in use and cannot be unloaded.
     //
     int ERROR_REDIRECTOR_HAS_OPEN_HANDLES = 1794;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_ALREADY_INSTALLED
     //
@@ -8645,6 +9695,7 @@ public interface WinError {
     // The specified printer driver is already installed.
     //
     int ERROR_PRINTER_DRIVER_ALREADY_INSTALLED = 1795;
+
     //
     // MessageId: ERROR_UNKNOWN_PORT
     //
@@ -8653,6 +9704,7 @@ public interface WinError {
     // The specified port is unknown.
     //
     int ERROR_UNKNOWN_PORT = 1796;
+
     //
     // MessageId: ERROR_UNKNOWN_PRINTER_DRIVER
     //
@@ -8661,6 +9713,7 @@ public interface WinError {
     // The printer driver is unknown.
     //
     int ERROR_UNKNOWN_PRINTER_DRIVER = 1797;
+
     //
     // MessageId: ERROR_UNKNOWN_PRINTPROCESSOR
     //
@@ -8669,6 +9722,7 @@ public interface WinError {
     // The print processor is unknown.
     //
     int ERROR_UNKNOWN_PRINTPROCESSOR = 1798;
+
     //
     // MessageId: ERROR_INVALID_SEPARATOR_FILE
     //
@@ -8677,6 +9731,7 @@ public interface WinError {
     // The specified separator file is invalid.
     //
     int ERROR_INVALID_SEPARATOR_FILE = 1799;
+
     //
     // MessageId: ERROR_INVALID_PRIORITY
     //
@@ -8685,6 +9740,7 @@ public interface WinError {
     // The specified priority is invalid.
     //
     int ERROR_INVALID_PRIORITY = 1800;
+
     //
     // MessageId: ERROR_INVALID_PRINTER_NAME
     //
@@ -8693,6 +9749,7 @@ public interface WinError {
     // The printer name is invalid.
     //
     int ERROR_INVALID_PRINTER_NAME = 1801;
+
     //
     // MessageId: ERROR_PRINTER_ALREADY_EXISTS
     //
@@ -8701,6 +9758,7 @@ public interface WinError {
     // The printer already exists.
     //
     int ERROR_PRINTER_ALREADY_EXISTS = 1802;
+
     //
     // MessageId: ERROR_INVALID_PRINTER_COMMAND
     //
@@ -8709,6 +9767,7 @@ public interface WinError {
     // The printer command is invalid.
     //
     int ERROR_INVALID_PRINTER_COMMAND = 1803;
+
     //
     // MessageId: ERROR_INVALID_DATATYPE
     //
@@ -8717,6 +9776,7 @@ public interface WinError {
     // The specified datatype is invalid.
     //
     int ERROR_INVALID_DATATYPE = 1804;
+
     //
     // MessageId: ERROR_INVALID_ENVIRONMENT
     //
@@ -8725,6 +9785,7 @@ public interface WinError {
     // The environment specified is invalid.
     //
     int ERROR_INVALID_ENVIRONMENT = 1805;
+
     //
     // MessageId: RPC_S_NO_MORE_BINDINGS
     //
@@ -8733,6 +9794,7 @@ public interface WinError {
     // There are no more bindings.
     //
     int RPC_S_NO_MORE_BINDINGS = 1806;
+
     //
     // MessageId: ERROR_NOLOGON_INTERDOMAIN_TRUST_ACCOUNT
     //
@@ -8742,6 +9804,7 @@ public interface WinError {
     // account or local user account to access this server.
     //
     int ERROR_NOLOGON_INTERDOMAIN_TRUST_ACCOUNT = 1807;
+
     //
     // MessageId: ERROR_NOLOGON_WORKSTATION_TRUST_ACCOUNT
     //
@@ -8751,6 +9814,7 @@ public interface WinError {
     // local user account to access this server.
     //
     int ERROR_NOLOGON_WORKSTATION_TRUST_ACCOUNT = 1808;
+
     //
     // MessageId: ERROR_NOLOGON_SERVER_TRUST_ACCOUNT
     //
@@ -8760,6 +9824,7 @@ public interface WinError {
     // or local user account to access this server.
     //
     int ERROR_NOLOGON_SERVER_TRUST_ACCOUNT = 1809;
+
     //
     // MessageId: ERROR_DOMAIN_TRUST_INCONSISTENT
     //
@@ -8769,6 +9834,7 @@ public interface WinError {
     // with the trust information for that domain.
     //
     int ERROR_DOMAIN_TRUST_INCONSISTENT = 1810;
+
     //
     // MessageId: ERROR_SERVER_HAS_OPEN_HANDLES
     //
@@ -8777,6 +9843,7 @@ public interface WinError {
     // The server is in use and cannot be unloaded.
     //
     int ERROR_SERVER_HAS_OPEN_HANDLES = 1811;
+
     //
     // MessageId: ERROR_RESOURCE_DATA_NOT_FOUND
     //
@@ -8785,6 +9852,7 @@ public interface WinError {
     // The specified image file did not contain a resource section.
     //
     int ERROR_RESOURCE_DATA_NOT_FOUND = 1812;
+
     //
     // MessageId: ERROR_RESOURCE_TYPE_NOT_FOUND
     //
@@ -8793,6 +9861,7 @@ public interface WinError {
     // The specified resource type cannot be found in the image file.
     //
     int ERROR_RESOURCE_TYPE_NOT_FOUND = 1813;
+
     //
     // MessageId: ERROR_RESOURCE_NAME_NOT_FOUND
     //
@@ -8801,6 +9870,7 @@ public interface WinError {
     // The specified resource name cannot be found in the image file.
     //
     int ERROR_RESOURCE_NAME_NOT_FOUND = 1814;
+
     //
     // MessageId: ERROR_RESOURCE_LANG_NOT_FOUND
     //
@@ -8809,6 +9879,7 @@ public interface WinError {
     // The specified resource language ID cannot be found in the image file.
     //
     int ERROR_RESOURCE_LANG_NOT_FOUND = 1815;
+
     //
     // MessageId: ERROR_NOT_ENOUGH_QUOTA
     //
@@ -8817,6 +9888,7 @@ public interface WinError {
     // Not enough quota is available to process this command.
     //
     int ERROR_NOT_ENOUGH_QUOTA = 1816;
+
     //
     // MessageId: RPC_S_NO_INTERFACES
     //
@@ -8825,6 +9897,7 @@ public interface WinError {
     // No interfaces have been registered.
     //
     int RPC_S_NO_INTERFACES = 1817;
+
     //
     // MessageId: RPC_S_CALL_CANCELLED
     //
@@ -8833,6 +9906,7 @@ public interface WinError {
     // The remote procedure call was cancelled.
     //
     int RPC_S_CALL_CANCELLED = 1818;
+
     //
     // MessageId: RPC_S_BINDING_INCOMPLETE
     //
@@ -8841,6 +9915,7 @@ public interface WinError {
     // The binding handle does not contain all required information.
     //
     int RPC_S_BINDING_INCOMPLETE = 1819;
+
     //
     // MessageId: RPC_S_COMM_FAILURE
     //
@@ -8849,6 +9924,7 @@ public interface WinError {
     // A communications failure occurred during a remote procedure call.
     //
     int RPC_S_COMM_FAILURE = 1820;
+
     //
     // MessageId: RPC_S_UNSUPPORTED_AUTHN_LEVEL
     //
@@ -8857,6 +9933,7 @@ public interface WinError {
     // The requested authentication level is not supported.
     //
     int RPC_S_UNSUPPORTED_AUTHN_LEVEL = 1821;
+
     //
     // MessageId: RPC_S_NO_PRINC_NAME
     //
@@ -8865,6 +9942,7 @@ public interface WinError {
     // No principal name registered.
     //
     int RPC_S_NO_PRINC_NAME = 1822;
+
     //
     // MessageId: RPC_S_NOT_RPC_ERROR
     //
@@ -8873,6 +9951,7 @@ public interface WinError {
     // The error specified is not a valid Windows RPC error code.
     //
     int RPC_S_NOT_RPC_ERROR = 1823;
+
     //
     // MessageId: RPC_S_UUID_LOCAL_ONLY
     //
@@ -8881,6 +9960,7 @@ public interface WinError {
     // A UUID that is valid only on this computer has been allocated.
     //
     int RPC_S_UUID_LOCAL_ONLY = 1824;
+
     //
     // MessageId: RPC_S_SEC_PKG_ERROR
     //
@@ -8889,6 +9969,7 @@ public interface WinError {
     // A security package specific error occurred.
     //
     int RPC_S_SEC_PKG_ERROR = 1825;
+
     //
     // MessageId: RPC_S_NOT_CANCELLED
     //
@@ -8897,6 +9978,7 @@ public interface WinError {
     // Thread is not canceled.
     //
     int RPC_S_NOT_CANCELLED = 1826;
+
     //
     // MessageId: RPC_X_INVALID_ES_ACTION
     //
@@ -8905,6 +9987,7 @@ public interface WinError {
     // Invalid operation on the encoding/decoding handle.
     //
     int RPC_X_INVALID_ES_ACTION = 1827;
+
     //
     // MessageId: RPC_X_WRONG_ES_VERSION
     //
@@ -8913,6 +9996,7 @@ public interface WinError {
     // Incompatible version of the serializing package.
     //
     int RPC_X_WRONG_ES_VERSION = 1828;
+
     //
     // MessageId: RPC_X_WRONG_STUB_VERSION
     //
@@ -8921,6 +10005,7 @@ public interface WinError {
     // Incompatible version of the RPC stub.
     //
     int RPC_X_WRONG_STUB_VERSION = 1829;
+
     //
     // MessageId: RPC_X_INVALID_PIPE_OBJECT
     //
@@ -8929,6 +10014,7 @@ public interface WinError {
     // The RPC pipe object is invalid or corrupted.
     //
     int RPC_X_INVALID_PIPE_OBJECT = 1830;
+
     //
     // MessageId: RPC_X_WRONG_PIPE_ORDER
     //
@@ -8937,6 +10023,7 @@ public interface WinError {
     // An invalid operation was attempted on an RPC pipe object.
     //
     int RPC_X_WRONG_PIPE_ORDER = 1831;
+
     //
     // MessageId: RPC_X_WRONG_PIPE_VERSION
     //
@@ -8945,6 +10032,7 @@ public interface WinError {
     // Unsupported RPC pipe version.
     //
     int RPC_X_WRONG_PIPE_VERSION = 1832;
+
     //
     // MessageId: RPC_S_GROUP_MEMBER_NOT_FOUND
     //
@@ -8953,6 +10041,7 @@ public interface WinError {
     // The group member was not found.
     //
     int RPC_S_GROUP_MEMBER_NOT_FOUND = 1898;
+
     //
     // MessageId: EPT_S_CANT_CREATE
     //
@@ -8961,6 +10050,7 @@ public interface WinError {
     // The endpoint mapper database entry could not be created.
     //
     int EPT_S_CANT_CREATE = 1899;
+
     //
     // MessageId: RPC_S_INVALID_OBJECT
     //
@@ -8969,6 +10059,7 @@ public interface WinError {
     // The object universal unique identifier (UUID) is the nil UUID.
     //
     int RPC_S_INVALID_OBJECT = 1900;
+
     //
     // MessageId: ERROR_INVALID_TIME
     //
@@ -8977,6 +10068,7 @@ public interface WinError {
     // The specified time is invalid.
     //
     int ERROR_INVALID_TIME = 1901;
+
     //
     // MessageId: ERROR_INVALID_FORM_NAME
     //
@@ -8985,6 +10077,7 @@ public interface WinError {
     // The specified form name is invalid.
     //
     int ERROR_INVALID_FORM_NAME = 1902;
+
     //
     // MessageId: ERROR_INVALID_FORM_SIZE
     //
@@ -8993,6 +10086,7 @@ public interface WinError {
     // The specified form size is invalid.
     //
     int ERROR_INVALID_FORM_SIZE = 1903;
+
     //
     // MessageId: ERROR_ALREADY_WAITING
     //
@@ -9001,6 +10095,7 @@ public interface WinError {
     // The specified printer handle is already being waited on
     //
     int ERROR_ALREADY_WAITING = 1904;
+
     //
     // MessageId: ERROR_PRINTER_DELETED
     //
@@ -9009,6 +10104,7 @@ public interface WinError {
     // The specified printer has been deleted.
     //
     int ERROR_PRINTER_DELETED = 1905;
+
     //
     // MessageId: ERROR_INVALID_PRINTER_STATE
     //
@@ -9017,6 +10113,7 @@ public interface WinError {
     // The state of the printer is invalid.
     //
     int ERROR_INVALID_PRINTER_STATE = 1906;
+
     //
     // MessageId: ERROR_PASSWORD_MUST_CHANGE
     //
@@ -9025,6 +10122,7 @@ public interface WinError {
     // The user's password must be changed before logging on the first time.
     //
     int ERROR_PASSWORD_MUST_CHANGE = 1907;
+
     //
     // MessageId: ERROR_DOMAIN_CONTROLLER_NOT_FOUND
     //
@@ -9033,6 +10131,7 @@ public interface WinError {
     // Could not find the domain controller for this domain.
     //
     int ERROR_DOMAIN_CONTROLLER_NOT_FOUND = 1908;
+
     //
     // MessageId: ERROR_ACCOUNT_LOCKED_OUT
     //
@@ -9042,6 +10141,7 @@ public interface WinError {
     // to.
     //
     int ERROR_ACCOUNT_LOCKED_OUT = 1909;
+
     //
     // MessageId: OR_INVALID_OXID
     //
@@ -9050,6 +10150,7 @@ public interface WinError {
     // The object exporter specified was not found.
     //
     int OR_INVALID_OXID = 1910;
+
     //
     // MessageId: OR_INVALID_OID
     //
@@ -9058,6 +10159,7 @@ public interface WinError {
     // The object specified was not found.
     //
     int OR_INVALID_OID = 1911;
+
     //
     // MessageId: OR_INVALID_SET
     //
@@ -9066,6 +10168,7 @@ public interface WinError {
     // The object resolver set specified was not found.
     //
     int OR_INVALID_SET = 1912;
+
     //
     // MessageId: RPC_S_SEND_INCOMPLETE
     //
@@ -9074,6 +10177,7 @@ public interface WinError {
     // Some data remains to be sent in the request buffer.
     //
     int RPC_S_SEND_INCOMPLETE = 1913;
+
     //
     // MessageId: RPC_S_INVALID_ASYNC_HANDLE
     //
@@ -9082,6 +10186,7 @@ public interface WinError {
     // Invalid asynchronous remote procedure call handle.
     //
     int RPC_S_INVALID_ASYNC_HANDLE = 1914;
+
     //
     // MessageId: RPC_S_INVALID_ASYNC_CALL
     //
@@ -9090,6 +10195,7 @@ public interface WinError {
     // Invalid asynchronous RPC call handle for this operation.
     //
     int RPC_S_INVALID_ASYNC_CALL = 1915;
+
     //
     // MessageId: RPC_X_PIPE_CLOSED
     //
@@ -9098,6 +10204,7 @@ public interface WinError {
     // The RPC pipe object has already been closed.
     //
     int RPC_X_PIPE_CLOSED = 1916;
+
     //
     // MessageId: RPC_X_PIPE_DISCIPLINE_ERROR
     //
@@ -9106,6 +10213,7 @@ public interface WinError {
     // The RPC call completed before all pipes were processed.
     //
     int RPC_X_PIPE_DISCIPLINE_ERROR = 1917;
+
     //
     // MessageId: RPC_X_PIPE_EMPTY
     //
@@ -9114,6 +10222,7 @@ public interface WinError {
     // No more data is available from the RPC pipe.
     //
     int RPC_X_PIPE_EMPTY = 1918;
+
     //
     // MessageId: ERROR_NO_SITENAME
     //
@@ -9122,6 +10231,7 @@ public interface WinError {
     // No site name is available for this machine.
     //
     int ERROR_NO_SITENAME = 1919;
+
     //
     // MessageId: ERROR_CANT_ACCESS_FILE
     //
@@ -9130,6 +10240,7 @@ public interface WinError {
     // The file cannot be accessed by the system.
     //
     int ERROR_CANT_ACCESS_FILE = 1920;
+
     //
     // MessageId: ERROR_CANT_RESOLVE_FILENAME
     //
@@ -9138,6 +10249,7 @@ public interface WinError {
     // The name of the file cannot be resolved by the system.
     //
     int ERROR_CANT_RESOLVE_FILENAME = 1921;
+
     //
     // MessageId: RPC_S_ENTRY_TYPE_MISMATCH
     //
@@ -9146,6 +10258,7 @@ public interface WinError {
     // The entry is not of the expected type.
     //
     int RPC_S_ENTRY_TYPE_MISMATCH = 1922;
+
     //
     // MessageId: RPC_S_NOT_ALL_OBJS_EXPORTED
     //
@@ -9154,6 +10267,7 @@ public interface WinError {
     // Not all object UUIDs could be exported to the specified entry.
     //
     int RPC_S_NOT_ALL_OBJS_EXPORTED = 1923;
+
     //
     // MessageId: RPC_S_INTERFACE_NOT_EXPORTED
     //
@@ -9162,6 +10276,7 @@ public interface WinError {
     // Interface could not be exported to the specified entry.
     //
     int RPC_S_INTERFACE_NOT_EXPORTED = 1924;
+
     //
     // MessageId: RPC_S_PROFILE_NOT_ADDED
     //
@@ -9170,6 +10285,7 @@ public interface WinError {
     // The specified profile entry could not be added.
     //
     int RPC_S_PROFILE_NOT_ADDED = 1925;
+
     //
     // MessageId: RPC_S_PRF_ELT_NOT_ADDED
     //
@@ -9178,6 +10294,7 @@ public interface WinError {
     // The specified profile element could not be added.
     //
     int RPC_S_PRF_ELT_NOT_ADDED = 1926;
+
     //
     // MessageId: RPC_S_PRF_ELT_NOT_REMOVED
     //
@@ -9186,6 +10303,7 @@ public interface WinError {
     // The specified profile element could not be removed.
     //
     int RPC_S_PRF_ELT_NOT_REMOVED = 1927;
+
     //
     // MessageId: RPC_S_GRP_ELT_NOT_ADDED
     //
@@ -9194,6 +10312,7 @@ public interface WinError {
     // The group element could not be added.
     //
     int RPC_S_GRP_ELT_NOT_ADDED = 1928;
+
     //
     // MessageId: RPC_S_GRP_ELT_NOT_REMOVED
     //
@@ -9202,6 +10321,7 @@ public interface WinError {
     // The group element could not be removed.
     //
     int RPC_S_GRP_ELT_NOT_REMOVED = 1929;
+
     //
     // MessageId: ERROR_KM_DRIVER_BLOCKED
     //
@@ -9211,6 +10331,7 @@ public interface WinError {
     // computer that blocks NT=4.0 drivers.
     //
     int ERROR_KM_DRIVER_BLOCKED = 1930;
+
     //
     // MessageId: ERROR_CONTEXT_EXPIRED
     //
@@ -9219,6 +10340,7 @@ public interface WinError {
     // The context has expired and can no longer be used.
     //
     int ERROR_CONTEXT_EXPIRED = 1931;
+
     //
     // MessageId: ERROR_PER_USER_TRUST_QUOTA_EXCEEDED
     //
@@ -9227,6 +10349,7 @@ public interface WinError {
     // The current user's delegated trust creation quota has been exceeded.
     //
     int ERROR_PER_USER_TRUST_QUOTA_EXCEEDED = 1932;
+
     //
     // MessageId: ERROR_ALL_USER_TRUST_QUOTA_EXCEEDED
     //
@@ -9235,6 +10358,7 @@ public interface WinError {
     // The total delegated trust creation quota has been exceeded.
     //
     int ERROR_ALL_USER_TRUST_QUOTA_EXCEEDED = 1933;
+
     //
     // MessageId: ERROR_USER_DELETE_TRUST_QUOTA_EXCEEDED
     //
@@ -9243,6 +10367,7 @@ public interface WinError {
     // The current user's delegated trust deletion quota has been exceeded.
     //
     int ERROR_USER_DELETE_TRUST_QUOTA_EXCEEDED = 1934;
+
     //
     // MessageId: ERROR_AUTHENTICATION_FIREWALL_FAILED
     //
@@ -9253,6 +10378,7 @@ public interface WinError {
     // authenticate to the machine.
     //
     int ERROR_AUTHENTICATION_FIREWALL_FAILED = 1935;
+
     //
     // MessageId: ERROR_REMOTE_PRINT_CONNECTIONS_BLOCKED
     //
@@ -9262,6 +10388,7 @@ public interface WinError {
     // your machine.
     //
     int ERROR_REMOTE_PRINT_CONNECTIONS_BLOCKED = 1936;
+
     //
     // MessageId: ERROR_NTLM_BLOCKED
     //
@@ -9271,6 +10398,7 @@ public interface WinError {
     // disabled.
     //
     int ERROR_NTLM_BLOCKED = 1937;
+
     // /////////////////////////////////////////////////
     // =//
     // =OpenGL Error codes=//
@@ -9285,6 +10413,7 @@ public interface WinError {
     // The pixel format is invalid.
     //
     int ERROR_INVALID_PIXEL_FORMAT = 2000;
+
     //
     // MessageId: ERROR_BAD_DRIVER
     //
@@ -9293,6 +10422,7 @@ public interface WinError {
     // The specified driver is invalid.
     //
     int ERROR_BAD_DRIVER = 2001;
+
     //
     // MessageId: ERROR_INVALID_WINDOW_STYLE
     //
@@ -9301,6 +10431,7 @@ public interface WinError {
     // The window style or class attribute is invalid for this operation.
     //
     int ERROR_INVALID_WINDOW_STYLE = 2002;
+
     //
     // MessageId: ERROR_METAFILE_NOT_SUPPORTED
     //
@@ -9309,6 +10440,7 @@ public interface WinError {
     // The requested metafile operation is not supported.
     //
     int ERROR_METAFILE_NOT_SUPPORTED = 2003;
+
     //
     // MessageId: ERROR_TRANSFORM_NOT_SUPPORTED
     //
@@ -9317,6 +10449,7 @@ public interface WinError {
     // The requested transformation operation is not supported.
     //
     int ERROR_TRANSFORM_NOT_SUPPORTED = 2004;
+
     //
     // MessageId: ERROR_CLIPPING_NOT_SUPPORTED
     //
@@ -9325,6 +10458,7 @@ public interface WinError {
     // The requested clipping operation is not supported.
     //
     int ERROR_CLIPPING_NOT_SUPPORTED = 2005;
+
     // /////////////////////////////////////////////////
     // =//
     // Image Color Management Error codes //
@@ -9339,6 +10473,7 @@ public interface WinError {
     // The specified color management module is invalid.
     //
     int ERROR_INVALID_CMM = 2010;
+
     //
     // MessageId: ERROR_INVALID_PROFILE
     //
@@ -9347,6 +10482,7 @@ public interface WinError {
     // The specified color profile is invalid.
     //
     int ERROR_INVALID_PROFILE = 2011;
+
     //
     // MessageId: ERROR_TAG_NOT_FOUND
     //
@@ -9355,6 +10491,7 @@ public interface WinError {
     // The specified tag was not found.
     //
     int ERROR_TAG_NOT_FOUND = 2012;
+
     //
     // MessageId: ERROR_TAG_NOT_PRESENT
     //
@@ -9363,6 +10500,7 @@ public interface WinError {
     // A required tag is not present.
     //
     int ERROR_TAG_NOT_PRESENT = 2013;
+
     //
     // MessageId: ERROR_DUPLICATE_TAG
     //
@@ -9371,6 +10509,7 @@ public interface WinError {
     // The specified tag is already present.
     //
     int ERROR_DUPLICATE_TAG = 2014;
+
     //
     // MessageId: ERROR_PROFILE_NOT_ASSOCIATED_WITH_DEVICE
     //
@@ -9379,6 +10518,7 @@ public interface WinError {
     // The specified color profile is not associated with the specified device.
     //
     int ERROR_PROFILE_NOT_ASSOCIATED_WITH_DEVICE = 2015;
+
     //
     // MessageId: ERROR_PROFILE_NOT_FOUND
     //
@@ -9387,6 +10527,7 @@ public interface WinError {
     // The specified color profile was not found.
     //
     int ERROR_PROFILE_NOT_FOUND = 2016;
+
     //
     // MessageId: ERROR_INVALID_COLORSPACE
     //
@@ -9395,6 +10536,7 @@ public interface WinError {
     // The specified color space is invalid.
     //
     int ERROR_INVALID_COLORSPACE = 2017;
+
     //
     // MessageId: ERROR_ICM_NOT_ENABLED
     //
@@ -9403,6 +10545,7 @@ public interface WinError {
     // Image Color Management is not enabled.
     //
     int ERROR_ICM_NOT_ENABLED = 2018;
+
     //
     // MessageId: ERROR_DELETING_ICM_XFORM
     //
@@ -9411,6 +10554,7 @@ public interface WinError {
     // There was an error while deleting the color transform.
     //
     int ERROR_DELETING_ICM_XFORM = 2019;
+
     //
     // MessageId: ERROR_INVALID_TRANSFORM
     //
@@ -9419,6 +10563,7 @@ public interface WinError {
     // The specified color transform is invalid.
     //
     int ERROR_INVALID_TRANSFORM = 2020;
+
     //
     // MessageId: ERROR_COLORSPACE_MISMATCH
     //
@@ -9427,6 +10572,7 @@ public interface WinError {
     // The specified transform does not match the bitmap's color space.
     //
     int ERROR_COLORSPACE_MISMATCH = 2021;
+
     //
     // MessageId: ERROR_INVALID_COLORINDEX
     //
@@ -9435,6 +10581,7 @@ public interface WinError {
     // The specified named color index is not present in the profile.
     //
     int ERROR_INVALID_COLORINDEX = 2022;
+
     //
     // MessageId: ERROR_PROFILE_DOES_NOT_MATCH_DEVICE
     //
@@ -9444,6 +10591,7 @@ public interface WinError {
     // the specified device.
     //
     int ERROR_PROFILE_DOES_NOT_MATCH_DEVICE = 2023;
+
     // /////////////////////////////////////////////////
     // =//
     // =Winnet32 Error codes=//
@@ -9463,6 +10611,7 @@ public interface WinError {
     // prompted for a password other than the one originally specified.
     //
     int ERROR_CONNECTED_OTHER_PASSWORD = 2108;
+
     //
     // MessageId: ERROR_CONNECTED_OTHER_PASSWORD_DEFAULT
     //
@@ -9471,6 +10620,7 @@ public interface WinError {
     // The network connection was made successfully using default credentials.
     //
     int ERROR_CONNECTED_OTHER_PASSWORD_DEFAULT = 2109;
+
     //
     // MessageId: ERROR_BAD_USERNAME
     //
@@ -9479,6 +10629,7 @@ public interface WinError {
     // The specified username is invalid.
     //
     int ERROR_BAD_USERNAME = 2202;
+
     //
     // MessageId: ERROR_NOT_CONNECTED
     //
@@ -9487,6 +10638,7 @@ public interface WinError {
     // This network connection does not exist.
     //
     int ERROR_NOT_CONNECTED = 2250;
+
     //
     // MessageId: ERROR_OPEN_FILES
     //
@@ -9495,6 +10647,7 @@ public interface WinError {
     // This network connection has files open or requests pending.
     //
     int ERROR_OPEN_FILES = 2401;
+
     //
     // MessageId: ERROR_ACTIVE_CONNECTIONS
     //
@@ -9503,6 +10656,7 @@ public interface WinError {
     // Active connections still exist.
     //
     int ERROR_ACTIVE_CONNECTIONS = 2402;
+
     //
     // MessageId: ERROR_DEVICE_IN_USE
     //
@@ -9511,6 +10665,7 @@ public interface WinError {
     // The device is in use by an active process and cannot be disconnected.
     //
     int ERROR_DEVICE_IN_USE = 2404;
+
     // /////////////////////////////////////////////////
     // =//
     // =Win32 Spooler Error codes=//
@@ -9525,6 +10680,7 @@ public interface WinError {
     // The specified print monitor is unknown.
     //
     int ERROR_UNKNOWN_PRINT_MONITOR = 3000;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_IN_USE
     //
@@ -9533,6 +10689,7 @@ public interface WinError {
     // The specified printer driver is currently in use.
     //
     int ERROR_PRINTER_DRIVER_IN_USE = 3001;
+
     //
     // MessageId: ERROR_SPOOL_FILE_NOT_FOUND
     //
@@ -9541,6 +10698,7 @@ public interface WinError {
     // The spool file was not found.
     //
     int ERROR_SPOOL_FILE_NOT_FOUND = 3002;
+
     //
     // MessageId: ERROR_SPL_NO_STARTDOC
     //
@@ -9549,6 +10707,7 @@ public interface WinError {
     // A StartDocPrinter call was not issued.
     //
     int ERROR_SPL_NO_STARTDOC = 3003;
+
     //
     // MessageId: ERROR_SPL_NO_ADDJOB
     //
@@ -9557,6 +10716,7 @@ public interface WinError {
     // An AddJob call was not issued.
     //
     int ERROR_SPL_NO_ADDJOB = 3004;
+
     //
     // MessageId: ERROR_PRINT_PROCESSOR_ALREADY_INSTALLED
     //
@@ -9565,6 +10725,7 @@ public interface WinError {
     // The specified print processor has already been installed.
     //
     int ERROR_PRINT_PROCESSOR_ALREADY_INSTALLED = 3005;
+
     //
     // MessageId: ERROR_PRINT_MONITOR_ALREADY_INSTALLED
     //
@@ -9573,6 +10734,7 @@ public interface WinError {
     // The specified print monitor has already been installed.
     //
     int ERROR_PRINT_MONITOR_ALREADY_INSTALLED = 3006;
+
     //
     // MessageId: ERROR_INVALID_PRINT_MONITOR
     //
@@ -9581,6 +10743,7 @@ public interface WinError {
     // The specified print monitor does not have the required functions.
     //
     int ERROR_INVALID_PRINT_MONITOR = 3007;
+
     //
     // MessageId: ERROR_PRINT_MONITOR_IN_USE
     //
@@ -9589,6 +10752,7 @@ public interface WinError {
     // The specified print monitor is currently in use.
     //
     int ERROR_PRINT_MONITOR_IN_USE = 3008;
+
     //
     // MessageId: ERROR_PRINTER_HAS_JOBS_QUEUED
     //
@@ -9598,6 +10762,7 @@ public interface WinError {
     // printer.
     //
     int ERROR_PRINTER_HAS_JOBS_QUEUED = 3009;
+
     //
     // MessageId: ERROR_SUCCESS_REBOOT_REQUIRED
     //
@@ -9607,6 +10772,7 @@ public interface WinError {
     // until the system is rebooted.
     //
     int ERROR_SUCCESS_REBOOT_REQUIRED = 3010;
+
     //
     // MessageId: ERROR_SUCCESS_RESTART_REQUIRED
     //
@@ -9616,6 +10782,7 @@ public interface WinError {
     // until the service is restarted.
     //
     int ERROR_SUCCESS_RESTART_REQUIRED = 3011;
+
     //
     // MessageId: ERROR_PRINTER_NOT_FOUND
     //
@@ -9624,6 +10791,7 @@ public interface WinError {
     // No printers were found.
     //
     int ERROR_PRINTER_NOT_FOUND = 3012;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_WARNED
     //
@@ -9632,6 +10800,7 @@ public interface WinError {
     // The printer driver is known to be unreliable.
     //
     int ERROR_PRINTER_DRIVER_WARNED = 3013;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_BLOCKED
     //
@@ -9640,6 +10809,7 @@ public interface WinError {
     // The printer driver is known to harm the system.
     //
     int ERROR_PRINTER_DRIVER_BLOCKED = 3014;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_PACKAGE_IN_USE
     //
@@ -9648,6 +10818,7 @@ public interface WinError {
     // The specified printer driver package is currently in use.
     //
     int ERROR_PRINTER_DRIVER_PACKAGE_IN_USE = 3015;
+
     //
     // MessageId: ERROR_CORE_DRIVER_PACKAGE_NOT_FOUND
     //
@@ -9657,6 +10828,7 @@ public interface WinError {
     // driver package.
     //
     int ERROR_CORE_DRIVER_PACKAGE_NOT_FOUND = 3016;
+
     //
     // MessageId: ERROR_FAIL_REBOOT_REQUIRED
     //
@@ -9666,6 +10838,7 @@ public interface WinError {
     // changes made.
     //
     int ERROR_FAIL_REBOOT_REQUIRED = 3017;
+
     //
     // MessageId: ERROR_FAIL_REBOOT_INITIATED
     //
@@ -9675,6 +10848,7 @@ public interface WinError {
     // roll back changes made.
     //
     int ERROR_FAIL_REBOOT_INITIATED = 3018;
+
     //
     // MessageId: ERROR_PRINTER_DRIVER_DOWNLOAD_NEEDED
     //
@@ -9684,6 +10858,7 @@ public interface WinError {
     // downloaded.
     //
     int ERROR_PRINTER_DRIVER_DOWNLOAD_NEEDED = 3019;
+
     //
     // MessageId: ERROR_PRINT_JOB_RESTART_REQUIRED
     //
@@ -9693,6 +10868,7 @@ public interface WinError {
     // requires the job to be resubmitted.
     //
     int ERROR_PRINT_JOB_RESTART_REQUIRED = 3020;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -9713,6 +10889,7 @@ public interface WinError {
     // Reissue the given operation as a cached IO operation
     //
     int ERROR_IO_REISSUE_AS_CACHED = 3950;
+
     // /////////////////////////////////////////////////
     // =//
     // =Wins Error codes=//
@@ -9727,6 +10904,7 @@ public interface WinError {
     // WINS encountered an error while processing the command.
     //
     int ERROR_WINS_INTERNAL = 4000;
+
     //
     // MessageId: ERROR_CAN_NOT_DEL_LOCAL_WINS
     //
@@ -9735,6 +10913,7 @@ public interface WinError {
     // The local WINS cannot be deleted.
     //
     int ERROR_CAN_NOT_DEL_LOCAL_WINS = 4001;
+
     //
     // MessageId: ERROR_STATIC_INIT
     //
@@ -9743,6 +10922,7 @@ public interface WinError {
     // The importation from the file failed.
     //
     int ERROR_STATIC_INIT = 4002;
+
     //
     // MessageId: ERROR_INC_BACKUP
     //
@@ -9751,6 +10931,7 @@ public interface WinError {
     // The backup failed. Was a full backup done before?
     //
     int ERROR_INC_BACKUP = 4003;
+
     //
     // MessageId: ERROR_FULL_BACKUP
     //
@@ -9760,6 +10941,7 @@ public interface WinError {
     // database.
     //
     int ERROR_FULL_BACKUP = 4004;
+
     //
     // MessageId: ERROR_REC_NON_EXISTENT
     //
@@ -9768,6 +10950,7 @@ public interface WinError {
     // The name does not exist in the WINS database.
     //
     int ERROR_REC_NON_EXISTENT = 4005;
+
     //
     // MessageId: ERROR_RPL_NOT_ALLOWED
     //
@@ -9776,6 +10959,7 @@ public interface WinError {
     // Replication with a nonconfigured partner is not allowed.
     //
     int ERROR_RPL_NOT_ALLOWED = 4006;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -9798,6 +10982,7 @@ public interface WinError {
     // obtain a new address.
     //
     int ERROR_DHCP_ADDRESS_CONFLICT = 4100;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -9818,6 +11003,7 @@ public interface WinError {
     // The GUID passed was not recognized as valid by a WMI data provider.
     //
     int ERROR_WMI_GUID_NOT_FOUND = 4200;
+
     //
     // MessageId: ERROR_WMI_INSTANCE_NOT_FOUND
     //
@@ -9827,6 +11013,7 @@ public interface WinError {
     // provider.
     //
     int ERROR_WMI_INSTANCE_NOT_FOUND = 4201;
+
     //
     // MessageId: ERROR_WMI_ITEMID_NOT_FOUND
     //
@@ -9836,6 +11023,7 @@ public interface WinError {
     // provider.
     //
     int ERROR_WMI_ITEMID_NOT_FOUND = 4202;
+
     //
     // MessageId: ERROR_WMI_TRY_AGAIN
     //
@@ -9844,6 +11032,7 @@ public interface WinError {
     // The WMI request could not be completed and should be retried.
     //
     int ERROR_WMI_TRY_AGAIN = 4203;
+
     //
     // MessageId: ERROR_WMI_DP_NOT_FOUND
     //
@@ -9852,6 +11041,7 @@ public interface WinError {
     // The WMI data provider could not be located.
     //
     int ERROR_WMI_DP_NOT_FOUND = 4204;
+
     //
     // MessageId: ERROR_WMI_UNRESOLVED_INSTANCE_REF
     //
@@ -9861,6 +11051,7 @@ public interface WinError {
     // registered.
     //
     int ERROR_WMI_UNRESOLVED_INSTANCE_REF = 4205;
+
     //
     // MessageId: ERROR_WMI_ALREADY_ENABLED
     //
@@ -9869,6 +11060,7 @@ public interface WinError {
     // The WMI data block or event notification has already been enabled.
     //
     int ERROR_WMI_ALREADY_ENABLED = 4206;
+
     //
     // MessageId: ERROR_WMI_GUID_DISCONNECTED
     //
@@ -9877,6 +11069,7 @@ public interface WinError {
     // The WMI data block is no longer available.
     //
     int ERROR_WMI_GUID_DISCONNECTED = 4207;
+
     //
     // MessageId: ERROR_WMI_SERVER_UNAVAILABLE
     //
@@ -9885,6 +11078,7 @@ public interface WinError {
     // The WMI data service is not available.
     //
     int ERROR_WMI_SERVER_UNAVAILABLE = 4208;
+
     //
     // MessageId: ERROR_WMI_DP_FAILED
     //
@@ -9893,6 +11087,7 @@ public interface WinError {
     // The WMI data provider failed to carry out the request.
     //
     int ERROR_WMI_DP_FAILED = 4209;
+
     //
     // MessageId: ERROR_WMI_INVALID_MOF
     //
@@ -9901,6 +11096,7 @@ public interface WinError {
     // The WMI MOF information is not valid.
     //
     int ERROR_WMI_INVALID_MOF = 4210;
+
     //
     // MessageId: ERROR_WMI_INVALID_REGINFO
     //
@@ -9909,6 +11105,7 @@ public interface WinError {
     // The WMI registration information is not valid.
     //
     int ERROR_WMI_INVALID_REGINFO = 4211;
+
     //
     // MessageId: ERROR_WMI_ALREADY_DISABLED
     //
@@ -9917,6 +11114,7 @@ public interface WinError {
     // The WMI data block or event notification has already been disabled.
     //
     int ERROR_WMI_ALREADY_DISABLED = 4212;
+
     //
     // MessageId: ERROR_WMI_READ_ONLY
     //
@@ -9925,6 +11123,7 @@ public interface WinError {
     // The WMI data item or data block is read only.
     //
     int ERROR_WMI_READ_ONLY = 4213;
+
     //
     // MessageId: ERROR_WMI_SET_FAILURE
     //
@@ -9933,6 +11132,7 @@ public interface WinError {
     // The WMI data item or data block could not be changed.
     //
     int ERROR_WMI_SET_FAILURE = 4214;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -9953,6 +11153,7 @@ public interface WinError {
     // The media identifier does not represent a valid medium.
     //
     int ERROR_INVALID_MEDIA = 4300;
+
     //
     // MessageId: ERROR_INVALID_LIBRARY
     //
@@ -9961,6 +11162,7 @@ public interface WinError {
     // The library identifier does not represent a valid library.
     //
     int ERROR_INVALID_LIBRARY = 4301;
+
     //
     // MessageId: ERROR_INVALID_MEDIA_POOL
     //
@@ -9969,6 +11171,7 @@ public interface WinError {
     // The media pool identifier does not represent a valid media pool.
     //
     int ERROR_INVALID_MEDIA_POOL = 4302;
+
     //
     // MessageId: ERROR_DRIVE_MEDIA_MISMATCH
     //
@@ -9977,6 +11180,7 @@ public interface WinError {
     // The drive and medium are not compatible or exist in different libraries.
     //
     int ERROR_DRIVE_MEDIA_MISMATCH = 4303;
+
     //
     // MessageId: ERROR_MEDIA_OFFLINE
     //
@@ -9986,6 +11190,7 @@ public interface WinError {
     // perform this operation.
     //
     int ERROR_MEDIA_OFFLINE = 4304;
+
     //
     // MessageId: ERROR_LIBRARY_OFFLINE
     //
@@ -9994,6 +11199,7 @@ public interface WinError {
     // The operation cannot be performed on an offline library.
     //
     int ERROR_LIBRARY_OFFLINE = 4305;
+
     //
     // MessageId: ERROR_EMPTY
     //
@@ -10002,6 +11208,7 @@ public interface WinError {
     // The library, drive, or media pool is empty.
     //
     int ERROR_EMPTY = 4306;
+
     //
     // MessageId: ERROR_NOT_EMPTY
     //
@@ -10011,6 +11218,7 @@ public interface WinError {
     // operation.
     //
     int ERROR_NOT_EMPTY = 4307;
+
     //
     // MessageId: ERROR_MEDIA_UNAVAILABLE
     //
@@ -10019,6 +11227,7 @@ public interface WinError {
     // No media is currently available in this media pool or library.
     //
     int ERROR_MEDIA_UNAVAILABLE = 4308;
+
     //
     // MessageId: ERROR_RESOURCE_DISABLED
     //
@@ -10027,6 +11236,7 @@ public interface WinError {
     // A resource required for this operation is disabled.
     //
     int ERROR_RESOURCE_DISABLED = 4309;
+
     //
     // MessageId: ERROR_INVALID_CLEANER
     //
@@ -10035,6 +11245,7 @@ public interface WinError {
     // The media identifier does not represent a valid cleaner.
     //
     int ERROR_INVALID_CLEANER = 4310;
+
     //
     // MessageId: ERROR_UNABLE_TO_CLEAN
     //
@@ -10043,6 +11254,7 @@ public interface WinError {
     // The drive cannot be cleaned or does not support cleaning.
     //
     int ERROR_UNABLE_TO_CLEAN = 4311;
+
     //
     // MessageId: ERROR_OBJECT_NOT_FOUND
     //
@@ -10051,6 +11263,7 @@ public interface WinError {
     // The object identifier does not represent a valid object.
     //
     int ERROR_OBJECT_NOT_FOUND = 4312;
+
     //
     // MessageId: ERROR_DATABASE_FAILURE
     //
@@ -10059,6 +11272,7 @@ public interface WinError {
     // Unable to read from or write to the database.
     //
     int ERROR_DATABASE_FAILURE = 4313;
+
     //
     // MessageId: ERROR_DATABASE_FULL
     //
@@ -10067,6 +11281,7 @@ public interface WinError {
     // The database is full.
     //
     int ERROR_DATABASE_FULL = 4314;
+
     //
     // MessageId: ERROR_MEDIA_INCOMPATIBLE
     //
@@ -10075,6 +11290,7 @@ public interface WinError {
     // The medium is not compatible with the device or media pool.
     //
     int ERROR_MEDIA_INCOMPATIBLE = 4315;
+
     //
     // MessageId: ERROR_RESOURCE_NOT_PRESENT
     //
@@ -10083,6 +11299,7 @@ public interface WinError {
     // The resource required for this operation does not exist.
     //
     int ERROR_RESOURCE_NOT_PRESENT = 4316;
+
     //
     // MessageId: ERROR_INVALID_OPERATION
     //
@@ -10091,6 +11308,7 @@ public interface WinError {
     // The operation identifier is not valid.
     //
     int ERROR_INVALID_OPERATION = 4317;
+
     //
     // MessageId: ERROR_MEDIA_NOT_AVAILABLE
     //
@@ -10099,6 +11317,7 @@ public interface WinError {
     // The media is not mounted or ready for use.
     //
     int ERROR_MEDIA_NOT_AVAILABLE = 4318;
+
     //
     // MessageId: ERROR_DEVICE_NOT_AVAILABLE
     //
@@ -10107,6 +11326,7 @@ public interface WinError {
     // The device is not ready for use.
     //
     int ERROR_DEVICE_NOT_AVAILABLE = 4319;
+
     //
     // MessageId: ERROR_REQUEST_REFUSED
     //
@@ -10115,6 +11335,7 @@ public interface WinError {
     // The operator or administrator has refused the request.
     //
     int ERROR_REQUEST_REFUSED = 4320;
+
     //
     // MessageId: ERROR_INVALID_DRIVE_OBJECT
     //
@@ -10123,6 +11344,7 @@ public interface WinError {
     // The drive identifier does not represent a valid drive.
     //
     int ERROR_INVALID_DRIVE_OBJECT = 4321;
+
     //
     // MessageId: ERROR_LIBRARY_FULL
     //
@@ -10131,6 +11353,7 @@ public interface WinError {
     // Library is full. No slot is available for use.
     //
     int ERROR_LIBRARY_FULL = 4322;
+
     //
     // MessageId: ERROR_MEDIUM_NOT_ACCESSIBLE
     //
@@ -10139,6 +11362,7 @@ public interface WinError {
     // The transport cannot access the medium.
     //
     int ERROR_MEDIUM_NOT_ACCESSIBLE = 4323;
+
     //
     // MessageId: ERROR_UNABLE_TO_LOAD_MEDIUM
     //
@@ -10147,6 +11371,7 @@ public interface WinError {
     // Unable to load the medium into the drive.
     //
     int ERROR_UNABLE_TO_LOAD_MEDIUM = 4324;
+
     //
     // MessageId: ERROR_UNABLE_TO_INVENTORY_DRIVE
     //
@@ -10155,6 +11380,7 @@ public interface WinError {
     // Unable to retrieve the drive status.
     //
     int ERROR_UNABLE_TO_INVENTORY_DRIVE = 4325;
+
     //
     // MessageId: ERROR_UNABLE_TO_INVENTORY_SLOT
     //
@@ -10163,6 +11389,7 @@ public interface WinError {
     // Unable to retrieve the slot status.
     //
     int ERROR_UNABLE_TO_INVENTORY_SLOT = 4326;
+
     //
     // MessageId: ERROR_UNABLE_TO_INVENTORY_TRANSPORT
     //
@@ -10171,6 +11398,7 @@ public interface WinError {
     // Unable to retrieve status about the transport.
     //
     int ERROR_UNABLE_TO_INVENTORY_TRANSPORT = 4327;
+
     //
     // MessageId: ERROR_TRANSPORT_FULL
     //
@@ -10179,6 +11407,7 @@ public interface WinError {
     // Cannot use the transport because it is already in use.
     //
     int ERROR_TRANSPORT_FULL = 4328;
+
     //
     // MessageId: ERROR_CONTROLLING_IEPORT
     //
@@ -10187,6 +11416,7 @@ public interface WinError {
     // Unable to open or close the inject/eject port.
     //
     int ERROR_CONTROLLING_IEPORT = 4329;
+
     //
     // MessageId: ERROR_UNABLE_TO_EJECT_MOUNTED_MEDIA
     //
@@ -10195,6 +11425,7 @@ public interface WinError {
     // Unable to eject the medium because it is in a drive.
     //
     int ERROR_UNABLE_TO_EJECT_MOUNTED_MEDIA = 4330;
+
     //
     // MessageId: ERROR_CLEANER_SLOT_SET
     //
@@ -10203,6 +11434,7 @@ public interface WinError {
     // A cleaner slot is already reserved.
     //
     int ERROR_CLEANER_SLOT_SET = 4331;
+
     //
     // MessageId: ERROR_CLEANER_SLOT_NOT_SET
     //
@@ -10211,6 +11443,7 @@ public interface WinError {
     // A cleaner slot is not reserved.
     //
     int ERROR_CLEANER_SLOT_NOT_SET = 4332;
+
     //
     // MessageId: ERROR_CLEANER_CARTRIDGE_SPENT
     //
@@ -10220,6 +11453,7 @@ public interface WinError {
     // cleanings.
     //
     int ERROR_CLEANER_CARTRIDGE_SPENT = 4333;
+
     //
     // MessageId: ERROR_UNEXPECTED_OMID
     //
@@ -10228,6 +11462,7 @@ public interface WinError {
     // Unexpected on-medium identifier.
     //
     int ERROR_UNEXPECTED_OMID = 4334;
+
     //
     // MessageId: ERROR_CANT_DELETE_LAST_ITEM
     //
@@ -10236,6 +11471,7 @@ public interface WinError {
     // The last remaining item in this group or resource cannot be deleted.
     //
     int ERROR_CANT_DELETE_LAST_ITEM = 4335;
+
     //
     // MessageId: ERROR_MESSAGE_EXCEEDS_MAX_SIZE
     //
@@ -10244,6 +11480,7 @@ public interface WinError {
     // The message provided exceeds the maximum size allowed for this parameter.
     //
     int ERROR_MESSAGE_EXCEEDS_MAX_SIZE = 4336;
+
     //
     // MessageId: ERROR_VOLUME_CONTAINS_SYS_FILES
     //
@@ -10252,6 +11489,7 @@ public interface WinError {
     // The volume contains system or paging files.
     //
     int ERROR_VOLUME_CONTAINS_SYS_FILES = 4337;
+
     //
     // MessageId: ERROR_INDIGENOUS_TYPE
     //
@@ -10261,6 +11499,7 @@ public interface WinError {
     // drive in the library reports it can support this media type.
     //
     int ERROR_INDIGENOUS_TYPE = 4338;
+
     //
     // MessageId: ERROR_NO_SUPPORTING_DRIVES
     //
@@ -10270,6 +11509,7 @@ public interface WinError {
     // drives are present which can be used.
     //
     int ERROR_NO_SUPPORTING_DRIVES = 4339;
+
     //
     // MessageId: ERROR_CLEANER_CARTRIDGE_INSTALLED
     //
@@ -10278,6 +11518,7 @@ public interface WinError {
     // A cleaner cartridge is present in the tape library.
     //
     int ERROR_CLEANER_CARTRIDGE_INSTALLED = 4340;
+
     //
     // MessageId: ERROR_IEPORT_FULL
     //
@@ -10286,6 +11527,7 @@ public interface WinError {
     // Cannot use the ieport because it is not empty.
     //
     int ERROR_IEPORT_FULL = 4341;
+
     // /////////////////////////////////////////////////
     // =//
     // Remote Storage Service Error codes //
@@ -10300,6 +11542,7 @@ public interface WinError {
     // This file is currently not available for use on this computer.
     //
     int ERROR_FILE_OFFLINE = 4350;
+
     //
     // MessageId: ERROR_REMOTE_STORAGE_NOT_ACTIVE
     //
@@ -10308,6 +11551,7 @@ public interface WinError {
     // The remote storage service is not operational at this time.
     //
     int ERROR_REMOTE_STORAGE_NOT_ACTIVE = 4351;
+
     //
     // MessageId: ERROR_REMOTE_STORAGE_MEDIA_ERROR
     //
@@ -10316,6 +11560,7 @@ public interface WinError {
     // The remote storage service encountered a media error.
     //
     int ERROR_REMOTE_STORAGE_MEDIA_ERROR = 4352;
+
     // /////////////////////////////////////////////////
     // =//
     // =Reparse Point Error codes=//
@@ -10330,6 +11575,7 @@ public interface WinError {
     // The file or directory is not a reparse point.
     //
     int ERROR_NOT_A_REPARSE_POINT = 4390;
+
     //
     // MessageId: ERROR_REPARSE_ATTRIBUTE_CONFLICT
     //
@@ -10339,6 +11585,7 @@ public interface WinError {
     // existing attribute.
     //
     int ERROR_REPARSE_ATTRIBUTE_CONFLICT = 4391;
+
     //
     // MessageId: ERROR_INVALID_REPARSE_DATA
     //
@@ -10347,6 +11594,7 @@ public interface WinError {
     // The data present in the reparse point buffer is invalid.
     //
     int ERROR_INVALID_REPARSE_DATA = 4392;
+
     //
     // MessageId: ERROR_REPARSE_TAG_INVALID
     //
@@ -10355,6 +11603,7 @@ public interface WinError {
     // The tag present in the reparse point buffer is invalid.
     //
     int ERROR_REPARSE_TAG_INVALID = 4393;
+
     //
     // MessageId: ERROR_REPARSE_TAG_MISMATCH
     //
@@ -10362,9 +11611,10 @@ public interface WinError {
     //
     // There is a mismatch between the tag specified in the request and the tag
     // present in the reparse point.
-    // 
+    //
     //
     int ERROR_REPARSE_TAG_MISMATCH = 4394;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -10385,6 +11635,7 @@ public interface WinError {
     // Single Instance Storage is not available on this volume.
     //
     int ERROR_VOLUME_NOT_SIS_ENABLED = 4500;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -10406,6 +11657,7 @@ public interface WinError {
     // on this resource.
     //
     int ERROR_DEPENDENT_RESOURCE_EXISTS = 5001;
+
     //
     // MessageId: ERROR_DEPENDENCY_NOT_FOUND
     //
@@ -10414,6 +11666,7 @@ public interface WinError {
     // The cluster resource dependency cannot be found.
     //
     int ERROR_DEPENDENCY_NOT_FOUND = 5002;
+
     //
     // MessageId: ERROR_DEPENDENCY_ALREADY_EXISTS
     //
@@ -10423,6 +11676,7 @@ public interface WinError {
     // because it is already dependent.
     //
     int ERROR_DEPENDENCY_ALREADY_EXISTS = 5003;
+
     //
     // MessageId: ERROR_RESOURCE_NOT_ONLINE
     //
@@ -10431,6 +11685,7 @@ public interface WinError {
     // The cluster resource is not online.
     //
     int ERROR_RESOURCE_NOT_ONLINE = 5004;
+
     //
     // MessageId: ERROR_HOST_NODE_NOT_AVAILABLE
     //
@@ -10439,6 +11694,7 @@ public interface WinError {
     // A cluster node is not available for this operation.
     //
     int ERROR_HOST_NODE_NOT_AVAILABLE = 5005;
+
     //
     // MessageId: ERROR_RESOURCE_NOT_AVAILABLE
     //
@@ -10447,6 +11703,7 @@ public interface WinError {
     // The cluster resource is not available.
     //
     int ERROR_RESOURCE_NOT_AVAILABLE = 5006;
+
     //
     // MessageId: ERROR_RESOURCE_NOT_FOUND
     //
@@ -10455,6 +11712,7 @@ public interface WinError {
     // The cluster resource could not be found.
     //
     int ERROR_RESOURCE_NOT_FOUND = 5007;
+
     //
     // MessageId: ERROR_SHUTDOWN_CLUSTER
     //
@@ -10463,6 +11721,7 @@ public interface WinError {
     // The cluster is being shut down.
     //
     int ERROR_SHUTDOWN_CLUSTER = 5008;
+
     //
     // MessageId: ERROR_CANT_EVICT_ACTIVE_NODE
     //
@@ -10472,6 +11731,7 @@ public interface WinError {
     // or it is the last node.
     //
     int ERROR_CANT_EVICT_ACTIVE_NODE = 5009;
+
     //
     // MessageId: ERROR_OBJECT_ALREADY_EXISTS
     //
@@ -10480,6 +11740,7 @@ public interface WinError {
     // The object already exists.
     //
     int ERROR_OBJECT_ALREADY_EXISTS = 5010;
+
     //
     // MessageId: ERROR_OBJECT_IN_LIST
     //
@@ -10488,6 +11749,7 @@ public interface WinError {
     // The object is already in the list.
     //
     int ERROR_OBJECT_IN_LIST = 5011;
+
     //
     // MessageId: ERROR_GROUP_NOT_AVAILABLE
     //
@@ -10496,6 +11758,7 @@ public interface WinError {
     // The cluster group is not available for any new requests.
     //
     int ERROR_GROUP_NOT_AVAILABLE = 5012;
+
     //
     // MessageId: ERROR_GROUP_NOT_FOUND
     //
@@ -10504,6 +11767,7 @@ public interface WinError {
     // The cluster group could not be found.
     //
     int ERROR_GROUP_NOT_FOUND = 5013;
+
     //
     // MessageId: ERROR_GROUP_NOT_ONLINE
     //
@@ -10513,6 +11777,7 @@ public interface WinError {
     // online.
     //
     int ERROR_GROUP_NOT_ONLINE = 5014;
+
     //
     // MessageId: ERROR_HOST_NODE_NOT_RESOURCE_OWNER
     //
@@ -10523,6 +11788,7 @@ public interface WinError {
     // is not a possible owner of the resource.
     //
     int ERROR_HOST_NODE_NOT_RESOURCE_OWNER = 5015;
+
     //
     // MessageId: ERROR_HOST_NODE_NOT_GROUP_OWNER
     //
@@ -10533,6 +11799,7 @@ public interface WinError {
     // is not a possible owner of the group.
     //
     int ERROR_HOST_NODE_NOT_GROUP_OWNER = 5016;
+
     //
     // MessageId: ERROR_RESMON_CREATE_FAILED
     //
@@ -10542,6 +11809,7 @@ public interface WinError {
     // monitor.
     //
     int ERROR_RESMON_CREATE_FAILED = 5017;
+
     //
     // MessageId: ERROR_RESMON_ONLINE_FAILED
     //
@@ -10550,6 +11818,7 @@ public interface WinError {
     // The cluster resource could not be brought online by the resource monitor.
     //
     int ERROR_RESMON_ONLINE_FAILED = 5018;
+
     //
     // MessageId: ERROR_RESOURCE_ONLINE
     //
@@ -10559,6 +11828,7 @@ public interface WinError {
     // online.
     //
     int ERROR_RESOURCE_ONLINE = 5019;
+
     //
     // MessageId: ERROR_QUORUM_RESOURCE
     //
@@ -10568,6 +11838,7 @@ public interface WinError {
     // is the quorum resource.
     //
     int ERROR_QUORUM_RESOURCE = 5020;
+
     //
     // MessageId: ERROR_NOT_QUORUM_CAPABLE
     //
@@ -10577,6 +11848,7 @@ public interface WinError {
     // because it is not capable of being a quorum resource.
     //
     int ERROR_NOT_QUORUM_CAPABLE = 5021;
+
     //
     // MessageId: ERROR_CLUSTER_SHUTTING_DOWN
     //
@@ -10585,6 +11857,7 @@ public interface WinError {
     // The cluster software is shutting down.
     //
     int ERROR_CLUSTER_SHUTTING_DOWN = 5022;
+
     //
     // MessageId: ERROR_INVALID_STATE
     //
@@ -10594,6 +11867,7 @@ public interface WinError {
     // requested operation.
     //
     int ERROR_INVALID_STATE = 5023;
+
     //
     // MessageId: ERROR_RESOURCE_PROPERTIES_STORED
     //
@@ -10603,6 +11877,7 @@ public interface WinError {
     // next time the resource is brought online.
     //
     int ERROR_RESOURCE_PROPERTIES_STORED = 5024;
+
     //
     // MessageId: ERROR_NOT_QUORUM_CLASS
     //
@@ -10612,6 +11887,7 @@ public interface WinError {
     // because it does not belong to a shared storage class.
     //
     int ERROR_NOT_QUORUM_CLASS = 5025;
+
     //
     // MessageId: ERROR_CORE_RESOURCE
     //
@@ -10620,6 +11896,7 @@ public interface WinError {
     // The cluster resource could not be deleted since it is a core resource.
     //
     int ERROR_CORE_RESOURCE = 5026;
+
     //
     // MessageId: ERROR_QUORUM_RESOURCE_ONLINE_FAILED
     //
@@ -10628,6 +11905,7 @@ public interface WinError {
     // The quorum resource failed to come online.
     //
     int ERROR_QUORUM_RESOURCE_ONLINE_FAILED = 5027;
+
     //
     // MessageId: ERROR_QUORUMLOG_OPEN_FAILED
     //
@@ -10636,6 +11914,7 @@ public interface WinError {
     // The quorum log could not be created or mounted successfully.
     //
     int ERROR_QUORUMLOG_OPEN_FAILED = 5028;
+
     //
     // MessageId: ERROR_CLUSTERLOG_CORRUPT
     //
@@ -10644,6 +11923,7 @@ public interface WinError {
     // The cluster log is corrupt.
     //
     int ERROR_CLUSTERLOG_CORRUPT = 5029;
+
     //
     // MessageId: ERROR_CLUSTERLOG_RECORD_EXCEEDS_MAXSIZE
     //
@@ -10653,6 +11933,7 @@ public interface WinError {
     // maximum size.
     //
     int ERROR_CLUSTERLOG_RECORD_EXCEEDS_MAXSIZE = 5030;
+
     //
     // MessageId: ERROR_CLUSTERLOG_EXCEEDS_MAXSIZE
     //
@@ -10661,6 +11942,7 @@ public interface WinError {
     // The cluster log exceeds its maximum size.
     //
     int ERROR_CLUSTERLOG_EXCEEDS_MAXSIZE = 5031;
+
     //
     // MessageId: ERROR_CLUSTERLOG_CHKPOINT_NOT_FOUND
     //
@@ -10669,6 +11951,7 @@ public interface WinError {
     // No checkpoint record was found in the cluster log.
     //
     int ERROR_CLUSTERLOG_CHKPOINT_NOT_FOUND = 5032;
+
     //
     // MessageId: ERROR_CLUSTERLOG_NOT_ENOUGH_SPACE
     //
@@ -10677,6 +11960,7 @@ public interface WinError {
     // The minimum required disk space needed for logging is not available.
     //
     int ERROR_CLUSTERLOG_NOT_ENOUGH_SPACE = 5033;
+
     //
     // MessageId: ERROR_QUORUM_OWNER_ALIVE
     //
@@ -10686,6 +11970,7 @@ public interface WinError {
     // the resource is owned by another active node.
     //
     int ERROR_QUORUM_OWNER_ALIVE = 5034;
+
     //
     // MessageId: ERROR_NETWORK_NOT_AVAILABLE
     //
@@ -10694,6 +11979,7 @@ public interface WinError {
     // A cluster network is not available for this operation.
     //
     int ERROR_NETWORK_NOT_AVAILABLE = 5035;
+
     //
     // MessageId: ERROR_NODE_NOT_AVAILABLE
     //
@@ -10702,6 +11988,7 @@ public interface WinError {
     // A cluster node is not available for this operation.
     //
     int ERROR_NODE_NOT_AVAILABLE = 5036;
+
     //
     // MessageId: ERROR_ALL_NODES_NOT_AVAILABLE
     //
@@ -10710,6 +11997,7 @@ public interface WinError {
     // All cluster nodes must be running to perform this operation.
     //
     int ERROR_ALL_NODES_NOT_AVAILABLE = 5037;
+
     //
     // MessageId: ERROR_RESOURCE_FAILED
     //
@@ -10718,6 +12006,7 @@ public interface WinError {
     // A cluster resource failed.
     //
     int ERROR_RESOURCE_FAILED = 5038;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_NODE
     //
@@ -10726,6 +12015,7 @@ public interface WinError {
     // The cluster node is not valid.
     //
     int ERROR_CLUSTER_INVALID_NODE = 5039;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_EXISTS
     //
@@ -10734,6 +12024,7 @@ public interface WinError {
     // The cluster node already exists.
     //
     int ERROR_CLUSTER_NODE_EXISTS = 5040;
+
     //
     // MessageId: ERROR_CLUSTER_JOIN_IN_PROGRESS
     //
@@ -10742,6 +12033,7 @@ public interface WinError {
     // A node is in the process of joining the cluster.
     //
     int ERROR_CLUSTER_JOIN_IN_PROGRESS = 5041;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_NOT_FOUND
     //
@@ -10750,6 +12042,7 @@ public interface WinError {
     // The cluster node was not found.
     //
     int ERROR_CLUSTER_NODE_NOT_FOUND = 5042;
+
     //
     // MessageId: ERROR_CLUSTER_LOCAL_NODE_NOT_FOUND
     //
@@ -10758,6 +12051,7 @@ public interface WinError {
     // The cluster local node information was not found.
     //
     int ERROR_CLUSTER_LOCAL_NODE_NOT_FOUND = 5043;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_EXISTS
     //
@@ -10766,6 +12060,7 @@ public interface WinError {
     // The cluster network already exists.
     //
     int ERROR_CLUSTER_NETWORK_EXISTS = 5044;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_NOT_FOUND
     //
@@ -10774,6 +12069,7 @@ public interface WinError {
     // The cluster network was not found.
     //
     int ERROR_CLUSTER_NETWORK_NOT_FOUND = 5045;
+
     //
     // MessageId: ERROR_CLUSTER_NETINTERFACE_EXISTS
     //
@@ -10782,6 +12078,7 @@ public interface WinError {
     // The cluster network interface already exists.
     //
     int ERROR_CLUSTER_NETINTERFACE_EXISTS = 5046;
+
     //
     // MessageId: ERROR_CLUSTER_NETINTERFACE_NOT_FOUND
     //
@@ -10790,6 +12087,7 @@ public interface WinError {
     // The cluster network interface was not found.
     //
     int ERROR_CLUSTER_NETINTERFACE_NOT_FOUND = 5047;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_REQUEST
     //
@@ -10798,6 +12096,7 @@ public interface WinError {
     // The cluster request is not valid for this object.
     //
     int ERROR_CLUSTER_INVALID_REQUEST = 5048;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_NETWORK_PROVIDER
     //
@@ -10806,6 +12105,7 @@ public interface WinError {
     // The cluster network provider is not valid.
     //
     int ERROR_CLUSTER_INVALID_NETWORK_PROVIDER = 5049;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_DOWN
     //
@@ -10814,6 +12114,7 @@ public interface WinError {
     // The cluster node is down.
     //
     int ERROR_CLUSTER_NODE_DOWN = 5050;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_UNREACHABLE
     //
@@ -10822,6 +12123,7 @@ public interface WinError {
     // The cluster node is not reachable.
     //
     int ERROR_CLUSTER_NODE_UNREACHABLE = 5051;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_NOT_MEMBER
     //
@@ -10830,6 +12132,7 @@ public interface WinError {
     // The cluster node is not a member of the cluster.
     //
     int ERROR_CLUSTER_NODE_NOT_MEMBER = 5052;
+
     //
     // MessageId: ERROR_CLUSTER_JOIN_NOT_IN_PROGRESS
     //
@@ -10838,6 +12141,7 @@ public interface WinError {
     // A cluster join operation is not in progress.
     //
     int ERROR_CLUSTER_JOIN_NOT_IN_PROGRESS = 5053;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_NETWORK
     //
@@ -10846,6 +12150,7 @@ public interface WinError {
     // The cluster network is not valid.
     //
     int ERROR_CLUSTER_INVALID_NETWORK = 5054;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_UP
     //
@@ -10854,6 +12159,7 @@ public interface WinError {
     // The cluster node is up.
     //
     int ERROR_CLUSTER_NODE_UP = 5056;
+
     //
     // MessageId: ERROR_CLUSTER_IPADDR_IN_USE
     //
@@ -10862,6 +12168,7 @@ public interface WinError {
     // The cluster IP address is already in use.
     //
     int ERROR_CLUSTER_IPADDR_IN_USE = 5057;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_NOT_PAUSED
     //
@@ -10870,6 +12177,7 @@ public interface WinError {
     // The cluster node is not paused.
     //
     int ERROR_CLUSTER_NODE_NOT_PAUSED = 5058;
+
     //
     // MessageId: ERROR_CLUSTER_NO_SECURITY_CONTEXT
     //
@@ -10878,6 +12186,7 @@ public interface WinError {
     // No cluster security context is available.
     //
     int ERROR_CLUSTER_NO_SECURITY_CONTEXT = 5059;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_NOT_INTERNAL
     //
@@ -10886,6 +12195,7 @@ public interface WinError {
     // The cluster network is not configured for internal cluster communication.
     //
     int ERROR_CLUSTER_NETWORK_NOT_INTERNAL = 5060;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_ALREADY_UP
     //
@@ -10894,6 +12204,7 @@ public interface WinError {
     // The cluster node is already up.
     //
     int ERROR_CLUSTER_NODE_ALREADY_UP = 5061;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_ALREADY_DOWN
     //
@@ -10902,6 +12213,7 @@ public interface WinError {
     // The cluster node is already down.
     //
     int ERROR_CLUSTER_NODE_ALREADY_DOWN = 5062;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_ALREADY_ONLINE
     //
@@ -10910,6 +12222,7 @@ public interface WinError {
     // The cluster network is already online.
     //
     int ERROR_CLUSTER_NETWORK_ALREADY_ONLINE = 5063;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_ALREADY_OFFLINE
     //
@@ -10918,6 +12231,7 @@ public interface WinError {
     // The cluster network is already offline.
     //
     int ERROR_CLUSTER_NETWORK_ALREADY_OFFLINE = 5064;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_ALREADY_MEMBER
     //
@@ -10926,6 +12240,7 @@ public interface WinError {
     // The cluster node is already a member of the cluster.
     //
     int ERROR_CLUSTER_NODE_ALREADY_MEMBER = 5065;
+
     //
     // MessageId: ERROR_CLUSTER_LAST_INTERNAL_NETWORK
     //
@@ -10936,6 +12251,7 @@ public interface WinError {
     // communication capability cannot be removed from the network.
     //
     int ERROR_CLUSTER_LAST_INTERNAL_NETWORK = 5066;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_HAS_DEPENDENTS
     //
@@ -10945,6 +12261,7 @@ public interface WinError {
     // clients. The client access capability cannot be removed from the network.
     //
     int ERROR_CLUSTER_NETWORK_HAS_DEPENDENTS = 5067;
+
     //
     // MessageId: ERROR_INVALID_OPERATION_ON_QUORUM
     //
@@ -10955,6 +12272,7 @@ public interface WinError {
     // its possible owners list.
     //
     int ERROR_INVALID_OPERATION_ON_QUORUM = 5068;
+
     //
     // MessageId: ERROR_DEPENDENCY_NOT_ALLOWED
     //
@@ -10963,6 +12281,7 @@ public interface WinError {
     // The cluster quorum resource is not allowed to have any dependencies.
     //
     int ERROR_DEPENDENCY_NOT_ALLOWED = 5069;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_PAUSED
     //
@@ -10971,6 +12290,7 @@ public interface WinError {
     // The cluster node is paused.
     //
     int ERROR_CLUSTER_NODE_PAUSED = 5070;
+
     //
     // MessageId: ERROR_NODE_CANT_HOST_RESOURCE
     //
@@ -10980,6 +12300,7 @@ public interface WinError {
     // this resource.
     //
     int ERROR_NODE_CANT_HOST_RESOURCE = 5071;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_NOT_READY
     //
@@ -10988,6 +12309,7 @@ public interface WinError {
     // The cluster node is not ready to perform the requested operation.
     //
     int ERROR_CLUSTER_NODE_NOT_READY = 5072;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_SHUTTING_DOWN
     //
@@ -10996,6 +12318,7 @@ public interface WinError {
     // The cluster node is shutting down.
     //
     int ERROR_CLUSTER_NODE_SHUTTING_DOWN = 5073;
+
     //
     // MessageId: ERROR_CLUSTER_JOIN_ABORTED
     //
@@ -11004,6 +12327,7 @@ public interface WinError {
     // The cluster join operation was aborted.
     //
     int ERROR_CLUSTER_JOIN_ABORTED = 5074;
+
     //
     // MessageId: ERROR_CLUSTER_INCOMPATIBLE_VERSIONS
     //
@@ -11013,6 +12337,7 @@ public interface WinError {
     // between the joining node and its sponsor.
     //
     int ERROR_CLUSTER_INCOMPATIBLE_VERSIONS = 5075;
+
     //
     // MessageId: ERROR_CLUSTER_MAXNUM_OF_RESOURCES_EXCEEDED
     //
@@ -11022,6 +12347,7 @@ public interface WinError {
     // on the number of resources it can monitor.
     //
     int ERROR_CLUSTER_MAXNUM_OF_RESOURCES_EXCEEDED = 5076;
+
     //
     // MessageId: ERROR_CLUSTER_SYSTEM_CONFIG_CHANGED
     //
@@ -11031,6 +12357,7 @@ public interface WinError {
     // operation. The join or form operation was aborted.
     //
     int ERROR_CLUSTER_SYSTEM_CONFIG_CHANGED = 5077;
+
     //
     // MessageId: ERROR_CLUSTER_RESOURCE_TYPE_NOT_FOUND
     //
@@ -11039,6 +12366,7 @@ public interface WinError {
     // The specified resource type was not found.
     //
     int ERROR_CLUSTER_RESOURCE_TYPE_NOT_FOUND = 5078;
+
     //
     // MessageId: ERROR_CLUSTER_RESTYPE_NOT_SUPPORTED
     //
@@ -11049,6 +12377,7 @@ public interface WinError {
     // on this node.
     //
     int ERROR_CLUSTER_RESTYPE_NOT_SUPPORTED = 5079;
+
     //
     // MessageId: ERROR_CLUSTER_RESNAME_NOT_FOUND
     //
@@ -11058,6 +12387,7 @@ public interface WinError {
     // may be due to a bad (or changed) name supplied to the resource DLL.
     //
     int ERROR_CLUSTER_RESNAME_NOT_FOUND = 5080;
+
     //
     // MessageId: ERROR_CLUSTER_NO_RPC_PACKAGES_REGISTERED
     //
@@ -11066,6 +12396,7 @@ public interface WinError {
     // No authentication package could be registered with the RPC server.
     //
     int ERROR_CLUSTER_NO_RPC_PACKAGES_REGISTERED = 5081;
+
     //
     // MessageId: ERROR_CLUSTER_OWNER_NOT_IN_PREFLIST
     //
@@ -11076,6 +12407,7 @@ public interface WinError {
     // group, move the group.
     //
     int ERROR_CLUSTER_OWNER_NOT_IN_PREFLIST = 5082;
+
     //
     // MessageId: ERROR_CLUSTER_DATABASE_SEQMISMATCH
     //
@@ -11087,6 +12419,7 @@ public interface WinError {
     // join.
     //
     int ERROR_CLUSTER_DATABASE_SEQMISMATCH = 5083;
+
     //
     // MessageId: ERROR_RESMON_INVALID_STATE
     //
@@ -11097,6 +12430,7 @@ public interface WinError {
     // resource is in a pending state.
     //
     int ERROR_RESMON_INVALID_STATE = 5084;
+
     //
     // MessageId: ERROR_CLUSTER_GUM_NOT_LOCKER
     //
@@ -11106,6 +12440,7 @@ public interface WinError {
     // updates.
     //
     int ERROR_CLUSTER_GUM_NOT_LOCKER = 5085;
+
     //
     // MessageId: ERROR_QUORUM_DISK_NOT_FOUND
     //
@@ -11114,6 +12449,7 @@ public interface WinError {
     // The quorum disk could not be located by the cluster service.
     //
     int ERROR_QUORUM_DISK_NOT_FOUND = 5086;
+
     //
     // MessageId: ERROR_DATABASE_BACKUP_CORRUPT
     //
@@ -11122,6 +12458,7 @@ public interface WinError {
     // The backed up cluster database is possibly corrupt.
     //
     int ERROR_DATABASE_BACKUP_CORRUPT = 5087;
+
     //
     // MessageId: ERROR_CLUSTER_NODE_ALREADY_HAS_DFS_ROOT
     //
@@ -11130,6 +12467,7 @@ public interface WinError {
     // A DFS root already exists in this cluster node.
     //
     int ERROR_CLUSTER_NODE_ALREADY_HAS_DFS_ROOT = 5088;
+
     //
     // MessageId: ERROR_RESOURCE_PROPERTY_UNCHANGEABLE
     //
@@ -11154,6 +12492,7 @@ public interface WinError {
     // membership state of the node.
     //
     int ERROR_CLUSTER_MEMBERSHIP_INVALID_STATE = 5890;
+
     //
     // MessageId: ERROR_CLUSTER_QUORUMLOG_NOT_FOUND
     //
@@ -11162,6 +12501,7 @@ public interface WinError {
     // The quorum resource does not contain the quorum log.
     //
     int ERROR_CLUSTER_QUORUMLOG_NOT_FOUND = 5891;
+
     //
     // MessageId: ERROR_CLUSTER_MEMBERSHIP_HALT
     //
@@ -11171,6 +12511,7 @@ public interface WinError {
     // node.
     //
     int ERROR_CLUSTER_MEMBERSHIP_HALT = 5892;
+
     //
     // MessageId: ERROR_CLUSTER_INSTANCE_ID_MISMATCH
     //
@@ -11180,6 +12521,7 @@ public interface WinError {
     // node does not match the cluster instance ID of the sponsor node.
     //
     int ERROR_CLUSTER_INSTANCE_ID_MISMATCH = 5893;
+
     //
     // MessageId: ERROR_CLUSTER_NETWORK_NOT_FOUND_FOR_IP
     //
@@ -11189,6 +12531,7 @@ public interface WinError {
     // found.
     //
     int ERROR_CLUSTER_NETWORK_NOT_FOUND_FOR_IP = 5894;
+
     //
     // MessageId: ERROR_CLUSTER_PROPERTY_DATA_TYPE_MISMATCH
     //
@@ -11198,6 +12541,7 @@ public interface WinError {
     // of the property.
     //
     int ERROR_CLUSTER_PROPERTY_DATA_TYPE_MISMATCH = 5895;
+
     //
     // MessageId: ERROR_CLUSTER_EVICT_WITHOUT_CLEANUP
     //
@@ -11209,6 +12553,7 @@ public interface WinError {
     // Viewer.
     //
     int ERROR_CLUSTER_EVICT_WITHOUT_CLEANUP = 5896;
+
     //
     // MessageId: ERROR_CLUSTER_PARAMETER_MISMATCH
     //
@@ -11218,6 +12563,7 @@ public interface WinError {
     // conflict.
     //
     int ERROR_CLUSTER_PARAMETER_MISMATCH = 5897;
+
     //
     // MessageId: ERROR_NODE_CANNOT_BE_CLUSTERED
     //
@@ -11226,6 +12572,7 @@ public interface WinError {
     // This computer cannot be made a member of a cluster.
     //
     int ERROR_NODE_CANNOT_BE_CLUSTERED = 5898;
+
     //
     // MessageId: ERROR_CLUSTER_WRONG_OS_VERSION
     //
@@ -11235,6 +12582,7 @@ public interface WinError {
     // have the correct version of Windows installed.
     //
     int ERROR_CLUSTER_WRONG_OS_VERSION = 5899;
+
     //
     // MessageId: ERROR_CLUSTER_CANT_CREATE_DUP_CLUSTER_NAME
     //
@@ -11244,6 +12592,7 @@ public interface WinError {
     // cluster name is already in use. Specify a different name for the cluster.
     //
     int ERROR_CLUSTER_CANT_CREATE_DUP_CLUSTER_NAME = 5900;
+
     //
     // MessageId: ERROR_CLUSCFG_ALREADY_COMMITTED
     //
@@ -11252,6 +12601,7 @@ public interface WinError {
     // The cluster configuration action has already been committed.
     //
     int ERROR_CLUSCFG_ALREADY_COMMITTED = 5901;
+
     //
     // MessageId: ERROR_CLUSCFG_ROLLBACK_FAILED
     //
@@ -11260,6 +12610,7 @@ public interface WinError {
     // The cluster configuration action could not be rolled back.
     //
     int ERROR_CLUSCFG_ROLLBACK_FAILED = 5902;
+
     //
     // MessageId: ERROR_CLUSCFG_SYSTEM_DISK_DRIVE_LETTER_CONFLICT
     //
@@ -11269,6 +12620,7 @@ public interface WinError {
     // the drive letter assigned to a disk on another node.
     //
     int ERROR_CLUSCFG_SYSTEM_DISK_DRIVE_LETTER_CONFLICT = 5903;
+
     //
     // MessageId: ERROR_CLUSTER_OLD_VERSION
     //
@@ -11278,6 +12630,7 @@ public interface WinError {
     // does not support this operation.
     //
     int ERROR_CLUSTER_OLD_VERSION = 5904;
+
     //
     // MessageId: ERROR_CLUSTER_MISMATCHED_COMPUTER_ACCT_NAME
     //
@@ -11287,6 +12640,7 @@ public interface WinError {
     // Name for this resource.
     //
     int ERROR_CLUSTER_MISMATCHED_COMPUTER_ACCT_NAME = 5905;
+
     //
     // MessageId: ERROR_CLUSTER_NO_NET_ADAPTERS
     //
@@ -11295,6 +12649,7 @@ public interface WinError {
     // No network adapters are available.
     //
     int ERROR_CLUSTER_NO_NET_ADAPTERS = 5906;
+
     //
     // MessageId: ERROR_CLUSTER_POISONED
     //
@@ -11303,6 +12658,7 @@ public interface WinError {
     // The cluster node has been poisoned.
     //
     int ERROR_CLUSTER_POISONED = 5907;
+
     //
     // MessageId: ERROR_CLUSTER_GROUP_MOVING
     //
@@ -11312,6 +12668,7 @@ public interface WinError {
     // node.
     //
     int ERROR_CLUSTER_GROUP_MOVING = 5908;
+
     //
     // MessageId: ERROR_CLUSTER_RESOURCE_TYPE_BUSY
     //
@@ -11321,6 +12678,7 @@ public interface WinError {
     // another operation.
     //
     int ERROR_CLUSTER_RESOURCE_TYPE_BUSY = 5909;
+
     //
     // MessageId: ERROR_RESOURCE_CALL_TIMED_OUT
     //
@@ -11329,6 +12687,7 @@ public interface WinError {
     // The call to the cluster resource DLL timed out.
     //
     int ERROR_RESOURCE_CALL_TIMED_OUT = 5910;
+
     //
     // MessageId: ERROR_INVALID_CLUSTER_IPV6_ADDRESS
     //
@@ -11339,6 +12698,7 @@ public interface WinError {
     // addresses are not permitted.
     //
     int ERROR_INVALID_CLUSTER_IPV6_ADDRESS = 5911;
+
     //
     // MessageId: ERROR_CLUSTER_INTERNAL_INVALID_FUNCTION
     //
@@ -11348,6 +12708,7 @@ public interface WinError {
     // attempted.
     //
     int ERROR_CLUSTER_INTERNAL_INVALID_FUNCTION = 5912;
+
     //
     // MessageId: ERROR_CLUSTER_PARAMETER_OUT_OF_BOUNDS
     //
@@ -11356,6 +12717,7 @@ public interface WinError {
     // A parameter value is out of acceptable range.
     //
     int ERROR_CLUSTER_PARAMETER_OUT_OF_BOUNDS = 5913;
+
     //
     // MessageId: ERROR_CLUSTER_PARTIAL_SEND
     //
@@ -11365,6 +12727,7 @@ public interface WinError {
     // cluster. The number of bytes transmitted was less than required.
     //
     int ERROR_CLUSTER_PARTIAL_SEND = 5914;
+
     //
     // MessageId: ERROR_CLUSTER_REGISTRY_INVALID_FUNCTION
     //
@@ -11373,6 +12736,7 @@ public interface WinError {
     // An invalid cluster registry operation was attempted.
     //
     int ERROR_CLUSTER_REGISTRY_INVALID_FUNCTION = 5915;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_STRING_TERMINATION
     //
@@ -11381,6 +12745,7 @@ public interface WinError {
     // An input string of characters is not properly terminated.
     //
     int ERROR_CLUSTER_INVALID_STRING_TERMINATION = 5916;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_STRING_FORMAT
     //
@@ -11390,6 +12755,7 @@ public interface WinError {
     // represents.
     //
     int ERROR_CLUSTER_INVALID_STRING_FORMAT = 5917;
+
     //
     // MessageId: ERROR_CLUSTER_DATABASE_TRANSACTION_IN_PROGRESS
     //
@@ -11399,6 +12765,7 @@ public interface WinError {
     // attempted while a transaction was already in progress.
     //
     int ERROR_CLUSTER_DATABASE_TRANSACTION_IN_PROGRESS = 5918;
+
     //
     // MessageId: ERROR_CLUSTER_DATABASE_TRANSACTION_NOT_IN_PROGRESS
     //
@@ -11408,6 +12775,7 @@ public interface WinError {
     // cluster database transaction while no transaction was in progress.
     //
     int ERROR_CLUSTER_DATABASE_TRANSACTION_NOT_IN_PROGRESS = 5919;
+
     //
     // MessageId: ERROR_CLUSTER_NULL_DATA
     //
@@ -11416,6 +12784,7 @@ public interface WinError {
     // An internal cluster error occurred. Data was not properly initialized.
     //
     int ERROR_CLUSTER_NULL_DATA = 5920;
+
     //
     // MessageId: ERROR_CLUSTER_PARTIAL_READ
     //
@@ -11425,6 +12794,7 @@ public interface WinError {
     // number of bytes was returned.
     //
     int ERROR_CLUSTER_PARTIAL_READ = 5921;
+
     //
     // MessageId: ERROR_CLUSTER_PARTIAL_WRITE
     //
@@ -11434,6 +12804,7 @@ public interface WinError {
     // of bytes could not be written.
     //
     int ERROR_CLUSTER_PARTIAL_WRITE = 5922;
+
     //
     // MessageId: ERROR_CLUSTER_CANT_DESERIALIZE_DATA
     //
@@ -11442,6 +12813,7 @@ public interface WinError {
     // An error occurred while deserializing a stream of cluster data.
     //
     int ERROR_CLUSTER_CANT_DESERIALIZE_DATA = 5923;
+
     //
     // MessageId: ERROR_DEPENDENT_RESOURCE_PROPERTY_CONFLICT
     //
@@ -11451,6 +12823,7 @@ public interface WinError {
     // more property values associated with its dependent resource(s).
     //
     int ERROR_DEPENDENT_RESOURCE_PROPERTY_CONFLICT = 5924;
+
     //
     // MessageId: ERROR_CLUSTER_NO_QUORUM
     //
@@ -11459,6 +12832,7 @@ public interface WinError {
     // A quorum of cluster nodes was not present to form a cluster.
     //
     int ERROR_CLUSTER_NO_QUORUM = 5925;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_IPV6_NETWORK
     //
@@ -11468,6 +12842,7 @@ public interface WinError {
     // not match the configured address.
     //
     int ERROR_CLUSTER_INVALID_IPV6_NETWORK = 5926;
+
     //
     // MessageId: ERROR_CLUSTER_INVALID_IPV6_TUNNEL_NETWORK
     //
@@ -11478,6 +12853,7 @@ public interface WinError {
     // resource depends.
     //
     int ERROR_CLUSTER_INVALID_IPV6_TUNNEL_NETWORK = 5927;
+
     //
     // MessageId: ERROR_QUORUM_NOT_ALLOWED_IN_THIS_GROUP
     //
@@ -11486,6 +12862,7 @@ public interface WinError {
     // Quorum resource cannot reside in the Available Storage group.
     //
     int ERROR_QUORUM_NOT_ALLOWED_IN_THIS_GROUP = 5928;
+
     //
     // MessageId: ERROR_DEPENDENCY_TREE_TOO_COMPLEX
     //
@@ -11494,6 +12871,7 @@ public interface WinError {
     // The dependencies for this resource are nested too deeply.
     //
     int ERROR_DEPENDENCY_TREE_TOO_COMPLEX = 5929;
+
     //
     // MessageId: ERROR_EXCEPTION_IN_RESOURCE_CALL
     //
@@ -11502,6 +12880,7 @@ public interface WinError {
     // The call into the resource DLL raised an unhandled exception.
     //
     int ERROR_EXCEPTION_IN_RESOURCE_CALL = 5930;
+
     //
     // MessageId: ERROR_CLUSTER_RHS_FAILED_INITIALIZATION
     //
@@ -11510,6 +12889,7 @@ public interface WinError {
     // The RHS process failed to initialize.
     //
     int ERROR_CLUSTER_RHS_FAILED_INITIALIZATION = 5931;
+
     //
     // MessageId: ERROR_CLUSTER_NOT_INSTALLED
     //
@@ -11518,6 +12898,7 @@ public interface WinError {
     // The Failover Clustering feature is not installed on this node.
     //
     int ERROR_CLUSTER_NOT_INSTALLED = 5932;
+
     //
     // MessageId: ERROR_CLUSTER_RESOURCES_MUST_BE_ONLINE_ON_THE_SAME_NODE
     //
@@ -11526,6 +12907,7 @@ public interface WinError {
     // The resources must be online on the same node for this operation
     //
     int ERROR_CLUSTER_RESOURCES_MUST_BE_ONLINE_ON_THE_SAME_NODE = 5933;
+
     // /////////////////////////////////////////////////
     // =//
     // =EFS Error codes=//
@@ -11540,6 +12922,7 @@ public interface WinError {
     // The specified file could not be encrypted.
     //
     int ERROR_ENCRYPTION_FAILED = 6000;
+
     //
     // MessageId: ERROR_DECRYPTION_FAILED
     //
@@ -11548,6 +12931,7 @@ public interface WinError {
     // The specified file could not be decrypted.
     //
     int ERROR_DECRYPTION_FAILED = 6001;
+
     //
     // MessageId: ERROR_FILE_ENCRYPTED
     //
@@ -11557,6 +12941,7 @@ public interface WinError {
     // decrypt it.
     //
     int ERROR_FILE_ENCRYPTED = 6002;
+
     //
     // MessageId: ERROR_NO_RECOVERY_POLICY
     //
@@ -11565,6 +12950,7 @@ public interface WinError {
     // There is no valid encryption recovery policy configured for this system.
     //
     int ERROR_NO_RECOVERY_POLICY = 6003;
+
     //
     // MessageId: ERROR_NO_EFS
     //
@@ -11573,6 +12959,7 @@ public interface WinError {
     // The required encryption driver is not loaded for this system.
     //
     int ERROR_NO_EFS = 6004;
+
     //
     // MessageId: ERROR_WRONG_EFS
     //
@@ -11582,6 +12969,7 @@ public interface WinError {
     // currently loaded.
     //
     int ERROR_WRONG_EFS = 6005;
+
     //
     // MessageId: ERROR_NO_USER_KEYS
     //
@@ -11590,6 +12978,7 @@ public interface WinError {
     // There are no EFS keys defined for the user.
     //
     int ERROR_NO_USER_KEYS = 6006;
+
     //
     // MessageId: ERROR_FILE_NOT_ENCRYPTED
     //
@@ -11598,6 +12987,7 @@ public interface WinError {
     // The specified file is not encrypted.
     //
     int ERROR_FILE_NOT_ENCRYPTED = 6007;
+
     //
     // MessageId: ERROR_NOT_EXPORT_FORMAT
     //
@@ -11606,6 +12996,7 @@ public interface WinError {
     // The specified file is not in the defined EFS export format.
     //
     int ERROR_NOT_EXPORT_FORMAT = 6008;
+
     //
     // MessageId: ERROR_FILE_READ_ONLY
     //
@@ -11614,6 +13005,7 @@ public interface WinError {
     // The specified file is read only.
     //
     int ERROR_FILE_READ_ONLY = 6009;
+
     //
     // MessageId: ERROR_DIR_EFS_DISALLOWED
     //
@@ -11622,6 +13014,7 @@ public interface WinError {
     // The directory has been disabled for encryption.
     //
     int ERROR_DIR_EFS_DISALLOWED = 6010;
+
     //
     // MessageId: ERROR_EFS_SERVER_NOT_TRUSTED
     //
@@ -11630,6 +13023,7 @@ public interface WinError {
     // The server is not trusted for remote encryption operation.
     //
     int ERROR_EFS_SERVER_NOT_TRUSTED = 6011;
+
     //
     // MessageId: ERROR_BAD_RECOVERY_POLICY
     //
@@ -11639,6 +13033,7 @@ public interface WinError {
     // certificate.
     //
     int ERROR_BAD_RECOVERY_POLICY = 6012;
+
     //
     // MessageId: ERROR_EFS_ALG_BLOB_TOO_BIG
     //
@@ -11648,6 +13043,7 @@ public interface WinError {
     // buffer than the one on the destination file.
     //
     int ERROR_EFS_ALG_BLOB_TOO_BIG = 6013;
+
     //
     // MessageId: ERROR_VOLUME_NOT_SUPPORT_EFS
     //
@@ -11656,6 +13052,7 @@ public interface WinError {
     // The disk partition does not support file encryption.
     //
     int ERROR_VOLUME_NOT_SUPPORT_EFS = 6014;
+
     //
     // MessageId: ERROR_EFS_DISABLED
     //
@@ -11664,6 +13061,7 @@ public interface WinError {
     // This machine is disabled for file encryption.
     //
     int ERROR_EFS_DISABLED = 6015;
+
     //
     // MessageId: ERROR_EFS_VERSION_NOT_SUPPORT
     //
@@ -11672,6 +13070,7 @@ public interface WinError {
     // A newer system is required to decrypt this encrypted file.
     //
     int ERROR_EFS_VERSION_NOT_SUPPORT = 6016;
+
     //
     // MessageId: ERROR_CS_ENCRYPTION_INVALID_SERVER_RESPONSE
     //
@@ -11681,6 +13080,7 @@ public interface WinError {
     // Client Side Encryption.
     //
     int ERROR_CS_ENCRYPTION_INVALID_SERVER_RESPONSE = 6017;
+
     //
     // MessageId: ERROR_CS_ENCRYPTION_UNSUPPORTED_SERVER
     //
@@ -11690,6 +13090,7 @@ public interface WinError {
     // it claims to support it.
     //
     int ERROR_CS_ENCRYPTION_UNSUPPORTED_SERVER = 6018;
+
     //
     // MessageId: ERROR_CS_ENCRYPTION_EXISTING_ENCRYPTED_FILE
     //
@@ -11698,6 +13099,7 @@ public interface WinError {
     // File is encrypted and should be opened in Client Side Encryption mode.
     //
     int ERROR_CS_ENCRYPTION_EXISTING_ENCRYPTED_FILE = 6019;
+
     //
     // MessageId: ERROR_CS_ENCRYPTION_NEW_ENCRYPTED_FILE
     //
@@ -11706,6 +13108,7 @@ public interface WinError {
     // A new encrypted file is being created and a $EFS needs to be provided.
     //
     int ERROR_CS_ENCRYPTION_NEW_ENCRYPTED_FILE = 6020;
+
     //
     // MessageId: ERROR_CS_ENCRYPTION_FILE_NOT_CSE
     //
@@ -11714,6 +13117,7 @@ public interface WinError {
     // The SMB client requested a CSE FSCTL on a non-CSE file.
     //
     int ERROR_CS_ENCRYPTION_FILE_NOT_CSE = 6021;
+
     // /////////////////////////////////////////////////
     // =//
     // =BROWSER Error codes=//
@@ -11730,6 +13134,7 @@ public interface WinError {
     // The list of servers for this workgroup is not currently available
     //
     int ERROR_NO_BROWSER_SERVERS_FOUND = 6118;
+
     // /////////////////////////////////////////////////
     // =//
     // =Task Scheduler Error codes=//
@@ -11747,6 +13152,7 @@ public interface WinError {
     // in other accounts.
     //
     int SCHED_E_SERVICE_NOT_LOCALSYSTEM = 6200;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -11767,6 +13173,7 @@ public interface WinError {
     // Log service encountered an invalid log sector.
     //
     int ERROR_LOG_SECTOR_INVALID = 6600;
+
     //
     // MessageId: ERROR_LOG_SECTOR_PARITY_INVALID
     //
@@ -11775,6 +13182,7 @@ public interface WinError {
     // Log service encountered a log sector with invalid block parity.
     //
     int ERROR_LOG_SECTOR_PARITY_INVALID = 6601;
+
     //
     // MessageId: ERROR_LOG_SECTOR_REMAPPED
     //
@@ -11783,6 +13191,7 @@ public interface WinError {
     // Log service encountered a remapped log sector.
     //
     int ERROR_LOG_SECTOR_REMAPPED = 6602;
+
     //
     // MessageId: ERROR_LOG_BLOCK_INCOMPLETE
     //
@@ -11791,6 +13200,7 @@ public interface WinError {
     // Log service encountered a partial or incomplete log block.
     //
     int ERROR_LOG_BLOCK_INCOMPLETE = 6603;
+
     //
     // MessageId: ERROR_LOG_INVALID_RANGE
     //
@@ -11800,6 +13210,7 @@ public interface WinError {
     // range.
     //
     int ERROR_LOG_INVALID_RANGE = 6604;
+
     //
     // MessageId: ERROR_LOG_BLOCKS_EXHAUSTED
     //
@@ -11808,6 +13219,7 @@ public interface WinError {
     // Log service user marshalling buffers are exhausted.
     //
     int ERROR_LOG_BLOCKS_EXHAUSTED = 6605;
+
     //
     // MessageId: ERROR_LOG_READ_CONTEXT_INVALID
     //
@@ -11817,6 +13229,7 @@ public interface WinError {
     // invalid read context.
     //
     int ERROR_LOG_READ_CONTEXT_INVALID = 6606;
+
     //
     // MessageId: ERROR_LOG_RESTART_INVALID
     //
@@ -11825,6 +13238,7 @@ public interface WinError {
     // Log service encountered an invalid log restart area.
     //
     int ERROR_LOG_RESTART_INVALID = 6607;
+
     //
     // MessageId: ERROR_LOG_BLOCK_VERSION
     //
@@ -11833,6 +13247,7 @@ public interface WinError {
     // Log service encountered an invalid log block version.
     //
     int ERROR_LOG_BLOCK_VERSION = 6608;
+
     //
     // MessageId: ERROR_LOG_BLOCK_INVALID
     //
@@ -11841,6 +13256,7 @@ public interface WinError {
     // Log service encountered an invalid log block.
     //
     int ERROR_LOG_BLOCK_INVALID = 6609;
+
     //
     // MessageId: ERROR_LOG_READ_MODE_INVALID
     //
@@ -11850,6 +13266,7 @@ public interface WinError {
     // mode.
     //
     int ERROR_LOG_READ_MODE_INVALID = 6610;
+
     //
     // MessageId: ERROR_LOG_NO_RESTART
     //
@@ -11858,6 +13275,7 @@ public interface WinError {
     // Log service encountered a log stream with no restart area.
     //
     int ERROR_LOG_NO_RESTART = 6611;
+
     //
     // MessageId: ERROR_LOG_METADATA_CORRUPT
     //
@@ -11866,6 +13284,7 @@ public interface WinError {
     // Log service encountered a corrupted metadata file.
     //
     int ERROR_LOG_METADATA_CORRUPT = 6612;
+
     //
     // MessageId: ERROR_LOG_METADATA_INVALID
     //
@@ -11875,6 +13294,7 @@ public interface WinError {
     // log file system.
     //
     int ERROR_LOG_METADATA_INVALID = 6613;
+
     //
     // MessageId: ERROR_LOG_METADATA_INCONSISTENT
     //
@@ -11883,6 +13303,7 @@ public interface WinError {
     // Log service encountered a metadata file with inconsistent data.
     //
     int ERROR_LOG_METADATA_INCONSISTENT = 6614;
+
     //
     // MessageId: ERROR_LOG_RESERVATION_INVALID
     //
@@ -11892,6 +13313,7 @@ public interface WinError {
     // reservation space.
     //
     int ERROR_LOG_RESERVATION_INVALID = 6615;
+
     //
     // MessageId: ERROR_LOG_CANT_DELETE
     //
@@ -11900,6 +13322,7 @@ public interface WinError {
     // Log service cannot delete log file or file system container.
     //
     int ERROR_LOG_CANT_DELETE = 6616;
+
     //
     // MessageId: ERROR_LOG_CONTAINER_LIMIT_EXCEEDED
     //
@@ -11909,6 +13332,7 @@ public interface WinError {
     // log file.
     //
     int ERROR_LOG_CONTAINER_LIMIT_EXCEEDED = 6617;
+
     //
     // MessageId: ERROR_LOG_START_OF_LOG
     //
@@ -11918,6 +13342,7 @@ public interface WinError {
     // log.
     //
     int ERROR_LOG_START_OF_LOG = 6618;
+
     //
     // MessageId: ERROR_LOG_POLICY_ALREADY_INSTALLED
     //
@@ -11927,6 +13352,7 @@ public interface WinError {
     // already present.
     //
     int ERROR_LOG_POLICY_ALREADY_INSTALLED = 6619;
+
     //
     // MessageId: ERROR_LOG_POLICY_NOT_INSTALLED
     //
@@ -11935,6 +13361,7 @@ public interface WinError {
     // Log policy in question was not installed at the time of the request.
     //
     int ERROR_LOG_POLICY_NOT_INSTALLED = 6620;
+
     //
     // MessageId: ERROR_LOG_POLICY_INVALID
     //
@@ -11943,6 +13370,7 @@ public interface WinError {
     // The installed set of policies on the log is invalid.
     //
     int ERROR_LOG_POLICY_INVALID = 6621;
+
     //
     // MessageId: ERROR_LOG_POLICY_CONFLICT
     //
@@ -11951,6 +13379,7 @@ public interface WinError {
     // A policy on the log in question prevented the operation from completing.
     //
     int ERROR_LOG_POLICY_CONFLICT = 6622;
+
     //
     // MessageId: ERROR_LOG_PINNED_ARCHIVE_TAIL
     //
@@ -11960,6 +13389,7 @@ public interface WinError {
     // tail.
     //
     int ERROR_LOG_PINNED_ARCHIVE_TAIL = 6623;
+
     //
     // MessageId: ERROR_LOG_RECORD_NONEXISTENT
     //
@@ -11968,6 +13398,7 @@ public interface WinError {
     // Log record is not a record in the log file.
     //
     int ERROR_LOG_RECORD_NONEXISTENT = 6624;
+
     //
     // MessageId: ERROR_LOG_RECORDS_RESERVED_INVALID
     //
@@ -11977,6 +13408,7 @@ public interface WinError {
     // reserved log records is invalid.
     //
     int ERROR_LOG_RECORDS_RESERVED_INVALID = 6625;
+
     //
     // MessageId: ERROR_LOG_SPACE_RESERVED_INVALID
     //
@@ -11985,6 +13417,7 @@ public interface WinError {
     // Reserved log space or the adjustment of the log space is invalid.
     //
     int ERROR_LOG_SPACE_RESERVED_INVALID = 6626;
+
     //
     // MessageId: ERROR_LOG_TAIL_INVALID
     //
@@ -11993,6 +13426,7 @@ public interface WinError {
     // An new or existing archive tail or base of the active log is invalid.
     //
     int ERROR_LOG_TAIL_INVALID = 6627;
+
     //
     // MessageId: ERROR_LOG_FULL
     //
@@ -12001,6 +13435,7 @@ public interface WinError {
     // Log space is exhausted.
     //
     int ERROR_LOG_FULL = 6628;
+
     //
     // MessageId: ERROR_COULD_NOT_RESIZE_LOG
     //
@@ -12009,6 +13444,7 @@ public interface WinError {
     // The log could not be set to the requested size.
     //
     int ERROR_COULD_NOT_RESIZE_LOG = 6629;
+
     //
     // MessageId: ERROR_LOG_MULTIPLEXED
     //
@@ -12017,6 +13453,7 @@ public interface WinError {
     // Log is multiplexed, no direct writes to the physical log is allowed.
     //
     int ERROR_LOG_MULTIPLEXED = 6630;
+
     //
     // MessageId: ERROR_LOG_DEDICATED
     //
@@ -12025,6 +13462,7 @@ public interface WinError {
     // The operation failed because the log is a dedicated log.
     //
     int ERROR_LOG_DEDICATED = 6631;
+
     //
     // MessageId: ERROR_LOG_ARCHIVE_NOT_IN_PROGRESS
     //
@@ -12033,6 +13471,7 @@ public interface WinError {
     // The operation requires an archive context.
     //
     int ERROR_LOG_ARCHIVE_NOT_IN_PROGRESS = 6632;
+
     //
     // MessageId: ERROR_LOG_ARCHIVE_IN_PROGRESS
     //
@@ -12041,6 +13480,7 @@ public interface WinError {
     // Log archival is in progress.
     //
     int ERROR_LOG_ARCHIVE_IN_PROGRESS = 6633;
+
     //
     // MessageId: ERROR_LOG_EPHEMERAL
     //
@@ -12049,6 +13489,7 @@ public interface WinError {
     // The operation requires a non-ephemeral log, but the log is ephemeral.
     //
     int ERROR_LOG_EPHEMERAL = 6634;
+
     //
     // MessageId: ERROR_LOG_NOT_ENOUGH_CONTAINERS
     //
@@ -12058,6 +13499,7 @@ public interface WinError {
     // written to.
     //
     int ERROR_LOG_NOT_ENOUGH_CONTAINERS = 6635;
+
     //
     // MessageId: ERROR_LOG_CLIENT_ALREADY_REGISTERED
     //
@@ -12066,6 +13508,7 @@ public interface WinError {
     // A log client has already registered on the stream.
     //
     int ERROR_LOG_CLIENT_ALREADY_REGISTERED = 6636;
+
     //
     // MessageId: ERROR_LOG_CLIENT_NOT_REGISTERED
     //
@@ -12074,6 +13517,7 @@ public interface WinError {
     // A log client has not been registered on the stream.
     //
     int ERROR_LOG_CLIENT_NOT_REGISTERED = 6637;
+
     //
     // MessageId: ERROR_LOG_FULL_HANDLER_IN_PROGRESS
     //
@@ -12082,6 +13526,7 @@ public interface WinError {
     // A request has already been made to handle the log full condition.
     //
     int ERROR_LOG_FULL_HANDLER_IN_PROGRESS = 6638;
+
     //
     // MessageId: ERROR_LOG_CONTAINER_READ_FAILED
     //
@@ -12091,6 +13536,7 @@ public interface WinError {
     // container.
     //
     int ERROR_LOG_CONTAINER_READ_FAILED = 6639;
+
     //
     // MessageId: ERROR_LOG_CONTAINER_WRITE_FAILED
     //
@@ -12100,6 +13546,7 @@ public interface WinError {
     // container.
     //
     int ERROR_LOG_CONTAINER_WRITE_FAILED = 6640;
+
     //
     // MessageId: ERROR_LOG_CONTAINER_OPEN_FAILED
     //
@@ -12108,6 +13555,7 @@ public interface WinError {
     // Log service enountered an error when attempting open a log container.
     //
     int ERROR_LOG_CONTAINER_OPEN_FAILED = 6641;
+
     //
     // MessageId: ERROR_LOG_CONTAINER_STATE_INVALID
     //
@@ -12117,6 +13565,7 @@ public interface WinError {
     // requested action.
     //
     int ERROR_LOG_CONTAINER_STATE_INVALID = 6642;
+
     //
     // MessageId: ERROR_LOG_STATE_INVALID
     //
@@ -12125,6 +13574,7 @@ public interface WinError {
     // Log service is not in the correct state to perform a requested action.
     //
     int ERROR_LOG_STATE_INVALID = 6643;
+
     //
     // MessageId: ERROR_LOG_PINNED
     //
@@ -12133,6 +13583,7 @@ public interface WinError {
     // Log space cannot be reclaimed because the log is pinned.
     //
     int ERROR_LOG_PINNED = 6644;
+
     //
     // MessageId: ERROR_LOG_METADATA_FLUSH_FAILED
     //
@@ -12141,6 +13592,7 @@ public interface WinError {
     // Log metadata flush failed.
     //
     int ERROR_LOG_METADATA_FLUSH_FAILED = 6645;
+
     //
     // MessageId: ERROR_LOG_INCONSISTENT_SECURITY
     //
@@ -12149,6 +13601,7 @@ public interface WinError {
     // Security on the log and its containers is inconsistent.
     //
     int ERROR_LOG_INCONSISTENT_SECURITY = 6646;
+
     //
     // MessageId: ERROR_LOG_APPENDED_FLUSH_FAILED
     //
@@ -12158,6 +13611,7 @@ public interface WinError {
     // the log could not be flushed.
     //
     int ERROR_LOG_APPENDED_FLUSH_FAILED = 6647;
+
     //
     // MessageId: ERROR_LOG_PINNED_RESERVATION
     //
@@ -12167,6 +13621,7 @@ public interface WinError {
     // Free some reserved records to make space available.
     //
     int ERROR_LOG_PINNED_RESERVATION = 6648;
+
     // /////////////////////////////////////////////////
     // =//
     // =Transaction (KTM) Error codes //
@@ -12181,6 +13636,7 @@ public interface WinError {
     // The transaction handle associated with this operation is not valid.
     //
     int ERROR_INVALID_TRANSACTION = 6700;
+
     //
     // MessageId: ERROR_TRANSACTION_NOT_ACTIVE
     //
@@ -12190,6 +13646,7 @@ public interface WinError {
     // no longer active.
     //
     int ERROR_TRANSACTION_NOT_ACTIVE = 6701;
+
     //
     // MessageId: ERROR_TRANSACTION_REQUEST_NOT_VALID
     //
@@ -12199,6 +13656,7 @@ public interface WinError {
     // current state.
     //
     int ERROR_TRANSACTION_REQUEST_NOT_VALID = 6702;
+
     //
     // MessageId: ERROR_TRANSACTION_NOT_REQUESTED
     //
@@ -12208,6 +13666,7 @@ public interface WinError {
     // because the TM did not issue the corresponding request to the caller.
     //
     int ERROR_TRANSACTION_NOT_REQUESTED = 6703;
+
     //
     // MessageId: ERROR_TRANSACTION_ALREADY_ABORTED
     //
@@ -12217,6 +13676,7 @@ public interface WinError {
     // has already been aborted.
     //
     int ERROR_TRANSACTION_ALREADY_ABORTED = 6704;
+
     //
     // MessageId: ERROR_TRANSACTION_ALREADY_COMMITTED
     //
@@ -12226,6 +13686,7 @@ public interface WinError {
     // has already been committed.
     //
     int ERROR_TRANSACTION_ALREADY_COMMITTED = 6705;
+
     //
     // MessageId: ERROR_TM_INITIALIZATION_FAILED
     //
@@ -12235,6 +13696,7 @@ public interface WinError {
     // Transacted operations are not supported.
     //
     int ERROR_TM_INITIALIZATION_FAILED = 6706;
+
     //
     // MessageId: ERROR_RESOURCEMANAGER_READ_ONLY
     //
@@ -12244,6 +13706,7 @@ public interface WinError {
     // under this transaction.
     //
     int ERROR_RESOURCEMANAGER_READ_ONLY = 6707;
+
     //
     // MessageId: ERROR_TRANSACTION_NOT_JOINED
     //
@@ -12253,6 +13716,7 @@ public interface WinError {
     // not successfully joined.
     //
     int ERROR_TRANSACTION_NOT_JOINED = 6708;
+
     //
     // MessageId: ERROR_TRANSACTION_SUPERIOR_EXISTS
     //
@@ -12263,6 +13727,7 @@ public interface WinError {
     // single superior enlistment is allow.
     //
     int ERROR_TRANSACTION_SUPERIOR_EXISTS = 6709;
+
     //
     // MessageId: ERROR_CRM_PROTOCOL_ALREADY_EXISTS
     //
@@ -12271,6 +13736,7 @@ public interface WinError {
     // The RM tried to register a protocol that already exists.
     //
     int ERROR_CRM_PROTOCOL_ALREADY_EXISTS = 6710;
+
     //
     // MessageId: ERROR_TRANSACTION_PROPAGATION_FAILED
     //
@@ -12279,6 +13745,7 @@ public interface WinError {
     // The attempt to propagate the Transaction failed.
     //
     int ERROR_TRANSACTION_PROPAGATION_FAILED = 6711;
+
     //
     // MessageId: ERROR_CRM_PROTOCOL_NOT_FOUND
     //
@@ -12287,6 +13754,7 @@ public interface WinError {
     // The requested propagation protocol was not registered as a CRM.
     //
     int ERROR_CRM_PROTOCOL_NOT_FOUND = 6712;
+
     //
     // MessageId: ERROR_TRANSACTION_INVALID_MARSHALL_BUFFER
     //
@@ -12296,6 +13764,7 @@ public interface WinError {
     // valid format.
     //
     int ERROR_TRANSACTION_INVALID_MARSHALL_BUFFER = 6713;
+
     //
     // MessageId: ERROR_CURRENT_TRANSACTION_NOT_VALID
     //
@@ -12305,6 +13774,7 @@ public interface WinError {
     // handle to a transaction object.
     //
     int ERROR_CURRENT_TRANSACTION_NOT_VALID = 6714;
+
     //
     // MessageId: ERROR_TRANSACTION_NOT_FOUND
     //
@@ -12314,6 +13784,7 @@ public interface WinError {
     // found.
     //
     int ERROR_TRANSACTION_NOT_FOUND = 6715;
+
     //
     // MessageId: ERROR_RESOURCEMANAGER_NOT_FOUND
     //
@@ -12323,6 +13794,7 @@ public interface WinError {
     // not found.
     //
     int ERROR_RESOURCEMANAGER_NOT_FOUND = 6716;
+
     //
     // MessageId: ERROR_ENLISTMENT_NOT_FOUND
     //
@@ -12332,6 +13804,7 @@ public interface WinError {
     // found.
     //
     int ERROR_ENLISTMENT_NOT_FOUND = 6717;
+
     //
     // MessageId: ERROR_TRANSACTIONMANAGER_NOT_FOUND
     //
@@ -12341,6 +13814,7 @@ public interface WinError {
     // was not found.
     //
     int ERROR_TRANSACTIONMANAGER_NOT_FOUND = 6718;
+
     //
     // MessageId: ERROR_TRANSACTIONMANAGER_NOT_ONLINE
     //
@@ -12350,6 +13824,7 @@ public interface WinError {
     // its associated TransactionManager is not online.
     //
     int ERROR_TRANSACTIONMANAGER_NOT_ONLINE = 6719;
+
     //
     // MessageId: ERROR_TRANSACTIONMANAGER_RECOVERY_NAME_COLLISION
     //
@@ -12360,6 +13835,7 @@ public interface WinError {
     // TransactionManager was unable to recover.
     //
     int ERROR_TRANSACTIONMANAGER_RECOVERY_NAME_COLLISION = 6720;
+
     //
     // MessageId: ERROR_TRANSACTION_NOT_ROOT
     //
@@ -12371,6 +13847,7 @@ public interface WinError {
     // the Transactoin can be enlisted on as a superior.
     //
     int ERROR_TRANSACTION_NOT_ROOT = 6721;
+
     //
     // MessageId: ERROR_TRANSACTION_OBJECT_EXPIRED
     //
@@ -12380,6 +13857,7 @@ public interface WinError {
     // closed, the handle is no longer valid.
     //
     int ERROR_TRANSACTION_OBJECT_EXPIRED = 6722;
+
     //
     // MessageId: ERROR_TRANSACTION_RESPONSE_NOT_ENLISTED
     //
@@ -12390,6 +13868,7 @@ public interface WinError {
     // completion response in the NotificationMask.
     //
     int ERROR_TRANSACTION_RESPONSE_NOT_ENLISTED = 6723;
+
     //
     // MessageId: ERROR_TRANSACTION_RECORD_TOO_LONG
     //
@@ -12402,6 +13881,7 @@ public interface WinError {
     // is too long.
     //
     int ERROR_TRANSACTION_RECORD_TOO_LONG = 6724;
+
     //
     // MessageId: ERROR_IMPLICIT_TRANSACTION_NOT_SUPPORTED
     //
@@ -12410,6 +13890,7 @@ public interface WinError {
     // Implicit transaction are not supported.
     //
     int ERROR_IMPLICIT_TRANSACTION_NOT_SUPPORTED = 6725;
+
     //
     // MessageId: ERROR_TRANSACTION_INTEGRITY_VIOLATED
     //
@@ -12419,6 +13900,7 @@ public interface WinError {
     // because it blocked forward progress.
     //
     int ERROR_TRANSACTION_INTEGRITY_VIOLATED = 6726;
+
     // /////////////////////////////////////////////////
     // =//
     // =Transactional File Services (TxF) //
@@ -12435,6 +13917,7 @@ public interface WinError {
     // transaction.
     //
     int ERROR_TRANSACTIONAL_CONFLICT = 6800;
+
     //
     // MessageId: ERROR_RM_NOT_ACTIVE
     //
@@ -12444,6 +13927,7 @@ public interface WinError {
     // not started or was shutdown due to an error.
     //
     int ERROR_RM_NOT_ACTIVE = 6801;
+
     //
     // MessageId: ERROR_RM_METADATA_CORRUPT
     //
@@ -12452,6 +13936,7 @@ public interface WinError {
     // The metadata of the RM has been corrupted. The RM will not function.
     //
     int ERROR_RM_METADATA_CORRUPT = 6802;
+
     //
     // MessageId: ERROR_DIRECTORY_NOT_RM
     //
@@ -12460,6 +13945,7 @@ public interface WinError {
     // The specified directory does not contain a resource manager.
     //
     int ERROR_DIRECTORY_NOT_RM = 6803;
+
     //
     // MessageId: ERROR_TRANSACTIONS_UNSUPPORTED_REMOTE
     //
@@ -12468,6 +13954,7 @@ public interface WinError {
     // The remote server or share does not support transacted file operations.
     //
     int ERROR_TRANSACTIONS_UNSUPPORTED_REMOTE = 6805;
+
     //
     // MessageId: ERROR_LOG_RESIZE_INVALID_SIZE
     //
@@ -12476,6 +13963,7 @@ public interface WinError {
     // The requested log size is invalid.
     //
     int ERROR_LOG_RESIZE_INVALID_SIZE = 6806;
+
     //
     // MessageId: ERROR_OBJECT_NO_LONGER_EXISTS
     //
@@ -12485,6 +13973,7 @@ public interface WinError {
     // deleted by a Transaction Savepoint Rollback.
     //
     int ERROR_OBJECT_NO_LONGER_EXISTS = 6807;
+
     //
     // MessageId: ERROR_STREAM_MINIVERSION_NOT_FOUND
     //
@@ -12494,6 +13983,7 @@ public interface WinError {
     // open.
     //
     int ERROR_STREAM_MINIVERSION_NOT_FOUND = 6808;
+
     //
     // MessageId: ERROR_STREAM_MINIVERSION_NOT_VALID
     //
@@ -12503,6 +13993,7 @@ public interface WinError {
     // likely cause is a transaction savepoint rollback.
     //
     int ERROR_STREAM_MINIVERSION_NOT_VALID = 6809;
+
     //
     // MessageId: ERROR_MINIVERSION_INACCESSIBLE_FROM_SPECIFIED_TRANSACTION
     //
@@ -12512,6 +14003,7 @@ public interface WinError {
     // created it.
     //
     int ERROR_MINIVERSION_INACCESSIBLE_FROM_SPECIFIED_TRANSACTION = 6810;
+
     //
     // MessageId: ERROR_CANT_OPEN_MINIVERSION_WITH_MODIFY_INTENT
     //
@@ -12520,6 +14012,7 @@ public interface WinError {
     // It is not possible to open a miniversion with modify access.
     //
     int ERROR_CANT_OPEN_MINIVERSION_WITH_MODIFY_INTENT = 6811;
+
     //
     // MessageId: ERROR_CANT_CREATE_MORE_STREAM_MINIVERSIONS
     //
@@ -12528,6 +14021,7 @@ public interface WinError {
     // It is not possible to create any more miniversions for this stream.
     //
     int ERROR_CANT_CREATE_MORE_STREAM_MINIVERSIONS = 6812;
+
     //
     // MessageId: ERROR_REMOTE_FILE_VERSION_MISMATCH
     //
@@ -12537,6 +14031,7 @@ public interface WinError {
     // opened with transactions.
     //
     int ERROR_REMOTE_FILE_VERSION_MISMATCH = 6814;
+
     //
     // MessageId: ERROR_HANDLE_NO_LONGER_VALID
     //
@@ -12547,6 +14042,7 @@ public interface WinError {
     // transaction ended or rolled back to savepoint.
     //
     int ERROR_HANDLE_NO_LONGER_VALID = 6815;
+
     //
     // MessageId: ERROR_NO_TXF_METADATA
     //
@@ -12555,6 +14051,7 @@ public interface WinError {
     // There is no transaction metadata on the file.
     //
     int ERROR_NO_TXF_METADATA = 6816;
+
     //
     // MessageId: ERROR_LOG_CORRUPTION_DETECTED
     //
@@ -12563,6 +14060,7 @@ public interface WinError {
     // The log data is corrupt.
     //
     int ERROR_LOG_CORRUPTION_DETECTED = 6817;
+
     //
     // MessageId: ERROR_CANT_RECOVER_WITH_HANDLE_OPEN
     //
@@ -12571,6 +14069,7 @@ public interface WinError {
     // The file can't be recovered because there is a handle still open on it.
     //
     int ERROR_CANT_RECOVER_WITH_HANDLE_OPEN = 6818;
+
     //
     // MessageId: ERROR_RM_DISCONNECTED
     //
@@ -12580,6 +14079,7 @@ public interface WinError {
     // responsible for it has disconnected.
     //
     int ERROR_RM_DISCONNECTED = 6819;
+
     //
     // MessageId: ERROR_ENLISTMENT_NOT_SUPERIOR
     //
@@ -12589,6 +14089,7 @@ public interface WinError {
     // superior enlistment.
     //
     int ERROR_ENLISTMENT_NOT_SUPERIOR = 6820;
+
     //
     // MessageId: ERROR_RECOVERY_NOT_NEEDED
     //
@@ -12598,6 +14099,7 @@ public interface WinError {
     // needed.
     //
     int ERROR_RECOVERY_NOT_NEEDED = 6821;
+
     //
     // MessageId: ERROR_RM_ALREADY_STARTED
     //
@@ -12606,6 +14108,7 @@ public interface WinError {
     // The transactional resource manager has already been started.
     //
     int ERROR_RM_ALREADY_STARTED = 6822;
+
     //
     // MessageId: ERROR_FILE_IDENTITY_NOT_PERSISTENT
     //
@@ -12615,6 +14118,7 @@ public interface WinError {
     // on the outcome of an unresolved transaction.
     //
     int ERROR_FILE_IDENTITY_NOT_PERSISTENT = 6823;
+
     //
     // MessageId: ERROR_CANT_BREAK_TRANSACTIONAL_DEPENDENCY
     //
@@ -12624,6 +14128,7 @@ public interface WinError {
     // depending on the fact that this property will not change.
     //
     int ERROR_CANT_BREAK_TRANSACTIONAL_DEPENDENCY = 6824;
+
     //
     // MessageId: ERROR_CANT_CROSS_RM_BOUNDARY
     //
@@ -12633,6 +14138,7 @@ public interface WinError {
     // managers and is therefore not allowed.
     //
     int ERROR_CANT_CROSS_RM_BOUNDARY = 6825;
+
     //
     // MessageId: ERROR_TXF_DIR_NOT_EMPTY
     //
@@ -12641,6 +14147,7 @@ public interface WinError {
     // The $Txf directory must be empty for this operation to succeed.
     //
     int ERROR_TXF_DIR_NOT_EMPTY = 6826;
+
     //
     // MessageId: ERROR_INDOUBT_TRANSACTIONS_EXIST
     //
@@ -12650,6 +14157,7 @@ public interface WinError {
     // inconsistent state and is therefore not allowed.
     //
     int ERROR_INDOUBT_TRANSACTIONS_EXIST = 6827;
+
     //
     // MessageId: ERROR_TM_VOLATILE
     //
@@ -12659,6 +14167,7 @@ public interface WinError {
     // not have a log.
     //
     int ERROR_TM_VOLATILE = 6828;
+
     //
     // MessageId: ERROR_ROLLBACK_TIMER_EXPIRED
     //
@@ -12668,6 +14177,7 @@ public interface WinError {
     // has already executed or been queued for execution.
     //
     int ERROR_ROLLBACK_TIMER_EXPIRED = 6829;
+
     //
     // MessageId: ERROR_TXF_ATTRIBUTE_CORRUPT
     //
@@ -12677,6 +14187,7 @@ public interface WinError {
     // and unreadable.
     //
     int ERROR_TXF_ATTRIBUTE_CORRUPT = 6830;
+
     //
     // MessageId: ERROR_EFS_NOT_ALLOWED_IN_TRANSACTION
     //
@@ -12686,6 +14197,7 @@ public interface WinError {
     // active.
     //
     int ERROR_EFS_NOT_ALLOWED_IN_TRANSACTION = 6831;
+
     //
     // MessageId: ERROR_TRANSACTIONAL_OPEN_NOT_ALLOWED
     //
@@ -12694,6 +14206,7 @@ public interface WinError {
     // This object is not allowed to be opened in a transaction.
     //
     int ERROR_TRANSACTIONAL_OPEN_NOT_ALLOWED = 6832;
+
     //
     // MessageId: ERROR_LOG_GROWTH_FAILED
     //
@@ -12703,6 +14216,7 @@ public interface WinError {
     // failed. The failure status has been recorded in the event log.
     //
     int ERROR_LOG_GROWTH_FAILED = 6833;
+
     //
     // MessageId: ERROR_TRANSACTED_MAPPING_UNSUPPORTED_REMOTE
     //
@@ -12712,6 +14226,7 @@ public interface WinError {
     // transaction is not supported.
     //
     int ERROR_TRANSACTED_MAPPING_UNSUPPORTED_REMOTE = 6834;
+
     //
     // MessageId: ERROR_TXF_METADATA_ALREADY_PRESENT
     //
@@ -12721,6 +14236,7 @@ public interface WinError {
     // superseded.
     //
     int ERROR_TXF_METADATA_ALREADY_PRESENT = 6835;
+
     //
     // MessageId: ERROR_TRANSACTION_SCOPE_CALLBACKS_NOT_SET
     //
@@ -12730,6 +14246,7 @@ public interface WinError {
     // not been initialized.
     //
     int ERROR_TRANSACTION_SCOPE_CALLBACKS_NOT_SET = 6836;
+
     //
     // MessageId: ERROR_TRANSACTION_REQUIRED_PROMOTION
     //
@@ -12739,6 +14256,7 @@ public interface WinError {
     // but the transaction was set to disallow it.
     //
     int ERROR_TRANSACTION_REQUIRED_PROMOTION = 6837;
+
     //
     // MessageId: ERROR_CANNOT_EXECUTE_FILE_IN_TRANSACTION
     //
@@ -12748,6 +14266,7 @@ public interface WinError {
     // be opened for execute only by a transacted reader.
     //
     int ERROR_CANNOT_EXECUTE_FILE_IN_TRANSACTION = 6838;
+
     //
     // MessageId: ERROR_TRANSACTIONS_NOT_FROZEN
     //
@@ -12757,6 +14276,7 @@ public interface WinError {
     // had not previously been frozen.
     //
     int ERROR_TRANSACTIONS_NOT_FROZEN = 6839;
+
     //
     // MessageId: ERROR_TRANSACTION_FREEZE_IN_PROGRESS
     //
@@ -12765,6 +14285,7 @@ public interface WinError {
     // Transactions cannot be frozen because a freeze is already in progress.
     //
     int ERROR_TRANSACTION_FREEZE_IN_PROGRESS = 6840;
+
     //
     // MessageId: ERROR_NOT_SNAPSHOT_VOLUME
     //
@@ -12774,6 +14295,7 @@ public interface WinError {
     // on a volume mounted as a snapshot.
     //
     int ERROR_NOT_SNAPSHOT_VOLUME = 6841;
+
     //
     // MessageId: ERROR_NO_SAVEPOINT_WITH_OPEN_FILES
     //
@@ -12783,6 +14305,7 @@ public interface WinError {
     // This is not permitted.
     //
     int ERROR_NO_SAVEPOINT_WITH_OPEN_FILES = 6842;
+
     //
     // MessageId: ERROR_DATA_LOST_REPAIR
     //
@@ -12792,6 +14315,7 @@ public interface WinError {
     // repaired. Data loss may have occurred.
     //
     int ERROR_DATA_LOST_REPAIR = 6843;
+
     //
     // MessageId: ERROR_SPARSE_NOT_ALLOWED_IN_TRANSACTION
     //
@@ -12801,6 +14325,7 @@ public interface WinError {
     // active on the file.
     //
     int ERROR_SPARSE_NOT_ALLOWED_IN_TRANSACTION = 6844;
+
     //
     // MessageId: ERROR_TM_IDENTITY_MISMATCH
     //
@@ -12811,6 +14336,7 @@ public interface WinError {
     // passed in as an argument.
     //
     int ERROR_TM_IDENTITY_MISMATCH = 6845;
+
     //
     // MessageId: ERROR_FLOATED_SECTION
     //
@@ -12820,6 +14346,7 @@ public interface WinError {
     // of a transaction ending. There is no valid data.
     //
     int ERROR_FLOATED_SECTION = 6846;
+
     //
     // MessageId: ERROR_CANNOT_ACCEPT_TRANSACTED_WORK
     //
@@ -12829,6 +14356,7 @@ public interface WinError {
     // work due to a transient condition such as low resources.
     //
     int ERROR_CANNOT_ACCEPT_TRANSACTED_WORK = 6847;
+
     //
     // MessageId: ERROR_CANNOT_ABORT_TRANSACTIONS
     //
@@ -12839,6 +14367,7 @@ public interface WinError {
     // shut down.
     //
     int ERROR_CANNOT_ABORT_TRANSACTIONS = 6848;
+
     //
     // MessageId: ERROR_BAD_CLUSTERS
     //
@@ -12847,6 +14376,7 @@ public interface WinError {
     // The operation could not be completed due to bad clusters on disk.
     //
     int ERROR_BAD_CLUSTERS = 6849;
+
     //
     // MessageId: ERROR_COMPRESSION_NOT_ALLOWED_IN_TRANSACTION
     //
@@ -12856,6 +14386,7 @@ public interface WinError {
     // active on the file.
     //
     int ERROR_COMPRESSION_NOT_ALLOWED_IN_TRANSACTION = 6850;
+
     //
     // MessageId: ERROR_VOLUME_DIRTY
     //
@@ -12865,6 +14396,7 @@ public interface WinError {
     // run chkdsk and try again.
     //
     int ERROR_VOLUME_DIRTY = 6851;
+
     //
     // MessageId: ERROR_NO_LINK_TRACKING_IN_TRANSACTION
     //
@@ -12874,6 +14406,7 @@ public interface WinError {
     // is active.
     //
     int ERROR_NO_LINK_TRACKING_IN_TRANSACTION = 6852;
+
     //
     // MessageId: ERROR_OPERATION_NOT_SUPPORTED_IN_TRANSACTION
     //
@@ -12882,6 +14415,7 @@ public interface WinError {
     // This operation cannot be performed in a transaction.
     //
     int ERROR_OPERATION_NOT_SUPPORTED_IN_TRANSACTION = 6853;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -12902,6 +14436,7 @@ public interface WinError {
     // The specified session name is invalid.
     //
     int ERROR_CTX_WINSTATION_NAME_INVALID = 7001;
+
     //
     // MessageId: ERROR_CTX_INVALID_PD
     //
@@ -12910,6 +14445,7 @@ public interface WinError {
     // The specified protocol driver is invalid.
     //
     int ERROR_CTX_INVALID_PD = 7002;
+
     //
     // MessageId: ERROR_CTX_PD_NOT_FOUND
     //
@@ -12918,6 +14454,7 @@ public interface WinError {
     // The specified protocol driver was not found in the system path.
     //
     int ERROR_CTX_PD_NOT_FOUND = 7003;
+
     //
     // MessageId: ERROR_CTX_WD_NOT_FOUND
     //
@@ -12927,6 +14464,7 @@ public interface WinError {
     // path.
     //
     int ERROR_CTX_WD_NOT_FOUND = 7004;
+
     //
     // MessageId: ERROR_CTX_CANNOT_MAKE_EVENTLOG_ENTRY
     //
@@ -12935,6 +14473,7 @@ public interface WinError {
     // A registry key for event logging could not be created for this session.
     //
     int ERROR_CTX_CANNOT_MAKE_EVENTLOG_ENTRY = 7005;
+
     //
     // MessageId: ERROR_CTX_SERVICE_NAME_COLLISION
     //
@@ -12943,6 +14482,7 @@ public interface WinError {
     // A service with the same name already exists on the system.
     //
     int ERROR_CTX_SERVICE_NAME_COLLISION = 7006;
+
     //
     // MessageId: ERROR_CTX_CLOSE_PENDING
     //
@@ -12951,6 +14491,7 @@ public interface WinError {
     // A close operation is pending on the session.
     //
     int ERROR_CTX_CLOSE_PENDING = 7007;
+
     //
     // MessageId: ERROR_CTX_NO_OUTBUF
     //
@@ -12959,6 +14500,7 @@ public interface WinError {
     // There are no free output buffers available.
     //
     int ERROR_CTX_NO_OUTBUF = 7008;
+
     //
     // MessageId: ERROR_CTX_MODEM_INF_NOT_FOUND
     //
@@ -12967,6 +14509,7 @@ public interface WinError {
     // The MODEM.INF file was not found.
     //
     int ERROR_CTX_MODEM_INF_NOT_FOUND = 7009;
+
     //
     // MessageId: ERROR_CTX_INVALID_MODEMNAME
     //
@@ -12975,6 +14518,7 @@ public interface WinError {
     // The modem name was not found in MODEM.INF.
     //
     int ERROR_CTX_INVALID_MODEMNAME = 7010;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_ERROR
     //
@@ -12984,6 +14528,7 @@ public interface WinError {
     // configured modem name matches the attached modem.
     //
     int ERROR_CTX_MODEM_RESPONSE_ERROR = 7011;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_TIMEOUT
     //
@@ -12993,6 +14538,7 @@ public interface WinError {
     // modem is properly cabled and powered on.
     //
     int ERROR_CTX_MODEM_RESPONSE_TIMEOUT = 7012;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_NO_CARRIER
     //
@@ -13001,6 +14547,7 @@ public interface WinError {
     // Carrier detect has failed or carrier has been dropped due to disconnect.
     //
     int ERROR_CTX_MODEM_RESPONSE_NO_CARRIER = 7013;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_NO_DIALTONE
     //
@@ -13010,6 +14557,7 @@ public interface WinError {
     // cable is properly attached and functional.
     //
     int ERROR_CTX_MODEM_RESPONSE_NO_DIALTONE = 7014;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_BUSY
     //
@@ -13018,6 +14566,7 @@ public interface WinError {
     // Busy signal detected at remote site on callback.
     //
     int ERROR_CTX_MODEM_RESPONSE_BUSY = 7015;
+
     //
     // MessageId: ERROR_CTX_MODEM_RESPONSE_VOICE
     //
@@ -13026,6 +14575,7 @@ public interface WinError {
     // Voice detected at remote site on callback.
     //
     int ERROR_CTX_MODEM_RESPONSE_VOICE = 7016;
+
     //
     // MessageId: ERROR_CTX_TD_ERROR
     //
@@ -13034,6 +14584,7 @@ public interface WinError {
     // Transport driver error
     //
     int ERROR_CTX_TD_ERROR = 7017;
+
     //
     // MessageId: ERROR_CTX_WINSTATION_NOT_FOUND
     //
@@ -13042,6 +14593,7 @@ public interface WinError {
     // The specified session cannot be found.
     //
     int ERROR_CTX_WINSTATION_NOT_FOUND = 7022;
+
     //
     // MessageId: ERROR_CTX_WINSTATION_ALREADY_EXISTS
     //
@@ -13050,6 +14602,7 @@ public interface WinError {
     // The specified session name is already in use.
     //
     int ERROR_CTX_WINSTATION_ALREADY_EXISTS = 7023;
+
     //
     // MessageId: ERROR_CTX_WINSTATION_BUSY
     //
@@ -13060,6 +14613,7 @@ public interface WinError {
     // delete operation.
     //
     int ERROR_CTX_WINSTATION_BUSY = 7024;
+
     //
     // MessageId: ERROR_CTX_BAD_VIDEO_MODE
     //
@@ -13069,6 +14623,7 @@ public interface WinError {
     // supported by the current client.
     //
     int ERROR_CTX_BAD_VIDEO_MODE = 7025;
+
     //
     // MessageId: ERROR_CTX_GRAPHICS_INVALID
     //
@@ -13078,6 +14633,7 @@ public interface WinError {
     // DOS graphics mode is not supported.
     //
     int ERROR_CTX_GRAPHICS_INVALID = 7035;
+
     //
     // MessageId: ERROR_CTX_LOGON_DISABLED
     //
@@ -13087,6 +14643,7 @@ public interface WinError {
     // Please contact your administrator.
     //
     int ERROR_CTX_LOGON_DISABLED = 7037;
+
     //
     // MessageId: ERROR_CTX_NOT_CONSOLE
     //
@@ -13097,6 +14654,7 @@ public interface WinError {
     // console access.
     //
     int ERROR_CTX_NOT_CONSOLE = 7038;
+
     //
     // MessageId: ERROR_CTX_CLIENT_QUERY_TIMEOUT
     //
@@ -13105,6 +14663,7 @@ public interface WinError {
     // The client failed to respond to the server connect message.
     //
     int ERROR_CTX_CLIENT_QUERY_TIMEOUT = 7040;
+
     //
     // MessageId: ERROR_CTX_CONSOLE_DISCONNECT
     //
@@ -13113,6 +14672,7 @@ public interface WinError {
     // Disconnecting the console session is not supported.
     //
     int ERROR_CTX_CONSOLE_DISCONNECT = 7041;
+
     //
     // MessageId: ERROR_CTX_CONSOLE_CONNECT
     //
@@ -13121,6 +14681,7 @@ public interface WinError {
     // Reconnecting a disconnected session to the console is not supported.
     //
     int ERROR_CTX_CONSOLE_CONNECT = 7042;
+
     //
     // MessageId: ERROR_CTX_SHADOW_DENIED
     //
@@ -13129,6 +14690,7 @@ public interface WinError {
     // The request to control another session remotely was denied.
     //
     int ERROR_CTX_SHADOW_DENIED = 7044;
+
     //
     // MessageId: ERROR_CTX_WINSTATION_ACCESS_DENIED
     //
@@ -13137,6 +14699,7 @@ public interface WinError {
     // The requested session access is denied.
     //
     int ERROR_CTX_WINSTATION_ACCESS_DENIED = 7045;
+
     //
     // MessageId: ERROR_CTX_INVALID_WD
     //
@@ -13145,6 +14708,7 @@ public interface WinError {
     // The specified terminal connection driver is invalid.
     //
     int ERROR_CTX_INVALID_WD = 7049;
+
     //
     // MessageId: ERROR_CTX_SHADOW_INVALID
     //
@@ -13155,6 +14719,7 @@ public interface WinError {
     // have a user logged on.
     //
     int ERROR_CTX_SHADOW_INVALID = 7050;
+
     //
     // MessageId: ERROR_CTX_SHADOW_DISABLED
     //
@@ -13163,6 +14728,7 @@ public interface WinError {
     // The requested session is not configured to allow remote control.
     //
     int ERROR_CTX_SHADOW_DISABLED = 7051;
+
     //
     // MessageId: ERROR_CTX_CLIENT_LICENSE_IN_USE
     //
@@ -13174,6 +14740,7 @@ public interface WinError {
     // Please call your system administrator to obtain a unique license number.
     //
     int ERROR_CTX_CLIENT_LICENSE_IN_USE = 7052;
+
     //
     // MessageId: ERROR_CTX_CLIENT_LICENSE_NOT_SET
     //
@@ -13185,6 +14752,7 @@ public interface WinError {
     // Please contact your system administrator.
     //
     int ERROR_CTX_CLIENT_LICENSE_NOT_SET = 7053;
+
     //
     // MessageId: ERROR_CTX_LICENSE_NOT_AVAILABLE
     //
@@ -13195,6 +14763,7 @@ public interface WinError {
     // Try connecting later or contact your system administrator.
     //
     int ERROR_CTX_LICENSE_NOT_AVAILABLE = 7054;
+
     //
     // MessageId: ERROR_CTX_LICENSE_CLIENT_INVALID
     //
@@ -13204,6 +14773,7 @@ public interface WinError {
     // request is denied.
     //
     int ERROR_CTX_LICENSE_CLIENT_INVALID = 7055;
+
     //
     // MessageId: ERROR_CTX_LICENSE_EXPIRED
     //
@@ -13212,6 +14782,7 @@ public interface WinError {
     // The system license has expired. Your logon request is denied.
     //
     int ERROR_CTX_LICENSE_EXPIRED = 7056;
+
     //
     // MessageId: ERROR_CTX_SHADOW_NOT_RUNNING
     //
@@ -13221,6 +14792,7 @@ public interface WinError {
     // not currently being remotely controlled.
     //
     int ERROR_CTX_SHADOW_NOT_RUNNING = 7057;
+
     //
     // MessageId: ERROR_CTX_SHADOW_ENDED_BY_MODE_CHANGE
     //
@@ -13231,6 +14803,7 @@ public interface WinError {
     // supported.
     //
     int ERROR_CTX_SHADOW_ENDED_BY_MODE_CHANGE = 7058;
+
     //
     // MessageId: ERROR_ACTIVATION_COUNT_EXCEEDED
     //
@@ -13240,6 +14813,7 @@ public interface WinError {
     // installation. Your activation timer will not be cleared.
     //
     int ERROR_ACTIVATION_COUNT_EXCEEDED = 7059;
+
     //
     // MessageId: ERROR_CTX_WINSTATIONS_DISABLED
     //
@@ -13248,6 +14822,7 @@ public interface WinError {
     // Remote logins are currently disabled.
     //
     int ERROR_CTX_WINSTATIONS_DISABLED = 7060;
+
     //
     // MessageId: ERROR_CTX_ENCRYPTION_LEVEL_REQUIRED
     //
@@ -13256,6 +14831,7 @@ public interface WinError {
     // You do not have the proper encryption level to access this Session.
     //
     int ERROR_CTX_ENCRYPTION_LEVEL_REQUIRED = 7061;
+
     //
     // MessageId: ERROR_CTX_SESSION_IN_USE
     //
@@ -13265,6 +14841,7 @@ public interface WinError {
     // user or an administrator can log on to this computer.
     //
     int ERROR_CTX_SESSION_IN_USE = 7062;
+
     //
     // MessageId: ERROR_CTX_NO_FORCE_LOGOFF
     //
@@ -13275,6 +14852,7 @@ public interface WinError {
     // contact %s\\%s and have them log off.
     //
     int ERROR_CTX_NO_FORCE_LOGOFF = 7063;
+
     //
     // MessageId: ERROR_CTX_ACCOUNT_RESTRICTION
     //
@@ -13283,6 +14861,7 @@ public interface WinError {
     // Unable to log you on because of an account restriction.
     //
     int ERROR_CTX_ACCOUNT_RESTRICTION = 7064;
+
     //
     // MessageId: ERROR_RDP_PROTOCOL_ERROR
     //
@@ -13292,6 +14871,7 @@ public interface WinError {
     // and has disconnected the client.
     //
     int ERROR_RDP_PROTOCOL_ERROR = 7065;
+
     //
     // MessageId: ERROR_CTX_CDM_CONNECT
     //
@@ -13300,6 +14880,7 @@ public interface WinError {
     // The Client Drive Mapping Service Has Connected on Terminal Connection.
     //
     int ERROR_CTX_CDM_CONNECT = 7066;
+
     //
     // MessageId: ERROR_CTX_CDM_DISCONNECT
     //
@@ -13308,6 +14889,7 @@ public interface WinError {
     // The Client Drive Mapping Service Has Disconnected on Terminal Connection.
     //
     int ERROR_CTX_CDM_DISCONNECT = 7067;
+
     //
     // MessageId: ERROR_CTX_SECURITY_LAYER_ERROR
     //
@@ -13317,6 +14899,7 @@ public interface WinError {
     // stream and has disconnected the client.
     //
     int ERROR_CTX_SECURITY_LAYER_ERROR = 7068;
+
     //
     // MessageId: ERROR_TS_INCOMPATIBLE_SESSIONS
     //
@@ -13325,6 +14908,7 @@ public interface WinError {
     // The target session is incompatible with the current session.
     //
     int ERROR_TS_INCOMPATIBLE_SESSIONS = 7069;
+
     // /////////////////////////////////////////////////
     // =//
     // =Available=//
@@ -13356,6 +14940,7 @@ public interface WinError {
     // The file replication service API was called incorrectly.
     //
     int FRS_ERR_INVALID_API_SEQUENCE = 8001;
+
     //
     // MessageId: FRS_ERR_STARTING_SERVICE
     //
@@ -13364,6 +14949,7 @@ public interface WinError {
     // The file replication service cannot be started.
     //
     int FRS_ERR_STARTING_SERVICE = 8002;
+
     //
     // MessageId: FRS_ERR_STOPPING_SERVICE
     //
@@ -13372,6 +14958,7 @@ public interface WinError {
     // The file replication service cannot be stopped.
     //
     int FRS_ERR_STOPPING_SERVICE = 8003;
+
     //
     // MessageId: FRS_ERR_INTERNAL_API
     //
@@ -13381,6 +14968,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_INTERNAL_API = 8004;
+
     //
     // MessageId: FRS_ERR_INTERNAL
     //
@@ -13390,6 +14978,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_INTERNAL = 8005;
+
     //
     // MessageId: FRS_ERR_SERVICE_COMM
     //
@@ -13399,6 +14988,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_SERVICE_COMM = 8006;
+
     //
     // MessageId: FRS_ERR_INSUFFICIENT_PRIV
     //
@@ -13409,6 +14999,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_INSUFFICIENT_PRIV = 8007;
+
     //
     // MessageId: FRS_ERR_AUTHENTICATION
     //
@@ -13419,6 +15010,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_AUTHENTICATION = 8008;
+
     //
     // MessageId: FRS_ERR_PARENT_INSUFFICIENT_PRIV
     //
@@ -13429,6 +15021,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_PARENT_INSUFFICIENT_PRIV = 8009;
+
     //
     // MessageId: FRS_ERR_PARENT_AUTHENTICATION
     //
@@ -13439,6 +15032,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_PARENT_AUTHENTICATION = 8010;
+
     //
     // MessageId: FRS_ERR_CHILD_TO_PARENT_COMM
     //
@@ -13449,6 +15043,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_CHILD_TO_PARENT_COMM = 8011;
+
     //
     // MessageId: FRS_ERR_PARENT_TO_CHILD_COMM
     //
@@ -13459,6 +15054,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_PARENT_TO_CHILD_COMM = 8012;
+
     //
     // MessageId: FRS_ERR_SYSVOL_POPULATE
     //
@@ -13469,6 +15065,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_SYSVOL_POPULATE = 8013;
+
     //
     // MessageId: FRS_ERR_SYSVOL_POPULATE_TIMEOUT
     //
@@ -13479,6 +15076,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_SYSVOL_POPULATE_TIMEOUT = 8014;
+
     //
     // MessageId: FRS_ERR_SYSVOL_IS_BUSY
     //
@@ -13488,6 +15086,7 @@ public interface WinError {
     // volume is busy with a previous request.
     //
     int FRS_ERR_SYSVOL_IS_BUSY = 8015;
+
     //
     // MessageId: FRS_ERR_SYSVOL_DEMOTE
     //
@@ -13498,6 +15097,7 @@ public interface WinError {
     // The event log may have more information.
     //
     int FRS_ERR_SYSVOL_DEMOTE = 8016;
+
     //
     // MessageId: FRS_ERR_INVALID_SERVICE_PARAMETER
     //
@@ -13506,10 +15106,12 @@ public interface WinError {
     // The file replication service detected an invalid parameter.
     //
     int FRS_ERR_INVALID_SERVICE_PARAMETER = 8017;
+
     // *****************
     // FACILITY DIRECTORY SERVICE
     // *****************
     int DS_S_SUCCESS = NO_ERROR;
+
     //
     // MessageId: ERROR_DS_NOT_INSTALLED
     //
@@ -13519,6 +15121,7 @@ public interface WinError {
     // information, see the event log.
     //
     int ERROR_DS_NOT_INSTALLED = 8200;
+
     //
     // MessageId: ERROR_DS_MEMBERSHIP_EVALUATED_LOCALLY
     //
@@ -13527,6 +15130,7 @@ public interface WinError {
     // The directory service evaluated group memberships locally.
     //
     int ERROR_DS_MEMBERSHIP_EVALUATED_LOCALLY = 8201;
+
     //
     // MessageId: ERROR_DS_NO_ATTRIBUTE_OR_VALUE
     //
@@ -13535,6 +15139,7 @@ public interface WinError {
     // The specified directory service attribute or value does not exist.
     //
     int ERROR_DS_NO_ATTRIBUTE_OR_VALUE = 8202;
+
     //
     // MessageId: ERROR_DS_INVALID_ATTRIBUTE_SYNTAX
     //
@@ -13543,6 +15148,7 @@ public interface WinError {
     // The attribute syntax specified to the directory service is invalid.
     //
     int ERROR_DS_INVALID_ATTRIBUTE_SYNTAX = 8203;
+
     //
     // MessageId: ERROR_DS_ATTRIBUTE_TYPE_UNDEFINED
     //
@@ -13551,6 +15157,7 @@ public interface WinError {
     // The attribute type specified to the directory service is not defined.
     //
     int ERROR_DS_ATTRIBUTE_TYPE_UNDEFINED = 8204;
+
     //
     // MessageId: ERROR_DS_ATTRIBUTE_OR_VALUE_EXISTS
     //
@@ -13559,6 +15166,7 @@ public interface WinError {
     // The specified directory service attribute or value already exists.
     //
     int ERROR_DS_ATTRIBUTE_OR_VALUE_EXISTS = 8205;
+
     //
     // MessageId: ERROR_DS_BUSY
     //
@@ -13567,6 +15175,7 @@ public interface WinError {
     // The directory service is busy.
     //
     int ERROR_DS_BUSY = 8206;
+
     //
     // MessageId: ERROR_DS_UNAVAILABLE
     //
@@ -13575,6 +15184,7 @@ public interface WinError {
     // The directory service is unavailable.
     //
     int ERROR_DS_UNAVAILABLE = 8207;
+
     //
     // MessageId: ERROR_DS_NO_RIDS_ALLOCATED
     //
@@ -13583,6 +15193,7 @@ public interface WinError {
     // The directory service was unable to allocate a relative identifier.
     //
     int ERROR_DS_NO_RIDS_ALLOCATED = 8208;
+
     //
     // MessageId: ERROR_DS_NO_MORE_RIDS
     //
@@ -13591,6 +15202,7 @@ public interface WinError {
     // The directory service has exhausted the pool of relative identifiers.
     //
     int ERROR_DS_NO_MORE_RIDS = 8209;
+
     //
     // MessageId: ERROR_DS_INCORRECT_ROLE_OWNER
     //
@@ -13600,6 +15212,7 @@ public interface WinError {
     // service is not the master for that type of operation.
     //
     int ERROR_DS_INCORRECT_ROLE_OWNER = 8210;
+
     //
     // MessageId: ERROR_DS_RIDMGR_INIT_ERROR
     //
@@ -13609,6 +15222,7 @@ public interface WinError {
     // allocates relative identifiers.
     //
     int ERROR_DS_RIDMGR_INIT_ERROR = 8211;
+
     //
     // MessageId: ERROR_DS_OBJ_CLASS_VIOLATION
     //
@@ -13618,6 +15232,7 @@ public interface WinError {
     // associated with the class of the object.
     //
     int ERROR_DS_OBJ_CLASS_VIOLATION = 8212;
+
     //
     // MessageId: ERROR_DS_CANT_ON_NON_LEAF
     //
@@ -13627,6 +15242,7 @@ public interface WinError {
     // object.
     //
     int ERROR_DS_CANT_ON_NON_LEAF = 8213;
+
     //
     // MessageId: ERROR_DS_CANT_ON_RDN
     //
@@ -13636,6 +15252,7 @@ public interface WinError {
     // attribute of an object.
     //
     int ERROR_DS_CANT_ON_RDN = 8214;
+
     //
     // MessageId: ERROR_DS_CANT_MOD_OBJ_CLASS
     //
@@ -13645,6 +15262,7 @@ public interface WinError {
     // an object.
     //
     int ERROR_DS_CANT_MOD_OBJ_CLASS = 8215;
+
     //
     // MessageId: ERROR_DS_CROSS_DOM_MOVE_ERROR
     //
@@ -13653,6 +15271,7 @@ public interface WinError {
     // The requested cross-domain move operation could not be performed.
     //
     int ERROR_DS_CROSS_DOM_MOVE_ERROR = 8216;
+
     //
     // MessageId: ERROR_DS_GC_NOT_AVAILABLE
     //
@@ -13661,6 +15280,7 @@ public interface WinError {
     // Unable to contact the global catalog server.
     //
     int ERROR_DS_GC_NOT_AVAILABLE = 8217;
+
     //
     // MessageId: ERROR_SHARED_POLICY
     //
@@ -13669,6 +15289,7 @@ public interface WinError {
     // The policy object is shared and can only be modified at the root.
     //
     int ERROR_SHARED_POLICY = 8218;
+
     //
     // MessageId: ERROR_POLICY_OBJECT_NOT_FOUND
     //
@@ -13677,6 +15298,7 @@ public interface WinError {
     // The policy object does not exist.
     //
     int ERROR_POLICY_OBJECT_NOT_FOUND = 8219;
+
     //
     // MessageId: ERROR_POLICY_ONLY_IN_DS
     //
@@ -13685,6 +15307,7 @@ public interface WinError {
     // The requested policy information is only in the directory service.
     //
     int ERROR_POLICY_ONLY_IN_DS = 8220;
+
     //
     // MessageId: ERROR_PROMOTION_ACTIVE
     //
@@ -13693,6 +15316,7 @@ public interface WinError {
     // A domain controller promotion is currently active.
     //
     int ERROR_PROMOTION_ACTIVE = 8221;
+
     //
     // MessageId: ERROR_NO_PROMOTION_ACTIVE
     //
@@ -13701,6 +15325,7 @@ public interface WinError {
     // A domain controller promotion is not currently active
     //
     int ERROR_NO_PROMOTION_ACTIVE = 8222;
+
     // =8223 unused
     //
     // MessageId: ERROR_DS_OPERATIONS_ERROR
@@ -13710,6 +15335,7 @@ public interface WinError {
     // An operations error occurred.
     //
     int ERROR_DS_OPERATIONS_ERROR = 8224;
+
     //
     // MessageId: ERROR_DS_PROTOCOL_ERROR
     //
@@ -13718,6 +15344,7 @@ public interface WinError {
     // A protocol error occurred.
     //
     int ERROR_DS_PROTOCOL_ERROR = 8225;
+
     //
     // MessageId: ERROR_DS_TIMELIMIT_EXCEEDED
     //
@@ -13726,6 +15353,7 @@ public interface WinError {
     // The time limit for this request was exceeded.
     //
     int ERROR_DS_TIMELIMIT_EXCEEDED = 8226;
+
     //
     // MessageId: ERROR_DS_SIZELIMIT_EXCEEDED
     //
@@ -13734,6 +15362,7 @@ public interface WinError {
     // The size limit for this request was exceeded.
     //
     int ERROR_DS_SIZELIMIT_EXCEEDED = 8227;
+
     //
     // MessageId: ERROR_DS_ADMIN_LIMIT_EXCEEDED
     //
@@ -13742,6 +15371,7 @@ public interface WinError {
     // The administrative limit for this request was exceeded.
     //
     int ERROR_DS_ADMIN_LIMIT_EXCEEDED = 8228;
+
     //
     // MessageId: ERROR_DS_COMPARE_FALSE
     //
@@ -13750,6 +15380,7 @@ public interface WinError {
     // The compare response was false.
     //
     int ERROR_DS_COMPARE_FALSE = 8229;
+
     //
     // MessageId: ERROR_DS_COMPARE_TRUE
     //
@@ -13758,6 +15389,7 @@ public interface WinError {
     // The compare response was true.
     //
     int ERROR_DS_COMPARE_TRUE = 8230;
+
     //
     // MessageId: ERROR_DS_AUTH_METHOD_NOT_SUPPORTED
     //
@@ -13766,6 +15398,7 @@ public interface WinError {
     // The requested authentication method is not supported by the server.
     //
     int ERROR_DS_AUTH_METHOD_NOT_SUPPORTED = 8231;
+
     //
     // MessageId: ERROR_DS_STRONG_AUTH_REQUIRED
     //
@@ -13774,6 +15407,7 @@ public interface WinError {
     // A more secure authentication method is required for this server.
     //
     int ERROR_DS_STRONG_AUTH_REQUIRED = 8232;
+
     //
     // MessageId: ERROR_DS_INAPPROPRIATE_AUTH
     //
@@ -13782,6 +15416,7 @@ public interface WinError {
     // Inappropriate authentication.
     //
     int ERROR_DS_INAPPROPRIATE_AUTH = 8233;
+
     //
     // MessageId: ERROR_DS_AUTH_UNKNOWN
     //
@@ -13790,6 +15425,7 @@ public interface WinError {
     // The authentication mechanism is unknown.
     //
     int ERROR_DS_AUTH_UNKNOWN = 8234;
+
     //
     // MessageId: ERROR_DS_REFERRAL
     //
@@ -13798,6 +15434,7 @@ public interface WinError {
     // A referral was returned from the server.
     //
     int ERROR_DS_REFERRAL = 8235;
+
     //
     // MessageId: ERROR_DS_UNAVAILABLE_CRIT_EXTENSION
     //
@@ -13806,6 +15443,7 @@ public interface WinError {
     // The server does not support the requested critical extension.
     //
     int ERROR_DS_UNAVAILABLE_CRIT_EXTENSION = 8236;
+
     //
     // MessageId: ERROR_DS_CONFIDENTIALITY_REQUIRED
     //
@@ -13814,6 +15452,7 @@ public interface WinError {
     // This request requires a secure connection.
     //
     int ERROR_DS_CONFIDENTIALITY_REQUIRED = 8237;
+
     //
     // MessageId: ERROR_DS_INAPPROPRIATE_MATCHING
     //
@@ -13822,6 +15461,7 @@ public interface WinError {
     // Inappropriate matching.
     //
     int ERROR_DS_INAPPROPRIATE_MATCHING = 8238;
+
     //
     // MessageId: ERROR_DS_CONSTRAINT_VIOLATION
     //
@@ -13830,6 +15470,7 @@ public interface WinError {
     // A constraint violation occurred.
     //
     int ERROR_DS_CONSTRAINT_VIOLATION = 8239;
+
     //
     // MessageId: ERROR_DS_NO_SUCH_OBJECT
     //
@@ -13838,6 +15479,7 @@ public interface WinError {
     // There is no such object on the server.
     //
     int ERROR_DS_NO_SUCH_OBJECT = 8240;
+
     //
     // MessageId: ERROR_DS_ALIAS_PROBLEM
     //
@@ -13846,6 +15488,7 @@ public interface WinError {
     // There is an alias problem.
     //
     int ERROR_DS_ALIAS_PROBLEM = 8241;
+
     //
     // MessageId: ERROR_DS_INVALID_DN_SYNTAX
     //
@@ -13854,6 +15497,7 @@ public interface WinError {
     // An invalid dn syntax has been specified.
     //
     int ERROR_DS_INVALID_DN_SYNTAX = 8242;
+
     //
     // MessageId: ERROR_DS_IS_LEAF
     //
@@ -13862,6 +15506,7 @@ public interface WinError {
     // The object is a leaf object.
     //
     int ERROR_DS_IS_LEAF = 8243;
+
     //
     // MessageId: ERROR_DS_ALIAS_DEREF_PROBLEM
     //
@@ -13870,6 +15515,7 @@ public interface WinError {
     // There is an alias dereferencing problem.
     //
     int ERROR_DS_ALIAS_DEREF_PROBLEM = 8244;
+
     //
     // MessageId: ERROR_DS_UNWILLING_TO_PERFORM
     //
@@ -13878,6 +15524,7 @@ public interface WinError {
     // The server is unwilling to process the request.
     //
     int ERROR_DS_UNWILLING_TO_PERFORM = 8245;
+
     //
     // MessageId: ERROR_DS_LOOP_DETECT
     //
@@ -13886,6 +15533,7 @@ public interface WinError {
     // A loop has been detected.
     //
     int ERROR_DS_LOOP_DETECT = 8246;
+
     //
     // MessageId: ERROR_DS_NAMING_VIOLATION
     //
@@ -13894,6 +15542,7 @@ public interface WinError {
     // There is a naming violation.
     //
     int ERROR_DS_NAMING_VIOLATION = 8247;
+
     //
     // MessageId: ERROR_DS_OBJECT_RESULTS_TOO_LARGE
     //
@@ -13902,6 +15551,7 @@ public interface WinError {
     // The result set is too large.
     //
     int ERROR_DS_OBJECT_RESULTS_TOO_LARGE = 8248;
+
     //
     // MessageId: ERROR_DS_AFFECTS_MULTIPLE_DSAS
     //
@@ -13910,6 +15560,7 @@ public interface WinError {
     // The operation affects multiple DSAs
     //
     int ERROR_DS_AFFECTS_MULTIPLE_DSAS = 8249;
+
     //
     // MessageId: ERROR_DS_SERVER_DOWN
     //
@@ -13918,6 +15569,7 @@ public interface WinError {
     // The server is not operational.
     //
     int ERROR_DS_SERVER_DOWN = 8250;
+
     //
     // MessageId: ERROR_DS_LOCAL_ERROR
     //
@@ -13926,6 +15578,7 @@ public interface WinError {
     // A local error has occurred.
     //
     int ERROR_DS_LOCAL_ERROR = 8251;
+
     //
     // MessageId: ERROR_DS_ENCODING_ERROR
     //
@@ -13934,6 +15587,7 @@ public interface WinError {
     // An encoding error has occurred.
     //
     int ERROR_DS_ENCODING_ERROR = 8252;
+
     //
     // MessageId: ERROR_DS_DECODING_ERROR
     //
@@ -13942,6 +15596,7 @@ public interface WinError {
     // A decoding error has occurred.
     //
     int ERROR_DS_DECODING_ERROR = 8253;
+
     //
     // MessageId: ERROR_DS_FILTER_UNKNOWN
     //
@@ -13950,6 +15605,7 @@ public interface WinError {
     // The search filter cannot be recognized.
     //
     int ERROR_DS_FILTER_UNKNOWN = 8254;
+
     //
     // MessageId: ERROR_DS_PARAM_ERROR
     //
@@ -13958,6 +15614,7 @@ public interface WinError {
     // One or more parameters are illegal.
     //
     int ERROR_DS_PARAM_ERROR = 8255;
+
     //
     // MessageId: ERROR_DS_NOT_SUPPORTED
     //
@@ -13966,6 +15623,7 @@ public interface WinError {
     // The specified method is not supported.
     //
     int ERROR_DS_NOT_SUPPORTED = 8256;
+
     //
     // MessageId: ERROR_DS_NO_RESULTS_RETURNED
     //
@@ -13974,6 +15632,7 @@ public interface WinError {
     // No results were returned.
     //
     int ERROR_DS_NO_RESULTS_RETURNED = 8257;
+
     //
     // MessageId: ERROR_DS_CONTROL_NOT_FOUND
     //
@@ -13982,6 +15641,7 @@ public interface WinError {
     // The specified control is not supported by the server.
     //
     int ERROR_DS_CONTROL_NOT_FOUND = 8258;
+
     //
     // MessageId: ERROR_DS_CLIENT_LOOP
     //
@@ -13990,6 +15650,7 @@ public interface WinError {
     // A referral loop was detected by the client.
     //
     int ERROR_DS_CLIENT_LOOP = 8259;
+
     //
     // MessageId: ERROR_DS_REFERRAL_LIMIT_EXCEEDED
     //
@@ -13998,6 +15659,7 @@ public interface WinError {
     // The preset referral limit was exceeded.
     //
     int ERROR_DS_REFERRAL_LIMIT_EXCEEDED = 8260;
+
     //
     // MessageId: ERROR_DS_SORT_CONTROL_MISSING
     //
@@ -14006,6 +15668,7 @@ public interface WinError {
     // The search requires a SORT control.
     //
     int ERROR_DS_SORT_CONTROL_MISSING = 8261;
+
     //
     // MessageId: ERROR_DS_OFFSET_RANGE_ERROR
     //
@@ -14014,6 +15677,7 @@ public interface WinError {
     // The search results exceed the offset range specified.
     //
     int ERROR_DS_OFFSET_RANGE_ERROR = 8262;
+
     //
     // MessageId: ERROR_DS_ROOT_MUST_BE_NC
     //
@@ -14023,6 +15687,7 @@ public interface WinError {
     // cannot have an instantiated parent.
     //
     int ERROR_DS_ROOT_MUST_BE_NC = 8301;
+
     //
     // MessageId: ERROR_DS_ADD_REPLICA_INHIBITED
     //
@@ -14032,6 +15697,7 @@ public interface WinError {
     // writeable in order to create the replica.
     //
     int ERROR_DS_ADD_REPLICA_INHIBITED = 8302;
+
     //
     // MessageId: ERROR_DS_ATT_NOT_DEF_IN_SCHEMA
     //
@@ -14040,6 +15706,7 @@ public interface WinError {
     // A reference to an attribute that is not defined in the schema occurred.
     //
     int ERROR_DS_ATT_NOT_DEF_IN_SCHEMA = 8303;
+
     //
     // MessageId: ERROR_DS_MAX_OBJ_SIZE_EXCEEDED
     //
@@ -14048,6 +15715,7 @@ public interface WinError {
     // The maximum size of an object has been exceeded.
     //
     int ERROR_DS_MAX_OBJ_SIZE_EXCEEDED = 8304;
+
     //
     // MessageId: ERROR_DS_OBJ_STRING_NAME_EXISTS
     //
@@ -14057,6 +15725,7 @@ public interface WinError {
     // already in use.
     //
     int ERROR_DS_OBJ_STRING_NAME_EXISTS = 8305;
+
     //
     // MessageId: ERROR_DS_NO_RDN_DEFINED_IN_SCHEMA
     //
@@ -14066,6 +15735,7 @@ public interface WinError {
     // defined in the schema.
     //
     int ERROR_DS_NO_RDN_DEFINED_IN_SCHEMA = 8306;
+
     //
     // MessageId: ERROR_DS_RDN_DOESNT_MATCH_SCHEMA
     //
@@ -14075,6 +15745,7 @@ public interface WinError {
     // defined in the schema.
     //
     int ERROR_DS_RDN_DOESNT_MATCH_SCHEMA = 8307;
+
     //
     // MessageId: ERROR_DS_NO_REQUESTED_ATTS_FOUND
     //
@@ -14083,6 +15754,7 @@ public interface WinError {
     // None of the requested attributes were found on the objects.
     //
     int ERROR_DS_NO_REQUESTED_ATTS_FOUND = 8308;
+
     //
     // MessageId: ERROR_DS_USER_BUFFER_TO_SMALL
     //
@@ -14091,6 +15763,7 @@ public interface WinError {
     // The user buffer is too small.
     //
     int ERROR_DS_USER_BUFFER_TO_SMALL = 8309;
+
     //
     // MessageId: ERROR_DS_ATT_IS_NOT_ON_OBJ
     //
@@ -14099,6 +15772,7 @@ public interface WinError {
     // The attribute specified in the operation is not present on the object.
     //
     int ERROR_DS_ATT_IS_NOT_ON_OBJ = 8310;
+
     //
     // MessageId: ERROR_DS_ILLEGAL_MOD_OPERATION
     //
@@ -14108,6 +15782,7 @@ public interface WinError {
     // permitted.
     //
     int ERROR_DS_ILLEGAL_MOD_OPERATION = 8311;
+
     //
     // MessageId: ERROR_DS_OBJ_TOO_LARGE
     //
@@ -14116,6 +15791,7 @@ public interface WinError {
     // The specified object is too large.
     //
     int ERROR_DS_OBJ_TOO_LARGE = 8312;
+
     //
     // MessageId: ERROR_DS_BAD_INSTANCE_TYPE
     //
@@ -14124,6 +15800,7 @@ public interface WinError {
     // The specified instance type is not valid.
     //
     int ERROR_DS_BAD_INSTANCE_TYPE = 8313;
+
     //
     // MessageId: ERROR_DS_MASTERDSA_REQUIRED
     //
@@ -14132,6 +15809,7 @@ public interface WinError {
     // The operation must be performed at a master DSA.
     //
     int ERROR_DS_MASTERDSA_REQUIRED = 8314;
+
     //
     // MessageId: ERROR_DS_OBJECT_CLASS_REQUIRED
     //
@@ -14140,6 +15818,7 @@ public interface WinError {
     // The object class attribute must be specified.
     //
     int ERROR_DS_OBJECT_CLASS_REQUIRED = 8315;
+
     //
     // MessageId: ERROR_DS_MISSING_REQUIRED_ATT
     //
@@ -14148,6 +15827,7 @@ public interface WinError {
     // A required attribute is missing.
     //
     int ERROR_DS_MISSING_REQUIRED_ATT = 8316;
+
     //
     // MessageId: ERROR_DS_ATT_NOT_DEF_FOR_CLASS
     //
@@ -14157,6 +15837,7 @@ public interface WinError {
     // not legal for its class.
     //
     int ERROR_DS_ATT_NOT_DEF_FOR_CLASS = 8317;
+
     //
     // MessageId: ERROR_DS_ATT_ALREADY_EXISTS
     //
@@ -14165,6 +15846,7 @@ public interface WinError {
     // The specified attribute is already present on the object.
     //
     int ERROR_DS_ATT_ALREADY_EXISTS = 8318;
+
     // =8319 unused
     //
     // MessageId: ERROR_DS_CANT_ADD_ATT_VALUES
@@ -14174,6 +15856,7 @@ public interface WinError {
     // The specified attribute is not present, or has no values.
     //
     int ERROR_DS_CANT_ADD_ATT_VALUES = 8320;
+
     //
     // MessageId: ERROR_DS_SINGLE_VALUE_CONSTRAINT
     //
@@ -14183,6 +15866,7 @@ public interface WinError {
     // value.
     //
     int ERROR_DS_SINGLE_VALUE_CONSTRAINT = 8321;
+
     //
     // MessageId: ERROR_DS_RANGE_CONSTRAINT
     //
@@ -14191,6 +15875,7 @@ public interface WinError {
     // A value for the attribute was not in the acceptable range of values.
     //
     int ERROR_DS_RANGE_CONSTRAINT = 8322;
+
     //
     // MessageId: ERROR_DS_ATT_VAL_ALREADY_EXISTS
     //
@@ -14199,6 +15884,7 @@ public interface WinError {
     // The specified value already exists.
     //
     int ERROR_DS_ATT_VAL_ALREADY_EXISTS = 8323;
+
     //
     // MessageId: ERROR_DS_CANT_REM_MISSING_ATT
     //
@@ -14207,6 +15893,7 @@ public interface WinError {
     // The attribute cannot be removed because it is not present on the object.
     //
     int ERROR_DS_CANT_REM_MISSING_ATT = 8324;
+
     //
     // MessageId: ERROR_DS_CANT_REM_MISSING_ATT_VAL
     //
@@ -14216,6 +15903,7 @@ public interface WinError {
     // object.
     //
     int ERROR_DS_CANT_REM_MISSING_ATT_VAL = 8325;
+
     //
     // MessageId: ERROR_DS_ROOT_CANT_BE_SUBREF
     //
@@ -14224,6 +15912,7 @@ public interface WinError {
     // The specified root object cannot be a subref.
     //
     int ERROR_DS_ROOT_CANT_BE_SUBREF = 8326;
+
     //
     // MessageId: ERROR_DS_NO_CHAINING
     //
@@ -14232,6 +15921,7 @@ public interface WinError {
     // Chaining is not permitted.
     //
     int ERROR_DS_NO_CHAINING = 8327;
+
     //
     // MessageId: ERROR_DS_NO_CHAINED_EVAL
     //
@@ -14240,6 +15930,7 @@ public interface WinError {
     // Chained evaluation is not permitted.
     //
     int ERROR_DS_NO_CHAINED_EVAL = 8328;
+
     //
     // MessageId: ERROR_DS_NO_PARENT_OBJECT
     //
@@ -14249,6 +15940,7 @@ public interface WinError {
     // either uninstantiated or deleted.
     //
     int ERROR_DS_NO_PARENT_OBJECT = 8329;
+
     //
     // MessageId: ERROR_DS_PARENT_IS_AN_ALIAS
     //
@@ -14258,6 +15950,7 @@ public interface WinError {
     // objects.
     //
     int ERROR_DS_PARENT_IS_AN_ALIAS = 8330;
+
     //
     // MessageId: ERROR_DS_CANT_MIX_MASTER_AND_REPS
     //
@@ -14267,6 +15960,7 @@ public interface WinError {
     // both replicas.
     //
     int ERROR_DS_CANT_MIX_MASTER_AND_REPS = 8331;
+
     //
     // MessageId: ERROR_DS_CHILDREN_EXIST
     //
@@ -14276,6 +15970,7 @@ public interface WinError {
     // operation can only be performed on a leaf object.
     //
     int ERROR_DS_CHILDREN_EXIST = 8332;
+
     //
     // MessageId: ERROR_DS_OBJ_NOT_FOUND
     //
@@ -14284,6 +15979,7 @@ public interface WinError {
     // Directory object not found.
     //
     int ERROR_DS_OBJ_NOT_FOUND = 8333;
+
     //
     // MessageId: ERROR_DS_ALIASED_OBJ_MISSING
     //
@@ -14292,6 +15988,7 @@ public interface WinError {
     // The aliased object is missing.
     //
     int ERROR_DS_ALIASED_OBJ_MISSING = 8334;
+
     //
     // MessageId: ERROR_DS_BAD_NAME_SYNTAX
     //
@@ -14300,6 +15997,7 @@ public interface WinError {
     // The object name has bad syntax.
     //
     int ERROR_DS_BAD_NAME_SYNTAX = 8335;
+
     //
     // MessageId: ERROR_DS_ALIAS_POINTS_TO_ALIAS
     //
@@ -14308,6 +16006,7 @@ public interface WinError {
     // It is not permitted for an alias to refer to another alias.
     //
     int ERROR_DS_ALIAS_POINTS_TO_ALIAS = 8336;
+
     //
     // MessageId: ERROR_DS_CANT_DEREF_ALIAS
     //
@@ -14316,6 +16015,7 @@ public interface WinError {
     // The alias cannot be dereferenced.
     //
     int ERROR_DS_CANT_DEREF_ALIAS = 8337;
+
     //
     // MessageId: ERROR_DS_OUT_OF_SCOPE
     //
@@ -14324,6 +16024,7 @@ public interface WinError {
     // The operation is out of scope.
     //
     int ERROR_DS_OUT_OF_SCOPE = 8338;
+
     //
     // MessageId: ERROR_DS_OBJECT_BEING_REMOVED
     //
@@ -14333,6 +16034,7 @@ public interface WinError {
     // being removed.
     //
     int ERROR_DS_OBJECT_BEING_REMOVED = 8339;
+
     //
     // MessageId: ERROR_DS_CANT_DELETE_DSA_OBJ
     //
@@ -14341,6 +16043,7 @@ public interface WinError {
     // The DSA object cannot be deleted.
     //
     int ERROR_DS_CANT_DELETE_DSA_OBJ = 8340;
+
     //
     // MessageId: ERROR_DS_GENERIC_ERROR
     //
@@ -14349,6 +16052,7 @@ public interface WinError {
     // A directory service error has occurred.
     //
     int ERROR_DS_GENERIC_ERROR = 8341;
+
     //
     // MessageId: ERROR_DS_DSA_MUST_BE_INT_MASTER
     //
@@ -14357,6 +16061,7 @@ public interface WinError {
     // The operation can only be performed on an internal master DSA object.
     //
     int ERROR_DS_DSA_MUST_BE_INT_MASTER = 8342;
+
     //
     // MessageId: ERROR_DS_CLASS_NOT_DSA
     //
@@ -14365,6 +16070,7 @@ public interface WinError {
     // The object must be of class DSA.
     //
     int ERROR_DS_CLASS_NOT_DSA = 8343;
+
     //
     // MessageId: ERROR_DS_INSUFF_ACCESS_RIGHTS
     //
@@ -14373,6 +16079,7 @@ public interface WinError {
     // Insufficient access rights to perform the operation.
     //
     int ERROR_DS_INSUFF_ACCESS_RIGHTS = 8344;
+
     //
     // MessageId: ERROR_DS_ILLEGAL_SUPERIOR
     //
@@ -14382,6 +16089,7 @@ public interface WinError {
     // possible superiors.
     //
     int ERROR_DS_ILLEGAL_SUPERIOR = 8345;
+
     //
     // MessageId: ERROR_DS_ATTRIBUTE_OWNED_BY_SAM
     //
@@ -14391,6 +16099,7 @@ public interface WinError {
     // by the Security Accounts Manager (SAM).
     //
     int ERROR_DS_ATTRIBUTE_OWNED_BY_SAM = 8346;
+
     //
     // MessageId: ERROR_DS_NAME_TOO_MANY_PARTS
     //
@@ -14399,6 +16108,7 @@ public interface WinError {
     // The name has too many parts.
     //
     int ERROR_DS_NAME_TOO_MANY_PARTS = 8347;
+
     //
     // MessageId: ERROR_DS_NAME_TOO_LONG
     //
@@ -14407,6 +16117,7 @@ public interface WinError {
     // The name is too long.
     //
     int ERROR_DS_NAME_TOO_LONG = 8348;
+
     //
     // MessageId: ERROR_DS_NAME_VALUE_TOO_LONG
     //
@@ -14415,6 +16126,7 @@ public interface WinError {
     // The name value is too long.
     //
     int ERROR_DS_NAME_VALUE_TOO_LONG = 8349;
+
     //
     // MessageId: ERROR_DS_NAME_UNPARSEABLE
     //
@@ -14423,6 +16135,7 @@ public interface WinError {
     // The directory service encountered an error parsing a name.
     //
     int ERROR_DS_NAME_UNPARSEABLE = 8350;
+
     //
     // MessageId: ERROR_DS_NAME_TYPE_UNKNOWN
     //
@@ -14431,6 +16144,7 @@ public interface WinError {
     // The directory service cannot get the attribute type for a name.
     //
     int ERROR_DS_NAME_TYPE_UNKNOWN = 8351;
+
     //
     // MessageId: ERROR_DS_NOT_AN_OBJECT
     //
@@ -14439,6 +16153,7 @@ public interface WinError {
     // The name does not identify an object; the name identifies a phantom.
     //
     int ERROR_DS_NOT_AN_OBJECT = 8352;
+
     //
     // MessageId: ERROR_DS_SEC_DESC_TOO_SHORT
     //
@@ -14447,6 +16162,7 @@ public interface WinError {
     // The security descriptor is too short.
     //
     int ERROR_DS_SEC_DESC_TOO_SHORT = 8353;
+
     //
     // MessageId: ERROR_DS_SEC_DESC_INVALID
     //
@@ -14455,6 +16171,7 @@ public interface WinError {
     // The security descriptor is invalid.
     //
     int ERROR_DS_SEC_DESC_INVALID = 8354;
+
     //
     // MessageId: ERROR_DS_NO_DELETED_NAME
     //
@@ -14463,6 +16180,7 @@ public interface WinError {
     // Failed to create name for deleted object.
     //
     int ERROR_DS_NO_DELETED_NAME = 8355;
+
     //
     // MessageId: ERROR_DS_SUBREF_MUST_HAVE_PARENT
     //
@@ -14471,6 +16189,7 @@ public interface WinError {
     // The parent of a new subref must exist.
     //
     int ERROR_DS_SUBREF_MUST_HAVE_PARENT = 8356;
+
     //
     // MessageId: ERROR_DS_NCNAME_MUST_BE_NC
     //
@@ -14479,6 +16198,7 @@ public interface WinError {
     // The object must be a naming context.
     //
     int ERROR_DS_NCNAME_MUST_BE_NC = 8357;
+
     //
     // MessageId: ERROR_DS_CANT_ADD_SYSTEM_ONLY
     //
@@ -14487,6 +16207,7 @@ public interface WinError {
     // It is not permitted to add an attribute which is owned by the system.
     //
     int ERROR_DS_CANT_ADD_SYSTEM_ONLY = 8358;
+
     //
     // MessageId: ERROR_DS_CLASS_MUST_BE_CONCRETE
     //
@@ -14496,6 +16217,7 @@ public interface WinError {
     // abstract class.
     //
     int ERROR_DS_CLASS_MUST_BE_CONCRETE = 8359;
+
     //
     // MessageId: ERROR_DS_INVALID_DMD
     //
@@ -14504,6 +16226,7 @@ public interface WinError {
     // The schema object could not be found.
     //
     int ERROR_DS_INVALID_DMD = 8360;
+
     //
     // MessageId: ERROR_DS_OBJ_GUID_EXISTS
     //
@@ -14512,6 +16235,7 @@ public interface WinError {
     // A local object with this GUID (dead or alive) already exists.
     //
     int ERROR_DS_OBJ_GUID_EXISTS = 8361;
+
     //
     // MessageId: ERROR_DS_NOT_ON_BACKLINK
     //
@@ -14520,6 +16244,7 @@ public interface WinError {
     // The operation cannot be performed on a back link.
     //
     int ERROR_DS_NOT_ON_BACKLINK = 8362;
+
     //
     // MessageId: ERROR_DS_NO_CROSSREF_FOR_NC
     //
@@ -14528,6 +16253,7 @@ public interface WinError {
     // The cross reference for the specified naming context could not be found.
     //
     int ERROR_DS_NO_CROSSREF_FOR_NC = 8363;
+
     //
     // MessageId: ERROR_DS_SHUTTING_DOWN
     //
@@ -14537,6 +16263,7 @@ public interface WinError {
     // shutting down.
     //
     int ERROR_DS_SHUTTING_DOWN = 8364;
+
     //
     // MessageId: ERROR_DS_UNKNOWN_OPERATION
     //
@@ -14545,6 +16272,7 @@ public interface WinError {
     // The directory service request is invalid.
     //
     int ERROR_DS_UNKNOWN_OPERATION = 8365;
+
     //
     // MessageId: ERROR_DS_INVALID_ROLE_OWNER
     //
@@ -14553,6 +16281,7 @@ public interface WinError {
     // The role owner attribute could not be read.
     //
     int ERROR_DS_INVALID_ROLE_OWNER = 8366;
+
     //
     // MessageId: ERROR_DS_COULDNT_CONTACT_FSMO
     //
@@ -14562,6 +16291,7 @@ public interface WinError {
     // contacted.
     //
     int ERROR_DS_COULDNT_CONTACT_FSMO = 8367;
+
     //
     // MessageId: ERROR_DS_CROSS_NC_DN_RENAME
     //
@@ -14570,6 +16300,7 @@ public interface WinError {
     // Modification of a DN across a naming context is not permitted.
     //
     int ERROR_DS_CROSS_NC_DN_RENAME = 8368;
+
     //
     // MessageId: ERROR_DS_CANT_MOD_SYSTEM_ONLY
     //
@@ -14578,6 +16309,7 @@ public interface WinError {
     // The attribute cannot be modified because it is owned by the system.
     //
     int ERROR_DS_CANT_MOD_SYSTEM_ONLY = 8369;
+
     //
     // MessageId: ERROR_DS_REPLICATOR_ONLY
     //
@@ -14586,6 +16318,7 @@ public interface WinError {
     // Only the replicator can perform this function.
     //
     int ERROR_DS_REPLICATOR_ONLY = 8370;
+
     //
     // MessageId: ERROR_DS_OBJ_CLASS_NOT_DEFINED
     //
@@ -14594,6 +16327,7 @@ public interface WinError {
     // The specified class is not defined.
     //
     int ERROR_DS_OBJ_CLASS_NOT_DEFINED = 8371;
+
     //
     // MessageId: ERROR_DS_OBJ_CLASS_NOT_SUBCLASS
     //
@@ -14602,6 +16336,7 @@ public interface WinError {
     // The specified class is not a subclass.
     //
     int ERROR_DS_OBJ_CLASS_NOT_SUBCLASS = 8372;
+
     //
     // MessageId: ERROR_DS_NAME_REFERENCE_INVALID
     //
@@ -14610,6 +16345,7 @@ public interface WinError {
     // The name reference is invalid.
     //
     int ERROR_DS_NAME_REFERENCE_INVALID = 8373;
+
     //
     // MessageId: ERROR_DS_CROSS_REF_EXISTS
     //
@@ -14618,6 +16354,7 @@ public interface WinError {
     // A cross reference already exists.
     //
     int ERROR_DS_CROSS_REF_EXISTS = 8374;
+
     //
     // MessageId: ERROR_DS_CANT_DEL_MASTER_CROSSREF
     //
@@ -14626,6 +16363,7 @@ public interface WinError {
     // It is not permitted to delete a master cross reference.
     //
     int ERROR_DS_CANT_DEL_MASTER_CROSSREF = 8375;
+
     //
     // MessageId: ERROR_DS_SUBTREE_NOTIFY_NOT_NC_HEAD
     //
@@ -14634,6 +16372,7 @@ public interface WinError {
     // Subtree notifications are only supported on NC heads.
     //
     int ERROR_DS_SUBTREE_NOTIFY_NOT_NC_HEAD = 8376;
+
     //
     // MessageId: ERROR_DS_NOTIFY_FILTER_TOO_COMPLEX
     //
@@ -14642,6 +16381,7 @@ public interface WinError {
     // Notification filter is too complex.
     //
     int ERROR_DS_NOTIFY_FILTER_TOO_COMPLEX = 8377;
+
     //
     // MessageId: ERROR_DS_DUP_RDN
     //
@@ -14650,6 +16390,7 @@ public interface WinError {
     // Schema update failed: duplicate RDN.
     //
     int ERROR_DS_DUP_RDN = 8378;
+
     //
     // MessageId: ERROR_DS_DUP_OID
     //
@@ -14658,6 +16399,7 @@ public interface WinError {
     // Schema update failed: duplicate OID.
     //
     int ERROR_DS_DUP_OID = 8379;
+
     //
     // MessageId: ERROR_DS_DUP_MAPI_ID
     //
@@ -14666,6 +16408,7 @@ public interface WinError {
     // Schema update failed: duplicate MAPI identifier.
     //
     int ERROR_DS_DUP_MAPI_ID = 8380;
+
     //
     // MessageId: ERROR_DS_DUP_SCHEMA_ID_GUID
     //
@@ -14674,6 +16417,7 @@ public interface WinError {
     // Schema update failed: duplicate schema-id GUID.
     //
     int ERROR_DS_DUP_SCHEMA_ID_GUID = 8381;
+
     //
     // MessageId: ERROR_DS_DUP_LDAP_DISPLAY_NAME
     //
@@ -14682,6 +16426,7 @@ public interface WinError {
     // Schema update failed: duplicate LDAP display name.
     //
     int ERROR_DS_DUP_LDAP_DISPLAY_NAME = 8382;
+
     //
     // MessageId: ERROR_DS_SEMANTIC_ATT_TEST
     //
@@ -14690,6 +16435,7 @@ public interface WinError {
     // Schema update failed: range-lower less than range upper.
     //
     int ERROR_DS_SEMANTIC_ATT_TEST = 8383;
+
     //
     // MessageId: ERROR_DS_SYNTAX_MISMATCH
     //
@@ -14698,6 +16444,7 @@ public interface WinError {
     // Schema update failed: syntax mismatch.
     //
     int ERROR_DS_SYNTAX_MISMATCH = 8384;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_MUST_HAVE
     //
@@ -14706,6 +16453,7 @@ public interface WinError {
     // Schema deletion failed: attribute is used in must-contain.
     //
     int ERROR_DS_EXISTS_IN_MUST_HAVE = 8385;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_MAY_HAVE
     //
@@ -14714,6 +16462,7 @@ public interface WinError {
     // Schema deletion failed: attribute is used in may-contain.
     //
     int ERROR_DS_EXISTS_IN_MAY_HAVE = 8386;
+
     //
     // MessageId: ERROR_DS_NONEXISTENT_MAY_HAVE
     //
@@ -14722,6 +16471,7 @@ public interface WinError {
     // Schema update failed: attribute in may-contain does not exist.
     //
     int ERROR_DS_NONEXISTENT_MAY_HAVE = 8387;
+
     //
     // MessageId: ERROR_DS_NONEXISTENT_MUST_HAVE
     //
@@ -14730,6 +16480,7 @@ public interface WinError {
     // Schema update failed: attribute in must-contain does not exist.
     //
     int ERROR_DS_NONEXISTENT_MUST_HAVE = 8388;
+
     //
     // MessageId: ERROR_DS_AUX_CLS_TEST_FAIL
     //
@@ -14739,6 +16490,7 @@ public interface WinError {
     // auxiliary class.
     //
     int ERROR_DS_AUX_CLS_TEST_FAIL = 8389;
+
     //
     // MessageId: ERROR_DS_NONEXISTENT_POSS_SUP
     //
@@ -14747,6 +16499,7 @@ public interface WinError {
     // Schema update failed: class in poss-superiors does not exist.
     //
     int ERROR_DS_NONEXISTENT_POSS_SUP = 8390;
+
     //
     // MessageId: ERROR_DS_SUB_CLS_TEST_FAIL
     //
@@ -14756,6 +16509,7 @@ public interface WinError {
     // satisfy hierarchy rules.
     //
     int ERROR_DS_SUB_CLS_TEST_FAIL = 8391;
+
     //
     // MessageId: ERROR_DS_BAD_RDN_ATT_ID_SYNTAX
     //
@@ -14764,6 +16518,7 @@ public interface WinError {
     // Schema update failed: Rdn-Att-Id has wrong syntax.
     //
     int ERROR_DS_BAD_RDN_ATT_ID_SYNTAX = 8392;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_AUX_CLS
     //
@@ -14772,6 +16527,7 @@ public interface WinError {
     // Schema deletion failed: class is used as auxiliary class.
     //
     int ERROR_DS_EXISTS_IN_AUX_CLS = 8393;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_SUB_CLS
     //
@@ -14780,6 +16536,7 @@ public interface WinError {
     // Schema deletion failed: class is used as sub class.
     //
     int ERROR_DS_EXISTS_IN_SUB_CLS = 8394;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_POSS_SUP
     //
@@ -14788,6 +16545,7 @@ public interface WinError {
     // Schema deletion failed: class is used as poss superior.
     //
     int ERROR_DS_EXISTS_IN_POSS_SUP = 8395;
+
     //
     // MessageId: ERROR_DS_RECALCSCHEMA_FAILED
     //
@@ -14796,6 +16554,7 @@ public interface WinError {
     // Schema update failed in recalculating validation cache.
     //
     int ERROR_DS_RECALCSCHEMA_FAILED = 8396;
+
     //
     // MessageId: ERROR_DS_TREE_DELETE_NOT_FINISHED
     //
@@ -14805,6 +16564,7 @@ public interface WinError {
     // continue deleting the tree.
     //
     int ERROR_DS_TREE_DELETE_NOT_FINISHED = 8397;
+
     //
     // MessageId: ERROR_DS_CANT_DELETE
     //
@@ -14813,6 +16573,7 @@ public interface WinError {
     // The requested delete operation could not be performed.
     //
     int ERROR_DS_CANT_DELETE = 8398;
+
     //
     // MessageId: ERROR_DS_ATT_SCHEMA_REQ_ID
     //
@@ -14821,6 +16582,7 @@ public interface WinError {
     // Cannot read the governs class identifier for the schema record.
     //
     int ERROR_DS_ATT_SCHEMA_REQ_ID = 8399;
+
     //
     // MessageId: ERROR_DS_BAD_ATT_SCHEMA_SYNTAX
     //
@@ -14829,6 +16591,7 @@ public interface WinError {
     // The attribute schema has bad syntax.
     //
     int ERROR_DS_BAD_ATT_SCHEMA_SYNTAX = 8400;
+
     //
     // MessageId: ERROR_DS_CANT_CACHE_ATT
     //
@@ -14837,6 +16600,7 @@ public interface WinError {
     // The attribute could not be cached.
     //
     int ERROR_DS_CANT_CACHE_ATT = 8401;
+
     //
     // MessageId: ERROR_DS_CANT_CACHE_CLASS
     //
@@ -14845,6 +16609,7 @@ public interface WinError {
     // The class could not be cached.
     //
     int ERROR_DS_CANT_CACHE_CLASS = 8402;
+
     //
     // MessageId: ERROR_DS_CANT_REMOVE_ATT_CACHE
     //
@@ -14853,6 +16618,7 @@ public interface WinError {
     // The attribute could not be removed from the cache.
     //
     int ERROR_DS_CANT_REMOVE_ATT_CACHE = 8403;
+
     //
     // MessageId: ERROR_DS_CANT_REMOVE_CLASS_CACHE
     //
@@ -14861,6 +16627,7 @@ public interface WinError {
     // The class could not be removed from the cache.
     //
     int ERROR_DS_CANT_REMOVE_CLASS_CACHE = 8404;
+
     //
     // MessageId: ERROR_DS_CANT_RETRIEVE_DN
     //
@@ -14869,6 +16636,7 @@ public interface WinError {
     // The distinguished name attribute could not be read.
     //
     int ERROR_DS_CANT_RETRIEVE_DN = 8405;
+
     //
     // MessageId: ERROR_DS_MISSING_SUPREF
     //
@@ -14879,6 +16647,7 @@ public interface WinError {
     // outside this forest.
     //
     int ERROR_DS_MISSING_SUPREF = 8406;
+
     //
     // MessageId: ERROR_DS_CANT_RETRIEVE_INSTANCE
     //
@@ -14887,6 +16656,7 @@ public interface WinError {
     // The instance type attribute could not be retrieved.
     //
     int ERROR_DS_CANT_RETRIEVE_INSTANCE = 8407;
+
     //
     // MessageId: ERROR_DS_CODE_INCONSISTENCY
     //
@@ -14895,6 +16665,7 @@ public interface WinError {
     // An internal error has occurred.
     //
     int ERROR_DS_CODE_INCONSISTENCY = 8408;
+
     //
     // MessageId: ERROR_DS_DATABASE_ERROR
     //
@@ -14903,6 +16674,7 @@ public interface WinError {
     // A database error has occurred.
     //
     int ERROR_DS_DATABASE_ERROR = 8409;
+
     //
     // MessageId: ERROR_DS_GOVERNSID_MISSING
     //
@@ -14911,6 +16683,7 @@ public interface WinError {
     // The attribute GOVERNSID is missing.
     //
     int ERROR_DS_GOVERNSID_MISSING = 8410;
+
     //
     // MessageId: ERROR_DS_MISSING_EXPECTED_ATT
     //
@@ -14919,6 +16692,7 @@ public interface WinError {
     // An expected attribute is missing.
     //
     int ERROR_DS_MISSING_EXPECTED_ATT = 8411;
+
     //
     // MessageId: ERROR_DS_NCNAME_MISSING_CR_REF
     //
@@ -14927,6 +16701,7 @@ public interface WinError {
     // The specified naming context is missing a cross reference.
     //
     int ERROR_DS_NCNAME_MISSING_CR_REF = 8412;
+
     //
     // MessageId: ERROR_DS_SECURITY_CHECKING_ERROR
     //
@@ -14935,6 +16710,7 @@ public interface WinError {
     // A security checking error has occurred.
     //
     int ERROR_DS_SECURITY_CHECKING_ERROR = 8413;
+
     //
     // MessageId: ERROR_DS_SCHEMA_NOT_LOADED
     //
@@ -14943,6 +16719,7 @@ public interface WinError {
     // The schema is not loaded.
     //
     int ERROR_DS_SCHEMA_NOT_LOADED = 8414;
+
     //
     // MessageId: ERROR_DS_SCHEMA_ALLOC_FAILED
     //
@@ -14952,6 +16729,7 @@ public interface WinError {
     // memory.
     //
     int ERROR_DS_SCHEMA_ALLOC_FAILED = 8415;
+
     //
     // MessageId: ERROR_DS_ATT_SCHEMA_REQ_SYNTAX
     //
@@ -14960,6 +16738,7 @@ public interface WinError {
     // Failed to obtain the required syntax for the attribute schema.
     //
     int ERROR_DS_ATT_SCHEMA_REQ_SYNTAX = 8416;
+
     //
     // MessageId: ERROR_DS_GCVERIFY_ERROR
     //
@@ -14970,6 +16749,7 @@ public interface WinError {
     // is currently not available.
     //
     int ERROR_DS_GCVERIFY_ERROR = 8417;
+
     //
     // MessageId: ERROR_DS_DRA_SCHEMA_MISMATCH
     //
@@ -14979,6 +16759,7 @@ public interface WinError {
     // servers involved.
     //
     int ERROR_DS_DRA_SCHEMA_MISMATCH = 8418;
+
     //
     // MessageId: ERROR_DS_CANT_FIND_DSA_OBJ
     //
@@ -14987,6 +16768,7 @@ public interface WinError {
     // The DSA object could not be found.
     //
     int ERROR_DS_CANT_FIND_DSA_OBJ = 8419;
+
     //
     // MessageId: ERROR_DS_CANT_FIND_EXPECTED_NC
     //
@@ -14995,6 +16777,7 @@ public interface WinError {
     // The naming context could not be found.
     //
     int ERROR_DS_CANT_FIND_EXPECTED_NC = 8420;
+
     //
     // MessageId: ERROR_DS_CANT_FIND_NC_IN_CACHE
     //
@@ -15003,6 +16786,7 @@ public interface WinError {
     // The naming context could not be found in the cache.
     //
     int ERROR_DS_CANT_FIND_NC_IN_CACHE = 8421;
+
     //
     // MessageId: ERROR_DS_CANT_RETRIEVE_CHILD
     //
@@ -15011,6 +16795,7 @@ public interface WinError {
     // The child object could not be retrieved.
     //
     int ERROR_DS_CANT_RETRIEVE_CHILD = 8422;
+
     //
     // MessageId: ERROR_DS_SECURITY_ILLEGAL_MODIFY
     //
@@ -15019,6 +16804,7 @@ public interface WinError {
     // The modification was not permitted for security reasons.
     //
     int ERROR_DS_SECURITY_ILLEGAL_MODIFY = 8423;
+
     //
     // MessageId: ERROR_DS_CANT_REPLACE_HIDDEN_REC
     //
@@ -15027,6 +16813,7 @@ public interface WinError {
     // The operation cannot replace the hidden record.
     //
     int ERROR_DS_CANT_REPLACE_HIDDEN_REC = 8424;
+
     //
     // MessageId: ERROR_DS_BAD_HIERARCHY_FILE
     //
@@ -15035,6 +16822,7 @@ public interface WinError {
     // The hierarchy file is invalid.
     //
     int ERROR_DS_BAD_HIERARCHY_FILE = 8425;
+
     //
     // MessageId: ERROR_DS_BUILD_HIERARCHY_TABLE_FAILED
     //
@@ -15043,6 +16831,7 @@ public interface WinError {
     // The attempt to build the hierarchy table failed.
     //
     int ERROR_DS_BUILD_HIERARCHY_TABLE_FAILED = 8426;
+
     //
     // MessageId: ERROR_DS_CONFIG_PARAM_MISSING
     //
@@ -15051,6 +16840,7 @@ public interface WinError {
     // The directory configuration parameter is missing from the registry.
     //
     int ERROR_DS_CONFIG_PARAM_MISSING = 8427;
+
     //
     // MessageId: ERROR_DS_COUNTING_AB_INDICES_FAILED
     //
@@ -15059,6 +16849,7 @@ public interface WinError {
     // The attempt to count the address book indices failed.
     //
     int ERROR_DS_COUNTING_AB_INDICES_FAILED = 8428;
+
     //
     // MessageId: ERROR_DS_HIERARCHY_TABLE_MALLOC_FAILED
     //
@@ -15067,6 +16858,7 @@ public interface WinError {
     // The allocation of the hierarchy table failed.
     //
     int ERROR_DS_HIERARCHY_TABLE_MALLOC_FAILED = 8429;
+
     //
     // MessageId: ERROR_DS_INTERNAL_FAILURE
     //
@@ -15075,6 +16867,7 @@ public interface WinError {
     // The directory service encountered an internal failure.
     //
     int ERROR_DS_INTERNAL_FAILURE = 8430;
+
     //
     // MessageId: ERROR_DS_UNKNOWN_ERROR
     //
@@ -15083,6 +16876,7 @@ public interface WinError {
     // The directory service encountered an unknown failure.
     //
     int ERROR_DS_UNKNOWN_ERROR = 8431;
+
     //
     // MessageId: ERROR_DS_ROOT_REQUIRES_CLASS_TOP
     //
@@ -15091,6 +16885,7 @@ public interface WinError {
     // A root object requires a class of 'top'.
     //
     int ERROR_DS_ROOT_REQUIRES_CLASS_TOP = 8432;
+
     //
     // MessageId: ERROR_DS_REFUSING_FSMO_ROLES
     //
@@ -15100,6 +16895,7 @@ public interface WinError {
     // floating single-master operation roles.
     //
     int ERROR_DS_REFUSING_FSMO_ROLES = 8433;
+
     //
     // MessageId: ERROR_DS_MISSING_FSMO_SETTINGS
     //
@@ -15110,6 +16906,7 @@ public interface WinError {
     // roles.
     //
     int ERROR_DS_MISSING_FSMO_SETTINGS = 8434;
+
     //
     // MessageId: ERROR_DS_UNABLE_TO_SURRENDER_ROLES
     //
@@ -15119,6 +16916,7 @@ public interface WinError {
     // floating single-master operation roles to other servers.
     //
     int ERROR_DS_UNABLE_TO_SURRENDER_ROLES = 8435;
+
     //
     // MessageId: ERROR_DS_DRA_GENERIC
     //
@@ -15127,6 +16925,7 @@ public interface WinError {
     // The replication operation failed.
     //
     int ERROR_DS_DRA_GENERIC = 8436;
+
     //
     // MessageId: ERROR_DS_DRA_INVALID_PARAMETER
     //
@@ -15135,6 +16934,7 @@ public interface WinError {
     // An invalid parameter was specified for this replication operation.
     //
     int ERROR_DS_DRA_INVALID_PARAMETER = 8437;
+
     //
     // MessageId: ERROR_DS_DRA_BUSY
     //
@@ -15144,6 +16944,7 @@ public interface WinError {
     // at this time.
     //
     int ERROR_DS_DRA_BUSY = 8438;
+
     //
     // MessageId: ERROR_DS_DRA_BAD_DN
     //
@@ -15153,6 +16954,7 @@ public interface WinError {
     // invalid.
     //
     int ERROR_DS_DRA_BAD_DN = 8439;
+
     //
     // MessageId: ERROR_DS_DRA_BAD_NC
     //
@@ -15161,6 +16963,7 @@ public interface WinError {
     // The naming context specified for this replication operation is invalid.
     //
     int ERROR_DS_DRA_BAD_NC = 8440;
+
     //
     // MessageId: ERROR_DS_DRA_DN_EXISTS
     //
@@ -15170,6 +16973,7 @@ public interface WinError {
     // exists.
     //
     int ERROR_DS_DRA_DN_EXISTS = 8441;
+
     //
     // MessageId: ERROR_DS_DRA_INTERNAL_ERROR
     //
@@ -15178,6 +16982,7 @@ public interface WinError {
     // The replication system encountered an internal error.
     //
     int ERROR_DS_DRA_INTERNAL_ERROR = 8442;
+
     //
     // MessageId: ERROR_DS_DRA_INCONSISTENT_DIT
     //
@@ -15186,6 +16991,7 @@ public interface WinError {
     // The replication operation encountered a database inconsistency.
     //
     int ERROR_DS_DRA_INCONSISTENT_DIT = 8443;
+
     //
     // MessageId: ERROR_DS_DRA_CONNECTION_FAILED
     //
@@ -15195,6 +17001,7 @@ public interface WinError {
     // contacted.
     //
     int ERROR_DS_DRA_CONNECTION_FAILED = 8444;
+
     //
     // MessageId: ERROR_DS_DRA_BAD_INSTANCE_TYPE
     //
@@ -15204,6 +17011,7 @@ public interface WinError {
     // type.
     //
     int ERROR_DS_DRA_BAD_INSTANCE_TYPE = 8445;
+
     //
     // MessageId: ERROR_DS_DRA_OUT_OF_MEM
     //
@@ -15212,6 +17020,7 @@ public interface WinError {
     // The replication operation failed to allocate memory.
     //
     int ERROR_DS_DRA_OUT_OF_MEM = 8446;
+
     //
     // MessageId: ERROR_DS_DRA_MAIL_PROBLEM
     //
@@ -15220,6 +17029,7 @@ public interface WinError {
     // The replication operation encountered an error with the mail system.
     //
     int ERROR_DS_DRA_MAIL_PROBLEM = 8447;
+
     //
     // MessageId: ERROR_DS_DRA_REF_ALREADY_EXISTS
     //
@@ -15229,6 +17039,7 @@ public interface WinError {
     // exists.
     //
     int ERROR_DS_DRA_REF_ALREADY_EXISTS = 8448;
+
     //
     // MessageId: ERROR_DS_DRA_REF_NOT_FOUND
     //
@@ -15238,6 +17049,7 @@ public interface WinError {
     // exist.
     //
     int ERROR_DS_DRA_REF_NOT_FOUND = 8449;
+
     //
     // MessageId: ERROR_DS_DRA_OBJ_IS_REP_SOURCE
     //
@@ -15247,6 +17059,7 @@ public interface WinError {
     // server.
     //
     int ERROR_DS_DRA_OBJ_IS_REP_SOURCE = 8450;
+
     //
     // MessageId: ERROR_DS_DRA_DB_ERROR
     //
@@ -15255,6 +17068,7 @@ public interface WinError {
     // The replication operation encountered a database error.
     //
     int ERROR_DS_DRA_DB_ERROR = 8451;
+
     //
     // MessageId: ERROR_DS_DRA_NO_REPLICA
     //
@@ -15264,6 +17078,7 @@ public interface WinError {
     // replicated from the specified server.
     //
     int ERROR_DS_DRA_NO_REPLICA = 8452;
+
     //
     // MessageId: ERROR_DS_DRA_ACCESS_DENIED
     //
@@ -15272,6 +17087,7 @@ public interface WinError {
     // Replication access was denied.
     //
     int ERROR_DS_DRA_ACCESS_DENIED = 8453;
+
     //
     // MessageId: ERROR_DS_DRA_NOT_SUPPORTED
     //
@@ -15281,6 +17097,7 @@ public interface WinError {
     // service.
     //
     int ERROR_DS_DRA_NOT_SUPPORTED = 8454;
+
     //
     // MessageId: ERROR_DS_DRA_RPC_CANCELLED
     //
@@ -15289,6 +17106,7 @@ public interface WinError {
     // The replication remote procedure call was cancelled.
     //
     int ERROR_DS_DRA_RPC_CANCELLED = 8455;
+
     //
     // MessageId: ERROR_DS_DRA_SOURCE_DISABLED
     //
@@ -15297,6 +17115,7 @@ public interface WinError {
     // The source server is currently rejecting replication requests.
     //
     int ERROR_DS_DRA_SOURCE_DISABLED = 8456;
+
     //
     // MessageId: ERROR_DS_DRA_SINK_DISABLED
     //
@@ -15305,6 +17124,7 @@ public interface WinError {
     // The destination server is currently rejecting replication requests.
     //
     int ERROR_DS_DRA_SINK_DISABLED = 8457;
+
     //
     // MessageId: ERROR_DS_DRA_NAME_COLLISION
     //
@@ -15313,6 +17133,7 @@ public interface WinError {
     // The replication operation failed due to a collision of object names.
     //
     int ERROR_DS_DRA_NAME_COLLISION = 8458;
+
     //
     // MessageId: ERROR_DS_DRA_SOURCE_REINSTALLED
     //
@@ -15321,6 +17142,7 @@ public interface WinError {
     // The replication source has been reinstalled.
     //
     int ERROR_DS_DRA_SOURCE_REINSTALLED = 8459;
+
     //
     // MessageId: ERROR_DS_DRA_MISSING_PARENT
     //
@@ -15330,6 +17152,7 @@ public interface WinError {
     // missing.
     //
     int ERROR_DS_DRA_MISSING_PARENT = 8460;
+
     //
     // MessageId: ERROR_DS_DRA_PREEMPTED
     //
@@ -15338,6 +17161,7 @@ public interface WinError {
     // The replication operation was preempted.
     //
     int ERROR_DS_DRA_PREEMPTED = 8461;
+
     //
     // MessageId: ERROR_DS_DRA_ABANDON_SYNC
     //
@@ -15347,6 +17171,7 @@ public interface WinError {
     // of updates.
     //
     int ERROR_DS_DRA_ABANDON_SYNC = 8462;
+
     //
     // MessageId: ERROR_DS_DRA_SHUTDOWN
     //
@@ -15356,6 +17181,7 @@ public interface WinError {
     // down.
     //
     int ERROR_DS_DRA_SHUTDOWN = 8463;
+
     //
     // MessageId: ERROR_DS_DRA_INCOMPATIBLE_PARTIAL_SET
     //
@@ -15368,6 +17194,7 @@ public interface WinError {
     // attribute set.
     //
     int ERROR_DS_DRA_INCOMPATIBLE_PARTIAL_SET = 8464;
+
     //
     // MessageId: ERROR_DS_DRA_SOURCE_IS_PARTIAL_REPLICA
     //
@@ -15377,6 +17204,7 @@ public interface WinError {
     // attempted to sync from a partial replica.
     //
     int ERROR_DS_DRA_SOURCE_IS_PARTIAL_REPLICA = 8465;
+
     //
     // MessageId: ERROR_DS_DRA_EXTN_CONNECTION_FAILED
     //
@@ -15387,6 +17215,7 @@ public interface WinError {
     // the operation.
     //
     int ERROR_DS_DRA_EXTN_CONNECTION_FAILED = 8466;
+
     //
     // MessageId: ERROR_DS_INSTALL_SCHEMA_MISMATCH
     //
@@ -15396,6 +17225,7 @@ public interface WinError {
     // compatible with the version of directory service on this computer.
     //
     int ERROR_DS_INSTALL_SCHEMA_MISMATCH = 8467;
+
     //
     // MessageId: ERROR_DS_DUP_LINK_ID
     //
@@ -15405,6 +17235,7 @@ public interface WinError {
     // exists.
     //
     int ERROR_DS_DUP_LINK_ID = 8468;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_RESOLVING
     //
@@ -15413,6 +17244,7 @@ public interface WinError {
     // Name translation: Generic processing error.
     //
     int ERROR_DS_NAME_ERROR_RESOLVING = 8469;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_NOT_FOUND
     //
@@ -15422,6 +17254,7 @@ public interface WinError {
     // name.
     //
     int ERROR_DS_NAME_ERROR_NOT_FOUND = 8470;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_NOT_UNIQUE
     //
@@ -15430,6 +17263,7 @@ public interface WinError {
     // Name translation: Input name mapped to more than one output name.
     //
     int ERROR_DS_NAME_ERROR_NOT_UNIQUE = 8471;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_NO_MAPPING
     //
@@ -15438,6 +17272,7 @@ public interface WinError {
     // Name translation: Input name found, but not the associated output format.
     //
     int ERROR_DS_NAME_ERROR_NO_MAPPING = 8472;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_DOMAIN_ONLY
     //
@@ -15447,6 +17282,7 @@ public interface WinError {
     // found.
     //
     int ERROR_DS_NAME_ERROR_DOMAIN_ONLY = 8473;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING
     //
@@ -15456,6 +17292,7 @@ public interface WinError {
     // client without going out to the wire.
     //
     int ERROR_DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING = 8474;
+
     //
     // MessageId: ERROR_DS_CONSTRUCTED_ATT_MOD
     //
@@ -15464,6 +17301,7 @@ public interface WinError {
     // Modification of a constructed attribute is not allowed.
     //
     int ERROR_DS_CONSTRUCTED_ATT_MOD = 8475;
+
     //
     // MessageId: ERROR_DS_WRONG_OM_OBJ_CLASS
     //
@@ -15473,6 +17311,7 @@ public interface WinError {
     // specified syntax.
     //
     int ERROR_DS_WRONG_OM_OBJ_CLASS = 8476;
+
     //
     // MessageId: ERROR_DS_DRA_REPL_PENDING
     //
@@ -15481,6 +17320,7 @@ public interface WinError {
     // The replication request has been posted; waiting for reply.
     //
     int ERROR_DS_DRA_REPL_PENDING = 8477;
+
     //
     // MessageId: ERROR_DS_DS_REQUIRED
     //
@@ -15490,6 +17330,7 @@ public interface WinError {
     // available.
     //
     int ERROR_DS_DS_REQUIRED = 8478;
+
     //
     // MessageId: ERROR_DS_INVALID_LDAP_DISPLAY_NAME
     //
@@ -15499,6 +17340,7 @@ public interface WinError {
     // characters.
     //
     int ERROR_DS_INVALID_LDAP_DISPLAY_NAME = 8479;
+
     //
     // MessageId: ERROR_DS_NON_BASE_SEARCH
     //
@@ -15507,6 +17349,7 @@ public interface WinError {
     // The requested search operation is only supported for base searches.
     //
     int ERROR_DS_NON_BASE_SEARCH = 8480;
+
     //
     // MessageId: ERROR_DS_CANT_RETRIEVE_ATTS
     //
@@ -15515,6 +17358,7 @@ public interface WinError {
     // The search failed to retrieve attributes from the database.
     //
     int ERROR_DS_CANT_RETRIEVE_ATTS = 8481;
+
     //
     // MessageId: ERROR_DS_BACKLINK_WITHOUT_LINK
     //
@@ -15524,6 +17368,7 @@ public interface WinError {
     // has no corresponding forward link.
     //
     int ERROR_DS_BACKLINK_WITHOUT_LINK = 8482;
+
     //
     // MessageId: ERROR_DS_EPOCH_MISMATCH
     //
@@ -15534,6 +17379,7 @@ public interface WinError {
     // latest version of the object.
     //
     int ERROR_DS_EPOCH_MISMATCH = 8483;
+
     //
     // MessageId: ERROR_DS_SRC_NAME_MISMATCH
     //
@@ -15544,6 +17390,7 @@ public interface WinError {
     // latest version of the object.
     //
     int ERROR_DS_SRC_NAME_MISMATCH = 8484;
+
     //
     // MessageId: ERROR_DS_SRC_AND_DST_NC_IDENTICAL
     //
@@ -15554,6 +17401,7 @@ public interface WinError {
     // operation.
     //
     int ERROR_DS_SRC_AND_DST_NC_IDENTICAL = 8485;
+
     //
     // MessageId: ERROR_DS_DST_NC_MISMATCH
     //
@@ -15564,6 +17412,7 @@ public interface WinError {
     // have the latest version of the Partitions container.
     //
     int ERROR_DS_DST_NC_MISMATCH = 8486;
+
     //
     // MessageId: ERROR_DS_NOT_AUTHORITIVE_FOR_DST_NC
     //
@@ -15573,6 +17422,7 @@ public interface WinError {
     // destination naming context.
     //
     int ERROR_DS_NOT_AUTHORITIVE_FOR_DST_NC = 8487;
+
     //
     // MessageId: ERROR_DS_SRC_GUID_MISMATCH
     //
@@ -15583,6 +17433,7 @@ public interface WinError {
     // the latest version of the source object.
     //
     int ERROR_DS_SRC_GUID_MISMATCH = 8488;
+
     //
     // MessageId: ERROR_DS_CANT_MOVE_DELETED_OBJECT
     //
@@ -15593,6 +17444,7 @@ public interface WinError {
     // the source object.
     //
     int ERROR_DS_CANT_MOVE_DELETED_OBJECT = 8489;
+
     //
     // MessageId: ERROR_DS_PDC_OPERATION_IN_PROGRESS
     //
@@ -15602,6 +17454,7 @@ public interface WinError {
     // already in progress.
     //
     int ERROR_DS_PDC_OPERATION_IN_PROGRESS = 8490;
+
     //
     // MessageId: ERROR_DS_CROSS_DOMAIN_CLEANUP_REQD
     //
@@ -15613,6 +17466,7 @@ public interface WinError {
     // consistent state.
     //
     int ERROR_DS_CROSS_DOMAIN_CLEANUP_REQD = 8491;
+
     //
     // MessageId: ERROR_DS_ILLEGAL_XDOM_MOVE_OPERATION
     //
@@ -15624,6 +17478,7 @@ public interface WinError {
     // prevent its move.
     //
     int ERROR_DS_ILLEGAL_XDOM_MOVE_OPERATION = 8492;
+
     //
     // MessageId: ERROR_DS_CANT_WITH_ACCT_GROUP_MEMBERSHPS
     //
@@ -15634,6 +17489,7 @@ public interface WinError {
     // Remove the object from any account group memberships and retry.
     //
     int ERROR_DS_CANT_WITH_ACCT_GROUP_MEMBERSHPS = 8493;
+
     //
     // MessageId: ERROR_DS_NC_MUST_HAVE_NC_PARENT
     //
@@ -15643,6 +17499,7 @@ public interface WinError {
     // context head, not of an interior node.
     //
     int ERROR_DS_NC_MUST_HAVE_NC_PARENT = 8494;
+
     //
     // MessageId: ERROR_DS_CR_IMPOSSIBLE_TO_VALIDATE
     //
@@ -15656,6 +17513,7 @@ public interface WinError {
     // Windows=2000 Domain Naming masters)
     //
     int ERROR_DS_CR_IMPOSSIBLE_TO_VALIDATE = 8495;
+
     //
     // MessageId: ERROR_DS_DST_DOMAIN_NOT_NATIVE
     //
@@ -15664,6 +17522,7 @@ public interface WinError {
     // Destination domain must be in native mode.
     //
     int ERROR_DS_DST_DOMAIN_NOT_NATIVE = 8496;
+
     //
     // MessageId: ERROR_DS_MISSING_INFRASTRUCTURE_CONTAINER
     //
@@ -15673,6 +17532,7 @@ public interface WinError {
     // infrastructure container in the domain of interest.
     //
     int ERROR_DS_MISSING_INFRASTRUCTURE_CONTAINER = 8497;
+
     //
     // MessageId: ERROR_DS_CANT_MOVE_ACCOUNT_GROUP
     //
@@ -15681,6 +17541,7 @@ public interface WinError {
     // Cross-domain move of non-empty account groups is not allowed.
     //
     int ERROR_DS_CANT_MOVE_ACCOUNT_GROUP = 8498;
+
     //
     // MessageId: ERROR_DS_CANT_MOVE_RESOURCE_GROUP
     //
@@ -15689,6 +17550,7 @@ public interface WinError {
     // Cross-domain move of non-empty resource groups is not allowed.
     //
     int ERROR_DS_CANT_MOVE_RESOURCE_GROUP = 8499;
+
     //
     // MessageId: ERROR_DS_INVALID_SEARCH_FLAG
     //
@@ -15698,6 +17560,7 @@ public interface WinError {
     // on attributes of Unicode or Teletex strings.
     //
     int ERROR_DS_INVALID_SEARCH_FLAG = 8500;
+
     //
     // MessageId: ERROR_DS_NO_TREE_DELETE_ABOVE_NC
     //
@@ -15707,6 +17570,7 @@ public interface WinError {
     // are not allowed.
     //
     int ERROR_DS_NO_TREE_DELETE_ABOVE_NC = 8501;
+
     //
     // MessageId: ERROR_DS_COULDNT_LOCK_TREE_FOR_DELETE
     //
@@ -15716,6 +17580,7 @@ public interface WinError {
     // deletion because the tree was in use.
     //
     int ERROR_DS_COULDNT_LOCK_TREE_FOR_DELETE = 8502;
+
     //
     // MessageId: ERROR_DS_COULDNT_IDENTIFY_OBJECTS_FOR_TREE_DELETE
     //
@@ -15725,6 +17590,7 @@ public interface WinError {
     // while attempting a tree deletion.
     //
     int ERROR_DS_COULDNT_IDENTIFY_OBJECTS_FOR_TREE_DELETE = 8503;
+
     //
     // MessageId: ERROR_DS_SAM_INIT_FAILURE
     //
@@ -15737,6 +17603,7 @@ public interface WinError {
     // information.
     //
     int ERROR_DS_SAM_INIT_FAILURE = 8504;
+
     //
     // MessageId: ERROR_DS_SENSITIVE_GROUP_VIOLATION
     //
@@ -15746,6 +17613,7 @@ public interface WinError {
     // group.
     //
     int ERROR_DS_SENSITIVE_GROUP_VIOLATION = 8505;
+
     //
     // MessageId: ERROR_DS_CANT_MOD_PRIMARYGROUPID
     //
@@ -15754,6 +17622,7 @@ public interface WinError {
     // Cannot change the primary group ID of a domain controller account.
     //
     int ERROR_DS_CANT_MOD_PRIMARYGROUPID = 8506;
+
     //
     // MessageId: ERROR_DS_ILLEGAL_BASE_SCHEMA_MOD
     //
@@ -15762,6 +17631,7 @@ public interface WinError {
     // An attempt is made to modify the base schema.
     //
     int ERROR_DS_ILLEGAL_BASE_SCHEMA_MOD = 8507;
+
     //
     // MessageId: ERROR_DS_NONSAFE_SCHEMA_CHANGE
     //
@@ -15774,6 +17644,7 @@ public interface WinError {
     // auxiliary class) is not allowed.
     //
     int ERROR_DS_NONSAFE_SCHEMA_CHANGE = 8508;
+
     //
     // MessageId: ERROR_DS_SCHEMA_UPDATE_DISALLOWED
     //
@@ -15783,6 +17654,7 @@ public interface WinError {
     // FSMO Role Owner.
     //
     int ERROR_DS_SCHEMA_UPDATE_DISALLOWED = 8509;
+
     //
     // MessageId: ERROR_DS_CANT_CREATE_UNDER_SCHEMA
     //
@@ -15793,6 +17665,7 @@ public interface WinError {
     // schema container.
     //
     int ERROR_DS_CANT_CREATE_UNDER_SCHEMA = 8510;
+
     //
     // MessageId: ERROR_DS_INSTALL_NO_SRC_SCH_VERSION
     //
@@ -15804,6 +17677,7 @@ public interface WinError {
     // to read it.
     //
     int ERROR_DS_INSTALL_NO_SRC_SCH_VERSION = 8511;
+
     //
     // MessageId: ERROR_DS_INSTALL_NO_SCH_VERSION_IN_INIFILE
     //
@@ -15813,6 +17687,7 @@ public interface WinError {
     // the SCHEMA section of the file schema.ini in the system32 directory.
     //
     int ERROR_DS_INSTALL_NO_SCH_VERSION_IN_INIFILE = 8512;
+
     //
     // MessageId: ERROR_DS_INVALID_GROUP_TYPE
     //
@@ -15821,6 +17696,7 @@ public interface WinError {
     // The specified group type is invalid.
     //
     int ERROR_DS_INVALID_GROUP_TYPE = 8513;
+
     //
     // MessageId: ERROR_DS_NO_NEST_GLOBALGROUP_IN_MIXEDDOMAIN
     //
@@ -15830,6 +17706,7 @@ public interface WinError {
     // security-enabled.
     //
     int ERROR_DS_NO_NEST_GLOBALGROUP_IN_MIXEDDOMAIN = 8514;
+
     //
     // MessageId: ERROR_DS_NO_NEST_LOCALGROUP_IN_MIXEDDOMAIN
     //
@@ -15839,6 +17716,7 @@ public interface WinError {
     // security-enabled.
     //
     int ERROR_DS_NO_NEST_LOCALGROUP_IN_MIXEDDOMAIN = 8515;
+
     //
     // MessageId: ERROR_DS_GLOBAL_CANT_HAVE_LOCAL_MEMBER
     //
@@ -15847,6 +17725,7 @@ public interface WinError {
     // A global group cannot have a local group as a member.
     //
     int ERROR_DS_GLOBAL_CANT_HAVE_LOCAL_MEMBER = 8516;
+
     //
     // MessageId: ERROR_DS_GLOBAL_CANT_HAVE_UNIVERSAL_MEMBER
     //
@@ -15855,6 +17734,7 @@ public interface WinError {
     // A global group cannot have a universal group as a member.
     //
     int ERROR_DS_GLOBAL_CANT_HAVE_UNIVERSAL_MEMBER = 8517;
+
     //
     // MessageId: ERROR_DS_UNIVERSAL_CANT_HAVE_LOCAL_MEMBER
     //
@@ -15863,6 +17743,7 @@ public interface WinError {
     // A universal group cannot have a local group as a member.
     //
     int ERROR_DS_UNIVERSAL_CANT_HAVE_LOCAL_MEMBER = 8518;
+
     //
     // MessageId: ERROR_DS_GLOBAL_CANT_HAVE_CROSSDOMAIN_MEMBER
     //
@@ -15871,6 +17752,7 @@ public interface WinError {
     // A global group cannot have a cross-domain member.
     //
     int ERROR_DS_GLOBAL_CANT_HAVE_CROSSDOMAIN_MEMBER = 8519;
+
     //
     // MessageId: ERROR_DS_LOCAL_CANT_HAVE_CROSSDOMAIN_LOCAL_MEMBER
     //
@@ -15879,6 +17761,7 @@ public interface WinError {
     // A local group cannot have another cross domain local group as a member.
     //
     int ERROR_DS_LOCAL_CANT_HAVE_CROSSDOMAIN_LOCAL_MEMBER = 8520;
+
     //
     // MessageId: ERROR_DS_HAVE_PRIMARY_MEMBERS
     //
@@ -15887,6 +17770,7 @@ public interface WinError {
     // A group with primary members cannot change to a security-disabled group.
     //
     int ERROR_DS_HAVE_PRIMARY_MEMBERS = 8521;
+
     //
     // MessageId: ERROR_DS_STRING_SD_CONVERSION_FAILED
     //
@@ -15896,6 +17780,7 @@ public interface WinError {
     // class-schema object.
     //
     int ERROR_DS_STRING_SD_CONVERSION_FAILED = 8522;
+
     //
     // MessageId: ERROR_DS_NAMING_MASTER_GC
     //
@@ -15906,6 +17791,7 @@ public interface WinError {
     // servers)
     //
     int ERROR_DS_NAMING_MASTER_GC = 8523;
+
     //
     // MessageId: ERROR_DS_DNS_LOOKUP_FAILURE
     //
@@ -15914,6 +17800,7 @@ public interface WinError {
     // The DSA operation is unable to proceed because of a DNS lookup failure.
     //
     int ERROR_DS_DNS_LOOKUP_FAILURE = 8524;
+
     //
     // MessageId: ERROR_DS_COULDNT_UPDATE_SPNS
     //
@@ -15923,6 +17810,7 @@ public interface WinError {
     // Principal Name values could not be kept in sync.
     //
     int ERROR_DS_COULDNT_UPDATE_SPNS = 8525;
+
     //
     // MessageId: ERROR_DS_CANT_RETRIEVE_SD
     //
@@ -15931,6 +17819,7 @@ public interface WinError {
     // The Security Descriptor attribute could not be read.
     //
     int ERROR_DS_CANT_RETRIEVE_SD = 8526;
+
     //
     // MessageId: ERROR_DS_KEY_NOT_UNIQUE
     //
@@ -15940,6 +17829,7 @@ public interface WinError {
     // found.
     //
     int ERROR_DS_KEY_NOT_UNIQUE = 8527;
+
     //
     // MessageId: ERROR_DS_WRONG_LINKED_ATT_SYNTAX
     //
@@ -15950,6 +17840,7 @@ public interface WinError {
     // can only have syntax=2.5.5.1
     //
     int ERROR_DS_WRONG_LINKED_ATT_SYNTAX = 8528;
+
     //
     // MessageId: ERROR_DS_SAM_NEED_BOOTKEY_PASSWORD
     //
@@ -15958,6 +17849,7 @@ public interface WinError {
     // Security Account Manager needs to get the boot password.
     //
     int ERROR_DS_SAM_NEED_BOOTKEY_PASSWORD = 8529;
+
     //
     // MessageId: ERROR_DS_SAM_NEED_BOOTKEY_FLOPPY
     //
@@ -15966,6 +17858,7 @@ public interface WinError {
     // Security Account Manager needs to get the boot key from floppy disk.
     //
     int ERROR_DS_SAM_NEED_BOOTKEY_FLOPPY = 8530;
+
     //
     // MessageId: ERROR_DS_CANT_START
     //
@@ -15974,6 +17867,7 @@ public interface WinError {
     // Directory Service cannot start.
     //
     int ERROR_DS_CANT_START = 8531;
+
     //
     // MessageId: ERROR_DS_INIT_FAILURE
     //
@@ -15982,6 +17876,7 @@ public interface WinError {
     // Directory Services could not start.
     //
     int ERROR_DS_INIT_FAILURE = 8532;
+
     //
     // MessageId: ERROR_DS_NO_PKT_PRIVACY_ON_CONNECTION
     //
@@ -15991,6 +17886,7 @@ public interface WinError {
     // better.
     //
     int ERROR_DS_NO_PKT_PRIVACY_ON_CONNECTION = 8533;
+
     //
     // MessageId: ERROR_DS_SOURCE_DOMAIN_IN_FOREST
     //
@@ -15999,6 +17895,7 @@ public interface WinError {
     // The source domain may not be in the same forest as destination.
     //
     int ERROR_DS_SOURCE_DOMAIN_IN_FOREST = 8534;
+
     //
     // MessageId: ERROR_DS_DESTINATION_DOMAIN_NOT_IN_FOREST
     //
@@ -16007,6 +17904,7 @@ public interface WinError {
     // The destination domain must be in the forest.
     //
     int ERROR_DS_DESTINATION_DOMAIN_NOT_IN_FOREST = 8535;
+
     //
     // MessageId: ERROR_DS_DESTINATION_AUDITING_NOT_ENABLED
     //
@@ -16015,6 +17913,7 @@ public interface WinError {
     // The operation requires that destination domain auditing be enabled.
     //
     int ERROR_DS_DESTINATION_AUDITING_NOT_ENABLED = 8536;
+
     //
     // MessageId: ERROR_DS_CANT_FIND_DC_FOR_SRC_DOMAIN
     //
@@ -16023,6 +17922,7 @@ public interface WinError {
     // The operation couldn't locate a DC for the source domain.
     //
     int ERROR_DS_CANT_FIND_DC_FOR_SRC_DOMAIN = 8537;
+
     //
     // MessageId: ERROR_DS_SRC_OBJ_NOT_GROUP_OR_USER
     //
@@ -16031,6 +17931,7 @@ public interface WinError {
     // The source object must be a group or user.
     //
     int ERROR_DS_SRC_OBJ_NOT_GROUP_OR_USER = 8538;
+
     //
     // MessageId: ERROR_DS_SRC_SID_EXISTS_IN_FOREST
     //
@@ -16039,6 +17940,7 @@ public interface WinError {
     // The source object's SID already exists in destination forest.
     //
     int ERROR_DS_SRC_SID_EXISTS_IN_FOREST = 8539;
+
     //
     // MessageId: ERROR_DS_SRC_AND_DST_OBJECT_CLASS_MISMATCH
     //
@@ -16047,6 +17949,7 @@ public interface WinError {
     // The source and destination object must be of the same type.
     //
     int ERROR_DS_SRC_AND_DST_OBJECT_CLASS_MISMATCH = 8540;
+
     //
     // MessageId: ERROR_SAM_INIT_FAILURE
     //
@@ -16058,6 +17961,7 @@ public interface WinError {
     // Mode. Check the event log for detailed information.
     //
     int ERROR_SAM_INIT_FAILURE = 8541;
+
     //
     // MessageId: ERROR_DS_DRA_SCHEMA_INFO_SHIP
     //
@@ -16066,6 +17970,7 @@ public interface WinError {
     // Schema information could not be included in the replication request.
     //
     int ERROR_DS_DRA_SCHEMA_INFO_SHIP = 8542;
+
     //
     // MessageId: ERROR_DS_DRA_SCHEMA_CONFLICT
     //
@@ -16075,6 +17980,7 @@ public interface WinError {
     // incompatibility.
     //
     int ERROR_DS_DRA_SCHEMA_CONFLICT = 8543;
+
     //
     // MessageId: ERROR_DS_DRA_EARLIER_SCHEMA_CONFLICT
     //
@@ -16084,6 +17990,7 @@ public interface WinError {
     // incompatibility.
     //
     int ERROR_DS_DRA_EARLIER_SCHEMA_CONFLICT = 8544;
+
     //
     // MessageId: ERROR_DS_DRA_OBJ_NC_MISMATCH
     //
@@ -16094,6 +18001,7 @@ public interface WinError {
     // cross-domain move operation.
     //
     int ERROR_DS_DRA_OBJ_NC_MISMATCH = 8545;
+
     //
     // MessageId: ERROR_DS_NC_STILL_HAS_DSAS
     //
@@ -16103,6 +18011,7 @@ public interface WinError {
     // controllers that still host this domain.
     //
     int ERROR_DS_NC_STILL_HAS_DSAS = 8546;
+
     //
     // MessageId: ERROR_DS_GC_REQUIRED
     //
@@ -16111,6 +18020,7 @@ public interface WinError {
     // The requested operation can be performed only on a global catalog server.
     //
     int ERROR_DS_GC_REQUIRED = 8547;
+
     //
     // MessageId: ERROR_DS_LOCAL_MEMBER_OF_LOCAL_ONLY
     //
@@ -16120,6 +18030,7 @@ public interface WinError {
     // domain.
     //
     int ERROR_DS_LOCAL_MEMBER_OF_LOCAL_ONLY = 8548;
+
     //
     // MessageId: ERROR_DS_NO_FPO_IN_UNIVERSAL_GROUPS
     //
@@ -16128,6 +18039,7 @@ public interface WinError {
     // Foreign security principals cannot be members of universal groups.
     //
     int ERROR_DS_NO_FPO_IN_UNIVERSAL_GROUPS = 8549;
+
     //
     // MessageId: ERROR_DS_CANT_ADD_TO_GC
     //
@@ -16137,6 +18049,7 @@ public interface WinError {
     // security reasons.
     //
     int ERROR_DS_CANT_ADD_TO_GC = 8550;
+
     //
     // MessageId: ERROR_DS_NO_CHECKPOINT_WITH_PDC
     //
@@ -16146,6 +18059,7 @@ public interface WinError {
     // modifications being processed currently.
     //
     int ERROR_DS_NO_CHECKPOINT_WITH_PDC = 8551;
+
     //
     // MessageId: ERROR_DS_SOURCE_AUDITING_NOT_ENABLED
     //
@@ -16154,6 +18068,7 @@ public interface WinError {
     // The operation requires that source domain auditing be enabled.
     //
     int ERROR_DS_SOURCE_AUDITING_NOT_ENABLED = 8552;
+
     //
     // MessageId: ERROR_DS_CANT_CREATE_IN_NONDOMAIN_NC
     //
@@ -16163,6 +18078,7 @@ public interface WinError {
     // contexts.
     //
     int ERROR_DS_CANT_CREATE_IN_NONDOMAIN_NC = 8553;
+
     //
     // MessageId: ERROR_DS_INVALID_NAME_FOR_SPN
     //
@@ -16172,6 +18088,7 @@ public interface WinError {
     // provided hostname is not in the necessary format.
     //
     int ERROR_DS_INVALID_NAME_FOR_SPN = 8554;
+
     //
     // MessageId: ERROR_DS_FILTER_USES_CONTRUCTED_ATTRS
     //
@@ -16180,6 +18097,7 @@ public interface WinError {
     // A Filter was passed that uses constructed attributes.
     //
     int ERROR_DS_FILTER_USES_CONTRUCTED_ATTRS = 8555;
+
     //
     // MessageId: ERROR_DS_UNICODEPWD_NOT_IN_QUOTES
     //
@@ -16188,6 +18106,7 @@ public interface WinError {
     // The unicodePwd attribute value must be enclosed in double quotes.
     //
     int ERROR_DS_UNICODEPWD_NOT_IN_QUOTES = 8556;
+
     //
     // MessageId: ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED
     //
@@ -16199,6 +18118,7 @@ public interface WinError {
     // increased.
     //
     int ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED = 8557;
+
     //
     // MessageId: ERROR_DS_MUST_BE_RUN_ON_DST_DC
     //
@@ -16207,6 +18127,7 @@ public interface WinError {
     // For security reasons, the operation must be run on the destination DC.
     //
     int ERROR_DS_MUST_BE_RUN_ON_DST_DC = 8558;
+
     //
     // MessageId: ERROR_DS_SRC_DC_MUST_BE_SP4_OR_GREATER
     //
@@ -16215,6 +18136,7 @@ public interface WinError {
     // For security reasons, the source DC must be NT4SP4 or greater.
     //
     int ERROR_DS_SRC_DC_MUST_BE_SP4_OR_GREATER = 8559;
+
     //
     // MessageId: ERROR_DS_CANT_TREE_DELETE_CRITICAL_OBJ
     //
@@ -16224,6 +18146,7 @@ public interface WinError {
     // delete operations. The tree delete may have been partially performed.
     //
     int ERROR_DS_CANT_TREE_DELETE_CRITICAL_OBJ = 8560;
+
     //
     // MessageId: ERROR_DS_INIT_FAILURE_CONSOLE
     //
@@ -16234,6 +18157,7 @@ public interface WinError {
     // the recovery console to diagnose the system further.
     //
     int ERROR_DS_INIT_FAILURE_CONSOLE = 8561;
+
     //
     // MessageId: ERROR_DS_SAM_INIT_FAILURE_CONSOLE
     //
@@ -16245,6 +18169,7 @@ public interface WinError {
     // the recovery console to diagnose the system further.
     //
     int ERROR_DS_SAM_INIT_FAILURE_CONSOLE = 8562;
+
     //
     // MessageId: ERROR_DS_FOREST_VERSION_TOO_HIGH
     //
@@ -16256,6 +18181,7 @@ public interface WinError {
     // this forest.
     //
     int ERROR_DS_FOREST_VERSION_TOO_HIGH = 8563;
+
     //
     // MessageId: ERROR_DS_DOMAIN_VERSION_TOO_HIGH
     //
@@ -16267,6 +18193,7 @@ public interface WinError {
     // this domain.
     //
     int ERROR_DS_DOMAIN_VERSION_TOO_HIGH = 8564;
+
     //
     // MessageId: ERROR_DS_FOREST_VERSION_TOO_LOW
     //
@@ -16278,6 +18205,7 @@ public interface WinError {
     // this forest.
     //
     int ERROR_DS_FOREST_VERSION_TOO_LOW = 8565;
+
     //
     // MessageId: ERROR_DS_DOMAIN_VERSION_TOO_LOW
     //
@@ -16289,6 +18217,7 @@ public interface WinError {
     // this domain.
     //
     int ERROR_DS_DOMAIN_VERSION_TOO_LOW = 8566;
+
     //
     // MessageId: ERROR_DS_INCOMPATIBLE_VERSION
     //
@@ -16298,6 +18227,7 @@ public interface WinError {
     // incompatible with the functional level of the domain or forest.
     //
     int ERROR_DS_INCOMPATIBLE_VERSION = 8567;
+
     //
     // MessageId: ERROR_DS_LOW_DSA_VERSION
     //
@@ -16308,6 +18238,7 @@ public interface WinError {
     // the domain (or forest) that are at a lower incompatible functional level.
     //
     int ERROR_DS_LOW_DSA_VERSION = 8568;
+
     //
     // MessageId: ERROR_DS_NO_BEHAVIOR_VERSION_IN_MIXEDDOMAIN
     //
@@ -16319,6 +18250,7 @@ public interface WinError {
     // level.
     //
     int ERROR_DS_NO_BEHAVIOR_VERSION_IN_MIXEDDOMAIN = 8569;
+
     //
     // MessageId: ERROR_DS_NOT_SUPPORTED_SORT_ORDER
     //
@@ -16327,6 +18259,7 @@ public interface WinError {
     // The sort order requested is not supported.
     //
     int ERROR_DS_NOT_SUPPORTED_SORT_ORDER = 8570;
+
     //
     // MessageId: ERROR_DS_NAME_NOT_UNIQUE
     //
@@ -16335,6 +18268,7 @@ public interface WinError {
     // The requested name already exists as a unique identifier.
     //
     int ERROR_DS_NAME_NOT_UNIQUE = 8571;
+
     //
     // MessageId: ERROR_DS_MACHINE_ACCOUNT_CREATED_PRENT4
     //
@@ -16344,6 +18278,7 @@ public interface WinError {
     // recreated.
     //
     int ERROR_DS_MACHINE_ACCOUNT_CREATED_PRENT4 = 8572;
+
     //
     // MessageId: ERROR_DS_OUT_OF_VERSION_STORE
     //
@@ -16352,6 +18287,7 @@ public interface WinError {
     // The database is out of version store.
     //
     int ERROR_DS_OUT_OF_VERSION_STORE = 8573;
+
     //
     // MessageId: ERROR_DS_INCOMPATIBLE_CONTROLS_USED
     //
@@ -16361,6 +18297,7 @@ public interface WinError {
     // used.
     //
     int ERROR_DS_INCOMPATIBLE_CONTROLS_USED = 8574;
+
     //
     // MessageId: ERROR_DS_NO_REF_DOMAIN
     //
@@ -16370,6 +18307,7 @@ public interface WinError {
     // partition.
     //
     int ERROR_DS_NO_REF_DOMAIN = 8575;
+
     //
     // MessageId: ERROR_DS_RESERVED_LINK_ID
     //
@@ -16378,6 +18316,7 @@ public interface WinError {
     // Schema update failed: The link identifier is reserved.
     //
     int ERROR_DS_RESERVED_LINK_ID = 8576;
+
     //
     // MessageId: ERROR_DS_LINK_ID_NOT_AVAILABLE
     //
@@ -16386,6 +18325,7 @@ public interface WinError {
     // Schema update failed: There are no link identifiers available.
     //
     int ERROR_DS_LINK_ID_NOT_AVAILABLE = 8577;
+
     //
     // MessageId: ERROR_DS_AG_CANT_HAVE_UNIVERSAL_MEMBER
     //
@@ -16394,6 +18334,7 @@ public interface WinError {
     // An account group cannot have a universal group as a member.
     //
     int ERROR_DS_AG_CANT_HAVE_UNIVERSAL_MEMBER = 8578;
+
     //
     // MessageId: ERROR_DS_MODIFYDN_DISALLOWED_BY_INSTANCE_TYPE
     //
@@ -16403,6 +18344,7 @@ public interface WinError {
     // are not allowed.
     //
     int ERROR_DS_MODIFYDN_DISALLOWED_BY_INSTANCE_TYPE = 8579;
+
     //
     // MessageId: ERROR_DS_NO_OBJECT_MOVE_IN_SCHEMA_NC
     //
@@ -16411,6 +18353,7 @@ public interface WinError {
     // Move operations on objects in the schema naming context are not allowed.
     //
     int ERROR_DS_NO_OBJECT_MOVE_IN_SCHEMA_NC = 8580;
+
     //
     // MessageId: ERROR_DS_MODIFYDN_DISALLOWED_BY_FLAG
     //
@@ -16420,6 +18363,7 @@ public interface WinError {
     // be moved or renamed.
     //
     int ERROR_DS_MODIFYDN_DISALLOWED_BY_FLAG = 8581;
+
     //
     // MessageId: ERROR_DS_MODIFYDN_WRONG_GRANDPARENT
     //
@@ -16429,6 +18373,7 @@ public interface WinError {
     // not forbidden on this object, but are restricted to sibling containers.
     //
     int ERROR_DS_MODIFYDN_WRONG_GRANDPARENT = 8582;
+
     //
     // MessageId: ERROR_DS_NAME_ERROR_TRUST_REFERRAL
     //
@@ -16437,6 +18382,7 @@ public interface WinError {
     // Unable to resolve completely, a referral to another forest is generated.
     //
     int ERROR_DS_NAME_ERROR_TRUST_REFERRAL = 8583;
+
     //
     // MessageId: ERROR_NOT_SUPPORTED_ON_STANDARD_SERVER
     //
@@ -16445,6 +18391,7 @@ public interface WinError {
     // The requested action is not supported on standard server.
     //
     int ERROR_NOT_SUPPORTED_ON_STANDARD_SERVER = 8584;
+
     //
     // MessageId: ERROR_DS_CANT_ACCESS_REMOTE_PART_OF_AD
     //
@@ -16455,6 +18402,7 @@ public interface WinError {
     // question.
     //
     int ERROR_DS_CANT_ACCESS_REMOTE_PART_OF_AD = 8585;
+
     //
     // MessageId: ERROR_DS_CR_IMPOSSIBLE_TO_VALIDATE_V2
     //
@@ -16467,6 +18415,7 @@ public interface WinError {
     // replica of this naming context is reachable by the Domain Naming master.
     //
     int ERROR_DS_CR_IMPOSSIBLE_TO_VALIDATE_V2 = 8586;
+
     //
     // MessageId: ERROR_DS_THREAD_LIMIT_EXCEEDED
     //
@@ -16475,6 +18424,7 @@ public interface WinError {
     // The thread limit for this request was exceeded.
     //
     int ERROR_DS_THREAD_LIMIT_EXCEEDED = 8587;
+
     //
     // MessageId: ERROR_DS_NOT_CLOSEST
     //
@@ -16483,6 +18433,7 @@ public interface WinError {
     // The Global catalog server is not in the closest site.
     //
     int ERROR_DS_NOT_CLOSEST = 8588;
+
     //
     // MessageId: ERROR_DS_CANT_DERIVE_SPN_WITHOUT_SERVER_REF
     //
@@ -16493,6 +18444,7 @@ public interface WinError {
     // object in the local DS database has no serverReference attribute.
     //
     int ERROR_DS_CANT_DERIVE_SPN_WITHOUT_SERVER_REF = 8589;
+
     //
     // MessageId: ERROR_DS_SINGLE_USER_MODE_FAILED
     //
@@ -16501,6 +18453,7 @@ public interface WinError {
     // The Directory Service failed to enter single user mode.
     //
     int ERROR_DS_SINGLE_USER_MODE_FAILED = 8590;
+
     //
     // MessageId: ERROR_DS_NTDSCRIPT_SYNTAX_ERROR
     //
@@ -16509,6 +18462,7 @@ public interface WinError {
     // The Directory Service cannot parse the script because of a syntax error.
     //
     int ERROR_DS_NTDSCRIPT_SYNTAX_ERROR = 8591;
+
     //
     // MessageId: ERROR_DS_NTDSCRIPT_PROCESS_ERROR
     //
@@ -16517,6 +18471,7 @@ public interface WinError {
     // The Directory Service cannot process the script because of an error.
     //
     int ERROR_DS_NTDSCRIPT_PROCESS_ERROR = 8592;
+
     //
     // MessageId: ERROR_DS_DIFFERENT_REPL_EPOCHS
     //
@@ -16529,6 +18484,7 @@ public interface WinError {
     // domain rename that is in progress).
     //
     int ERROR_DS_DIFFERENT_REPL_EPOCHS = 8593;
+
     //
     // MessageId: ERROR_DS_DRS_EXTENSIONS_CHANGED
     //
@@ -16539,6 +18495,7 @@ public interface WinError {
     // extensions information.
     //
     int ERROR_DS_DRS_EXTENSIONS_CHANGED = 8594;
+
     //
     // MessageId: ERROR_DS_REPLICA_SET_CHANGE_NOT_ALLOWED_ON_DISABLED_CR
     //
@@ -16547,6 +18504,7 @@ public interface WinError {
     // Operation not allowed on a disabled cross ref.
     //
     int ERROR_DS_REPLICA_SET_CHANGE_NOT_ALLOWED_ON_DISABLED_CR = 8595;
+
     //
     // MessageId: ERROR_DS_NO_MSDS_INTID
     //
@@ -16555,6 +18513,7 @@ public interface WinError {
     // Schema update failed: No values for msDS-IntId are available.
     //
     int ERROR_DS_NO_MSDS_INTID = 8596;
+
     //
     // MessageId: ERROR_DS_DUP_MSDS_INTID
     //
@@ -16563,6 +18522,7 @@ public interface WinError {
     // Schema update failed: Duplicate msDS-INtId. Retry the operation.
     //
     int ERROR_DS_DUP_MSDS_INTID = 8597;
+
     //
     // MessageId: ERROR_DS_EXISTS_IN_RDNATTID
     //
@@ -16571,6 +18531,7 @@ public interface WinError {
     // Schema deletion failed: attribute is used in rDNAttID.
     //
     int ERROR_DS_EXISTS_IN_RDNATTID = 8598;
+
     //
     // MessageId: ERROR_DS_AUTHORIZATION_FAILED
     //
@@ -16579,6 +18540,7 @@ public interface WinError {
     // The directory service failed to authorize the request.
     //
     int ERROR_DS_AUTHORIZATION_FAILED = 8599;
+
     //
     // MessageId: ERROR_DS_INVALID_SCRIPT
     //
@@ -16587,6 +18549,7 @@ public interface WinError {
     // The Directory Service cannot process the script because it is invalid.
     //
     int ERROR_DS_INVALID_SCRIPT = 8600;
+
     //
     // MessageId: ERROR_DS_REMOTE_CROSSREF_OP_FAILED
     //
@@ -16596,6 +18559,7 @@ public interface WinError {
     // Master FSMO. The operation's error is in the extended data.
     //
     int ERROR_DS_REMOTE_CROSSREF_OP_FAILED = 8601;
+
     //
     // MessageId: ERROR_DS_CROSS_REF_BUSY
     //
@@ -16604,6 +18568,7 @@ public interface WinError {
     // A cross reference is in use locally with the same name.
     //
     int ERROR_DS_CROSS_REF_BUSY = 8602;
+
     //
     // MessageId: ERROR_DS_CANT_DERIVE_SPN_FOR_DELETED_DOMAIN
     //
@@ -16614,6 +18579,7 @@ public interface WinError {
     // been deleted from the forest.
     //
     int ERROR_DS_CANT_DERIVE_SPN_FOR_DELETED_DOMAIN = 8603;
+
     //
     // MessageId: ERROR_DS_CANT_DEMOTE_WITH_WRITEABLE_NC
     //
@@ -16622,6 +18588,7 @@ public interface WinError {
     // Writeable NCs prevent this DC from demoting.
     //
     int ERROR_DS_CANT_DEMOTE_WITH_WRITEABLE_NC = 8604;
+
     //
     // MessageId: ERROR_DS_DUPLICATE_ID_FOUND
     //
@@ -16630,6 +18597,7 @@ public interface WinError {
     // The requested object has a non-unique identifier and cannot be retrieved.
     //
     int ERROR_DS_DUPLICATE_ID_FOUND = 8605;
+
     //
     // MessageId: ERROR_DS_INSUFFICIENT_ATTR_TO_CREATE_OBJECT
     //
@@ -16639,6 +18607,7 @@ public interface WinError {
     // not exist because it may have been deleted and already garbage collected.
     //
     int ERROR_DS_INSUFFICIENT_ATTR_TO_CREATE_OBJECT = 8606;
+
     //
     // MessageId: ERROR_DS_GROUP_CONVERSION_ERROR
     //
@@ -16648,6 +18617,7 @@ public interface WinError {
     // requested group type.
     //
     int ERROR_DS_GROUP_CONVERSION_ERROR = 8607;
+
     //
     // MessageId: ERROR_DS_CANT_MOVE_APP_BASIC_GROUP
     //
@@ -16656,6 +18626,7 @@ public interface WinError {
     // Cross-domain move of non-empty basic application groups is not allowed.
     //
     int ERROR_DS_CANT_MOVE_APP_BASIC_GROUP = 8608;
+
     //
     // MessageId: ERROR_DS_CANT_MOVE_APP_QUERY_GROUP
     //
@@ -16665,6 +18636,7 @@ public interface WinError {
     // allowed.
     //
     int ERROR_DS_CANT_MOVE_APP_QUERY_GROUP = 8609;
+
     //
     // MessageId: ERROR_DS_ROLE_NOT_VERIFIED
     //
@@ -16675,6 +18647,7 @@ public interface WinError {
     // partner.
     //
     int ERROR_DS_ROLE_NOT_VERIFIED = 8610;
+
     //
     // MessageId: ERROR_DS_WKO_CONTAINER_CANNOT_BE_SPECIAL
     //
@@ -16684,6 +18657,7 @@ public interface WinError {
     // cannot already be a special container.
     //
     int ERROR_DS_WKO_CONTAINER_CANNOT_BE_SPECIAL = 8611;
+
     //
     // MessageId: ERROR_DS_DOMAIN_RENAME_IN_PROGRESS
     //
@@ -16693,6 +18667,7 @@ public interface WinError {
     // domain rename operation is in progress.
     //
     int ERROR_DS_DOMAIN_RENAME_IN_PROGRESS = 8612;
+
     //
     // MessageId: ERROR_DS_EXISTING_AD_CHILD_NC
     //
@@ -16703,6 +18678,7 @@ public interface WinError {
     // method.
     //
     int ERROR_DS_EXISTING_AD_CHILD_NC = 8613;
+
     //
     // MessageId: ERROR_DS_REPL_LIFETIME_EXCEEDED
     //
@@ -16713,6 +18689,7 @@ public interface WinError {
     // lifetime.
     //
     int ERROR_DS_REPL_LIFETIME_EXCEEDED = 8614;
+
     //
     // MessageId: ERROR_DS_DISALLOWED_IN_SYSTEM_CONTAINER
     //
@@ -16722,6 +18699,7 @@ public interface WinError {
     // container.
     //
     int ERROR_DS_DISALLOWED_IN_SYSTEM_CONTAINER = 8615;
+
     //
     // MessageId: ERROR_DS_LDAP_SEND_QUEUE_FULL
     //
@@ -16733,6 +18711,7 @@ public interface WinError {
     // catch up then it will be disconnected.
     //
     int ERROR_DS_LDAP_SEND_QUEUE_FULL = 8616;
+
     //
     // MessageId: ERROR_DS_DRA_OUT_SCHEDULE_WINDOW
     //
@@ -16744,6 +18723,7 @@ public interface WinError {
     // decreasing the scheduled replication frequency.
     //
     int ERROR_DS_DRA_OUT_SCHEDULE_WINDOW = 8617;
+
     //
     // MessageId: ERROR_DS_POLICY_NOT_KNOWN
     //
@@ -16754,6 +18734,7 @@ public interface WinError {
     // account for replication latencies.
     //
     int ERROR_DS_POLICY_NOT_KNOWN = 8618;
+
     //
     // MessageId: ERROR_NO_SITE_SETTINGS_OBJECT
     //
@@ -16762,6 +18743,7 @@ public interface WinError {
     // The site settings object for the specified site does not exist.
     //
     int ERROR_NO_SITE_SETTINGS_OBJECT = 8619;
+
     //
     // MessageId: ERROR_NO_SECRETS
     //
@@ -16771,6 +18753,7 @@ public interface WinError {
     // specified account.
     //
     int ERROR_NO_SECRETS = 8620;
+
     //
     // MessageId: ERROR_NO_WRITABLE_DC_FOUND
     //
@@ -16779,6 +18762,7 @@ public interface WinError {
     // Could not find a writable domain controller in the domain.
     //
     int ERROR_NO_WRITABLE_DC_FOUND = 8621;
+
     //
     // MessageId: ERROR_DS_NO_SERVER_OBJECT
     //
@@ -16787,6 +18771,7 @@ public interface WinError {
     // The server object for the domain controller does not exist.
     //
     int ERROR_DS_NO_SERVER_OBJECT = 8622;
+
     //
     // MessageId: ERROR_DS_NO_NTDSA_OBJECT
     //
@@ -16795,6 +18780,7 @@ public interface WinError {
     // The NTDS Settings object for the domain controller does not exist.
     //
     int ERROR_DS_NO_NTDSA_OBJECT = 8623;
+
     //
     // MessageId: ERROR_DS_NON_ASQ_SEARCH
     //
@@ -16803,6 +18789,7 @@ public interface WinError {
     // The requested search operation is not supported for ASQ searches.
     //
     int ERROR_DS_NON_ASQ_SEARCH = 8624;
+
     //
     // MessageId: ERROR_DS_AUDIT_FAILURE
     //
@@ -16811,6 +18798,7 @@ public interface WinError {
     // A required audit event could not be generated for the operation.
     //
     int ERROR_DS_AUDIT_FAILURE = 8625;
+
     //
     // MessageId: ERROR_DS_INVALID_SEARCH_FLAG_SUBTREE
     //
@@ -16820,6 +18808,7 @@ public interface WinError {
     // valid only on single valued attributes.
     //
     int ERROR_DS_INVALID_SEARCH_FLAG_SUBTREE = 8626;
+
     //
     // MessageId: ERROR_DS_INVALID_SEARCH_FLAG_TUPLE
     //
@@ -16829,6 +18818,7 @@ public interface WinError {
     // valid only on attributes of Unicode strings.
     //
     int ERROR_DS_INVALID_SEARCH_FLAG_TUPLE = 8627;
+
     //
     // MessageId: ERROR_DS_HIERARCHY_TABLE_TOO_DEEP
     //
@@ -16838,6 +18828,7 @@ public interface WinError {
     // table.
     //
     int ERROR_DS_HIERARCHY_TABLE_TOO_DEEP = 8628;
+
     // /////////////////////////////////////////////////
     // =/
     // =End of Active Directory Error Codes /
@@ -16857,7 +18848,9 @@ public interface WinError {
     // DNS response codes.
     //
     int DNS_ERROR_RESPONSE_CODES_BASE = 9000;
+
     int DNS_ERROR_RCODE_NO_ERROR = NO_ERROR;
+
     int DNS_ERROR_MASK = 0x00002328; // =9000 or
     // DNS_ERROR_RESPONSE_CODES_BASE
     // DNS_ERROR_RCODE_FORMAT_ERROR=0x00002329
@@ -16868,7 +18861,9 @@ public interface WinError {
     //
     // DNS server unable to interpret format.
     //
+
     int DNS_ERROR_RCODE_FORMAT_ERROR = 9001;
+
     // DNS_ERROR_RCODE_SERVER_FAILURE=0x0000232a
     //
     // MessageId: DNS_ERROR_RCODE_SERVER_FAILURE
@@ -16878,6 +18873,7 @@ public interface WinError {
     // DNS server failure.
     //
     int DNS_ERROR_RCODE_SERVER_FAILURE = 9002;
+
     // DNS_ERROR_RCODE_NAME_ERROR=0x0000232b
     //
     // MessageId: DNS_ERROR_RCODE_NAME_ERROR
@@ -16887,6 +18883,7 @@ public interface WinError {
     // DNS name does not exist.
     //
     int DNS_ERROR_RCODE_NAME_ERROR = 9003;
+
     // DNS_ERROR_RCODE_NOT_IMPLEMENTED 0x0000232c
     //
     // MessageId: DNS_ERROR_RCODE_NOT_IMPLEMENTED
@@ -16896,6 +18893,7 @@ public interface WinError {
     // DNS request not supported by name server.
     //
     int DNS_ERROR_RCODE_NOT_IMPLEMENTED = 9004;
+
     // DNS_ERROR_RCODE_REFUSED=0x0000232d
     //
     // MessageId: DNS_ERROR_RCODE_REFUSED
@@ -16905,6 +18903,7 @@ public interface WinError {
     // DNS operation refused.
     //
     int DNS_ERROR_RCODE_REFUSED = 9005;
+
     // DNS_ERROR_RCODE_YXDOMAIN=0x0000232e
     //
     // MessageId: DNS_ERROR_RCODE_YXDOMAIN
@@ -16914,6 +18913,7 @@ public interface WinError {
     // DNS name that ought not exist, does exist.
     //
     int DNS_ERROR_RCODE_YXDOMAIN = 9006;
+
     // DNS_ERROR_RCODE_YXRRSET=0x0000232f
     //
     // MessageId: DNS_ERROR_RCODE_YXRRSET
@@ -16923,6 +18923,7 @@ public interface WinError {
     // DNS RR set that ought not exist, does exist.
     //
     int DNS_ERROR_RCODE_YXRRSET = 9007;
+
     // DNS_ERROR_RCODE_NXRRSET=0x00002330
     //
     // MessageId: DNS_ERROR_RCODE_NXRRSET
@@ -16932,6 +18933,7 @@ public interface WinError {
     // DNS RR set that ought to exist, does not exist.
     //
     int DNS_ERROR_RCODE_NXRRSET = 9008;
+
     // DNS_ERROR_RCODE_NOTAUTH=0x00002331
     //
     // MessageId: DNS_ERROR_RCODE_NOTAUTH
@@ -16941,6 +18943,7 @@ public interface WinError {
     // DNS server not authoritative for zone.
     //
     int DNS_ERROR_RCODE_NOTAUTH = 9009;
+
     // DNS_ERROR_RCODE_NOTZONE=0x00002332
     //
     // MessageId: DNS_ERROR_RCODE_NOTZONE
@@ -16950,6 +18953,7 @@ public interface WinError {
     // DNS name in update or prereq is not in zone.
     //
     int DNS_ERROR_RCODE_NOTZONE = 9010;
+
     // DNS_ERROR_RCODE_BADSIG=0x00002338
     //
     // MessageId: DNS_ERROR_RCODE_BADSIG
@@ -16959,6 +18963,7 @@ public interface WinError {
     // DNS signature failed to verify.
     //
     int DNS_ERROR_RCODE_BADSIG = 9016;
+
     // DNS_ERROR_RCODE_BADKEY=0x00002339
     //
     // MessageId: DNS_ERROR_RCODE_BADKEY
@@ -16968,6 +18973,7 @@ public interface WinError {
     // DNS bad key.
     //
     int DNS_ERROR_RCODE_BADKEY = 9017;
+
     // DNS_ERROR_RCODE_BADTIME=0x0000233a
     //
     // MessageId: DNS_ERROR_RCODE_BADTIME
@@ -16977,11 +18983,14 @@ public interface WinError {
     // DNS signature validity expired.
     //
     int DNS_ERROR_RCODE_BADTIME = 9018;
+
     int DNS_ERROR_RCODE_LAST = DNS_ERROR_RCODE_BADTIME;
+
     //
     // Packet format
     //
     int DNS_ERROR_PACKET_FMT_BASE = 9500;
+
     // DNS_INFO_NO_RECORDS=0x0000251d
     //
     // MessageId: DNS_INFO_NO_RECORDS
@@ -16991,6 +19000,7 @@ public interface WinError {
     // No records found for given DNS query.
     //
     int DNS_INFO_NO_RECORDS = 9501;
+
     // DNS_ERROR_BAD_PACKET=0x0000251e
     //
     // MessageId: DNS_ERROR_BAD_PACKET
@@ -17000,6 +19010,7 @@ public interface WinError {
     // Bad DNS packet.
     //
     int DNS_ERROR_BAD_PACKET = 9502;
+
     // DNS_ERROR_NO_PACKET=0x0000251f
     //
     // MessageId: DNS_ERROR_NO_PACKET
@@ -17009,6 +19020,7 @@ public interface WinError {
     // No DNS packet.
     //
     int DNS_ERROR_NO_PACKET = 9503;
+
     // DNS_ERROR_RCODE=0x00002520
     //
     // MessageId: DNS_ERROR_RCODE
@@ -17018,6 +19030,7 @@ public interface WinError {
     // DNS error, check rcode.
     //
     int DNS_ERROR_RCODE = 9504;
+
     // DNS_ERROR_UNSECURE_PACKET=0x00002521
     //
     // MessageId: DNS_ERROR_UNSECURE_PACKET
@@ -17027,14 +19040,20 @@ public interface WinError {
     // Unsecured DNS packet.
     //
     int DNS_ERROR_UNSECURE_PACKET = 9505;
+
     int DNS_STATUS_PACKET_UNSECURE = DNS_ERROR_UNSECURE_PACKET;
+
     //
     // General API errors
     //
     int DNS_ERROR_NO_MEMORY = ERROR_OUTOFMEMORY;
+
     int DNS_ERROR_INVALID_NAME = ERROR_INVALID_NAME;
+
     int DNS_ERROR_INVALID_DATA = ERROR_INVALID_DATA;
+
     int DNS_ERROR_GENERAL_API_BASE = 9550;
+
     // DNS_ERROR_INVALID_TYPE=0x0000254f
     //
     // MessageId: DNS_ERROR_INVALID_TYPE
@@ -17044,6 +19063,7 @@ public interface WinError {
     // Invalid DNS type.
     //
     int DNS_ERROR_INVALID_TYPE = 9551;
+
     // DNS_ERROR_INVALID_IP_ADDRESS=0x00002550
     //
     // MessageId: DNS_ERROR_INVALID_IP_ADDRESS
@@ -17053,6 +19073,7 @@ public interface WinError {
     // Invalid IP address.
     //
     int DNS_ERROR_INVALID_IP_ADDRESS = 9552;
+
     // DNS_ERROR_INVALID_PROPERTY=0x00002551
     //
     // MessageId: DNS_ERROR_INVALID_PROPERTY
@@ -17062,6 +19083,7 @@ public interface WinError {
     // Invalid property.
     //
     int DNS_ERROR_INVALID_PROPERTY = 9553;
+
     // DNS_ERROR_TRY_AGAIN_LATER=0x00002552
     //
     // MessageId: DNS_ERROR_TRY_AGAIN_LATER
@@ -17071,6 +19093,7 @@ public interface WinError {
     // Try DNS operation again later.
     //
     int DNS_ERROR_TRY_AGAIN_LATER = 9554;
+
     // DNS_ERROR_NOT_UNIQUE=0x00002553
     //
     // MessageId: DNS_ERROR_NOT_UNIQUE
@@ -17080,6 +19103,7 @@ public interface WinError {
     // Record for given name and type is not unique.
     //
     int DNS_ERROR_NOT_UNIQUE = 9555;
+
     // DNS_ERROR_NON_RFC_NAME=0x00002554
     //
     // MessageId: DNS_ERROR_NON_RFC_NAME
@@ -17089,6 +19113,7 @@ public interface WinError {
     // DNS name does not comply with RFC specifications.
     //
     int DNS_ERROR_NON_RFC_NAME = 9556;
+
     // DNS_STATUS_FQDN=0x00002555
     //
     // MessageId: DNS_STATUS_FQDN
@@ -17098,6 +19123,7 @@ public interface WinError {
     // DNS name is a fully-qualified DNS name.
     //
     int DNS_STATUS_FQDN = 9557;
+
     // DNS_STATUS_DOTTED_NAME=0x00002556
     //
     // MessageId: DNS_STATUS_DOTTED_NAME
@@ -17107,6 +19133,7 @@ public interface WinError {
     // DNS name is dotted (multi-labe;.
     //
     int DNS_STATUS_DOTTED_NAME = 9558;
+
     // DNS_STATUS_SINGLE_PART_NAME=0x00002557
     //
     // MessageId: DNS_STATUS_SINGLE_PART_NAME
@@ -17116,6 +19143,7 @@ public interface WinError {
     // DNS name is a single-part name.
     //
     int DNS_STATUS_SINGLE_PART_NAME = 9559;
+
     // DNS_ERROR_INVALID_NAME_CHAR=0x00002558
     //
     // MessageId: DNS_ERROR_INVALID_NAME_CHAR
@@ -17125,6 +19153,7 @@ public interface WinError {
     // DNS name contains an invalid character.
     //
     int DNS_ERROR_INVALID_NAME_CHAR = 9560;
+
     // DNS_ERROR_NUMERIC_NAME=0x00002559
     //
     // MessageId: DNS_ERROR_NUMERIC_NAME
@@ -17134,6 +19163,7 @@ public interface WinError {
     // DNS name is entirely numeric.
     //
     int DNS_ERROR_NUMERIC_NAME = 9561;
+
     // DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER 0x0000255A
     //
     // MessageId: DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER
@@ -17143,6 +19173,7 @@ public interface WinError {
     // The operation requested is not permitted on a DNS root server.
     //
     int DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER = 9562;
+
     // DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION 0x0000255B
     //
     // MessageId: DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION
@@ -17153,6 +19184,7 @@ public interface WinError {
     // has been delegated to another server.
     //
     int DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION = 9563;
+
     // DNS_ERROR_CANNOT_FIND_ROOT_HINTS 0x0000255C
     //
     // MessageId: DNS_ERROR_CANNOT_FIND_ROOT_HINTS
@@ -17162,6 +19194,7 @@ public interface WinError {
     // The DNS server could not find a set of root hints.
     //
     int DNS_ERROR_CANNOT_FIND_ROOT_HINTS = 9564;
+
     // DNS_ERROR_INCONSISTENT_ROOT_HINTS 0x0000255D
     //
     // MessageId: DNS_ERROR_INCONSISTENT_ROOT_HINTS
@@ -17172,6 +19205,7 @@ public interface WinError {
     // adapters.
     //
     int DNS_ERROR_INCONSISTENT_ROOT_HINTS = 9565;
+
     // DNS_ERROR_DWORD_VALUE_TOO_SMALL 0x0000255E
     //
     // MessageId: DNS_ERROR_DWORD_VALUE_TOO_SMALL
@@ -17181,6 +19215,7 @@ public interface WinError {
     // The specified value is too small for this parameter.
     //
     int DNS_ERROR_DWORD_VALUE_TOO_SMALL = 9566;
+
     // DNS_ERROR_DWORD_VALUE_TOO_LARGE 0x0000255F
     //
     // MessageId: DNS_ERROR_DWORD_VALUE_TOO_LARGE
@@ -17190,6 +19225,7 @@ public interface WinError {
     // The specified value is too large for this parameter.
     //
     int DNS_ERROR_DWORD_VALUE_TOO_LARGE = 9567;
+
     // DNS_ERROR_BACKGROUND_LOADING 0x00002560
     //
     // MessageId: DNS_ERROR_BACKGROUND_LOADING
@@ -17200,6 +19236,7 @@ public interface WinError {
     // the background. Please try again later.
     //
     int DNS_ERROR_BACKGROUND_LOADING = 9568;
+
     // DNS_ERROR_NOT_ALLOWED_ON_RODC 0x00002561
     //
     // MessageId: DNS_ERROR_NOT_ALLOWED_ON_RODC
@@ -17210,6 +19247,7 @@ public interface WinError {
     // on a read-only DC.
     //
     int DNS_ERROR_NOT_ALLOWED_ON_RODC = 9569;
+
     // DNS_ERROR_NOT_ALLOWED_UNDER_DNAME 0x00002562
     //
     // MessageId: DNS_ERROR_NOT_ALLOWED_UNDER_DNAME
@@ -17219,10 +19257,12 @@ public interface WinError {
     // No data is allowed to exist underneath a DNAME record.
     //
     int DNS_ERROR_NOT_ALLOWED_UNDER_DNAME = 9570;
+
     //
     // Zone errors
     //
     int DNS_ERROR_ZONE_BASE = 9600;
+
     // DNS_ERROR_ZONE_DOES_NOT_EXIST=0x00002581
     //
     // MessageId: DNS_ERROR_ZONE_DOES_NOT_EXIST
@@ -17232,6 +19272,7 @@ public interface WinError {
     // DNS zone does not exist.
     //
     int DNS_ERROR_ZONE_DOES_NOT_EXIST = 9601;
+
     // DNS_ERROR_NO_ZONE_INFO=0x00002582
     //
     // MessageId: DNS_ERROR_NO_ZONE_INFO
@@ -17241,6 +19282,7 @@ public interface WinError {
     // DNS zone information not available.
     //
     int DNS_ERROR_NO_ZONE_INFO = 9602;
+
     // DNS_ERROR_INVALID_ZONE_OPERATION 0x00002583
     //
     // MessageId: DNS_ERROR_INVALID_ZONE_OPERATION
@@ -17250,6 +19292,7 @@ public interface WinError {
     // Invalid operation for DNS zone.
     //
     int DNS_ERROR_INVALID_ZONE_OPERATION = 9603;
+
     // DNS_ERROR_ZONE_CONFIGURATION_ERROR 0x00002584
     //
     // MessageId: DNS_ERROR_ZONE_CONFIGURATION_ERROR
@@ -17259,6 +19302,7 @@ public interface WinError {
     // Invalid DNS zone configuration.
     //
     int DNS_ERROR_ZONE_CONFIGURATION_ERROR = 9604;
+
     // DNS_ERROR_ZONE_HAS_NO_SOA_RECORD 0x00002585
     //
     // MessageId: DNS_ERROR_ZONE_HAS_NO_SOA_RECORD
@@ -17268,6 +19312,7 @@ public interface WinError {
     // DNS zone has no start of authority (SOA) record.
     //
     int DNS_ERROR_ZONE_HAS_NO_SOA_RECORD = 9605;
+
     // DNS_ERROR_ZONE_HAS_NO_NS_RECORDS 0x00002586
     //
     // MessageId: DNS_ERROR_ZONE_HAS_NO_NS_RECORDS
@@ -17277,6 +19322,7 @@ public interface WinError {
     // DNS zone has no Name Server (NS) record.
     //
     int DNS_ERROR_ZONE_HAS_NO_NS_RECORDS = 9606;
+
     // DNS_ERROR_ZONE_LOCKED=0x00002587
     //
     // MessageId: DNS_ERROR_ZONE_LOCKED
@@ -17286,6 +19332,7 @@ public interface WinError {
     // DNS zone is locked.
     //
     int DNS_ERROR_ZONE_LOCKED = 9607;
+
     // DNS_ERROR_ZONE_CREATION_FAILED=0x00002588
     //
     // MessageId: DNS_ERROR_ZONE_CREATION_FAILED
@@ -17295,6 +19342,7 @@ public interface WinError {
     // DNS zone creation failed.
     //
     int DNS_ERROR_ZONE_CREATION_FAILED = 9608;
+
     // DNS_ERROR_ZONE_ALREADY_EXISTS=0x00002589
     //
     // MessageId: DNS_ERROR_ZONE_ALREADY_EXISTS
@@ -17304,6 +19352,7 @@ public interface WinError {
     // DNS zone already exists.
     //
     int DNS_ERROR_ZONE_ALREADY_EXISTS = 9609;
+
     // DNS_ERROR_AUTOZONE_ALREADY_EXISTS 0x0000258a
     //
     // MessageId: DNS_ERROR_AUTOZONE_ALREADY_EXISTS
@@ -17313,6 +19362,7 @@ public interface WinError {
     // DNS automatic zone already exists.
     //
     int DNS_ERROR_AUTOZONE_ALREADY_EXISTS = 9610;
+
     // DNS_ERROR_INVALID_ZONE_TYPE=0x0000258b
     //
     // MessageId: DNS_ERROR_INVALID_ZONE_TYPE
@@ -17322,6 +19372,7 @@ public interface WinError {
     // Invalid DNS zone type.
     //
     int DNS_ERROR_INVALID_ZONE_TYPE = 9611;
+
     // DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP 0x0000258c
     //
     // MessageId: DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP
@@ -17331,6 +19382,7 @@ public interface WinError {
     // Secondary DNS zone requires master IP address.
     //
     int DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP = 9612;
+
     // DNS_ERROR_ZONE_NOT_SECONDARY=0x0000258d
     //
     // MessageId: DNS_ERROR_ZONE_NOT_SECONDARY
@@ -17340,6 +19392,7 @@ public interface WinError {
     // DNS zone not secondary.
     //
     int DNS_ERROR_ZONE_NOT_SECONDARY = 9613;
+
     // DNS_ERROR_NEED_SECONDARY_ADDRESSES 0x0000258e
     //
     // MessageId: DNS_ERROR_NEED_SECONDARY_ADDRESSES
@@ -17349,6 +19402,7 @@ public interface WinError {
     // Need secondary IP address.
     //
     int DNS_ERROR_NEED_SECONDARY_ADDRESSES = 9614;
+
     // DNS_ERROR_WINS_INIT_FAILED=0x0000258f
     //
     // MessageId: DNS_ERROR_WINS_INIT_FAILED
@@ -17358,6 +19412,7 @@ public interface WinError {
     // WINS initialization failed.
     //
     int DNS_ERROR_WINS_INIT_FAILED = 9615;
+
     // DNS_ERROR_NEED_WINS_SERVERS=0x00002590
     //
     // MessageId: DNS_ERROR_NEED_WINS_SERVERS
@@ -17367,6 +19422,7 @@ public interface WinError {
     // Need WINS servers.
     //
     int DNS_ERROR_NEED_WINS_SERVERS = 9616;
+
     // DNS_ERROR_NBSTAT_INIT_FAILED=0x00002591
     //
     // MessageId: DNS_ERROR_NBSTAT_INIT_FAILED
@@ -17376,6 +19432,7 @@ public interface WinError {
     // NBTSTAT initialization call failed.
     //
     int DNS_ERROR_NBSTAT_INIT_FAILED = 9617;
+
     // DNS_ERROR_SOA_DELETE_INVALID=0x00002592
     //
     // MessageId: DNS_ERROR_SOA_DELETE_INVALID
@@ -17385,6 +19442,7 @@ public interface WinError {
     // Invalid delete of start of authority (SOA)
     //
     int DNS_ERROR_SOA_DELETE_INVALID = 9618;
+
     // DNS_ERROR_FORWARDER_ALREADY_EXISTS 0x00002593
     //
     // MessageId: DNS_ERROR_FORWARDER_ALREADY_EXISTS
@@ -17394,6 +19452,7 @@ public interface WinError {
     // A conditional forwarding zone already exists for that name.
     //
     int DNS_ERROR_FORWARDER_ALREADY_EXISTS = 9619;
+
     // DNS_ERROR_ZONE_REQUIRES_MASTER_IP 0x00002594
     //
     // MessageId: DNS_ERROR_ZONE_REQUIRES_MASTER_IP
@@ -17404,6 +19463,7 @@ public interface WinError {
     // addresses.
     //
     int DNS_ERROR_ZONE_REQUIRES_MASTER_IP = 9620;
+
     // DNS_ERROR_ZONE_IS_SHUTDOWN=0x00002595
     //
     // MessageId: DNS_ERROR_ZONE_IS_SHUTDOWN
@@ -17413,10 +19473,12 @@ public interface WinError {
     // The operation cannot be performed because this zone is shutdown.
     //
     int DNS_ERROR_ZONE_IS_SHUTDOWN = 9621;
+
     //
     // Datafile errors
     //
     int DNS_ERROR_DATAFILE_BASE = 9650;
+
     // DNS=0x000025b3
     //
     // MessageId: DNS_ERROR_PRIMARY_REQUIRES_DATAFILE
@@ -17426,6 +19488,7 @@ public interface WinError {
     // Primary DNS zone requires datafile.
     //
     int DNS_ERROR_PRIMARY_REQUIRES_DATAFILE = 9651;
+
     // DNS=0x000025b4
     //
     // MessageId: DNS_ERROR_INVALID_DATAFILE_NAME
@@ -17435,6 +19498,7 @@ public interface WinError {
     // Invalid datafile name for DNS zone.
     //
     int DNS_ERROR_INVALID_DATAFILE_NAME = 9652;
+
     // DNS=0x000025b5
     //
     // MessageId: DNS_ERROR_DATAFILE_OPEN_FAILURE
@@ -17444,6 +19508,7 @@ public interface WinError {
     // Failed to open datafile for DNS zone.
     //
     int DNS_ERROR_DATAFILE_OPEN_FAILURE = 9653;
+
     // DNS=0x000025b6
     //
     // MessageId: DNS_ERROR_FILE_WRITEBACK_FAILED
@@ -17453,6 +19518,7 @@ public interface WinError {
     // Failed to write datafile for DNS zone.
     //
     int DNS_ERROR_FILE_WRITEBACK_FAILED = 9654;
+
     // DNS=0x000025b7
     //
     // MessageId: DNS_ERROR_DATAFILE_PARSING
@@ -17462,10 +19528,12 @@ public interface WinError {
     // Failure while reading datafile for DNS zone.
     //
     int DNS_ERROR_DATAFILE_PARSING = 9655;
+
     //
     // Database errors
     //
     int DNS_ERROR_DATABASE_BASE = 9700;
+
     // DNS_ERROR_RECORD_DOES_NOT_EXIST 0x000025e5
     //
     // MessageId: DNS_ERROR_RECORD_DOES_NOT_EXIST
@@ -17475,6 +19543,7 @@ public interface WinError {
     // DNS record does not exist.
     //
     int DNS_ERROR_RECORD_DOES_NOT_EXIST = 9701;
+
     // DNS_ERROR_RECORD_FORMAT=0x000025e6
     //
     // MessageId: DNS_ERROR_RECORD_FORMAT
@@ -17484,6 +19553,7 @@ public interface WinError {
     // DNS record format error.
     //
     int DNS_ERROR_RECORD_FORMAT = 9702;
+
     // DNS_ERROR_NODE_CREATION_FAILED=0x000025e7
     //
     // MessageId: DNS_ERROR_NODE_CREATION_FAILED
@@ -17493,6 +19563,7 @@ public interface WinError {
     // Node creation failure in DNS.
     //
     int DNS_ERROR_NODE_CREATION_FAILED = 9703;
+
     // DNS_ERROR_UNKNOWN_RECORD_TYPE=0x000025e8
     //
     // MessageId: DNS_ERROR_UNKNOWN_RECORD_TYPE
@@ -17502,6 +19573,7 @@ public interface WinError {
     // Unknown DNS record type.
     //
     int DNS_ERROR_UNKNOWN_RECORD_TYPE = 9704;
+
     // DNS_ERROR_RECORD_TIMED_OUT=0x000025e9
     //
     // MessageId: DNS_ERROR_RECORD_TIMED_OUT
@@ -17511,6 +19583,7 @@ public interface WinError {
     // DNS record timed out.
     //
     int DNS_ERROR_RECORD_TIMED_OUT = 9705;
+
     // DNS_ERROR_NAME_NOT_IN_ZONE=0x000025ea
     //
     // MessageId: DNS_ERROR_NAME_NOT_IN_ZONE
@@ -17520,6 +19593,7 @@ public interface WinError {
     // Name not in DNS zone.
     //
     int DNS_ERROR_NAME_NOT_IN_ZONE = 9706;
+
     // DNS_ERROR_CNAME_LOOP=0x000025eb
     //
     // MessageId: DNS_ERROR_CNAME_LOOP
@@ -17529,6 +19603,7 @@ public interface WinError {
     // CNAME loop detected.
     //
     int DNS_ERROR_CNAME_LOOP = 9707;
+
     // DNS_ERROR_NODE_IS_CNAME=0x000025ec
     //
     // MessageId: DNS_ERROR_NODE_IS_CNAME
@@ -17538,6 +19613,7 @@ public interface WinError {
     // Node is a CNAME DNS record.
     //
     int DNS_ERROR_NODE_IS_CNAME = 9708;
+
     // DNS_ERROR_CNAME_COLLISION=0x000025ed
     //
     // MessageId: DNS_ERROR_CNAME_COLLISION
@@ -17547,6 +19623,7 @@ public interface WinError {
     // A CNAME record already exists for given name.
     //
     int DNS_ERROR_CNAME_COLLISION = 9709;
+
     // DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT 0x000025ee
     //
     // MessageId: DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT
@@ -17556,6 +19633,7 @@ public interface WinError {
     // Record only at DNS zone root.
     //
     int DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT = 9710;
+
     // DNS_ERROR_RECORD_ALREADY_EXISTS 0x000025ef
     //
     // MessageId: DNS_ERROR_RECORD_ALREADY_EXISTS
@@ -17565,6 +19643,7 @@ public interface WinError {
     // DNS record already exists.
     //
     int DNS_ERROR_RECORD_ALREADY_EXISTS = 9711;
+
     // DNS_ERROR_SECONDARY_DATA=0x000025f0
     //
     // MessageId: DNS_ERROR_SECONDARY_DATA
@@ -17574,6 +19653,7 @@ public interface WinError {
     // Secondary DNS zone data error.
     //
     int DNS_ERROR_SECONDARY_DATA = 9712;
+
     // DNS_ERROR_NO_CREATE_CACHE_DATA=0x000025f1
     //
     // MessageId: DNS_ERROR_NO_CREATE_CACHE_DATA
@@ -17583,6 +19663,7 @@ public interface WinError {
     // Could not create DNS cache data.
     //
     int DNS_ERROR_NO_CREATE_CACHE_DATA = 9713;
+
     // DNS_ERROR_NAME_DOES_NOT_EXIST=0x000025f2
     //
     // MessageId: DNS_ERROR_NAME_DOES_NOT_EXIST
@@ -17592,6 +19673,7 @@ public interface WinError {
     // DNS name does not exist.
     //
     int DNS_ERROR_NAME_DOES_NOT_EXIST = 9714;
+
     // DNS_WARNING_PTR_CREATE_FAILED=0x000025f3
     //
     // MessageId: DNS_WARNING_PTR_CREATE_FAILED
@@ -17601,6 +19683,7 @@ public interface WinError {
     // Could not create pointer (PTR) record.
     //
     int DNS_WARNING_PTR_CREATE_FAILED = 9715;
+
     // DNS_WARNING_DOMAIN_UNDELETED=0x000025f4
     //
     // MessageId: DNS_WARNING_DOMAIN_UNDELETED
@@ -17610,6 +19693,7 @@ public interface WinError {
     // DNS domain was undeleted.
     //
     int DNS_WARNING_DOMAIN_UNDELETED = 9716;
+
     // DNS_ERROR_DS_UNAVAILABLE=0x000025f5
     //
     // MessageId: DNS_ERROR_DS_UNAVAILABLE
@@ -17619,6 +19703,7 @@ public interface WinError {
     // The directory service is unavailable.
     //
     int DNS_ERROR_DS_UNAVAILABLE = 9717;
+
     // DNS_ERROR_DS_ZONE_ALREADY_EXISTS 0x000025f6
     //
     // MessageId: DNS_ERROR_DS_ZONE_ALREADY_EXISTS
@@ -17628,6 +19713,7 @@ public interface WinError {
     // DNS zone already exists in the directory service.
     //
     int DNS_ERROR_DS_ZONE_ALREADY_EXISTS = 9718;
+
     // DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE 0x000025f7
     //
     // MessageId: DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE
@@ -17638,6 +19724,7 @@ public interface WinError {
     // service integrated DNS zone.
     //
     int DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE = 9719;
+
     // DNS_ERROR_NODE_IS_DNAME=0x000025f8
     //
     // MessageId: DNS_ERROR_NODE_IS_DNAME
@@ -17647,6 +19734,7 @@ public interface WinError {
     // Node is a DNAME DNS record.
     //
     int DNS_ERROR_NODE_IS_DNAME = 9720;
+
     // DNS_ERROR_DNAME_COLLISION=0x000025f9
     //
     // MessageId: DNS_ERROR_DNAME_COLLISION
@@ -17656,6 +19744,7 @@ public interface WinError {
     // A DNAME record already exists for given name.
     //
     int DNS_ERROR_DNAME_COLLISION = 9721;
+
     // DNS_ERROR_ALIAS_LOOP=0x000025fa
     //
     // MessageId: DNS_ERROR_ALIAS_LOOP
@@ -17665,10 +19754,12 @@ public interface WinError {
     // An alias loop has been detected with either CNAME or DNAME records.
     //
     int DNS_ERROR_ALIAS_LOOP = 9722;
+
     //
     // Operation errors
     //
     int DNS_ERROR_OPERATION_BASE = 9750;
+
     // DNS_INFO_AXFR_COMPLETE=0x00002617
     //
     // MessageId: DNS_INFO_AXFR_COMPLETE
@@ -17678,6 +19769,7 @@ public interface WinError {
     // DNS AXFR (zone transfer) complete.
     //
     int DNS_INFO_AXFR_COMPLETE = 9751;
+
     // DNS_ERROR_AXFR=0x00002618
     //
     // MessageId: DNS_ERROR_AXFR
@@ -17687,6 +19779,7 @@ public interface WinError {
     // DNS zone transfer failed.
     //
     int DNS_ERROR_AXFR = 9752;
+
     // DNS_INFO_ADDED_LOCAL_WINS=0x00002619
     //
     // MessageId: DNS_INFO_ADDED_LOCAL_WINS
@@ -17696,10 +19789,12 @@ public interface WinError {
     // Added local WINS server.
     //
     int DNS_INFO_ADDED_LOCAL_WINS = 9753;
+
     //
     // Secure update
     //
     int DNS_ERROR_SECURE_BASE = 9800;
+
     // DNS_STATUS_CONTINUE_NEEDED=0x00002649
     //
     // MessageId: DNS_STATUS_CONTINUE_NEEDED
@@ -17709,10 +19804,12 @@ public interface WinError {
     // Secure update call needs to continue update request.
     //
     int DNS_STATUS_CONTINUE_NEEDED = 9801;
+
     //
     // Setup errors
     //
     int DNS_ERROR_SETUP_BASE = 9850;
+
     // DNS_ERROR_NO_TCPIP=0x0000267b
     //
     // MessageId: DNS_ERROR_NO_TCPIP
@@ -17722,6 +19819,7 @@ public interface WinError {
     // TCP/IP network protocol not installed.
     //
     int DNS_ERROR_NO_TCPIP = 9851;
+
     // DNS_ERROR_NO_DNS_SERVERS=0x0000267c
     //
     // MessageId: DNS_ERROR_NO_DNS_SERVERS
@@ -17731,10 +19829,12 @@ public interface WinError {
     // No DNS servers configured for local system.
     //
     int DNS_ERROR_NO_DNS_SERVERS = 9852;
+
     //
     // Directory partition (DP) errors
     //
     int DNS_ERROR_DP_BASE = 9900;
+
     // DNS_ERROR_DP_DOES_NOT_EXIST=0x000026ad
     //
     // MessageId: DNS_ERROR_DP_DOES_NOT_EXIST
@@ -17744,6 +19844,7 @@ public interface WinError {
     // The specified directory partition does not exist.
     //
     int DNS_ERROR_DP_DOES_NOT_EXIST = 9901;
+
     // DNS_ERROR_DP_ALREADY_EXISTS=0x000026ae
     //
     // MessageId: DNS_ERROR_DP_ALREADY_EXISTS
@@ -17753,6 +19854,7 @@ public interface WinError {
     // The specified directory partition already exists.
     //
     int DNS_ERROR_DP_ALREADY_EXISTS = 9902;
+
     // DNS_ERROR_DP_NOT_ENLISTED=0x000026af
     //
     // MessageId: DNS_ERROR_DP_NOT_ENLISTED
@@ -17762,6 +19864,7 @@ public interface WinError {
     // This DNS server is not enlisted in the specified directory partition.
     //
     int DNS_ERROR_DP_NOT_ENLISTED = 9903;
+
     // DNS_ERROR_DP_ALREADY_ENLISTED=0x000026b0
     //
     // MessageId: DNS_ERROR_DP_ALREADY_ENLISTED
@@ -17771,6 +19874,7 @@ public interface WinError {
     // This DNS server is already enlisted in the specified directory partition.
     //
     int DNS_ERROR_DP_ALREADY_ENLISTED = 9904;
+
     // DNS_ERROR_DP_NOT_AVAILABLE=0x000026b1
     //
     // MessageId: DNS_ERROR_DP_NOT_AVAILABLE
@@ -17781,6 +19885,7 @@ public interface WinError {
     // minutes and try again.
     //
     int DNS_ERROR_DP_NOT_AVAILABLE = 9905;
+
     // DNS_ERROR_DP_FSMO_ERROR=0x000026b2
     //
     // MessageId: DNS_ERROR_DP_FSMO_ERROR
@@ -17792,6 +19897,7 @@ public interface WinError {
     // service the request or is not running Windows Server=2003.
     //
     int DNS_ERROR_DP_FSMO_ERROR = 9906;
+
     // /////////////////////////////////////////////////
     // =//
     // =End of DNS Error Codes=//
@@ -17809,6 +19915,7 @@ public interface WinError {
     // and WinSock2.h, hence the IFDEF
     //
     int WSABASEERR = 10000;
+
     //
     // MessageId: WSAEINTR
     //
@@ -17817,6 +19924,7 @@ public interface WinError {
     // A blocking operation was interrupted by a call to WSACancelBlockingCall.
     //
     int WSAEINTR = 10004;
+
     //
     // MessageId: WSAEBADF
     //
@@ -17825,6 +19933,7 @@ public interface WinError {
     // The file handle supplied is not valid.
     //
     int WSAEBADF = 10009;
+
     //
     // MessageId: WSAEACCES
     //
@@ -17834,6 +19943,7 @@ public interface WinError {
     // permissions.
     //
     int WSAEACCES = 10013;
+
     //
     // MessageId: WSAEFAULT
     //
@@ -17843,6 +19953,7 @@ public interface WinError {
     // pointer argument in a call.
     //
     int WSAEFAULT = 10014;
+
     //
     // MessageId: WSAEINVAL
     //
@@ -17851,6 +19962,7 @@ public interface WinError {
     // An invalid argument was supplied.
     //
     int WSAEINVAL = 10022;
+
     //
     // MessageId: WSAEMFILE
     //
@@ -17859,6 +19971,7 @@ public interface WinError {
     // Too many open sockets.
     //
     int WSAEMFILE = 10024;
+
     //
     // MessageId: WSAEWOULDBLOCK
     //
@@ -17867,6 +19980,7 @@ public interface WinError {
     // A non-blocking socket operation could not be completed immediately.
     //
     int WSAEWOULDBLOCK = 10035;
+
     //
     // MessageId: WSAEINPROGRESS
     //
@@ -17875,6 +19989,7 @@ public interface WinError {
     // A blocking operation is currently executing.
     //
     int WSAEINPROGRESS = 10036;
+
     //
     // MessageId: WSAEALREADY
     //
@@ -17884,6 +19999,7 @@ public interface WinError {
     // operation in progress.
     //
     int WSAEALREADY = 10037;
+
     //
     // MessageId: WSAENOTSOCK
     //
@@ -17892,6 +20008,7 @@ public interface WinError {
     // An operation was attempted on something that is not a socket.
     //
     int WSAENOTSOCK = 10038;
+
     //
     // MessageId: WSAEDESTADDRREQ
     //
@@ -17900,6 +20017,7 @@ public interface WinError {
     // A required address was omitted from an operation on a socket.
     //
     int WSAEDESTADDRREQ = 10039;
+
     //
     // MessageId: WSAEMSGSIZE
     //
@@ -17910,6 +20028,7 @@ public interface WinError {
     // datagram into was smaller than the datagram itself.
     //
     int WSAEMSGSIZE = 10040;
+
     //
     // MessageId: WSAEPROTOTYPE
     //
@@ -17919,6 +20038,7 @@ public interface WinError {
     // support the semantics of the socket type requested.
     //
     int WSAEPROTOTYPE = 10041;
+
     //
     // MessageId: WSAENOPROTOOPT
     //
@@ -17928,6 +20048,7 @@ public interface WinError {
     // getsockopt or setsockopt call.
     //
     int WSAENOPROTOOPT = 10042;
+
     //
     // MessageId: WSAEPROTONOSUPPORT
     //
@@ -17937,6 +20058,7 @@ public interface WinError {
     // implementation for it exists.
     //
     int WSAEPROTONOSUPPORT = 10043;
+
     //
     // MessageId: WSAESOCKTNOSUPPORT
     //
@@ -17946,6 +20068,7 @@ public interface WinError {
     // family.
     //
     int WSAESOCKTNOSUPPORT = 10044;
+
     //
     // MessageId: WSAEOPNOTSUPP
     //
@@ -17955,6 +20078,7 @@ public interface WinError {
     // referenced.
     //
     int WSAEOPNOTSUPP = 10045;
+
     //
     // MessageId: WSAEPFNOSUPPORT
     //
@@ -17964,6 +20088,7 @@ public interface WinError {
     // implementation for it exists.
     //
     int WSAEPFNOSUPPORT = 10046;
+
     //
     // MessageId: WSAEAFNOSUPPORT
     //
@@ -17972,6 +20097,7 @@ public interface WinError {
     // An address incompatible with the requested protocol was used.
     //
     int WSAEAFNOSUPPORT = 10047;
+
     //
     // MessageId: WSAEADDRINUSE
     //
@@ -17981,6 +20107,7 @@ public interface WinError {
     // normally permitted.
     //
     int WSAEADDRINUSE = 10048;
+
     //
     // MessageId: WSAEADDRNOTAVAIL
     //
@@ -17989,6 +20116,7 @@ public interface WinError {
     // The requested address is not valid in its context.
     //
     int WSAEADDRNOTAVAIL = 10049;
+
     //
     // MessageId: WSAENETDOWN
     //
@@ -17997,6 +20125,7 @@ public interface WinError {
     // A socket operation encountered a dead network.
     //
     int WSAENETDOWN = 10050;
+
     //
     // MessageId: WSAENETUNREACH
     //
@@ -18005,6 +20134,7 @@ public interface WinError {
     // A socket operation was attempted to an unreachable network.
     //
     int WSAENETUNREACH = 10051;
+
     //
     // MessageId: WSAENETRESET
     //
@@ -18014,6 +20144,7 @@ public interface WinError {
     // failure while the operation was in progress.
     //
     int WSAENETRESET = 10052;
+
     //
     // MessageId: WSAECONNABORTED
     //
@@ -18023,6 +20154,7 @@ public interface WinError {
     // machine.
     //
     int WSAECONNABORTED = 10053;
+
     //
     // MessageId: WSAECONNRESET
     //
@@ -18031,6 +20163,7 @@ public interface WinError {
     // An existing connection was forcibly closed by the remote host.
     //
     int WSAECONNRESET = 10054;
+
     //
     // MessageId: WSAENOBUFS
     //
@@ -18040,6 +20173,7 @@ public interface WinError {
     // sufficient buffer space or because a queue was full.
     //
     int WSAENOBUFS = 10055;
+
     //
     // MessageId: WSAEISCONN
     //
@@ -18048,6 +20182,7 @@ public interface WinError {
     // A connect request was made on an already connected socket.
     //
     int WSAEISCONN = 10056;
+
     //
     // MessageId: WSAENOTCONN
     //
@@ -18058,6 +20193,7 @@ public interface WinError {
     // no address was supplied.
     //
     int WSAENOTCONN = 10057;
+
     //
     // MessageId: WSAESHUTDOWN
     //
@@ -18067,6 +20203,7 @@ public interface WinError {
     // already been shut down in that direction with a previous shutdown call.
     //
     int WSAESHUTDOWN = 10058;
+
     //
     // MessageId: WSAETOOMANYREFS
     //
@@ -18075,6 +20212,7 @@ public interface WinError {
     // Too many references to some kernel object.
     //
     int WSAETOOMANYREFS = 10059;
+
     //
     // MessageId: WSAETIMEDOUT
     //
@@ -18085,6 +20223,7 @@ public interface WinError {
     // connected host has failed to respond.
     //
     int WSAETIMEDOUT = 10060;
+
     //
     // MessageId: WSAECONNREFUSED
     //
@@ -18094,6 +20233,7 @@ public interface WinError {
     // it.
     //
     int WSAECONNREFUSED = 10061;
+
     //
     // MessageId: WSAELOOP
     //
@@ -18102,6 +20242,7 @@ public interface WinError {
     // Cannot translate name.
     //
     int WSAELOOP = 10062;
+
     //
     // MessageId: WSAENAMETOOLONG
     //
@@ -18110,6 +20251,7 @@ public interface WinError {
     // Name component or name was too long.
     //
     int WSAENAMETOOLONG = 10063;
+
     //
     // MessageId: WSAEHOSTDOWN
     //
@@ -18118,6 +20260,7 @@ public interface WinError {
     // A socket operation failed because the destination host was down.
     //
     int WSAEHOSTDOWN = 10064;
+
     //
     // MessageId: WSAEHOSTUNREACH
     //
@@ -18126,6 +20269,7 @@ public interface WinError {
     // A socket operation was attempted to an unreachable host.
     //
     int WSAEHOSTUNREACH = 10065;
+
     //
     // MessageId: WSAENOTEMPTY
     //
@@ -18134,6 +20278,7 @@ public interface WinError {
     // Cannot remove a directory that is not empty.
     //
     int WSAENOTEMPTY = 10066;
+
     //
     // MessageId: WSAEPROCLIM
     //
@@ -18143,6 +20288,7 @@ public interface WinError {
     // applications that may use it simultaneously.
     //
     int WSAEPROCLIM = 10067;
+
     //
     // MessageId: WSAEUSERS
     //
@@ -18151,6 +20297,7 @@ public interface WinError {
     // Ran out of quota.
     //
     int WSAEUSERS = 10068;
+
     //
     // MessageId: WSAEDQUOT
     //
@@ -18159,6 +20306,7 @@ public interface WinError {
     // Ran out of disk quota.
     //
     int WSAEDQUOT = 10069;
+
     //
     // MessageId: WSAESTALE
     //
@@ -18167,6 +20315,7 @@ public interface WinError {
     // File handle reference is no longer available.
     //
     int WSAESTALE = 10070;
+
     //
     // MessageId: WSAEREMOTE
     //
@@ -18175,6 +20324,7 @@ public interface WinError {
     // Item is not available locally.
     //
     int WSAEREMOTE = 10071;
+
     //
     // MessageId: WSASYSNOTREADY
     //
@@ -18184,6 +20334,7 @@ public interface WinError {
     // uses to provide network services is currently unavailable.
     //
     int WSASYSNOTREADY = 10091;
+
     //
     // MessageId: WSAVERNOTSUPPORTED
     //
@@ -18192,6 +20343,7 @@ public interface WinError {
     // The Windows Sockets version requested is not supported.
     //
     int WSAVERNOTSUPPORTED = 10092;
+
     //
     // MessageId: WSANOTINITIALISED
     //
@@ -18200,6 +20352,7 @@ public interface WinError {
     // Either the application has not called WSAStartup, or WSAStartup failed.
     //
     int WSANOTINITIALISED = 10093;
+
     //
     // MessageId: WSAEDISCON
     //
@@ -18209,6 +20362,7 @@ public interface WinError {
     // initiated a graceful shutdown sequence.
     //
     int WSAEDISCON = 10101;
+
     //
     // MessageId: WSAENOMORE
     //
@@ -18217,6 +20371,7 @@ public interface WinError {
     // No more results can be returned by WSALookupServiceNext.
     //
     int WSAENOMORE = 10102;
+
     //
     // MessageId: WSAECANCELLED
     //
@@ -18226,6 +20381,7 @@ public interface WinError {
     // processing. The call has been canceled.
     //
     int WSAECANCELLED = 10103;
+
     //
     // MessageId: WSAEINVALIDPROCTABLE
     //
@@ -18234,6 +20390,7 @@ public interface WinError {
     // The procedure call table is invalid.
     //
     int WSAEINVALIDPROCTABLE = 10104;
+
     //
     // MessageId: WSAEINVALIDPROVIDER
     //
@@ -18242,6 +20399,7 @@ public interface WinError {
     // The requested service provider is invalid.
     //
     int WSAEINVALIDPROVIDER = 10105;
+
     //
     // MessageId: WSAEPROVIDERFAILEDINIT
     //
@@ -18250,6 +20408,7 @@ public interface WinError {
     // The requested service provider could not be loaded or initialized.
     //
     int WSAEPROVIDERFAILEDINIT = 10106;
+
     //
     // MessageId: WSASYSCALLFAILURE
     //
@@ -18258,6 +20417,7 @@ public interface WinError {
     // A system call that should never fail has failed.
     //
     int WSASYSCALLFAILURE = 10107;
+
     //
     // MessageId: WSASERVICE_NOT_FOUND
     //
@@ -18267,6 +20427,7 @@ public interface WinError {
     // name space.
     //
     int WSASERVICE_NOT_FOUND = 10108;
+
     //
     // MessageId: WSATYPE_NOT_FOUND
     //
@@ -18275,6 +20436,7 @@ public interface WinError {
     // The specified class was not found.
     //
     int WSATYPE_NOT_FOUND = 10109;
+
     //
     // MessageId: WSA_E_NO_MORE
     //
@@ -18283,6 +20445,7 @@ public interface WinError {
     // No more results can be returned by WSALookupServiceNext.
     //
     int WSA_E_NO_MORE = 10110;
+
     //
     // MessageId: WSA_E_CANCELLED
     //
@@ -18292,6 +20455,7 @@ public interface WinError {
     // processing. The call has been canceled.
     //
     int WSA_E_CANCELLED = 10111;
+
     //
     // MessageId: WSAEREFUSED
     //
@@ -18300,6 +20464,7 @@ public interface WinError {
     // A database query failed because it was actively refused.
     //
     int WSAEREFUSED = 10112;
+
     //
     // MessageId: WSAHOST_NOT_FOUND
     //
@@ -18308,6 +20473,7 @@ public interface WinError {
     // No such host is known.
     //
     int WSAHOST_NOT_FOUND = 11001;
+
     //
     // MessageId: WSATRY_AGAIN
     //
@@ -18318,6 +20484,7 @@ public interface WinError {
     // server.
     //
     int WSATRY_AGAIN = 11002;
+
     //
     // MessageId: WSANO_RECOVERY
     //
@@ -18326,6 +20493,7 @@ public interface WinError {
     // A non-recoverable error occurred during a database lookup.
     //
     int WSANO_RECOVERY = 11003;
+
     //
     // MessageId: WSANO_DATA
     //
@@ -18334,6 +20502,7 @@ public interface WinError {
     // The requested name is valid, but no data of the requested type was found.
     //
     int WSANO_DATA = 11004;
+
     //
     // MessageId: WSA_QOS_RECEIVERS
     //
@@ -18342,6 +20511,7 @@ public interface WinError {
     // At least one reserve has arrived.
     //
     int WSA_QOS_RECEIVERS = 11005;
+
     //
     // MessageId: WSA_QOS_SENDERS
     //
@@ -18350,6 +20520,7 @@ public interface WinError {
     // At least one path has arrived.
     //
     int WSA_QOS_SENDERS = 11006;
+
     //
     // MessageId: WSA_QOS_NO_SENDERS
     //
@@ -18358,6 +20529,7 @@ public interface WinError {
     // There are no senders.
     //
     int WSA_QOS_NO_SENDERS = 11007;
+
     //
     // MessageId: WSA_QOS_NO_RECEIVERS
     //
@@ -18366,6 +20538,7 @@ public interface WinError {
     // There are no receivers.
     //
     int WSA_QOS_NO_RECEIVERS = 11008;
+
     //
     // MessageId: WSA_QOS_REQUEST_CONFIRMED
     //
@@ -18374,6 +20547,7 @@ public interface WinError {
     // Reserve has been confirmed.
     //
     int WSA_QOS_REQUEST_CONFIRMED = 11009;
+
     //
     // MessageId: WSA_QOS_ADMISSION_FAILURE
     //
@@ -18382,6 +20556,7 @@ public interface WinError {
     // Error due to lack of resources.
     //
     int WSA_QOS_ADMISSION_FAILURE = 11010;
+
     //
     // MessageId: WSA_QOS_POLICY_FAILURE
     //
@@ -18390,6 +20565,7 @@ public interface WinError {
     // Rejected for administrative reasons - bad credentials.
     //
     int WSA_QOS_POLICY_FAILURE = 11011;
+
     //
     // MessageId: WSA_QOS_BAD_STYLE
     //
@@ -18398,6 +20574,7 @@ public interface WinError {
     // Unknown or conflicting style.
     //
     int WSA_QOS_BAD_STYLE = 11012;
+
     //
     // MessageId: WSA_QOS_BAD_OBJECT
     //
@@ -18407,6 +20584,7 @@ public interface WinError {
     // general.
     //
     int WSA_QOS_BAD_OBJECT = 11013;
+
     //
     // MessageId: WSA_QOS_TRAFFIC_CTRL_ERROR
     //
@@ -18415,6 +20593,7 @@ public interface WinError {
     // Problem with some part of the flowspec.
     //
     int WSA_QOS_TRAFFIC_CTRL_ERROR = 11014;
+
     //
     // MessageId: WSA_QOS_GENERIC_ERROR
     //
@@ -18423,6 +20602,7 @@ public interface WinError {
     // General QOS error.
     //
     int WSA_QOS_GENERIC_ERROR = 11015;
+
     //
     // MessageId: WSA_QOS_ESERVICETYPE
     //
@@ -18431,6 +20611,7 @@ public interface WinError {
     // An invalid or unrecognized service type was found in the flowspec.
     //
     int WSA_QOS_ESERVICETYPE = 11016;
+
     //
     // MessageId: WSA_QOS_EFLOWSPEC
     //
@@ -18439,6 +20620,7 @@ public interface WinError {
     // An invalid or inconsistent flowspec was found in the QOS structure.
     //
     int WSA_QOS_EFLOWSPEC = 11017;
+
     //
     // MessageId: WSA_QOS_EPROVSPECBUF
     //
@@ -18447,6 +20629,7 @@ public interface WinError {
     // Invalid QOS provider-specific buffer.
     //
     int WSA_QOS_EPROVSPECBUF = 11018;
+
     //
     // MessageId: WSA_QOS_EFILTERSTYLE
     //
@@ -18455,6 +20638,7 @@ public interface WinError {
     // An invalid QOS filter style was used.
     //
     int WSA_QOS_EFILTERSTYLE = 11019;
+
     //
     // MessageId: WSA_QOS_EFILTERTYPE
     //
@@ -18463,6 +20647,7 @@ public interface WinError {
     // An invalid QOS filter type was used.
     //
     int WSA_QOS_EFILTERTYPE = 11020;
+
     //
     // MessageId: WSA_QOS_EFILTERCOUNT
     //
@@ -18472,6 +20657,7 @@ public interface WinError {
     // FLOWDESCRIPTOR.
     //
     int WSA_QOS_EFILTERCOUNT = 11021;
+
     //
     // MessageId: WSA_QOS_EOBJLENGTH
     //
@@ -18481,6 +20667,7 @@ public interface WinError {
     // provider-specific buffer.
     //
     int WSA_QOS_EOBJLENGTH = 11022;
+
     //
     // MessageId: WSA_QOS_EFLOWCOUNT
     //
@@ -18490,6 +20677,7 @@ public interface WinError {
     // structure.
     //
     int WSA_QOS_EFLOWCOUNT = 11023;
+
     //
     // MessageId: WSA_QOS_EUNKOWNPSOBJ
     //
@@ -18498,6 +20686,7 @@ public interface WinError {
     // An unrecognized object was found in the QOS provider-specific buffer.
     //
     int WSA_QOS_EUNKOWNPSOBJ = 11024;
+
     //
     // MessageId: WSA_QOS_EPOLICYOBJ
     //
@@ -18506,6 +20695,7 @@ public interface WinError {
     // An invalid policy object was found in the QOS provider-specific buffer.
     //
     int WSA_QOS_EPOLICYOBJ = 11025;
+
     //
     // MessageId: WSA_QOS_EFLOWDESC
     //
@@ -18514,6 +20704,7 @@ public interface WinError {
     // An invalid QOS flow descriptor was found in the flow descriptor list.
     //
     int WSA_QOS_EFLOWDESC = 11026;
+
     //
     // MessageId: WSA_QOS_EPSFLOWSPEC
     //
@@ -18523,6 +20714,7 @@ public interface WinError {
     // specific buffer.
     //
     int WSA_QOS_EPSFLOWSPEC = 11027;
+
     //
     // MessageId: WSA_QOS_EPSFILTERSPEC
     //
@@ -18531,6 +20723,7 @@ public interface WinError {
     // An invalid FILTERSPEC was found in the QOS provider-specific buffer.
     //
     int WSA_QOS_EPSFILTERSPEC = 11028;
+
     //
     // MessageId: WSA_QOS_ESDMODEOBJ
     //
@@ -18540,6 +20733,7 @@ public interface WinError {
     // specific buffer.
     //
     int WSA_QOS_ESDMODEOBJ = 11029;
+
     //
     // MessageId: WSA_QOS_ESHAPERATEOBJ
     //
@@ -18549,6 +20743,7 @@ public interface WinError {
     // buffer.
     //
     int WSA_QOS_ESHAPERATEOBJ = 11030;
+
     //
     // MessageId: WSA_QOS_RESERVED_PETYPE
     //
@@ -18557,6 +20752,7 @@ public interface WinError {
     // A reserved policy element was found in the QOS provider-specific buffer.
     //
     int WSA_QOS_RESERVED_PETYPE = 11031;
+
     // /////////////////////////////////////////////////
     // =End of WinSock Error Codes=//
     // =//
@@ -18582,6 +20778,7 @@ public interface WinError {
     // The specified quick mode policy already exists.
     //
     int ERROR_IPSEC_QM_POLICY_EXISTS = 13000;
+
     //
     // MessageId: ERROR_IPSEC_QM_POLICY_NOT_FOUND
     //
@@ -18590,6 +20787,7 @@ public interface WinError {
     // The specified quick mode policy was not found.
     //
     int ERROR_IPSEC_QM_POLICY_NOT_FOUND = 13001;
+
     //
     // MessageId: ERROR_IPSEC_QM_POLICY_IN_USE
     //
@@ -18598,6 +20796,7 @@ public interface WinError {
     // The specified quick mode policy is being used.
     //
     int ERROR_IPSEC_QM_POLICY_IN_USE = 13002;
+
     //
     // MessageId: ERROR_IPSEC_MM_POLICY_EXISTS
     //
@@ -18606,6 +20805,7 @@ public interface WinError {
     // The specified main mode policy already exists.
     //
     int ERROR_IPSEC_MM_POLICY_EXISTS = 13003;
+
     //
     // MessageId: ERROR_IPSEC_MM_POLICY_NOT_FOUND
     //
@@ -18614,6 +20814,7 @@ public interface WinError {
     // The specified main mode policy was not found
     //
     int ERROR_IPSEC_MM_POLICY_NOT_FOUND = 13004;
+
     //
     // MessageId: ERROR_IPSEC_MM_POLICY_IN_USE
     //
@@ -18622,6 +20823,7 @@ public interface WinError {
     // The specified main mode policy is being used.
     //
     int ERROR_IPSEC_MM_POLICY_IN_USE = 13005;
+
     //
     // MessageId: ERROR_IPSEC_MM_FILTER_EXISTS
     //
@@ -18630,6 +20832,7 @@ public interface WinError {
     // The specified main mode filter already exists.
     //
     int ERROR_IPSEC_MM_FILTER_EXISTS = 13006;
+
     //
     // MessageId: ERROR_IPSEC_MM_FILTER_NOT_FOUND
     //
@@ -18638,6 +20841,7 @@ public interface WinError {
     // The specified main mode filter was not found.
     //
     int ERROR_IPSEC_MM_FILTER_NOT_FOUND = 13007;
+
     //
     // MessageId: ERROR_IPSEC_TRANSPORT_FILTER_EXISTS
     //
@@ -18646,6 +20850,7 @@ public interface WinError {
     // The specified transport mode filter already exists.
     //
     int ERROR_IPSEC_TRANSPORT_FILTER_EXISTS = 13008;
+
     //
     // MessageId: ERROR_IPSEC_TRANSPORT_FILTER_NOT_FOUND
     //
@@ -18654,6 +20859,7 @@ public interface WinError {
     // The specified transport mode filter does not exist.
     //
     int ERROR_IPSEC_TRANSPORT_FILTER_NOT_FOUND = 13009;
+
     //
     // MessageId: ERROR_IPSEC_MM_AUTH_EXISTS
     //
@@ -18662,6 +20868,7 @@ public interface WinError {
     // The specified main mode authentication list exists.
     //
     int ERROR_IPSEC_MM_AUTH_EXISTS = 13010;
+
     //
     // MessageId: ERROR_IPSEC_MM_AUTH_NOT_FOUND
     //
@@ -18670,6 +20877,7 @@ public interface WinError {
     // The specified main mode authentication list was not found.
     //
     int ERROR_IPSEC_MM_AUTH_NOT_FOUND = 13011;
+
     //
     // MessageId: ERROR_IPSEC_MM_AUTH_IN_USE
     //
@@ -18678,6 +20886,7 @@ public interface WinError {
     // The specified main mode authentication list is being used.
     //
     int ERROR_IPSEC_MM_AUTH_IN_USE = 13012;
+
     //
     // MessageId: ERROR_IPSEC_DEFAULT_MM_POLICY_NOT_FOUND
     //
@@ -18686,6 +20895,7 @@ public interface WinError {
     // The specified default main mode policy was not found.
     //
     int ERROR_IPSEC_DEFAULT_MM_POLICY_NOT_FOUND = 13013;
+
     //
     // MessageId: ERROR_IPSEC_DEFAULT_MM_AUTH_NOT_FOUND
     //
@@ -18694,6 +20904,7 @@ public interface WinError {
     // The specified default main mode authentication list was not found.
     //
     int ERROR_IPSEC_DEFAULT_MM_AUTH_NOT_FOUND = 13014;
+
     //
     // MessageId: ERROR_IPSEC_DEFAULT_QM_POLICY_NOT_FOUND
     //
@@ -18702,6 +20913,7 @@ public interface WinError {
     // The specified default quick mode policy was not found.
     //
     int ERROR_IPSEC_DEFAULT_QM_POLICY_NOT_FOUND = 13015;
+
     //
     // MessageId: ERROR_IPSEC_TUNNEL_FILTER_EXISTS
     //
@@ -18710,6 +20922,7 @@ public interface WinError {
     // The specified tunnel mode filter exists.
     //
     int ERROR_IPSEC_TUNNEL_FILTER_EXISTS = 13016;
+
     //
     // MessageId: ERROR_IPSEC_TUNNEL_FILTER_NOT_FOUND
     //
@@ -18718,6 +20931,7 @@ public interface WinError {
     // The specified tunnel mode filter was not found.
     //
     int ERROR_IPSEC_TUNNEL_FILTER_NOT_FOUND = 13017;
+
     //
     // MessageId: ERROR_IPSEC_MM_FILTER_PENDING_DELETION
     //
@@ -18726,6 +20940,7 @@ public interface WinError {
     // The Main Mode filter is pending deletion.
     //
     int ERROR_IPSEC_MM_FILTER_PENDING_DELETION = 13018;
+
     //
     // MessageId: ERROR_IPSEC_TRANSPORT_FILTER_PENDING_DELETION
     //
@@ -18734,6 +20949,7 @@ public interface WinError {
     // The transport filter is pending deletion.
     //
     int ERROR_IPSEC_TRANSPORT_FILTER_PENDING_DELETION = 13019;
+
     //
     // MessageId: ERROR_IPSEC_TUNNEL_FILTER_PENDING_DELETION
     //
@@ -18742,6 +20958,7 @@ public interface WinError {
     // The tunnel filter is pending deletion.
     //
     int ERROR_IPSEC_TUNNEL_FILTER_PENDING_DELETION = 13020;
+
     //
     // MessageId: ERROR_IPSEC_MM_POLICY_PENDING_DELETION
     //
@@ -18750,6 +20967,7 @@ public interface WinError {
     // The Main Mode policy is pending deletion.
     //
     int ERROR_IPSEC_MM_POLICY_PENDING_DELETION = 13021;
+
     //
     // MessageId: ERROR_IPSEC_MM_AUTH_PENDING_DELETION
     //
@@ -18758,6 +20976,7 @@ public interface WinError {
     // The Main Mode authentication bundle is pending deletion.
     //
     int ERROR_IPSEC_MM_AUTH_PENDING_DELETION = 13022;
+
     //
     // MessageId: ERROR_IPSEC_QM_POLICY_PENDING_DELETION
     //
@@ -18766,6 +20985,7 @@ public interface WinError {
     // The Quick Mode policy is pending deletion.
     //
     int ERROR_IPSEC_QM_POLICY_PENDING_DELETION = 13023;
+
     //
     // MessageId: WARNING_IPSEC_MM_POLICY_PRUNED
     //
@@ -18775,6 +20995,7 @@ public interface WinError {
     // offers are not supported.
     //
     int WARNING_IPSEC_MM_POLICY_PRUNED = 13024;
+
     //
     // MessageId: WARNING_IPSEC_QM_POLICY_PRUNED
     //
@@ -18784,6 +21005,7 @@ public interface WinError {
     // offers are not supported.
     //
     int WARNING_IPSEC_QM_POLICY_PRUNED = 13025;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NEG_STATUS_BEGIN
     //
@@ -18792,6 +21014,7 @@ public interface WinError {
     // ERROR_IPSEC_IKE_NEG_STATUS_BEGIN
     //
     int ERROR_IPSEC_IKE_NEG_STATUS_BEGIN = 13800;
+
     //
     // MessageId: ERROR_IPSEC_IKE_AUTH_FAIL
     //
@@ -18800,6 +21023,7 @@ public interface WinError {
     // IKE authentication credentials are unacceptable
     //
     int ERROR_IPSEC_IKE_AUTH_FAIL = 13801;
+
     //
     // MessageId: ERROR_IPSEC_IKE_ATTRIB_FAIL
     //
@@ -18808,6 +21032,7 @@ public interface WinError {
     // IKE security attributes are unacceptable
     //
     int ERROR_IPSEC_IKE_ATTRIB_FAIL = 13802;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NEGOTIATION_PENDING
     //
@@ -18816,6 +21041,7 @@ public interface WinError {
     // IKE Negotiation in progress
     //
     int ERROR_IPSEC_IKE_NEGOTIATION_PENDING = 13803;
+
     //
     // MessageId: ERROR_IPSEC_IKE_GENERAL_PROCESSING_ERROR
     //
@@ -18824,6 +21050,7 @@ public interface WinError {
     // General processing error
     //
     int ERROR_IPSEC_IKE_GENERAL_PROCESSING_ERROR = 13804;
+
     //
     // MessageId: ERROR_IPSEC_IKE_TIMED_OUT
     //
@@ -18832,6 +21059,7 @@ public interface WinError {
     // Negotiation timed out
     //
     int ERROR_IPSEC_IKE_TIMED_OUT = 13805;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_CERT
     //
@@ -18842,6 +21070,7 @@ public interface WinError {
     // appropriate Certificate Store.
     //
     int ERROR_IPSEC_IKE_NO_CERT = 13806;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SA_DELETED
     //
@@ -18850,6 +21079,7 @@ public interface WinError {
     // IKE SA deleted by peer before establishment completed
     //
     int ERROR_IPSEC_IKE_SA_DELETED = 13807;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SA_REAPED
     //
@@ -18858,6 +21088,7 @@ public interface WinError {
     // IKE SA deleted before establishment completed
     //
     int ERROR_IPSEC_IKE_SA_REAPED = 13808;
+
     //
     // MessageId: ERROR_IPSEC_IKE_MM_ACQUIRE_DROP
     //
@@ -18866,6 +21097,7 @@ public interface WinError {
     // Negotiation request sat in Queue too long
     //
     int ERROR_IPSEC_IKE_MM_ACQUIRE_DROP = 13809;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QM_ACQUIRE_DROP
     //
@@ -18874,6 +21106,7 @@ public interface WinError {
     // Negotiation request sat in Queue too long
     //
     int ERROR_IPSEC_IKE_QM_ACQUIRE_DROP = 13810;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QUEUE_DROP_MM
     //
@@ -18882,6 +21115,7 @@ public interface WinError {
     // Negotiation request sat in Queue too long
     //
     int ERROR_IPSEC_IKE_QUEUE_DROP_MM = 13811;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QUEUE_DROP_NO_MM
     //
@@ -18890,6 +21124,7 @@ public interface WinError {
     // Negotiation request sat in Queue too long
     //
     int ERROR_IPSEC_IKE_QUEUE_DROP_NO_MM = 13812;
+
     //
     // MessageId: ERROR_IPSEC_IKE_DROP_NO_RESPONSE
     //
@@ -18898,6 +21133,7 @@ public interface WinError {
     // No response from peer
     //
     int ERROR_IPSEC_IKE_DROP_NO_RESPONSE = 13813;
+
     //
     // MessageId: ERROR_IPSEC_IKE_MM_DELAY_DROP
     //
@@ -18906,6 +21142,7 @@ public interface WinError {
     // Negotiation took too long
     //
     int ERROR_IPSEC_IKE_MM_DELAY_DROP = 13814;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QM_DELAY_DROP
     //
@@ -18914,6 +21151,7 @@ public interface WinError {
     // Negotiation took too long
     //
     int ERROR_IPSEC_IKE_QM_DELAY_DROP = 13815;
+
     //
     // MessageId: ERROR_IPSEC_IKE_ERROR
     //
@@ -18922,6 +21160,7 @@ public interface WinError {
     // Unknown error occurred
     //
     int ERROR_IPSEC_IKE_ERROR = 13816;
+
     //
     // MessageId: ERROR_IPSEC_IKE_CRL_FAILED
     //
@@ -18930,6 +21169,7 @@ public interface WinError {
     // Certificate Revocation Check failed
     //
     int ERROR_IPSEC_IKE_CRL_FAILED = 13817;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_KEY_USAGE
     //
@@ -18938,6 +21178,7 @@ public interface WinError {
     // Invalid certificate key usage
     //
     int ERROR_IPSEC_IKE_INVALID_KEY_USAGE = 13818;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_CERT_TYPE
     //
@@ -18946,6 +21187,7 @@ public interface WinError {
     // Invalid certificate type
     //
     int ERROR_IPSEC_IKE_INVALID_CERT_TYPE = 13819;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_PRIVATE_KEY
     //
@@ -18957,6 +21199,7 @@ public interface WinError {
     // has a private key.
     //
     int ERROR_IPSEC_IKE_NO_PRIVATE_KEY = 13820;
+
     //
     // MessageId: ERROR_IPSEC_IKE_DH_FAIL
     //
@@ -18965,6 +21208,7 @@ public interface WinError {
     // Failure in Diffie-Helman computation
     //
     int ERROR_IPSEC_IKE_DH_FAIL = 13822;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_HEADER
     //
@@ -18973,6 +21217,7 @@ public interface WinError {
     // Invalid header
     //
     int ERROR_IPSEC_IKE_INVALID_HEADER = 13824;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_POLICY
     //
@@ -18981,6 +21226,7 @@ public interface WinError {
     // No policy configured
     //
     int ERROR_IPSEC_IKE_NO_POLICY = 13825;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_SIGNATURE
     //
@@ -18989,6 +21235,7 @@ public interface WinError {
     // Failed to verify signature
     //
     int ERROR_IPSEC_IKE_INVALID_SIGNATURE = 13826;
+
     //
     // MessageId: ERROR_IPSEC_IKE_KERBEROS_ERROR
     //
@@ -18997,6 +21244,7 @@ public interface WinError {
     // Failed to authenticate using kerberos
     //
     int ERROR_IPSEC_IKE_KERBEROS_ERROR = 13827;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_PUBLIC_KEY
     //
@@ -19005,6 +21253,7 @@ public interface WinError {
     // Peer's certificate did not have a public key
     //
     int ERROR_IPSEC_IKE_NO_PUBLIC_KEY = 13828;
+
     // These must stay as a unit.
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR
@@ -19014,6 +21263,7 @@ public interface WinError {
     // Error processing error payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR = 13829;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_SA
     //
@@ -19022,6 +21272,7 @@ public interface WinError {
     // Error processing SA payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_SA = 13830;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_PROP
     //
@@ -19030,6 +21281,7 @@ public interface WinError {
     // Error processing Proposal payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_PROP = 13831;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_TRANS
     //
@@ -19038,6 +21290,7 @@ public interface WinError {
     // Error processing Transform payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_TRANS = 13832;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_KE
     //
@@ -19046,6 +21299,7 @@ public interface WinError {
     // Error processing KE payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_KE = 13833;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_ID
     //
@@ -19054,6 +21308,7 @@ public interface WinError {
     // Error processing ID payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_ID = 13834;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_CERT
     //
@@ -19062,6 +21317,7 @@ public interface WinError {
     // Error processing Cert payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_CERT = 13835;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_CERT_REQ
     //
@@ -19070,6 +21326,7 @@ public interface WinError {
     // Error processing Certificate Request payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_CERT_REQ = 13836;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_HASH
     //
@@ -19078,6 +21335,7 @@ public interface WinError {
     // Error processing Hash payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_HASH = 13837;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_SIG
     //
@@ -19086,6 +21344,7 @@ public interface WinError {
     // Error processing Signature payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_SIG = 13838;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_NONCE
     //
@@ -19094,6 +21353,7 @@ public interface WinError {
     // Error processing Nonce payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_NONCE = 13839;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_NOTIFY
     //
@@ -19102,6 +21362,7 @@ public interface WinError {
     // Error processing Notify payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_NOTIFY = 13840;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_DELETE
     //
@@ -19110,6 +21371,7 @@ public interface WinError {
     // Error processing Delete Payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_DELETE = 13841;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_VENDOR
     //
@@ -19118,6 +21380,7 @@ public interface WinError {
     // Error processing VendorId payload
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_VENDOR = 13842;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_PAYLOAD
     //
@@ -19126,6 +21389,7 @@ public interface WinError {
     // Invalid payload received
     //
     int ERROR_IPSEC_IKE_INVALID_PAYLOAD = 13843;
+
     //
     // MessageId: ERROR_IPSEC_IKE_LOAD_SOFT_SA
     //
@@ -19134,6 +21398,7 @@ public interface WinError {
     // Soft SA loaded
     //
     int ERROR_IPSEC_IKE_LOAD_SOFT_SA = 13844;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SOFT_SA_TORN_DOWN
     //
@@ -19142,6 +21407,7 @@ public interface WinError {
     // Soft SA torn down
     //
     int ERROR_IPSEC_IKE_SOFT_SA_TORN_DOWN = 13845;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_COOKIE
     //
@@ -19150,6 +21416,7 @@ public interface WinError {
     // Invalid cookie received.
     //
     int ERROR_IPSEC_IKE_INVALID_COOKIE = 13846;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_PEER_CERT
     //
@@ -19158,6 +21425,7 @@ public interface WinError {
     // Peer failed to send valid machine certificate
     //
     int ERROR_IPSEC_IKE_NO_PEER_CERT = 13847;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PEER_CRL_FAILED
     //
@@ -19166,6 +21434,7 @@ public interface WinError {
     // Certification Revocation check of peer's certificate failed
     //
     int ERROR_IPSEC_IKE_PEER_CRL_FAILED = 13848;
+
     //
     // MessageId: ERROR_IPSEC_IKE_POLICY_CHANGE
     //
@@ -19174,6 +21443,7 @@ public interface WinError {
     // New policy invalidated SAs formed with old policy
     //
     int ERROR_IPSEC_IKE_POLICY_CHANGE = 13849;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NO_MM_POLICY
     //
@@ -19182,6 +21452,7 @@ public interface WinError {
     // There is no available Main Mode IKE policy.
     //
     int ERROR_IPSEC_IKE_NO_MM_POLICY = 13850;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NOTCBPRIV
     //
@@ -19190,6 +21461,7 @@ public interface WinError {
     // Failed to enabled TCB privilege.
     //
     int ERROR_IPSEC_IKE_NOTCBPRIV = 13851;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SECLOADFAIL
     //
@@ -19198,6 +21470,7 @@ public interface WinError {
     // Failed to load SECURITY.DLL.
     //
     int ERROR_IPSEC_IKE_SECLOADFAIL = 13852;
+
     //
     // MessageId: ERROR_IPSEC_IKE_FAILSSPINIT
     //
@@ -19206,6 +21479,7 @@ public interface WinError {
     // Failed to obtain security function table dispatch address from SSPI.
     //
     int ERROR_IPSEC_IKE_FAILSSPINIT = 13853;
+
     //
     // MessageId: ERROR_IPSEC_IKE_FAILQUERYSSP
     //
@@ -19214,6 +21488,7 @@ public interface WinError {
     // Failed to query Kerberos package to obtain max token size.
     //
     int ERROR_IPSEC_IKE_FAILQUERYSSP = 13854;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SRVACQFAIL
     //
@@ -19225,6 +21500,7 @@ public interface WinError {
     // computer is a member of a workgroup.
     //
     int ERROR_IPSEC_IKE_SRVACQFAIL = 13855;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SRVQUERYCRED
     //
@@ -19234,6 +21510,7 @@ public interface WinError {
     // service (QueryCredentialsAttributes).
     //
     int ERROR_IPSEC_IKE_SRVQUERYCRED = 13856;
+
     //
     // MessageId: ERROR_IPSEC_IKE_GETSPIFAIL
     //
@@ -19244,6 +21521,7 @@ public interface WinError {
     // filter. Check your policy to verify the filters.
     //
     int ERROR_IPSEC_IKE_GETSPIFAIL = 13857;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_FILTER
     //
@@ -19252,6 +21530,7 @@ public interface WinError {
     // Given filter is invalid
     //
     int ERROR_IPSEC_IKE_INVALID_FILTER = 13858;
+
     //
     // MessageId: ERROR_IPSEC_IKE_OUT_OF_MEMORY
     //
@@ -19260,6 +21539,7 @@ public interface WinError {
     // Memory allocation failed.
     //
     int ERROR_IPSEC_IKE_OUT_OF_MEMORY = 13859;
+
     //
     // MessageId: ERROR_IPSEC_IKE_ADD_UPDATE_KEY_FAILED
     //
@@ -19270,6 +21550,7 @@ public interface WinError {
     // problem persists, reduce the load on the faulting machine.
     //
     int ERROR_IPSEC_IKE_ADD_UPDATE_KEY_FAILED = 13860;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_POLICY
     //
@@ -19278,6 +21559,7 @@ public interface WinError {
     // Invalid policy
     //
     int ERROR_IPSEC_IKE_INVALID_POLICY = 13861;
+
     //
     // MessageId: ERROR_IPSEC_IKE_UNKNOWN_DOI
     //
@@ -19286,6 +21568,7 @@ public interface WinError {
     // Invalid DOI
     //
     int ERROR_IPSEC_IKE_UNKNOWN_DOI = 13862;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_SITUATION
     //
@@ -19294,6 +21577,7 @@ public interface WinError {
     // Invalid situation
     //
     int ERROR_IPSEC_IKE_INVALID_SITUATION = 13863;
+
     //
     // MessageId: ERROR_IPSEC_IKE_DH_FAILURE
     //
@@ -19302,6 +21586,7 @@ public interface WinError {
     // Diffie-Hellman failure
     //
     int ERROR_IPSEC_IKE_DH_FAILURE = 13864;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_GROUP
     //
@@ -19310,6 +21595,7 @@ public interface WinError {
     // Invalid Diffie-Hellman group
     //
     int ERROR_IPSEC_IKE_INVALID_GROUP = 13865;
+
     //
     // MessageId: ERROR_IPSEC_IKE_ENCRYPT
     //
@@ -19318,6 +21604,7 @@ public interface WinError {
     // Error encrypting payload
     //
     int ERROR_IPSEC_IKE_ENCRYPT = 13866;
+
     //
     // MessageId: ERROR_IPSEC_IKE_DECRYPT
     //
@@ -19326,6 +21613,7 @@ public interface WinError {
     // Error decrypting payload
     //
     int ERROR_IPSEC_IKE_DECRYPT = 13867;
+
     //
     // MessageId: ERROR_IPSEC_IKE_POLICY_MATCH
     //
@@ -19334,6 +21622,7 @@ public interface WinError {
     // Policy match error
     //
     int ERROR_IPSEC_IKE_POLICY_MATCH = 13868;
+
     //
     // MessageId: ERROR_IPSEC_IKE_UNSUPPORTED_ID
     //
@@ -19342,6 +21631,7 @@ public interface WinError {
     // Unsupported ID
     //
     int ERROR_IPSEC_IKE_UNSUPPORTED_ID = 13869;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_HASH
     //
@@ -19350,6 +21640,7 @@ public interface WinError {
     // Hash verification failed
     //
     int ERROR_IPSEC_IKE_INVALID_HASH = 13870;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_HASH_ALG
     //
@@ -19358,6 +21649,7 @@ public interface WinError {
     // Invalid hash algorithm
     //
     int ERROR_IPSEC_IKE_INVALID_HASH_ALG = 13871;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_HASH_SIZE
     //
@@ -19366,6 +21658,7 @@ public interface WinError {
     // Invalid hash size
     //
     int ERROR_IPSEC_IKE_INVALID_HASH_SIZE = 13872;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_ENCRYPT_ALG
     //
@@ -19374,6 +21667,7 @@ public interface WinError {
     // Invalid encryption algorithm
     //
     int ERROR_IPSEC_IKE_INVALID_ENCRYPT_ALG = 13873;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_AUTH_ALG
     //
@@ -19382,6 +21676,7 @@ public interface WinError {
     // Invalid authentication algorithm
     //
     int ERROR_IPSEC_IKE_INVALID_AUTH_ALG = 13874;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_SIG
     //
@@ -19390,6 +21685,7 @@ public interface WinError {
     // Invalid certificate signature
     //
     int ERROR_IPSEC_IKE_INVALID_SIG = 13875;
+
     //
     // MessageId: ERROR_IPSEC_IKE_LOAD_FAILED
     //
@@ -19398,6 +21694,7 @@ public interface WinError {
     // Load failed
     //
     int ERROR_IPSEC_IKE_LOAD_FAILED = 13876;
+
     //
     // MessageId: ERROR_IPSEC_IKE_RPC_DELETE
     //
@@ -19406,6 +21703,7 @@ public interface WinError {
     // Deleted via RPC call
     //
     int ERROR_IPSEC_IKE_RPC_DELETE = 13877;
+
     //
     // MessageId: ERROR_IPSEC_IKE_BENIGN_REINIT
     //
@@ -19414,6 +21712,7 @@ public interface WinError {
     // Temporary state created to perform reinit. This is not a real failure.
     //
     int ERROR_IPSEC_IKE_BENIGN_REINIT = 13878;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_RESPONDER_LIFETIME_NOTIFY
     //
@@ -19424,6 +21723,7 @@ public interface WinError {
     // machine.
     //
     int ERROR_IPSEC_IKE_INVALID_RESPONDER_LIFETIME_NOTIFY = 13879;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_CERT_KEYLEN
     //
@@ -19433,6 +21733,7 @@ public interface WinError {
     // requirements.
     //
     int ERROR_IPSEC_IKE_INVALID_CERT_KEYLEN = 13881;
+
     //
     // MessageId: ERROR_IPSEC_IKE_MM_LIMIT
     //
@@ -19441,6 +21742,7 @@ public interface WinError {
     // Max number of established MM SAs to peer exceeded.
     //
     int ERROR_IPSEC_IKE_MM_LIMIT = 13882;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NEGOTIATION_DISABLED
     //
@@ -19449,6 +21751,7 @@ public interface WinError {
     // IKE received a policy that disables negotiation.
     //
     int ERROR_IPSEC_IKE_NEGOTIATION_DISABLED = 13883;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QM_LIMIT
     //
@@ -19458,6 +21761,7 @@ public interface WinError {
     // started.
     //
     int ERROR_IPSEC_IKE_QM_LIMIT = 13884;
+
     //
     // MessageId: ERROR_IPSEC_IKE_MM_EXPIRED
     //
@@ -19466,6 +21770,7 @@ public interface WinError {
     // Main mode SA lifetime expired or peer sent a main mode delete.
     //
     int ERROR_IPSEC_IKE_MM_EXPIRED = 13885;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PEER_MM_ASSUMED_INVALID
     //
@@ -19474,6 +21779,7 @@ public interface WinError {
     // Main mode SA assumed to be invalid because peer stopped responding.
     //
     int ERROR_IPSEC_IKE_PEER_MM_ASSUMED_INVALID = 13886;
+
     //
     // MessageId: ERROR_IPSEC_IKE_CERT_CHAIN_POLICY_MISMATCH
     //
@@ -19482,6 +21788,7 @@ public interface WinError {
     // Certificate doesn't chain to a trusted root in IPsec policy.
     //
     int ERROR_IPSEC_IKE_CERT_CHAIN_POLICY_MISMATCH = 13887;
+
     //
     // MessageId: ERROR_IPSEC_IKE_UNEXPECTED_MESSAGE_ID
     //
@@ -19490,6 +21797,7 @@ public interface WinError {
     // Received unexpected message ID.
     //
     int ERROR_IPSEC_IKE_UNEXPECTED_MESSAGE_ID = 13888;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_AUTH_PAYLOAD
     //
@@ -19498,6 +21806,7 @@ public interface WinError {
     // Received invalid authentication offers.
     //
     int ERROR_IPSEC_IKE_INVALID_AUTH_PAYLOAD = 13889;
+
     //
     // MessageId: ERROR_IPSEC_IKE_DOS_COOKIE_SENT
     //
@@ -19506,6 +21815,7 @@ public interface WinError {
     // Sent DOS cookie notify to intiator.
     //
     int ERROR_IPSEC_IKE_DOS_COOKIE_SENT = 13890;
+
     //
     // MessageId: ERROR_IPSEC_IKE_SHUTTING_DOWN
     //
@@ -19514,6 +21824,7 @@ public interface WinError {
     // IKE service is shutting down.
     //
     int ERROR_IPSEC_IKE_SHUTTING_DOWN = 13891;
+
     //
     // MessageId: ERROR_IPSEC_IKE_CGA_AUTH_FAILED
     //
@@ -19522,6 +21833,7 @@ public interface WinError {
     // Could not verify binding between CGA address and certificate.
     //
     int ERROR_IPSEC_IKE_CGA_AUTH_FAILED = 13892;
+
     //
     // MessageId: ERROR_IPSEC_IKE_PROCESS_ERR_NATOA
     //
@@ -19530,6 +21842,7 @@ public interface WinError {
     // Error processing NatOA payload.
     //
     int ERROR_IPSEC_IKE_PROCESS_ERR_NATOA = 13893;
+
     //
     // MessageId: ERROR_IPSEC_IKE_INVALID_MM_FOR_QM
     //
@@ -19538,6 +21851,7 @@ public interface WinError {
     // Parameters of the main mode are invalid for this quick mode.
     //
     int ERROR_IPSEC_IKE_INVALID_MM_FOR_QM = 13894;
+
     //
     // MessageId: ERROR_IPSEC_IKE_QM_EXPIRED
     //
@@ -19546,6 +21860,7 @@ public interface WinError {
     // Quick mode SA was expired by IPsec driver.
     //
     int ERROR_IPSEC_IKE_QM_EXPIRED = 13895;
+
     //
     // MessageId: ERROR_IPSEC_IKE_TOO_MANY_FILTERS
     //
@@ -19554,6 +21869,7 @@ public interface WinError {
     // Too many dynamically added IKEEXT filters were detected.
     //
     int ERROR_IPSEC_IKE_TOO_MANY_FILTERS = 13896;
+
     //
     // MessageId: ERROR_IPSEC_IKE_NEG_STATUS_END
     //
@@ -19562,6 +21878,7 @@ public interface WinError {
     // ERROR_IPSEC_IKE_NEG_STATUS_END
     //
     int ERROR_IPSEC_IKE_NEG_STATUS_END = 13897;
+
     //
     // Following error codes are returned by IPsec kernel.
     //
@@ -19573,6 +21890,7 @@ public interface WinError {
     // The SPI in the packet does not match a valid IPsec SA.
     //
     int ERROR_IPSEC_BAD_SPI = 13910;
+
     //
     // MessageId: ERROR_IPSEC_SA_LIFETIME_EXPIRED
     //
@@ -19581,6 +21899,7 @@ public interface WinError {
     // Packet was received on an IPsec SA whose lifetime has expired.
     //
     int ERROR_IPSEC_SA_LIFETIME_EXPIRED = 13911;
+
     //
     // MessageId: ERROR_IPSEC_WRONG_SA
     //
@@ -19590,6 +21909,7 @@ public interface WinError {
     // characteristics.
     //
     int ERROR_IPSEC_WRONG_SA = 13912;
+
     //
     // MessageId: ERROR_IPSEC_REPLAY_CHECK_FAILED
     //
@@ -19598,6 +21918,7 @@ public interface WinError {
     // Packet sequence number replay check failed.
     //
     int ERROR_IPSEC_REPLAY_CHECK_FAILED = 13913;
+
     //
     // MessageId: ERROR_IPSEC_INVALID_PACKET
     //
@@ -19606,6 +21927,7 @@ public interface WinError {
     // IPsec header and/or trailer in the packet is invalid.
     //
     int ERROR_IPSEC_INVALID_PACKET = 13914;
+
     //
     // MessageId: ERROR_IPSEC_INTEGRITY_CHECK_FAILED
     //
@@ -19614,6 +21936,7 @@ public interface WinError {
     // IPsec integrity check failed.
     //
     int ERROR_IPSEC_INTEGRITY_CHECK_FAILED = 13915;
+
     //
     // MessageId: ERROR_IPSEC_CLEAR_TEXT_DROP
     //
@@ -19622,6 +21945,7 @@ public interface WinError {
     // IPsec dropped a clear text packet.
     //
     int ERROR_IPSEC_CLEAR_TEXT_DROP = 13916;
+
     // /////////////////////////////////////////////////
     // =//
     // =End of IPSec Error codes=//
@@ -19642,6 +21966,7 @@ public interface WinError {
     // The requested section was not present in the activation context.
     //
     int ERROR_SXS_SECTION_NOT_FOUND = 14000;
+
     //
     // MessageId: ERROR_SXS_CANT_GEN_ACTCTX
     //
@@ -19652,6 +21977,7 @@ public interface WinError {
     // detail.
     //
     int ERROR_SXS_CANT_GEN_ACTCTX = 14001;
+
     //
     // MessageId: ERROR_SXS_INVALID_ACTCTXDATA_FORMAT
     //
@@ -19660,6 +21986,7 @@ public interface WinError {
     // The application binding data format is invalid.
     //
     int ERROR_SXS_INVALID_ACTCTXDATA_FORMAT = 14002;
+
     //
     // MessageId: ERROR_SXS_ASSEMBLY_NOT_FOUND
     //
@@ -19668,6 +21995,7 @@ public interface WinError {
     // The referenced assembly is not installed on your system.
     //
     int ERROR_SXS_ASSEMBLY_NOT_FOUND = 14003;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_FORMAT_ERROR
     //
@@ -19677,6 +22005,7 @@ public interface WinError {
     // information.
     //
     int ERROR_SXS_MANIFEST_FORMAT_ERROR = 14004;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_PARSE_ERROR
     //
@@ -19685,6 +22014,7 @@ public interface WinError {
     // The manifest file contains one or more syntax errors.
     //
     int ERROR_SXS_MANIFEST_PARSE_ERROR = 14005;
+
     //
     // MessageId: ERROR_SXS_ACTIVATION_CONTEXT_DISABLED
     //
@@ -19693,6 +22023,7 @@ public interface WinError {
     // The application attempted to activate a disabled activation context.
     //
     int ERROR_SXS_ACTIVATION_CONTEXT_DISABLED = 14006;
+
     //
     // MessageId: ERROR_SXS_KEY_NOT_FOUND
     //
@@ -19701,6 +22032,7 @@ public interface WinError {
     // The requested lookup key was not found in any active activation context.
     //
     int ERROR_SXS_KEY_NOT_FOUND = 14007;
+
     //
     // MessageId: ERROR_SXS_VERSION_CONFLICT
     //
@@ -19710,6 +22042,7 @@ public interface WinError {
     // component version already active.
     //
     int ERROR_SXS_VERSION_CONFLICT = 14008;
+
     //
     // MessageId: ERROR_SXS_WRONG_SECTION_TYPE
     //
@@ -19719,6 +22052,7 @@ public interface WinError {
     // API used.
     //
     int ERROR_SXS_WRONG_SECTION_TYPE = 14009;
+
     //
     // MessageId: ERROR_SXS_THREAD_QUERIES_DISABLED
     //
@@ -19728,6 +22062,7 @@ public interface WinError {
     // for the current thread of execution.
     //
     int ERROR_SXS_THREAD_QUERIES_DISABLED = 14010;
+
     //
     // MessageId: ERROR_SXS_PROCESS_DEFAULT_ALREADY_SET
     //
@@ -19737,6 +22072,7 @@ public interface WinError {
     // the process default activation context was already set.
     //
     int ERROR_SXS_PROCESS_DEFAULT_ALREADY_SET = 14011;
+
     //
     // MessageId: ERROR_SXS_UNKNOWN_ENCODING_GROUP
     //
@@ -19745,6 +22081,7 @@ public interface WinError {
     // The encoding group identifier specified is not recognized.
     //
     int ERROR_SXS_UNKNOWN_ENCODING_GROUP = 14012;
+
     //
     // MessageId: ERROR_SXS_UNKNOWN_ENCODING
     //
@@ -19753,6 +22090,7 @@ public interface WinError {
     // The encoding requested is not recognized.
     //
     int ERROR_SXS_UNKNOWN_ENCODING = 14013;
+
     //
     // MessageId: ERROR_SXS_INVALID_XML_NAMESPACE_URI
     //
@@ -19761,6 +22099,7 @@ public interface WinError {
     // The manifest contains a reference to an invalid URI.
     //
     int ERROR_SXS_INVALID_XML_NAMESPACE_URI = 14014;
+
     //
     // MessageId: ERROR_SXS_ROOT_MANIFEST_DEPENDENCY_NOT_INSTALLED
     //
@@ -19770,6 +22109,7 @@ public interface WinError {
     // which is not installed
     //
     int ERROR_SXS_ROOT_MANIFEST_DEPENDENCY_NOT_INSTALLED = 14015;
+
     //
     // MessageId: ERROR_SXS_LEAF_MANIFEST_DEPENDENCY_NOT_INSTALLED
     //
@@ -19779,6 +22119,7 @@ public interface WinError {
     // dependent assembly which is not installed
     //
     int ERROR_SXS_LEAF_MANIFEST_DEPENDENCY_NOT_INSTALLED = 14016;
+
     //
     // MessageId: ERROR_SXS_INVALID_ASSEMBLY_IDENTITY_ATTRIBUTE
     //
@@ -19788,6 +22129,7 @@ public interface WinError {
     // valid.
     //
     int ERROR_SXS_INVALID_ASSEMBLY_IDENTITY_ATTRIBUTE = 14017;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_MISSING_REQUIRED_DEFAULT_NAMESPACE
     //
@@ -19797,6 +22139,7 @@ public interface WinError {
     // the assembly element.
     //
     int ERROR_SXS_MANIFEST_MISSING_REQUIRED_DEFAULT_NAMESPACE = 14018;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_INVALID_REQUIRED_DEFAULT_NAMESPACE
     //
@@ -19806,6 +22149,7 @@ public interface WinError {
     // but its value is not "urn:schemas-microsoft-com:asm.v1".
     //
     int ERROR_SXS_MANIFEST_INVALID_REQUIRED_DEFAULT_NAMESPACE = 14019;
+
     //
     // MessageId: ERROR_SXS_PRIVATE_MANIFEST_CROSS_PATH_WITH_REPARSE_POINT
     //
@@ -19814,6 +22158,7 @@ public interface WinError {
     // The private manifest probed has crossed reparse-point-associated path
     //
     int ERROR_SXS_PRIVATE_MANIFEST_CROSS_PATH_WITH_REPARSE_POINT = 14020;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_DLL_NAME
     //
@@ -19823,6 +22168,7 @@ public interface WinError {
     // application manifest have files by the same name.
     //
     int ERROR_SXS_DUPLICATE_DLL_NAME = 14021;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_WINDOWCLASS_NAME
     //
@@ -19832,6 +22178,7 @@ public interface WinError {
     // application manifest have window classes with the same name.
     //
     int ERROR_SXS_DUPLICATE_WINDOWCLASS_NAME = 14022;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_CLSID
     //
@@ -19841,6 +22188,7 @@ public interface WinError {
     // application manifest have the same COM server CLSIDs.
     //
     int ERROR_SXS_DUPLICATE_CLSID = 14023;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_IID
     //
@@ -19850,6 +22198,7 @@ public interface WinError {
     // application manifest have proxies for the same COM interface IIDs.
     //
     int ERROR_SXS_DUPLICATE_IID = 14024;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_TLBID
     //
@@ -19859,6 +22208,7 @@ public interface WinError {
     // application manifest have the same COM type library TLBIDs.
     //
     int ERROR_SXS_DUPLICATE_TLBID = 14025;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_PROGID
     //
@@ -19868,6 +22218,7 @@ public interface WinError {
     // application manifest have the same COM ProgIDs.
     //
     int ERROR_SXS_DUPLICATE_PROGID = 14026;
+
     //
     // MessageId: ERROR_SXS_DUPLICATE_ASSEMBLY_NAME
     //
@@ -19878,6 +22229,7 @@ public interface WinError {
     // is not permitted.
     //
     int ERROR_SXS_DUPLICATE_ASSEMBLY_NAME = 14027;
+
     //
     // MessageId: ERROR_SXS_FILE_HASH_MISMATCH
     //
@@ -19887,6 +22239,7 @@ public interface WinError {
     // the component manifest.
     //
     int ERROR_SXS_FILE_HASH_MISMATCH = 14028;
+
     //
     // MessageId: ERROR_SXS_POLICY_PARSE_ERROR
     //
@@ -19895,6 +22248,7 @@ public interface WinError {
     // The policy manifest contains one or more syntax errors.
     //
     int ERROR_SXS_POLICY_PARSE_ERROR = 14029;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSINGQUOTE
     //
@@ -19904,6 +22258,7 @@ public interface WinError {
     // quote character was found.
     //
     int ERROR_SXS_XML_E_MISSINGQUOTE = 14030;
+
     //
     // MessageId: ERROR_SXS_XML_E_COMMENTSYNTAX
     //
@@ -19912,6 +22267,7 @@ public interface WinError {
     // Manifest Parse Error : Incorrect syntax was used in a comment.
     //
     int ERROR_SXS_XML_E_COMMENTSYNTAX = 14031;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADSTARTNAMECHAR
     //
@@ -19920,6 +22276,7 @@ public interface WinError {
     // Manifest Parse Error : A name was started with an invalid character.
     //
     int ERROR_SXS_XML_E_BADSTARTNAMECHAR = 14032;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADNAMECHAR
     //
@@ -19928,6 +22285,7 @@ public interface WinError {
     // Manifest Parse Error : A name contained an invalid character.
     //
     int ERROR_SXS_XML_E_BADNAMECHAR = 14033;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADCHARINSTRING
     //
@@ -19936,6 +22294,7 @@ public interface WinError {
     // Manifest Parse Error : A string literal contained an invalid character.
     //
     int ERROR_SXS_XML_E_BADCHARINSTRING = 14034;
+
     //
     // MessageId: ERROR_SXS_XML_E_XMLDECLSYNTAX
     //
@@ -19944,6 +22303,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid syntax for an xml declaration.
     //
     int ERROR_SXS_XML_E_XMLDECLSYNTAX = 14035;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADCHARDATA
     //
@@ -19952,6 +22312,7 @@ public interface WinError {
     // Manifest Parse Error : An Invalid character was found in text content.
     //
     int ERROR_SXS_XML_E_BADCHARDATA = 14036;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSINGWHITESPACE
     //
@@ -19960,6 +22321,7 @@ public interface WinError {
     // Manifest Parse Error : Required white space was missing.
     //
     int ERROR_SXS_XML_E_MISSINGWHITESPACE = 14037;
+
     //
     // MessageId: ERROR_SXS_XML_E_EXPECTINGTAGEND
     //
@@ -19968,6 +22330,7 @@ public interface WinError {
     // Manifest Parse Error : The character '>' was expected.
     //
     int ERROR_SXS_XML_E_EXPECTINGTAGEND = 14038;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSINGSEMICOLON
     //
@@ -19976,6 +22339,7 @@ public interface WinError {
     // Manifest Parse Error : A semi colon character was expected.
     //
     int ERROR_SXS_XML_E_MISSINGSEMICOLON = 14039;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNBALANCEDPAREN
     //
@@ -19984,6 +22348,7 @@ public interface WinError {
     // Manifest Parse Error : Unbalanced parentheses.
     //
     int ERROR_SXS_XML_E_UNBALANCEDPAREN = 14040;
+
     //
     // MessageId: ERROR_SXS_XML_E_INTERNALERROR
     //
@@ -19992,6 +22357,7 @@ public interface WinError {
     // Manifest Parse Error : Internal error.
     //
     int ERROR_SXS_XML_E_INTERNALERROR = 14041;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNEXPECTED_WHITESPACE
     //
@@ -20000,6 +22366,7 @@ public interface WinError {
     // Manifest Parse Error : Whitespace is not allowed at this location.
     //
     int ERROR_SXS_XML_E_UNEXPECTED_WHITESPACE = 14042;
+
     //
     // MessageId: ERROR_SXS_XML_E_INCOMPLETE_ENCODING
     //
@@ -20009,6 +22376,7 @@ public interface WinError {
     // encoding.
     //
     int ERROR_SXS_XML_E_INCOMPLETE_ENCODING = 14043;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSING_PAREN
     //
@@ -20017,6 +22385,7 @@ public interface WinError {
     // Manifest Parse Error : Missing parenthesis.
     //
     int ERROR_SXS_XML_E_MISSING_PAREN = 14044;
+
     //
     // MessageId: ERROR_SXS_XML_E_EXPECTINGCLOSEQUOTE
     //
@@ -20026,6 +22395,7 @@ public interface WinError {
     // \") is missing.
     //
     int ERROR_SXS_XML_E_EXPECTINGCLOSEQUOTE = 14045;
+
     //
     // MessageId: ERROR_SXS_XML_E_MULTIPLE_COLONS
     //
@@ -20034,6 +22404,7 @@ public interface WinError {
     // Manifest Parse Error : Multiple colons are not allowed in a name.
     //
     int ERROR_SXS_XML_E_MULTIPLE_COLONS = 14046;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALID_DECIMAL
     //
@@ -20042,6 +22413,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid character for decimal digit.
     //
     int ERROR_SXS_XML_E_INVALID_DECIMAL = 14047;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALID_HEXIDECIMAL
     //
@@ -20050,6 +22422,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid character for hexidecimal digit.
     //
     int ERROR_SXS_XML_E_INVALID_HEXIDECIMAL = 14048;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALID_UNICODE
     //
@@ -20058,6 +22431,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid unicode character value for this platform.
     //
     int ERROR_SXS_XML_E_INVALID_UNICODE = 14049;
+
     //
     // MessageId: ERROR_SXS_XML_E_WHITESPACEORQUESTIONMARK
     //
@@ -20066,6 +22440,7 @@ public interface WinError {
     // Manifest Parse Error : Expecting whitespace or '?'.
     //
     int ERROR_SXS_XML_E_WHITESPACEORQUESTIONMARK = 14050;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNEXPECTEDENDTAG
     //
@@ -20074,6 +22449,7 @@ public interface WinError {
     // Manifest Parse Error : End tag was not expected at this location.
     //
     int ERROR_SXS_XML_E_UNEXPECTEDENDTAG = 14051;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDTAG
     //
@@ -20082,6 +22458,7 @@ public interface WinError {
     // Manifest Parse Error : The following tags were not closed: %1.
     //
     int ERROR_SXS_XML_E_UNCLOSEDTAG = 14052;
+
     //
     // MessageId: ERROR_SXS_XML_E_DUPLICATEATTRIBUTE
     //
@@ -20090,6 +22467,7 @@ public interface WinError {
     // Manifest Parse Error : Duplicate attribute.
     //
     int ERROR_SXS_XML_E_DUPLICATEATTRIBUTE = 14053;
+
     //
     // MessageId: ERROR_SXS_XML_E_MULTIPLEROOTS
     //
@@ -20099,6 +22477,7 @@ public interface WinError {
     // document.
     //
     int ERROR_SXS_XML_E_MULTIPLEROOTS = 14054;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALIDATROOTLEVEL
     //
@@ -20107,6 +22486,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid at the top level of the document.
     //
     int ERROR_SXS_XML_E_INVALIDATROOTLEVEL = 14055;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADXMLDECL
     //
@@ -20115,6 +22495,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid xml declaration.
     //
     int ERROR_SXS_XML_E_BADXMLDECL = 14056;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSINGROOT
     //
@@ -20123,6 +22504,7 @@ public interface WinError {
     // Manifest Parse Error : XML document must have a top level element.
     //
     int ERROR_SXS_XML_E_MISSINGROOT = 14057;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNEXPECTEDEOF
     //
@@ -20131,6 +22513,7 @@ public interface WinError {
     // Manifest Parse Error : Unexpected end of file.
     //
     int ERROR_SXS_XML_E_UNEXPECTEDEOF = 14058;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADPEREFINSUBSET
     //
@@ -20140,6 +22523,7 @@ public interface WinError {
     // declarations in an internal subset.
     //
     int ERROR_SXS_XML_E_BADPEREFINSUBSET = 14059;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDSTARTTAG
     //
@@ -20148,6 +22532,7 @@ public interface WinError {
     // Manifest Parse Error : Element was not closed.
     //
     int ERROR_SXS_XML_E_UNCLOSEDSTARTTAG = 14060;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDENDTAG
     //
@@ -20156,6 +22541,7 @@ public interface WinError {
     // Manifest Parse Error : End element was missing the character '>'.
     //
     int ERROR_SXS_XML_E_UNCLOSEDENDTAG = 14061;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDSTRING
     //
@@ -20164,6 +22550,7 @@ public interface WinError {
     // Manifest Parse Error : A string literal was not closed.
     //
     int ERROR_SXS_XML_E_UNCLOSEDSTRING = 14062;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDCOMMENT
     //
@@ -20172,6 +22559,7 @@ public interface WinError {
     // Manifest Parse Error : A comment was not closed.
     //
     int ERROR_SXS_XML_E_UNCLOSEDCOMMENT = 14063;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDDECL
     //
@@ -20180,6 +22568,7 @@ public interface WinError {
     // Manifest Parse Error : A declaration was not closed.
     //
     int ERROR_SXS_XML_E_UNCLOSEDDECL = 14064;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNCLOSEDCDATA
     //
@@ -20188,6 +22577,7 @@ public interface WinError {
     // Manifest Parse Error : A CDATA section was not closed.
     //
     int ERROR_SXS_XML_E_UNCLOSEDCDATA = 14065;
+
     //
     // MessageId: ERROR_SXS_XML_E_RESERVEDNAMESPACE
     //
@@ -20197,6 +22587,7 @@ public interface WinError {
     // the reserved string "xml".
     //
     int ERROR_SXS_XML_E_RESERVEDNAMESPACE = 14066;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALIDENCODING
     //
@@ -20205,6 +22596,7 @@ public interface WinError {
     // Manifest Parse Error : System does not support the specified encoding.
     //
     int ERROR_SXS_XML_E_INVALIDENCODING = 14067;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALIDSWITCH
     //
@@ -20214,6 +22606,7 @@ public interface WinError {
     // not supported.
     //
     int ERROR_SXS_XML_E_INVALIDSWITCH = 14068;
+
     //
     // MessageId: ERROR_SXS_XML_E_BADXMLCASE
     //
@@ -20222,6 +22615,7 @@ public interface WinError {
     // Manifest Parse Error : The name 'xml' is reserved and must be lower case.
     //
     int ERROR_SXS_XML_E_BADXMLCASE = 14069;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALID_STANDALONE
     //
@@ -20231,6 +22625,7 @@ public interface WinError {
     // or 'no'.
     //
     int ERROR_SXS_XML_E_INVALID_STANDALONE = 14070;
+
     //
     // MessageId: ERROR_SXS_XML_E_UNEXPECTED_STANDALONE
     //
@@ -20240,6 +22635,7 @@ public interface WinError {
     // external entities.
     //
     int ERROR_SXS_XML_E_UNEXPECTED_STANDALONE = 14071;
+
     //
     // MessageId: ERROR_SXS_XML_E_INVALID_VERSION
     //
@@ -20248,6 +22644,7 @@ public interface WinError {
     // Manifest Parse Error : Invalid version number.
     //
     int ERROR_SXS_XML_E_INVALID_VERSION = 14072;
+
     //
     // MessageId: ERROR_SXS_XML_E_MISSINGEQUALS
     //
@@ -20257,6 +22654,7 @@ public interface WinError {
     // attribute value.
     //
     int ERROR_SXS_XML_E_MISSINGEQUALS = 14073;
+
     //
     // MessageId: ERROR_SXS_PROTECTION_RECOVERY_FAILED
     //
@@ -20265,6 +22663,7 @@ public interface WinError {
     // Assembly Protection Error : Unable to recover the specified assembly.
     //
     int ERROR_SXS_PROTECTION_RECOVERY_FAILED = 14074;
+
     //
     // MessageId: ERROR_SXS_PROTECTION_PUBLIC_KEY_TOO_SHORT
     //
@@ -20274,6 +22673,7 @@ public interface WinError {
     // to be allowed.
     //
     int ERROR_SXS_PROTECTION_PUBLIC_KEY_TOO_SHORT = 14075;
+
     //
     // MessageId: ERROR_SXS_PROTECTION_CATALOG_NOT_VALID
     //
@@ -20283,6 +22683,7 @@ public interface WinError {
     // does not match the assembly's manifest.
     //
     int ERROR_SXS_PROTECTION_CATALOG_NOT_VALID = 14076;
+
     //
     // MessageId: ERROR_SXS_UNTRANSLATABLE_HRESULT
     //
@@ -20291,6 +22692,7 @@ public interface WinError {
     // An HRESULT could not be translated to a corresponding Win32 error code.
     //
     int ERROR_SXS_UNTRANSLATABLE_HRESULT = 14077;
+
     //
     // MessageId: ERROR_SXS_PROTECTION_CATALOG_FILE_MISSING
     //
@@ -20299,6 +22701,7 @@ public interface WinError {
     // Assembly Protection Error : The catalog for an assembly is missing.
     //
     int ERROR_SXS_PROTECTION_CATALOG_FILE_MISSING = 14078;
+
     //
     // MessageId: ERROR_SXS_MISSING_ASSEMBLY_IDENTITY_ATTRIBUTE
     //
@@ -20308,6 +22711,7 @@ public interface WinError {
     // must be present in this context.
     //
     int ERROR_SXS_MISSING_ASSEMBLY_IDENTITY_ATTRIBUTE = 14079;
+
     //
     // MessageId: ERROR_SXS_INVALID_ASSEMBLY_IDENTITY_ATTRIBUTE_NAME
     //
@@ -20317,6 +22721,7 @@ public interface WinError {
     // contain characters not permitted in XML names.
     //
     int ERROR_SXS_INVALID_ASSEMBLY_IDENTITY_ATTRIBUTE_NAME = 14080;
+
     //
     // MessageId: ERROR_SXS_ASSEMBLY_MISSING
     //
@@ -20325,6 +22730,7 @@ public interface WinError {
     // The referenced assembly could not be found.
     //
     int ERROR_SXS_ASSEMBLY_MISSING = 14081;
+
     //
     // MessageId: ERROR_SXS_CORRUPT_ACTIVATION_STACK
     //
@@ -20334,6 +22740,7 @@ public interface WinError {
     // execution is corrupt.
     //
     int ERROR_SXS_CORRUPT_ACTIVATION_STACK = 14082;
+
     //
     // MessageId: ERROR_SXS_CORRUPTION
     //
@@ -20343,6 +22750,7 @@ public interface WinError {
     // corrupt.
     //
     int ERROR_SXS_CORRUPTION = 14083;
+
     //
     // MessageId: ERROR_SXS_EARLY_DEACTIVATION
     //
@@ -20352,6 +22760,7 @@ public interface WinError {
     // activated one.
     //
     int ERROR_SXS_EARLY_DEACTIVATION = 14084;
+
     //
     // MessageId: ERROR_SXS_INVALID_DEACTIVATION
     //
@@ -20361,6 +22770,7 @@ public interface WinError {
     // thread of execution.
     //
     int ERROR_SXS_INVALID_DEACTIVATION = 14085;
+
     //
     // MessageId: ERROR_SXS_MULTIPLE_DEACTIVATION
     //
@@ -20369,6 +22779,7 @@ public interface WinError {
     // The activation context being deactivated has already been deactivated.
     //
     int ERROR_SXS_MULTIPLE_DEACTIVATION = 14086;
+
     //
     // MessageId: ERROR_SXS_PROCESS_TERMINATION_REQUESTED
     //
@@ -20378,6 +22789,7 @@ public interface WinError {
     // process.
     //
     int ERROR_SXS_PROCESS_TERMINATION_REQUESTED = 14087;
+
     //
     // MessageId: ERROR_SXS_RELEASE_ACTIVATION_CONTEXT
     //
@@ -20387,6 +22799,7 @@ public interface WinError {
     // context.
     //
     int ERROR_SXS_RELEASE_ACTIVATION_CONTEXT = 14088;
+
     //
     // MessageId: ERROR_SXS_SYSTEM_DEFAULT_ACTIVATION_CONTEXT_EMPTY
     //
@@ -20395,6 +22808,7 @@ public interface WinError {
     // The activation context of system default assembly could not be generated.
     //
     int ERROR_SXS_SYSTEM_DEFAULT_ACTIVATION_CONTEXT_EMPTY = 14089;
+
     //
     // MessageId: ERROR_SXS_INVALID_IDENTITY_ATTRIBUTE_VALUE
     //
@@ -20403,6 +22817,7 @@ public interface WinError {
     // The value of an attribute in an identity is not within the legal range.
     //
     int ERROR_SXS_INVALID_IDENTITY_ATTRIBUTE_VALUE = 14090;
+
     //
     // MessageId: ERROR_SXS_INVALID_IDENTITY_ATTRIBUTE_NAME
     //
@@ -20411,6 +22826,7 @@ public interface WinError {
     // The name of an attribute in an identity is not within the legal range.
     //
     int ERROR_SXS_INVALID_IDENTITY_ATTRIBUTE_NAME = 14091;
+
     //
     // MessageId: ERROR_SXS_IDENTITY_DUPLICATE_ATTRIBUTE
     //
@@ -20419,6 +22835,7 @@ public interface WinError {
     // An identity contains two definitions for the same attribute.
     //
     int ERROR_SXS_IDENTITY_DUPLICATE_ATTRIBUTE = 14092;
+
     //
     // MessageId: ERROR_SXS_IDENTITY_PARSE_ERROR
     //
@@ -20429,6 +22846,7 @@ public interface WinError {
     // attribute value.
     //
     int ERROR_SXS_IDENTITY_PARSE_ERROR = 14093;
+
     //
     // MessageId: ERROR_MALFORMED_SUBSTITUTION_STRING
     //
@@ -20440,6 +22858,7 @@ public interface WinError {
     // found.
     //
     int ERROR_MALFORMED_SUBSTITUTION_STRING = 14094;
+
     //
     // MessageId: ERROR_SXS_INCORRECT_PUBLIC_KEY_TOKEN
     //
@@ -20448,6 +22867,7 @@ public interface WinError {
     // The public key token does not correspond to the public key specified.
     //
     int ERROR_SXS_INCORRECT_PUBLIC_KEY_TOKEN = 14095;
+
     //
     // MessageId: ERROR_UNMAPPED_SUBSTITUTION_STRING
     //
@@ -20456,6 +22876,7 @@ public interface WinError {
     // A substitution string had no mapping.
     //
     int ERROR_UNMAPPED_SUBSTITUTION_STRING = 14096;
+
     //
     // MessageId: ERROR_SXS_ASSEMBLY_NOT_LOCKED
     //
@@ -20464,6 +22885,7 @@ public interface WinError {
     // The component must be locked before making the request.
     //
     int ERROR_SXS_ASSEMBLY_NOT_LOCKED = 14097;
+
     //
     // MessageId: ERROR_SXS_COMPONENT_STORE_CORRUPT
     //
@@ -20472,6 +22894,7 @@ public interface WinError {
     // The component store has been corrupted.
     //
     int ERROR_SXS_COMPONENT_STORE_CORRUPT = 14098;
+
     //
     // MessageId: ERROR_ADVANCED_INSTALLER_FAILED
     //
@@ -20480,6 +22903,7 @@ public interface WinError {
     // An advanced installer failed during setup or servicing.
     //
     int ERROR_ADVANCED_INSTALLER_FAILED = 14099;
+
     //
     // MessageId: ERROR_XML_ENCODING_MISMATCH
     //
@@ -20489,6 +22913,7 @@ public interface WinError {
     // used in the document.
     //
     int ERROR_XML_ENCODING_MISMATCH = 14100;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_IDENTITY_SAME_BUT_CONTENTS_DIFFERENT
     //
@@ -20498,6 +22923,7 @@ public interface WinError {
     // different.
     //
     int ERROR_SXS_MANIFEST_IDENTITY_SAME_BUT_CONTENTS_DIFFERENT = 14101;
+
     //
     // MessageId: ERROR_SXS_IDENTITIES_DIFFERENT
     //
@@ -20506,6 +22932,7 @@ public interface WinError {
     // The component identities are different.
     //
     int ERROR_SXS_IDENTITIES_DIFFERENT = 14102;
+
     //
     // MessageId: ERROR_SXS_ASSEMBLY_IS_NOT_A_DEPLOYMENT
     //
@@ -20514,6 +22941,7 @@ public interface WinError {
     // The assembly is not a deployment.
     //
     int ERROR_SXS_ASSEMBLY_IS_NOT_A_DEPLOYMENT = 14103;
+
     //
     // MessageId: ERROR_SXS_FILE_NOT_PART_OF_ASSEMBLY
     //
@@ -20522,6 +22950,7 @@ public interface WinError {
     // The file is not a part of the assembly.
     //
     int ERROR_SXS_FILE_NOT_PART_OF_ASSEMBLY = 14104;
+
     //
     // MessageId: ERROR_SXS_MANIFEST_TOO_BIG
     //
@@ -20530,6 +22959,7 @@ public interface WinError {
     // The size of the manifest exceeds the maximum allowed.
     //
     int ERROR_SXS_MANIFEST_TOO_BIG = 14105;
+
     //
     // MessageId: ERROR_SXS_SETTING_NOT_REGISTERED
     //
@@ -20538,6 +22968,7 @@ public interface WinError {
     // The setting is not registered.
     //
     int ERROR_SXS_SETTING_NOT_REGISTERED = 14106;
+
     //
     // MessageId: ERROR_SXS_TRANSACTION_CLOSURE_INCOMPLETE
     //
@@ -20546,6 +22977,7 @@ public interface WinError {
     // One or more required members of the transaction are not present.
     //
     int ERROR_SXS_TRANSACTION_CLOSURE_INCOMPLETE = 14107;
+
     //
     // MessageId: ERROR_SMI_PRIMITIVE_INSTALLER_FAILED
     //
@@ -20554,6 +22986,7 @@ public interface WinError {
     // The SMI primitive installer failed during setup or servicing.
     //
     int ERROR_SMI_PRIMITIVE_INSTALLER_FAILED = 14108;
+
     //
     // MessageId: ERROR_GENERIC_COMMAND_FAILED
     //
@@ -20562,6 +22995,7 @@ public interface WinError {
     // A generic command executable returned a result that indicates failure.
     //
     int ERROR_GENERIC_COMMAND_FAILED = 14109;
+
     //
     // MessageId: ERROR_SXS_FILE_HASH_MISSING
     //
@@ -20570,6 +23004,7 @@ public interface WinError {
     // A component is missing file verification information in its manifest.
     //
     int ERROR_SXS_FILE_HASH_MISSING = 14110;
+
     // /////////////////////////////////////////////////
     // =//
     // =End of Side By Side Error Codes //
@@ -20590,6 +23025,7 @@ public interface WinError {
     // The specified channel path is invalid.
     //
     int ERROR_EVT_INVALID_CHANNEL_PATH = 15000;
+
     //
     // MessageId: ERROR_EVT_INVALID_QUERY
     //
@@ -20598,6 +23034,7 @@ public interface WinError {
     // The specified query is invalid.
     //
     int ERROR_EVT_INVALID_QUERY = 15001;
+
     //
     // MessageId: ERROR_EVT_PUBLISHER_METADATA_NOT_FOUND
     //
@@ -20606,6 +23043,7 @@ public interface WinError {
     // The publisher metadata cannot be found in the resource.
     //
     int ERROR_EVT_PUBLISHER_METADATA_NOT_FOUND = 15002;
+
     //
     // MessageId: ERROR_EVT_EVENT_TEMPLATE_NOT_FOUND
     //
@@ -20615,6 +23053,7 @@ public interface WinError {
     // (error =%1).
     //
     int ERROR_EVT_EVENT_TEMPLATE_NOT_FOUND = 15003;
+
     //
     // MessageId: ERROR_EVT_INVALID_PUBLISHER_NAME
     //
@@ -20623,6 +23062,7 @@ public interface WinError {
     // The specified publisher name is invalid.
     //
     int ERROR_EVT_INVALID_PUBLISHER_NAME = 15004;
+
     //
     // MessageId: ERROR_EVT_INVALID_EVENT_DATA
     //
@@ -20632,6 +23072,7 @@ public interface WinError {
     // template definition in the publisher's manifest
     //
     int ERROR_EVT_INVALID_EVENT_DATA = 15005;
+
     //
     // MessageId: ERROR_EVT_CHANNEL_NOT_FOUND
     //
@@ -20640,6 +23081,7 @@ public interface WinError {
     // The specified channel could not be found. Check channel configuration.
     //
     int ERROR_EVT_CHANNEL_NOT_FOUND = 15007;
+
     //
     // MessageId: ERROR_EVT_MALFORMED_XML_TEXT
     //
@@ -20649,6 +23091,7 @@ public interface WinError {
     // details.
     //
     int ERROR_EVT_MALFORMED_XML_TEXT = 15008;
+
     //
     // MessageId: ERROR_EVT_SUBSCRIPTION_TO_DIRECT_CHANNEL
     //
@@ -20659,6 +23102,7 @@ public interface WinError {
     // cannot be subscribed to.
     //
     int ERROR_EVT_SUBSCRIPTION_TO_DIRECT_CHANNEL = 15009;
+
     //
     // MessageId: ERROR_EVT_CONFIGURATION_ERROR
     //
@@ -20667,6 +23111,7 @@ public interface WinError {
     // Configuration error.
     //
     int ERROR_EVT_CONFIGURATION_ERROR = 15010;
+
     //
     // MessageId: ERROR_EVT_QUERY_RESULT_STALE
     //
@@ -20678,6 +23123,7 @@ public interface WinError {
     // query.
     //
     int ERROR_EVT_QUERY_RESULT_STALE = 15011;
+
     //
     // MessageId: ERROR_EVT_QUERY_RESULT_INVALID_POSITION
     //
@@ -20686,6 +23132,7 @@ public interface WinError {
     // Query result is currently at an invalid position.
     //
     int ERROR_EVT_QUERY_RESULT_INVALID_POSITION = 15012;
+
     //
     // MessageId: ERROR_EVT_NON_VALIDATING_MSXML
     //
@@ -20694,6 +23141,7 @@ public interface WinError {
     // Registered MSXML doesn't support validation.
     //
     int ERROR_EVT_NON_VALIDATING_MSXML = 15013;
+
     //
     // MessageId: ERROR_EVT_FILTER_ALREADYSCOPED
     //
@@ -20704,6 +23152,7 @@ public interface WinError {
     // change of scope operation.
     //
     int ERROR_EVT_FILTER_ALREADYSCOPED = 15014;
+
     //
     // MessageId: ERROR_EVT_FILTER_NOTELTSET
     //
@@ -20713,6 +23162,7 @@ public interface WinError {
     // element set.
     //
     int ERROR_EVT_FILTER_NOTELTSET = 15015;
+
     //
     // MessageId: ERROR_EVT_FILTER_INVARG
     //
@@ -20722,6 +23172,7 @@ public interface WinError {
     // nodes or variables and right hand side arguments must be constants.
     //
     int ERROR_EVT_FILTER_INVARG = 15016;
+
     //
     // MessageId: ERROR_EVT_FILTER_INVTEST
     //
@@ -20732,6 +23183,7 @@ public interface WinError {
     // node set identified by the preceeding node set can be evaluated.
     //
     int ERROR_EVT_FILTER_INVTEST = 15017;
+
     //
     // MessageId: ERROR_EVT_FILTER_INVTYPE
     //
@@ -20740,6 +23192,7 @@ public interface WinError {
     // This data type is currently unsupported.
     //
     int ERROR_EVT_FILTER_INVTYPE = 15018;
+
     //
     // MessageId: ERROR_EVT_FILTER_PARSEERR
     //
@@ -20748,6 +23201,7 @@ public interface WinError {
     // A syntax error occurred at position %1!d!
     //
     int ERROR_EVT_FILTER_PARSEERR = 15019;
+
     //
     // MessageId: ERROR_EVT_FILTER_UNSUPPORTEDOP
     //
@@ -20756,6 +23210,7 @@ public interface WinError {
     // This operator is unsupported by this implementation of the filter.
     //
     int ERROR_EVT_FILTER_UNSUPPORTEDOP = 15020;
+
     //
     // MessageId: ERROR_EVT_FILTER_UNEXPECTEDTOKEN
     //
@@ -20764,6 +23219,7 @@ public interface WinError {
     // The token encountered was unexpected.
     //
     int ERROR_EVT_FILTER_UNEXPECTEDTOKEN = 15021;
+
     //
     // MessageId: ERROR_EVT_INVALID_OPERATION_OVER_ENABLED_DIRECT_CHANNEL
     //
@@ -20774,6 +23230,7 @@ public interface WinError {
     // requested operation.
     //
     int ERROR_EVT_INVALID_OPERATION_OVER_ENABLED_DIRECT_CHANNEL = 15022;
+
     //
     // MessageId: ERROR_EVT_INVALID_CHANNEL_PROPERTY_VALUE
     //
@@ -20784,6 +23241,7 @@ public interface WinError {
     // this type of channel.
     //
     int ERROR_EVT_INVALID_CHANNEL_PROPERTY_VALUE = 15023;
+
     //
     // MessageId: ERROR_EVT_INVALID_PUBLISHER_PROPERTY_VALUE
     //
@@ -20794,6 +23252,7 @@ public interface WinError {
     // this type of publisher.
     //
     int ERROR_EVT_INVALID_PUBLISHER_PROPERTY_VALUE = 15024;
+
     //
     // MessageId: ERROR_EVT_CHANNEL_CANNOT_ACTIVATE
     //
@@ -20802,6 +23261,7 @@ public interface WinError {
     // The channel fails to activate.
     //
     int ERROR_EVT_CHANNEL_CANNOT_ACTIVATE = 15025;
+
     //
     // MessageId: ERROR_EVT_FILTER_TOO_COMPLEX
     //
@@ -20811,6 +23271,7 @@ public interface WinError {
     // split it into two or more simple expressions.
     //
     int ERROR_EVT_FILTER_TOO_COMPLEX = 15026;
+
     //
     // MessageId: ERROR_EVT_MESSAGE_NOT_FOUND
     //
@@ -20820,6 +23281,7 @@ public interface WinError {
     // string/message table
     //
     int ERROR_EVT_MESSAGE_NOT_FOUND = 15027;
+
     //
     // MessageId: ERROR_EVT_MESSAGE_ID_NOT_FOUND
     //
@@ -20828,6 +23290,7 @@ public interface WinError {
     // The message id for the desired message could not be found.
     //
     int ERROR_EVT_MESSAGE_ID_NOT_FOUND = 15028;
+
     //
     // MessageId: ERROR_EVT_UNRESOLVED_VALUE_INSERT
     //
@@ -20836,6 +23299,7 @@ public interface WinError {
     // The substitution string for insert index (%1) could not be found.
     //
     int ERROR_EVT_UNRESOLVED_VALUE_INSERT = 15029;
+
     //
     // MessageId: ERROR_EVT_UNRESOLVED_PARAMETER_INSERT
     //
@@ -20844,6 +23308,7 @@ public interface WinError {
     // The description string for parameter reference (%1) could not be found.
     //
     int ERROR_EVT_UNRESOLVED_PARAMETER_INSERT = 15030;
+
     //
     // MessageId: ERROR_EVT_MAX_INSERTS_REACHED
     //
@@ -20852,6 +23317,7 @@ public interface WinError {
     // The maximum number of replacements has been reached.
     //
     int ERROR_EVT_MAX_INSERTS_REACHED = 15031;
+
     //
     // MessageId: ERROR_EVT_EVENT_DEFINITION_NOT_FOUND
     //
@@ -20860,6 +23326,7 @@ public interface WinError {
     // The event definition could not be found for event id (%1).
     //
     int ERROR_EVT_EVENT_DEFINITION_NOT_FOUND = 15032;
+
     //
     // MessageId: ERROR_EVT_MESSAGE_LOCALE_NOT_FOUND
     //
@@ -20868,6 +23335,7 @@ public interface WinError {
     // The locale specific resource for the desired message is not present.
     //
     int ERROR_EVT_MESSAGE_LOCALE_NOT_FOUND = 15033;
+
     //
     // MessageId: ERROR_EVT_VERSION_TOO_OLD
     //
@@ -20876,6 +23344,7 @@ public interface WinError {
     // The resource is too old to be compatible.
     //
     int ERROR_EVT_VERSION_TOO_OLD = 15034;
+
     //
     // MessageId: ERROR_EVT_VERSION_TOO_NEW
     //
@@ -20884,6 +23353,7 @@ public interface WinError {
     // The resource is too new to be compatible.
     //
     int ERROR_EVT_VERSION_TOO_NEW = 15035;
+
     //
     // MessageId: ERROR_EVT_CANNOT_OPEN_CHANNEL_OF_QUERY
     //
@@ -20892,6 +23362,7 @@ public interface WinError {
     // The channel at index %1!d! of the query can't be opened.
     //
     int ERROR_EVT_CANNOT_OPEN_CHANNEL_OF_QUERY = 15036;
+
     //
     // MessageId: ERROR_EVT_PUBLISHER_DISABLED
     //
@@ -20902,6 +23373,7 @@ public interface WinError {
     // or upgraded.
     //
     int ERROR_EVT_PUBLISHER_DISABLED = 15037;
+
     //
     // MessageId: ERROR_EVT_FILTER_OUT_OF_RANGE
     //
@@ -20910,6 +23382,7 @@ public interface WinError {
     // Attempted to create a numeric type that is outside of its valid range.
     //
     int ERROR_EVT_FILTER_OUT_OF_RANGE = 15038;
+
     // /////////////////////////////////////////////////
     // =//
     // =Start of Wecsvc Error codes=//
@@ -20924,6 +23397,7 @@ public interface WinError {
     // The subscription fails to activate.
     //
     int ERROR_EC_SUBSCRIPTION_CANNOT_ACTIVATE = 15080;
+
     //
     // MessageId: ERROR_EC_LOG_DISABLED
     //
@@ -20934,6 +23408,7 @@ public interface WinError {
     // can be activated.
     //
     int ERROR_EC_LOG_DISABLED = 15081;
+
     //
     // MessageId: ERROR_EC_CIRCULAR_FORWARDING
     //
@@ -20943,6 +23418,7 @@ public interface WinError {
     // subscription can't contain target log of the subscription.
     //
     int ERROR_EC_CIRCULAR_FORWARDING = 15082;
+
     //
     // MessageId: ERROR_EC_CREDSTORE_FULL
     //
@@ -20951,6 +23427,7 @@ public interface WinError {
     // The credential store that is used to save credentials is full.
     //
     int ERROR_EC_CREDSTORE_FULL = 15083;
+
     //
     // MessageId: ERROR_EC_CRED_NOT_FOUND
     //
@@ -20960,6 +23437,7 @@ public interface WinError {
     // store.
     //
     int ERROR_EC_CRED_NOT_FOUND = 15084;
+
     //
     // MessageId: ERROR_EC_NO_ACTIVE_CHANNEL
     //
@@ -20968,6 +23446,7 @@ public interface WinError {
     // No active channel is found for the query.
     //
     int ERROR_EC_NO_ACTIVE_CHANNEL = 15085;
+
     // /////////////////////////////////////////////////
     // =//
     // =Start of MUI Error codes=//
@@ -20982,6 +23461,7 @@ public interface WinError {
     // The resource loader failed to find MUI file.
     //
     int ERROR_MUI_FILE_NOT_FOUND = 15100;
+
     //
     // MessageId: ERROR_MUI_INVALID_FILE
     //
@@ -20991,6 +23471,7 @@ public interface WinError {
     // validation.
     //
     int ERROR_MUI_INVALID_FILE = 15101;
+
     //
     // MessageId: ERROR_MUI_INVALID_RC_CONFIG
     //
@@ -21000,6 +23481,7 @@ public interface WinError {
     // missing required item.
     //
     int ERROR_MUI_INVALID_RC_CONFIG = 15102;
+
     //
     // MessageId: ERROR_MUI_INVALID_LOCALE_NAME
     //
@@ -21008,6 +23490,7 @@ public interface WinError {
     // The RC Manifest has invalid culture name.
     //
     int ERROR_MUI_INVALID_LOCALE_NAME = 15103;
+
     //
     // MessageId: ERROR_MUI_INVALID_ULTIMATEFALLBACK_NAME
     //
@@ -21016,6 +23499,7 @@ public interface WinError {
     // The RC Manifest has invalid ultimatefallback name.
     //
     int ERROR_MUI_INVALID_ULTIMATEFALLBACK_NAME = 15104;
+
     //
     // MessageId: ERROR_MUI_FILE_NOT_LOADED
     //
@@ -21024,6 +23508,7 @@ public interface WinError {
     // The resource loader cache doesn't have loaded MUI entry.
     //
     int ERROR_MUI_FILE_NOT_LOADED = 15105;
+
     //
     // MessageId: ERROR_RESOURCE_ENUM_USER_STOP
     //
@@ -21032,6 +23517,7 @@ public interface WinError {
     // User stopped resource enumeration.
     //
     int ERROR_RESOURCE_ENUM_USER_STOP = 15106;
+
     //
     // MessageId: ERROR_MUI_INTLSETTINGS_UILANG_NOT_INSTALLED
     //
@@ -21040,6 +23526,7 @@ public interface WinError {
     // UI language installation failed.
     //
     int ERROR_MUI_INTLSETTINGS_UILANG_NOT_INSTALLED = 15107;
+
     //
     // MessageId: ERROR_MUI_INTLSETTINGS_INVALID_LOCALE_NAME
     //
@@ -21048,6 +23535,7 @@ public interface WinError {
     // Locale installation failed.
     //
     int ERROR_MUI_INTLSETTINGS_INVALID_LOCALE_NAME = 15108;
+
     // /////////////////////////////////////////////////
     // =//
     // Start of Monitor Configuration API error codes//
@@ -21063,6 +23551,7 @@ public interface WinError {
     // with the ACCESS.bus=3.0, DDC/CI=1.1 or MCCS=2 Revision=1 specification.
     //
     int ERROR_MCA_INVALID_CAPABILITIES_STRING = 15200;
+
     //
     // MessageId: ERROR_MCA_INVALID_VCP_VERSION
     //
@@ -21072,6 +23561,7 @@ public interface WinError {
     // value.
     //
     int ERROR_MCA_INVALID_VCP_VERSION = 15201;
+
     //
     // MessageId: ERROR_MCA_MONITOR_VIOLATES_MCCS_SPECIFICATION
     //
@@ -21081,6 +23571,7 @@ public interface WinError {
     // support.
     //
     int ERROR_MCA_MONITOR_VIOLATES_MCCS_SPECIFICATION = 15202;
+
     //
     // MessageId: ERROR_MCA_MCCS_VERSION_MISMATCH
     //
@@ -21091,6 +23582,7 @@ public interface WinError {
     // used.
     //
     int ERROR_MCA_MCCS_VERSION_MISMATCH = 15203;
+
     //
     // MessageId: ERROR_MCA_UNSUPPORTED_MCCS_VERSION
     //
@@ -21101,6 +23593,7 @@ public interface WinError {
     // specification.
     //
     int ERROR_MCA_UNSUPPORTED_MCCS_VERSION = 15204;
+
     //
     // MessageId: ERROR_MCA_INTERNAL_ERROR
     //
@@ -21109,6 +23602,7 @@ public interface WinError {
     // An internal Monitor Configuration API error occurred.
     //
     int ERROR_MCA_INTERNAL_ERROR = 15205;
+
     //
     // MessageId: ERROR_MCA_INVALID_TECHNOLOGY_TYPE_RETURNED
     //
@@ -21120,6 +23614,7 @@ public interface WinError {
     // specification.
     //
     int ERROR_MCA_INVALID_TECHNOLOGY_TYPE_RETURNED = 15206;
+
     //
     // MessageId: ERROR_MCA_UNSUPPORTED_COLOR_TEMPERATURE
     //
@@ -21130,6 +23625,7 @@ public interface WinError {
     // monitor violated the MCCS=2.0 or MCCS=2.0 Revision=1 specification.
     //
     int ERROR_MCA_UNSUPPORTED_COLOR_TEMPERATURE = 15207;
+
     // ////////////////////////////////////////////////
     // =//
     // End of Monitor Configuration API error codes //
@@ -21153,6 +23649,7 @@ public interface WinError {
     // criteria.
     //
     int ERROR_AMBIGUOUS_SYSTEM_DEVICE = 15250;
+
     //
     // MessageId: ERROR_SYSTEM_DEVICE_NOT_FOUND
     //
@@ -21161,6 +23658,7 @@ public interface WinError {
     // The requested system device cannot be found.
     //
     int ERROR_SYSTEM_DEVICE_NOT_FOUND = 15299;
+
     // //////////////////////////////////
     // =//
     // COM Error Codes=//
@@ -21214,15 +23712,19 @@ public interface WinError {
     // Severity values
     //
     int SEVERITY_SUCCESS = 0;
+
     int SEVERITY_ERROR = 1;
+
     //
     // Define bits here so macros are guaranteed to work
     int FACILITY_NT_BIT = 0x10000000;
+
     // ---------------------- HRESULT value definitions -----------------
     //
     // HRESULT definitions
     //
     int NOERROR = 0;
+
     //
     // Error definitions follow
     //
@@ -21240,6 +23742,7 @@ public interface WinError {
     // Catastrophic failure
     //
     int E_UNEXPECTED = 0x8000FFFF;
+
     //
     // MessageId: E_NOTIMPL
     //
@@ -21248,6 +23751,7 @@ public interface WinError {
     // Not implemented
     //
     int E_NOTIMPL = 0x80004001;
+
     //
     // MessageId: E_OUTOFMEMORY
     //
@@ -21256,6 +23760,7 @@ public interface WinError {
     // Ran out of memory
     //
     int E_OUTOFMEMORY = 0x8007000E;
+
     //
     // MessageId: E_INVALIDARG
     //
@@ -21264,6 +23769,7 @@ public interface WinError {
     // One or more arguments are invalid
     //
     int E_INVALIDARG = 0x80070057;
+
     //
     // MessageId: E_NOINTERFACE
     //
@@ -21272,6 +23778,7 @@ public interface WinError {
     // No such interface supported
     //
     int E_NOINTERFACE = 0x80004002;
+
     //
     // MessageId: E_POINTER
     //
@@ -21280,6 +23787,7 @@ public interface WinError {
     // Invalid pointer
     //
     int E_POINTER = 0x80004003;
+
     //
     // MessageId: E_HANDLE
     //
@@ -21288,6 +23796,7 @@ public interface WinError {
     // Invalid handle
     //
     int E_HANDLE = 0x80070006;
+
     //
     // MessageId: E_ABORT
     //
@@ -21296,6 +23805,7 @@ public interface WinError {
     // Operation aborted
     //
     int E_ABORT = 0x80004004;
+
     //
     // MessageId: E_FAIL
     //
@@ -21304,6 +23814,7 @@ public interface WinError {
     // Unspecified error
     //
     int E_FAIL = 0x80004005;
+
     //
     // MessageId: E_ACCESSDENIED
     //
@@ -21312,6 +23823,7 @@ public interface WinError {
     // General access denied error
     //
     int E_ACCESSDENIED = 0x80070005;
+
     //
     // MessageId: E_PENDING
     //
@@ -21320,6 +23832,7 @@ public interface WinError {
     // The data necessary to complete this operation is not yet available.
     //
     int E_PENDING = 0x8000000A;
+
     //
     // MessageId: CO_E_INIT_TLS
     //
@@ -21328,6 +23841,7 @@ public interface WinError {
     // Thread local storage failure
     //
     int CO_E_INIT_TLS = 0x80004006;
+
     //
     // MessageId: CO_E_INIT_SHARED_ALLOCATOR
     //
@@ -21336,6 +23850,7 @@ public interface WinError {
     // Get shared memory allocator failure
     //
     int CO_E_INIT_SHARED_ALLOCATOR = 0x80004007;
+
     //
     // MessageId: CO_E_INIT_MEMORY_ALLOCATOR
     //
@@ -21344,6 +23859,7 @@ public interface WinError {
     // Get memory allocator failure
     //
     int CO_E_INIT_MEMORY_ALLOCATOR = 0x80004008;
+
     //
     // MessageId: CO_E_INIT_CLASS_CACHE
     //
@@ -21352,6 +23868,7 @@ public interface WinError {
     // Unable to initialize class cache
     //
     int CO_E_INIT_CLASS_CACHE = 0x80004009;
+
     //
     // MessageId: CO_E_INIT_RPC_CHANNEL
     //
@@ -21360,6 +23877,7 @@ public interface WinError {
     // Unable to initialize RPC services
     //
     int CO_E_INIT_RPC_CHANNEL = 0x8000400A;
+
     //
     // MessageId: CO_E_INIT_TLS_SET_CHANNEL_CONTROL
     //
@@ -21368,6 +23886,7 @@ public interface WinError {
     // Cannot set thread local storage channel control
     //
     int CO_E_INIT_TLS_SET_CHANNEL_CONTROL = 0x8000400B;
+
     //
     // MessageId: CO_E_INIT_TLS_CHANNEL_CONTROL
     //
@@ -21376,6 +23895,7 @@ public interface WinError {
     // Could not allocate thread local storage channel control
     //
     int CO_E_INIT_TLS_CHANNEL_CONTROL = 0x8000400C;
+
     //
     // MessageId: CO_E_INIT_UNACCEPTED_USER_ALLOCATOR
     //
@@ -21384,6 +23904,7 @@ public interface WinError {
     // The user supplied memory allocator is unacceptable
     //
     int CO_E_INIT_UNACCEPTED_USER_ALLOCATOR = 0x8000400D;
+
     //
     // MessageId: CO_E_INIT_SCM_MUTEX_EXISTS
     //
@@ -21392,6 +23913,7 @@ public interface WinError {
     // The OLE service mutex already exists
     //
     int CO_E_INIT_SCM_MUTEX_EXISTS = 0x8000400E;
+
     //
     // MessageId: CO_E_INIT_SCM_FILE_MAPPING_EXISTS
     //
@@ -21400,6 +23922,7 @@ public interface WinError {
     // The OLE service file mapping already exists
     //
     int CO_E_INIT_SCM_FILE_MAPPING_EXISTS = 0x8000400F;
+
     //
     // MessageId: CO_E_INIT_SCM_MAP_VIEW_OF_FILE
     //
@@ -21408,6 +23931,7 @@ public interface WinError {
     // Unable to map view of file for OLE service
     //
     int CO_E_INIT_SCM_MAP_VIEW_OF_FILE = 0x80004010;
+
     //
     // MessageId: CO_E_INIT_SCM_EXEC_FAILURE
     //
@@ -21416,6 +23940,7 @@ public interface WinError {
     // Failure attempting to launch OLE service
     //
     int CO_E_INIT_SCM_EXEC_FAILURE = 0x80004011;
+
     //
     // MessageId: CO_E_INIT_ONLY_SINGLE_THREADED
     //
@@ -21425,6 +23950,7 @@ public interface WinError {
     // threaded
     //
     int CO_E_INIT_ONLY_SINGLE_THREADED = 0x80004012;
+
     //
     // MessageId: CO_E_CANT_REMOTE
     //
@@ -21433,6 +23959,7 @@ public interface WinError {
     // A Remote activation was necessary but was not allowed
     //
     int CO_E_CANT_REMOTE = 0x80004013;
+
     //
     // MessageId: CO_E_BAD_SERVER_NAME
     //
@@ -21442,6 +23969,7 @@ public interface WinError {
     // invalid
     //
     int CO_E_BAD_SERVER_NAME = 0x80004014;
+
     //
     // MessageId: CO_E_WRONG_SERVER_IDENTITY
     //
@@ -21450,6 +23978,7 @@ public interface WinError {
     // The class is configured to run as a security id different from the caller
     //
     int CO_E_WRONG_SERVER_IDENTITY = 0x80004015;
+
     //
     // MessageId: CO_E_OLE1DDE_DISABLED
     //
@@ -21458,6 +23987,7 @@ public interface WinError {
     // Use of Ole1 services requiring DDE windows is disabled
     //
     int CO_E_OLE1DDE_DISABLED = 0x80004016;
+
     //
     // MessageId: CO_E_RUNAS_SYNTAX
     //
@@ -21467,6 +23997,7 @@ public interface WinError {
     // name>
     //
     int CO_E_RUNAS_SYNTAX = 0x80004017;
+
     //
     // MessageId: CO_E_CREATEPROCESS_FAILURE
     //
@@ -21475,6 +24006,7 @@ public interface WinError {
     // The server process could not be started. The pathname may be incorrect.
     //
     int CO_E_CREATEPROCESS_FAILURE = 0x80004018;
+
     //
     // MessageId: CO_E_RUNAS_CREATEPROCESS_FAILURE
     //
@@ -21484,6 +24016,7 @@ public interface WinError {
     // pathname may be incorrect or unavailable.
     //
     int CO_E_RUNAS_CREATEPROCESS_FAILURE = 0x80004019;
+
     //
     // MessageId: CO_E_RUNAS_LOGON_FAILURE
     //
@@ -21493,6 +24026,7 @@ public interface WinError {
     // is incorrect. Check the username and password.
     //
     int CO_E_RUNAS_LOGON_FAILURE = 0x8000401A;
+
     //
     // MessageId: CO_E_LAUNCH_PERMSSION_DENIED
     //
@@ -21501,6 +24035,7 @@ public interface WinError {
     // The client is not allowed to launch this server.
     //
     int CO_E_LAUNCH_PERMSSION_DENIED = 0x8000401B;
+
     //
     // MessageId: CO_E_START_SERVICE_FAILURE
     //
@@ -21509,6 +24044,7 @@ public interface WinError {
     // The service providing this server could not be started.
     //
     int CO_E_START_SERVICE_FAILURE = 0x8000401C;
+
     //
     // MessageId: CO_E_REMOTE_COMMUNICATION_FAILURE
     //
@@ -21518,6 +24054,7 @@ public interface WinError {
     // server.
     //
     int CO_E_REMOTE_COMMUNICATION_FAILURE = 0x8000401D;
+
     //
     // MessageId: CO_E_SERVER_START_TIMEOUT
     //
@@ -21526,6 +24063,7 @@ public interface WinError {
     // The server did not respond after being launched.
     //
     int CO_E_SERVER_START_TIMEOUT = 0x8000401E;
+
     //
     // MessageId: CO_E_CLSREG_INCONSISTENT
     //
@@ -21535,6 +24073,7 @@ public interface WinError {
     // incomplete.
     //
     int CO_E_CLSREG_INCONSISTENT = 0x8000401F;
+
     //
     // MessageId: CO_E_IIDREG_INCONSISTENT
     //
@@ -21544,6 +24083,7 @@ public interface WinError {
     // incomplete.
     //
     int CO_E_IIDREG_INCONSISTENT = 0x80004020;
+
     //
     // MessageId: CO_E_NOT_SUPPORTED
     //
@@ -21552,6 +24092,7 @@ public interface WinError {
     // The operation attempted is not supported.
     //
     int CO_E_NOT_SUPPORTED = 0x80004021;
+
     //
     // MessageId: CO_E_RELOAD_DLL
     //
@@ -21560,6 +24101,7 @@ public interface WinError {
     // A dll must be loaded.
     //
     int CO_E_RELOAD_DLL = 0x80004022;
+
     //
     // MessageId: CO_E_MSI_ERROR
     //
@@ -21568,6 +24110,7 @@ public interface WinError {
     // A Microsoft Software Installer error was encountered.
     //
     int CO_E_MSI_ERROR = 0x80004023;
+
     //
     // MessageId: CO_E_ATTEMPT_TO_CREATE_OUTSIDE_CLIENT_CONTEXT
     //
@@ -21577,6 +24120,7 @@ public interface WinError {
     // specified.
     //
     int CO_E_ATTEMPT_TO_CREATE_OUTSIDE_CLIENT_CONTEXT = 0x80004024;
+
     //
     // MessageId: CO_E_SERVER_PAUSED
     //
@@ -21585,6 +24129,7 @@ public interface WinError {
     // Activations on the server are paused.
     //
     int CO_E_SERVER_PAUSED = 0x80004025;
+
     //
     // MessageId: CO_E_SERVER_NOT_PAUSED
     //
@@ -21593,6 +24138,7 @@ public interface WinError {
     // Activations on the server are not paused.
     //
     int CO_E_SERVER_NOT_PAUSED = 0x80004026;
+
     //
     // MessageId: CO_E_CLASS_DISABLED
     //
@@ -21601,6 +24147,7 @@ public interface WinError {
     // The component or application containing the component has been disabled.
     //
     int CO_E_CLASS_DISABLED = 0x80004027;
+
     //
     // MessageId: CO_E_CLRNOTAVAILABLE
     //
@@ -21609,6 +24156,7 @@ public interface WinError {
     // The common language runtime is not available
     //
     int CO_E_CLRNOTAVAILABLE = 0x80004028;
+
     //
     // MessageId: CO_E_ASYNC_WORK_REJECTED
     //
@@ -21617,6 +24165,7 @@ public interface WinError {
     // The thread-pool rejected the submitted asynchronous work.
     //
     int CO_E_ASYNC_WORK_REJECTED = 0x80004029;
+
     //
     // MessageId: CO_E_SERVER_INIT_TIMEOUT
     //
@@ -21625,6 +24174,7 @@ public interface WinError {
     // The server started, but did not finish initializing in a timely fashion.
     //
     int CO_E_SERVER_INIT_TIMEOUT = 0x8000402A;
+
     //
     // MessageId: CO_E_NO_SECCTX_IN_ACTIVATE
     //
@@ -21634,6 +24184,7 @@ public interface WinError {
     // inside IObjectControl.Activate.
     //
     int CO_E_NO_SECCTX_IN_ACTIVATE = 0x8000402B;
+
     //
     // MessageId: CO_E_TRACKER_CONFIG
     //
@@ -21642,6 +24193,7 @@ public interface WinError {
     // The provided tracker configuration is invalid
     //
     int CO_E_TRACKER_CONFIG = 0x80004030;
+
     //
     // MessageId: CO_E_THREADPOOL_CONFIG
     //
@@ -21650,6 +24202,7 @@ public interface WinError {
     // The provided thread pool configuration is invalid
     //
     int CO_E_THREADPOOL_CONFIG = 0x80004031;
+
     //
     // MessageId: CO_E_SXS_CONFIG
     //
@@ -21658,6 +24211,7 @@ public interface WinError {
     // The provided side-by-side configuration is invalid
     //
     int CO_E_SXS_CONFIG = 0x80004032;
+
     //
     // MessageId: CO_E_MALFORMED_SPN
     //
@@ -21667,11 +24221,14 @@ public interface WinError {
     // malformed.
     //
     int CO_E_MALFORMED_SPN = 0x80004033;
+
     //
     // Success codes
     //
     HRESULT S_OK = new HRESULT(0);
+
     HRESULT S_FALSE = new HRESULT(1);
+
     // ******************
     // FACILITY_ITF
     // ******************
@@ -21683,9 +24240,13 @@ public interface WinError {
     // Generic OLE errors that may be returned by many inerfaces
     //
     int OLE_E_FIRST = 0x80040000;
+
     int OLE_E_LAST = 0x800400FF;
+
     int OLE_S_FIRST = 0x00040000;
+
     int OLE_S_LAST = 0x000400FF;
+
     //
     // Old OLE errors
     //
@@ -21697,6 +24258,7 @@ public interface WinError {
     // Invalid OLEVERB structure
     //
     int OLE_E_OLEVERB = 0x80040000;
+
     //
     // MessageId: OLE_E_ADVF
     //
@@ -21705,6 +24267,7 @@ public interface WinError {
     // Invalid advise flags
     //
     int OLE_E_ADVF = 0x80040001;
+
     //
     // MessageId: OLE_E_ENUM_NOMORE
     //
@@ -21713,6 +24276,7 @@ public interface WinError {
     // Can't enumerate any more, because the associated data is missing
     //
     int OLE_E_ENUM_NOMORE = 0x80040002;
+
     //
     // MessageId: OLE_E_ADVISENOTSUPPORTED
     //
@@ -21721,6 +24285,7 @@ public interface WinError {
     // This implementation doesn't take advises
     //
     int OLE_E_ADVISENOTSUPPORTED = 0x80040003;
+
     //
     // MessageId: OLE_E_NOCONNECTION
     //
@@ -21729,6 +24294,7 @@ public interface WinError {
     // There is no connection for this connection ID
     //
     int OLE_E_NOCONNECTION = 0x80040004;
+
     //
     // MessageId: OLE_E_NOTRUNNING
     //
@@ -21737,6 +24303,7 @@ public interface WinError {
     // Need to run the object to perform this operation
     //
     int OLE_E_NOTRUNNING = 0x80040005;
+
     //
     // MessageId: OLE_E_NOCACHE
     //
@@ -21745,6 +24312,7 @@ public interface WinError {
     // There is no cache to operate on
     //
     int OLE_E_NOCACHE = 0x80040006;
+
     //
     // MessageId: OLE_E_BLANK
     //
@@ -21753,6 +24321,7 @@ public interface WinError {
     // Uninitialized object
     //
     int OLE_E_BLANK = 0x80040007;
+
     //
     // MessageId: OLE_E_CLASSDIFF
     //
@@ -21761,6 +24330,7 @@ public interface WinError {
     // Linked object's source class has changed
     //
     int OLE_E_CLASSDIFF = 0x80040008;
+
     //
     // MessageId: OLE_E_CANT_GETMONIKER
     //
@@ -21769,6 +24339,7 @@ public interface WinError {
     // Not able to get the moniker of the object
     //
     int OLE_E_CANT_GETMONIKER = 0x80040009;
+
     //
     // MessageId: OLE_E_CANT_BINDTOSOURCE
     //
@@ -21777,6 +24348,7 @@ public interface WinError {
     // Not able to bind to the source
     //
     int OLE_E_CANT_BINDTOSOURCE = 0x8004000A;
+
     //
     // MessageId: OLE_E_STATIC
     //
@@ -21785,6 +24357,7 @@ public interface WinError {
     // Object is static; operation not allowed
     //
     int OLE_E_STATIC = 0x8004000B;
+
     //
     // MessageId: OLE_E_PROMPTSAVECANCELLED
     //
@@ -21793,6 +24366,7 @@ public interface WinError {
     // User canceled out of save dialog
     //
     int OLE_E_PROMPTSAVECANCELLED = 0x8004000C;
+
     //
     // MessageId: OLE_E_INVALIDRECT
     //
@@ -21801,6 +24375,7 @@ public interface WinError {
     // Invalid rectangle
     //
     int OLE_E_INVALIDRECT = 0x8004000D;
+
     //
     // MessageId: OLE_E_WRONGCOMPOBJ
     //
@@ -21809,6 +24384,7 @@ public interface WinError {
     // compobj.dll is too old for the ole2.dll initialized
     //
     int OLE_E_WRONGCOMPOBJ = 0x8004000E;
+
     //
     // MessageId: OLE_E_INVALIDHWND
     //
@@ -21817,6 +24393,7 @@ public interface WinError {
     // Invalid window handle
     //
     int OLE_E_INVALIDHWND = 0x8004000F;
+
     //
     // MessageId: OLE_E_NOT_INPLACEACTIVE
     //
@@ -21825,6 +24402,7 @@ public interface WinError {
     // Object is not in any of the inplace active states
     //
     int OLE_E_NOT_INPLACEACTIVE = 0x80040010;
+
     //
     // MessageId: OLE_E_CANTCONVERT
     //
@@ -21833,6 +24411,7 @@ public interface WinError {
     // Not able to convert object
     //
     int OLE_E_CANTCONVERT = 0x80040011;
+
     //
     // MessageId: OLE_E_NOSTORAGE
     //
@@ -21841,6 +24420,7 @@ public interface WinError {
     // Not able to perform the operation because object is not given storage yet
     //
     int OLE_E_NOSTORAGE = 0x80040012;
+
     //
     // MessageId: DV_E_FORMATETC
     //
@@ -21849,6 +24429,7 @@ public interface WinError {
     // Invalid FORMATETC structure
     //
     int DV_E_FORMATETC = 0x80040064;
+
     //
     // MessageId: DV_E_DVTARGETDEVICE
     //
@@ -21857,6 +24438,7 @@ public interface WinError {
     // Invalid DVTARGETDEVICE structure
     //
     int DV_E_DVTARGETDEVICE = 0x80040065;
+
     //
     // MessageId: DV_E_STGMEDIUM
     //
@@ -21865,6 +24447,7 @@ public interface WinError {
     // Invalid STDGMEDIUM structure
     //
     int DV_E_STGMEDIUM = 0x80040066;
+
     //
     // MessageId: DV_E_STATDATA
     //
@@ -21873,6 +24456,7 @@ public interface WinError {
     // Invalid STATDATA structure
     //
     int DV_E_STATDATA = 0x80040067;
+
     //
     // MessageId: DV_E_LINDEX
     //
@@ -21881,6 +24465,7 @@ public interface WinError {
     // Invalid lindex
     //
     int DV_E_LINDEX = 0x80040068;
+
     //
     // MessageId: DV_E_TYMED
     //
@@ -21889,6 +24474,7 @@ public interface WinError {
     // Invalid tymed
     //
     int DV_E_TYMED = 0x80040069;
+
     //
     // MessageId: DV_E_CLIPFORMAT
     //
@@ -21897,6 +24483,7 @@ public interface WinError {
     // Invalid clipboard format
     //
     int DV_E_CLIPFORMAT = 0x8004006A;
+
     //
     // MessageId: DV_E_DVASPECT
     //
@@ -21905,6 +24492,7 @@ public interface WinError {
     // Invalid aspect(s)
     //
     int DV_E_DVASPECT = 0x8004006B;
+
     //
     // MessageId: DV_E_DVTARGETDEVICE_SIZE
     //
@@ -21913,6 +24501,7 @@ public interface WinError {
     // tdSize parameter of the DVTARGETDEVICE structure is invalid
     //
     int DV_E_DVTARGETDEVICE_SIZE = 0x8004006C;
+
     //
     // MessageId: DV_E_NOIVIEWOBJECT
     //
@@ -21921,10 +24510,15 @@ public interface WinError {
     // Object doesn't support IViewObject interface
     //
     int DV_E_NOIVIEWOBJECT = 0x8004006D;
+
     int DRAGDROP_E_FIRST = 0x80040100;
+
     int DRAGDROP_E_LAST = 0x8004010F;
+
     int DRAGDROP_S_FIRST = 0x00040100;
+
     int DRAGDROP_S_LAST = 0x0004010F;
+
     //
     // MessageId: DRAGDROP_E_NOTREGISTERED
     //
@@ -21933,6 +24527,7 @@ public interface WinError {
     // Trying to revoke a drop target that has not been registered
     //
     int DRAGDROP_E_NOTREGISTERED = 0x80040100;
+
     //
     // MessageId: DRAGDROP_E_ALREADYREGISTERED
     //
@@ -21941,6 +24536,7 @@ public interface WinError {
     // This window has already been registered as a drop target
     //
     int DRAGDROP_E_ALREADYREGISTERED = 0x80040101;
+
     //
     // MessageId: DRAGDROP_E_INVALIDHWND
     //
@@ -21949,10 +24545,15 @@ public interface WinError {
     // Invalid window handle
     //
     int DRAGDROP_E_INVALIDHWND = 0x80040102;
+
     int CLASSFACTORY_E_FIRST = 0x80040110;
+
     int CLASSFACTORY_E_LAST = 0x8004011F;
+
     int CLASSFACTORY_S_FIRST = 0x00040110;
+
     int CLASSFACTORY_S_LAST = 0x0004011F;
+
     //
     // MessageId: CLASS_E_NOAGGREGATION
     //
@@ -21961,6 +24562,7 @@ public interface WinError {
     // Class does not support aggregation (or class object is remote)
     //
     int CLASS_E_NOAGGREGATION = 0x80040110;
+
     //
     // MessageId: CLASS_E_CLASSNOTAVAILABLE
     //
@@ -21969,6 +24571,7 @@ public interface WinError {
     // ClassFactory cannot supply requested class
     //
     int CLASS_E_CLASSNOTAVAILABLE = 0x80040111;
+
     //
     // MessageId: CLASS_E_NOTLICENSED
     //
@@ -21977,18 +24580,31 @@ public interface WinError {
     // Class is not licensed for use
     //
     int CLASS_E_NOTLICENSED = 0x80040112;
+
     int MARSHAL_E_FIRST = 0x80040120;
+
     int MARSHAL_E_LAST = 0x8004012F;
+
     int MARSHAL_S_FIRST = 0x00040120;
+
     int MARSHAL_S_LAST = 0x0004012F;
+
     int DATA_E_FIRST = 0x80040130;
+
     int DATA_E_LAST = 0x8004013F;
+
     int DATA_S_FIRST = 0x00040130;
+
     int DATA_S_LAST = 0x0004013F;
+
     int VIEW_E_FIRST = 0x80040140;
+
     int VIEW_E_LAST = 0x8004014F;
+
     int VIEW_S_FIRST = 0x00040140;
+
     int VIEW_S_LAST = 0x0004014F;
+
     //
     // MessageId: VIEW_E_DRAW
     //
@@ -21997,10 +24613,15 @@ public interface WinError {
     // Error drawing view
     //
     int VIEW_E_DRAW = 0x80040140;
+
     int REGDB_E_FIRST = 0x80040150;
+
     int REGDB_E_LAST = 0x8004015F;
+
     int REGDB_S_FIRST = 0x00040150;
+
     int REGDB_S_LAST = 0x0004015F;
+
     //
     // MessageId: REGDB_E_READREGDB
     //
@@ -22009,6 +24630,7 @@ public interface WinError {
     // Could not read key from registry
     //
     int REGDB_E_READREGDB = 0x80040150;
+
     //
     // MessageId: REGDB_E_WRITEREGDB
     //
@@ -22017,6 +24639,7 @@ public interface WinError {
     // Could not write key to registry
     //
     int REGDB_E_WRITEREGDB = 0x80040151;
+
     //
     // MessageId: REGDB_E_KEYMISSING
     //
@@ -22025,6 +24648,7 @@ public interface WinError {
     // Could not find the key in the registry
     //
     int REGDB_E_KEYMISSING = 0x80040152;
+
     //
     // MessageId: REGDB_E_INVALIDVALUE
     //
@@ -22033,6 +24657,7 @@ public interface WinError {
     // Invalid value for registry
     //
     int REGDB_E_INVALIDVALUE = 0x80040153;
+
     //
     // MessageId: REGDB_E_CLASSNOTREG
     //
@@ -22041,6 +24666,7 @@ public interface WinError {
     // Class not registered
     //
     int REGDB_E_CLASSNOTREG = 0x80040154;
+
     //
     // MessageId: REGDB_E_IIDNOTREG
     //
@@ -22049,6 +24675,7 @@ public interface WinError {
     // Interface not registered
     //
     int REGDB_E_IIDNOTREG = 0x80040155;
+
     //
     // MessageId: REGDB_E_BADTHREADINGMODEL
     //
@@ -22057,8 +24684,11 @@ public interface WinError {
     // Threading model entry is not valid
     //
     int REGDB_E_BADTHREADINGMODEL = 0x80040156;
+
     int CAT_E_FIRST = 0x80040160;
+
     int CAT_E_LAST = 0x80040161;
+
     //
     // MessageId: CAT_E_CATIDNOEXIST
     //
@@ -22067,6 +24697,7 @@ public interface WinError {
     // CATID does not exist
     //
     int CAT_E_CATIDNOEXIST = 0x80040160;
+
     //
     // MessageId: CAT_E_NODESCRIPTION
     //
@@ -22075,13 +24706,16 @@ public interface WinError {
     // Description not found
     //
     int CAT_E_NODESCRIPTION = 0x80040161;
+
     // //////////////////////////////////
     // =//
     // Class Store Error Codes //
     // =//
     // //////////////////////////////////
     int CS_E_FIRST = 0x80040164;
+
     int CS_E_LAST = 0x8004016F;
+
     //
     // MessageId: CS_E_PACKAGE_NOTFOUND
     //
@@ -22091,6 +24725,7 @@ public interface WinError {
     // meets this criteria.
     //
     int CS_E_PACKAGE_NOTFOUND = 0x80040164;
+
     //
     // MessageId: CS_E_NOT_DELETABLE
     //
@@ -22100,6 +24735,7 @@ public interface WinError {
     // installation data in the Active Directory.
     //
     int CS_E_NOT_DELETABLE = 0x80040165;
+
     //
     // MessageId: CS_E_CLASS_NOTFOUND
     //
@@ -22109,6 +24745,7 @@ public interface WinError {
     // Directory.
     //
     int CS_E_CLASS_NOTFOUND = 0x80040166;
+
     //
     // MessageId: CS_E_INVALID_VERSION
     //
@@ -22117,6 +24754,7 @@ public interface WinError {
     // The software installation data in the Active Directory is corrupt.
     //
     int CS_E_INVALID_VERSION = 0x80040167;
+
     //
     // MessageId: CS_E_NO_CLASSSTORE
     //
@@ -22125,6 +24763,7 @@ public interface WinError {
     // There is no software installation data in the Active Directory.
     //
     int CS_E_NO_CLASSSTORE = 0x80040168;
+
     //
     // MessageId: CS_E_OBJECT_NOTFOUND
     //
@@ -22133,6 +24772,7 @@ public interface WinError {
     // There is no software installation data object in the Active Directory.
     //
     int CS_E_OBJECT_NOTFOUND = 0x80040169;
+
     //
     // MessageId: CS_E_OBJECT_ALREADY_EXISTS
     //
@@ -22142,6 +24782,7 @@ public interface WinError {
     // exists.
     //
     int CS_E_OBJECT_ALREADY_EXISTS = 0x8004016A;
+
     //
     // MessageId: CS_E_INVALID_PATH
     //
@@ -22151,6 +24792,7 @@ public interface WinError {
     // correct.
     //
     int CS_E_INVALID_PATH = 0x8004016B;
+
     //
     // MessageId: CS_E_NETWORK_ERROR
     //
@@ -22159,6 +24801,7 @@ public interface WinError {
     // A network error interrupted the operation.
     //
     int CS_E_NETWORK_ERROR = 0x8004016C;
+
     //
     // MessageId: CS_E_ADMIN_LIMIT_EXCEEDED
     //
@@ -22168,6 +24811,7 @@ public interface WinError {
     // Administrator.
     //
     int CS_E_ADMIN_LIMIT_EXCEEDED = 0x8004016D;
+
     //
     // MessageId: CS_E_SCHEMA_MISMATCH
     //
@@ -22177,6 +24821,7 @@ public interface WinError {
     // does not match the required schema.
     //
     int CS_E_SCHEMA_MISMATCH = 0x8004016E;
+
     //
     // MessageId: CS_E_INTERNAL_ERROR
     //
@@ -22186,10 +24831,15 @@ public interface WinError {
     // Directory.
     //
     int CS_E_INTERNAL_ERROR = 0x8004016F;
+
     int CACHE_E_FIRST = 0x80040170;
+
     int CACHE_E_LAST = 0x8004017F;
+
     int CACHE_S_FIRST = 0x00040170;
+
     int CACHE_S_LAST = 0x0004017F;
+
     //
     // MessageId: CACHE_E_NOCACHE_UPDATED
     //
@@ -22198,10 +24848,15 @@ public interface WinError {
     // Cache not updated
     //
     int CACHE_E_NOCACHE_UPDATED = 0x80040170;
+
     int OLEOBJ_E_FIRST = 0x80040180;
+
     int OLEOBJ_E_LAST = 0x8004018F;
+
     int OLEOBJ_S_FIRST = 0x00040180;
+
     int OLEOBJ_S_LAST = 0x0004018F;
+
     //
     // MessageId: OLEOBJ_E_NOVERBS
     //
@@ -22210,6 +24865,7 @@ public interface WinError {
     // No verbs for OLE object
     //
     int OLEOBJ_E_NOVERBS = 0x80040180;
+
     //
     // MessageId: OLEOBJ_E_INVALIDVERB
     //
@@ -22218,10 +24874,15 @@ public interface WinError {
     // Invalid verb for OLE object
     //
     int OLEOBJ_E_INVALIDVERB = 0x80040181;
+
     int CLIENTSITE_E_FIRST = 0x80040190;
+
     int CLIENTSITE_E_LAST = 0x8004019F;
+
     int CLIENTSITE_S_FIRST = 0x00040190;
+
     int CLIENTSITE_S_LAST = 0x0004019F;
+
     //
     // MessageId: INPLACE_E_NOTUNDOABLE
     //
@@ -22230,6 +24891,7 @@ public interface WinError {
     // Undo is not available
     //
     int INPLACE_E_NOTUNDOABLE = 0x800401A0;
+
     //
     // MessageId: INPLACE_E_NOTOOLSPACE
     //
@@ -22238,18 +24900,31 @@ public interface WinError {
     // Space for tools is not available
     //
     int INPLACE_E_NOTOOLSPACE = 0x800401A1;
+
     int INPLACE_E_FIRST = 0x800401A0;
+
     int INPLACE_E_LAST = 0x800401AF;
+
     int INPLACE_S_FIRST = 0x000401A0;
+
     int INPLACE_S_LAST = 0x000401AF;
+
     int ENUM_E_FIRST = 0x800401B0;
+
     int ENUM_E_LAST = 0x800401BF;
+
     int ENUM_S_FIRST = 0x000401B0;
+
     int ENUM_S_LAST = 0x000401BF;
+
     int CONVERT10_E_FIRST = 0x800401C0;
+
     int CONVERT10_E_LAST = 0x800401CF;
+
     int CONVERT10_S_FIRST = 0x000401C0;
+
     int CONVERT10_S_LAST = 0x000401CF;
+
     //
     // MessageId: CONVERT10_E_OLESTREAM_GET
     //
@@ -22258,6 +24933,7 @@ public interface WinError {
     // OLESTREAM Get method failed
     //
     int CONVERT10_E_OLESTREAM_GET = 0x800401C0;
+
     //
     // MessageId: CONVERT10_E_OLESTREAM_PUT
     //
@@ -22266,6 +24942,7 @@ public interface WinError {
     // OLESTREAM Put method failed
     //
     int CONVERT10_E_OLESTREAM_PUT = 0x800401C1;
+
     //
     // MessageId: CONVERT10_E_OLESTREAM_FMT
     //
@@ -22274,6 +24951,7 @@ public interface WinError {
     // Contents of the OLESTREAM not in correct format
     //
     int CONVERT10_E_OLESTREAM_FMT = 0x800401C2;
+
     //
     // MessageId: CONVERT10_E_OLESTREAM_BITMAP_TO_DIB
     //
@@ -22283,6 +24961,7 @@ public interface WinError {
     // DIB
     //
     int CONVERT10_E_OLESTREAM_BITMAP_TO_DIB = 0x800401C3;
+
     //
     // MessageId: CONVERT10_E_STG_FMT
     //
@@ -22291,6 +24970,7 @@ public interface WinError {
     // Contents of the IStorage not in correct format
     //
     int CONVERT10_E_STG_FMT = 0x800401C4;
+
     //
     // MessageId: CONVERT10_E_STG_NO_STD_STREAM
     //
@@ -22299,6 +24979,7 @@ public interface WinError {
     // Contents of IStorage is missing one of the standard streams
     //
     int CONVERT10_E_STG_NO_STD_STREAM = 0x800401C5;
+
     //
     // MessageId: CONVERT10_E_STG_DIB_TO_BITMAP
     //
@@ -22306,13 +24987,18 @@ public interface WinError {
     //
     // There was an error in a Windows GDI call while converting the DIB to a
     // bitmap.
-    // 
+    //
     //
     int CONVERT10_E_STG_DIB_TO_BITMAP = 0x800401C6;
+
     int CLIPBRD_E_FIRST = 0x800401D0;
+
     int CLIPBRD_E_LAST = 0x800401DF;
+
     int CLIPBRD_S_FIRST = 0x000401D0;
+
     int CLIPBRD_S_LAST = 0x000401DF;
+
     //
     // MessageId: CLIPBRD_E_CANT_OPEN
     //
@@ -22321,6 +25007,7 @@ public interface WinError {
     // OpenClipboard Failed
     //
     int CLIPBRD_E_CANT_OPEN = 0x800401D0;
+
     //
     // MessageId: CLIPBRD_E_CANT_EMPTY
     //
@@ -22329,6 +25016,7 @@ public interface WinError {
     // EmptyClipboard Failed
     //
     int CLIPBRD_E_CANT_EMPTY = 0x800401D1;
+
     //
     // MessageId: CLIPBRD_E_CANT_SET
     //
@@ -22337,6 +25025,7 @@ public interface WinError {
     // SetClipboard Failed
     //
     int CLIPBRD_E_CANT_SET = 0x800401D2;
+
     //
     // MessageId: CLIPBRD_E_BAD_DATA
     //
@@ -22345,6 +25034,7 @@ public interface WinError {
     // Data on clipboard is invalid
     //
     int CLIPBRD_E_BAD_DATA = 0x800401D3;
+
     //
     // MessageId: CLIPBRD_E_CANT_CLOSE
     //
@@ -22353,10 +25043,15 @@ public interface WinError {
     // CloseClipboard Failed
     //
     int CLIPBRD_E_CANT_CLOSE = 0x800401D4;
+
     int MK_E_FIRST = 0x800401E0;
+
     int MK_E_LAST = 0x800401EF;
+
     int MK_S_FIRST = 0x000401E0;
+
     int MK_S_LAST = 0x000401EF;
+
     //
     // MessageId: MK_E_CONNECTMANUALLY
     //
@@ -22365,6 +25060,7 @@ public interface WinError {
     // Moniker needs to be connected manually
     //
     int MK_E_CONNECTMANUALLY = 0x800401E0;
+
     //
     // MessageId: MK_E_EXCEEDEDDEADLINE
     //
@@ -22373,6 +25069,7 @@ public interface WinError {
     // Operation exceeded deadline
     //
     int MK_E_EXCEEDEDDEADLINE = 0x800401E1;
+
     //
     // MessageId: MK_E_NEEDGENERIC
     //
@@ -22381,6 +25078,7 @@ public interface WinError {
     // Moniker needs to be generic
     //
     int MK_E_NEEDGENERIC = 0x800401E2;
+
     //
     // MessageId: MK_E_UNAVAILABLE
     //
@@ -22389,6 +25087,7 @@ public interface WinError {
     // Operation unavailable
     //
     int MK_E_UNAVAILABLE = 0x800401E3;
+
     //
     // MessageId: MK_E_SYNTAX
     //
@@ -22397,6 +25096,7 @@ public interface WinError {
     // Invalid syntax
     //
     int MK_E_SYNTAX = 0x800401E4;
+
     //
     // MessageId: MK_E_NOOBJECT
     //
@@ -22405,6 +25105,7 @@ public interface WinError {
     // No object for moniker
     //
     int MK_E_NOOBJECT = 0x800401E5;
+
     //
     // MessageId: MK_E_INVALIDEXTENSION
     //
@@ -22413,6 +25114,7 @@ public interface WinError {
     // Bad extension for file
     //
     int MK_E_INVALIDEXTENSION = 0x800401E6;
+
     //
     // MessageId: MK_E_INTERMEDIATEINTERFACENOTSUPPORTED
     //
@@ -22421,6 +25123,7 @@ public interface WinError {
     // Intermediate operation failed
     //
     int MK_E_INTERMEDIATEINTERFACENOTSUPPORTED = 0x800401E7;
+
     //
     // MessageId: MK_E_NOTBINDABLE
     //
@@ -22429,6 +25132,7 @@ public interface WinError {
     // Moniker is not bindable
     //
     int MK_E_NOTBINDABLE = 0x800401E8;
+
     //
     // MessageId: MK_E_NOTBOUND
     //
@@ -22437,6 +25141,7 @@ public interface WinError {
     // Moniker is not bound
     //
     int MK_E_NOTBOUND = 0x800401E9;
+
     //
     // MessageId: MK_E_CANTOPENFILE
     //
@@ -22445,6 +25150,7 @@ public interface WinError {
     // Moniker cannot open file
     //
     int MK_E_CANTOPENFILE = 0x800401EA;
+
     //
     // MessageId: MK_E_MUSTBOTHERUSER
     //
@@ -22453,6 +25159,7 @@ public interface WinError {
     // User input required for operation to succeed
     //
     int MK_E_MUSTBOTHERUSER = 0x800401EB;
+
     //
     // MessageId: MK_E_NOINVERSE
     //
@@ -22461,6 +25168,7 @@ public interface WinError {
     // Moniker class has no inverse
     //
     int MK_E_NOINVERSE = 0x800401EC;
+
     //
     // MessageId: MK_E_NOSTORAGE
     //
@@ -22469,6 +25177,7 @@ public interface WinError {
     // Moniker does not refer to storage
     //
     int MK_E_NOSTORAGE = 0x800401ED;
+
     //
     // MessageId: MK_E_NOPREFIX
     //
@@ -22477,6 +25186,7 @@ public interface WinError {
     // No common prefix
     //
     int MK_E_NOPREFIX = 0x800401EE;
+
     //
     // MessageId: MK_E_ENUMERATION_FAILED
     //
@@ -22485,10 +25195,15 @@ public interface WinError {
     // Moniker could not be enumerated
     //
     int MK_E_ENUMERATION_FAILED = 0x800401EF;
+
     int CO_E_FIRST = 0x800401F0;
+
     int CO_E_LAST = 0x800401FF;
+
     int CO_S_FIRST = 0x000401F0;
+
     int CO_S_LAST = 0x000401FF;
+
     //
     // MessageId: CO_E_NOTINITIALIZED
     //
@@ -22497,6 +25212,7 @@ public interface WinError {
     // CoInitialize has not been called.
     //
     int CO_E_NOTINITIALIZED = 0x800401F0;
+
     //
     // MessageId: CO_E_ALREADYINITIALIZED
     //
@@ -22505,6 +25221,7 @@ public interface WinError {
     // CoInitialize has already been called.
     //
     int CO_E_ALREADYINITIALIZED = 0x800401F1;
+
     //
     // MessageId: CO_E_CANTDETERMINECLASS
     //
@@ -22513,6 +25230,7 @@ public interface WinError {
     // Class of object cannot be determined
     //
     int CO_E_CANTDETERMINECLASS = 0x800401F2;
+
     //
     // MessageId: CO_E_CLASSSTRING
     //
@@ -22521,6 +25239,7 @@ public interface WinError {
     // Invalid class string
     //
     int CO_E_CLASSSTRING = 0x800401F3;
+
     //
     // MessageId: CO_E_IIDSTRING
     //
@@ -22529,6 +25248,7 @@ public interface WinError {
     // Invalid interface string
     //
     int CO_E_IIDSTRING = 0x800401F4;
+
     //
     // MessageId: CO_E_APPNOTFOUND
     //
@@ -22537,6 +25257,7 @@ public interface WinError {
     // Application not found
     //
     int CO_E_APPNOTFOUND = 0x800401F5;
+
     //
     // MessageId: CO_E_APPSINGLEUSE
     //
@@ -22545,6 +25266,7 @@ public interface WinError {
     // Application cannot be run more than once
     //
     int CO_E_APPSINGLEUSE = 0x800401F6;
+
     //
     // MessageId: CO_E_ERRORINAPP
     //
@@ -22553,6 +25275,7 @@ public interface WinError {
     // Some error in application program
     //
     int CO_E_ERRORINAPP = 0x800401F7;
+
     //
     // MessageId: CO_E_DLLNOTFOUND
     //
@@ -22561,6 +25284,7 @@ public interface WinError {
     // DLL for class not found
     //
     int CO_E_DLLNOTFOUND = 0x800401F8;
+
     //
     // MessageId: CO_E_ERRORINDLL
     //
@@ -22569,6 +25293,7 @@ public interface WinError {
     // Error in the DLL
     //
     int CO_E_ERRORINDLL = 0x800401F9;
+
     //
     // MessageId: CO_E_WRONGOSFORAPP
     //
@@ -22577,6 +25302,7 @@ public interface WinError {
     // Wrong OS or OS version for application
     //
     int CO_E_WRONGOSFORAPP = 0x800401FA;
+
     //
     // MessageId: CO_E_OBJNOTREG
     //
@@ -22585,6 +25311,7 @@ public interface WinError {
     // Object is not registered
     //
     int CO_E_OBJNOTREG = 0x800401FB;
+
     //
     // MessageId: CO_E_OBJISREG
     //
@@ -22593,6 +25320,7 @@ public interface WinError {
     // Object is already registered
     //
     int CO_E_OBJISREG = 0x800401FC;
+
     //
     // MessageId: CO_E_OBJNOTCONNECTED
     //
@@ -22601,6 +25329,7 @@ public interface WinError {
     // Object is not connected to server
     //
     int CO_E_OBJNOTCONNECTED = 0x800401FD;
+
     //
     // MessageId: CO_E_APPDIDNTREG
     //
@@ -22609,6 +25338,7 @@ public interface WinError {
     // Application was launched but it didn't register a class factory
     //
     int CO_E_APPDIDNTREG = 0x800401FE;
+
     //
     // MessageId: CO_E_RELEASED
     //
@@ -22617,10 +25347,15 @@ public interface WinError {
     // Object has been released
     //
     int CO_E_RELEASED = 0x800401FF;
+
     int EVENT_E_FIRST = 0x80040200;
+
     int EVENT_E_LAST = 0x8004021F;
+
     int EVENT_S_FIRST = 0x00040200;
+
     int EVENT_S_LAST = 0x0004021F;
+
     //
     // MessageId: EVENT_S_SOME_SUBSCRIBERS_FAILED
     //
@@ -22629,6 +25364,7 @@ public interface WinError {
     // An event was able to invoke some but not all of the subscribers
     //
     int EVENT_S_SOME_SUBSCRIBERS_FAILED = 0x00040200;
+
     //
     // MessageId: EVENT_E_ALL_SUBSCRIBERS_FAILED
     //
@@ -22637,6 +25373,7 @@ public interface WinError {
     // An event was unable to invoke any of the subscribers
     //
     int EVENT_E_ALL_SUBSCRIBERS_FAILED = 0x80040201;
+
     //
     // MessageId: EVENT_S_NOSUBSCRIBERS
     //
@@ -22645,6 +25382,7 @@ public interface WinError {
     // An event was delivered but there were no subscribers
     //
     int EVENT_S_NOSUBSCRIBERS = 0x00040202;
+
     //
     // MessageId: EVENT_E_QUERYSYNTAX
     //
@@ -22653,6 +25391,7 @@ public interface WinError {
     // A syntax error occurred trying to evaluate a query string
     //
     int EVENT_E_QUERYSYNTAX = 0x80040203;
+
     //
     // MessageId: EVENT_E_QUERYFIELD
     //
@@ -22661,6 +25400,7 @@ public interface WinError {
     // An invalid field name was used in a query string
     //
     int EVENT_E_QUERYFIELD = 0x80040204;
+
     //
     // MessageId: EVENT_E_INTERNALEXCEPTION
     //
@@ -22669,6 +25409,7 @@ public interface WinError {
     // An unexpected exception was raised
     //
     int EVENT_E_INTERNALEXCEPTION = 0x80040205;
+
     //
     // MessageId: EVENT_E_INTERNALERROR
     //
@@ -22677,6 +25418,7 @@ public interface WinError {
     // An unexpected internal error was detected
     //
     int EVENT_E_INTERNALERROR = 0x80040206;
+
     //
     // MessageId: EVENT_E_INVALID_PER_USER_SID
     //
@@ -22685,6 +25427,7 @@ public interface WinError {
     // The owner SID on a per-user subscription doesn't exist
     //
     int EVENT_E_INVALID_PER_USER_SID = 0x80040207;
+
     //
     // MessageId: EVENT_E_USER_EXCEPTION
     //
@@ -22693,6 +25436,7 @@ public interface WinError {
     // A user-supplied component or subscriber raised an exception
     //
     int EVENT_E_USER_EXCEPTION = 0x80040208;
+
     //
     // MessageId: EVENT_E_TOO_MANY_METHODS
     //
@@ -22701,6 +25445,7 @@ public interface WinError {
     // An interface has too many methods to fire events from
     //
     int EVENT_E_TOO_MANY_METHODS = 0x80040209;
+
     //
     // MessageId: EVENT_E_MISSING_EVENTCLASS
     //
@@ -22709,6 +25454,7 @@ public interface WinError {
     // A subscription cannot be stored unless its event class already exists
     //
     int EVENT_E_MISSING_EVENTCLASS = 0x8004020A;
+
     //
     // MessageId: EVENT_E_NOT_ALL_REMOVED
     //
@@ -22717,6 +25463,7 @@ public interface WinError {
     // Not all the objects requested could be removed
     //
     int EVENT_E_NOT_ALL_REMOVED = 0x8004020B;
+
     //
     // MessageId: EVENT_E_COMPLUS_NOT_INSTALLED
     //
@@ -22725,6 +25472,7 @@ public interface WinError {
     // COM+ is required for this operation, but is not installed
     //
     int EVENT_E_COMPLUS_NOT_INSTALLED = 0x8004020C;
+
     //
     // MessageId: EVENT_E_CANT_MODIFY_OR_DELETE_UNCONFIGURED_OBJECT
     //
@@ -22734,6 +25482,7 @@ public interface WinError {
     // SDK
     //
     int EVENT_E_CANT_MODIFY_OR_DELETE_UNCONFIGURED_OBJECT = 0x8004020D;
+
     //
     // MessageId: EVENT_E_CANT_MODIFY_OR_DELETE_CONFIGURED_OBJECT
     //
@@ -22742,6 +25491,7 @@ public interface WinError {
     // Cannot modify or delete an object that was added using the COM+ Admin SDK
     //
     int EVENT_E_CANT_MODIFY_OR_DELETE_CONFIGURED_OBJECT = 0x8004020E;
+
     //
     // MessageId: EVENT_E_INVALID_EVENT_CLASS_PARTITION
     //
@@ -22750,6 +25500,7 @@ public interface WinError {
     // The event class for this subscription is in an invalid partition
     //
     int EVENT_E_INVALID_EVENT_CLASS_PARTITION = 0x8004020F;
+
     //
     // MessageId: EVENT_E_PER_USER_SID_NOT_LOGGED_ON
     //
@@ -22759,10 +25510,15 @@ public interface WinError {
     // specified
     //
     int EVENT_E_PER_USER_SID_NOT_LOGGED_ON = 0x80040210;
+
     int XACT_E_FIRST = 0x8004D000;
+
     int XACT_E_LAST = 0x8004D029;
+
     int XACT_S_FIRST = 0x0004D000;
+
     int XACT_S_LAST = 0x0004D010;
+
     //
     // MessageId: XACT_E_ALREADYOTHERSINGLEPHASE
     //
@@ -22772,6 +25528,7 @@ public interface WinError {
     // transaction.
     //
     int XACT_E_ALREADYOTHERSINGLEPHASE = 0x8004D000;
+
     //
     // MessageId: XACT_E_CANTRETAIN
     //
@@ -22780,6 +25537,7 @@ public interface WinError {
     // A retaining commit or abort is not supported
     //
     int XACT_E_CANTRETAIN = 0x8004D001;
+
     //
     // MessageId: XACT_E_COMMITFAILED
     //
@@ -22789,6 +25547,7 @@ public interface WinError {
     // was aborted.
     //
     int XACT_E_COMMITFAILED = 0x8004D002;
+
     //
     // MessageId: XACT_E_COMMITPREVENTED
     //
@@ -22798,6 +25557,7 @@ public interface WinError {
     // application did not initiate the transaction.
     //
     int XACT_E_COMMITPREVENTED = 0x8004D003;
+
     //
     // MessageId: XACT_E_HEURISTICABORT
     //
@@ -22806,6 +25566,7 @@ public interface WinError {
     // Instead of committing, the resource heuristically aborted.
     //
     int XACT_E_HEURISTICABORT = 0x8004D004;
+
     //
     // MessageId: XACT_E_HEURISTICCOMMIT
     //
@@ -22814,6 +25575,7 @@ public interface WinError {
     // Instead of aborting, the resource heuristically committed.
     //
     int XACT_E_HEURISTICCOMMIT = 0x8004D005;
+
     //
     // MessageId: XACT_E_HEURISTICDAMAGE
     //
@@ -22823,6 +25585,7 @@ public interface WinError {
     // aborted, likely because of heuristic decisions.
     //
     int XACT_E_HEURISTICDAMAGE = 0x8004D006;
+
     //
     // MessageId: XACT_E_HEURISTICDANGER
     //
@@ -22832,6 +25595,7 @@ public interface WinError {
     // may have been aborted, likely because of heuristic decisions.
     //
     int XACT_E_HEURISTICDANGER = 0x8004D007;
+
     //
     // MessageId: XACT_E_ISOLATIONLEVEL
     //
@@ -22840,6 +25604,7 @@ public interface WinError {
     // The requested isolation level is not valid or supported.
     //
     int XACT_E_ISOLATIONLEVEL = 0x8004D008;
+
     //
     // MessageId: XACT_E_NOASYNC
     //
@@ -22849,6 +25614,7 @@ public interface WinError {
     // this method.
     //
     int XACT_E_NOASYNC = 0x8004D009;
+
     //
     // MessageId: XACT_E_NOENLIST
     //
@@ -22857,6 +25623,7 @@ public interface WinError {
     // Unable to enlist in the transaction.
     //
     int XACT_E_NOENLIST = 0x8004D00A;
+
     //
     // MessageId: XACT_E_NOISORETAIN
     //
@@ -22867,6 +25634,7 @@ public interface WinError {
     // implementation, or isoF;ags was not equal to zero.
     //
     int XACT_E_NOISORETAIN = 0x8004D00B;
+
     //
     // MessageId: XACT_E_NORESOURCE
     //
@@ -22875,6 +25643,7 @@ public interface WinError {
     // There is no resource presently associated with this enlistment
     //
     int XACT_E_NORESOURCE = 0x8004D00C;
+
     //
     // MessageId: XACT_E_NOTCURRENT
     //
@@ -22884,6 +25653,7 @@ public interface WinError {
     // concurrency control in at least one of the resource managers.
     //
     int XACT_E_NOTCURRENT = 0x8004D00D;
+
     //
     // MessageId: XACT_E_NOTRANSACTION
     //
@@ -22893,6 +25663,7 @@ public interface WinError {
     // aborted
     //
     int XACT_E_NOTRANSACTION = 0x8004D00E;
+
     //
     // MessageId: XACT_E_NOTSUPPORTED
     //
@@ -22901,6 +25672,7 @@ public interface WinError {
     // An invalid combination of F;ags was specified
     //
     int XACT_E_NOTSUPPORTED = 0x8004D00F;
+
     //
     // MessageId: XACT_E_UNKNOWNRMGRID
     //
@@ -22910,6 +25682,7 @@ public interface WinError {
     // transaction manager.
     //
     int XACT_E_UNKNOWNRMGRID = 0x8004D010;
+
     //
     // MessageId: XACT_E_WRONGSTATE
     //
@@ -22918,6 +25691,7 @@ public interface WinError {
     // This method was called in the wrong state
     //
     int XACT_E_WRONGSTATE = 0x8004D011;
+
     //
     // MessageId: XACT_E_WRONGUOW
     //
@@ -22927,6 +25701,7 @@ public interface WinError {
     // the resource manager.
     //
     int XACT_E_WRONGUOW = 0x8004D012;
+
     //
     // MessageId: XACT_E_XTIONEXISTS
     //
@@ -22935,6 +25710,7 @@ public interface WinError {
     // An enlistment in a transaction already exists.
     //
     int XACT_E_XTIONEXISTS = 0x8004D013;
+
     //
     // MessageId: XACT_E_NOIMPORTOBJECT
     //
@@ -22943,6 +25719,7 @@ public interface WinError {
     // An import object for the transaction could not be found.
     //
     int XACT_E_NOIMPORTOBJECT = 0x8004D014;
+
     //
     // MessageId: XACT_E_INVALIDCOOKIE
     //
@@ -22951,6 +25728,7 @@ public interface WinError {
     // The transaction cookie is invalid.
     //
     int XACT_E_INVALIDCOOKIE = 0x8004D015;
+
     //
     // MessageId: XACT_E_INDOUBT
     //
@@ -22960,6 +25738,7 @@ public interface WinError {
     // a transaction manager or resource manager has failed
     //
     int XACT_E_INDOUBT = 0x8004D016;
+
     //
     // MessageId: XACT_E_NOTIMEOUT
     //
@@ -22968,6 +25747,7 @@ public interface WinError {
     // A time-out was specified, but time-outs are not supported.
     //
     int XACT_E_NOTIMEOUT = 0x8004D017;
+
     //
     // MessageId: XACT_E_ALREADYINPROGRESS
     //
@@ -22976,6 +25756,7 @@ public interface WinError {
     // The requested operation is already in progress for the transaction.
     //
     int XACT_E_ALREADYINPROGRESS = 0x8004D018;
+
     //
     // MessageId: XACT_E_ABORTED
     //
@@ -22984,6 +25765,7 @@ public interface WinError {
     // The transaction has already been aborted.
     //
     int XACT_E_ABORTED = 0x8004D019;
+
     //
     // MessageId: XACT_E_LOGFULL
     //
@@ -22992,6 +25774,7 @@ public interface WinError {
     // The Transaction Manager returned a log full error.
     //
     int XACT_E_LOGFULL = 0x8004D01A;
+
     //
     // MessageId: XACT_E_TMNOTAVAILABLE
     //
@@ -23000,6 +25783,7 @@ public interface WinError {
     // The Transaction Manager is not available.
     //
     int XACT_E_TMNOTAVAILABLE = 0x8004D01B;
+
     //
     // MessageId: XACT_E_CONNECTION_DOWN
     //
@@ -23008,6 +25792,7 @@ public interface WinError {
     // A connection with the transaction manager was lost.
     //
     int XACT_E_CONNECTION_DOWN = 0x8004D01C;
+
     //
     // MessageId: XACT_E_CONNECTION_DENIED
     //
@@ -23017,6 +25802,7 @@ public interface WinError {
     // denied.
     //
     int XACT_E_CONNECTION_DENIED = 0x8004D01D;
+
     //
     // MessageId: XACT_E_REENLISTTIMEOUT
     //
@@ -23025,6 +25811,7 @@ public interface WinError {
     // Resource manager reenlistment to determine transaction status timed out.
     //
     int XACT_E_REENLISTTIMEOUT = 0x8004D01E;
+
     //
     // MessageId: XACT_E_TIP_CONNECT_FAILED
     //
@@ -23034,6 +25821,7 @@ public interface WinError {
     // TIP transaction manager.
     //
     int XACT_E_TIP_CONNECT_FAILED = 0x8004D01F;
+
     //
     // MessageId: XACT_E_TIP_PROTOCOL_ERROR
     //
@@ -23043,6 +25831,7 @@ public interface WinError {
     // transaction manager.
     //
     int XACT_E_TIP_PROTOCOL_ERROR = 0x8004D020;
+
     //
     // MessageId: XACT_E_TIP_PULL_FAILED
     //
@@ -23052,6 +25841,7 @@ public interface WinError {
     // TIP transaction manager.
     //
     int XACT_E_TIP_PULL_FAILED = 0x8004D021;
+
     //
     // MessageId: XACT_E_DEST_TMNOTAVAILABLE
     //
@@ -23060,6 +25850,7 @@ public interface WinError {
     // The Transaction Manager on the destination machine is not available.
     //
     int XACT_E_DEST_TMNOTAVAILABLE = 0x8004D022;
+
     //
     // MessageId: XACT_E_TIP_DISABLED
     //
@@ -23068,6 +25859,7 @@ public interface WinError {
     // The Transaction Manager has disabled its support for TIP.
     //
     int XACT_E_TIP_DISABLED = 0x8004D023;
+
     //
     // MessageId: XACT_E_NETWORK_TX_DISABLED
     //
@@ -23077,6 +25869,7 @@ public interface WinError {
     // transactions.
     //
     int XACT_E_NETWORK_TX_DISABLED = 0x8004D024;
+
     //
     // MessageId: XACT_E_PARTNER_NETWORK_TX_DISABLED
     //
@@ -23086,6 +25879,7 @@ public interface WinError {
     // remote/network transactions.
     //
     int XACT_E_PARTNER_NETWORK_TX_DISABLED = 0x8004D025;
+
     //
     // MessageId: XACT_E_XA_TX_DISABLED
     //
@@ -23094,6 +25888,7 @@ public interface WinError {
     // The transaction manager has disabled its support for XA transactions.
     //
     int XACT_E_XA_TX_DISABLED = 0x8004D026;
+
     //
     // MessageId: XACT_E_UNABLE_TO_READ_DTC_CONFIG
     //
@@ -23102,6 +25897,7 @@ public interface WinError {
     // MSDTC was unable to read its configuration information.
     //
     int XACT_E_UNABLE_TO_READ_DTC_CONFIG = 0x8004D027;
+
     //
     // MessageId: XACT_E_UNABLE_TO_LOAD_DTC_PROXY
     //
@@ -23110,6 +25906,7 @@ public interface WinError {
     // MSDTC was unable to load the dtc proxy dll.
     //
     int XACT_E_UNABLE_TO_LOAD_DTC_PROXY = 0x8004D028;
+
     //
     // MessageId: XACT_E_ABORTING
     //
@@ -23118,6 +25915,7 @@ public interface WinError {
     // The local transaction has aborted.
     //
     int XACT_E_ABORTING = 0x8004D029;
+
     //
     // TXF & CRM errors start=4d080.
     //
@@ -23128,6 +25926,7 @@ public interface WinError {
     // XACT_E_CLERKNOTFOUND
     //
     int XACT_E_CLERKNOTFOUND = 0x8004D080;
+
     //
     // MessageId: XACT_E_CLERKEXISTS
     //
@@ -23136,6 +25935,7 @@ public interface WinError {
     // XACT_E_CLERKEXISTS
     //
     int XACT_E_CLERKEXISTS = 0x8004D081;
+
     //
     // MessageId: XACT_E_RECOVERYINPROGRESS
     //
@@ -23144,6 +25944,7 @@ public interface WinError {
     // XACT_E_RECOVERYINPROGRESS
     //
     int XACT_E_RECOVERYINPROGRESS = 0x8004D082;
+
     //
     // MessageId: XACT_E_TRANSACTIONCLOSED
     //
@@ -23152,6 +25953,7 @@ public interface WinError {
     // XACT_E_TRANSACTIONCLOSED
     //
     int XACT_E_TRANSACTIONCLOSED = 0x8004D083;
+
     //
     // MessageId: XACT_E_INVALIDLSN
     //
@@ -23160,6 +25962,7 @@ public interface WinError {
     // XACT_E_INVALIDLSN
     //
     int XACT_E_INVALIDLSN = 0x8004D084;
+
     //
     // MessageId: XACT_E_REPLAYREQUEST
     //
@@ -23168,6 +25971,7 @@ public interface WinError {
     // XACT_E_REPLAYREQUEST
     //
     int XACT_E_REPLAYREQUEST = 0x8004D085;
+
     // Begin XACT_DTC_CONSTANTS enumerated values defined in txdtc.h
     // SymbolicName=XACT_E_CONNECTION_REQUEST_DENIED
     //
@@ -23332,6 +26136,7 @@ public interface WinError {
     // outcome is not known yet.
     //
     int XACT_S_ASYNC = 0x0004D000;
+
     //
     // MessageId: XACT_S_DEFECT
     //
@@ -23340,6 +26145,7 @@ public interface WinError {
     // XACT_S_DEFECT
     //
     int XACT_S_DEFECT = 0x0004D001;
+
     //
     // MessageId: XACT_S_READONLY
     //
@@ -23348,6 +26154,7 @@ public interface WinError {
     // The method call succeeded because the transaction was read-only.
     //
     int XACT_S_READONLY = 0x0004D002;
+
     //
     // MessageId: XACT_S_SOMENORETAIN
     //
@@ -23358,6 +26165,7 @@ public interface WinError {
     // because they could not support abort-retaining semantics
     //
     int XACT_S_SOMENORETAIN = 0x0004D003;
+
     //
     // MessageId: XACT_S_OKINFORM
     //
@@ -23367,6 +26175,7 @@ public interface WinError {
     // to look if any other sinks make further changes.
     //
     int XACT_S_OKINFORM = 0x0004D004;
+
     //
     // MessageId: XACT_S_MADECHANGESCONTENT
     //
@@ -23376,6 +26185,7 @@ public interface WinError {
     // made to one or more resources during this call.
     //
     int XACT_S_MADECHANGESCONTENT = 0x0004D005;
+
     //
     // MessageId: XACT_S_MADECHANGESINFORM
     //
@@ -23386,6 +26196,7 @@ public interface WinError {
     // this sink wants another chance to look
     //
     int XACT_S_MADECHANGESINFORM = 0x0004D006;
+
     //
     // MessageId: XACT_S_ALLNORETAIN
     //
@@ -23395,6 +26206,7 @@ public interface WinError {
     // non-retaining.
     //
     int XACT_S_ALLNORETAIN = 0x0004D007;
+
     //
     // MessageId: XACT_S_ABORTING
     //
@@ -23403,6 +26215,7 @@ public interface WinError {
     // An abort operation was already in progress.
     //
     int XACT_S_ABORTING = 0x0004D008;
+
     //
     // MessageId: XACT_S_SINGLEPHASE
     //
@@ -23412,6 +26225,7 @@ public interface WinError {
     // transaction.
     //
     int XACT_S_SINGLEPHASE = 0x0004D009;
+
     //
     // MessageId: XACT_S_LOCALLY_OK
     //
@@ -23420,6 +26234,7 @@ public interface WinError {
     // The local transaction has not aborted.
     //
     int XACT_S_LOCALLY_OK = 0x0004D00A;
+
     //
     // MessageId: XACT_S_LASTRESOURCEMANAGER
     //
@@ -23429,10 +26244,15 @@ public interface WinError {
     // manager) for the transaction.
     //
     int XACT_S_LASTRESOURCEMANAGER = 0x0004D010;
+
     int CONTEXT_E_FIRST = 0x8004E000;
+
     int CONTEXT_E_LAST = 0x8004E02F;
+
     int CONTEXT_S_FIRST = 0x0004E000;
+
     int CONTEXT_S_LAST = 0x0004E02F;
+
     //
     // MessageId: CONTEXT_E_ABORTED
     //
@@ -23441,6 +26261,7 @@ public interface WinError {
     // The root transaction wanted to commit, but transaction aborted
     //
     int CONTEXT_E_ABORTED = 0x8004E002;
+
     //
     // MessageId: CONTEXT_E_ABORTING
     //
@@ -23450,6 +26271,7 @@ public interface WinError {
     // has already aborted or in the process of aborting.
     //
     int CONTEXT_E_ABORTING = 0x8004E003;
+
     //
     // MessageId: CONTEXT_E_NOCONTEXT
     //
@@ -23458,6 +26280,7 @@ public interface WinError {
     // There is no MTS object context
     //
     int CONTEXT_E_NOCONTEXT = 0x8004E004;
+
     //
     // MessageId: CONTEXT_E_WOULD_DEADLOCK
     //
@@ -23467,6 +26290,7 @@ public interface WinError {
     // would cause a deadlock to occur.
     //
     int CONTEXT_E_WOULD_DEADLOCK = 0x8004E005;
+
     //
     // MessageId: CONTEXT_E_SYNCH_TIMEOUT
     //
@@ -23476,6 +26300,7 @@ public interface WinError {
     // out waiting to enter the context.
     //
     int CONTEXT_E_SYNCH_TIMEOUT = 0x8004E006;
+
     //
     // MessageId: CONTEXT_E_OLDREF
     //
@@ -23485,6 +26310,7 @@ public interface WinError {
     // has already committed or aborted.
     //
     int CONTEXT_E_OLDREF = 0x8004E007;
+
     //
     // MessageId: CONTEXT_E_ROLENOTFOUND
     //
@@ -23493,6 +26319,7 @@ public interface WinError {
     // The specified role was not configured for the application
     //
     int CONTEXT_E_ROLENOTFOUND = 0x8004E00C;
+
     //
     // MessageId: CONTEXT_E_TMNOTAVAILABLE
     //
@@ -23502,6 +26329,7 @@ public interface WinError {
     // Coordinator
     //
     int CONTEXT_E_TMNOTAVAILABLE = 0x8004E00F;
+
     //
     // MessageId: CO_E_ACTIVATIONFAILED
     //
@@ -23510,6 +26338,7 @@ public interface WinError {
     // An unexpected error occurred during COM+ Activation.
     //
     int CO_E_ACTIVATIONFAILED = 0x8004E021;
+
     //
     // MessageId: CO_E_ACTIVATIONFAILED_EVENTLOGGED
     //
@@ -23518,6 +26347,7 @@ public interface WinError {
     // COM+ Activation failed. Check the event log for more information
     //
     int CO_E_ACTIVATIONFAILED_EVENTLOGGED = 0x8004E022;
+
     //
     // MessageId: CO_E_ACTIVATIONFAILED_CATALOGERROR
     //
@@ -23526,6 +26356,7 @@ public interface WinError {
     // COM+ Activation failed due to a catalog or configuration error.
     //
     int CO_E_ACTIVATIONFAILED_CATALOGERROR = 0x8004E023;
+
     //
     // MessageId: CO_E_ACTIVATIONFAILED_TIMEOUT
     //
@@ -23535,6 +26366,7 @@ public interface WinError {
     // the specified amount of time.
     //
     int CO_E_ACTIVATIONFAILED_TIMEOUT = 0x8004E024;
+
     //
     // MessageId: CO_E_INITIALIZATIONFAILED
     //
@@ -23544,6 +26376,7 @@ public interface WinError {
     // the event log for more information.
     //
     int CO_E_INITIALIZATIONFAILED = 0x8004E025;
+
     //
     // MessageId: CONTEXT_E_NOJIT
     //
@@ -23553,6 +26386,7 @@ public interface WinError {
     // it is not
     //
     int CONTEXT_E_NOJIT = 0x8004E026;
+
     //
     // MessageId: CONTEXT_E_NOTRANSACTION
     //
@@ -23562,6 +26396,7 @@ public interface WinError {
     // Transaction, and it does not
     //
     int CONTEXT_E_NOTRANSACTION = 0x8004E027;
+
     //
     // MessageId: CO_E_THREADINGMODEL_CHANGED
     //
@@ -23571,6 +26406,7 @@ public interface WinError {
     // Application. Please re-install component.
     //
     int CO_E_THREADINGMODEL_CHANGED = 0x8004E028;
+
     //
     // MessageId: CO_E_NOIISINTRINSICS
     //
@@ -23579,6 +26415,7 @@ public interface WinError {
     // IIS intrinsics not available. Start your work with IIS.
     //
     int CO_E_NOIISINTRINSICS = 0x8004E029;
+
     //
     // MessageId: CO_E_NOCOOKIES
     //
@@ -23587,6 +26424,7 @@ public interface WinError {
     // An attempt to write a cookie failed.
     //
     int CO_E_NOCOOKIES = 0x8004E02A;
+
     //
     // MessageId: CO_E_DBERROR
     //
@@ -23595,6 +26433,7 @@ public interface WinError {
     // An attempt to use a database generated a database specific error.
     //
     int CO_E_DBERROR = 0x8004E02B;
+
     //
     // MessageId: CO_E_NOTPOOLED
     //
@@ -23603,6 +26442,7 @@ public interface WinError {
     // The COM+ component you created must use object pooling to work.
     //
     int CO_E_NOTPOOLED = 0x8004E02C;
+
     //
     // MessageId: CO_E_NOTCONSTRUCTED
     //
@@ -23612,6 +26452,7 @@ public interface WinError {
     // correctly.
     //
     int CO_E_NOTCONSTRUCTED = 0x8004E02D;
+
     //
     // MessageId: CO_E_NOSYNCHRONIZATION
     //
@@ -23621,6 +26462,7 @@ public interface WinError {
     // it.
     //
     int CO_E_NOSYNCHRONIZATION = 0x8004E02E;
+
     //
     // MessageId: CO_E_ISOLEVELMISMATCH
     //
@@ -23631,6 +26473,7 @@ public interface WinError {
     // transaction. The creation failed.
     //
     int CO_E_ISOLEVELMISMATCH = 0x8004E02F;
+
     //
     // MessageId: CO_E_CALL_OUT_OF_TX_SCOPE_NOT_ALLOWED
     //
@@ -23641,6 +26484,7 @@ public interface WinError {
     // Cross-context calls cannot be made while inside of a transaction scope.
     //
     int CO_E_CALL_OUT_OF_TX_SCOPE_NOT_ALLOWED = 0x8004E030;
+
     //
     // MessageId: CO_E_EXIT_TRANSACTION_SCOPE_NOT_CALLED
     //
@@ -23650,6 +26494,7 @@ public interface WinError {
     // corresponding call to ExitTransactionScope before returning.
     //
     int CO_E_EXIT_TRANSACTION_SCOPE_NOT_CALLED = 0x8004E031;
+
     //
     // Old OLE Success Codes
     //
@@ -23661,6 +26506,7 @@ public interface WinError {
     // Use the registry database to provide the requested information
     //
     int OLE_S_USEREG = 0x00040000;
+
     //
     // MessageId: OLE_S_STATIC
     //
@@ -23669,6 +26515,7 @@ public interface WinError {
     // Success, but static
     //
     int OLE_S_STATIC = 0x00040001;
+
     //
     // MessageId: OLE_S_MAC_CLIPFORMAT
     //
@@ -23677,6 +26524,7 @@ public interface WinError {
     // Macintosh clipboard format
     //
     int OLE_S_MAC_CLIPFORMAT = 0x00040002;
+
     //
     // MessageId: DRAGDROP_S_DROP
     //
@@ -23685,6 +26533,7 @@ public interface WinError {
     // Successful drop took place
     //
     int DRAGDROP_S_DROP = 0x00040100;
+
     //
     // MessageId: DRAGDROP_S_CANCEL
     //
@@ -23693,6 +26542,7 @@ public interface WinError {
     // Drag-drop operation canceled
     //
     int DRAGDROP_S_CANCEL = 0x00040101;
+
     //
     // MessageId: DRAGDROP_S_USEDEFAULTCURSORS
     //
@@ -23701,6 +26551,7 @@ public interface WinError {
     // Use the default cursor
     //
     int DRAGDROP_S_USEDEFAULTCURSORS = 0x00040102;
+
     //
     // MessageId: DATA_S_SAMEFORMATETC
     //
@@ -23709,6 +26560,7 @@ public interface WinError {
     // Data has same FORMATETC
     //
     int DATA_S_SAMEFORMATETC = 0x00040130;
+
     //
     // MessageId: VIEW_S_ALREADY_FROZEN
     //
@@ -23717,6 +26569,7 @@ public interface WinError {
     // View is already frozen
     //
     int VIEW_S_ALREADY_FROZEN = 0x00040140;
+
     //
     // MessageId: CACHE_S_FORMATETC_NOTSUPPORTED
     //
@@ -23725,6 +26578,7 @@ public interface WinError {
     // FORMATETC not supported
     //
     int CACHE_S_FORMATETC_NOTSUPPORTED = 0x00040170;
+
     //
     // MessageId: CACHE_S_SAMECACHE
     //
@@ -23733,6 +26587,7 @@ public interface WinError {
     // Same cache
     //
     int CACHE_S_SAMECACHE = 0x00040171;
+
     //
     // MessageId: CACHE_S_SOMECACHES_NOTUPDATED
     //
@@ -23741,6 +26596,7 @@ public interface WinError {
     // Some cache(s) not updated
     //
     int CACHE_S_SOMECACHES_NOTUPDATED = 0x00040172;
+
     //
     // MessageId: OLEOBJ_S_INVALIDVERB
     //
@@ -23749,6 +26605,7 @@ public interface WinError {
     // Invalid verb for OLE object
     //
     int OLEOBJ_S_INVALIDVERB = 0x00040180;
+
     //
     // MessageId: OLEOBJ_S_CANNOT_DOVERB_NOW
     //
@@ -23757,6 +26614,7 @@ public interface WinError {
     // Verb number is valid but verb cannot be done now
     //
     int OLEOBJ_S_CANNOT_DOVERB_NOW = 0x00040181;
+
     //
     // MessageId: OLEOBJ_S_INVALIDHWND
     //
@@ -23765,6 +26623,7 @@ public interface WinError {
     // Invalid window handle passed
     //
     int OLEOBJ_S_INVALIDHWND = 0x00040182;
+
     //
     // MessageId: INPLACE_S_TRUNCATED
     //
@@ -23773,6 +26632,7 @@ public interface WinError {
     // Message is too long; some of it had to be truncated before displaying
     //
     int INPLACE_S_TRUNCATED = 0x000401A0;
+
     //
     // MessageId: CONVERT10_S_NO_PRESENTATION
     //
@@ -23781,6 +26641,7 @@ public interface WinError {
     // Unable to convert OLESTREAM to IStorage
     //
     int CONVERT10_S_NO_PRESENTATION = 0x000401C0;
+
     //
     // MessageId: MK_S_REDUCED_TO_SELF
     //
@@ -23789,6 +26650,7 @@ public interface WinError {
     // Moniker reduced to itself
     //
     int MK_S_REDUCED_TO_SELF = 0x000401E2;
+
     //
     // MessageId: MK_S_ME
     //
@@ -23797,6 +26659,7 @@ public interface WinError {
     // Common prefix is this moniker
     //
     int MK_S_ME = 0x000401E4;
+
     //
     // MessageId: MK_S_HIM
     //
@@ -23805,6 +26668,7 @@ public interface WinError {
     // Common prefix is input moniker
     //
     int MK_S_HIM = 0x000401E5;
+
     //
     // MessageId: MK_S_US
     //
@@ -23813,6 +26677,7 @@ public interface WinError {
     // Common prefix is both monikers
     //
     int MK_S_US = 0x000401E6;
+
     //
     // MessageId: MK_S_MONIKERALREADYREGISTERED
     //
@@ -23821,6 +26686,7 @@ public interface WinError {
     // Moniker is already registered in running object table
     //
     int MK_S_MONIKERALREADYREGISTERED = 0x000401E7;
+
     //
     // Task Scheduler errors
     //
@@ -23832,6 +26698,7 @@ public interface WinError {
     // The task is ready to run at its next scheduled time.
     //
     int SCHED_S_TASK_READY = 0x00041300;
+
     //
     // MessageId: SCHED_S_TASK_RUNNING
     //
@@ -23840,6 +26707,7 @@ public interface WinError {
     // The task is currently running.
     //
     int SCHED_S_TASK_RUNNING = 0x00041301;
+
     //
     // MessageId: SCHED_S_TASK_DISABLED
     //
@@ -23849,6 +26717,7 @@ public interface WinError {
     // disabled.
     //
     int SCHED_S_TASK_DISABLED = 0x00041302;
+
     //
     // MessageId: SCHED_S_TASK_HAS_NOT_RUN
     //
@@ -23857,6 +26726,7 @@ public interface WinError {
     // The task has not yet run.
     //
     int SCHED_S_TASK_HAS_NOT_RUN = 0x00041303;
+
     //
     // MessageId: SCHED_S_TASK_NO_MORE_RUNS
     //
@@ -23865,6 +26735,7 @@ public interface WinError {
     // There are no more runs scheduled for this task.
     //
     int SCHED_S_TASK_NO_MORE_RUNS = 0x00041304;
+
     //
     // MessageId: SCHED_S_TASK_NOT_SCHEDULED
     //
@@ -23874,6 +26745,7 @@ public interface WinError {
     // schedule have not been set.
     //
     int SCHED_S_TASK_NOT_SCHEDULED = 0x00041305;
+
     //
     // MessageId: SCHED_S_TASK_TERMINATED
     //
@@ -23882,6 +26754,7 @@ public interface WinError {
     // The last run of the task was terminated by the user.
     //
     int SCHED_S_TASK_TERMINATED = 0x00041306;
+
     //
     // MessageId: SCHED_S_TASK_NO_VALID_TRIGGERS
     //
@@ -23891,6 +26764,7 @@ public interface WinError {
     // not set.
     //
     int SCHED_S_TASK_NO_VALID_TRIGGERS = 0x00041307;
+
     //
     // MessageId: SCHED_S_EVENT_TRIGGER
     //
@@ -23899,6 +26773,7 @@ public interface WinError {
     // Event triggers don't have set run times.
     //
     int SCHED_S_EVENT_TRIGGER = 0x00041308;
+
     //
     // MessageId: SCHED_E_TRIGGER_NOT_FOUND
     //
@@ -23907,6 +26782,7 @@ public interface WinError {
     // Trigger not found.
     //
     int SCHED_E_TRIGGER_NOT_FOUND = 0x80041309;
+
     //
     // MessageId: SCHED_E_TASK_NOT_READY
     //
@@ -23916,6 +26792,7 @@ public interface WinError {
     // been set.
     //
     int SCHED_E_TASK_NOT_READY = 0x8004130A;
+
     //
     // MessageId: SCHED_E_TASK_NOT_RUNNING
     //
@@ -23924,6 +26801,7 @@ public interface WinError {
     // There is no running instance of the task.
     //
     int SCHED_E_TASK_NOT_RUNNING = 0x8004130B;
+
     //
     // MessageId: SCHED_E_SERVICE_NOT_INSTALLED
     //
@@ -23932,6 +26810,7 @@ public interface WinError {
     // The Task Scheduler Service is not installed on this computer.
     //
     int SCHED_E_SERVICE_NOT_INSTALLED = 0x8004130C;
+
     //
     // MessageId: SCHED_E_CANNOT_OPEN_TASK
     //
@@ -23940,6 +26819,7 @@ public interface WinError {
     // The task object could not be opened.
     //
     int SCHED_E_CANNOT_OPEN_TASK = 0x8004130D;
+
     //
     // MessageId: SCHED_E_INVALID_TASK
     //
@@ -23948,6 +26828,7 @@ public interface WinError {
     // The object is either an invalid task object or is not a task object.
     //
     int SCHED_E_INVALID_TASK = 0x8004130E;
+
     //
     // MessageId: SCHED_E_ACCOUNT_INFORMATION_NOT_SET
     //
@@ -23957,6 +26838,7 @@ public interface WinError {
     // database for the task indicated.
     //
     int SCHED_E_ACCOUNT_INFORMATION_NOT_SET = 0x8004130F;
+
     //
     // MessageId: SCHED_E_ACCOUNT_NAME_NOT_FOUND
     //
@@ -23965,6 +26847,7 @@ public interface WinError {
     // Unable to establish existence of the account specified.
     //
     int SCHED_E_ACCOUNT_NAME_NOT_FOUND = 0x80041310;
+
     //
     // MessageId: SCHED_E_ACCOUNT_DBASE_CORRUPT
     //
@@ -23974,6 +26857,7 @@ public interface WinError {
     // database has been reset.
     //
     int SCHED_E_ACCOUNT_DBASE_CORRUPT = 0x80041311;
+
     //
     // MessageId: SCHED_E_NO_SECURITY_SERVICES
     //
@@ -23982,6 +26866,7 @@ public interface WinError {
     // Task Scheduler security services are available only on Windows NT.
     //
     int SCHED_E_NO_SECURITY_SERVICES = 0x80041312;
+
     //
     // MessageId: SCHED_E_UNKNOWN_OBJECT_VERSION
     //
@@ -23990,6 +26875,7 @@ public interface WinError {
     // The task object version is either unsupported or invalid.
     //
     int SCHED_E_UNKNOWN_OBJECT_VERSION = 0x80041313;
+
     //
     // MessageId: SCHED_E_UNSUPPORTED_ACCOUNT_OPTION
     //
@@ -23999,6 +26885,7 @@ public interface WinError {
     // settings and run time options.
     //
     int SCHED_E_UNSUPPORTED_ACCOUNT_OPTION = 0x80041314;
+
     //
     // MessageId: SCHED_E_SERVICE_NOT_RUNNING
     //
@@ -24007,6 +26894,7 @@ public interface WinError {
     // The Task Scheduler Service is not running.
     //
     int SCHED_E_SERVICE_NOT_RUNNING = 0x80041315;
+
     //
     // MessageId: SCHED_E_UNEXPECTEDNODE
     //
@@ -24015,6 +26903,7 @@ public interface WinError {
     // The task XML contains an unexpected node.
     //
     int SCHED_E_UNEXPECTEDNODE = 0x80041316;
+
     //
     // MessageId: SCHED_E_NAMESPACE
     //
@@ -24024,6 +26913,7 @@ public interface WinError {
     // namespace.
     //
     int SCHED_E_NAMESPACE = 0x80041317;
+
     //
     // MessageId: SCHED_E_INVALIDVALUE
     //
@@ -24033,6 +26923,7 @@ public interface WinError {
     // range.
     //
     int SCHED_E_INVALIDVALUE = 0x80041318;
+
     //
     // MessageId: SCHED_E_MISSINGNODE
     //
@@ -24041,6 +26932,7 @@ public interface WinError {
     // The task XML is missing a required element or attribute.
     //
     int SCHED_E_MISSINGNODE = 0x80041319;
+
     //
     // MessageId: SCHED_E_MALFORMEDXML
     //
@@ -24049,6 +26941,7 @@ public interface WinError {
     // The task XML is malformed.
     //
     int SCHED_E_MALFORMEDXML = 0x8004131A;
+
     //
     // MessageId: SCHED_S_SOME_TRIGGERS_FAILED
     //
@@ -24058,6 +26951,7 @@ public interface WinError {
     // task.
     //
     int SCHED_S_SOME_TRIGGERS_FAILED = 0x0004131B;
+
     //
     // MessageId: SCHED_S_BATCH_LOGON_PROBLEM
     //
@@ -24067,6 +26961,7 @@ public interface WinError {
     // needs to be enabled for the task principal.
     //
     int SCHED_S_BATCH_LOGON_PROBLEM = 0x0004131C;
+
     //
     // MessageId: SCHED_E_TOO_MANY_NODES
     //
@@ -24075,6 +26970,7 @@ public interface WinError {
     // The task XML contains too many nodes of the same type.
     //
     int SCHED_E_TOO_MANY_NODES = 0x8004131D;
+
     //
     // MessageId: SCHED_E_PAST_END_BOUNDARY
     //
@@ -24083,6 +26979,7 @@ public interface WinError {
     // The task cannot be started after the trigger's end boundary.
     //
     int SCHED_E_PAST_END_BOUNDARY = 0x8004131E;
+
     //
     // MessageId: SCHED_E_ALREADY_RUNNING
     //
@@ -24091,6 +26988,7 @@ public interface WinError {
     // An instance of this task is already running.
     //
     int SCHED_E_ALREADY_RUNNING = 0x8004131F;
+
     //
     // MessageId: SCHED_E_USER_NOT_LOGGED_ON
     //
@@ -24099,6 +26997,7 @@ public interface WinError {
     // The task will not run because the user is not logged on.
     //
     int SCHED_E_USER_NOT_LOGGED_ON = 0x80041320;
+
     //
     // MessageId: SCHED_E_INVALID_TASK_HASH
     //
@@ -24107,6 +27006,7 @@ public interface WinError {
     // The task image is corrupt or has been tampered with.
     //
     int SCHED_E_INVALID_TASK_HASH = 0x80041321;
+
     //
     // MessageId: SCHED_E_SERVICE_NOT_AVAILABLE
     //
@@ -24115,6 +27015,7 @@ public interface WinError {
     // The Task Scheduler service is not available.
     //
     int SCHED_E_SERVICE_NOT_AVAILABLE = 0x80041322;
+
     //
     // MessageId: SCHED_E_SERVICE_TOO_BUSY
     //
@@ -24124,6 +27025,7 @@ public interface WinError {
     // again later.
     //
     int SCHED_E_SERVICE_TOO_BUSY = 0x80041323;
+
     //
     // MessageId: SCHED_E_TASK_ATTEMPTED
     //
@@ -24133,6 +27035,7 @@ public interface WinError {
     // not run due to one of the constraints in the task definition.
     //
     int SCHED_E_TASK_ATTEMPTED = 0x80041324;
+
     //
     // MessageId: SCHED_S_TASK_QUEUED
     //
@@ -24141,6 +27044,7 @@ public interface WinError {
     // The Task Scheduler service has asked the task to run.
     //
     int SCHED_S_TASK_QUEUED = 0x00041325;
+
     //
     // MessageId: SCHED_E_TASK_DISABLED
     //
@@ -24149,6 +27053,7 @@ public interface WinError {
     // The task is disabled.
     //
     int SCHED_E_TASK_DISABLED = 0x80041326;
+
     //
     // MessageId: SCHED_E_TASK_NOT_V1_COMPAT
     //
@@ -24158,6 +27063,7 @@ public interface WinError {
     // Windows.
     //
     int SCHED_E_TASK_NOT_V1_COMPAT = 0x80041327;
+
     //
     // MessageId: SCHED_E_START_ON_DEMAND
     //
@@ -24166,6 +27072,7 @@ public interface WinError {
     // The task settings do not allow the task to start on demand.
     //
     int SCHED_E_START_ON_DEMAND = 0x80041328;
+
     // ******************
     // FACILITY_WINDOWS
     // ******************
@@ -24181,6 +27088,7 @@ public interface WinError {
     // Attempt to create a class object failed
     //
     int CO_E_CLASS_CREATE_FAILED = 0x80080001;
+
     //
     // MessageId: CO_E_SCM_ERROR
     //
@@ -24189,6 +27097,7 @@ public interface WinError {
     // OLE service could not bind object
     //
     int CO_E_SCM_ERROR = 0x80080002;
+
     //
     // MessageId: CO_E_SCM_RPC_FAILURE
     //
@@ -24197,6 +27106,7 @@ public interface WinError {
     // RPC communication failed with OLE service
     //
     int CO_E_SCM_RPC_FAILURE = 0x80080003;
+
     //
     // MessageId: CO_E_BAD_PATH
     //
@@ -24205,6 +27115,7 @@ public interface WinError {
     // Bad path to object
     //
     int CO_E_BAD_PATH = 0x80080004;
+
     //
     // MessageId: CO_E_SERVER_EXEC_FAILURE
     //
@@ -24213,6 +27124,7 @@ public interface WinError {
     // Server execution failed
     //
     int CO_E_SERVER_EXEC_FAILURE = 0x80080005;
+
     //
     // MessageId: CO_E_OBJSRV_RPC_FAILURE
     //
@@ -24221,6 +27133,7 @@ public interface WinError {
     // OLE service could not communicate with the object server
     //
     int CO_E_OBJSRV_RPC_FAILURE = 0x80080006;
+
     //
     // MessageId: MK_E_NO_NORMALIZED
     //
@@ -24229,6 +27142,7 @@ public interface WinError {
     // Moniker path could not be normalized
     //
     int MK_E_NO_NORMALIZED = 0x80080007;
+
     //
     // MessageId: CO_E_SERVER_STOPPING
     //
@@ -24237,6 +27151,7 @@ public interface WinError {
     // Object server is stopping when OLE service contacts it
     //
     int CO_E_SERVER_STOPPING = 0x80080008;
+
     //
     // MessageId: MEM_E_INVALID_ROOT
     //
@@ -24245,6 +27160,7 @@ public interface WinError {
     // An invalid root block pointer was specified
     //
     int MEM_E_INVALID_ROOT = 0x80080009;
+
     //
     // MessageId: MEM_E_INVALID_LINK
     //
@@ -24253,6 +27169,7 @@ public interface WinError {
     // An allocation chain contained an invalid link pointer
     //
     int MEM_E_INVALID_LINK = 0x80080010;
+
     //
     // MessageId: MEM_E_INVALID_SIZE
     //
@@ -24261,6 +27178,7 @@ public interface WinError {
     // The requested allocation size was too large
     //
     int MEM_E_INVALID_SIZE = 0x80080011;
+
     //
     // MessageId: CO_S_NOTALLINTERFACES
     //
@@ -24269,6 +27187,7 @@ public interface WinError {
     // Not all the requested interfaces were available
     //
     int CO_S_NOTALLINTERFACES = 0x00080012;
+
     //
     // MessageId: CO_S_MACHINENAMENOTFOUND
     //
@@ -24277,6 +27196,7 @@ public interface WinError {
     // The specified machine name was not found in the cache.
     //
     int CO_S_MACHINENAMENOTFOUND = 0x00080013;
+
     //
     // MessageId: CO_E_MISSING_DISPLAYNAME
     //
@@ -24285,6 +27205,7 @@ public interface WinError {
     // The activation requires a display name to be present under the CLSID key.
     //
     int CO_E_MISSING_DISPLAYNAME = 0x80080015;
+
     //
     // MessageId: CO_E_RUNAS_VALUE_MUST_BE_AAA
     //
@@ -24294,6 +27215,7 @@ public interface WinError {
     // Activate As Activator.
     //
     int CO_E_RUNAS_VALUE_MUST_BE_AAA = 0x80080016;
+
     //
     // MessageId: CO_E_ELEVATION_DISABLED
     //
@@ -24302,6 +27224,7 @@ public interface WinError {
     // The class is not configured to support Elevated activation.
     //
     int CO_E_ELEVATION_DISABLED = 0x80080017;
+
     // ******************
     // FACILITY_DISPATCH
     // ******************
@@ -24313,6 +27236,7 @@ public interface WinError {
     // Unknown interface.
     //
     int DISP_E_UNKNOWNINTERFACE = 0x80020001;
+
     //
     // MessageId: DISP_E_MEMBERNOTFOUND
     //
@@ -24321,6 +27245,7 @@ public interface WinError {
     // Member not found.
     //
     int DISP_E_MEMBERNOTFOUND = 0x80020003;
+
     //
     // MessageId: DISP_E_PARAMNOTFOUND
     //
@@ -24329,6 +27254,7 @@ public interface WinError {
     // Parameter not found.
     //
     int DISP_E_PARAMNOTFOUND = 0x80020004;
+
     //
     // MessageId: DISP_E_TYPEMISMATCH
     //
@@ -24337,6 +27263,7 @@ public interface WinError {
     // Type mismatch.
     //
     int DISP_E_TYPEMISMATCH = 0x80020005;
+
     //
     // MessageId: DISP_E_UNKNOWNNAME
     //
@@ -24345,6 +27272,7 @@ public interface WinError {
     // Unknown name.
     //
     int DISP_E_UNKNOWNNAME = 0x80020006;
+
     //
     // MessageId: DISP_E_NONAMEDARGS
     //
@@ -24353,6 +27281,7 @@ public interface WinError {
     // No named arguments.
     //
     int DISP_E_NONAMEDARGS = 0x80020007;
+
     //
     // MessageId: DISP_E_BADVARTYPE
     //
@@ -24361,6 +27290,7 @@ public interface WinError {
     // Bad variable type.
     //
     int DISP_E_BADVARTYPE = 0x80020008;
+
     //
     // MessageId: DISP_E_EXCEPTION
     //
@@ -24369,6 +27299,7 @@ public interface WinError {
     // Exception occurred.
     //
     int DISP_E_EXCEPTION = 0x80020009;
+
     //
     // MessageId: DISP_E_OVERF;OW
     //
@@ -24377,6 +27308,7 @@ public interface WinError {
     // Out of present range.
     //
     int DISP_E_OVERFLOW = 0x8002000A;
+
     //
     // MessageId: DISP_E_BADINDEX
     //
@@ -24385,6 +27317,7 @@ public interface WinError {
     // Invalid index.
     //
     int DISP_E_BADINDEX = 0x8002000B;
+
     //
     // MessageId: DISP_E_UNKNOWNLCID
     //
@@ -24393,6 +27326,7 @@ public interface WinError {
     // Unknown language.
     //
     int DISP_E_UNKNOWNLCID = 0x8002000C;
+
     //
     // MessageId: DISP_E_ARRAYISLOCKED
     //
@@ -24401,6 +27335,7 @@ public interface WinError {
     // Memory is locked.
     //
     int DISP_E_ARRAYISLOCKED = 0x8002000D;
+
     //
     // MessageId: DISP_E_BADPARAMCOUNT
     //
@@ -24409,6 +27344,7 @@ public interface WinError {
     // Invalid number of parameters.
     //
     int DISP_E_BADPARAMCOUNT = 0x8002000E;
+
     //
     // MessageId: DISP_E_PARAMNOTOPTIONAL
     //
@@ -24417,6 +27353,7 @@ public interface WinError {
     // Parameter not optional.
     //
     int DISP_E_PARAMNOTOPTIONAL = 0x8002000F;
+
     //
     // MessageId: DISP_E_BADCALLEE
     //
@@ -24425,6 +27362,7 @@ public interface WinError {
     // Invalid callee.
     //
     int DISP_E_BADCALLEE = 0x80020010;
+
     //
     // MessageId: DISP_E_NOTACOLLECTION
     //
@@ -24433,6 +27371,7 @@ public interface WinError {
     // Does not support a collection.
     //
     int DISP_E_NOTACOLLECTION = 0x80020011;
+
     //
     // MessageId: DISP_E_DIVBYZERO
     //
@@ -24441,6 +27380,7 @@ public interface WinError {
     // Division by zero.
     //
     int DISP_E_DIVBYZERO = 0x80020012;
+
     //
     // MessageId: DISP_E_BUFFERTOOSMALL
     //
@@ -24449,6 +27389,7 @@ public interface WinError {
     // Buffer too small
     //
     int DISP_E_BUFFERTOOSMALL = 0x80020013;
+
     //
     // MessageId: TYPE_E_BUFFERTOOSMALL
     //
@@ -24457,6 +27398,7 @@ public interface WinError {
     // Buffer too small.
     //
     int TYPE_E_BUFFERTOOSMALL = 0x80028016;
+
     //
     // MessageId: TYPE_E_FIELDNOTFOUND
     //
@@ -24465,6 +27407,7 @@ public interface WinError {
     // Field name not defined in the record.
     //
     int TYPE_E_FIELDNOTFOUND = 0x80028017;
+
     //
     // MessageId: TYPE_E_INVDATAREAD
     //
@@ -24473,6 +27416,7 @@ public interface WinError {
     // Old format or invalid type library.
     //
     int TYPE_E_INVDATAREAD = 0x80028018;
+
     //
     // MessageId: TYPE_E_UNSUPFORMAT
     //
@@ -24481,6 +27425,7 @@ public interface WinError {
     // Old format or invalid type library.
     //
     int TYPE_E_UNSUPFORMAT = 0x80028019;
+
     //
     // MessageId: TYPE_E_REGISTRYACCESS
     //
@@ -24489,6 +27434,7 @@ public interface WinError {
     // Error accessing the OLE registry.
     //
     int TYPE_E_REGISTRYACCESS = 0x8002801C;
+
     //
     // MessageId: TYPE_E_LIBNOTREGISTERED
     //
@@ -24497,6 +27443,7 @@ public interface WinError {
     // Library not registered.
     //
     int TYPE_E_LIBNOTREGISTERED = 0x8002801D;
+
     //
     // MessageId: TYPE_E_UNDEFINEDTYPE
     //
@@ -24505,6 +27452,7 @@ public interface WinError {
     // Bound to unknown type.
     //
     int TYPE_E_UNDEFINEDTYPE = 0x80028027;
+
     //
     // MessageId: TYPE_E_QUALIFIEDNAMEDISALLOWED
     //
@@ -24513,6 +27461,7 @@ public interface WinError {
     // Qualified name disallowed.
     //
     int TYPE_E_QUALIFIEDNAMEDISALLOWED = 0x80028028;
+
     //
     // MessageId: TYPE_E_INVALIDSTATE
     //
@@ -24521,6 +27470,7 @@ public interface WinError {
     // Invalid forward reference, or reference to uncompiled type.
     //
     int TYPE_E_INVALIDSTATE = 0x80028029;
+
     //
     // MessageId: TYPE_E_WRONGTYPEKIND
     //
@@ -24529,6 +27479,7 @@ public interface WinError {
     // Type mismatch.
     //
     int TYPE_E_WRONGTYPEKIND = 0x8002802A;
+
     //
     // MessageId: TYPE_E_ELEMENTNOTFOUND
     //
@@ -24537,6 +27488,7 @@ public interface WinError {
     // Element not found.
     //
     int TYPE_E_ELEMENTNOTFOUND = 0x8002802B;
+
     //
     // MessageId: TYPE_E_AMBIGUOUSNAME
     //
@@ -24545,6 +27497,7 @@ public interface WinError {
     // Ambiguous name.
     //
     int TYPE_E_AMBIGUOUSNAME = 0x8002802C;
+
     //
     // MessageId: TYPE_E_NAMECONF;ICT
     //
@@ -24553,6 +27506,7 @@ public interface WinError {
     // Name already exists in the library.
     //
     int TYPE_E_NAMECONFLICT = 0x8002802D;
+
     //
     // MessageId: TYPE_E_UNKNOWNLCID
     //
@@ -24561,6 +27515,7 @@ public interface WinError {
     // Unknown LCID.
     //
     int TYPE_E_UNKNOWNLCID = 0x8002802E;
+
     //
     // MessageId: TYPE_E_DLLFUNCTIONNOTFOUND
     //
@@ -24569,6 +27524,7 @@ public interface WinError {
     // Function not defined in specified DLL.
     //
     int TYPE_E_DLLFUNCTIONNOTFOUND = 0x8002802F;
+
     //
     // MessageId: TYPE_E_BADMODULEKIND
     //
@@ -24577,6 +27533,7 @@ public interface WinError {
     // Wrong module kind for the operation.
     //
     int TYPE_E_BADMODULEKIND = 0x800288BD;
+
     //
     // MessageId: TYPE_E_SIZETOOBIG
     //
@@ -24585,6 +27542,7 @@ public interface WinError {
     // Size may not exceed=64K.
     //
     int TYPE_E_SIZETOOBIG = 0x800288C5;
+
     //
     // MessageId: TYPE_E_DUPLICATEID
     //
@@ -24593,6 +27551,7 @@ public interface WinError {
     // Duplicate ID in inheritance hierarchy.
     //
     int TYPE_E_DUPLICATEID = 0x800288C6;
+
     //
     // MessageId: TYPE_E_INVALIDID
     //
@@ -24601,6 +27560,7 @@ public interface WinError {
     // Incorrect inheritance depth in standard OLE hmember.
     //
     int TYPE_E_INVALIDID = 0x800288CF;
+
     //
     // MessageId: TYPE_E_TYPEMISMATCH
     //
@@ -24609,6 +27569,7 @@ public interface WinError {
     // Type mismatch.
     //
     int TYPE_E_TYPEMISMATCH = 0x80028CA0;
+
     //
     // MessageId: TYPE_E_OUTOFBOUNDS
     //
@@ -24617,6 +27578,7 @@ public interface WinError {
     // Invalid number of arguments.
     //
     int TYPE_E_OUTOFBOUNDS = 0x80028CA1;
+
     //
     // MessageId: TYPE_E_IOERROR
     //
@@ -24625,6 +27587,7 @@ public interface WinError {
     // I/O Error.
     //
     int TYPE_E_IOERROR = 0x80028CA2;
+
     //
     // MessageId: TYPE_E_CANTCREATETMPFILE
     //
@@ -24633,6 +27596,7 @@ public interface WinError {
     // Error creating unique tmp file.
     //
     int TYPE_E_CANTCREATETMPFILE = 0x80028CA3;
+
     //
     // MessageId: TYPE_E_CANTLOADLIBRARY
     //
@@ -24641,6 +27605,7 @@ public interface WinError {
     // Error loading type library/DLL.
     //
     int TYPE_E_CANTLOADLIBRARY = 0x80029C4A;
+
     //
     // MessageId: TYPE_E_INCONSISTENTPROPFUNCS
     //
@@ -24649,6 +27614,7 @@ public interface WinError {
     // Inconsistent property functions.
     //
     int TYPE_E_INCONSISTENTPROPFUNCS = 0x80029C83;
+
     //
     // MessageId: TYPE_E_CIRCULARTYPE
     //
@@ -24657,6 +27623,7 @@ public interface WinError {
     // Circular dependency between types/modules.
     //
     int TYPE_E_CIRCULARTYPE = 0x80029C84;
+
     // ******************
     // FACILITY_STORAGE
     // ******************
@@ -24668,6 +27635,7 @@ public interface WinError {
     // Unable to perform requested operation.
     //
     int STG_E_INVALIDFUNCTION = 0x80030001;
+
     //
     // MessageId: STG_E_FILENOTFOUND
     //
@@ -24676,6 +27644,7 @@ public interface WinError {
     // %1 could not be found.
     //
     int STG_E_FILENOTFOUND = 0x80030002;
+
     //
     // MessageId: STG_E_PATHNOTFOUND
     //
@@ -24684,6 +27653,7 @@ public interface WinError {
     // The path %1 could not be found.
     //
     int STG_E_PATHNOTFOUND = 0x80030003;
+
     //
     // MessageId: STG_E_TOOMANYOPENFILES
     //
@@ -24692,6 +27662,7 @@ public interface WinError {
     // There are insufficient resources to open another file.
     //
     int STG_E_TOOMANYOPENFILES = 0x80030004;
+
     //
     // MessageId: STG_E_ACCESSDENIED
     //
@@ -24700,6 +27671,7 @@ public interface WinError {
     // Access Denied.
     //
     int STG_E_ACCESSDENIED = 0x80030005;
+
     //
     // MessageId: STG_E_INVALIDHANDLE
     //
@@ -24708,6 +27680,7 @@ public interface WinError {
     // Attempted an operation on an invalid object.
     //
     int STG_E_INVALIDHANDLE = 0x80030006;
+
     //
     // MessageId: STG_E_INSUFFICIENTMEMORY
     //
@@ -24716,6 +27689,7 @@ public interface WinError {
     // There is insufficient memory available to complete operation.
     //
     int STG_E_INSUFFICIENTMEMORY = 0x80030008;
+
     //
     // MessageId: STG_E_INVALIDPOINTER
     //
@@ -24724,6 +27698,7 @@ public interface WinError {
     // Invalid pointer error.
     //
     int STG_E_INVALIDPOINTER = 0x80030009;
+
     //
     // MessageId: STG_E_NOMOREFILES
     //
@@ -24732,6 +27707,7 @@ public interface WinError {
     // There are no more entries to return.
     //
     int STG_E_NOMOREFILES = 0x80030012;
+
     //
     // MessageId: STG_E_DISKISWRITEPROTECTED
     //
@@ -24740,6 +27716,7 @@ public interface WinError {
     // Disk is write-protected.
     //
     int STG_E_DISKISWRITEPROTECTED = 0x80030013;
+
     //
     // MessageId: STG_E_SEEKERROR
     //
@@ -24748,6 +27725,7 @@ public interface WinError {
     // An error occurred during a seek operation.
     //
     int STG_E_SEEKERROR = 0x80030019;
+
     //
     // MessageId: STG_E_WRITEFAULT
     //
@@ -24756,6 +27734,7 @@ public interface WinError {
     // A disk error occurred during a write operation.
     //
     int STG_E_WRITEFAULT = 0x8003001D;
+
     //
     // MessageId: STG_E_READFAULT
     //
@@ -24764,6 +27743,7 @@ public interface WinError {
     // A disk error occurred during a read operation.
     //
     int STG_E_READFAULT = 0x8003001E;
+
     //
     // MessageId: STG_E_SHAREVIOLATION
     //
@@ -24772,6 +27752,7 @@ public interface WinError {
     // A share violation has occurred.
     //
     int STG_E_SHAREVIOLATION = 0x80030020;
+
     //
     // MessageId: STG_E_LOCKVIOLATION
     //
@@ -24780,6 +27761,7 @@ public interface WinError {
     // A lock violation has occurred.
     //
     int STG_E_LOCKVIOLATION = 0x80030021;
+
     //
     // MessageId: STG_E_FILEALREADYEXISTS
     //
@@ -24788,6 +27770,7 @@ public interface WinError {
     // %1 already exists.
     //
     int STG_E_FILEALREADYEXISTS = 0x80030050;
+
     //
     // MessageId: STG_E_INVALIDPARAMETER
     //
@@ -24796,6 +27779,7 @@ public interface WinError {
     // Invalid parameter error.
     //
     int STG_E_INVALIDPARAMETER = 0x80030057;
+
     //
     // MessageId: STG_E_MEDIUMFULL
     //
@@ -24804,6 +27788,7 @@ public interface WinError {
     // There is insufficient disk space to complete operation.
     //
     int STG_E_MEDIUMFULL = 0x80030070;
+
     //
     // MessageId: STG_E_PROPSETMISMATCHED
     //
@@ -24812,6 +27797,7 @@ public interface WinError {
     // Illegal write of non-simple property to simple property set.
     //
     int STG_E_PROPSETMISMATCHED = 0x800300F0;
+
     //
     // MessageId: STG_E_ABNORMALAPIEXIT
     //
@@ -24820,6 +27806,7 @@ public interface WinError {
     // An API call exited abnormally.
     //
     int STG_E_ABNORMALAPIEXIT = 0x800300FA;
+
     //
     // MessageId: STG_E_INVALIDHEADER
     //
@@ -24828,6 +27815,7 @@ public interface WinError {
     // The file %1 is not a valid compound file.
     //
     int STG_E_INVALIDHEADER = 0x800300FB;
+
     //
     // MessageId: STG_E_INVALIDNAME
     //
@@ -24836,6 +27824,7 @@ public interface WinError {
     // The name %1 is not valid.
     //
     int STG_E_INVALIDNAME = 0x800300FC;
+
     //
     // MessageId: STG_E_UNKNOWN
     //
@@ -24844,6 +27833,7 @@ public interface WinError {
     // An unexpected error occurred.
     //
     int STG_E_UNKNOWN = 0x800300FD;
+
     //
     // MessageId: STG_E_UNIMPLEMENTEDFUNCTION
     //
@@ -24852,6 +27842,7 @@ public interface WinError {
     // That function is not implemented.
     //
     int STG_E_UNIMPLEMENTEDFUNCTION = 0x800300FE;
+
     //
     // MessageId: STG_E_INVALIDF;AG
     //
@@ -24860,6 +27851,7 @@ public interface WinError {
     // Invalid F;ag error.
     //
     int STG_E_INVALIDFLAG = 0x800300FF;
+
     //
     // MessageId: STG_E_INUSE
     //
@@ -24868,6 +27860,7 @@ public interface WinError {
     // Attempted to use an object that is busy.
     //
     int STG_E_INUSE = 0x80030100;
+
     //
     // MessageId: STG_E_NOTCURRENT
     //
@@ -24876,6 +27869,7 @@ public interface WinError {
     // The storage has been changed since the last commit.
     //
     int STG_E_NOTCURRENT = 0x80030101;
+
     //
     // MessageId: STG_E_REVERTED
     //
@@ -24884,6 +27878,7 @@ public interface WinError {
     // Attempted to use an object that has ceased to exist.
     //
     int STG_E_REVERTED = 0x80030102;
+
     //
     // MessageId: STG_E_CANTSAVE
     //
@@ -24892,6 +27887,7 @@ public interface WinError {
     // Can't save.
     //
     int STG_E_CANTSAVE = 0x80030103;
+
     //
     // MessageId: STG_E_OLDFORMAT
     //
@@ -24901,6 +27897,7 @@ public interface WinError {
     // storage.
     //
     int STG_E_OLDFORMAT = 0x80030104;
+
     //
     // MessageId: STG_E_OLDDLL
     //
@@ -24909,6 +27906,7 @@ public interface WinError {
     // The compound file %1 was produced with a newer version of storage.
     //
     int STG_E_OLDDLL = 0x80030105;
+
     //
     // MessageId: STG_E_SHAREREQUIRED
     //
@@ -24917,6 +27915,7 @@ public interface WinError {
     // Share.exe or equivalent is required for operation.
     //
     int STG_E_SHAREREQUIRED = 0x80030106;
+
     //
     // MessageId: STG_E_NOTFILEBASEDSTORAGE
     //
@@ -24925,6 +27924,7 @@ public interface WinError {
     // Illegal operation called on non-file based storage.
     //
     int STG_E_NOTFILEBASEDSTORAGE = 0x80030107;
+
     //
     // MessageId: STG_E_EXTANTMARSHALLINGS
     //
@@ -24933,6 +27933,7 @@ public interface WinError {
     // Illegal operation called on object with extant marshallings.
     //
     int STG_E_EXTANTMARSHALLINGS = 0x80030108;
+
     //
     // MessageId: STG_E_DOCFILECORRUPT
     //
@@ -24941,6 +27942,7 @@ public interface WinError {
     // The docfile has been corrupted.
     //
     int STG_E_DOCFILECORRUPT = 0x80030109;
+
     //
     // MessageId: STG_E_BADBASEADDRESS
     //
@@ -24949,6 +27951,7 @@ public interface WinError {
     // OLE32.DLL has been loaded at the wrong address.
     //
     int STG_E_BADBASEADDRESS = 0x80030110;
+
     //
     // MessageId: STG_E_DOCFILETOOLARGE
     //
@@ -24957,6 +27960,7 @@ public interface WinError {
     // The compound file is too large for the current implementation
     //
     int STG_E_DOCFILETOOLARGE = 0x80030111;
+
     //
     // MessageId: STG_E_NOTSIMPLEFORMAT
     //
@@ -24965,6 +27969,7 @@ public interface WinError {
     // The compound file was not created with the STGM_SIMPLE F;ag
     //
     int STG_E_NOTSIMPLEFORMAT = 0x80030112;
+
     //
     // MessageId: STG_E_INCOMPLETE
     //
@@ -24973,6 +27978,7 @@ public interface WinError {
     // The file download was aborted abnormally. The file is incomplete.
     //
     int STG_E_INCOMPLETE = 0x80030201;
+
     //
     // MessageId: STG_E_TERMINATED
     //
@@ -24981,6 +27987,7 @@ public interface WinError {
     // The file download has been terminated.
     //
     int STG_E_TERMINATED = 0x80030202;
+
     //
     // MessageId: STG_S_CONVERTED
     //
@@ -24989,6 +27996,7 @@ public interface WinError {
     // The underlying file was converted to compound file format.
     //
     int STG_S_CONVERTED = 0x00030200;
+
     //
     // MessageId: STG_S_BLOCK
     //
@@ -24997,6 +28005,7 @@ public interface WinError {
     // The storage operation should block until more data is available.
     //
     int STG_S_BLOCK = 0x00030201;
+
     //
     // MessageId: STG_S_RETRYNOW
     //
@@ -25005,6 +28014,7 @@ public interface WinError {
     // The storage operation should retry immediately.
     //
     int STG_S_RETRYNOW = 0x00030202;
+
     //
     // MessageId: STG_S_MONITORING
     //
@@ -25013,6 +28023,7 @@ public interface WinError {
     // The notified event sink will not inF;uence the storage operation.
     //
     int STG_S_MONITORING = 0x00030203;
+
     //
     // MessageId: STG_S_MULTIPLEOPENS
     //
@@ -25021,6 +28032,7 @@ public interface WinError {
     // Multiple opens prevent consolidated. (commit succeeded).
     //
     int STG_S_MULTIPLEOPENS = 0x00030204;
+
     //
     // MessageId: STG_S_CONSOLIDATIONFAILED
     //
@@ -25029,6 +28041,7 @@ public interface WinError {
     // Consolidation of the storage file failed. (commit succeeded).
     //
     int STG_S_CONSOLIDATIONFAILED = 0x00030205;
+
     //
     // MessageId: STG_S_CANNOTCONSOLIDATE
     //
@@ -25040,10 +28053,10 @@ public interface WinError {
 
     /*
      * ++
-     * 
+     *
      * MessageId's 0x0305 - 0x031f (inclusive) are reserved for **STORAGE** copy
      * protection errors.
-     * 
+     *
      * --
      */
     //
@@ -25054,6 +28067,7 @@ public interface WinError {
     // Generic Copy Protection Error.
     //
     int STG_E_STATUS_COPY_PROTECTION_FAILURE = 0x80030305;
+
     //
     // MessageId: STG_E_CSS_AUTHENTICATION_FAILURE
     //
@@ -25062,6 +28076,7 @@ public interface WinError {
     // Copy Protection Error - DVD CSS Authentication failed.
     //
     int STG_E_CSS_AUTHENTICATION_FAILURE = 0x80030306;
+
     //
     // MessageId: STG_E_CSS_KEY_NOT_PRESENT
     //
@@ -25070,6 +28085,7 @@ public interface WinError {
     // Copy Protection Error - The given sector does not have a valid CSS key.
     //
     int STG_E_CSS_KEY_NOT_PRESENT = 0x80030307;
+
     //
     // MessageId: STG_E_CSS_KEY_NOT_ESTABLISHED
     //
@@ -25078,6 +28094,7 @@ public interface WinError {
     // Copy Protection Error - DVD session key not established.
     //
     int STG_E_CSS_KEY_NOT_ESTABLISHED = 0x80030308;
+
     //
     // MessageId: STG_E_CSS_SCRAMBLED_SECTOR
     //
@@ -25086,6 +28103,7 @@ public interface WinError {
     // Copy Protection Error - The read failed because the sector is encrypted.
     //
     int STG_E_CSS_SCRAMBLED_SECTOR = 0x80030309;
+
     //
     // MessageId: STG_E_CSS_REGION_MISMATCH
     //
@@ -25095,6 +28113,7 @@ public interface WinError {
     // the region setting of the drive.
     //
     int STG_E_CSS_REGION_MISMATCH = 0x8003030A;
+
     //
     // MessageId: STG_E_RESETS_EXHAUSTED
     //
@@ -25107,10 +28126,10 @@ public interface WinError {
 
     /*
      * ++
-     * 
+     *
      * MessageId's 0x0305 - 0x031f (inclusive) are reserved for **STORAGE** copy
      * protection errors.
-     * 
+     *
      * --
      */
     // ******************
@@ -25127,6 +28146,7 @@ public interface WinError {
     // Call was rejected by callee.
     //
     int RPC_E_CALL_REJECTED = 0x80010001;
+
     //
     // MessageId: RPC_E_CALL_CANCELED
     //
@@ -25135,6 +28155,7 @@ public interface WinError {
     // Call was canceled by the message filter.
     //
     int RPC_E_CALL_CANCELED = 0x80010002;
+
     //
     // MessageId: RPC_E_CANTPOST_INSENDCALL
     //
@@ -25144,6 +28165,7 @@ public interface WinError {
     // out via PostMessage.
     //
     int RPC_E_CANTPOST_INSENDCALL = 0x80010003;
+
     //
     // MessageId: RPC_E_CANTCALLOUT_INASYNCCALL
     //
@@ -25153,6 +28175,7 @@ public interface WinError {
     // outgoing call on behalf of this call.
     //
     int RPC_E_CANTCALLOUT_INASYNCCALL = 0x80010004;
+
     //
     // MessageId: RPC_E_CANTCALLOUT_INEXTERNALCALL
     //
@@ -25161,6 +28184,7 @@ public interface WinError {
     // It is illegal to call out while inside message filter.
     //
     int RPC_E_CANTCALLOUT_INEXTERNALCALL = 0x80010005;
+
     //
     // MessageId: RPC_E_CONNECTION_TERMINATED
     //
@@ -25170,6 +28194,7 @@ public interface WinError {
     // more. Other connections are still valid.
     //
     int RPC_E_CONNECTION_TERMINATED = 0x80010006;
+
     //
     // MessageId: RPC_E_SERVER_DIED
     //
@@ -25179,6 +28204,7 @@ public interface WinError {
     // disappeared; all connections are invalid. The call may have executed.
     //
     int RPC_E_SERVER_DIED = 0x80010007;
+
     //
     // MessageId: RPC_E_CLIENT_DIED
     //
@@ -25188,6 +28214,7 @@ public interface WinError {
     // a call.
     //
     int RPC_E_CLIENT_DIED = 0x80010008;
+
     //
     // MessageId: RPC_E_INVALID_DATAPACKET
     //
@@ -25196,6 +28223,7 @@ public interface WinError {
     // The data packet with the marshalled parameter data is incorrect.
     //
     int RPC_E_INVALID_DATAPACKET = 0x80010009;
+
     //
     // MessageId: RPC_E_CANTTRANSMIT_CALL
     //
@@ -25205,6 +28233,7 @@ public interface WinError {
     // not emptied after yielding.
     //
     int RPC_E_CANTTRANSMIT_CALL = 0x8001000A;
+
     //
     // MessageId: RPC_E_CLIENT_CANTMARSHAL_DATA
     //
@@ -25213,6 +28242,7 @@ public interface WinError {
     // The client (caller) cannot marshall the parameter data - low memory, etc.
     //
     int RPC_E_CLIENT_CANTMARSHAL_DATA = 0x8001000B;
+
     //
     // MessageId: RPC_E_CLIENT_CANTUNMARSHAL_DATA
     //
@@ -25221,6 +28251,7 @@ public interface WinError {
     // The client (caller) cannot unmarshall the return data - low memory, etc.
     //
     int RPC_E_CLIENT_CANTUNMARSHAL_DATA = 0x8001000C;
+
     //
     // MessageId: RPC_E_SERVER_CANTMARSHAL_DATA
     //
@@ -25229,6 +28260,7 @@ public interface WinError {
     // The server (callee) cannot marshall the return data - low memory, etc.
     //
     int RPC_E_SERVER_CANTMARSHAL_DATA = 0x8001000D;
+
     //
     // MessageId: RPC_E_SERVER_CANTUNMARSHAL_DATA
     //
@@ -25238,6 +28270,7 @@ public interface WinError {
     // etc.
     //
     int RPC_E_SERVER_CANTUNMARSHAL_DATA = 0x8001000E;
+
     //
     // MessageId: RPC_E_INVALID_DATA
     //
@@ -25246,6 +28279,7 @@ public interface WinError {
     // Received data is invalid; could be server or client data.
     //
     int RPC_E_INVALID_DATA = 0x8001000F;
+
     //
     // MessageId: RPC_E_INVALID_PARAMETER
     //
@@ -25254,6 +28288,7 @@ public interface WinError {
     // A particular parameter is invalid and cannot be (un)marshalled.
     //
     int RPC_E_INVALID_PARAMETER = 0x80010010;
+
     //
     // MessageId: RPC_E_CANTCALLOUT_AGAIN
     //
@@ -25262,6 +28297,7 @@ public interface WinError {
     // There is no second outgoing call on same channel in DDE conversation.
     //
     int RPC_E_CANTCALLOUT_AGAIN = 0x80010011;
+
     //
     // MessageId: RPC_E_SERVER_DIED_DNE
     //
@@ -25271,6 +28307,7 @@ public interface WinError {
     // disappeared; all connections are invalid. The call did not execute.
     //
     int RPC_E_SERVER_DIED_DNE = 0x80010012;
+
     //
     // MessageId: RPC_E_SYS_CALL_FAILED
     //
@@ -25279,6 +28316,7 @@ public interface WinError {
     // System call failed.
     //
     int RPC_E_SYS_CALL_FAILED = 0x80010100;
+
     //
     // MessageId: RPC_E_OUT_OF_RESOURCES
     //
@@ -25287,6 +28325,7 @@ public interface WinError {
     // Could not allocate some required resource (memory, events, ...)
     //
     int RPC_E_OUT_OF_RESOURCES = 0x80010101;
+
     //
     // MessageId: RPC_E_ATTEMPTED_MULTITHREAD
     //
@@ -25295,6 +28334,7 @@ public interface WinError {
     // Attempted to make calls on more than one thread in single threaded mode.
     //
     int RPC_E_ATTEMPTED_MULTITHREAD = 0x80010102;
+
     //
     // MessageId: RPC_E_NOT_REGISTERED
     //
@@ -25303,6 +28343,7 @@ public interface WinError {
     // The requested interface is not registered on the server object.
     //
     int RPC_E_NOT_REGISTERED = 0x80010103;
+
     //
     // MessageId: RPC_E_FAULT
     //
@@ -25312,6 +28353,7 @@ public interface WinError {
     // the server.
     //
     int RPC_E_FAULT = 0x80010104;
+
     //
     // MessageId: RPC_E_SERVERFAULT
     //
@@ -25320,6 +28362,7 @@ public interface WinError {
     // The server threw an exception.
     //
     int RPC_E_SERVERFAULT = 0x80010105;
+
     //
     // MessageId: RPC_E_CHANGED_MODE
     //
@@ -25328,6 +28371,7 @@ public interface WinError {
     // Cannot change thread mode after it is set.
     //
     int RPC_E_CHANGED_MODE = 0x80010106;
+
     //
     // MessageId: RPC_E_INVALIDMETHOD
     //
@@ -25336,6 +28380,7 @@ public interface WinError {
     // The method called does not exist on the server.
     //
     int RPC_E_INVALIDMETHOD = 0x80010107;
+
     //
     // MessageId: RPC_E_DISCONNECTED
     //
@@ -25344,6 +28389,7 @@ public interface WinError {
     // The object invoked has disconnected from its clients.
     //
     int RPC_E_DISCONNECTED = 0x80010108;
+
     //
     // MessageId: RPC_E_RETRY
     //
@@ -25352,6 +28398,7 @@ public interface WinError {
     // The object invoked chose not to process the call now. Try again later.
     //
     int RPC_E_RETRY = 0x80010109;
+
     //
     // MessageId: RPC_E_SERVERCALL_RETRYLATER
     //
@@ -25360,6 +28407,7 @@ public interface WinError {
     // The message filter indicated that the application is busy.
     //
     int RPC_E_SERVERCALL_RETRYLATER = 0x8001010A;
+
     //
     // MessageId: RPC_E_SERVERCALL_REJECTED
     //
@@ -25368,6 +28416,7 @@ public interface WinError {
     // The message filter rejected the call.
     //
     int RPC_E_SERVERCALL_REJECTED = 0x8001010B;
+
     //
     // MessageId: RPC_E_INVALID_CALLDATA
     //
@@ -25376,6 +28425,7 @@ public interface WinError {
     // A call control interfaces was called with invalid data.
     //
     int RPC_E_INVALID_CALLDATA = 0x8001010C;
+
     //
     // MessageId: RPC_E_CANTCALLOUT_ININPUTSYNCCALL
     //
@@ -25385,6 +28435,7 @@ public interface WinError {
     // input-synchronous call.
     //
     int RPC_E_CANTCALLOUT_ININPUTSYNCCALL = 0x8001010D;
+
     //
     // MessageId: RPC_E_WRONG_THREAD
     //
@@ -25394,6 +28445,7 @@ public interface WinError {
     // thread.
     //
     int RPC_E_WRONG_THREAD = 0x8001010E;
+
     //
     // MessageId: RPC_E_THREAD_NOT_INIT
     //
@@ -25402,6 +28454,7 @@ public interface WinError {
     // CoInitialize has not been called on the current thread.
     //
     int RPC_E_THREAD_NOT_INIT = 0x8001010F;
+
     //
     // MessageId: RPC_E_VERSION_MISMATCH
     //
@@ -25410,6 +28463,7 @@ public interface WinError {
     // The version of OLE on the client and server machines does not match.
     //
     int RPC_E_VERSION_MISMATCH = 0x80010110;
+
     //
     // MessageId: RPC_E_INVALID_HEADER
     //
@@ -25418,6 +28472,7 @@ public interface WinError {
     // OLE received a packet with an invalid header.
     //
     int RPC_E_INVALID_HEADER = 0x80010111;
+
     //
     // MessageId: RPC_E_INVALID_EXTENSION
     //
@@ -25426,6 +28481,7 @@ public interface WinError {
     // OLE received a packet with an invalid extension.
     //
     int RPC_E_INVALID_EXTENSION = 0x80010112;
+
     //
     // MessageId: RPC_E_INVALID_IPID
     //
@@ -25434,6 +28490,7 @@ public interface WinError {
     // The requested object or interface does not exist.
     //
     int RPC_E_INVALID_IPID = 0x80010113;
+
     //
     // MessageId: RPC_E_INVALID_OBJECT
     //
@@ -25442,6 +28499,7 @@ public interface WinError {
     // The requested object does not exist.
     //
     int RPC_E_INVALID_OBJECT = 0x80010114;
+
     //
     // MessageId: RPC_S_CALLPENDING
     //
@@ -25450,6 +28508,7 @@ public interface WinError {
     // OLE has sent a request and is waiting for a reply.
     //
     int RPC_S_CALLPENDING = 0x80010115;
+
     //
     // MessageId: RPC_S_WAITONTIMER
     //
@@ -25458,6 +28517,7 @@ public interface WinError {
     // OLE is waiting before retrying a request.
     //
     int RPC_S_WAITONTIMER = 0x80010116;
+
     //
     // MessageId: RPC_E_CALL_COMPLETE
     //
@@ -25466,6 +28526,7 @@ public interface WinError {
     // Call context cannot be accessed after call completed.
     //
     int RPC_E_CALL_COMPLETE = 0x80010117;
+
     //
     // MessageId: RPC_E_UNSECURE_CALL
     //
@@ -25474,6 +28535,7 @@ public interface WinError {
     // Impersonate on unsecure calls is not supported.
     //
     int RPC_E_UNSECURE_CALL = 0x80010118;
+
     //
     // MessageId: RPC_E_TOO_LATE
     //
@@ -25483,6 +28545,7 @@ public interface WinError {
     // unmarshalled. It cannot be changed once initialized.
     //
     int RPC_E_TOO_LATE = 0x80010119;
+
     //
     // MessageId: RPC_E_NO_GOOD_SECURITY_PACKAGES
     //
@@ -25493,6 +28556,7 @@ public interface WinError {
     // and server.
     //
     int RPC_E_NO_GOOD_SECURITY_PACKAGES = 0x8001011A;
+
     //
     // MessageId: RPC_E_ACCESS_DENIED
     //
@@ -25501,6 +28565,7 @@ public interface WinError {
     // Access is denied.
     //
     int RPC_E_ACCESS_DENIED = 0x8001011B;
+
     //
     // MessageId: RPC_E_REMOTE_DISABLED
     //
@@ -25509,6 +28574,7 @@ public interface WinError {
     // Remote calls are not allowed for this process.
     //
     int RPC_E_REMOTE_DISABLED = 0x8001011C;
+
     //
     // MessageId: RPC_E_INVALID_OBJREF
     //
@@ -25518,6 +28584,7 @@ public interface WinError {
     // format.
     //
     int RPC_E_INVALID_OBJREF = 0x8001011D;
+
     //
     // MessageId: RPC_E_NO_CONTEXT
     //
@@ -25527,6 +28594,7 @@ public interface WinError {
     // marshalled calls and on the client side of the call.
     //
     int RPC_E_NO_CONTEXT = 0x8001011E;
+
     //
     // MessageId: RPC_E_TIMEOUT
     //
@@ -25535,6 +28603,7 @@ public interface WinError {
     // This operation returned because the timeout period expired.
     //
     int RPC_E_TIMEOUT = 0x8001011F;
+
     //
     // MessageId: RPC_E_NO_SYNC
     //
@@ -25543,6 +28612,7 @@ public interface WinError {
     // There are no synchronize objects to wait on.
     //
     int RPC_E_NO_SYNC = 0x80010120;
+
     //
     // MessageId: RPC_E_FULLSIC_REQUIRED
     //
@@ -25551,6 +28621,7 @@ public interface WinError {
     // Full subject issuer chain SSL principal name expected from the server.
     //
     int RPC_E_FULLSIC_REQUIRED = 0x80010121;
+
     //
     // MessageId: RPC_E_INVALID_STD_NAME
     //
@@ -25559,6 +28630,7 @@ public interface WinError {
     // Principal name is not a valid MSSTD name.
     //
     int RPC_E_INVALID_STD_NAME = 0x80010122;
+
     //
     // MessageId: CO_E_FAILEDTOIMPERSONATE
     //
@@ -25567,6 +28639,7 @@ public interface WinError {
     // Unable to impersonate DCOM client
     //
     int CO_E_FAILEDTOIMPERSONATE = 0x80010123;
+
     //
     // MessageId: CO_E_FAILEDTOGETSECCTX
     //
@@ -25575,6 +28648,7 @@ public interface WinError {
     // Unable to obtain server's security context
     //
     int CO_E_FAILEDTOGETSECCTX = 0x80010124;
+
     //
     // MessageId: CO_E_FAILEDTOOPENTHREADTOKEN
     //
@@ -25583,6 +28657,7 @@ public interface WinError {
     // Unable to open the access token of the current thread
     //
     int CO_E_FAILEDTOOPENTHREADTOKEN = 0x80010125;
+
     //
     // MessageId: CO_E_FAILEDTOGETTOKENINFO
     //
@@ -25591,6 +28666,7 @@ public interface WinError {
     // Unable to obtain user info from an access token
     //
     int CO_E_FAILEDTOGETTOKENINFO = 0x80010126;
+
     //
     // MessageId: CO_E_TRUSTEEDOESNTMATCHCLIENT
     //
@@ -25600,6 +28676,7 @@ public interface WinError {
     // trustee provided to the method
     //
     int CO_E_TRUSTEEDOESNTMATCHCLIENT = 0x80010127;
+
     //
     // MessageId: CO_E_FAILEDTOQUERYCLIENTBLANKET
     //
@@ -25608,6 +28685,7 @@ public interface WinError {
     // Unable to obtain the client's security blanket
     //
     int CO_E_FAILEDTOQUERYCLIENTBLANKET = 0x80010128;
+
     //
     // MessageId: CO_E_FAILEDTOSETDACL
     //
@@ -25616,6 +28694,7 @@ public interface WinError {
     // Unable to set a discretionary ACL into a security descriptor
     //
     int CO_E_FAILEDTOSETDACL = 0x80010129;
+
     //
     // MessageId: CO_E_ACCESSCHECKFAILED
     //
@@ -25624,6 +28703,7 @@ public interface WinError {
     // The system function, AccessCheck, returned false
     //
     int CO_E_ACCESSCHECKFAILED = 0x8001012A;
+
     //
     // MessageId: CO_E_NETACCESSAPIFAILED
     //
@@ -25632,6 +28712,7 @@ public interface WinError {
     // Either NetAccessDel or NetAccessAdd returned an error code.
     //
     int CO_E_NETACCESSAPIFAILED = 0x8001012B;
+
     //
     // MessageId: CO_E_WRONGTRUSTEENAMESYNTAX
     //
@@ -25641,6 +28722,7 @@ public interface WinError {
     // <Domain>\<Name> syntax and it was not the "*" string
     //
     int CO_E_WRONGTRUSTEENAMESYNTAX = 0x8001012C;
+
     //
     // MessageId: CO_E_INVALIDSID
     //
@@ -25649,6 +28731,7 @@ public interface WinError {
     // One of the security identifiers provided by the user was invalid
     //
     int CO_E_INVALIDSID = 0x8001012D;
+
     //
     // MessageId: CO_E_CONVERSIONFAILED
     //
@@ -25658,6 +28741,7 @@ public interface WinError {
     // string
     //
     int CO_E_CONVERSIONFAILED = 0x8001012E;
+
     //
     // MessageId: CO_E_NOMATCHINGSIDFOUND
     //
@@ -25667,6 +28751,7 @@ public interface WinError {
     // provided by the user
     //
     int CO_E_NOMATCHINGSIDFOUND = 0x8001012F;
+
     //
     // MessageId: CO_E_LOOKUPACCSIDFAILED
     //
@@ -25675,6 +28760,7 @@ public interface WinError {
     // The system function, LookupAccountSID, failed
     //
     int CO_E_LOOKUPACCSIDFAILED = 0x80010130;
+
     //
     // MessageId: CO_E_NOMATCHINGNAMEFOUND
     //
@@ -25684,6 +28770,7 @@ public interface WinError {
     // provided by the user
     //
     int CO_E_NOMATCHINGNAMEFOUND = 0x80010131;
+
     //
     // MessageId: CO_E_LOOKUPACCNAMEFAILED
     //
@@ -25692,6 +28779,7 @@ public interface WinError {
     // The system function, LookupAccountName, failed
     //
     int CO_E_LOOKUPACCNAMEFAILED = 0x80010132;
+
     //
     // MessageId: CO_E_SETSERLHNDLFAILED
     //
@@ -25700,6 +28788,7 @@ public interface WinError {
     // Unable to set or reset a serialization handle
     //
     int CO_E_SETSERLHNDLFAILED = 0x80010133;
+
     //
     // MessageId: CO_E_FAILEDTOGETWINDIR
     //
@@ -25708,6 +28797,7 @@ public interface WinError {
     // Unable to obtain the Windows directory
     //
     int CO_E_FAILEDTOGETWINDIR = 0x80010134;
+
     //
     // MessageId: CO_E_PATHTOOLONG
     //
@@ -25716,6 +28806,7 @@ public interface WinError {
     // Path too long
     //
     int CO_E_PATHTOOLONG = 0x80010135;
+
     //
     // MessageId: CO_E_FAILEDTOGENUUID
     //
@@ -25724,6 +28815,7 @@ public interface WinError {
     // Unable to generate a uuid.
     //
     int CO_E_FAILEDTOGENUUID = 0x80010136;
+
     //
     // MessageId: CO_E_FAILEDTOCREATEFILE
     //
@@ -25732,6 +28824,7 @@ public interface WinError {
     // Unable to create file
     //
     int CO_E_FAILEDTOCREATEFILE = 0x80010137;
+
     //
     // MessageId: CO_E_FAILEDTOCLOSEHANDLE
     //
@@ -25740,6 +28833,7 @@ public interface WinError {
     // Unable to close a serialization handle or a file handle.
     //
     int CO_E_FAILEDTOCLOSEHANDLE = 0x80010138;
+
     //
     // MessageId: CO_E_EXCEEDSYSACLLIMIT
     //
@@ -25748,6 +28842,7 @@ public interface WinError {
     // The number of ACEs in an ACL exceeds the system limit.
     //
     int CO_E_EXCEEDSYSACLLIMIT = 0x80010139;
+
     //
     // MessageId: CO_E_ACESINWRONGORDER
     //
@@ -25757,6 +28852,7 @@ public interface WinError {
     // ACEs in the stream.
     //
     int CO_E_ACESINWRONGORDER = 0x8001013A;
+
     //
     // MessageId: CO_E_INCOMPATIBLESTREAMVERSION
     //
@@ -25766,6 +28862,7 @@ public interface WinError {
     // implementation of IAccessControl
     //
     int CO_E_INCOMPATIBLESTREAMVERSION = 0x8001013B;
+
     //
     // MessageId: CO_E_FAILEDTOOPENPROCESSTOKEN
     //
@@ -25774,6 +28871,7 @@ public interface WinError {
     // Unable to open the access token of the server process
     //
     int CO_E_FAILEDTOOPENPROCESSTOKEN = 0x8001013C;
+
     //
     // MessageId: CO_E_DECODEFAILED
     //
@@ -25782,6 +28880,7 @@ public interface WinError {
     // Unable to decode the ACL in the stream provided by the user
     //
     int CO_E_DECODEFAILED = 0x8001013D;
+
     //
     // MessageId: CO_E_ACNOTINITIALIZED
     //
@@ -25790,6 +28889,7 @@ public interface WinError {
     // The COM IAccessControl object is not initialized
     //
     int CO_E_ACNOTINITIALIZED = 0x8001013F;
+
     //
     // MessageId: CO_E_CANCEL_DISABLED
     //
@@ -25798,6 +28898,7 @@ public interface WinError {
     // Call Cancellation is disabled
     //
     int CO_E_CANCEL_DISABLED = 0x80010140;
+
     //
     // MessageId: RPC_E_UNEXPECTED
     //
@@ -25806,6 +28907,7 @@ public interface WinError {
     // An internal error occurred.
     //
     int RPC_E_UNEXPECTED = 0x8001FFFF;
+
     // ////////////////////////////////////
     // =//
     // Additional Security Status Codes //
@@ -25821,6 +28923,7 @@ public interface WinError {
     // The specified event is currently not being audited.
     //
     int ERROR_AUDITING_DISABLED = 0xC0090001;
+
     //
     // MessageId: ERROR_ALL_SIDS_FILTERED
     //
@@ -25829,6 +28932,7 @@ public interface WinError {
     // The SID filtering operation removed all SIDs.
     //
     int ERROR_ALL_SIDS_FILTERED = 0xC0090002;
+
     //
     // MessageId: ERROR_BIZRULES_NOT_ENABLED
     //
@@ -25837,6 +28941,7 @@ public interface WinError {
     // Business rule scripts are disabled for the calling application.
     //
     int ERROR_BIZRULES_NOT_ENABLED = 0xC0090003;
+
     // ///////////////////////////////////////////
     // =//
     // end of Additional Security Status Codes //
@@ -25855,6 +28960,7 @@ public interface WinError {
     // Bad UID.
     //
     int NTE_BAD_UID = 0x80090001;
+
     //
     // MessageId: NTE_BAD_HASH
     //
@@ -25863,6 +28969,7 @@ public interface WinError {
     // Bad Hash.
     //
     int NTE_BAD_HASH = 0x80090002;
+
     //
     // MessageId: NTE_BAD_KEY
     //
@@ -25871,6 +28978,7 @@ public interface WinError {
     // Bad Key.
     //
     int NTE_BAD_KEY = 0x80090003;
+
     //
     // MessageId: NTE_BAD_LEN
     //
@@ -25879,6 +28987,7 @@ public interface WinError {
     // Bad Length.
     //
     int NTE_BAD_LEN = 0x80090004;
+
     //
     // MessageId: NTE_BAD_DATA
     //
@@ -25887,6 +28996,7 @@ public interface WinError {
     // Bad Data.
     //
     int NTE_BAD_DATA = 0x80090005;
+
     //
     // MessageId: NTE_BAD_SIGNATURE
     //
@@ -25895,6 +29005,7 @@ public interface WinError {
     // Invalid Signature.
     //
     int NTE_BAD_SIGNATURE = 0x80090006;
+
     //
     // MessageId: NTE_BAD_VER
     //
@@ -25903,6 +29014,7 @@ public interface WinError {
     // Bad Version of provider.
     //
     int NTE_BAD_VER = 0x80090007;
+
     //
     // MessageId: NTE_BAD_ALGID
     //
@@ -25911,6 +29023,7 @@ public interface WinError {
     // Invalid algorithm specified.
     //
     int NTE_BAD_ALGID = 0x80090008;
+
     //
     // MessageId: NTE_BAD_F;AGS
     //
@@ -25919,6 +29032,7 @@ public interface WinError {
     // Invalid F;ags specified.
     //
     int NTE_BAD_FLAGS = 0x80090009;
+
     //
     // MessageId: NTE_BAD_TYPE
     //
@@ -25927,6 +29041,7 @@ public interface WinError {
     // Invalid type specified.
     //
     int NTE_BAD_TYPE = 0x8009000A;
+
     //
     // MessageId: NTE_BAD_KEY_STATE
     //
@@ -25935,6 +29050,7 @@ public interface WinError {
     // Key not valid for use in specified state.
     //
     int NTE_BAD_KEY_STATE = 0x8009000B;
+
     //
     // MessageId: NTE_BAD_HASH_STATE
     //
@@ -25943,6 +29059,7 @@ public interface WinError {
     // Hash not valid for use in specified state.
     //
     int NTE_BAD_HASH_STATE = 0x8009000C;
+
     //
     // MessageId: NTE_NO_KEY
     //
@@ -25951,6 +29068,7 @@ public interface WinError {
     // Key does not exist.
     //
     int NTE_NO_KEY = 0x8009000D;
+
     //
     // MessageId: NTE_NO_MEMORY
     //
@@ -25959,6 +29077,7 @@ public interface WinError {
     // Insufficient memory available for the operation.
     //
     int NTE_NO_MEMORY = 0x8009000E;
+
     //
     // MessageId: NTE_EXISTS
     //
@@ -25967,6 +29086,7 @@ public interface WinError {
     // Object already exists.
     //
     int NTE_EXISTS = 0x8009000F;
+
     //
     // MessageId: NTE_PERM
     //
@@ -25975,6 +29095,7 @@ public interface WinError {
     // Access denied.
     //
     int NTE_PERM = 0x80090010;
+
     //
     // MessageId: NTE_NOT_FOUND
     //
@@ -25983,6 +29104,7 @@ public interface WinError {
     // Object was not found.
     //
     int NTE_NOT_FOUND = 0x80090011;
+
     //
     // MessageId: NTE_DOUBLE_ENCRYPT
     //
@@ -25991,6 +29113,7 @@ public interface WinError {
     // Data already encrypted.
     //
     int NTE_DOUBLE_ENCRYPT = 0x80090012;
+
     //
     // MessageId: NTE_BAD_PROVIDER
     //
@@ -25999,6 +29122,7 @@ public interface WinError {
     // Invalid provider specified.
     //
     int NTE_BAD_PROVIDER = 0x80090013;
+
     //
     // MessageId: NTE_BAD_PROV_TYPE
     //
@@ -26007,6 +29131,7 @@ public interface WinError {
     // Invalid provider type specified.
     //
     int NTE_BAD_PROV_TYPE = 0x80090014;
+
     //
     // MessageId: NTE_BAD_PUBLIC_KEY
     //
@@ -26015,6 +29140,7 @@ public interface WinError {
     // Provider's public key is invalid.
     //
     int NTE_BAD_PUBLIC_KEY = 0x80090015;
+
     //
     // MessageId: NTE_BAD_KEYSET
     //
@@ -26023,6 +29149,7 @@ public interface WinError {
     // Keyset does not exist
     //
     int NTE_BAD_KEYSET = 0x80090016;
+
     //
     // MessageId: NTE_PROV_TYPE_NOT_DEF
     //
@@ -26031,6 +29158,7 @@ public interface WinError {
     // Provider type not defined.
     //
     int NTE_PROV_TYPE_NOT_DEF = 0x80090017;
+
     //
     // MessageId: NTE_PROV_TYPE_ENTRY_BAD
     //
@@ -26039,6 +29167,7 @@ public interface WinError {
     // Provider type as registered is invalid.
     //
     int NTE_PROV_TYPE_ENTRY_BAD = 0x80090018;
+
     //
     // MessageId: NTE_KEYSET_NOT_DEF
     //
@@ -26047,6 +29176,7 @@ public interface WinError {
     // The keyset is not defined.
     //
     int NTE_KEYSET_NOT_DEF = 0x80090019;
+
     //
     // MessageId: NTE_KEYSET_ENTRY_BAD
     //
@@ -26055,6 +29185,7 @@ public interface WinError {
     // Keyset as registered is invalid.
     //
     int NTE_KEYSET_ENTRY_BAD = 0x8009001A;
+
     //
     // MessageId: NTE_PROV_TYPE_NO_MATCH
     //
@@ -26063,6 +29194,7 @@ public interface WinError {
     // Provider type does not match registered value.
     //
     int NTE_PROV_TYPE_NO_MATCH = 0x8009001B;
+
     //
     // MessageId: NTE_SIGNATURE_FILE_BAD
     //
@@ -26071,6 +29203,7 @@ public interface WinError {
     // The digital signature file is corrupt.
     //
     int NTE_SIGNATURE_FILE_BAD = 0x8009001C;
+
     //
     // MessageId: NTE_PROVIDER_DLL_FAIL
     //
@@ -26079,6 +29212,7 @@ public interface WinError {
     // Provider DLL failed to initialize correctly.
     //
     int NTE_PROVIDER_DLL_FAIL = 0x8009001D;
+
     //
     // MessageId: NTE_PROV_DLL_NOT_FOUND
     //
@@ -26087,6 +29221,7 @@ public interface WinError {
     // Provider DLL could not be found.
     //
     int NTE_PROV_DLL_NOT_FOUND = 0x8009001E;
+
     //
     // MessageId: NTE_BAD_KEYSET_PARAM
     //
@@ -26095,6 +29230,7 @@ public interface WinError {
     // The Keyset parameter is invalid.
     //
     int NTE_BAD_KEYSET_PARAM = 0x8009001F;
+
     //
     // MessageId: NTE_FAIL
     //
@@ -26103,6 +29239,7 @@ public interface WinError {
     // An internal error occurred.
     //
     int NTE_FAIL = 0x80090020;
+
     //
     // MessageId: NTE_SYS_ERR
     //
@@ -26111,6 +29248,7 @@ public interface WinError {
     // A base error occurred.
     //
     int NTE_SYS_ERR = 0x80090021;
+
     //
     // MessageId: NTE_SILENT_CONTEXT
     //
@@ -26120,6 +29258,7 @@ public interface WinError {
     // silent.
     //
     int NTE_SILENT_CONTEXT = 0x80090022;
+
     //
     // MessageId: NTE_TOKEN_KEYSET_STORAGE_FULL
     //
@@ -26129,6 +29268,7 @@ public interface WinError {
     // additional container.
     //
     int NTE_TOKEN_KEYSET_STORAGE_FULL = 0x80090023;
+
     //
     // MessageId: NTE_TEMPORARY_PROFILE
     //
@@ -26137,6 +29277,7 @@ public interface WinError {
     // The profile for the user is a temporary profile.
     //
     int NTE_TEMPORARY_PROFILE = 0x80090024;
+
     //
     // MessageId: NTE_FIXEDPARAMETER
     //
@@ -26146,6 +29287,7 @@ public interface WinError {
     // parameters.
     //
     int NTE_FIXEDPARAMETER = 0x80090025;
+
     //
     // MessageId: NTE_INVALID_HANDLE
     //
@@ -26154,6 +29296,7 @@ public interface WinError {
     // The supplied handle is invalid.
     //
     int NTE_INVALID_HANDLE = 0x80090026;
+
     //
     // MessageId: NTE_INVALID_PARAMETER
     //
@@ -26162,6 +29305,7 @@ public interface WinError {
     // The parameter is incorrect.
     //
     int NTE_INVALID_PARAMETER = 0x80090027;
+
     //
     // MessageId: NTE_BUFFER_TOO_SMALL
     //
@@ -26170,6 +29314,7 @@ public interface WinError {
     // The buffer supplied to a function was too small.
     //
     int NTE_BUFFER_TOO_SMALL = 0x80090028;
+
     //
     // MessageId: NTE_NOT_SUPPORTED
     //
@@ -26178,6 +29323,7 @@ public interface WinError {
     // The requested operation is not supported.
     //
     int NTE_NOT_SUPPORTED = 0x80090029;
+
     //
     // MessageId: NTE_NO_MORE_ITEMS
     //
@@ -26186,6 +29332,7 @@ public interface WinError {
     // No more data is available.
     //
     int NTE_NO_MORE_ITEMS = 0x8009002A;
+
     //
     // MessageId: NTE_BUFFERS_OVERLAP
     //
@@ -26194,6 +29341,7 @@ public interface WinError {
     // The supplied buffers overlap incorrectly.
     //
     int NTE_BUFFERS_OVERLAP = 0x8009002B;
+
     //
     // MessageId: NTE_DECRYPTION_FAILURE
     //
@@ -26202,6 +29350,7 @@ public interface WinError {
     // The specified data could not be decrypted.
     //
     int NTE_DECRYPTION_FAILURE = 0x8009002C;
+
     //
     // MessageId: NTE_INTERNAL_ERROR
     //
@@ -26210,6 +29359,7 @@ public interface WinError {
     // An internal consistency check failed.
     //
     int NTE_INTERNAL_ERROR = 0x8009002D;
+
     //
     // MessageId: NTE_UI_REQUIRED
     //
@@ -26218,6 +29368,7 @@ public interface WinError {
     // This operation requires input from the user.
     //
     int NTE_UI_REQUIRED = 0x8009002E;
+
     //
     // MessageId: NTE_HMAC_NOT_SUPPORTED
     //
@@ -26226,6 +29377,7 @@ public interface WinError {
     // The cryptographic provider does not support HMAC.
     //
     int NTE_HMAC_NOT_SUPPORTED = 0x8009002F;
+
     //
     // MessageId: SEC_E_INSUFFICIENT_MEMORY
     //
@@ -26234,6 +29386,7 @@ public interface WinError {
     // Not enough memory is available to complete this request
     //
     int SEC_E_INSUFFICIENT_MEMORY = 0x80090300;
+
     //
     // MessageId: SEC_E_INVALID_HANDLE
     //
@@ -26242,6 +29395,7 @@ public interface WinError {
     // The handle specified is invalid
     //
     int SEC_E_INVALID_HANDLE = 0x80090301;
+
     //
     // MessageId: SEC_E_UNSUPPORTED_FUNCTION
     //
@@ -26250,6 +29404,7 @@ public interface WinError {
     // The function requested is not supported
     //
     int SEC_E_UNSUPPORTED_FUNCTION = 0x80090302;
+
     //
     // MessageId: SEC_E_TARGET_UNKNOWN
     //
@@ -26258,6 +29413,7 @@ public interface WinError {
     // The specified target is unknown or unreachable
     //
     int SEC_E_TARGET_UNKNOWN = 0x80090303;
+
     //
     // MessageId: SEC_E_INTERNAL_ERROR
     //
@@ -26266,6 +29422,7 @@ public interface WinError {
     // The Local Security Authority cannot be contacted
     //
     int SEC_E_INTERNAL_ERROR = 0x80090304;
+
     //
     // MessageId: SEC_E_SECPKG_NOT_FOUND
     //
@@ -26274,6 +29431,7 @@ public interface WinError {
     // The requested security package does not exist
     //
     int SEC_E_SECPKG_NOT_FOUND = 0x80090305;
+
     //
     // MessageId: SEC_E_NOT_OWNER
     //
@@ -26282,6 +29440,7 @@ public interface WinError {
     // The caller is not the owner of the desired credentials
     //
     int SEC_E_NOT_OWNER = 0x80090306;
+
     //
     // MessageId: SEC_E_CANNOT_INSTALL
     //
@@ -26290,6 +29449,7 @@ public interface WinError {
     // The security package failed to initialize, and cannot be installed
     //
     int SEC_E_CANNOT_INSTALL = 0x80090307;
+
     //
     // MessageId: SEC_E_INVALID_TOKEN
     //
@@ -26298,6 +29458,7 @@ public interface WinError {
     // The token supplied to the function is invalid
     //
     int SEC_E_INVALID_TOKEN = 0x80090308;
+
     //
     // MessageId: SEC_E_CANNOT_PACK
     //
@@ -26307,6 +29468,7 @@ public interface WinError {
     // logon attempt has failed
     //
     int SEC_E_CANNOT_PACK = 0x80090309;
+
     //
     // MessageId: SEC_E_QOP_NOT_SUPPORTED
     //
@@ -26316,6 +29478,7 @@ public interface WinError {
     // package
     //
     int SEC_E_QOP_NOT_SUPPORTED = 0x8009030A;
+
     //
     // MessageId: SEC_E_NO_IMPERSONATION
     //
@@ -26324,6 +29487,7 @@ public interface WinError {
     // The security context does not allow impersonation of the client
     //
     int SEC_E_NO_IMPERSONATION = 0x8009030B;
+
     //
     // MessageId: SEC_E_LOGON_DENIED
     //
@@ -26332,6 +29496,7 @@ public interface WinError {
     // The logon attempt failed
     //
     int SEC_E_LOGON_DENIED = 0x8009030C;
+
     //
     // MessageId: SEC_E_UNKNOWN_CREDENTIALS
     //
@@ -26340,6 +29505,7 @@ public interface WinError {
     // The credentials supplied to the package were not recognized
     //
     int SEC_E_UNKNOWN_CREDENTIALS = 0x8009030D;
+
     //
     // MessageId: SEC_E_NO_CREDENTIALS
     //
@@ -26348,6 +29514,7 @@ public interface WinError {
     // No credentials are available in the security package
     //
     int SEC_E_NO_CREDENTIALS = 0x8009030E;
+
     //
     // MessageId: SEC_E_MESSAGE_ALTERED
     //
@@ -26356,6 +29523,7 @@ public interface WinError {
     // The message or signature supplied for verification has been altered
     //
     int SEC_E_MESSAGE_ALTERED = 0x8009030F;
+
     //
     // MessageId: SEC_E_OUT_OF_SEQUENCE
     //
@@ -26364,6 +29532,7 @@ public interface WinError {
     // The message supplied for verification is out of sequence
     //
     int SEC_E_OUT_OF_SEQUENCE = 0x80090310;
+
     //
     // MessageId: SEC_E_NO_AUTHENTICATING_AUTHORITY
     //
@@ -26372,6 +29541,7 @@ public interface WinError {
     // No authority could be contacted for authentication.
     //
     int SEC_E_NO_AUTHENTICATING_AUTHORITY = 0x80090311;
+
     //
     // MessageId: SEC_I_CONTINUE_NEEDED
     //
@@ -26381,6 +29551,7 @@ public interface WinError {
     // the context
     //
     int SEC_I_CONTINUE_NEEDED = 0x00090312;
+
     //
     // MessageId: SEC_I_COMPLETE_NEEDED
     //
@@ -26389,6 +29560,7 @@ public interface WinError {
     // The function completed successfully, but CompleteToken must be called
     //
     int SEC_I_COMPLETE_NEEDED = 0x00090313;
+
     //
     // MessageId: SEC_I_COMPLETE_AND_CONTINUE
     //
@@ -26398,6 +29570,7 @@ public interface WinError {
     // function must be called to complete the context
     //
     int SEC_I_COMPLETE_AND_CONTINUE = 0x00090314;
+
     //
     // MessageId: SEC_I_LOCAL_LOGON
     //
@@ -26407,6 +29580,7 @@ public interface WinError {
     // logon was made using locally known information
     //
     int SEC_I_LOCAL_LOGON = 0x00090315;
+
     //
     // MessageId: SEC_E_BAD_PKGID
     //
@@ -26415,6 +29589,7 @@ public interface WinError {
     // The requested security package does not exist
     //
     int SEC_E_BAD_PKGID = 0x80090316;
+
     //
     // MessageId: SEC_E_CONTEXT_EXPIRED
     //
@@ -26423,6 +29598,7 @@ public interface WinError {
     // The context has expired and can no longer be used.
     //
     int SEC_E_CONTEXT_EXPIRED = 0x80090317;
+
     //
     // MessageId: SEC_I_CONTEXT_EXPIRED
     //
@@ -26431,6 +29607,7 @@ public interface WinError {
     // The context has expired and can no longer be used.
     //
     int SEC_I_CONTEXT_EXPIRED = 0x00090317;
+
     //
     // MessageId: SEC_E_INCOMPLETE_MESSAGE
     //
@@ -26439,6 +29616,7 @@ public interface WinError {
     // The supplied message is incomplete. The signature was not verified.
     //
     int SEC_E_INCOMPLETE_MESSAGE = 0x80090318;
+
     //
     // MessageId: SEC_E_INCOMPLETE_CREDENTIALS
     //
@@ -26448,6 +29626,7 @@ public interface WinError {
     // The context could not be initialized.
     //
     int SEC_E_INCOMPLETE_CREDENTIALS = 0x80090320;
+
     //
     // MessageId: SEC_E_BUFFER_TOO_SMALL
     //
@@ -26456,6 +29635,7 @@ public interface WinError {
     // The buffers supplied to a function was too small.
     //
     int SEC_E_BUFFER_TOO_SMALL = 0x80090321;
+
     //
     // MessageId: SEC_I_INCOMPLETE_CREDENTIALS
     //
@@ -26465,6 +29645,7 @@ public interface WinError {
     // Additional information can be returned from the context.
     //
     int SEC_I_INCOMPLETE_CREDENTIALS = 0x00090320;
+
     //
     // MessageId: SEC_I_RENEGOTIATE
     //
@@ -26473,6 +29654,7 @@ public interface WinError {
     // The context data must be renegotiated with the peer.
     //
     int SEC_I_RENEGOTIATE = 0x00090321;
+
     //
     // MessageId: SEC_E_WRONG_PRINCIPAL
     //
@@ -26481,6 +29663,7 @@ public interface WinError {
     // The target principal name is incorrect.
     //
     int SEC_E_WRONG_PRINCIPAL = 0x80090322;
+
     //
     // MessageId: SEC_I_NO_LSA_CONTEXT
     //
@@ -26489,6 +29672,7 @@ public interface WinError {
     // There is no LSA mode context associated with this context.
     //
     int SEC_I_NO_LSA_CONTEXT = 0x00090323;
+
     //
     // MessageId: SEC_E_TIME_SKEW
     //
@@ -26497,6 +29681,7 @@ public interface WinError {
     // The clocks on the client and server machines are skewed.
     //
     int SEC_E_TIME_SKEW = 0x80090324;
+
     //
     // MessageId: SEC_E_UNTRUSTED_ROOT
     //
@@ -26505,6 +29690,7 @@ public interface WinError {
     // The certificate chain was issued by an authority that is not trusted.
     //
     int SEC_E_UNTRUSTED_ROOT = 0x80090325;
+
     //
     // MessageId: SEC_E_ILLEGAL_MESSAGE
     //
@@ -26513,6 +29699,7 @@ public interface WinError {
     // The message received was unexpected or badly formatted.
     //
     int SEC_E_ILLEGAL_MESSAGE = 0x80090326;
+
     //
     // MessageId: SEC_E_CERT_UNKNOWN
     //
@@ -26521,6 +29708,7 @@ public interface WinError {
     // An unknown error occurred while processing the certificate.
     //
     int SEC_E_CERT_UNKNOWN = 0x80090327;
+
     //
     // MessageId: SEC_E_CERT_EXPIRED
     //
@@ -26529,6 +29717,7 @@ public interface WinError {
     // The received certificate has expired.
     //
     int SEC_E_CERT_EXPIRED = 0x80090328;
+
     //
     // MessageId: SEC_E_ENCRYPT_FAILURE
     //
@@ -26537,15 +29726,17 @@ public interface WinError {
     // The specified data could not be encrypted.
     //
     int SEC_E_ENCRYPT_FAILURE = 0x80090329;
+
     //
     // MessageId: SEC_E_DECRYPT_FAILURE
     //
     // MessageText:
     //
     // The specified data could not be decrypted.
-    // 
+    //
     //
     int SEC_E_DECRYPT_FAILURE = 0x80090330;
+
     //
     // MessageId: SEC_E_ALGORITHM_MISMATCH
     //
@@ -26555,6 +29746,7 @@ public interface WinError {
     // common algorithm.
     //
     int SEC_E_ALGORITHM_MISMATCH = 0x80090331;
+
     //
     // MessageId: SEC_E_SECURITY_QOS_FAILED
     //
@@ -26564,6 +29756,7 @@ public interface WinError {
     // requested quality of service (e.g. mutual authentication or delegation).
     //
     int SEC_E_SECURITY_QOS_FAILED = 0x80090332;
+
     //
     // MessageId: SEC_E_UNFINISHED_CONTEXT_DELETED
     //
@@ -26573,6 +29766,7 @@ public interface WinError {
     // considered a logon failure.
     //
     int SEC_E_UNFINISHED_CONTEXT_DELETED = 0x80090333;
+
     //
     // MessageId: SEC_E_NO_TGT_REPLY
     //
@@ -26582,6 +29776,7 @@ public interface WinError {
     // user-to-user but didn't send a TGT reply.
     //
     int SEC_E_NO_TGT_REPLY = 0x80090334;
+
     //
     // MessageId: SEC_E_NO_IP_ADDRESSES
     //
@@ -26591,6 +29786,7 @@ public interface WinError {
     // not have any IP addresses.
     //
     int SEC_E_NO_IP_ADDRESSES = 0x80090335;
+
     //
     // MessageId: SEC_E_WRONG_CREDENTIAL_HANDLE
     //
@@ -26600,6 +29796,7 @@ public interface WinError {
     // with the security context.
     //
     int SEC_E_WRONG_CREDENTIAL_HANDLE = 0x80090336;
+
     //
     // MessageId: SEC_E_CRYPTO_SYSTEM_INVALID
     //
@@ -26609,6 +29806,7 @@ public interface WinError {
     // function is unavailable.
     //
     int SEC_E_CRYPTO_SYSTEM_INVALID = 0x80090337;
+
     //
     // MessageId: SEC_E_MAX_REFERRALS_EXCEEDED
     //
@@ -26617,6 +29815,7 @@ public interface WinError {
     // The number of maximum ticket referrals has been exceeded.
     //
     int SEC_E_MAX_REFERRALS_EXCEEDED = 0x80090338;
+
     //
     // MessageId: SEC_E_MUST_BE_KDC
     //
@@ -26626,6 +29825,7 @@ public interface WinError {
     // not.
     //
     int SEC_E_MUST_BE_KDC = 0x80090339;
+
     //
     // MessageId: SEC_E_STRONG_CRYPTO_NOT_SUPPORTED
     //
@@ -26635,6 +29835,7 @@ public interface WinError {
     // it is not supported on the local machine.
     //
     int SEC_E_STRONG_CRYPTO_NOT_SUPPORTED = 0x8009033A;
+
     //
     // MessageId: SEC_E_TOO_MANY_PRINCIPALS
     //
@@ -26643,6 +29844,7 @@ public interface WinError {
     // The KDC reply contained more than one principal name.
     //
     int SEC_E_TOO_MANY_PRINCIPALS = 0x8009033B;
+
     //
     // MessageId: SEC_E_NO_PA_DATA
     //
@@ -26652,6 +29854,7 @@ public interface WinError {
     // found.
     //
     int SEC_E_NO_PA_DATA = 0x8009033C;
+
     //
     // MessageId: SEC_E_PKINIT_NAME_MISMATCH
     //
@@ -26662,6 +29865,7 @@ public interface WinError {
     // in the logon request. Please contact your administrator.
     //
     int SEC_E_PKINIT_NAME_MISMATCH = 0x8009033D;
+
     //
     // MessageId: SEC_E_SMARTCARD_LOGON_REQUIRED
     //
@@ -26670,6 +29874,7 @@ public interface WinError {
     // Smartcard logon is required and was not used.
     //
     int SEC_E_SMARTCARD_LOGON_REQUIRED = 0x8009033E;
+
     //
     // MessageId: SEC_E_SHUTDOWN_IN_PROGRESS
     //
@@ -26678,6 +29883,7 @@ public interface WinError {
     // A system shutdown is in progress.
     //
     int SEC_E_SHUTDOWN_IN_PROGRESS = 0x8009033F;
+
     //
     // MessageId: SEC_E_KDC_INVALID_REQUEST
     //
@@ -26686,6 +29892,7 @@ public interface WinError {
     // An invalid request was sent to the KDC.
     //
     int SEC_E_KDC_INVALID_REQUEST = 0x80090340;
+
     //
     // MessageId: SEC_E_KDC_UNABLE_TO_REFER
     //
@@ -26694,6 +29901,7 @@ public interface WinError {
     // The KDC was unable to generate a referral for the service requested.
     //
     int SEC_E_KDC_UNABLE_TO_REFER = 0x80090341;
+
     //
     // MessageId: SEC_E_KDC_UNKNOWN_ETYPE
     //
@@ -26702,6 +29910,7 @@ public interface WinError {
     // The encryption type requested is not supported by the KDC.
     //
     int SEC_E_KDC_UNKNOWN_ETYPE = 0x80090342;
+
     //
     // MessageId: SEC_E_UNSUPPORTED_PREAUTH
     //
@@ -26711,6 +29920,7 @@ public interface WinError {
     // package.
     //
     int SEC_E_UNSUPPORTED_PREAUTH = 0x80090343;
+
     //
     // MessageId: SEC_E_DELEGATION_REQUIRED
     //
@@ -26721,6 +29931,7 @@ public interface WinError {
     // delegation.
     //
     int SEC_E_DELEGATION_REQUIRED = 0x80090345;
+
     //
     // MessageId: SEC_E_BAD_BINDINGS
     //
@@ -26729,6 +29940,7 @@ public interface WinError {
     // Client's supplied SSPI channel bindings were incorrect.
     //
     int SEC_E_BAD_BINDINGS = 0x80090346;
+
     //
     // MessageId: SEC_E_MULTIPLE_ACCOUNTS
     //
@@ -26737,6 +29949,7 @@ public interface WinError {
     // The received certificate was mapped to multiple accounts.
     //
     int SEC_E_MULTIPLE_ACCOUNTS = 0x80090347;
+
     //
     // MessageId: SEC_E_NO_KERB_KEY
     //
@@ -26745,6 +29958,7 @@ public interface WinError {
     // SEC_E_NO_KERB_KEY
     //
     int SEC_E_NO_KERB_KEY = 0x80090348;
+
     //
     // MessageId: SEC_E_CERT_WRONG_USAGE
     //
@@ -26753,6 +29967,7 @@ public interface WinError {
     // The certificate is not valid for the requested usage.
     //
     int SEC_E_CERT_WRONG_USAGE = 0x80090349;
+
     //
     // MessageId: SEC_E_DOWNGRADE_DETECTED
     //
@@ -26762,6 +29977,7 @@ public interface WinError {
     // ensure that you can contact the server that authenticated you.
     //
     int SEC_E_DOWNGRADE_DETECTED = 0x80090350;
+
     //
     // MessageId: SEC_E_SMARTCARD_CERT_REVOKED
     //
@@ -26772,6 +29988,7 @@ public interface WinError {
     // information in the event log.
     //
     int SEC_E_SMARTCARD_CERT_REVOKED = 0x80090351;
+
     //
     // MessageId: SEC_E_ISSUING_CA_UNTRUSTED
     //
@@ -26782,6 +29999,7 @@ public interface WinError {
     // administrator.
     //
     int SEC_E_ISSUING_CA_UNTRUSTED = 0x80090352;
+
     //
     // MessageId: SEC_E_REVOCATION_OFF;INE_C
     //
@@ -26792,6 +30010,7 @@ public interface WinError {
     // administrator.
     //
     int SEC_E_REVOCATION_OFFLINE_C = 0x80090353;
+
     //
     // MessageId: SEC_E_PKINIT_CLIENT_FAILURE
     //
@@ -26801,6 +30020,7 @@ public interface WinError {
     // contact your system administrator.
     //
     int SEC_E_PKINIT_CLIENT_FAILURE = 0x80090354;
+
     //
     // MessageId: SEC_E_SMARTCARD_CERT_EXPIRED
     //
@@ -26810,6 +30030,7 @@ public interface WinError {
     // contact your system administrator.
     //
     int SEC_E_SMARTCARD_CERT_EXPIRED = 0x80090355;
+
     //
     // MessageId: SEC_E_NO_S4U_PROT_SUPPORT
     //
@@ -26820,6 +30041,7 @@ public interface WinError {
     // service for user.
     //
     int SEC_E_NO_S4U_PROT_SUPPORT = 0x80090356;
+
     //
     // MessageId: SEC_E_CROSSREALM_DELEGATION_FAILURE
     //
@@ -26831,6 +30053,7 @@ public interface WinError {
     // to delegate to list. Please contact your administrator.
     //
     int SEC_E_CROSSREALM_DELEGATION_FAILURE = 0x80090357;
+
     //
     // MessageId: SEC_E_REVOCATION_OFF;INE_KDC
     //
@@ -26842,6 +30065,7 @@ public interface WinError {
     // administrator.
     //
     int SEC_E_REVOCATION_OFFLINE_KDC = 0x80090358;
+
     //
     // MessageId: SEC_E_ISSUING_CA_UNTRUSTED_KDC
     //
@@ -26853,6 +30077,7 @@ public interface WinError {
     // system administrator.
     //
     int SEC_E_ISSUING_CA_UNTRUSTED_KDC = 0x80090359;
+
     //
     // MessageId: SEC_E_KDC_CERT_EXPIRED
     //
@@ -26863,6 +30088,7 @@ public interface WinError {
     // event log.
     //
     int SEC_E_KDC_CERT_EXPIRED = 0x8009035A;
+
     //
     // MessageId: SEC_E_KDC_CERT_REVOKED
     //
@@ -26873,6 +30099,7 @@ public interface WinError {
     // your system event log.
     //
     int SEC_E_KDC_CERT_REVOKED = 0x8009035B;
+
     //
     // MessageId: SEC_I_SIGNATURE_NEEDED
     //
@@ -26881,6 +30108,7 @@ public interface WinError {
     // A signature operation must be performed before the user can authenticate.
     //
     int SEC_I_SIGNATURE_NEEDED = 0x0009035C;
+
     //
     // MessageId: SEC_E_INVALID_PARAMETER
     //
@@ -26889,6 +30117,7 @@ public interface WinError {
     // One or more of the parameters passed to the function was invalid.
     //
     int SEC_E_INVALID_PARAMETER = 0x8009035D;
+
     //
     // MessageId: SEC_E_DELEGATION_POLICY
     //
@@ -26897,6 +30126,7 @@ public interface WinError {
     // Client policy does not allow credential delegation to target server.
     //
     int SEC_E_DELEGATION_POLICY = 0x8009035E;
+
     //
     // MessageId: SEC_E_POLICY_NLTM_ONLY
     //
@@ -26906,6 +30136,7 @@ public interface WinError {
     // NLTM only authentication.
     //
     int SEC_E_POLICY_NLTM_ONLY = 0x8009035F;
+
     //
     // MessageId: SEC_I_NO_RENEGOTIATION
     //
@@ -26914,11 +30145,14 @@ public interface WinError {
     // The recipient rejected the renegotiation request.
     //
     int SEC_I_NO_RENEGOTIATION = 0x00090360;
+
     //
     // Provided for backwards compatibility
     //
     int SEC_E_NO_SPM = SEC_E_INTERNAL_ERROR;
+
     int SEC_E_NOT_SUPPORTED = SEC_E_UNSUPPORTED_FUNCTION;
+
     //
     // MessageId: CRYPT_E_MSG_ERROR
     //
@@ -26928,6 +30162,7 @@ public interface WinError {
     // message.
     //
     int CRYPT_E_MSG_ERROR = 0x80091001;
+
     //
     // MessageId: CRYPT_E_UNKNOWN_ALGO
     //
@@ -26936,6 +30171,7 @@ public interface WinError {
     // Unknown cryptographic algorithm.
     //
     int CRYPT_E_UNKNOWN_ALGO = 0x80091002;
+
     //
     // MessageId: CRYPT_E_OID_FORMAT
     //
@@ -26944,6 +30180,7 @@ public interface WinError {
     // The object identifier is poorly formatted.
     //
     int CRYPT_E_OID_FORMAT = 0x80091003;
+
     //
     // MessageId: CRYPT_E_INVALID_MSG_TYPE
     //
@@ -26952,6 +30189,7 @@ public interface WinError {
     // Invalid cryptographic message type.
     //
     int CRYPT_E_INVALID_MSG_TYPE = 0x80091004;
+
     //
     // MessageId: CRYPT_E_UNEXPECTED_ENCODING
     //
@@ -26960,6 +30198,7 @@ public interface WinError {
     // Unexpected cryptographic message encoding.
     //
     int CRYPT_E_UNEXPECTED_ENCODING = 0x80091005;
+
     //
     // MessageId: CRYPT_E_AUTH_ATTR_MISSING
     //
@@ -26969,6 +30208,7 @@ public interface WinError {
     // attribute.
     //
     int CRYPT_E_AUTH_ATTR_MISSING = 0x80091006;
+
     //
     // MessageId: CRYPT_E_HASH_VALUE
     //
@@ -26977,6 +30217,7 @@ public interface WinError {
     // The hash value is not correct.
     //
     int CRYPT_E_HASH_VALUE = 0x80091007;
+
     //
     // MessageId: CRYPT_E_INVALID_INDEX
     //
@@ -26985,6 +30226,7 @@ public interface WinError {
     // The index value is not valid.
     //
     int CRYPT_E_INVALID_INDEX = 0x80091008;
+
     //
     // MessageId: CRYPT_E_ALREADY_DECRYPTED
     //
@@ -26993,6 +30235,7 @@ public interface WinError {
     // The content of the cryptographic message has already been decrypted.
     //
     int CRYPT_E_ALREADY_DECRYPTED = 0x80091009;
+
     //
     // MessageId: CRYPT_E_NOT_DECRYPTED
     //
@@ -27001,6 +30244,7 @@ public interface WinError {
     // The content of the cryptographic message has not been decrypted yet.
     //
     int CRYPT_E_NOT_DECRYPTED = 0x8009100A;
+
     //
     // MessageId: CRYPT_E_RECIPIENT_NOT_FOUND
     //
@@ -27009,6 +30253,7 @@ public interface WinError {
     // The enveloped-data message does not contain the specified recipient.
     //
     int CRYPT_E_RECIPIENT_NOT_FOUND = 0x8009100B;
+
     //
     // MessageId: CRYPT_E_CONTROL_TYPE
     //
@@ -27017,6 +30262,7 @@ public interface WinError {
     // Invalid control type.
     //
     int CRYPT_E_CONTROL_TYPE = 0x8009100C;
+
     //
     // MessageId: CRYPT_E_ISSUER_SERIALNUMBER
     //
@@ -27025,6 +30271,7 @@ public interface WinError {
     // Invalid issuer and/or serial number.
     //
     int CRYPT_E_ISSUER_SERIALNUMBER = 0x8009100D;
+
     //
     // MessageId: CRYPT_E_SIGNER_NOT_FOUND
     //
@@ -27033,6 +30280,7 @@ public interface WinError {
     // Cannot find the original signer.
     //
     int CRYPT_E_SIGNER_NOT_FOUND = 0x8009100E;
+
     //
     // MessageId: CRYPT_E_ATTRIBUTES_MISSING
     //
@@ -27042,6 +30290,7 @@ public interface WinError {
     // attributes.
     //
     int CRYPT_E_ATTRIBUTES_MISSING = 0x8009100F;
+
     //
     // MessageId: CRYPT_E_STREAM_MSG_NOT_READY
     //
@@ -27050,6 +30299,7 @@ public interface WinError {
     // The streamed cryptographic message is not ready to return data.
     //
     int CRYPT_E_STREAM_MSG_NOT_READY = 0x80091010;
+
     //
     // MessageId: CRYPT_E_STREAM_INSUFFICIENT_DATA
     //
@@ -27059,6 +30309,7 @@ public interface WinError {
     // decode operation.
     //
     int CRYPT_E_STREAM_INSUFFICIENT_DATA = 0x80091011;
+
     //
     // MessageId: CRYPT_I_NEW_PROTECTION_REQUIRED
     //
@@ -27067,6 +30318,7 @@ public interface WinError {
     // The protected data needs to be re-protected.
     //
     int CRYPT_I_NEW_PROTECTION_REQUIRED = 0x00091012;
+
     //
     // MessageId: CRYPT_E_BAD_LEN
     //
@@ -27075,6 +30327,7 @@ public interface WinError {
     // The length specified for the output data was insufficient.
     //
     int CRYPT_E_BAD_LEN = 0x80092001;
+
     //
     // MessageId: CRYPT_E_BAD_ENCODE
     //
@@ -27083,6 +30336,7 @@ public interface WinError {
     // An error occurred during encode or decode operation.
     //
     int CRYPT_E_BAD_ENCODE = 0x80092002;
+
     //
     // MessageId: CRYPT_E_FILE_ERROR
     //
@@ -27091,6 +30345,7 @@ public interface WinError {
     // An error occurred while reading or writing to a file.
     //
     int CRYPT_E_FILE_ERROR = 0x80092003;
+
     //
     // MessageId: CRYPT_E_NOT_FOUND
     //
@@ -27099,6 +30354,7 @@ public interface WinError {
     // Cannot find object or property.
     //
     int CRYPT_E_NOT_FOUND = 0x80092004;
+
     //
     // MessageId: CRYPT_E_EXISTS
     //
@@ -27107,6 +30363,7 @@ public interface WinError {
     // The object or property already exists.
     //
     int CRYPT_E_EXISTS = 0x80092005;
+
     //
     // MessageId: CRYPT_E_NO_PROVIDER
     //
@@ -27115,6 +30372,7 @@ public interface WinError {
     // No provider was specified for the store or object.
     //
     int CRYPT_E_NO_PROVIDER = 0x80092006;
+
     //
     // MessageId: CRYPT_E_SELF_SIGNED
     //
@@ -27123,6 +30381,7 @@ public interface WinError {
     // The specified certificate is self signed.
     //
     int CRYPT_E_SELF_SIGNED = 0x80092007;
+
     //
     // MessageId: CRYPT_E_DELETED_PREV
     //
@@ -27131,6 +30390,7 @@ public interface WinError {
     // The previous certificate or CRL context was deleted.
     //
     int CRYPT_E_DELETED_PREV = 0x80092008;
+
     //
     // MessageId: CRYPT_E_NO_MATCH
     //
@@ -27139,6 +30399,7 @@ public interface WinError {
     // Cannot find the requested object.
     //
     int CRYPT_E_NO_MATCH = 0x80092009;
+
     //
     // MessageId: CRYPT_E_UNEXPECTED_MSG_TYPE
     //
@@ -27147,6 +30408,7 @@ public interface WinError {
     // The certificate does not have a property that references a private key.
     //
     int CRYPT_E_UNEXPECTED_MSG_TYPE = 0x8009200A;
+
     //
     // MessageId: CRYPT_E_NO_KEY_PROPERTY
     //
@@ -27155,6 +30417,7 @@ public interface WinError {
     // Cannot find the certificate and private key for decryption.
     //
     int CRYPT_E_NO_KEY_PROPERTY = 0x8009200B;
+
     //
     // MessageId: CRYPT_E_NO_DECRYPT_CERT
     //
@@ -27163,6 +30426,7 @@ public interface WinError {
     // Cannot find the certificate and private key to use for decryption.
     //
     int CRYPT_E_NO_DECRYPT_CERT = 0x8009200C;
+
     //
     // MessageId: CRYPT_E_BAD_MSG
     //
@@ -27172,6 +30436,7 @@ public interface WinError {
     // correctly.
     //
     int CRYPT_E_BAD_MSG = 0x8009200D;
+
     //
     // MessageId: CRYPT_E_NO_SIGNER
     //
@@ -27181,6 +30446,7 @@ public interface WinError {
     // signer index.
     //
     int CRYPT_E_NO_SIGNER = 0x8009200E;
+
     //
     // MessageId: CRYPT_E_PENDING_CLOSE
     //
@@ -27189,6 +30455,7 @@ public interface WinError {
     // Final closure is pending until additional frees or closes.
     //
     int CRYPT_E_PENDING_CLOSE = 0x8009200F;
+
     //
     // MessageId: CRYPT_E_REVOKED
     //
@@ -27197,6 +30464,7 @@ public interface WinError {
     // The certificate is revoked.
     //
     int CRYPT_E_REVOKED = 0x80092010;
+
     //
     // MessageId: CRYPT_E_NO_REVOCATION_DLL
     //
@@ -27205,6 +30473,7 @@ public interface WinError {
     // No Dll or exported function was found to verify revocation.
     //
     int CRYPT_E_NO_REVOCATION_DLL = 0x80092011;
+
     //
     // MessageId: CRYPT_E_NO_REVOCATION_CHECK
     //
@@ -27214,6 +30483,7 @@ public interface WinError {
     // certificate.
     //
     int CRYPT_E_NO_REVOCATION_CHECK = 0x80092012;
+
     //
     // MessageId: CRYPT_E_REVOCATION_OFF;INE
     //
@@ -27223,6 +30493,7 @@ public interface WinError {
     // revocation server was ofF;ine.
     //
     int CRYPT_E_REVOCATION_OFFLINE = 0x80092013;
+
     //
     // MessageId: CRYPT_E_NOT_IN_REVOCATION_DATABASE
     //
@@ -27231,6 +30502,7 @@ public interface WinError {
     // The certificate is not in the revocation server's database.
     //
     int CRYPT_E_NOT_IN_REVOCATION_DATABASE = 0x80092014;
+
     //
     // MessageId: CRYPT_E_INVALID_NUMERIC_STRING
     //
@@ -27239,6 +30511,7 @@ public interface WinError {
     // The string contains a non-numeric character.
     //
     int CRYPT_E_INVALID_NUMERIC_STRING = 0x80092020;
+
     //
     // MessageId: CRYPT_E_INVALID_PRINTABLE_STRING
     //
@@ -27247,6 +30520,7 @@ public interface WinError {
     // The string contains a non-printable character.
     //
     int CRYPT_E_INVALID_PRINTABLE_STRING = 0x80092021;
+
     //
     // MessageId: CRYPT_E_INVALID_IA5_STRING
     //
@@ -27255,6 +30529,7 @@ public interface WinError {
     // The string contains a character not in the=7 bit ASCII character set.
     //
     int CRYPT_E_INVALID_IA5_STRING = 0x80092022;
+
     //
     // MessageId: CRYPT_E_INVALID_X500_STRING
     //
@@ -27264,6 +30539,7 @@ public interface WinError {
     // delimiter.
     //
     int CRYPT_E_INVALID_X500_STRING = 0x80092023;
+
     //
     // MessageId: CRYPT_E_NOT_CHAR_STRING
     //
@@ -27274,6 +30550,7 @@ public interface WinError {
     // CERT_TDN_OCTED_STRING.
     //
     int CRYPT_E_NOT_CHAR_STRING = 0x80092024;
+
     //
     // MessageId: CRYPT_E_FILERESIZED
     //
@@ -27284,6 +30561,7 @@ public interface WinError {
     // be done.
     //
     int CRYPT_E_FILERESIZED = 0x80092025;
+
     //
     // MessageId: CRYPT_E_SECURITY_SETTINGS
     //
@@ -27293,6 +30571,7 @@ public interface WinError {
     // setting.
     //
     int CRYPT_E_SECURITY_SETTINGS = 0x80092026;
+
     //
     // MessageId: CRYPT_E_NO_VERIFY_USAGE_DLL
     //
@@ -27301,6 +30580,7 @@ public interface WinError {
     // No DLL or exported function was found to verify subject usage.
     //
     int CRYPT_E_NO_VERIFY_USAGE_DLL = 0x80092027;
+
     //
     // MessageId: CRYPT_E_NO_VERIFY_USAGE_CHECK
     //
@@ -27309,6 +30589,7 @@ public interface WinError {
     // The called function was unable to do a usage check on the subject.
     //
     int CRYPT_E_NO_VERIFY_USAGE_CHECK = 0x80092028;
+
     //
     // MessageId: CRYPT_E_VERIFY_USAGE_OFF;INE
     //
@@ -27318,6 +30599,7 @@ public interface WinError {
     // the usage check.
     //
     int CRYPT_E_VERIFY_USAGE_OFFLINE = 0x80092029;
+
     //
     // MessageId: CRYPT_E_NOT_IN_CTL
     //
@@ -27326,6 +30608,7 @@ public interface WinError {
     // The subject was not found in a Certificate Trust List (CT;.
     //
     int CRYPT_E_NOT_IN_CTL = 0x8009202A;
+
     //
     // MessageId: CRYPT_E_NO_TRUSTED_SIGNER
     //
@@ -27335,6 +30618,7 @@ public interface WinError {
     // list is trusted.
     //
     int CRYPT_E_NO_TRUSTED_SIGNER = 0x8009202B;
+
     //
     // MessageId: CRYPT_E_MISSING_PUBKEY_PARA
     //
@@ -27343,17 +30627,19 @@ public interface WinError {
     // The public key's algorithm parameters are missing.
     //
     int CRYPT_E_MISSING_PUBKEY_PARA = 0x8009202C;
+
     //
     // MessageId: CRYPT_E_OSS_ERROR
     //
     // MessageText:
     //
     // OSS Certificate encode/decode error code base
-    // 
+    //
     // See asn1code.h for a definition of the OSS runtime errors. The OSS
     // error values are offset by CRYPT_E_OSS_ERROR.
     //
     int CRYPT_E_OSS_ERROR = 0x80093000;
+
     //
     // MessageId: OSS_MORE_BUF
     //
@@ -27362,6 +30648,7 @@ public interface WinError {
     // OSS ASN.1 Error: Output Buffer is too small.
     //
     int OSS_MORE_BUF = 0x80093001;
+
     //
     // MessageId: OSS_NEGATIVE_UINTEGER
     //
@@ -27370,6 +30657,7 @@ public interface WinError {
     // OSS ASN.1 Error: Signed integer is encoded as a unsigned integer.
     //
     int OSS_NEGATIVE_UINTEGER = 0x80093002;
+
     //
     // MessageId: OSS_PDU_RANGE
     //
@@ -27378,6 +30666,7 @@ public interface WinError {
     // OSS ASN.1 Error: Unknown ASN.1 data type.
     //
     int OSS_PDU_RANGE = 0x80093003;
+
     //
     // MessageId: OSS_MORE_INPUT
     //
@@ -27387,6 +30676,7 @@ public interface WinError {
     // truncated.
     //
     int OSS_MORE_INPUT = 0x80093004;
+
     //
     // MessageId: OSS_DATA_ERROR
     //
@@ -27395,6 +30685,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_DATA_ERROR = 0x80093005;
+
     //
     // MessageId: OSS_BAD_ARG
     //
@@ -27403,6 +30694,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid argument.
     //
     int OSS_BAD_ARG = 0x80093006;
+
     //
     // MessageId: OSS_BAD_VERSION
     //
@@ -27411,6 +30703,7 @@ public interface WinError {
     // OSS ASN.1 Error: Encode/Decode version mismatch.
     //
     int OSS_BAD_VERSION = 0x80093007;
+
     //
     // MessageId: OSS_OUT_MEMORY
     //
@@ -27419,6 +30712,7 @@ public interface WinError {
     // OSS ASN.1 Error: Out of memory.
     //
     int OSS_OUT_MEMORY = 0x80093008;
+
     //
     // MessageId: OSS_PDU_MISMATCH
     //
@@ -27427,6 +30721,7 @@ public interface WinError {
     // OSS ASN.1 Error: Encode/Decode Error.
     //
     int OSS_PDU_MISMATCH = 0x80093009;
+
     //
     // MessageId: OSS_LIMITED
     //
@@ -27435,6 +30730,7 @@ public interface WinError {
     // OSS ASN.1 Error: Internal Error.
     //
     int OSS_LIMITED = 0x8009300A;
+
     //
     // MessageId: OSS_BAD_PTR
     //
@@ -27443,6 +30739,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_BAD_PTR = 0x8009300B;
+
     //
     // MessageId: OSS_BAD_TIME
     //
@@ -27451,6 +30748,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_BAD_TIME = 0x8009300C;
+
     //
     // MessageId: OSS_INDEFINITE_NOT_SUPPORTED
     //
@@ -27459,6 +30757,7 @@ public interface WinError {
     // OSS ASN.1 Error: Unsupported BER indefinite-length encoding.
     //
     int OSS_INDEFINITE_NOT_SUPPORTED = 0x8009300D;
+
     //
     // MessageId: OSS_MEM_ERROR
     //
@@ -27467,6 +30766,7 @@ public interface WinError {
     // OSS ASN.1 Error: Access violation.
     //
     int OSS_MEM_ERROR = 0x8009300E;
+
     //
     // MessageId: OSS_BAD_TABLE
     //
@@ -27475,6 +30775,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_BAD_TABLE = 0x8009300F;
+
     //
     // MessageId: OSS_TOO_LONG
     //
@@ -27483,6 +30784,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_TOO_LONG = 0x80093010;
+
     //
     // MessageId: OSS_CONSTRAINT_VIOLATED
     //
@@ -27491,6 +30793,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_CONSTRAINT_VIOLATED = 0x80093011;
+
     //
     // MessageId: OSS_FATAL_ERROR
     //
@@ -27499,6 +30802,7 @@ public interface WinError {
     // OSS ASN.1 Error: Internal Error.
     //
     int OSS_FATAL_ERROR = 0x80093012;
+
     //
     // MessageId: OSS_ACCESS_SERIALIZATION_ERROR
     //
@@ -27507,6 +30811,7 @@ public interface WinError {
     // OSS ASN.1 Error: Multi-threading conF;ict.
     //
     int OSS_ACCESS_SERIALIZATION_ERROR = 0x80093013;
+
     //
     // MessageId: OSS_NULL_TBL
     //
@@ -27515,6 +30820,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_NULL_TBL = 0x80093014;
+
     //
     // MessageId: OSS_NULL_FCN
     //
@@ -27523,6 +30829,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_NULL_FCN = 0x80093015;
+
     //
     // MessageId: OSS_BAD_ENCRULES
     //
@@ -27531,6 +30838,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_BAD_ENCRULES = 0x80093016;
+
     //
     // MessageId: OSS_UNAVAIL_ENCRULES
     //
@@ -27539,6 +30847,7 @@ public interface WinError {
     // OSS ASN.1 Error: Encode/Decode function not implemented.
     //
     int OSS_UNAVAIL_ENCRULES = 0x80093017;
+
     //
     // MessageId: OSS_CANT_OPEN_TRACE_WINDOW
     //
@@ -27547,6 +30856,7 @@ public interface WinError {
     // OSS ASN.1 Error: Trace file error.
     //
     int OSS_CANT_OPEN_TRACE_WINDOW = 0x80093018;
+
     //
     // MessageId: OSS_UNIMPLEMENTED
     //
@@ -27555,6 +30865,7 @@ public interface WinError {
     // OSS ASN.1 Error: Function not implemented.
     //
     int OSS_UNIMPLEMENTED = 0x80093019;
+
     //
     // MessageId: OSS_OID_DLL_NOT_LINKED
     //
@@ -27563,6 +30874,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_OID_DLL_NOT_LINKED = 0x8009301A;
+
     //
     // MessageId: OSS_CANT_OPEN_TRACE_FILE
     //
@@ -27571,6 +30883,7 @@ public interface WinError {
     // OSS ASN.1 Error: Trace file error.
     //
     int OSS_CANT_OPEN_TRACE_FILE = 0x8009301B;
+
     //
     // MessageId: OSS_TRACE_FILE_ALREADY_OPEN
     //
@@ -27579,6 +30892,7 @@ public interface WinError {
     // OSS ASN.1 Error: Trace file error.
     //
     int OSS_TRACE_FILE_ALREADY_OPEN = 0x8009301C;
+
     //
     // MessageId: OSS_TABLE_MISMATCH
     //
@@ -27587,6 +30901,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_TABLE_MISMATCH = 0x8009301D;
+
     //
     // MessageId: OSS_TYPE_NOT_SUPPORTED
     //
@@ -27595,6 +30910,7 @@ public interface WinError {
     // OSS ASN.1 Error: Invalid data.
     //
     int OSS_TYPE_NOT_SUPPORTED = 0x8009301E;
+
     //
     // MessageId: OSS_REAL_DLL_NOT_LINKED
     //
@@ -27603,6 +30919,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_REAL_DLL_NOT_LINKED = 0x8009301F;
+
     //
     // MessageId: OSS_REAL_CODE_NOT_LINKED
     //
@@ -27611,6 +30928,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_REAL_CODE_NOT_LINKED = 0x80093020;
+
     //
     // MessageId: OSS_OUT_OF_RANGE
     //
@@ -27619,6 +30937,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_OUT_OF_RANGE = 0x80093021;
+
     //
     // MessageId: OSS_COPIER_DLL_NOT_LINKED
     //
@@ -27627,6 +30946,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_COPIER_DLL_NOT_LINKED = 0x80093022;
+
     //
     // MessageId: OSS_CONSTRAINT_DLL_NOT_LINKED
     //
@@ -27635,6 +30955,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_CONSTRAINT_DLL_NOT_LINKED = 0x80093023;
+
     //
     // MessageId: OSS_COMPARATOR_DLL_NOT_LINKED
     //
@@ -27643,6 +30964,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_COMPARATOR_DLL_NOT_LINKED = 0x80093024;
+
     //
     // MessageId: OSS_COMPARATOR_CODE_NOT_LINKED
     //
@@ -27651,6 +30973,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_COMPARATOR_CODE_NOT_LINKED = 0x80093025;
+
     //
     // MessageId: OSS_MEM_MGR_DLL_NOT_LINKED
     //
@@ -27659,6 +30982,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_MEM_MGR_DLL_NOT_LINKED = 0x80093026;
+
     //
     // MessageId: OSS_PDV_DLL_NOT_LINKED
     //
@@ -27667,6 +30991,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_PDV_DLL_NOT_LINKED = 0x80093027;
+
     //
     // MessageId: OSS_PDV_CODE_NOT_LINKED
     //
@@ -27675,6 +31000,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_PDV_CODE_NOT_LINKED = 0x80093028;
+
     //
     // MessageId: OSS_API_DLL_NOT_LINKED
     //
@@ -27683,6 +31009,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_API_DLL_NOT_LINKED = 0x80093029;
+
     //
     // MessageId: OSS_BERDER_DLL_NOT_LINKED
     //
@@ -27691,6 +31018,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_BERDER_DLL_NOT_LINKED = 0x8009302A;
+
     //
     // MessageId: OSS_PER_DLL_NOT_LINKED
     //
@@ -27699,6 +31027,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_PER_DLL_NOT_LINKED = 0x8009302B;
+
     //
     // MessageId: OSS_OPEN_TYPE_ERROR
     //
@@ -27707,6 +31036,7 @@ public interface WinError {
     // OSS ASN.1 Error: Program link error.
     //
     int OSS_OPEN_TYPE_ERROR = 0x8009302C;
+
     //
     // MessageId: OSS_MUTEX_NOT_CREATED
     //
@@ -27715,6 +31045,7 @@ public interface WinError {
     // OSS ASN.1 Error: System resource error.
     //
     int OSS_MUTEX_NOT_CREATED = 0x8009302D;
+
     //
     // MessageId: OSS_CANT_CLOSE_TRACE_FILE
     //
@@ -27723,16 +31054,18 @@ public interface WinError {
     // OSS ASN.1 Error: Trace file error.
     //
     int OSS_CANT_CLOSE_TRACE_FILE = 0x8009302E;
+
     //
     // MessageId: CRYPT_E_ASN1_ERROR
     //
     // MessageText:
     //
     // ASN1 Certificate encode/decode error code base.
-    // 
+    //
     // The ASN1 error values are offset by CRYPT_E_ASN1_ERROR.
     //
     int CRYPT_E_ASN1_ERROR = 0x80093100;
+
     //
     // MessageId: CRYPT_E_ASN1_INTERNAL
     //
@@ -27741,6 +31074,7 @@ public interface WinError {
     // ASN1 internal encode or decode error.
     //
     int CRYPT_E_ASN1_INTERNAL = 0x80093101;
+
     //
     // MessageId: CRYPT_E_ASN1_EOD
     //
@@ -27749,6 +31083,7 @@ public interface WinError {
     // ASN1 unexpected end of data.
     //
     int CRYPT_E_ASN1_EOD = 0x80093102;
+
     //
     // MessageId: CRYPT_E_ASN1_CORRUPT
     //
@@ -27757,6 +31092,7 @@ public interface WinError {
     // ASN1 corrupted data.
     //
     int CRYPT_E_ASN1_CORRUPT = 0x80093103;
+
     //
     // MessageId: CRYPT_E_ASN1_LARGE
     //
@@ -27765,6 +31101,7 @@ public interface WinError {
     // ASN1 value too large.
     //
     int CRYPT_E_ASN1_LARGE = 0x80093104;
+
     //
     // MessageId: CRYPT_E_ASN1_CONSTRAINT
     //
@@ -27773,6 +31110,7 @@ public interface WinError {
     // ASN1 constraint violated.
     //
     int CRYPT_E_ASN1_CONSTRAINT = 0x80093105;
+
     //
     // MessageId: CRYPT_E_ASN1_MEMORY
     //
@@ -27781,6 +31119,7 @@ public interface WinError {
     // ASN1 out of memory.
     //
     int CRYPT_E_ASN1_MEMORY = 0x80093106;
+
     //
     // MessageId: CRYPT_E_ASN1_OVERF;OW
     //
@@ -27789,6 +31128,7 @@ public interface WinError {
     // ASN1 buffer overF;ow.
     //
     int CRYPT_E_ASN1_OVERFLOW = 0x80093107;
+
     //
     // MessageId: CRYPT_E_ASN1_BADPDU
     //
@@ -27797,6 +31137,7 @@ public interface WinError {
     // ASN1 function not supported for this PDU.
     //
     int CRYPT_E_ASN1_BADPDU = 0x80093108;
+
     //
     // MessageId: CRYPT_E_ASN1_BADARGS
     //
@@ -27805,6 +31146,7 @@ public interface WinError {
     // ASN1 bad arguments to function call.
     //
     int CRYPT_E_ASN1_BADARGS = 0x80093109;
+
     //
     // MessageId: CRYPT_E_ASN1_BADREAL
     //
@@ -27813,6 +31155,7 @@ public interface WinError {
     // ASN1 bad real value.
     //
     int CRYPT_E_ASN1_BADREAL = 0x8009310A;
+
     //
     // MessageId: CRYPT_E_ASN1_BADTAG
     //
@@ -27821,6 +31164,7 @@ public interface WinError {
     // ASN1 bad tag value met.
     //
     int CRYPT_E_ASN1_BADTAG = 0x8009310B;
+
     //
     // MessageId: CRYPT_E_ASN1_CHOICE
     //
@@ -27829,6 +31173,7 @@ public interface WinError {
     // ASN1 bad choice value.
     //
     int CRYPT_E_ASN1_CHOICE = 0x8009310C;
+
     //
     // MessageId: CRYPT_E_ASN1_RULE
     //
@@ -27837,6 +31182,7 @@ public interface WinError {
     // ASN1 bad encoding rule.
     //
     int CRYPT_E_ASN1_RULE = 0x8009310D;
+
     //
     // MessageId: CRYPT_E_ASN1_UTF8
     //
@@ -27845,6 +31191,7 @@ public interface WinError {
     // ASN1 bad unicode (UTF8).
     //
     int CRYPT_E_ASN1_UTF8 = 0x8009310E;
+
     //
     // MessageId: CRYPT_E_ASN1_PDU_TYPE
     //
@@ -27853,6 +31200,7 @@ public interface WinError {
     // ASN1 bad PDU type.
     //
     int CRYPT_E_ASN1_PDU_TYPE = 0x80093133;
+
     //
     // MessageId: CRYPT_E_ASN1_NYI
     //
@@ -27861,6 +31209,7 @@ public interface WinError {
     // ASN1 not yet implemented.
     //
     int CRYPT_E_ASN1_NYI = 0x80093134;
+
     //
     // MessageId: CRYPT_E_ASN1_EXTENDED
     //
@@ -27869,6 +31218,7 @@ public interface WinError {
     // ASN1 skipped unknown extension(s).
     //
     int CRYPT_E_ASN1_EXTENDED = 0x80093201;
+
     //
     // MessageId: CRYPT_E_ASN1_NOEOD
     //
@@ -27877,6 +31227,7 @@ public interface WinError {
     // ASN1 end of data expected
     //
     int CRYPT_E_ASN1_NOEOD = 0x80093202;
+
     //
     // MessageId: CERTSRV_E_BAD_REQUESTSUBJECT
     //
@@ -27885,6 +31236,7 @@ public interface WinError {
     // The request subject name is invalid or too long.
     //
     int CERTSRV_E_BAD_REQUESTSUBJECT = 0x80094001;
+
     //
     // MessageId: CERTSRV_E_NO_REQUEST
     //
@@ -27893,6 +31245,7 @@ public interface WinError {
     // The request does not exist.
     //
     int CERTSRV_E_NO_REQUEST = 0x80094002;
+
     //
     // MessageId: CERTSRV_E_BAD_REQUESTSTATUS
     //
@@ -27901,6 +31254,7 @@ public interface WinError {
     // The request's current status does not allow this operation.
     //
     int CERTSRV_E_BAD_REQUESTSTATUS = 0x80094003;
+
     //
     // MessageId: CERTSRV_E_PROPERTY_EMPTY
     //
@@ -27909,6 +31263,7 @@ public interface WinError {
     // The requested property value is empty.
     //
     int CERTSRV_E_PROPERTY_EMPTY = 0x80094004;
+
     //
     // MessageId: CERTSRV_E_INVALID_CA_CERTIFICATE
     //
@@ -27917,6 +31272,7 @@ public interface WinError {
     // The certification authority's certificate contains invalid data.
     //
     int CERTSRV_E_INVALID_CA_CERTIFICATE = 0x80094005;
+
     //
     // MessageId: CERTSRV_E_SERVER_SUSPENDED
     //
@@ -27925,6 +31281,7 @@ public interface WinError {
     // Certificate service has been suspended for a database restore operation.
     //
     int CERTSRV_E_SERVER_SUSPENDED = 0x80094006;
+
     //
     // MessageId: CERTSRV_E_ENCODING_LENGTH
     //
@@ -27934,6 +31291,7 @@ public interface WinError {
     // incompatible with older enrollment software.
     //
     int CERTSRV_E_ENCODING_LENGTH = 0x80094007;
+
     //
     // MessageId: CERTSRV_E_ROLECONF;ICT
     //
@@ -27943,6 +31301,7 @@ public interface WinError {
     // certification authority is configured to enforce role separation.
     //
     int CERTSRV_E_ROLECONFLICT = 0x80094008;
+
     //
     // MessageId: CERTSRV_E_RESTRICTEDOFFICER
     //
@@ -27952,6 +31311,7 @@ public interface WinError {
     // manager that is allowed to manage certificates for the current requester.
     //
     int CERTSRV_E_RESTRICTEDOFFICER = 0x80094009;
+
     //
     // MessageId: CERTSRV_E_KEY_ARCHIVAL_NOT_CONFIGURED
     //
@@ -27961,6 +31321,7 @@ public interface WinError {
     // for key archival.
     //
     int CERTSRV_E_KEY_ARCHIVAL_NOT_CONFIGURED = 0x8009400A;
+
     //
     // MessageId: CERTSRV_E_NO_VALID_KRA
     //
@@ -27970,6 +31331,7 @@ public interface WinError {
     // one or more key recovery certificates.
     //
     int CERTSRV_E_NO_VALID_KRA = 0x8009400B;
+
     //
     // MessageId: CERTSRV_E_BAD_REQUEST_KEY_ARCHIVAL
     //
@@ -27979,6 +31341,7 @@ public interface WinError {
     // in an unauthenticated attribute in an outermost signature.
     //
     int CERTSRV_E_BAD_REQUEST_KEY_ARCHIVAL = 0x8009400C;
+
     //
     // MessageId: CERTSRV_E_NO_CAADMIN_DEFINED
     //
@@ -27988,6 +31351,7 @@ public interface WinError {
     // CA.
     //
     int CERTSRV_E_NO_CAADMIN_DEFINED = 0x8009400D;
+
     //
     // MessageId: CERTSRV_E_BAD_RENEWAL_CERT_ATTRIBUTE
     //
@@ -27996,6 +31360,7 @@ public interface WinError {
     // The request contains an invalid renewal certificate attribute.
     //
     int CERTSRV_E_BAD_RENEWAL_CERT_ATTRIBUTE = 0x8009400E;
+
     //
     // MessageId: CERTSRV_E_NO_DB_SESSIONS
     //
@@ -28006,6 +31371,7 @@ public interface WinError {
     // configured to allow additional sessions.
     //
     int CERTSRV_E_NO_DB_SESSIONS = 0x8009400F;
+
     //
     // MessageId: CERTSRV_E_ALIGNMENT_FAULT
     //
@@ -28014,6 +31380,7 @@ public interface WinError {
     // A memory reference caused a data alignment fault.
     //
     int CERTSRV_E_ALIGNMENT_FAULT = 0x80094010;
+
     //
     // MessageId: CERTSRV_E_ENROLL_DENIED
     //
@@ -28023,6 +31390,7 @@ public interface WinError {
     // user to enroll for certificates.
     //
     int CERTSRV_E_ENROLL_DENIED = 0x80094011;
+
     //
     // MessageId: CERTSRV_E_TEMPLATE_DENIED
     //
@@ -28032,6 +31400,7 @@ public interface WinError {
     // to enroll for this type of certificate.
     //
     int CERTSRV_E_TEMPLATE_DENIED = 0x80094012;
+
     //
     // MessageId: CERTSRV_E_DOWNLEVEL_DC_SSL_OR_UPGRADE
     //
@@ -28042,6 +31411,7 @@ public interface WinError {
     // for Active Directory access.
     //
     int CERTSRV_E_DOWNLEVEL_DC_SSL_OR_UPGRADE = 0x80094013;
+
     //
     // MessageId: CERTSRV_E_UNSUPPORTED_CERT_TYPE
     //
@@ -28050,6 +31420,7 @@ public interface WinError {
     // The requested certificate template is not supported by this CA.
     //
     int CERTSRV_E_UNSUPPORTED_CERT_TYPE = 0x80094800;
+
     //
     // MessageId: CERTSRV_E_NO_CERT_TYPE
     //
@@ -28058,6 +31429,7 @@ public interface WinError {
     // The request contains no certificate template information.
     //
     int CERTSRV_E_NO_CERT_TYPE = 0x80094801;
+
     //
     // MessageId: CERTSRV_E_TEMPLATE_CONF;ICT
     //
@@ -28066,6 +31438,7 @@ public interface WinError {
     // The request contains conF;icting template information.
     //
     int CERTSRV_E_TEMPLATE_CONFLICT = 0x80094802;
+
     //
     // MessageId: CERTSRV_E_SUBJECT_ALT_NAME_REQUIRED
     //
@@ -28074,6 +31447,7 @@ public interface WinError {
     // The request is missing a required Subject Alternate name extension.
     //
     int CERTSRV_E_SUBJECT_ALT_NAME_REQUIRED = 0x80094803;
+
     //
     // MessageId: CERTSRV_E_ARCHIVED_KEY_REQUIRED
     //
@@ -28082,6 +31456,7 @@ public interface WinError {
     // The request is missing a required private key for archival by the server.
     //
     int CERTSRV_E_ARCHIVED_KEY_REQUIRED = 0x80094804;
+
     //
     // MessageId: CERTSRV_E_SMIME_REQUIRED
     //
@@ -28090,6 +31465,7 @@ public interface WinError {
     // The request is missing a required SMIME capabilities extension.
     //
     int CERTSRV_E_SMIME_REQUIRED = 0x80094805;
+
     //
     // MessageId: CERTSRV_E_BAD_RENEWAL_SUBJECT
     //
@@ -28100,6 +31476,7 @@ public interface WinError {
     // to authorize the request.
     //
     int CERTSRV_E_BAD_RENEWAL_SUBJECT = 0x80094806;
+
     //
     // MessageId: CERTSRV_E_BAD_TEMPLATE_VERSION
     //
@@ -28109,6 +31486,7 @@ public interface WinError {
     // version.
     //
     int CERTSRV_E_BAD_TEMPLATE_VERSION = 0x80094807;
+
     //
     // MessageId: CERTSRV_E_TEMPLATE_POLICY_REQUIRED
     //
@@ -28117,6 +31495,7 @@ public interface WinError {
     // The template is missing a required signature policy attribute.
     //
     int CERTSRV_E_TEMPLATE_POLICY_REQUIRED = 0x80094808;
+
     //
     // MessageId: CERTSRV_E_SIGNATURE_POLICY_REQUIRED
     //
@@ -28125,6 +31504,7 @@ public interface WinError {
     // The request is missing required signature policy information.
     //
     int CERTSRV_E_SIGNATURE_POLICY_REQUIRED = 0x80094809;
+
     //
     // MessageId: CERTSRV_E_SIGNATURE_COUNT
     //
@@ -28133,6 +31513,7 @@ public interface WinError {
     // The request is missing one or more required signatures.
     //
     int CERTSRV_E_SIGNATURE_COUNT = 0x8009480A;
+
     //
     // MessageId: CERTSRV_E_SIGNATURE_REJECTED
     //
@@ -28143,6 +31524,7 @@ public interface WinError {
     // signatures.
     //
     int CERTSRV_E_SIGNATURE_REJECTED = 0x8009480B;
+
     //
     // MessageId: CERTSRV_E_ISSUANCE_POLICY_REQUIRED
     //
@@ -28151,6 +31533,7 @@ public interface WinError {
     // The request is missing one or more required signature issuance policies.
     //
     int CERTSRV_E_ISSUANCE_POLICY_REQUIRED = 0x8009480C;
+
     //
     // MessageId: CERTSRV_E_SUBJECT_UPN_REQUIRED
     //
@@ -28159,6 +31542,7 @@ public interface WinError {
     // The UPN is unavailable and cannot be added to the Subject Alternate name.
     //
     int CERTSRV_E_SUBJECT_UPN_REQUIRED = 0x8009480D;
+
     //
     // MessageId: CERTSRV_E_SUBJECT_DIRECTORY_GUID_REQUIRED
     //
@@ -28168,6 +31552,7 @@ public interface WinError {
     // Subject Alternate name.
     //
     int CERTSRV_E_SUBJECT_DIRECTORY_GUID_REQUIRED = 0x8009480E;
+
     //
     // MessageId: CERTSRV_E_SUBJECT_DNS_REQUIRED
     //
@@ -28177,6 +31562,7 @@ public interface WinError {
     // name.
     //
     int CERTSRV_E_SUBJECT_DNS_REQUIRED = 0x8009480F;
+
     //
     // MessageId: CERTSRV_E_ARCHIVED_KEY_UNEXPECTED
     //
@@ -28186,6 +31572,7 @@ public interface WinError {
     // archival is not enabled for the specified certificate template.
     //
     int CERTSRV_E_ARCHIVED_KEY_UNEXPECTED = 0x80094810;
+
     //
     // MessageId: CERTSRV_E_KEY_LENGTH
     //
@@ -28195,6 +31582,7 @@ public interface WinError {
     // certificate template.
     //
     int CERTSRV_E_KEY_LENGTH = 0x80094811;
+
     //
     // MessageId: CERTSRV_E_SUBJECT_EMAIL_REQUIRED
     //
@@ -28204,6 +31592,7 @@ public interface WinError {
     // Subject Alternate name.
     //
     int CERTSRV_E_SUBJECT_EMAIL_REQUIRED = 0x80094812;
+
     //
     // MessageId: CERTSRV_E_UNKNOWN_CERT_TYPE
     //
@@ -28213,6 +31602,7 @@ public interface WinError {
     // authority could not be found.
     //
     int CERTSRV_E_UNKNOWN_CERT_TYPE = 0x80094813;
+
     //
     // MessageId: CERTSRV_E_CERT_TYPE_OVERLAP
     //
@@ -28223,6 +31613,7 @@ public interface WinError {
     // certificate renewed.
     //
     int CERTSRV_E_CERT_TYPE_OVERLAP = 0x80094814;
+
     //
     // MessageId: CERTSRV_E_TOO_MANY_SIGNATURES
     //
@@ -28232,6 +31623,7 @@ public interface WinError {
     // signature is allowed.
     //
     int CERTSRV_E_TOO_MANY_SIGNATURES = 0x80094815;
+
     //
     // The range 0x5000-0x51ff is reserved for XENROLL errors.
     //
@@ -28243,6 +31635,7 @@ public interface WinError {
     // The key is not exportable.
     //
     int XENROLL_E_KEY_NOT_EXPORTABLE = 0x80095000;
+
     //
     // MessageId: XENROLL_E_CANNOT_ADD_ROOT_CERT
     //
@@ -28251,6 +31644,7 @@ public interface WinError {
     // You cannot add the root CA certificate into your local store.
     //
     int XENROLL_E_CANNOT_ADD_ROOT_CERT = 0x80095001;
+
     //
     // MessageId: XENROLL_E_RESPONSE_KA_HASH_NOT_FOUND
     //
@@ -28259,6 +31653,7 @@ public interface WinError {
     // The key archival hash attribute was not found in the response.
     //
     int XENROLL_E_RESPONSE_KA_HASH_NOT_FOUND = 0x80095002;
+
     //
     // MessageId: XENROLL_E_RESPONSE_UNEXPECTED_KA_HASH
     //
@@ -28267,6 +31662,7 @@ public interface WinError {
     // An unexpected key archival hash attribute was found in the response.
     //
     int XENROLL_E_RESPONSE_UNEXPECTED_KA_HASH = 0x80095003;
+
     //
     // MessageId: XENROLL_E_RESPONSE_KA_HASH_MISMATCH
     //
@@ -28276,6 +31672,7 @@ public interface WinError {
     // response.
     //
     int XENROLL_E_RESPONSE_KA_HASH_MISMATCH = 0x80095004;
+
     //
     // MessageId: XENROLL_E_KEYSPEC_SMIME_MISMATCH
     //
@@ -28284,6 +31681,7 @@ public interface WinError {
     // Signing certificate cannot include SMIME extension.
     //
     int XENROLL_E_KEYSPEC_SMIME_MISMATCH = 0x80095005;
+
     //
     // MessageId: TRUST_E_SYSTEM_ERROR
     //
@@ -28292,6 +31690,7 @@ public interface WinError {
     // A system-level error occurred while verifying trust.
     //
     int TRUST_E_SYSTEM_ERROR = 0x80096001;
+
     //
     // MessageId: TRUST_E_NO_SIGNER_CERT
     //
@@ -28300,6 +31699,7 @@ public interface WinError {
     // The certificate for the signer of the message is invalid or not found.
     //
     int TRUST_E_NO_SIGNER_CERT = 0x80096002;
+
     //
     // MessageId: TRUST_E_COUNTER_SIGNER
     //
@@ -28308,6 +31708,7 @@ public interface WinError {
     // One of the counter signatures was invalid.
     //
     int TRUST_E_COUNTER_SIGNER = 0x80096003;
+
     //
     // MessageId: TRUST_E_CERT_SIGNATURE
     //
@@ -28316,6 +31717,7 @@ public interface WinError {
     // The signature of the certificate cannot be verified.
     //
     int TRUST_E_CERT_SIGNATURE = 0x80096004;
+
     //
     // MessageId: TRUST_E_TIME_STAMP
     //
@@ -28325,6 +31727,7 @@ public interface WinError {
     // malformed.
     //
     int TRUST_E_TIME_STAMP = 0x80096005;
+
     //
     // MessageId: TRUST_E_BAD_DIGEST
     //
@@ -28333,6 +31736,7 @@ public interface WinError {
     // The digital signature of the object did not verify.
     //
     int TRUST_E_BAD_DIGEST = 0x80096010;
+
     //
     // MessageId: TRUST_E_BASIC_CONSTRAINTS
     //
@@ -28341,6 +31745,7 @@ public interface WinError {
     // A certificate's basic constraint extension has not been observed.
     //
     int TRUST_E_BASIC_CONSTRAINTS = 0x80096019;
+
     //
     // MessageId: TRUST_E_FINANCIAL_CRITERIA
     //
@@ -28350,6 +31755,7 @@ public interface WinError {
     // extensions.
     //
     int TRUST_E_FINANCIAL_CRITERIA = 0x8009601E;
+
     //
     // Error codes for mssipotf.dll
     // Most of the error codes can only occur when an error occurs
@@ -28364,6 +31770,7 @@ public interface WinError {
     // Tried to reference a part of the file outside the proper range.
     //
     int MSSIPOTF_E_OUTOFMEMRANGE = 0x80097001;
+
     //
     // MessageId: MSSIPOTF_E_CANTGETOBJECT
     //
@@ -28372,6 +31779,7 @@ public interface WinError {
     // Could not retrieve an object from the file.
     //
     int MSSIPOTF_E_CANTGETOBJECT = 0x80097002;
+
     //
     // MessageId: MSSIPOTF_E_NOHEADTABLE
     //
@@ -28380,6 +31788,7 @@ public interface WinError {
     // Could not find the head table in the file.
     //
     int MSSIPOTF_E_NOHEADTABLE = 0x80097003;
+
     //
     // MessageId: MSSIPOTF_E_BAD_MAGICNUMBER
     //
@@ -28388,6 +31797,7 @@ public interface WinError {
     // The magic number in the head table is incorrect.
     //
     int MSSIPOTF_E_BAD_MAGICNUMBER = 0x80097004;
+
     //
     // MessageId: MSSIPOTF_E_BAD_OFFSET_TABLE
     //
@@ -28396,6 +31806,7 @@ public interface WinError {
     // The offset table has incorrect values.
     //
     int MSSIPOTF_E_BAD_OFFSET_TABLE = 0x80097005;
+
     //
     // MessageId: MSSIPOTF_E_TABLE_TAGORDER
     //
@@ -28404,6 +31815,7 @@ public interface WinError {
     // Duplicate table tags or tags out of alphabetical order.
     //
     int MSSIPOTF_E_TABLE_TAGORDER = 0x80097006;
+
     //
     // MessageId: MSSIPOTF_E_TABLE_LONGWORD
     //
@@ -28412,6 +31824,7 @@ public interface WinError {
     // A table does not start on a long word boundary.
     //
     int MSSIPOTF_E_TABLE_LONGWORD = 0x80097007;
+
     //
     // MessageId: MSSIPOTF_E_BAD_FIRST_TABLE_PLACEMENT
     //
@@ -28420,6 +31833,7 @@ public interface WinError {
     // First table does not appear after header information.
     //
     int MSSIPOTF_E_BAD_FIRST_TABLE_PLACEMENT = 0x80097008;
+
     //
     // MessageId: MSSIPOTF_E_TABLES_OVERLAP
     //
@@ -28428,6 +31842,7 @@ public interface WinError {
     // Two or more tables overlap.
     //
     int MSSIPOTF_E_TABLES_OVERLAP = 0x80097009;
+
     //
     // MessageId: MSSIPOTF_E_TABLE_PADBYTES
     //
@@ -28436,6 +31851,7 @@ public interface WinError {
     // Too many pad bytes between tables or pad bytes are not 0.
     //
     int MSSIPOTF_E_TABLE_PADBYTES = 0x8009700A;
+
     //
     // MessageId: MSSIPOTF_E_FILETOOSMALL
     //
@@ -28444,6 +31860,7 @@ public interface WinError {
     // File is too small to contain the last table.
     //
     int MSSIPOTF_E_FILETOOSMALL = 0x8009700B;
+
     //
     // MessageId: MSSIPOTF_E_TABLE_CHECKSUM
     //
@@ -28452,6 +31869,7 @@ public interface WinError {
     // A table checksum is incorrect.
     //
     int MSSIPOTF_E_TABLE_CHECKSUM = 0x8009700C;
+
     //
     // MessageId: MSSIPOTF_E_FILE_CHECKSUM
     //
@@ -28460,6 +31878,7 @@ public interface WinError {
     // The file checksum is incorrect.
     //
     int MSSIPOTF_E_FILE_CHECKSUM = 0x8009700D;
+
     //
     // MessageId: MSSIPOTF_E_FAILED_POLICY
     //
@@ -28468,6 +31887,7 @@ public interface WinError {
     // The signature does not have the correct attributes for the policy.
     //
     int MSSIPOTF_E_FAILED_POLICY = 0x80097010;
+
     //
     // MessageId: MSSIPOTF_E_FAILED_HINTS_CHECK
     //
@@ -28476,6 +31896,7 @@ public interface WinError {
     // The file did not pass the hints check.
     //
     int MSSIPOTF_E_FAILED_HINTS_CHECK = 0x80097011;
+
     //
     // MessageId: MSSIPOTF_E_NOT_OPENTYPE
     //
@@ -28484,6 +31905,7 @@ public interface WinError {
     // The file is not an OpenType file.
     //
     int MSSIPOTF_E_NOT_OPENTYPE = 0x80097012;
+
     //
     // MessageId: MSSIPOTF_E_FILE
     //
@@ -28492,6 +31914,7 @@ public interface WinError {
     // Failed on a file operation (open, map, read, write).
     //
     int MSSIPOTF_E_FILE = 0x80097013;
+
     //
     // MessageId: MSSIPOTF_E_CRYPT
     //
@@ -28500,6 +31923,7 @@ public interface WinError {
     // A call to a CryptoAPI function failed.
     //
     int MSSIPOTF_E_CRYPT = 0x80097014;
+
     //
     // MessageId: MSSIPOTF_E_BADVERSION
     //
@@ -28508,6 +31932,7 @@ public interface WinError {
     // There is a bad version number in the file.
     //
     int MSSIPOTF_E_BADVERSION = 0x80097015;
+
     //
     // MessageId: MSSIPOTF_E_DSIG_STRUCTURE
     //
@@ -28516,6 +31941,7 @@ public interface WinError {
     // The structure of the DSIG table is incorrect.
     //
     int MSSIPOTF_E_DSIG_STRUCTURE = 0x80097016;
+
     //
     // MessageId: MSSIPOTF_E_PCONST_CHECK
     //
@@ -28524,6 +31950,7 @@ public interface WinError {
     // A check failed in a partially constant table.
     //
     int MSSIPOTF_E_PCONST_CHECK = 0x80097017;
+
     //
     // MessageId: MSSIPOTF_E_STRUCTURE
     //
@@ -28532,6 +31959,7 @@ public interface WinError {
     // Some kind of structural error.
     //
     int MSSIPOTF_E_STRUCTURE = 0x80097018;
+
     //
     // MessageId: ERROR_CRED_REQUIRES_CONFIRMATION
     //
@@ -28540,7 +31968,9 @@ public interface WinError {
     // The requested credential requires confirmation.
     //
     int ERROR_CRED_REQUIRES_CONFIRMATION = 0x80097019;
+
     int NTE_OP_OK = 0;
+
     //
     // Note that additional FACILITY_SSPI errors are in issperr.h
     //
@@ -28555,6 +31985,7 @@ public interface WinError {
     // Unknown trust provider.
     //
     int TRUST_E_PROVIDER_UNKNOWN = 0x800B0001;
+
     //
     // MessageId: TRUST_E_ACTION_UNKNOWN
     //
@@ -28564,6 +31995,7 @@ public interface WinError {
     // trust provider.
     //
     int TRUST_E_ACTION_UNKNOWN = 0x800B0002;
+
     //
     // MessageId: TRUST_E_SUBJECT_FORM_UNKNOWN
     //
@@ -28573,6 +32005,7 @@ public interface WinError {
     // specified trust provider.
     //
     int TRUST_E_SUBJECT_FORM_UNKNOWN = 0x800B0003;
+
     //
     // MessageId: TRUST_E_SUBJECT_NOT_TRUSTED
     //
@@ -28581,6 +32014,7 @@ public interface WinError {
     // The subject is not trusted for the specified action.
     //
     int TRUST_E_SUBJECT_NOT_TRUSTED = 0x800B0004;
+
     //
     // MessageId: DIGSIG_E_ENCODE
     //
@@ -28589,6 +32023,7 @@ public interface WinError {
     // Error due to problem in ASN.1 encoding process.
     //
     int DIGSIG_E_ENCODE = 0x800B0005;
+
     //
     // MessageId: DIGSIG_E_DECODE
     //
@@ -28597,6 +32032,7 @@ public interface WinError {
     // Error due to problem in ASN.1 decoding process.
     //
     int DIGSIG_E_DECODE = 0x800B0006;
+
     //
     // MessageId: DIGSIG_E_EXTENSIBILITY
     //
@@ -28606,6 +32042,7 @@ public interface WinError {
     // versa.
     //
     int DIGSIG_E_EXTENSIBILITY = 0x800B0007;
+
     //
     // MessageId: DIGSIG_E_CRYPTO
     //
@@ -28614,6 +32051,7 @@ public interface WinError {
     // Unspecified cryptographic failure.
     //
     int DIGSIG_E_CRYPTO = 0x800B0008;
+
     //
     // MessageId: PERSIST_E_SIZEDEFINITE
     //
@@ -28622,6 +32060,7 @@ public interface WinError {
     // The size of the data could not be determined.
     //
     int PERSIST_E_SIZEDEFINITE = 0x800B0009;
+
     //
     // MessageId: PERSIST_E_SIZEINDEFINITE
     //
@@ -28630,6 +32069,7 @@ public interface WinError {
     // The size of the indefinite-sized data could not be determined.
     //
     int PERSIST_E_SIZEINDEFINITE = 0x800B000A;
+
     //
     // MessageId: PERSIST_E_NOTSELFSIZING
     //
@@ -28638,6 +32078,7 @@ public interface WinError {
     // This object does not read and write self-sizing data.
     //
     int PERSIST_E_NOTSELFSIZING = 0x800B000B;
+
     //
     // MessageId: TRUST_E_NOSIGNATURE
     //
@@ -28646,6 +32087,7 @@ public interface WinError {
     // No signature was present in the subject.
     //
     int TRUST_E_NOSIGNATURE = 0x800B0100;
+
     //
     // MessageId: CERT_E_EXPIRED
     //
@@ -28655,6 +32097,7 @@ public interface WinError {
     // against the current system clock or the timestamp in the signed file.
     //
     int CERT_E_EXPIRED = 0x800B0101;
+
     //
     // MessageId: CERT_E_VALIDITYPERIODNESTING
     //
@@ -28663,6 +32106,7 @@ public interface WinError {
     // The validity periods of the certification chain do not nest correctly.
     //
     int CERT_E_VALIDITYPERIODNESTING = 0x800B0102;
+
     //
     // MessageId: CERT_E_ROLE
     //
@@ -28672,6 +32116,7 @@ public interface WinError {
     // CA or visa versa.
     //
     int CERT_E_ROLE = 0x800B0103;
+
     //
     // MessageId: CERT_E_PATHLENCONST
     //
@@ -28680,6 +32125,7 @@ public interface WinError {
     // A path length constraint in the certification chain has been violated.
     //
     int CERT_E_PATHLENCONST = 0x800B0104;
+
     //
     // MessageId: CERT_E_CRITICAL
     //
@@ -28688,6 +32134,7 @@ public interface WinError {
     // A certificate contains an unknown extension that is marked 'critical'.
     //
     int CERT_E_CRITICAL = 0x800B0105;
+
     //
     // MessageId: CERT_E_PURPOSE
     //
@@ -28697,6 +32144,7 @@ public interface WinError {
     // its CA.
     //
     int CERT_E_PURPOSE = 0x800B0106;
+
     //
     // MessageId: CERT_E_ISSUERCHAINING
     //
@@ -28706,6 +32154,7 @@ public interface WinError {
     // certificate.
     //
     int CERT_E_ISSUERCHAINING = 0x800B0107;
+
     //
     // MessageId: CERT_E_MALFORMED
     //
@@ -28715,6 +32164,7 @@ public interface WinError {
     // such as a subject or issuer name.
     //
     int CERT_E_MALFORMED = 0x800B0108;
+
     //
     // MessageId: CERT_E_UNTRUSTEDROOT
     //
@@ -28724,6 +32174,7 @@ public interface WinError {
     // is not trusted by the trust provider.
     //
     int CERT_E_UNTRUSTEDROOT = 0x800B0109;
+
     //
     // MessageId: CERT_E_CHAINING
     //
@@ -28732,6 +32183,7 @@ public interface WinError {
     // A certificate chain could not be built to a trusted root authority.
     //
     int CERT_E_CHAINING = 0x800B010A;
+
     //
     // MessageId: TRUST_E_FAIL
     //
@@ -28740,6 +32192,7 @@ public interface WinError {
     // Generic trust failure.
     //
     int TRUST_E_FAIL = 0x800B010B;
+
     //
     // MessageId: CERT_E_REVOKED
     //
@@ -28748,6 +32201,7 @@ public interface WinError {
     // A certificate was explicitly revoked by its issuer.
     //
     int CERT_E_REVOKED = 0x800B010C;
+
     //
     // MessageId: CERT_E_UNTRUSTEDTESTROOT
     //
@@ -28757,6 +32211,7 @@ public interface WinError {
     // with the current policy settings.
     //
     int CERT_E_UNTRUSTEDTESTROOT = 0x800B010D;
+
     //
     // MessageId: CERT_E_REVOCATION_FAILURE
     //
@@ -28766,6 +32221,7 @@ public interface WinError {
     // be checked.
     //
     int CERT_E_REVOCATION_FAILURE = 0x800B010E;
+
     //
     // MessageId: CERT_E_CN_NO_MATCH
     //
@@ -28774,6 +32230,7 @@ public interface WinError {
     // The certificate's CN name does not match the passed value.
     //
     int CERT_E_CN_NO_MATCH = 0x800B010F;
+
     //
     // MessageId: CERT_E_WRONG_USAGE
     //
@@ -28782,6 +32239,7 @@ public interface WinError {
     // The certificate is not valid for the requested usage.
     //
     int CERT_E_WRONG_USAGE = 0x800B0110;
+
     //
     // MessageId: TRUST_E_EXPLICIT_DISTRUST
     //
@@ -28790,6 +32248,7 @@ public interface WinError {
     // The certificate was explicitly marked as untrusted by the user.
     //
     int TRUST_E_EXPLICIT_DISTRUST = 0x800B0111;
+
     //
     // MessageId: CERT_E_UNTRUSTEDCA
     //
@@ -28799,6 +32258,7 @@ public interface WinError {
     // is not trusted by the policy provider.
     //
     int CERT_E_UNTRUSTEDCA = 0x800B0112;
+
     //
     // MessageId: CERT_E_INVALID_POLICY
     //
@@ -28807,6 +32267,7 @@ public interface WinError {
     // The certificate has invalid policy.
     //
     int CERT_E_INVALID_POLICY = 0x800B0113;
+
     //
     // MessageId: CERT_E_INVALID_NAME
     //
@@ -28816,6 +32277,7 @@ public interface WinError {
     // permitted list or is explicitly excluded.
     //
     int CERT_E_INVALID_NAME = 0x800B0114;
+
     // *****************
     // FACILITY_SETUPAPI
     // *****************
@@ -28832,6 +32294,7 @@ public interface WinError {
     // section.
     //
     int SPAPI_E_EXPECTED_SECTION_NAME = 0x800F0000;
+
     //
     // MessageId: SPAPI_E_BAD_SECTION_NAME_LINE
     //
@@ -28841,6 +32304,7 @@ public interface WinError {
     // line by itself.
     //
     int SPAPI_E_BAD_SECTION_NAME_LINE = 0x800F0001;
+
     //
     // MessageId: SPAPI_E_SECTION_NAME_TOO_LONG
     //
@@ -28850,6 +32314,7 @@ public interface WinError {
     // name length.
     //
     int SPAPI_E_SECTION_NAME_TOO_LONG = 0x800F0002;
+
     //
     // MessageId: SPAPI_E_GENERAL_SYNTAX
     //
@@ -28858,6 +32323,7 @@ public interface WinError {
     // The syntax of the INF is invalid.
     //
     int SPAPI_E_GENERAL_SYNTAX = 0x800F0003;
+
     //
     // MessageId: SPAPI_E_WRONG_INF_STYLE
     //
@@ -28866,6 +32332,7 @@ public interface WinError {
     // The style of the INF is different than what was requested.
     //
     int SPAPI_E_WRONG_INF_STYLE = 0x800F0100;
+
     //
     // MessageId: SPAPI_E_SECTION_NOT_FOUND
     //
@@ -28874,6 +32341,7 @@ public interface WinError {
     // The required section was not found in the INF.
     //
     int SPAPI_E_SECTION_NOT_FOUND = 0x800F0101;
+
     //
     // MessageId: SPAPI_E_LINE_NOT_FOUND
     //
@@ -28882,6 +32350,7 @@ public interface WinError {
     // The required line was not found in the INF.
     //
     int SPAPI_E_LINE_NOT_FOUND = 0x800F0102;
+
     //
     // MessageId: SPAPI_E_NO_BACKUP
     //
@@ -28891,6 +32360,7 @@ public interface WinError {
     // backed up for uninstall.
     //
     int SPAPI_E_NO_BACKUP = 0x800F0103;
+
     //
     // MessageId: SPAPI_E_NO_ASSOCIATED_CLASS
     //
@@ -28900,6 +32370,7 @@ public interface WinError {
     // associated install class.
     //
     int SPAPI_E_NO_ASSOCIATED_CLASS = 0x800F0200;
+
     //
     // MessageId: SPAPI_E_CLASS_MISMATCH
     //
@@ -28909,6 +32380,7 @@ public interface WinError {
     // specified install class.
     //
     int SPAPI_E_CLASS_MISMATCH = 0x800F0201;
+
     //
     // MessageId: SPAPI_E_DUPLICATE_FOUND
     //
@@ -28918,6 +32390,7 @@ public interface WinError {
     // manually installed.
     //
     int SPAPI_E_DUPLICATE_FOUND = 0x800F0202;
+
     //
     // MessageId: SPAPI_E_NO_DRIVER_SELECTED
     //
@@ -28926,6 +32399,7 @@ public interface WinError {
     // There is no driver selected for the device information set or element.
     //
     int SPAPI_E_NO_DRIVER_SELECTED = 0x800F0203;
+
     //
     // MessageId: SPAPI_E_KEY_DOES_NOT_EXIST
     //
@@ -28934,6 +32408,7 @@ public interface WinError {
     // The requested device registry key does not exist.
     //
     int SPAPI_E_KEY_DOES_NOT_EXIST = 0x800F0204;
+
     //
     // MessageId: SPAPI_E_INVALID_DEVINST_NAME
     //
@@ -28942,6 +32417,7 @@ public interface WinError {
     // The device instance name is invalid.
     //
     int SPAPI_E_INVALID_DEVINST_NAME = 0x800F0205;
+
     //
     // MessageId: SPAPI_E_INVALID_CLASS
     //
@@ -28950,6 +32426,7 @@ public interface WinError {
     // The install class is not present or is invalid.
     //
     int SPAPI_E_INVALID_CLASS = 0x800F0206;
+
     //
     // MessageId: SPAPI_E_DEVINST_ALREADY_EXISTS
     //
@@ -28958,6 +32435,7 @@ public interface WinError {
     // The device instance cannot be created because it already exists.
     //
     int SPAPI_E_DEVINST_ALREADY_EXISTS = 0x800F0207;
+
     //
     // MessageId: SPAPI_E_DEVINFO_NOT_REGISTERED
     //
@@ -28967,6 +32445,7 @@ public interface WinError {
     // has not been registered.
     //
     int SPAPI_E_DEVINFO_NOT_REGISTERED = 0x800F0208;
+
     //
     // MessageId: SPAPI_E_INVALID_REG_PROPERTY
     //
@@ -28975,6 +32454,7 @@ public interface WinError {
     // The device property code is invalid.
     //
     int SPAPI_E_INVALID_REG_PROPERTY = 0x800F0209;
+
     //
     // MessageId: SPAPI_E_NO_INF
     //
@@ -28983,6 +32463,7 @@ public interface WinError {
     // The INF from which a driver list is to be built does not exist.
     //
     int SPAPI_E_NO_INF = 0x800F020A;
+
     //
     // MessageId: SPAPI_E_NO_SUCH_DEVINST
     //
@@ -28991,6 +32472,7 @@ public interface WinError {
     // The device instance does not exist in the hardware tree.
     //
     int SPAPI_E_NO_SUCH_DEVINST = 0x800F020B;
+
     //
     // MessageId: SPAPI_E_CANT_LOAD_CLASS_ICON
     //
@@ -28999,6 +32481,7 @@ public interface WinError {
     // The icon representing this install class cannot be loaded.
     //
     int SPAPI_E_CANT_LOAD_CLASS_ICON = 0x800F020C;
+
     //
     // MessageId: SPAPI_E_INVALID_CLASS_INSTALLER
     //
@@ -29007,6 +32490,7 @@ public interface WinError {
     // The class installer registry entry is invalid.
     //
     int SPAPI_E_INVALID_CLASS_INSTALLER = 0x800F020D;
+
     //
     // MessageId: SPAPI_E_DI_DO_DEFAULT
     //
@@ -29016,6 +32500,7 @@ public interface WinError {
     // performed for this installation request.
     //
     int SPAPI_E_DI_DO_DEFAULT = 0x800F020E;
+
     //
     // MessageId: SPAPI_E_DI_NOFILECOPY
     //
@@ -29024,6 +32509,7 @@ public interface WinError {
     // The operation does not require any files to be copied.
     //
     int SPAPI_E_DI_NOFILECOPY = 0x800F020F;
+
     //
     // MessageId: SPAPI_E_INVALID_HWPROFILE
     //
@@ -29032,6 +32518,7 @@ public interface WinError {
     // The specified hardware profile does not exist.
     //
     int SPAPI_E_INVALID_HWPROFILE = 0x800F0210;
+
     //
     // MessageId: SPAPI_E_NO_DEVICE_SELECTED
     //
@@ -29041,6 +32528,7 @@ public interface WinError {
     // information set.
     //
     int SPAPI_E_NO_DEVICE_SELECTED = 0x800F0211;
+
     //
     // MessageId: SPAPI_E_DEVINFO_LIST_LOCKED
     //
@@ -29050,6 +32538,7 @@ public interface WinError {
     // locked.
     //
     int SPAPI_E_DEVINFO_LIST_LOCKED = 0x800F0212;
+
     //
     // MessageId: SPAPI_E_DEVINFO_DATA_LOCKED
     //
@@ -29059,6 +32548,7 @@ public interface WinError {
     // is locked.
     //
     int SPAPI_E_DEVINFO_DATA_LOCKED = 0x800F0213;
+
     //
     // MessageId: SPAPI_E_DI_BAD_PATH
     //
@@ -29067,6 +32557,7 @@ public interface WinError {
     // The specified path does not contain any applicable device INFs.
     //
     int SPAPI_E_DI_BAD_PATH = 0x800F0214;
+
     //
     // MessageId: SPAPI_E_NO_CLASSINSTALL_PARAMS
     //
@@ -29076,6 +32567,7 @@ public interface WinError {
     // set or element.
     //
     int SPAPI_E_NO_CLASSINSTALL_PARAMS = 0x800F0215;
+
     //
     // MessageId: SPAPI_E_FILEQUEUE_LOCKED
     //
@@ -29084,6 +32576,7 @@ public interface WinError {
     // The operation cannot be performed because the file queue is locked.
     //
     int SPAPI_E_FILEQUEUE_LOCKED = 0x800F0216;
+
     //
     // MessageId: SPAPI_E_BAD_SERVICE_INSTALLSECT
     //
@@ -29092,6 +32585,7 @@ public interface WinError {
     // A service installation section in this INF is invalid.
     //
     int SPAPI_E_BAD_SERVICE_INSTALLSECT = 0x800F0217;
+
     //
     // MessageId: SPAPI_E_NO_CLASS_DRIVER_LIST
     //
@@ -29100,6 +32594,7 @@ public interface WinError {
     // There is no class driver list for the device information element.
     //
     int SPAPI_E_NO_CLASS_DRIVER_LIST = 0x800F0218;
+
     //
     // MessageId: SPAPI_E_NO_ASSOCIATED_SERVICE
     //
@@ -29109,6 +32604,7 @@ public interface WinError {
     // this device instance.
     //
     int SPAPI_E_NO_ASSOCIATED_SERVICE = 0x800F0219;
+
     //
     // MessageId: SPAPI_E_NO_DEFAULT_DEVICE_INTERFACE
     //
@@ -29118,6 +32614,7 @@ public interface WinError {
     // interface class.
     //
     int SPAPI_E_NO_DEFAULT_DEVICE_INTERFACE = 0x800F021A;
+
     //
     // MessageId: SPAPI_E_DEVICE_INTERFACE_ACTIVE
     //
@@ -29127,6 +32624,7 @@ public interface WinError {
     // currently active.
     //
     int SPAPI_E_DEVICE_INTERFACE_ACTIVE = 0x800F021B;
+
     //
     // MessageId: SPAPI_E_DEVICE_INTERFACE_REMOVED
     //
@@ -29136,6 +32634,7 @@ public interface WinError {
     // removed from the system.
     //
     int SPAPI_E_DEVICE_INTERFACE_REMOVED = 0x800F021C;
+
     //
     // MessageId: SPAPI_E_BAD_INTERFACE_INSTALLSECT
     //
@@ -29144,6 +32643,7 @@ public interface WinError {
     // An interface installation section in this INF is invalid.
     //
     int SPAPI_E_BAD_INTERFACE_INSTALLSECT = 0x800F021D;
+
     //
     // MessageId: SPAPI_E_NO_SUCH_INTERFACE_CLASS
     //
@@ -29152,6 +32652,7 @@ public interface WinError {
     // This interface class does not exist in the system.
     //
     int SPAPI_E_NO_SUCH_INTERFACE_CLASS = 0x800F021E;
+
     //
     // MessageId: SPAPI_E_INVALID_REFERENCE_STRING
     //
@@ -29160,6 +32661,7 @@ public interface WinError {
     // The reference string supplied for this interface device is invalid.
     //
     int SPAPI_E_INVALID_REFERENCE_STRING = 0x800F021F;
+
     //
     // MessageId: SPAPI_E_INVALID_MACHINENAME
     //
@@ -29168,6 +32670,7 @@ public interface WinError {
     // The specified machine name does not conform to UNC naming conventions.
     //
     int SPAPI_E_INVALID_MACHINENAME = 0x800F0220;
+
     //
     // MessageId: SPAPI_E_REMOTE_COMM_FAILURE
     //
@@ -29176,6 +32679,7 @@ public interface WinError {
     // A general remote communication error occurred.
     //
     int SPAPI_E_REMOTE_COMM_FAILURE = 0x800F0221;
+
     //
     // MessageId: SPAPI_E_MACHINE_UNAVAILABLE
     //
@@ -29185,6 +32689,7 @@ public interface WinError {
     // time.
     //
     int SPAPI_E_MACHINE_UNAVAILABLE = 0x800F0222;
+
     //
     // MessageId: SPAPI_E_NO_CONFIGMGR_SERVICES
     //
@@ -29193,6 +32698,7 @@ public interface WinError {
     // The Plug and Play service is not available on the remote machine.
     //
     int SPAPI_E_NO_CONFIGMGR_SERVICES = 0x800F0223;
+
     //
     // MessageId: SPAPI_E_INVALID_PROPPAGE_PROVIDER
     //
@@ -29201,6 +32707,7 @@ public interface WinError {
     // The property page provider registry entry is invalid.
     //
     int SPAPI_E_INVALID_PROPPAGE_PROVIDER = 0x800F0224;
+
     //
     // MessageId: SPAPI_E_NO_SUCH_DEVICE_INTERFACE
     //
@@ -29209,6 +32716,7 @@ public interface WinError {
     // The requested device interface is not present in the system.
     //
     int SPAPI_E_NO_SUCH_DEVICE_INTERFACE = 0x800F0225;
+
     //
     // MessageId: SPAPI_E_DI_POSTPROCESSING_REQUIRED
     //
@@ -29218,6 +32726,7 @@ public interface WinError {
     // installation is complete.
     //
     int SPAPI_E_DI_POSTPROCESSING_REQUIRED = 0x800F0226;
+
     //
     // MessageId: SPAPI_E_INVALID_COINSTALLER
     //
@@ -29226,6 +32735,7 @@ public interface WinError {
     // The device's co-installer is invalid.
     //
     int SPAPI_E_INVALID_COINSTALLER = 0x800F0227;
+
     //
     // MessageId: SPAPI_E_NO_COMPAT_DRIVERS
     //
@@ -29234,6 +32744,7 @@ public interface WinError {
     // There are no compatible drivers for this device.
     //
     int SPAPI_E_NO_COMPAT_DRIVERS = 0x800F0228;
+
     //
     // MessageId: SPAPI_E_NO_DEVICE_ICON
     //
@@ -29242,6 +32753,7 @@ public interface WinError {
     // There is no icon that represents this device or device type.
     //
     int SPAPI_E_NO_DEVICE_ICON = 0x800F0229;
+
     //
     // MessageId: SPAPI_E_INVALID_INF_LOGCONFIG
     //
@@ -29250,6 +32762,7 @@ public interface WinError {
     // A logical configuration specified in this INF is invalid.
     //
     int SPAPI_E_INVALID_INF_LOGCONFIG = 0x800F022A;
+
     //
     // MessageId: SPAPI_E_DI_DONT_INSTALL
     //
@@ -29259,6 +32772,7 @@ public interface WinError {
     // device.
     //
     int SPAPI_E_DI_DONT_INSTALL = 0x800F022B;
+
     //
     // MessageId: SPAPI_E_INVALID_FILTER_DRIVER
     //
@@ -29267,6 +32781,7 @@ public interface WinError {
     // One of the filter drivers installed for this device is invalid.
     //
     int SPAPI_E_INVALID_FILTER_DRIVER = 0x800F022C;
+
     //
     // MessageId: SPAPI_E_NON_WINDOWS_NT_DRIVER
     //
@@ -29275,6 +32790,7 @@ public interface WinError {
     // The driver selected for this device does not support Windows Vista.
     //
     int SPAPI_E_NON_WINDOWS_NT_DRIVER = 0x800F022D;
+
     //
     // MessageId: SPAPI_E_NON_WINDOWS_DRIVER
     //
@@ -29283,6 +32799,7 @@ public interface WinError {
     // The driver selected for this device does not support Windows.
     //
     int SPAPI_E_NON_WINDOWS_DRIVER = 0x800F022E;
+
     //
     // MessageId: SPAPI_E_NO_CATALOG_FOR_OEM_INF
     //
@@ -29291,6 +32808,7 @@ public interface WinError {
     // The third-party INF does not contain digital signature information.
     //
     int SPAPI_E_NO_CATALOG_FOR_OEM_INF = 0x800F022F;
+
     //
     // MessageId: SPAPI_E_DEVINSTALL_QUEUE_NONNATIVE
     //
@@ -29300,6 +32818,7 @@ public interface WinError {
     // verification of digital signatures relative to other platforms.
     //
     int SPAPI_E_DEVINSTALL_QUEUE_NONNATIVE = 0x800F0230;
+
     //
     // MessageId: SPAPI_E_NOT_DISABLEABLE
     //
@@ -29308,6 +32827,7 @@ public interface WinError {
     // The device cannot be disabled.
     //
     int SPAPI_E_NOT_DISABLEABLE = 0x800F0231;
+
     //
     // MessageId: SPAPI_E_CANT_REMOVE_DEVINST
     //
@@ -29316,6 +32836,7 @@ public interface WinError {
     // The device could not be dynamically removed.
     //
     int SPAPI_E_CANT_REMOVE_DEVINST = 0x800F0232;
+
     //
     // MessageId: SPAPI_E_INVALID_TARGET
     //
@@ -29324,6 +32845,7 @@ public interface WinError {
     // Cannot copy to specified target.
     //
     int SPAPI_E_INVALID_TARGET = 0x800F0233;
+
     //
     // MessageId: SPAPI_E_DRIVER_NONNATIVE
     //
@@ -29332,6 +32854,7 @@ public interface WinError {
     // Driver is not intended for this platform.
     //
     int SPAPI_E_DRIVER_NONNATIVE = 0x800F0234;
+
     //
     // MessageId: SPAPI_E_IN_WOW64
     //
@@ -29340,6 +32863,7 @@ public interface WinError {
     // Operation not allowed in WOW64.
     //
     int SPAPI_E_IN_WOW64 = 0x800F0235;
+
     //
     // MessageId: SPAPI_E_SET_SYSTEM_RESTORE_POINT
     //
@@ -29349,6 +32873,7 @@ public interface WinError {
     // system restore point could be set.
     //
     int SPAPI_E_SET_SYSTEM_RESTORE_POINT = 0x800F0236;
+
     //
     // MessageId: SPAPI_E_INCORRECTLY_COPIED_INF
     //
@@ -29357,6 +32882,7 @@ public interface WinError {
     // An INF was copied into the Windows INF directory in an improper manner.
     //
     int SPAPI_E_INCORRECTLY_COPIED_INF = 0x800F0237;
+
     //
     // MessageId: SPAPI_E_SCE_DISABLED
     //
@@ -29366,6 +32892,7 @@ public interface WinError {
     // Embedded product.
     //
     int SPAPI_E_SCE_DISABLED = 0x800F0238;
+
     //
     // MessageId: SPAPI_E_UNKNOWN_EXCEPTION
     //
@@ -29374,6 +32901,7 @@ public interface WinError {
     // An unknown exception was encountered.
     //
     int SPAPI_E_UNKNOWN_EXCEPTION = 0x800F0239;
+
     //
     // MessageId: SPAPI_E_PNP_REGISTRY_ERROR
     //
@@ -29383,6 +32911,7 @@ public interface WinError {
     // database.
     //
     int SPAPI_E_PNP_REGISTRY_ERROR = 0x800F023A;
+
     //
     // MessageId: SPAPI_E_REMOTE_REQUEST_UNSUPPORTED
     //
@@ -29391,6 +32920,7 @@ public interface WinError {
     // The requested operation is not supported for a remote machine.
     //
     int SPAPI_E_REMOTE_REQUEST_UNSUPPORTED = 0x800F023B;
+
     //
     // MessageId: SPAPI_E_NOT_AN_INSTALLED_OEM_INF
     //
@@ -29399,6 +32929,7 @@ public interface WinError {
     // The specified file is not an installed OEM INF.
     //
     int SPAPI_E_NOT_AN_INSTALLED_OEM_INF = 0x800F023C;
+
     //
     // MessageId: SPAPI_E_INF_IN_USE_BY_DEVICES
     //
@@ -29407,6 +32938,7 @@ public interface WinError {
     // One or more devices are presently installed using the specified INF.
     //
     int SPAPI_E_INF_IN_USE_BY_DEVICES = 0x800F023D;
+
     //
     // MessageId: SPAPI_E_DI_FUNCTION_OBSOLETE
     //
@@ -29415,6 +32947,7 @@ public interface WinError {
     // The requested device install operation is obsolete.
     //
     int SPAPI_E_DI_FUNCTION_OBSOLETE = 0x800F023E;
+
     //
     // MessageId: SPAPI_E_NO_AUTHENTICODE_CATALOG
     //
@@ -29424,6 +32957,7 @@ public interface WinError {
     // catalog signed via Authenticode(tm).
     //
     int SPAPI_E_NO_AUTHENTICODE_CATALOG = 0x800F023F;
+
     //
     // MessageId: SPAPI_E_AUTHENTICODE_DISALLOWED
     //
@@ -29433,6 +32967,7 @@ public interface WinError {
     // specified INF.
     //
     int SPAPI_E_AUTHENTICODE_DISALLOWED = 0x800F0240;
+
     //
     // MessageId: SPAPI_E_AUTHENTICODE_TRUSTED_PUBLISHER
     //
@@ -29442,6 +32977,7 @@ public interface WinError {
     // publisher.
     //
     int SPAPI_E_AUTHENTICODE_TRUSTED_PUBLISHER = 0x800F0241;
+
     //
     // MessageId: SPAPI_E_AUTHENTICODE_TRUST_NOT_ESTABLISHED
     //
@@ -29451,6 +32987,7 @@ public interface WinError {
     // established as trusted.
     //
     int SPAPI_E_AUTHENTICODE_TRUST_NOT_ESTABLISHED = 0x800F0242;
+
     //
     // MessageId: SPAPI_E_AUTHENTICODE_PUBLISHER_NOT_TRUSTED
     //
@@ -29460,6 +32997,7 @@ public interface WinError {
     // as trusted.
     //
     int SPAPI_E_AUTHENTICODE_PUBLISHER_NOT_TRUSTED = 0x800F0243;
+
     //
     // MessageId: SPAPI_E_SIGNATURE_OSATTRIBUTE_MISMATCH
     //
@@ -29470,6 +33008,7 @@ public interface WinError {
     // version.
     //
     int SPAPI_E_SIGNATURE_OSATTRIBUTE_MISMATCH = 0x800F0244;
+
     //
     // MessageId: SPAPI_E_ONLY_VALIDATE_VIA_AUTHENTICODE
     //
@@ -29478,6 +33017,7 @@ public interface WinError {
     // The file may only be validated by a catalog signed via Authenticode(tm).
     //
     int SPAPI_E_ONLY_VALIDATE_VIA_AUTHENTICODE = 0x800F0245;
+
     //
     // MessageId: SPAPI_E_DEVICE_INSTALLER_NOT_READY
     //
@@ -29487,6 +33027,7 @@ public interface WinError {
     // this time.
     //
     int SPAPI_E_DEVICE_INSTALLER_NOT_READY = 0x800F0246;
+
     //
     // MessageId: SPAPI_E_DRIVER_STORE_ADD_FAILED
     //
@@ -29496,6 +33037,7 @@ public interface WinError {
     // store.
     //
     int SPAPI_E_DRIVER_STORE_ADD_FAILED = 0x800F0247;
+
     //
     // MessageId: SPAPI_E_DEVICE_INSTALL_BLOCKED
     //
@@ -29505,6 +33047,7 @@ public interface WinError {
     // your system administrator.
     //
     int SPAPI_E_DEVICE_INSTALL_BLOCKED = 0x800F0248;
+
     //
     // MessageId: SPAPI_E_DRIVER_INSTALL_BLOCKED
     //
@@ -29514,6 +33057,7 @@ public interface WinError {
     // your system administrator.
     //
     int SPAPI_E_DRIVER_INSTALL_BLOCKED = 0x800F0249;
+
     //
     // MessageId: SPAPI_E_WRONG_INF_TYPE
     //
@@ -29522,6 +33066,7 @@ public interface WinError {
     // The specified INF is the wrong type for this operation.
     //
     int SPAPI_E_WRONG_INF_TYPE = 0x800F024A;
+
     //
     // MessageId: SPAPI_E_FILE_HASH_NOT_IN_CATALOG
     //
@@ -29531,6 +33076,7 @@ public interface WinError {
     // file is likely corrupt or the victim of tampering.
     //
     int SPAPI_E_FILE_HASH_NOT_IN_CATALOG = 0x800F024B;
+
     //
     // MessageId: SPAPI_E_DRIVER_STORE_DELETE_FAILED
     //
@@ -29540,6 +33086,7 @@ public interface WinError {
     // store.
     //
     int SPAPI_E_DRIVER_STORE_DELETE_FAILED = 0x800F024C;
+
     //
     // MessageId: SPAPI_E_UNRECOVERABLE_STACK_OVERF;OW
     //
@@ -29548,6 +33095,7 @@ public interface WinError {
     // An unrecoverable stack overF;ow was encountered.
     //
     int SPAPI_E_UNRECOVERABLE_STACK_OVERFLOW = 0x800F0300;
+
     //
     // MessageId: SPAPI_E_ERROR_NOT_INSTALLED
     //
@@ -29556,6 +33104,7 @@ public interface WinError {
     // No installed components were detected.
     //
     int SPAPI_E_ERROR_NOT_INSTALLED = 0x800F1000;
+
     // *****************
     // FACILITY_SCARD
     // *****************
@@ -29565,6 +33114,7 @@ public interface WinError {
     // ==
     //
     int SCARD_S_SUCCESS = NO_ERROR;
+
     //
     // MessageId: SCARD_F_INTERNAL_ERROR
     //
@@ -29573,6 +33123,7 @@ public interface WinError {
     // An internal consistency check failed.
     //
     int SCARD_F_INTERNAL_ERROR = 0x80100001;
+
     //
     // MessageId: SCARD_E_CANCELLED
     //
@@ -29581,6 +33132,7 @@ public interface WinError {
     // The action was cancelled by an SCardCancel request.
     //
     int SCARD_E_CANCELLED = 0x80100002;
+
     //
     // MessageId: SCARD_E_INVALID_HANDLE
     //
@@ -29589,6 +33141,7 @@ public interface WinError {
     // The supplied handle was invalid.
     //
     int SCARD_E_INVALID_HANDLE = 0x80100003;
+
     //
     // MessageId: SCARD_E_INVALID_PARAMETER
     //
@@ -29597,6 +33150,7 @@ public interface WinError {
     // One or more of the supplied parameters could not be properly interpreted.
     //
     int SCARD_E_INVALID_PARAMETER = 0x80100004;
+
     //
     // MessageId: SCARD_E_INVALID_TARGET
     //
@@ -29605,6 +33159,7 @@ public interface WinError {
     // Registry startup information is missing or invalid.
     //
     int SCARD_E_INVALID_TARGET = 0x80100005;
+
     //
     // MessageId: SCARD_E_NO_MEMORY
     //
@@ -29613,6 +33168,7 @@ public interface WinError {
     // Not enough memory available to complete this command.
     //
     int SCARD_E_NO_MEMORY = 0x80100006;
+
     //
     // MessageId: SCARD_F_WAITED_TOO_LONG
     //
@@ -29621,6 +33177,7 @@ public interface WinError {
     // An internal consistency timer has expired.
     //
     int SCARD_F_WAITED_TOO_LONG = 0x80100007;
+
     //
     // MessageId: SCARD_E_INSUFFICIENT_BUFFER
     //
@@ -29630,6 +33187,7 @@ public interface WinError {
     // data.
     //
     int SCARD_E_INSUFFICIENT_BUFFER = 0x80100008;
+
     //
     // MessageId: SCARD_E_UNKNOWN_READER
     //
@@ -29638,6 +33196,7 @@ public interface WinError {
     // The specified reader name is not recognized.
     //
     int SCARD_E_UNKNOWN_READER = 0x80100009;
+
     //
     // MessageId: SCARD_E_TIMEOUT
     //
@@ -29646,6 +33205,7 @@ public interface WinError {
     // The user-specified timeout value has expired.
     //
     int SCARD_E_TIMEOUT = 0x8010000A;
+
     //
     // MessageId: SCARD_E_SHARING_VIOLATION
     //
@@ -29655,6 +33215,7 @@ public interface WinError {
     // outstanding.
     //
     int SCARD_E_SHARING_VIOLATION = 0x8010000B;
+
     //
     // MessageId: SCARD_E_NO_SMARTCARD
     //
@@ -29664,6 +33225,7 @@ public interface WinError {
     // the device.
     //
     int SCARD_E_NO_SMARTCARD = 0x8010000C;
+
     //
     // MessageId: SCARD_E_UNKNOWN_CARD
     //
@@ -29672,6 +33234,7 @@ public interface WinError {
     // The specified smart card name is not recognized.
     //
     int SCARD_E_UNKNOWN_CARD = 0x8010000D;
+
     //
     // MessageId: SCARD_E_CANT_DISPOSE
     //
@@ -29680,6 +33243,7 @@ public interface WinError {
     // The system could not dispose of the media in the requested manner.
     //
     int SCARD_E_CANT_DISPOSE = 0x8010000E;
+
     //
     // MessageId: SCARD_E_PROTO_MISMATCH
     //
@@ -29689,6 +33253,7 @@ public interface WinError {
     // use with the smart card.
     //
     int SCARD_E_PROTO_MISMATCH = 0x8010000F;
+
     //
     // MessageId: SCARD_E_NOT_READY
     //
@@ -29697,6 +33262,7 @@ public interface WinError {
     // The reader or smart card is not ready to accept commands.
     //
     int SCARD_E_NOT_READY = 0x80100010;
+
     //
     // MessageId: SCARD_E_INVALID_VALUE
     //
@@ -29706,6 +33272,7 @@ public interface WinError {
     // interpreted.
     //
     int SCARD_E_INVALID_VALUE = 0x80100011;
+
     //
     // MessageId: SCARD_E_SYSTEM_CANCELLED
     //
@@ -29715,6 +33282,7 @@ public interface WinError {
     // down.
     //
     int SCARD_E_SYSTEM_CANCELLED = 0x80100012;
+
     //
     // MessageId: SCARD_F_COMM_ERROR
     //
@@ -29723,6 +33291,7 @@ public interface WinError {
     // An internal communications error has been detected.
     //
     int SCARD_F_COMM_ERROR = 0x80100013;
+
     //
     // MessageId: SCARD_F_UNKNOWN_ERROR
     //
@@ -29731,6 +33300,7 @@ public interface WinError {
     // An internal error has been detected, but the source is unknown.
     //
     int SCARD_F_UNKNOWN_ERROR = 0x80100014;
+
     //
     // MessageId: SCARD_E_INVALID_ATR
     //
@@ -29739,6 +33309,7 @@ public interface WinError {
     // An ATR obtained from the registry is not a valid ATR string.
     //
     int SCARD_E_INVALID_ATR = 0x80100015;
+
     //
     // MessageId: SCARD_E_NOT_TRANSACTED
     //
@@ -29747,6 +33318,7 @@ public interface WinError {
     // An attempt was made to end a non-existent transaction.
     //
     int SCARD_E_NOT_TRANSACTED = 0x80100016;
+
     //
     // MessageId: SCARD_E_READER_UNAVAILABLE
     //
@@ -29755,6 +33327,7 @@ public interface WinError {
     // The specified reader is not currently available for use.
     //
     int SCARD_E_READER_UNAVAILABLE = 0x80100017;
+
     //
     // MessageId: SCARD_P_SHUTDOWN
     //
@@ -29763,6 +33336,7 @@ public interface WinError {
     // The operation has been aborted to allow the server application to exit.
     //
     int SCARD_P_SHUTDOWN = 0x80100018;
+
     //
     // MessageId: SCARD_E_PCI_TOO_SMALL
     //
@@ -29771,6 +33345,7 @@ public interface WinError {
     // The PCI Receive buffer was too small.
     //
     int SCARD_E_PCI_TOO_SMALL = 0x80100019;
+
     //
     // MessageId: SCARD_E_READER_UNSUPPORTED
     //
@@ -29779,6 +33354,7 @@ public interface WinError {
     // The reader driver does not meet minimal requirements for support.
     //
     int SCARD_E_READER_UNSUPPORTED = 0x8010001A;
+
     //
     // MessageId: SCARD_E_DUPLICATE_READER
     //
@@ -29787,6 +33363,7 @@ public interface WinError {
     // The reader driver did not produce a unique reader name.
     //
     int SCARD_E_DUPLICATE_READER = 0x8010001B;
+
     //
     // MessageId: SCARD_E_CARD_UNSUPPORTED
     //
@@ -29795,6 +33372,7 @@ public interface WinError {
     // The smart card does not meet minimal requirements for support.
     //
     int SCARD_E_CARD_UNSUPPORTED = 0x8010001C;
+
     //
     // MessageId: SCARD_E_NO_SERVICE
     //
@@ -29803,6 +33381,7 @@ public interface WinError {
     // The Smart card resource manager is not running.
     //
     int SCARD_E_NO_SERVICE = 0x8010001D;
+
     //
     // MessageId: SCARD_E_SERVICE_STOPPED
     //
@@ -29811,6 +33390,7 @@ public interface WinError {
     // The Smart card resource manager has shut down.
     //
     int SCARD_E_SERVICE_STOPPED = 0x8010001E;
+
     //
     // MessageId: SCARD_E_UNEXPECTED
     //
@@ -29819,6 +33399,7 @@ public interface WinError {
     // An unexpected card error has occurred.
     //
     int SCARD_E_UNEXPECTED = 0x8010001F;
+
     //
     // MessageId: SCARD_E_ICC_INSTALLATION
     //
@@ -29827,6 +33408,7 @@ public interface WinError {
     // No Primary Provider can be found for the smart card.
     //
     int SCARD_E_ICC_INSTALLATION = 0x80100020;
+
     //
     // MessageId: SCARD_E_ICC_CREATEORDER
     //
@@ -29835,6 +33417,7 @@ public interface WinError {
     // The requested order of object creation is not supported.
     //
     int SCARD_E_ICC_CREATEORDER = 0x80100021;
+
     //
     // MessageId: SCARD_E_UNSUPPORTED_FEATURE
     //
@@ -29843,6 +33426,7 @@ public interface WinError {
     // This smart card does not support the requested feature.
     //
     int SCARD_E_UNSUPPORTED_FEATURE = 0x80100022;
+
     //
     // MessageId: SCARD_E_DIR_NOT_FOUND
     //
@@ -29851,6 +33435,7 @@ public interface WinError {
     // The identified directory does not exist in the smart card.
     //
     int SCARD_E_DIR_NOT_FOUND = 0x80100023;
+
     //
     // MessageId: SCARD_E_FILE_NOT_FOUND
     //
@@ -29859,6 +33444,7 @@ public interface WinError {
     // The identified file does not exist in the smart card.
     //
     int SCARD_E_FILE_NOT_FOUND = 0x80100024;
+
     //
     // MessageId: SCARD_E_NO_DIR
     //
@@ -29867,6 +33453,7 @@ public interface WinError {
     // The supplied path does not represent a smart card directory.
     //
     int SCARD_E_NO_DIR = 0x80100025;
+
     //
     // MessageId: SCARD_E_NO_FILE
     //
@@ -29875,6 +33462,7 @@ public interface WinError {
     // The supplied path does not represent a smart card file.
     //
     int SCARD_E_NO_FILE = 0x80100026;
+
     //
     // MessageId: SCARD_E_NO_ACCESS
     //
@@ -29883,6 +33471,7 @@ public interface WinError {
     // Access is denied to this file.
     //
     int SCARD_E_NO_ACCESS = 0x80100027;
+
     //
     // MessageId: SCARD_E_WRITE_TOO_MANY
     //
@@ -29891,6 +33480,7 @@ public interface WinError {
     // The smartcard does not have enough memory to store the information.
     //
     int SCARD_E_WRITE_TOO_MANY = 0x80100028;
+
     //
     // MessageId: SCARD_E_BAD_SEEK
     //
@@ -29899,6 +33489,7 @@ public interface WinError {
     // There was an error trying to set the smart card file object pointer.
     //
     int SCARD_E_BAD_SEEK = 0x80100029;
+
     //
     // MessageId: SCARD_E_INVALID_CHV
     //
@@ -29907,6 +33498,7 @@ public interface WinError {
     // The supplied PIN is incorrect.
     //
     int SCARD_E_INVALID_CHV = 0x8010002A;
+
     //
     // MessageId: SCARD_E_UNKNOWN_RES_MNG
     //
@@ -29915,6 +33507,7 @@ public interface WinError {
     // An unrecognized error code was returned from a layered component.
     //
     int SCARD_E_UNKNOWN_RES_MNG = 0x8010002B;
+
     //
     // MessageId: SCARD_E_NO_SUCH_CERTIFICATE
     //
@@ -29923,6 +33516,7 @@ public interface WinError {
     // The requested certificate does not exist.
     //
     int SCARD_E_NO_SUCH_CERTIFICATE = 0x8010002C;
+
     //
     // MessageId: SCARD_E_CERTIFICATE_UNAVAILABLE
     //
@@ -29931,6 +33525,7 @@ public interface WinError {
     // The requested certificate could not be obtained.
     //
     int SCARD_E_CERTIFICATE_UNAVAILABLE = 0x8010002D;
+
     //
     // MessageId: SCARD_E_NO_READERS_AVAILABLE
     //
@@ -29939,6 +33534,7 @@ public interface WinError {
     // Cannot find a smart card reader.
     //
     int SCARD_E_NO_READERS_AVAILABLE = 0x8010002E;
+
     //
     // MessageId: SCARD_E_COMM_DATA_LOST
     //
@@ -29948,6 +33544,7 @@ public interface WinError {
     // operation.
     //
     int SCARD_E_COMM_DATA_LOST = 0x8010002F;
+
     //
     // MessageId: SCARD_E_NO_KEY_CONTAINER
     //
@@ -29956,6 +33553,7 @@ public interface WinError {
     // The requested key container does not exist on the smart card.
     //
     int SCARD_E_NO_KEY_CONTAINER = 0x80100030;
+
     //
     // MessageId: SCARD_E_SERVER_TOO_BUSY
     //
@@ -29964,6 +33562,7 @@ public interface WinError {
     // The Smart card resource manager is too busy to complete this operation.
     //
     int SCARD_E_SERVER_TOO_BUSY = 0x80100031;
+
     //
     // These are warning codes.
     //
@@ -29976,6 +33575,7 @@ public interface WinError {
     // configuration conF;icts.
     //
     int SCARD_W_UNSUPPORTED_CARD = 0x80100065;
+
     //
     // MessageId: SCARD_W_UNRESPONSIVE_CARD
     //
@@ -29984,6 +33584,7 @@ public interface WinError {
     // The smart card is not responding to a reset.
     //
     int SCARD_W_UNRESPONSIVE_CARD = 0x80100066;
+
     //
     // MessageId: SCARD_W_UNPOWERED_CARD
     //
@@ -29993,6 +33594,7 @@ public interface WinError {
     // is not possible.
     //
     int SCARD_W_UNPOWERED_CARD = 0x80100067;
+
     //
     // MessageId: SCARD_W_RESET_CARD
     //
@@ -30002,6 +33604,7 @@ public interface WinError {
     // invalid.
     //
     int SCARD_W_RESET_CARD = 0x80100068;
+
     //
     // MessageId: SCARD_W_REMOVED_CARD
     //
@@ -30011,6 +33614,7 @@ public interface WinError {
     // possible.
     //
     int SCARD_W_REMOVED_CARD = 0x80100069;
+
     //
     // MessageId: SCARD_W_SECURITY_VIOLATION
     //
@@ -30019,6 +33623,7 @@ public interface WinError {
     // Access was denied because of a security violation.
     //
     int SCARD_W_SECURITY_VIOLATION = 0x8010006A;
+
     //
     // MessageId: SCARD_W_WRONG_CHV
     //
@@ -30027,6 +33632,7 @@ public interface WinError {
     // The card cannot be accessed because the wrong PIN was presented.
     //
     int SCARD_W_WRONG_CHV = 0x8010006B;
+
     //
     // MessageId: SCARD_W_CHV_BLOCKED
     //
@@ -30036,6 +33642,7 @@ public interface WinError {
     // attempts has been reached.
     //
     int SCARD_W_CHV_BLOCKED = 0x8010006C;
+
     //
     // MessageId: SCARD_W_EOF
     //
@@ -30044,6 +33651,7 @@ public interface WinError {
     // The end of the smart card file has been reached.
     //
     int SCARD_W_EOF = 0x8010006D;
+
     //
     // MessageId: SCARD_W_CANCELLED_BY_USER
     //
@@ -30052,6 +33660,7 @@ public interface WinError {
     // The action was cancelled by the user.
     //
     int SCARD_W_CANCELLED_BY_USER = 0x8010006E;
+
     //
     // MessageId: SCARD_W_CARD_NOT_AUTHENTICATED
     //
@@ -30060,6 +33669,7 @@ public interface WinError {
     // No PIN was presented to the smart card.
     //
     int SCARD_W_CARD_NOT_AUTHENTICATED = 0x8010006F;
+
     //
     // MessageId: SCARD_W_CACHE_ITEM_NOT_FOUND
     //
@@ -30068,6 +33678,7 @@ public interface WinError {
     // The requested item could not be found in the cache.
     //
     int SCARD_W_CACHE_ITEM_NOT_FOUND = 0x80100070;
+
     //
     // MessageId: SCARD_W_CACHE_ITEM_STALE
     //
@@ -30076,6 +33687,7 @@ public interface WinError {
     // The requested cache item is too old and was deleted from the cache.
     //
     int SCARD_W_CACHE_ITEM_STALE = 0x80100071;
+
     //
     // MessageId: SCARD_W_CACHE_ITEM_TOO_BIG
     //
@@ -30085,6 +33697,7 @@ public interface WinError {
     // cache.
     //
     int SCARD_W_CACHE_ITEM_TOO_BIG = 0x80100072;
+
     // *****************
     // FACILITY_COMPLUS
     // *****************
@@ -30111,6 +33724,7 @@ public interface WinError {
     // may have more detail
     //
     int COMADMIN_E_OBJECTERRORS = 0x80110401;
+
     //
     // MessageId: COMADMIN_E_OBJECTINVALID
     //
@@ -30119,6 +33733,7 @@ public interface WinError {
     // One or more of the object's properties are missing or invalid
     //
     int COMADMIN_E_OBJECTINVALID = 0x80110402;
+
     //
     // MessageId: COMADMIN_E_KEYMISSING
     //
@@ -30127,6 +33742,7 @@ public interface WinError {
     // The object was not found in the catalog
     //
     int COMADMIN_E_KEYMISSING = 0x80110403;
+
     //
     // MessageId: COMADMIN_E_ALREADYINSTALLED
     //
@@ -30135,6 +33751,7 @@ public interface WinError {
     // The object is already registered
     //
     int COMADMIN_E_ALREADYINSTALLED = 0x80110404;
+
     //
     // MessageId: COMADMIN_E_APP_FILE_WRITEFAIL
     //
@@ -30143,6 +33760,7 @@ public interface WinError {
     // Error occurred writing to the application file
     //
     int COMADMIN_E_APP_FILE_WRITEFAIL = 0x80110407;
+
     //
     // MessageId: COMADMIN_E_APP_FILE_READFAIL
     //
@@ -30151,6 +33769,7 @@ public interface WinError {
     // Error occurred reading the application file
     //
     int COMADMIN_E_APP_FILE_READFAIL = 0x80110408;
+
     //
     // MessageId: COMADMIN_E_APP_FILE_VERSION
     //
@@ -30159,6 +33778,7 @@ public interface WinError {
     // Invalid version number in application file
     //
     int COMADMIN_E_APP_FILE_VERSION = 0x80110409;
+
     //
     // MessageId: COMADMIN_E_BADPATH
     //
@@ -30167,6 +33787,7 @@ public interface WinError {
     // The file path is invalid
     //
     int COMADMIN_E_BADPATH = 0x8011040A;
+
     //
     // MessageId: COMADMIN_E_APPLICATIONEXISTS
     //
@@ -30175,6 +33796,7 @@ public interface WinError {
     // The application is already installed
     //
     int COMADMIN_E_APPLICATIONEXISTS = 0x8011040B;
+
     //
     // MessageId: COMADMIN_E_ROLEEXISTS
     //
@@ -30183,6 +33805,7 @@ public interface WinError {
     // The role already exists
     //
     int COMADMIN_E_ROLEEXISTS = 0x8011040C;
+
     //
     // MessageId: COMADMIN_E_CANTCOPYFILE
     //
@@ -30191,6 +33814,7 @@ public interface WinError {
     // An error occurred copying the file
     //
     int COMADMIN_E_CANTCOPYFILE = 0x8011040D;
+
     //
     // MessageId: COMADMIN_E_NOUSER
     //
@@ -30199,6 +33823,7 @@ public interface WinError {
     // One or more users are not valid
     //
     int COMADMIN_E_NOUSER = 0x8011040F;
+
     //
     // MessageId: COMADMIN_E_INVALIDUSERIDS
     //
@@ -30207,6 +33832,7 @@ public interface WinError {
     // One or more users in the application file are not valid
     //
     int COMADMIN_E_INVALIDUSERIDS = 0x80110410;
+
     //
     // MessageId: COMADMIN_E_NOREGISTRYCLSID
     //
@@ -30215,6 +33841,7 @@ public interface WinError {
     // The component's CLSID is missing or corrupt
     //
     int COMADMIN_E_NOREGISTRYCLSID = 0x80110411;
+
     //
     // MessageId: COMADMIN_E_BADREGISTRYPROGID
     //
@@ -30223,6 +33850,7 @@ public interface WinError {
     // The component's progID is missing or corrupt
     //
     int COMADMIN_E_BADREGISTRYPROGID = 0x80110412;
+
     //
     // MessageId: COMADMIN_E_AUTHENTICATIONLEVEL
     //
@@ -30231,6 +33859,7 @@ public interface WinError {
     // Unable to set required authentication level for update request
     //
     int COMADMIN_E_AUTHENTICATIONLEVEL = 0x80110413;
+
     //
     // MessageId: COMADMIN_E_USERPASSWDNOTVALID
     //
@@ -30239,6 +33868,7 @@ public interface WinError {
     // The identity or password set on the application is not valid
     //
     int COMADMIN_E_USERPASSWDNOTVALID = 0x80110414;
+
     //
     // MessageId: COMADMIN_E_CLSIDORIIDMISMATCH
     //
@@ -30247,6 +33877,7 @@ public interface WinError {
     // Application file CLSIDs or IIDs do not match corresponding DLLs
     //
     int COMADMIN_E_CLSIDORIIDMISMATCH = 0x80110418;
+
     //
     // MessageId: COMADMIN_E_REMOTEINTERFACE
     //
@@ -30255,6 +33886,7 @@ public interface WinError {
     // Interface information is either missing or changed
     //
     int COMADMIN_E_REMOTEINTERFACE = 0x80110419;
+
     //
     // MessageId: COMADMIN_E_DLLREGISTERSERVER
     //
@@ -30263,6 +33895,7 @@ public interface WinError {
     // DllRegisterServer failed on component install
     //
     int COMADMIN_E_DLLREGISTERSERVER = 0x8011041A;
+
     //
     // MessageId: COMADMIN_E_NOSERVERSHARE
     //
@@ -30271,6 +33904,7 @@ public interface WinError {
     // No server file share available
     //
     int COMADMIN_E_NOSERVERSHARE = 0x8011041B;
+
     //
     // MessageId: COMADMIN_E_DLLLOADFAILED
     //
@@ -30279,6 +33913,7 @@ public interface WinError {
     // DLL could not be loaded
     //
     int COMADMIN_E_DLLLOADFAILED = 0x8011041D;
+
     //
     // MessageId: COMADMIN_E_BADREGISTRYLIBID
     //
@@ -30287,6 +33922,7 @@ public interface WinError {
     // The registered TypeLib ID is not valid
     //
     int COMADMIN_E_BADREGISTRYLIBID = 0x8011041E;
+
     //
     // MessageId: COMADMIN_E_APPDIRNOTFOUND
     //
@@ -30295,6 +33931,7 @@ public interface WinError {
     // Application install directory not found
     //
     int COMADMIN_E_APPDIRNOTFOUND = 0x8011041F;
+
     //
     // MessageId: COMADMIN_E_REGISTRARFAILED
     //
@@ -30303,6 +33940,7 @@ public interface WinError {
     // Errors occurred while in the component registrar
     //
     int COMADMIN_E_REGISTRARFAILED = 0x80110423;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_DOESNOTEXIST
     //
@@ -30311,6 +33949,7 @@ public interface WinError {
     // The file does not exist
     //
     int COMADMIN_E_COMPFILE_DOESNOTEXIST = 0x80110424;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_LOADDLLFAIL
     //
@@ -30319,6 +33958,7 @@ public interface WinError {
     // The DLL could not be loaded
     //
     int COMADMIN_E_COMPFILE_LOADDLLFAIL = 0x80110425;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_GETCLASSOBJ
     //
@@ -30327,6 +33967,7 @@ public interface WinError {
     // GetClassObject failed in the DLL
     //
     int COMADMIN_E_COMPFILE_GETCLASSOBJ = 0x80110426;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_CLASSNOTAVAIL
     //
@@ -30335,6 +33976,7 @@ public interface WinError {
     // The DLL does not support the components listed in the TypeLib
     //
     int COMADMIN_E_COMPFILE_CLASSNOTAVAIL = 0x80110427;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_BADTLB
     //
@@ -30343,6 +33985,7 @@ public interface WinError {
     // The TypeLib could not be loaded
     //
     int COMADMIN_E_COMPFILE_BADTLB = 0x80110428;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_NOTINSTALLABLE
     //
@@ -30351,6 +33994,7 @@ public interface WinError {
     // The file does not contain components or component information
     //
     int COMADMIN_E_COMPFILE_NOTINSTALLABLE = 0x80110429;
+
     //
     // MessageId: COMADMIN_E_NOTCHANGEABLE
     //
@@ -30359,6 +34003,7 @@ public interface WinError {
     // Changes to this object and its sub-objects have been disabled
     //
     int COMADMIN_E_NOTCHANGEABLE = 0x8011042A;
+
     //
     // MessageId: COMADMIN_E_NOTDELETEABLE
     //
@@ -30367,6 +34012,7 @@ public interface WinError {
     // The delete function has been disabled for this object
     //
     int COMADMIN_E_NOTDELETEABLE = 0x8011042B;
+
     //
     // MessageId: COMADMIN_E_SESSION
     //
@@ -30375,6 +34021,7 @@ public interface WinError {
     // The server catalog version is not supported
     //
     int COMADMIN_E_SESSION = 0x8011042C;
+
     //
     // MessageId: COMADMIN_E_COMP_MOVE_LOCKED
     //
@@ -30385,6 +34032,7 @@ public interface WinError {
     // changes
     //
     int COMADMIN_E_COMP_MOVE_LOCKED = 0x8011042D;
+
     //
     // MessageId: COMADMIN_E_COMP_MOVE_BAD_DEST
     //
@@ -30394,6 +34042,7 @@ public interface WinError {
     // exists
     //
     int COMADMIN_E_COMP_MOVE_BAD_DEST = 0x8011042E;
+
     //
     // MessageId: COMADMIN_E_REGISTERTLB
     //
@@ -30402,6 +34051,7 @@ public interface WinError {
     // The system was unable to register the TypeLib
     //
     int COMADMIN_E_REGISTERTLB = 0x80110430;
+
     //
     // MessageId: COMADMIN_E_SYSTEMAPP
     //
@@ -30410,6 +34060,7 @@ public interface WinError {
     // This operation cannot be performed on the system application
     //
     int COMADMIN_E_SYSTEMAPP = 0x80110433;
+
     //
     // MessageId: COMADMIN_E_COMPFILE_NOREGISTRAR
     //
@@ -30418,6 +34069,7 @@ public interface WinError {
     // The component registrar referenced in this file is not available
     //
     int COMADMIN_E_COMPFILE_NOREGISTRAR = 0x80110434;
+
     //
     // MessageId: COMADMIN_E_COREQCOMPINSTALLED
     //
@@ -30426,6 +34078,7 @@ public interface WinError {
     // A component in the same DLL is already installed
     //
     int COMADMIN_E_COREQCOMPINSTALLED = 0x80110435;
+
     //
     // MessageId: COMADMIN_E_SERVICENOTINSTALLED
     //
@@ -30434,6 +34087,7 @@ public interface WinError {
     // The service is not installed
     //
     int COMADMIN_E_SERVICENOTINSTALLED = 0x80110436;
+
     //
     // MessageId: COMADMIN_E_PROPERTYSAVEFAILED
     //
@@ -30443,6 +34097,7 @@ public interface WinError {
     // other
     //
     int COMADMIN_E_PROPERTYSAVEFAILED = 0x80110437;
+
     //
     // MessageId: COMADMIN_E_OBJECTEXISTS
     //
@@ -30451,6 +34106,7 @@ public interface WinError {
     // The object you are attempting to add or rename already exists
     //
     int COMADMIN_E_OBJECTEXISTS = 0x80110438;
+
     //
     // MessageId: COMADMIN_E_COMPONENTEXISTS
     //
@@ -30459,6 +34115,7 @@ public interface WinError {
     // The component already exists
     //
     int COMADMIN_E_COMPONENTEXISTS = 0x80110439;
+
     //
     // MessageId: COMADMIN_E_REGFILE_CORRUPT
     //
@@ -30467,6 +34124,7 @@ public interface WinError {
     // The registration file is corrupt
     //
     int COMADMIN_E_REGFILE_CORRUPT = 0x8011043B;
+
     //
     // MessageId: COMADMIN_E_PROPERTY_OVERF;OW
     //
@@ -30475,6 +34133,7 @@ public interface WinError {
     // The property value is too large
     //
     int COMADMIN_E_PROPERTY_OVERFLOW = 0x8011043C;
+
     //
     // MessageId: COMADMIN_E_NOTINREGISTRY
     //
@@ -30483,6 +34142,7 @@ public interface WinError {
     // Object was not found in registry
     //
     int COMADMIN_E_NOTINREGISTRY = 0x8011043E;
+
     //
     // MessageId: COMADMIN_E_OBJECTNOTPOOLABLE
     //
@@ -30491,6 +34151,7 @@ public interface WinError {
     // This object is not poolable
     //
     int COMADMIN_E_OBJECTNOTPOOLABLE = 0x8011043F;
+
     //
     // MessageId: COMADMIN_E_APPLID_MATCHES_CLSID
     //
@@ -30500,6 +34161,7 @@ public interface WinError {
     // on this machine
     //
     int COMADMIN_E_APPLID_MATCHES_CLSID = 0x80110446;
+
     //
     // MessageId: COMADMIN_E_ROLE_DOES_NOT_EXIST
     //
@@ -30509,6 +34171,7 @@ public interface WinError {
     // application
     //
     int COMADMIN_E_ROLE_DOES_NOT_EXIST = 0x80110447;
+
     //
     // MessageId: COMADMIN_E_START_APP_NEEDS_COMPONENTS
     //
@@ -30518,6 +34181,7 @@ public interface WinError {
     // application
     //
     int COMADMIN_E_START_APP_NEEDS_COMPONENTS = 0x80110448;
+
     //
     // MessageId: COMADMIN_E_REQUIRES_DIFFERENT_PLATFORM
     //
@@ -30526,6 +34190,7 @@ public interface WinError {
     // This operation is not enabled on this platform
     //
     int COMADMIN_E_REQUIRES_DIFFERENT_PLATFORM = 0x80110449;
+
     //
     // MessageId: COMADMIN_E_CAN_NOT_EXPORT_APP_PROXY
     //
@@ -30534,6 +34199,7 @@ public interface WinError {
     // Application Proxy is not exportable
     //
     int COMADMIN_E_CAN_NOT_EXPORT_APP_PROXY = 0x8011044A;
+
     //
     // MessageId: COMADMIN_E_CAN_NOT_START_APP
     //
@@ -30543,6 +34209,7 @@ public interface WinError {
     // an application proxy
     //
     int COMADMIN_E_CAN_NOT_START_APP = 0x8011044B;
+
     //
     // MessageId: COMADMIN_E_CAN_NOT_EXPORT_SYS_APP
     //
@@ -30551,6 +34218,7 @@ public interface WinError {
     // System application is not exportable
     //
     int COMADMIN_E_CAN_NOT_EXPORT_SYS_APP = 0x8011044C;
+
     //
     // MessageId: COMADMIN_E_CANT_SUBSCRIBE_TO_COMPONENT
     //
@@ -30559,6 +34227,7 @@ public interface WinError {
     // Cannot subscribe to this component (the component may have been imported)
     //
     int COMADMIN_E_CANT_SUBSCRIBE_TO_COMPONENT = 0x8011044D;
+
     //
     // MessageId: COMADMIN_E_EVENTCLASS_CANT_BE_SUBSCRIBER
     //
@@ -30567,6 +34236,7 @@ public interface WinError {
     // An event class cannot also be a subscriber component
     //
     int COMADMIN_E_EVENTCLASS_CANT_BE_SUBSCRIBER = 0x8011044E;
+
     //
     // MessageId: COMADMIN_E_LIB_APP_PROXY_INCOMPATIBLE
     //
@@ -30575,6 +34245,7 @@ public interface WinError {
     // Library applications and application proxies are incompatible
     //
     int COMADMIN_E_LIB_APP_PROXY_INCOMPATIBLE = 0x8011044F;
+
     //
     // MessageId: COMADMIN_E_BASE_PARTITION_ONLY
     //
@@ -30583,6 +34254,7 @@ public interface WinError {
     // This function is valid for the base partition only
     //
     int COMADMIN_E_BASE_PARTITION_ONLY = 0x80110450;
+
     //
     // MessageId: COMADMIN_E_START_APP_DISABLED
     //
@@ -30591,6 +34263,7 @@ public interface WinError {
     // You cannot start an application that has been disabled
     //
     int COMADMIN_E_START_APP_DISABLED = 0x80110451;
+
     //
     // MessageId: COMADMIN_E_CAT_DUPLICATE_PARTITION_NAME
     //
@@ -30599,6 +34272,7 @@ public interface WinError {
     // The specified partition name is already in use on this computer
     //
     int COMADMIN_E_CAT_DUPLICATE_PARTITION_NAME = 0x80110457;
+
     //
     // MessageId: COMADMIN_E_CAT_INVALID_PARTITION_NAME
     //
@@ -30608,6 +34282,7 @@ public interface WinError {
     // least one visible character
     //
     int COMADMIN_E_CAT_INVALID_PARTITION_NAME = 0x80110458;
+
     //
     // MessageId: COMADMIN_E_CAT_PARTITION_IN_USE
     //
@@ -30617,6 +34292,7 @@ public interface WinError {
     // one or more users
     //
     int COMADMIN_E_CAT_PARTITION_IN_USE = 0x80110459;
+
     //
     // MessageId: COMADMIN_E_FILE_PARTITION_DUPLICATE_FILES
     //
@@ -30626,6 +34302,7 @@ public interface WinError {
     // partition have the same file name
     //
     int COMADMIN_E_FILE_PARTITION_DUPLICATE_FILES = 0x8011045A;
+
     //
     // MessageId: COMADMIN_E_CAT_IMPORTED_COMPONENTS_NOT_ALLOWED
     //
@@ -30635,6 +34312,7 @@ public interface WinError {
     // installed into a non-base partition
     //
     int COMADMIN_E_CAT_IMPORTED_COMPONENTS_NOT_ALLOWED = 0x8011045B;
+
     //
     // MessageId: COMADMIN_E_AMBIGUOUS_APPLICATION_NAME
     //
@@ -30644,6 +34322,7 @@ public interface WinError {
     // application id
     //
     int COMADMIN_E_AMBIGUOUS_APPLICATION_NAME = 0x8011045C;
+
     //
     // MessageId: COMADMIN_E_AMBIGUOUS_PARTITION_NAME
     //
@@ -30652,6 +34331,7 @@ public interface WinError {
     // The partition name is not unique and cannot be resolved to a partition id
     //
     int COMADMIN_E_AMBIGUOUS_PARTITION_NAME = 0x8011045D;
+
     //
     // MessageId: COMADMIN_E_REGDB_NOTINITIALIZED
     //
@@ -30660,6 +34340,7 @@ public interface WinError {
     // The COM+ registry database has not been initialized
     //
     int COMADMIN_E_REGDB_NOTINITIALIZED = 0x80110472;
+
     //
     // MessageId: COMADMIN_E_REGDB_NOTOPEN
     //
@@ -30668,6 +34349,7 @@ public interface WinError {
     // The COM+ registry database is not open
     //
     int COMADMIN_E_REGDB_NOTOPEN = 0x80110473;
+
     //
     // MessageId: COMADMIN_E_REGDB_SYSTEMERR
     //
@@ -30676,6 +34358,7 @@ public interface WinError {
     // The COM+ registry database detected a system error
     //
     int COMADMIN_E_REGDB_SYSTEMERR = 0x80110474;
+
     //
     // MessageId: COMADMIN_E_REGDB_ALREADYRUNNING
     //
@@ -30684,6 +34367,7 @@ public interface WinError {
     // The COM+ registry database is already running
     //
     int COMADMIN_E_REGDB_ALREADYRUNNING = 0x80110475;
+
     //
     // MessageId: COMADMIN_E_MIG_VERSIONNOTSUPPORTED
     //
@@ -30692,6 +34376,7 @@ public interface WinError {
     // This version of the COM+ registry database cannot be migrated
     //
     int COMADMIN_E_MIG_VERSIONNOTSUPPORTED = 0x80110480;
+
     //
     // MessageId: COMADMIN_E_MIG_SCHEMANOTFOUND
     //
@@ -30701,6 +34386,7 @@ public interface WinError {
     // database
     //
     int COMADMIN_E_MIG_SCHEMANOTFOUND = 0x80110481;
+
     //
     // MessageId: COMADMIN_E_CAT_BITNESSMISMATCH
     //
@@ -30709,6 +34395,7 @@ public interface WinError {
     // There was a type mismatch between binaries
     //
     int COMADMIN_E_CAT_BITNESSMISMATCH = 0x80110482;
+
     //
     // MessageId: COMADMIN_E_CAT_UNACCEPTABLEBITNESS
     //
@@ -30717,6 +34404,7 @@ public interface WinError {
     // A binary of unknown or invalid type was provided
     //
     int COMADMIN_E_CAT_UNACCEPTABLEBITNESS = 0x80110483;
+
     //
     // MessageId: COMADMIN_E_CAT_WRONGAPPBITNESS
     //
@@ -30725,6 +34413,7 @@ public interface WinError {
     // There was a type mismatch between a binary and an application
     //
     int COMADMIN_E_CAT_WRONGAPPBITNESS = 0x80110484;
+
     //
     // MessageId: COMADMIN_E_CAT_PAUSE_RESUME_NOT_SUPPORTED
     //
@@ -30733,6 +34422,7 @@ public interface WinError {
     // The application cannot be paused or resumed
     //
     int COMADMIN_E_CAT_PAUSE_RESUME_NOT_SUPPORTED = 0x80110485;
+
     //
     // MessageId: COMADMIN_E_CAT_SERVERFAULT
     //
@@ -30741,6 +34431,7 @@ public interface WinError {
     // The COM+ Catalog Server threw an exception during execution
     //
     int COMADMIN_E_CAT_SERVERFAULT = 0x80110486;
+
     //
     // COMPLUS Queued component errors
     //
@@ -30753,6 +34444,7 @@ public interface WinError {
     // moniker
     //
     int COMQC_E_APPLICATION_NOT_QUEUED = 0x80110600;
+
     //
     // MessageId: COMQC_E_NO_QUEUEABLE_INTERFACES
     //
@@ -30762,6 +34454,7 @@ public interface WinError {
     // queued component instance with the "queue" moniker
     //
     int COMQC_E_NO_QUEUEABLE_INTERFACES = 0x80110601;
+
     //
     // MessageId: COMQC_E_QUEUING_SERVICE_NOT_AVAILABLE
     //
@@ -30770,6 +34463,7 @@ public interface WinError {
     // MSMQ is required for the requested operation and is not installed
     //
     int COMQC_E_QUEUING_SERVICE_NOT_AVAILABLE = 0x80110602;
+
     //
     // MessageId: COMQC_E_NO_IPERSISTSTREAM
     //
@@ -30778,6 +34472,7 @@ public interface WinError {
     // Unable to marshal an interface that does not support IPersistStream
     //
     int COMQC_E_NO_IPERSISTSTREAM = 0x80110603;
+
     //
     // MessageId: COMQC_E_BAD_MESSAGE
     //
@@ -30786,6 +34481,7 @@ public interface WinError {
     // The message is improperly formatted or was damaged in transit
     //
     int COMQC_E_BAD_MESSAGE = 0x80110604;
+
     //
     // MessageId: COMQC_E_UNAUTHENTICATED
     //
@@ -30795,6 +34491,7 @@ public interface WinError {
     // only authenticated messages
     //
     int COMQC_E_UNAUTHENTICATED = 0x80110605;
+
     //
     // MessageId: COMQC_E_UNTRUSTED_ENQUEUER
     //
@@ -30804,6 +34501,7 @@ public interface WinError {
     // role
     //
     int COMQC_E_UNTRUSTED_ENQUEUER = 0x80110606;
+
     //
     // The range 0x700-0x7ff is reserved for MSDTC errors.
     //
@@ -30816,6 +34514,7 @@ public interface WinError {
     // Coordinator
     //
     int MSDTC_E_DUPLICATE_RESOURCE = 0x80110701;
+
     //
     // More COMADMIN errors from 0x8**
     //
@@ -30828,6 +34527,7 @@ public interface WinError {
     // parent collection
     //
     int COMADMIN_E_OBJECT_PARENT_MISSING = 0x80110808;
+
     //
     // MessageId: COMADMIN_E_OBJECT_DOES_NOT_EXIST
     //
@@ -30836,6 +34536,7 @@ public interface WinError {
     // One of the specified objects cannot be found
     //
     int COMADMIN_E_OBJECT_DOES_NOT_EXIST = 0x80110809;
+
     //
     // MessageId: COMADMIN_E_APP_NOT_RUNNING
     //
@@ -30844,6 +34545,7 @@ public interface WinError {
     // The specified application is not currently running
     //
     int COMADMIN_E_APP_NOT_RUNNING = 0x8011080A;
+
     //
     // MessageId: COMADMIN_E_INVALID_PARTITION
     //
@@ -30852,6 +34554,7 @@ public interface WinError {
     // The partition(s) specified are not valid.
     //
     int COMADMIN_E_INVALID_PARTITION = 0x8011080B;
+
     //
     // MessageId: COMADMIN_E_SVCAPP_NOT_POOLABLE_OR_RECYCLABLE
     //
@@ -30860,6 +34563,7 @@ public interface WinError {
     // COM+ applications that run as NT service may not be pooled or recycled
     //
     int COMADMIN_E_SVCAPP_NOT_POOLABLE_OR_RECYCLABLE = 0x8011080D;
+
     //
     // MessageId: COMADMIN_E_USER_IN_SET
     //
@@ -30868,6 +34572,7 @@ public interface WinError {
     // One or more users are already assigned to a local partition set.
     //
     int COMADMIN_E_USER_IN_SET = 0x8011080E;
+
     //
     // MessageId: COMADMIN_E_CANTRECYCLELIBRARYAPPS
     //
@@ -30876,6 +34581,7 @@ public interface WinError {
     // Library applications may not be recycled.
     //
     int COMADMIN_E_CANTRECYCLELIBRARYAPPS = 0x8011080F;
+
     //
     // MessageId: COMADMIN_E_CANTRECYCLESERVICEAPPS
     //
@@ -30884,6 +34590,7 @@ public interface WinError {
     // Applications running as NT services may not be recycled.
     //
     int COMADMIN_E_CANTRECYCLESERVICEAPPS = 0x80110811;
+
     //
     // MessageId: COMADMIN_E_PROCESSALREADYRECYCLED
     //
@@ -30892,6 +34599,7 @@ public interface WinError {
     // The process has already been recycled.
     //
     int COMADMIN_E_PROCESSALREADYRECYCLED = 0x80110812;
+
     //
     // MessageId: COMADMIN_E_PAUSEDPROCESSMAYNOTBERECYCLED
     //
@@ -30900,6 +34608,7 @@ public interface WinError {
     // A paused process may not be recycled.
     //
     int COMADMIN_E_PAUSEDPROCESSMAYNOTBERECYCLED = 0x80110813;
+
     //
     // MessageId: COMADMIN_E_CANTMAKEINPROCSERVICE
     //
@@ -30908,6 +34617,7 @@ public interface WinError {
     // Library applications may not be NT services.
     //
     int COMADMIN_E_CANTMAKEINPROCSERVICE = 0x80110814;
+
     //
     // MessageId: COMADMIN_E_PROGIDINUSEBYCLSID
     //
@@ -30917,6 +34627,7 @@ public interface WinError {
     // use by another registered CLSID.
     //
     int COMADMIN_E_PROGIDINUSEBYCLSID = 0x80110815;
+
     //
     // MessageId: COMADMIN_E_DEFAULT_PARTITION_NOT_IN_SET
     //
@@ -30925,6 +34636,7 @@ public interface WinError {
     // The partition specified as default is not a member of the partition set.
     //
     int COMADMIN_E_DEFAULT_PARTITION_NOT_IN_SET = 0x80110816;
+
     //
     // MessageId: COMADMIN_E_RECYCLEDPROCESSMAYNOTBEPAUSED
     //
@@ -30933,6 +34645,7 @@ public interface WinError {
     // A recycled process may not be paused.
     //
     int COMADMIN_E_RECYCLEDPROCESSMAYNOTBEPAUSED = 0x80110817;
+
     //
     // MessageId: COMADMIN_E_PARTITION_ACCESSDENIED
     //
@@ -30941,6 +34654,7 @@ public interface WinError {
     // Access to the specified partition is denied.
     //
     int COMADMIN_E_PARTITION_ACCESSDENIED = 0x80110818;
+
     //
     // MessageId: COMADMIN_E_PARTITION_MSI_ONLY
     //
@@ -30949,6 +34663,7 @@ public interface WinError {
     // Only Application Files (*.MSI files) can be installed into partitions.
     //
     int COMADMIN_E_PARTITION_MSI_ONLY = 0x80110819;
+
     //
     // MessageId: COMADMIN_E_LEGACYCOMPS_NOT_ALLOWED_IN_1_0_FORMAT
     //
@@ -30958,6 +34673,7 @@ public interface WinError {
     // to=1.0 format.
     //
     int COMADMIN_E_LEGACYCOMPS_NOT_ALLOWED_IN_1_0_FORMAT = 0x8011081A;
+
     //
     // MessageId: COMADMIN_E_LEGACYCOMPS_NOT_ALLOWED_IN_NONBASE_PARTITIONS
     //
@@ -30966,6 +34682,7 @@ public interface WinError {
     // Legacy components may not exist in non-base partitions.
     //
     int COMADMIN_E_LEGACYCOMPS_NOT_ALLOWED_IN_NONBASE_PARTITIONS = 0x8011081B;
+
     //
     // MessageId: COMADMIN_E_COMP_MOVE_SOURCE
     //
@@ -30975,6 +34692,7 @@ public interface WinError {
     // application proxy or a non-changeable application
     //
     int COMADMIN_E_COMP_MOVE_SOURCE = 0x8011081C;
+
     //
     // MessageId: COMADMIN_E_COMP_MOVE_DEST
     //
@@ -30984,6 +34702,7 @@ public interface WinError {
     // application proxy or a non-changeable application
     //
     int COMADMIN_E_COMP_MOVE_DEST = 0x8011081D;
+
     //
     // MessageId: COMADMIN_E_COMP_MOVE_PRIVATE
     //
@@ -30993,6 +34712,7 @@ public interface WinError {
     // or to the base partition
     //
     int COMADMIN_E_COMP_MOVE_PRIVATE = 0x8011081E;
+
     //
     // MessageId: COMADMIN_E_BASEPARTITION_REQUIRED_IN_SET
     //
@@ -31002,6 +34722,7 @@ public interface WinError {
     // removed.
     //
     int COMADMIN_E_BASEPARTITION_REQUIRED_IN_SET = 0x8011081F;
+
     //
     // MessageId: COMADMIN_E_CANNOT_ALIAS_EVENTCLASS
     //
@@ -31010,6 +34731,7 @@ public interface WinError {
     // Alas, Event Class components cannot be aliased.
     //
     int COMADMIN_E_CANNOT_ALIAS_EVENTCLASS = 0x80110820;
+
     //
     // MessageId: COMADMIN_E_PRIVATE_ACCESSDENIED
     //
@@ -31018,6 +34740,7 @@ public interface WinError {
     // Access is denied because the component is private.
     //
     int COMADMIN_E_PRIVATE_ACCESSDENIED = 0x80110821;
+
     //
     // MessageId: COMADMIN_E_SAFERINVALID
     //
@@ -31026,6 +34749,7 @@ public interface WinError {
     // The specified SAFER level is invalid.
     //
     int COMADMIN_E_SAFERINVALID = 0x80110822;
+
     //
     // MessageId: COMADMIN_E_REGISTRY_ACCESSDENIED
     //
@@ -31034,6 +34758,7 @@ public interface WinError {
     // The specified user cannot write to the system registry
     //
     int COMADMIN_E_REGISTRY_ACCESSDENIED = 0x80110823;
+
     //
     // MessageId: COMADMIN_E_PARTITIONS_DISABLED
     //
@@ -31042,6 +34767,7 @@ public interface WinError {
     // COM+ partitions are currently disabled.
     //
     int COMADMIN_E_PARTITIONS_DISABLED = 0x80110824;
+
     //
     // MessageId: ERROR_FLT_IO_COMPLETE
     //
@@ -31050,6 +34776,7 @@ public interface WinError {
     // The IO was completed by a filter.
     //
     int ERROR_FLT_IO_COMPLETE = 0x001F0001;
+
     //
     // MessageId: ERROR_FLT_NO_HANDLER_DEFINED
     //
@@ -31058,6 +34785,7 @@ public interface WinError {
     // A handler was not defined by the filter for this operation.
     //
     int ERROR_FLT_NO_HANDLER_DEFINED = 0x801F0001;
+
     //
     // MessageId: ERROR_FLT_CONTEXT_ALREADY_DEFINED
     //
@@ -31066,6 +34794,7 @@ public interface WinError {
     // A context is already defined for this object.
     //
     int ERROR_FLT_CONTEXT_ALREADY_DEFINED = 0x801F0002;
+
     //
     // MessageId: ERROR_FLT_INVALID_ASYNCHRONOUS_REQUEST
     //
@@ -31074,6 +34803,7 @@ public interface WinError {
     // Asynchronous requests are not valid for this operation.
     //
     int ERROR_FLT_INVALID_ASYNCHRONOUS_REQUEST = 0x801F0003;
+
     //
     // MessageId: ERROR_FLT_DISALLOW_FAST_IO
     //
@@ -31082,6 +34812,7 @@ public interface WinError {
     // Disallow the Fast IO path for this operation.
     //
     int ERROR_FLT_DISALLOW_FAST_IO = 0x801F0004;
+
     //
     // MessageId: ERROR_FLT_INVALID_NAME_REQUEST
     //
@@ -31091,6 +34822,7 @@ public interface WinError {
     // at this time.
     //
     int ERROR_FLT_INVALID_NAME_REQUEST = 0x801F0005;
+
     //
     // MessageId: ERROR_FLT_NOT_SAFE_TO_POST_OPERATION
     //
@@ -31100,6 +34832,7 @@ public interface WinError {
     // safe at this time because it could lead to a system deadlock.
     //
     int ERROR_FLT_NOT_SAFE_TO_POST_OPERATION = 0x801F0006;
+
     //
     // MessageId: ERROR_FLT_NOT_INITIALIZED
     //
@@ -31109,6 +34842,7 @@ public interface WinError {
     // Make sure that the Filter Manager is getting loaded as a driver.
     //
     int ERROR_FLT_NOT_INITIALIZED = 0x801F0007;
+
     //
     // MessageId: ERROR_FLT_FILTER_NOT_READY
     //
@@ -31118,6 +34852,7 @@ public interface WinError {
     // finished initializing (FLTStartFiltering has not been called).
     //
     int ERROR_FLT_FILTER_NOT_READY = 0x801F0008;
+
     //
     // MessageId: ERROR_FLT_POST_OPERATION_CLEANUP
     //
@@ -31128,6 +34863,7 @@ public interface WinError {
     // completed by the lower drivers.
     //
     int ERROR_FLT_POST_OPERATION_CLEANUP = 0x801F0009;
+
     //
     // MessageId: ERROR_FLT_INTERNAL_ERROR
     //
@@ -31138,6 +34874,7 @@ public interface WinError {
     // filter returning an invalid value from a pre-operation callback.
     //
     int ERROR_FLT_INTERNAL_ERROR = 0x801F000A;
+
     //
     // MessageId: ERROR_FLT_DELETING_OBJECT
     //
@@ -31147,6 +34884,7 @@ public interface WinError {
     // therefore the action requested cannot be completed at this time.
     //
     int ERROR_FLT_DELETING_OBJECT = 0x801F000B;
+
     //
     // MessageId: ERROR_FLT_MUST_BE_NONPAGED_POOL
     //
@@ -31155,6 +34893,7 @@ public interface WinError {
     // Non-paged pool must be used for this type of context.
     //
     int ERROR_FLT_MUST_BE_NONPAGED_POOL = 0x801F000C;
+
     //
     // MessageId: ERROR_FLT_DUPLICATE_ENTRY
     //
@@ -31163,6 +34902,7 @@ public interface WinError {
     // A duplicate handler definition has been provided for an operation.
     //
     int ERROR_FLT_DUPLICATE_ENTRY = 0x801F000D;
+
     //
     // MessageId: ERROR_FLT_CBDQ_DISABLED
     //
@@ -31171,6 +34911,7 @@ public interface WinError {
     // The callback data queue has been disabled.
     //
     int ERROR_FLT_CBDQ_DISABLED = 0x801F000E;
+
     //
     // MessageId: ERROR_FLT_DO_NOT_ATTACH
     //
@@ -31179,6 +34920,7 @@ public interface WinError {
     // Do not attach the filter to the volume at this time.
     //
     int ERROR_FLT_DO_NOT_ATTACH = 0x801F000F;
+
     //
     // MessageId: ERROR_FLT_DO_NOT_DETACH
     //
@@ -31187,6 +34929,7 @@ public interface WinError {
     // Do not detach the filter from the volume at this time.
     //
     int ERROR_FLT_DO_NOT_DETACH = 0x801F0010;
+
     //
     // MessageId: ERROR_FLT_INSTANCE_ALTITUDE_COLLISION
     //
@@ -31195,6 +34938,7 @@ public interface WinError {
     // An instance already exists at this altitude on the volume specified.
     //
     int ERROR_FLT_INSTANCE_ALTITUDE_COLLISION = 0x801F0011;
+
     //
     // MessageId: ERROR_FLT_INSTANCE_NAME_COLLISION
     //
@@ -31203,6 +34947,7 @@ public interface WinError {
     // An instance already exists with this name on the volume specified.
     //
     int ERROR_FLT_INSTANCE_NAME_COLLISION = 0x801F0012;
+
     //
     // MessageId: ERROR_FLT_FILTER_NOT_FOUND
     //
@@ -31211,6 +34956,7 @@ public interface WinError {
     // The system could not find the filter specified.
     //
     int ERROR_FLT_FILTER_NOT_FOUND = 0x801F0013;
+
     //
     // MessageId: ERROR_FLT_VOLUME_NOT_FOUND
     //
@@ -31219,6 +34965,7 @@ public interface WinError {
     // The system could not find the volume specified.
     //
     int ERROR_FLT_VOLUME_NOT_FOUND = 0x801F0014;
+
     //
     // MessageId: ERROR_FLT_INSTANCE_NOT_FOUND
     //
@@ -31227,6 +34974,7 @@ public interface WinError {
     // The system could not find the instance specified.
     //
     int ERROR_FLT_INSTANCE_NOT_FOUND = 0x801F0015;
+
     //
     // MessageId: ERROR_FLT_CONTEXT_ALLOCATION_NOT_FOUND
     //
@@ -31236,6 +34984,7 @@ public interface WinError {
     // request.
     //
     int ERROR_FLT_CONTEXT_ALLOCATION_NOT_FOUND = 0x801F0016;
+
     //
     // MessageId: ERROR_FLT_INVALID_CONTEXT_REGISTRATION
     //
@@ -31244,6 +34993,7 @@ public interface WinError {
     // An invalid parameter was specified during context registration.
     //
     int ERROR_FLT_INVALID_CONTEXT_REGISTRATION = 0x801F0017;
+
     //
     // MessageId: ERROR_FLT_NAME_CACHE_MISS
     //
@@ -31253,6 +35003,7 @@ public interface WinError {
     // not be retrieved from the file system.
     //
     int ERROR_FLT_NAME_CACHE_MISS = 0x801F0018;
+
     //
     // MessageId: ERROR_FLT_NO_DEVICE_OBJECT
     //
@@ -31261,6 +35012,7 @@ public interface WinError {
     // The requested device object does not exist for the given volume.
     //
     int ERROR_FLT_NO_DEVICE_OBJECT = 0x801F0019;
+
     //
     // MessageId: ERROR_FLT_VOLUME_ALREADY_MOUNTED
     //
@@ -31269,6 +35021,7 @@ public interface WinError {
     // The specified volume is already mounted.
     //
     int ERROR_FLT_VOLUME_ALREADY_MOUNTED = 0x801F001A;
+
     //
     // MessageId: ERROR_FLT_ALREADY_ENLISTED
     //
@@ -31277,6 +35030,7 @@ public interface WinError {
     // The specified Transaction Context is already enlisted in a transaction
     //
     int ERROR_FLT_ALREADY_ENLISTED = 0x801F001B;
+
     //
     // MessageId: ERROR_FLT_CONTEXT_ALREADY_LINKED
     //
@@ -31285,6 +35039,7 @@ public interface WinError {
     // The specifiec context is already attached to another object
     //
     int ERROR_FLT_CONTEXT_ALREADY_LINKED = 0x801F001C;
+
     //
     // MessageId: ERROR_FLT_NO_WAITER_FOR_REPLY
     //
@@ -31293,6 +35048,7 @@ public interface WinError {
     // No waiter is present for the filter's reply to this message.
     //
     int ERROR_FLT_NO_WAITER_FOR_REPLY = 0x801F0020;
+
     //
     // ==
     // Facility Graphics Error Messages
@@ -31325,6 +35081,7 @@ public interface WinError {
     // you a chance to report this failure to Microsoft.
     //
     int ERROR_HUNG_DISPLAY_DRIVER_THREAD = 0x80260001;
+
     //
     // Desktop Window Manager errors {0x3000..0x3fff}
     //
@@ -31338,6 +35095,7 @@ public interface WinError {
     // disabled.
     //
     int DWM_E_COMPOSITIONDISABLED = 0x80263001;
+
     //
     // MessageId: DWM_E_REMOTING_NOT_SUPPORTED
     //
@@ -31347,6 +35105,7 @@ public interface WinError {
     // The operation is not supported while running in a remote session.
     //
     int DWM_E_REMOTING_NOT_SUPPORTED = 0x80263002;
+
     //
     // MessageId: DWM_E_NO_REDIRECTION_SURFACE_AVAILABLE
     //
@@ -31357,6 +35116,7 @@ public interface WinError {
     // DirectX present.
     //
     int DWM_E_NO_REDIRECTION_SURFACE_AVAILABLE = 0x80263003;
+
     //
     // MessageId: DWM_E_NOT_QUEUING_PRESENTS
     //
@@ -31366,6 +35126,7 @@ public interface WinError {
     // The window specified is not currently using queued presents.
     //
     int DWM_E_NOT_QUEUING_PRESENTS = 0x80263004;
+
     //
     // Monitor class function driver errors {0x1000..0x1fff}
     //
@@ -31377,6 +35138,7 @@ public interface WinError {
     // Monitor descriptor could not be obtained.
     //
     int ERROR_MONITOR_NO_DESCRIPTOR = 0x80261001;
+
     //
     // MessageId: ERROR_MONITOR_UNKNOWN_DESCRIPTOR_FORMAT
     //
@@ -31386,6 +35148,7 @@ public interface WinError {
     // release.
     //
     int ERROR_MONITOR_UNKNOWN_DESCRIPTOR_FORMAT = 0x80261002;
+
     //
     // MessageId: ERROR_MONITOR_INVALID_DESCRIPTOR_CHECKSUM
     //
@@ -31394,6 +35157,7 @@ public interface WinError {
     // Checksum of the obtained monitor descriptor is invalid.
     //
     int ERROR_MONITOR_INVALID_DESCRIPTOR_CHECKSUM = 0xC0261003;
+
     //
     // MessageId: ERROR_MONITOR_INVALID_STANDARD_TIMING_BLOCK
     //
@@ -31402,6 +35166,7 @@ public interface WinError {
     // Monitor descriptor contains an invalid standard timing block.
     //
     int ERROR_MONITOR_INVALID_STANDARD_TIMING_BLOCK = 0xC0261004;
+
     //
     // MessageId: ERROR_MONITOR_WMI_DATABLOCK_REGISTRATION_FAILED
     //
@@ -31411,6 +35176,7 @@ public interface WinError {
     // subclasses.
     //
     int ERROR_MONITOR_WMI_DATABLOCK_REGISTRATION_FAILED = 0xC0261005;
+
     //
     // MessageId: ERROR_MONITOR_INVALID_SERIAL_NUMBER_MONDSC_BLOCK
     //
@@ -31420,6 +35186,7 @@ public interface WinError {
     // monitor's detailed serial number.
     //
     int ERROR_MONITOR_INVALID_SERIAL_NUMBER_MONDSC_BLOCK = 0xC0261006;
+
     //
     // MessageId: ERROR_MONITOR_INVALID_USER_FRIENDLY_MONDSC_BLOCK
     //
@@ -31429,6 +35196,7 @@ public interface WinError {
     // monitor's user friendly name.
     //
     int ERROR_MONITOR_INVALID_USER_FRIENDLY_MONDSC_BLOCK = 0xC0261007;
+
     //
     // MessageId: ERROR_MONITOR_NO_MORE_DESCRIPTOR_DATA
     //
@@ -31438,6 +35206,7 @@ public interface WinError {
     // region.
     //
     int ERROR_MONITOR_NO_MORE_DESCRIPTOR_DATA = 0xC0261008;
+
     //
     // MessageId: ERROR_MONITOR_INVALID_DETAILED_TIMING_BLOCK
     //
@@ -31446,6 +35215,7 @@ public interface WinError {
     // Monitor descriptor contains an invalid detailed timing block.
     //
     int ERROR_MONITOR_INVALID_DETAILED_TIMING_BLOCK = 0xC0261009;
+
     //
     // Windows Graphics Kernel Subsystem errors {0x2000..0x2fff}
     //
@@ -31462,6 +35232,7 @@ public interface WinError {
     // allocation.
     //
     int ERROR_GRAPHICS_NOT_EXCLUSIVE_MODE_OWNER = 0xC0262000;
+
     //
     // MessageId: ERROR_GRAPHICS_INSUFFICIENT_DMA_BUFFER
     //
@@ -31471,6 +35242,7 @@ public interface WinError {
     // operation.
     //
     int ERROR_GRAPHICS_INSUFFICIENT_DMA_BUFFER = 0xC0262001;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_DISPLAY_ADAPTER
     //
@@ -31479,6 +35251,7 @@ public interface WinError {
     // Specified display adapter handle is invalid.
     //
     int ERROR_GRAPHICS_INVALID_DISPLAY_ADAPTER = 0xC0262002;
+
     //
     // MessageId: ERROR_GRAPHICS_ADAPTER_WAS_RESET
     //
@@ -31487,6 +35260,7 @@ public interface WinError {
     // Specified display adapter and all of its state has been reset.
     //
     int ERROR_GRAPHICS_ADAPTER_WAS_RESET = 0xC0262003;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_DRIVER_MODEL
     //
@@ -31495,6 +35269,7 @@ public interface WinError {
     // The driver stack doesn't match the expected driver model.
     //
     int ERROR_GRAPHICS_INVALID_DRIVER_MODEL = 0xC0262004;
+
     //
     // MessageId: ERROR_GRAPHICS_PRESENT_MODE_CHANGED
     //
@@ -31503,6 +35278,7 @@ public interface WinError {
     // Present happened but ended up into the changed desktop mode
     //
     int ERROR_GRAPHICS_PRESENT_MODE_CHANGED = 0xC0262005;
+
     //
     // MessageId: ERROR_GRAPHICS_PRESENT_OCCLUDED
     //
@@ -31511,6 +35287,7 @@ public interface WinError {
     // Nothing to present due to desktop occlusion
     //
     int ERROR_GRAPHICS_PRESENT_OCCLUDED = 0xC0262006;
+
     //
     // MessageId: ERROR_GRAPHICS_PRESENT_DENIED
     //
@@ -31519,6 +35296,7 @@ public interface WinError {
     // Not able to present due to denial of desktop access
     //
     int ERROR_GRAPHICS_PRESENT_DENIED = 0xC0262007;
+
     //
     // MessageId: ERROR_GRAPHICS_CANNOTCOLORCONVERT
     //
@@ -31527,6 +35305,7 @@ public interface WinError {
     // Not able to present with color convertion
     //
     int ERROR_GRAPHICS_CANNOTCOLORCONVERT = 0xC0262008;
+
     //
     // MessageId: ERROR_GRAPHICS_DRIVER_MISMATCH
     //
@@ -31536,6 +35315,7 @@ public interface WinError {
     // mode driver.
     //
     int ERROR_GRAPHICS_DRIVER_MISMATCH = 0xC0262009;
+
     //
     // MessageId: ERROR_GRAPHICS_PARTIAL_DATA_POPULATED
     //
@@ -31547,6 +35327,7 @@ public interface WinError {
     // populated buffer's content (interface specific).
     //
     int ERROR_GRAPHICS_PARTIAL_DATA_POPULATED = 0x4026200A;
+
     //
     // Video Memory Manager (VidMM) subsystem errors {0x2100..0x21ff}
     //
@@ -31558,6 +35339,7 @@ public interface WinError {
     // Not enough video memory available to complete the operation.
     //
     int ERROR_GRAPHICS_NO_VIDEO_MEMORY = 0xC0262100;
+
     //
     // MessageId: ERROR_GRAPHICS_CANT_LOCK_MEMORY
     //
@@ -31566,6 +35348,7 @@ public interface WinError {
     // Couldn't probe and lock the underlying memory of an allocation.
     //
     int ERROR_GRAPHICS_CANT_LOCK_MEMORY = 0xC0262101;
+
     //
     // MessageId: ERROR_GRAPHICS_ALLOCATION_BUSY
     //
@@ -31574,6 +35357,7 @@ public interface WinError {
     // The allocation is currently busy.
     //
     int ERROR_GRAPHICS_ALLOCATION_BUSY = 0xC0262102;
+
     //
     // MessageId: ERROR_GRAPHICS_TOO_MANY_REFERENCES
     //
@@ -31583,6 +35367,7 @@ public interface WinError {
     // and can't be reference further.
     //
     int ERROR_GRAPHICS_TOO_MANY_REFERENCES = 0xC0262103;
+
     //
     // MessageId: ERROR_GRAPHICS_TRY_AGAIN_LATER
     //
@@ -31592,6 +35377,7 @@ public interface WinError {
     // The problem should be tried again later.
     //
     int ERROR_GRAPHICS_TRY_AGAIN_LATER = 0xC0262104;
+
     //
     // MessageId: ERROR_GRAPHICS_TRY_AGAIN_NOW
     //
@@ -31601,6 +35387,7 @@ public interface WinError {
     // The problem should be tried again immediately.
     //
     int ERROR_GRAPHICS_TRY_AGAIN_NOW = 0xC0262105;
+
     //
     // MessageId: ERROR_GRAPHICS_ALLOCATION_INVALID
     //
@@ -31609,6 +35396,7 @@ public interface WinError {
     // The allocation is invalid.
     //
     int ERROR_GRAPHICS_ALLOCATION_INVALID = 0xC0262106;
+
     //
     // MessageId: ERROR_GRAPHICS_UNSWIZZLING_APERTURE_UNAVAILABLE
     //
@@ -31617,6 +35405,7 @@ public interface WinError {
     // No more unswizzling aperture are currently available.
     //
     int ERROR_GRAPHICS_UNSWIZZLING_APERTURE_UNAVAILABLE = 0xC0262107;
+
     //
     // MessageId: ERROR_GRAPHICS_UNSWIZZLING_APERTURE_UNSUPPORTED
     //
@@ -31625,6 +35414,7 @@ public interface WinError {
     // The current allocation can't be unswizzled by an aperture.
     //
     int ERROR_GRAPHICS_UNSWIZZLING_APERTURE_UNSUPPORTED = 0xC0262108;
+
     //
     // MessageId: ERROR_GRAPHICS_CANT_EVICT_PINNED_ALLOCATION
     //
@@ -31633,6 +35423,7 @@ public interface WinError {
     // The request failed because a pinned allocation can't be evicted.
     //
     int ERROR_GRAPHICS_CANT_EVICT_PINNED_ALLOCATION = 0xC0262109;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_ALLOCATION_USAGE
     //
@@ -31642,6 +35433,7 @@ public interface WinError {
     // specified operation.
     //
     int ERROR_GRAPHICS_INVALID_ALLOCATION_USAGE = 0xC0262110;
+
     //
     // MessageId: ERROR_GRAPHICS_CANT_RENDER_LOCKED_ALLOCATION
     //
@@ -31650,6 +35442,7 @@ public interface WinError {
     // A locked allocation can't be used in the current command buffer.
     //
     int ERROR_GRAPHICS_CANT_RENDER_LOCKED_ALLOCATION = 0xC0262111;
+
     //
     // MessageId: ERROR_GRAPHICS_ALLOCATION_CLOSED
     //
@@ -31658,6 +35451,7 @@ public interface WinError {
     // The allocation being referenced has been closed permanently.
     //
     int ERROR_GRAPHICS_ALLOCATION_CLOSED = 0xC0262112;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_ALLOCATION_INSTANCE
     //
@@ -31666,6 +35460,7 @@ public interface WinError {
     // An invalid allocation instance is being referenced.
     //
     int ERROR_GRAPHICS_INVALID_ALLOCATION_INSTANCE = 0xC0262113;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_ALLOCATION_HANDLE
     //
@@ -31674,6 +35469,7 @@ public interface WinError {
     // An invalid allocation handle is being referenced.
     //
     int ERROR_GRAPHICS_INVALID_ALLOCATION_HANDLE = 0xC0262114;
+
     //
     // MessageId: ERROR_GRAPHICS_WRONG_ALLOCATION_DEVICE
     //
@@ -31682,6 +35478,7 @@ public interface WinError {
     // The allocation being referenced doesn't belong to the current device.
     //
     int ERROR_GRAPHICS_WRONG_ALLOCATION_DEVICE = 0xC0262115;
+
     //
     // MessageId: ERROR_GRAPHICS_ALLOCATION_CONTENT_LOST
     //
@@ -31690,6 +35487,7 @@ public interface WinError {
     // The specified allocation lost its content.
     //
     int ERROR_GRAPHICS_ALLOCATION_CONTENT_LOST = 0xC0262116;
+
     //
     // Video GPU Scheduler (VidSch) subsystem errors {0x2200..0x22ff}
     //
@@ -31702,6 +35500,7 @@ public interface WinError {
     // be scheduled.
     //
     int ERROR_GRAPHICS_GPU_EXCEPTION_ON_DEVICE = 0xC0262200;
+
     //
     // Video Present Network Management (VidPNMgr) subsystem errors
     // {0x2300..0x23ff}
@@ -31714,6 +35513,7 @@ public interface WinError {
     // Specified VidPN topology is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_TOPOLOGY = 0xC0262300;
+
     //
     // MessageId: ERROR_GRAPHICS_VIDPN_TOPOLOGY_NOT_SUPPORTED
     //
@@ -31723,6 +35523,7 @@ public interface WinError {
     // the display adapter.
     //
     int ERROR_GRAPHICS_VIDPN_TOPOLOGY_NOT_SUPPORTED = 0xC0262301;
+
     //
     // MessageId: ERROR_GRAPHICS_VIDPN_TOPOLOGY_CURRENTLY_NOT_SUPPORTED
     //
@@ -31732,6 +35533,7 @@ public interface WinError {
     // adapter at this time, due to current allocation of its resources.
     //
     int ERROR_GRAPHICS_VIDPN_TOPOLOGY_CURRENTLY_NOT_SUPPORTED = 0xC0262302;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN
     //
@@ -31740,6 +35542,7 @@ public interface WinError {
     // Specified VidPN handle is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN = 0xC0262303;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_SOURCE
     //
@@ -31748,6 +35551,7 @@ public interface WinError {
     // Specified video present source is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_SOURCE = 0xC0262304;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_TARGET
     //
@@ -31756,6 +35560,7 @@ public interface WinError {
     // Specified video present target is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_TARGET = 0xC0262305;
+
     //
     // MessageId: ERROR_GRAPHICS_VIDPN_MODALITY_NOT_SUPPORTED
     //
@@ -31765,6 +35570,7 @@ public interface WinError {
     // pinned modes are not cofunctiona;.
     //
     int ERROR_GRAPHICS_VIDPN_MODALITY_NOT_SUPPORTED = 0xC0262306;
+
     //
     // MessageId: ERROR_GRAPHICS_MODE_NOT_PINNED
     //
@@ -31773,6 +35579,7 @@ public interface WinError {
     // No mode is pinned on the specified VidPN source/target.
     //
     int ERROR_GRAPHICS_MODE_NOT_PINNED = 0x00262307;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_SOURCEMODESET
     //
@@ -31781,6 +35588,7 @@ public interface WinError {
     // Specified VidPN source mode set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_SOURCEMODESET = 0xC0262308;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_TARGETMODESET
     //
@@ -31789,6 +35597,7 @@ public interface WinError {
     // Specified VidPN target mode set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_TARGETMODESET = 0xC0262309;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_FREQUENCY
     //
@@ -31797,6 +35606,7 @@ public interface WinError {
     // Specified video signal frequency is invalid.
     //
     int ERROR_GRAPHICS_INVALID_FREQUENCY = 0xC026230A;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_ACTIVE_REGION
     //
@@ -31805,6 +35615,7 @@ public interface WinError {
     // Specified video signal active region is invalid.
     //
     int ERROR_GRAPHICS_INVALID_ACTIVE_REGION = 0xC026230B;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_TOTAL_REGION
     //
@@ -31813,6 +35624,7 @@ public interface WinError {
     // Specified video signal total region is invalid.
     //
     int ERROR_GRAPHICS_INVALID_TOTAL_REGION = 0xC026230C;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_SOURCE_MODE
     //
@@ -31821,6 +35633,7 @@ public interface WinError {
     // Specified video present source mode is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_SOURCE_MODE = 0xC0262310;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_TARGET_MODE
     //
@@ -31829,6 +35642,7 @@ public interface WinError {
     // Specified video present target mode is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEO_PRESENT_TARGET_MODE = 0xC0262311;
+
     //
     // MessageId: ERROR_GRAPHICS_PINNED_MODE_MUST_REMAIN_IN_SET
     //
@@ -31838,6 +35652,7 @@ public interface WinError {
     // enumeration.
     //
     int ERROR_GRAPHICS_PINNED_MODE_MUST_REMAIN_IN_SET = 0xC0262312;
+
     //
     // MessageId: ERROR_GRAPHICS_PATH_ALREADY_IN_TOPOLOGY
     //
@@ -31846,6 +35661,7 @@ public interface WinError {
     // Specified video present path is already in VidPN's topology.
     //
     int ERROR_GRAPHICS_PATH_ALREADY_IN_TOPOLOGY = 0xC0262313;
+
     //
     // MessageId: ERROR_GRAPHICS_MODE_ALREADY_IN_MODESET
     //
@@ -31854,6 +35670,7 @@ public interface WinError {
     // Specified mode is already in the mode set.
     //
     int ERROR_GRAPHICS_MODE_ALREADY_IN_MODESET = 0xC0262314;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEOPRESENTSOURCESET
     //
@@ -31862,6 +35679,7 @@ public interface WinError {
     // Specified video present source set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEOPRESENTSOURCESET = 0xC0262315;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDEOPRESENTTARGETSET
     //
@@ -31870,6 +35688,7 @@ public interface WinError {
     // Specified video present target set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDEOPRESENTTARGETSET = 0xC0262316;
+
     //
     // MessageId: ERROR_GRAPHICS_SOURCE_ALREADY_IN_SET
     //
@@ -31879,6 +35698,7 @@ public interface WinError {
     // set.
     //
     int ERROR_GRAPHICS_SOURCE_ALREADY_IN_SET = 0xC0262317;
+
     //
     // MessageId: ERROR_GRAPHICS_TARGET_ALREADY_IN_SET
     //
@@ -31888,6 +35708,7 @@ public interface WinError {
     // set.
     //
     int ERROR_GRAPHICS_TARGET_ALREADY_IN_SET = 0xC0262318;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_PRESENT_PATH
     //
@@ -31896,6 +35717,7 @@ public interface WinError {
     // Specified VidPN present path is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_PRESENT_PATH = 0xC0262319;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_RECOMMENDED_VIDPN_TOPOLOGY
     //
@@ -31905,6 +35727,7 @@ public interface WinError {
     // topology.
     //
     int ERROR_GRAPHICS_NO_RECOMMENDED_VIDPN_TOPOLOGY = 0xC026231A;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGESET
     //
@@ -31913,6 +35736,7 @@ public interface WinError {
     // Specified monitor frequency range set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGESET = 0xC026231B;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGE
     //
@@ -31921,6 +35745,7 @@ public interface WinError {
     // Specified monitor frequency range is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGE = 0xC026231C;
+
     //
     // MessageId: ERROR_GRAPHICS_FREQUENCYRANGE_NOT_IN_SET
     //
@@ -31930,6 +35755,7 @@ public interface WinError {
     // set.
     //
     int ERROR_GRAPHICS_FREQUENCYRANGE_NOT_IN_SET = 0xC026231D;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_PREFERRED_MODE
     //
@@ -31938,6 +35764,7 @@ public interface WinError {
     // Specified mode set does not specify preference for one of its modes.
     //
     int ERROR_GRAPHICS_NO_PREFERRED_MODE = 0x0026231E;
+
     //
     // MessageId: ERROR_GRAPHICS_FREQUENCYRANGE_ALREADY_IN_SET
     //
@@ -31947,6 +35774,7 @@ public interface WinError {
     // range set.
     //
     int ERROR_GRAPHICS_FREQUENCYRANGE_ALREADY_IN_SET = 0xC026231F;
+
     //
     // MessageId: ERROR_GRAPHICS_STALE_MODESET
     //
@@ -31955,6 +35783,7 @@ public interface WinError {
     // Specified mode set is stale. Please reacquire the new mode set.
     //
     int ERROR_GRAPHICS_STALE_MODESET = 0xC0262320;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_SOURCEMODESET
     //
@@ -31963,6 +35792,7 @@ public interface WinError {
     // Specified monitor source mode set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_SOURCEMODESET = 0xC0262321;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_SOURCE_MODE
     //
@@ -31971,6 +35801,7 @@ public interface WinError {
     // Specified monitor source mode is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_SOURCE_MODE = 0xC0262322;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_RECOMMENDED_FUNCTIONAL_VIDPN
     //
@@ -31981,6 +35812,7 @@ public interface WinError {
     // configuration.
     //
     int ERROR_GRAPHICS_NO_RECOMMENDED_FUNCTIONAL_VIDPN = 0xC0262323;
+
     //
     // MessageId: ERROR_GRAPHICS_MODE_ID_MUST_BE_UNIQUE
     //
@@ -31989,6 +35821,7 @@ public interface WinError {
     // ID of the specified mode is already used by another mode in the set.
     //
     int ERROR_GRAPHICS_MODE_ID_MUST_BE_UNIQUE = 0xC0262324;
+
     //
     // MessageId: ERROR_GRAPHICS_EMPTY_ADAPTER_MONITOR_MODE_SUPPORT_INTERSECTION
     //
@@ -31998,6 +35831,7 @@ public interface WinError {
     // adapter and the monitor connected to it.
     //
     int ERROR_GRAPHICS_EMPTY_ADAPTER_MONITOR_MODE_SUPPORT_INTERSECTION = 0xC0262325;
+
     //
     // MessageId: ERROR_GRAPHICS_VIDEO_PRESENT_TARGETS_LESS_THAN_SOURCES
     //
@@ -32007,6 +35841,7 @@ public interface WinError {
     // number of video present sources.
     //
     int ERROR_GRAPHICS_VIDEO_PRESENT_TARGETS_LESS_THAN_SOURCES = 0xC0262326;
+
     //
     // MessageId: ERROR_GRAPHICS_PATH_NOT_IN_TOPOLOGY
     //
@@ -32015,6 +35850,7 @@ public interface WinError {
     // Specified present path is not in VidPN's topology.
     //
     int ERROR_GRAPHICS_PATH_NOT_IN_TOPOLOGY = 0xC0262327;
+
     //
     // MessageId: ERROR_GRAPHICS_ADAPTER_MUST_HAVE_AT_LEAST_ONE_SOURCE
     //
@@ -32023,6 +35859,7 @@ public interface WinError {
     // Display adapter must have at least one video present source.
     //
     int ERROR_GRAPHICS_ADAPTER_MUST_HAVE_AT_LEAST_ONE_SOURCE = 0xC0262328;
+
     //
     // MessageId: ERROR_GRAPHICS_ADAPTER_MUST_HAVE_AT_LEAST_ONE_TARGET
     //
@@ -32031,6 +35868,7 @@ public interface WinError {
     // Display adapter must have at least one video present target.
     //
     int ERROR_GRAPHICS_ADAPTER_MUST_HAVE_AT_LEAST_ONE_TARGET = 0xC0262329;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITORDESCRIPTORSET
     //
@@ -32039,6 +35877,7 @@ public interface WinError {
     // Specified monitor descriptor set is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITORDESCRIPTORSET = 0xC026232A;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITORDESCRIPTOR
     //
@@ -32047,6 +35886,7 @@ public interface WinError {
     // Specified monitor descriptor is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITORDESCRIPTOR = 0xC026232B;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITORDESCRIPTOR_NOT_IN_SET
     //
@@ -32055,6 +35895,7 @@ public interface WinError {
     // Specified descriptor is not in the specified monitor descriptor set.
     //
     int ERROR_GRAPHICS_MONITORDESCRIPTOR_NOT_IN_SET = 0xC026232C;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITORDESCRIPTOR_ALREADY_IN_SET
     //
@@ -32063,6 +35904,7 @@ public interface WinError {
     // Specified descriptor is already in the specified monitor descriptor set.
     //
     int ERROR_GRAPHICS_MONITORDESCRIPTOR_ALREADY_IN_SET = 0xC026232D;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITORDESCRIPTOR_ID_MUST_BE_UNIQUE
     //
@@ -32072,6 +35914,7 @@ public interface WinError {
     // descriptor in the set.
     //
     int ERROR_GRAPHICS_MONITORDESCRIPTOR_ID_MUST_BE_UNIQUE = 0xC026232E;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_TARGET_SUBSET_TYPE
     //
@@ -32080,6 +35923,7 @@ public interface WinError {
     // Specified video present target subset type is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_TARGET_SUBSET_TYPE = 0xC026232F;
+
     //
     // MessageId: ERROR_GRAPHICS_RESOURCES_NOT_RELATED
     //
@@ -32089,6 +35933,7 @@ public interface WinError {
     // defined by the interface semantics.
     //
     int ERROR_GRAPHICS_RESOURCES_NOT_RELATED = 0xC0262330;
+
     //
     // MessageId: ERROR_GRAPHICS_SOURCE_ID_MUST_BE_UNIQUE
     //
@@ -32098,6 +35943,7 @@ public interface WinError {
     // source in the set.
     //
     int ERROR_GRAPHICS_SOURCE_ID_MUST_BE_UNIQUE = 0xC0262331;
+
     //
     // MessageId: ERROR_GRAPHICS_TARGET_ID_MUST_BE_UNIQUE
     //
@@ -32107,6 +35953,7 @@ public interface WinError {
     // target in the set.
     //
     int ERROR_GRAPHICS_TARGET_ID_MUST_BE_UNIQUE = 0xC0262332;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_AVAILABLE_VIDPN_TARGET
     //
@@ -32116,6 +35963,7 @@ public interface WinError {
     // target to connect it to.
     //
     int ERROR_GRAPHICS_NO_AVAILABLE_VIDPN_TARGET = 0xC0262333;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITOR_COULD_NOT_BE_ASSOCIATED_WITH_ADAPTER
     //
@@ -32124,6 +35972,7 @@ public interface WinError {
     // Newly arrived monitor could not be associated with a display adapter.
     //
     int ERROR_GRAPHICS_MONITOR_COULD_NOT_BE_ASSOCIATED_WITH_ADAPTER = 0xC0262334;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_VIDPNMGR
     //
@@ -32132,6 +35981,7 @@ public interface WinError {
     // Display adapter in question does not have an associated VidPN manager.
     //
     int ERROR_GRAPHICS_NO_VIDPNMGR = 0xC0262335;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_ACTIVE_VIDPN
     //
@@ -32141,6 +35991,7 @@ public interface WinError {
     // VidPN.
     //
     int ERROR_GRAPHICS_NO_ACTIVE_VIDPN = 0xC0262336;
+
     //
     // MessageId: ERROR_GRAPHICS_STALE_VIDPN_TOPOLOGY
     //
@@ -32149,6 +36000,7 @@ public interface WinError {
     // Specified VidPN topology is stale. Please reacquire the new topology.
     //
     int ERROR_GRAPHICS_STALE_VIDPN_TOPOLOGY = 0xC0262337;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITOR_NOT_CONNECTED
     //
@@ -32157,6 +36009,7 @@ public interface WinError {
     // There is no monitor connected on the specified video present target.
     //
     int ERROR_GRAPHICS_MONITOR_NOT_CONNECTED = 0xC0262338;
+
     //
     // MessageId: ERROR_GRAPHICS_SOURCE_NOT_IN_TOPOLOGY
     //
@@ -32165,6 +36018,7 @@ public interface WinError {
     // Specified source is not part of the specified VidPN's topology.
     //
     int ERROR_GRAPHICS_SOURCE_NOT_IN_TOPOLOGY = 0xC0262339;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PRIMARYSURFACE_SIZE
     //
@@ -32173,6 +36027,7 @@ public interface WinError {
     // Specified primary surface size is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PRIMARYSURFACE_SIZE = 0xC026233A;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VISIBLEREGION_SIZE
     //
@@ -32181,6 +36036,7 @@ public interface WinError {
     // Specified visible region size is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VISIBLEREGION_SIZE = 0xC026233B;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_STRIDE
     //
@@ -32189,6 +36045,7 @@ public interface WinError {
     // Specified stride is invalid.
     //
     int ERROR_GRAPHICS_INVALID_STRIDE = 0xC026233C;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PIXELFORMAT
     //
@@ -32197,6 +36054,7 @@ public interface WinError {
     // Specified pixel format is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PIXELFORMAT = 0xC026233D;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_COLORBASIS
     //
@@ -32205,6 +36063,7 @@ public interface WinError {
     // Specified color basis is invalid.
     //
     int ERROR_GRAPHICS_INVALID_COLORBASIS = 0xC026233E;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PIXELVALUEACCESSMODE
     //
@@ -32213,6 +36072,7 @@ public interface WinError {
     // Specified pixel value access mode is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PIXELVALUEACCESSMODE = 0xC026233F;
+
     //
     // MessageId: ERROR_GRAPHICS_TARGET_NOT_IN_TOPOLOGY
     //
@@ -32221,6 +36081,7 @@ public interface WinError {
     // Specified target is not part of the specified VidPN's topology.
     //
     int ERROR_GRAPHICS_TARGET_NOT_IN_TOPOLOGY = 0xC0262340;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_DISPLAY_MODE_MANAGEMENT_SUPPORT
     //
@@ -32229,6 +36090,7 @@ public interface WinError {
     // Failed to acquire display mode management interface.
     //
     int ERROR_GRAPHICS_NO_DISPLAY_MODE_MANAGEMENT_SUPPORT = 0xC0262341;
+
     //
     // MessageId: ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE
     //
@@ -32238,6 +36100,7 @@ public interface WinError {
     // used until that client releases it.
     //
     int ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE = 0xC0262342;
+
     //
     // MessageId: ERROR_GRAPHICS_CANT_ACCESS_ACTIVE_VIDPN
     //
@@ -32246,6 +36109,7 @@ public interface WinError {
     // Specified VidPN is active and cannot be accessed.
     //
     int ERROR_GRAPHICS_CANT_ACCESS_ACTIVE_VIDPN = 0xC0262343;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PATH_IMPORTANCE_ORDINAL
     //
@@ -32254,6 +36118,7 @@ public interface WinError {
     // Specified VidPN present path importance ordinal is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PATH_IMPORTANCE_ORDINAL = 0xC0262344;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PATH_CONTENT_GEOMETRY_TRANSFORMATION
     //
@@ -32262,6 +36127,7 @@ public interface WinError {
     // Specified VidPN present path content geometry transformation is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PATH_CONTENT_GEOMETRY_TRANSFORMATION = 0xC0262345;
+
     //
     // MessageId:
     // ERROR_GRAPHICS_PATH_CONTENT_GEOMETRY_TRANSFORMATION_NOT_SUPPORTED
@@ -32272,6 +36138,7 @@ public interface WinError {
     // respective VidPN present path.
     //
     int ERROR_GRAPHICS_PATH_CONTENT_GEOMETRY_TRANSFORMATION_NOT_SUPPORTED = 0xC0262346;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_GAMMA_RAMP
     //
@@ -32280,6 +36147,7 @@ public interface WinError {
     // Specified gamma ramp is invalid.
     //
     int ERROR_GRAPHICS_INVALID_GAMMA_RAMP = 0xC0262347;
+
     //
     // MessageId: ERROR_GRAPHICS_GAMMA_RAMP_NOT_SUPPORTED
     //
@@ -32289,6 +36157,7 @@ public interface WinError {
     // path.
     //
     int ERROR_GRAPHICS_GAMMA_RAMP_NOT_SUPPORTED = 0xC0262348;
+
     //
     // MessageId: ERROR_GRAPHICS_MULTISAMPLING_NOT_SUPPORTED
     //
@@ -32297,6 +36166,7 @@ public interface WinError {
     // Multi-sampling is not supported on the respective VidPN present path.
     //
     int ERROR_GRAPHICS_MULTISAMPLING_NOT_SUPPORTED = 0xC0262349;
+
     //
     // MessageId: ERROR_GRAPHICS_MODE_NOT_IN_MODESET
     //
@@ -32305,6 +36175,7 @@ public interface WinError {
     // Specified mode is not in the specified mode set.
     //
     int ERROR_GRAPHICS_MODE_NOT_IN_MODESET = 0xC026234A;
+
     //
     // MessageId: ERROR_GRAPHICS_DATASET_IS_EMPTY
     //
@@ -32314,6 +36185,7 @@ public interface WinError {
     // topology, etc.) is empty.
     //
     int ERROR_GRAPHICS_DATASET_IS_EMPTY = 0x0026234B;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_MORE_ELEMENTS_IN_DATASET
     //
@@ -32323,6 +36195,7 @@ public interface WinError {
     // topology, etc.) does not contain any more elements.
     //
     int ERROR_GRAPHICS_NO_MORE_ELEMENTS_IN_DATASET = 0x0026234C;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_TOPOLOGY_RECOMMENDATION_REASON
     //
@@ -32331,6 +36204,7 @@ public interface WinError {
     // Specified VidPN topology recommendation reason is invalid.
     //
     int ERROR_GRAPHICS_INVALID_VIDPN_TOPOLOGY_RECOMMENDATION_REASON = 0xC026234D;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PATH_CONTENT_TYPE
     //
@@ -32339,6 +36213,7 @@ public interface WinError {
     // Specified VidPN present path content type is invalid.
     //
     int ERROR_GRAPHICS_INVALID_PATH_CONTENT_TYPE = 0xC026234E;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_COPYPROTECTION_TYPE
     //
@@ -32347,6 +36222,7 @@ public interface WinError {
     // Specified VidPN present path copy protection type is invalid.
     //
     int ERROR_GRAPHICS_INVALID_COPYPROTECTION_TYPE = 0xC026234F;
+
     //
     // MessageId: ERROR_GRAPHICS_UNASSIGNED_MODESET_ALREADY_EXISTS
     //
@@ -32356,6 +36232,7 @@ public interface WinError {
     // given VidPN source/target.
     //
     int ERROR_GRAPHICS_UNASSIGNED_MODESET_ALREADY_EXISTS = 0xC0262350;
+
     //
     // MessageId: ERROR_GRAPHICS_PATH_CONTENT_GEOMETRY_TRANSFORMATION_NOT_PINNED
     //
@@ -32365,6 +36242,7 @@ public interface WinError {
     // present path.
     //
     int ERROR_GRAPHICS_PATH_CONTENT_GEOMETRY_TRANSFORMATION_NOT_PINNED = 0x00262351;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_SCANLINE_ORDERING
     //
@@ -32373,6 +36251,7 @@ public interface WinError {
     // Specified scanline ordering type is invalid.
     //
     int ERROR_GRAPHICS_INVALID_SCANLINE_ORDERING = 0xC0262352;
+
     //
     // MessageId: ERROR_GRAPHICS_TOPOLOGY_CHANGES_NOT_ALLOWED
     //
@@ -32381,6 +36260,7 @@ public interface WinError {
     // Topology changes are not allowed for the specified VidPN.
     //
     int ERROR_GRAPHICS_TOPOLOGY_CHANGES_NOT_ALLOWED = 0xC0262353;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_AVAILABLE_IMPORTANCE_ORDINALS
     //
@@ -32389,6 +36269,7 @@ public interface WinError {
     // All available importance ordinals are already used in specified topology.
     //
     int ERROR_GRAPHICS_NO_AVAILABLE_IMPORTANCE_ORDINALS = 0xC0262354;
+
     //
     // MessageId: ERROR_GRAPHICS_INCOMPATIBLE_PRIVATE_FORMAT
     //
@@ -32398,6 +36279,7 @@ public interface WinError {
     // the current primary surface
     //
     int ERROR_GRAPHICS_INCOMPATIBLE_PRIVATE_FORMAT = 0xC0262355;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MODE_PRUNING_ALGORITHM
     //
@@ -32406,6 +36288,7 @@ public interface WinError {
     // Specified mode pruning algorithm is invalid
     //
     int ERROR_GRAPHICS_INVALID_MODE_PRUNING_ALGORITHM = 0xC0262356;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_CAPABILITY_ORIGIN
     //
@@ -32414,6 +36297,7 @@ public interface WinError {
     // Specified monitor capability origin is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_CAPABILITY_ORIGIN = 0xC0262357;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGE_CONSTRAINT
     //
@@ -32422,6 +36306,7 @@ public interface WinError {
     // Specified monitor frequency range constraint is invalid.
     //
     int ERROR_GRAPHICS_INVALID_MONITOR_FREQUENCYRANGE_CONSTRAINT = 0xC0262358;
+
     //
     // MessageId: ERROR_GRAPHICS_MAX_NUM_PATHS_REACHED
     //
@@ -32430,6 +36315,7 @@ public interface WinError {
     // Maximum supported number of present paths has been reached.
     //
     int ERROR_GRAPHICS_MAX_NUM_PATHS_REACHED = 0xC0262359;
+
     //
     // MessageId: ERROR_GRAPHICS_CANCEL_VIDPN_TOPOLOGY_AUGMENTATION
     //
@@ -32439,6 +36325,7 @@ public interface WinError {
     // source of the specified VidPN's topology.
     //
     int ERROR_GRAPHICS_CANCEL_VIDPN_TOPOLOGY_AUGMENTATION = 0xC026235A;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_CLIENT_TYPE
     //
@@ -32447,6 +36334,7 @@ public interface WinError {
     // Specified client type was not recognized.
     //
     int ERROR_GRAPHICS_INVALID_CLIENT_TYPE = 0xC026235B;
+
     //
     // MessageId: ERROR_GRAPHICS_CLIENTVIDPN_NOT_SET
     //
@@ -32456,6 +36344,7 @@ public interface WinError {
     // changes took place on this adapter yet).
     //
     int ERROR_GRAPHICS_CLIENTVIDPN_NOT_SET = 0xC026235C;
+
     //
     // Port specific status codes {0x2400..0x24ff}
     //
@@ -32468,6 +36357,7 @@ public interface WinError {
     // connected to it.
     //
     int ERROR_GRAPHICS_SPECIFIED_CHILD_ALREADY_CONNECTED = 0xC0262400;
+
     //
     // MessageId: ERROR_GRAPHICS_CHILD_DESCRIPTOR_NOT_SUPPORTED
     //
@@ -32477,6 +36367,7 @@ public interface WinError {
     // exposure.
     //
     int ERROR_GRAPHICS_CHILD_DESCRIPTOR_NOT_SUPPORTED = 0xC0262401;
+
     //
     // MessageId: ERROR_GRAPHICS_UNKNOWN_CHILD_STATUS
     //
@@ -32485,6 +36376,7 @@ public interface WinError {
     // Child device presence was not reliably detected.
     //
     int ERROR_GRAPHICS_UNKNOWN_CHILD_STATUS = 0x4026242F;
+
     //
     // MessageId: ERROR_GRAPHICS_NOT_A_LINKED_ADAPTER
     //
@@ -32493,6 +36385,7 @@ public interface WinError {
     // The display adapter is not linked to any other adapters.
     //
     int ERROR_GRAPHICS_NOT_A_LINKED_ADAPTER = 0xC0262430;
+
     //
     // MessageId: ERROR_GRAPHICS_LEADLINK_NOT_ENUMERATED
     //
@@ -32501,6 +36394,7 @@ public interface WinError {
     // Lead adapter in a linked configuration was not enumerated yet.
     //
     int ERROR_GRAPHICS_LEADLINK_NOT_ENUMERATED = 0xC0262431;
+
     //
     // MessageId: ERROR_GRAPHICS_CHAINLINKS_NOT_ENUMERATED
     //
@@ -32509,6 +36403,7 @@ public interface WinError {
     // Some chain adapters in a linked configuration were not enumerated yet.
     //
     int ERROR_GRAPHICS_CHAINLINKS_NOT_ENUMERATED = 0xC0262432;
+
     //
     // MessageId: ERROR_GRAPHICS_ADAPTER_CHAIN_NOT_READY
     //
@@ -32518,6 +36413,7 @@ public interface WinError {
     // failure.
     //
     int ERROR_GRAPHICS_ADAPTER_CHAIN_NOT_READY = 0xC0262433;
+
     //
     // MessageId: ERROR_GRAPHICS_CHAINLINKS_NOT_STARTED
     //
@@ -32527,6 +36423,7 @@ public interface WinError {
     // links were not started yet.
     //
     int ERROR_GRAPHICS_CHAINLINKS_NOT_STARTED = 0xC0262434;
+
     //
     // MessageId: ERROR_GRAPHICS_CHAINLINKS_NOT_POWERED_ON
     //
@@ -32536,6 +36433,7 @@ public interface WinError {
     // chain links were powered down.
     //
     int ERROR_GRAPHICS_CHAINLINKS_NOT_POWERED_ON = 0xC0262435;
+
     //
     // MessageId: ERROR_GRAPHICS_INCONSISTENT_DEVICE_LINK_STATE
     //
@@ -32545,6 +36443,7 @@ public interface WinError {
     // adapters are in an expected PNP/Power state.
     //
     int ERROR_GRAPHICS_INCONSISTENT_DEVICE_LINK_STATE = 0xC0262436;
+
     //
     // MessageId: ERROR_GRAPHICS_LEADLINK_START_DEFERRED
     //
@@ -32553,6 +36452,7 @@ public interface WinError {
     // Starting the leadlink adapter has been deferred temporarily.
     //
     int ERROR_GRAPHICS_LEADLINK_START_DEFERRED = 0x40262437;
+
     //
     // MessageId: ERROR_GRAPHICS_NOT_POST_DEVICE_DRIVER
     //
@@ -32562,6 +36462,7 @@ public interface WinError {
     // display adapter.
     //
     int ERROR_GRAPHICS_NOT_POST_DEVICE_DRIVER = 0xC0262438;
+
     //
     // MessageId: ERROR_GRAPHICS_POLLING_TOO_FREQUENTLY
     //
@@ -32571,6 +36472,7 @@ public interface WinError {
     // same polling level.
     //
     int ERROR_GRAPHICS_POLLING_TOO_FREQUENTLY = 0x40262439;
+
     //
     // MessageId: ERROR_GRAPHICS_START_DEFERRED
     //
@@ -32579,6 +36481,7 @@ public interface WinError {
     // Starting the adapter has been deferred temporarily.
     //
     int ERROR_GRAPHICS_START_DEFERRED = 0x4026243A;
+
     //
     // MessageId: ERROR_GRAPHICS_ADAPTER_ACCESS_NOT_EXCLUDED
     //
@@ -32588,6 +36491,7 @@ public interface WinError {
     // in a quiescent state.
     //
     int ERROR_GRAPHICS_ADAPTER_ACCESS_NOT_EXCLUDED = 0xC026243B;
+
     //
     // OPM, UAB and PVP specific error codes {0x2500..0x257f}
     //
@@ -32599,6 +36503,7 @@ public interface WinError {
     // The driver does not support OPM.
     //
     int ERROR_GRAPHICS_OPM_NOT_SUPPORTED = 0xC0262500;
+
     //
     // MessageId: ERROR_GRAPHICS_COPP_NOT_SUPPORTED
     //
@@ -32607,6 +36512,7 @@ public interface WinError {
     // The driver does not support COPP.
     //
     int ERROR_GRAPHICS_COPP_NOT_SUPPORTED = 0xC0262501;
+
     //
     // MessageId: ERROR_GRAPHICS_UAB_NOT_SUPPORTED
     //
@@ -32615,6 +36521,7 @@ public interface WinError {
     // The driver does not support UAB.
     //
     int ERROR_GRAPHICS_UAB_NOT_SUPPORTED = 0xC0262502;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INVALID_ENCRYPTED_PARAMETERS
     //
@@ -32623,6 +36530,7 @@ public interface WinError {
     // The specified encrypted parameters are invalid.
     //
     int ERROR_GRAPHICS_OPM_INVALID_ENCRYPTED_PARAMETERS = 0xC0262503;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_NO_VIDEO_OUTPUTS_EXIST
     //
@@ -32632,6 +36540,7 @@ public interface WinError {
     // video outputs.
     //
     int ERROR_GRAPHICS_OPM_NO_VIDEO_OUTPUTS_EXIST = 0xC0262505;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INTERNAL_ERROR
     //
@@ -32640,6 +36549,7 @@ public interface WinError {
     // An internal error caused this operation to fail.
     //
     int ERROR_GRAPHICS_OPM_INTERNAL_ERROR = 0xC026250B;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INVALID_HANDLE
     //
@@ -32649,6 +36559,7 @@ public interface WinError {
     // handle.
     //
     int ERROR_GRAPHICS_OPM_INVALID_HANDLE = 0xC026250C;
+
     //
     // MessageId: ERROR_GRAPHICS_PVP_INVALID_CERTIFICATE_LENGTH
     //
@@ -32658,6 +36569,7 @@ public interface WinError {
     // to the function was too small.
     //
     int ERROR_GRAPHICS_PVP_INVALID_CERTIFICATE_LENGTH = 0xC026250E;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_SPANNING_MODE_ENABLED
     //
@@ -32667,6 +36579,7 @@ public interface WinError {
     // spanning mode.
     //
     int ERROR_GRAPHICS_OPM_SPANNING_MODE_ENABLED = 0xC026250F;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_THEATER_MODE_ENABLED
     //
@@ -32676,6 +36589,7 @@ public interface WinError {
     // theater mode.
     //
     int ERROR_GRAPHICS_OPM_THEATER_MODE_ENABLED = 0xC0262510;
+
     //
     // MessageId: ERROR_GRAPHICS_PVP_HFS_FAILED
     //
@@ -32685,6 +36599,7 @@ public interface WinError {
     // Scan failed to validate the graphics hardware.
     //
     int ERROR_GRAPHICS_PVP_HFS_FAILED = 0xC0262511;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INVALID_SRM
     //
@@ -32694,6 +36609,7 @@ public interface WinError {
     // comply with section=5 of the HDCP=1.1 specification.
     //
     int ERROR_GRAPHICS_OPM_INVALID_SRM = 0xC0262512;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_HDCP
     //
@@ -32703,6 +36619,7 @@ public interface WinError {
     // Protection (HDCP) System because it does not support HDCP.
     //
     int ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_HDCP = 0xC0262513;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_ACP
     //
@@ -32712,6 +36629,7 @@ public interface WinError {
     // does not support ACP.
     //
     int ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_ACP = 0xC0262514;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_CGMSA
     //
@@ -32722,6 +36640,7 @@ public interface WinError {
     // CGMS-A.
     //
     int ERROR_GRAPHICS_OPM_OUTPUT_DOES_NOT_SUPPORT_CGMSA = 0xC0262515;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_HDCP_SRM_NEVER_SET
     //
@@ -32732,6 +36651,7 @@ public interface WinError {
     // SRM to the video output.
     //
     int ERROR_GRAPHICS_OPM_HDCP_SRM_NEVER_SET = 0xC0262516;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_RESOLUTION_TOO_HIGH
     //
@@ -32741,6 +36661,7 @@ public interface WinError {
     // protection technology because the output's screen resolution is too high.
     //
     int ERROR_GRAPHICS_OPM_RESOLUTION_TOO_HIGH = 0xC0262517;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_ALL_HDCP_HARDWARE_ALREADY_IN_USE
     //
@@ -32751,6 +36672,7 @@ public interface WinError {
     // outputs.
     //
     int ERROR_GRAPHICS_OPM_ALL_HDCP_HARDWARE_ALREADY_IN_USE = 0xC0262518;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_NO_LONGER_EXISTS
     //
@@ -32764,6 +36686,7 @@ public interface WinError {
     // desktop became an inactive desktop.
     //
     int ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_NO_LONGER_EXISTS = 0xC026251A;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_SESSION_TYPE_CHANGE_IN_PROGRESS
     //
@@ -32775,6 +36698,7 @@ public interface WinError {
     // and remote (RDP or ICA).
     //
     int ERROR_GRAPHICS_OPM_SESSION_TYPE_CHANGE_IN_PROGRESS = 0xC026251B;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_DOES_NOT_HAVE_COPP_SEMANTICS
     //
@@ -32790,6 +36714,7 @@ public interface WinError {
     // caller tries to use a COPP specific command.
     //
     int ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_DOES_NOT_HAVE_COPP_SEMANTICS = 0xC026251C;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INVALID_INFORMATION_REQUEST
     //
@@ -32801,6 +36726,7 @@ public interface WinError {
     // the passed in OMAC value is invalid.
     //
     int ERROR_GRAPHICS_OPM_INVALID_INFORMATION_REQUEST = 0xC026251D;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_DRIVER_INTERNAL_ERROR
     //
@@ -32810,6 +36736,7 @@ public interface WinError {
     // display driver.
     //
     int ERROR_GRAPHICS_OPM_DRIVER_INTERNAL_ERROR = 0xC026251E;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_DOES_NOT_HAVE_OPM_SEMANTICS
     //
@@ -32825,6 +36752,7 @@ public interface WinError {
     // when the caller tries to use an OPM specific command.
     //
     int ERROR_GRAPHICS_OPM_VIDEO_OUTPUT_DOES_NOT_HAVE_OPM_SEMANTICS = 0xC026251F;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_SIGNALING_NOT_SUPPORTED
     //
@@ -32836,6 +36764,7 @@ public interface WinError {
     // OPM_SET_ACP_AND_CGMSA_SIGNALING GUIDs.
     //
     int ERROR_GRAPHICS_OPM_SIGNALING_NOT_SUPPORTED = 0xC0262520;
+
     //
     // MessageId: ERROR_GRAPHICS_OPM_INVALID_CONFIGURATION_REQUEST
     //
@@ -32846,6 +36775,7 @@ public interface WinError {
     // passed in OMAC value is invalid.
     //
     int ERROR_GRAPHICS_OPM_INVALID_CONFIGURATION_REQUEST = 0xC0262521;
+
     //
     // Monitor Configuration API error codes {0x2580..0x25DF}
     //
@@ -32858,6 +36788,7 @@ public interface WinError {
     // bus.
     //
     int ERROR_GRAPHICS_I2C_NOT_SUPPORTED = 0xC0262580;
+
     //
     // MessageId: ERROR_GRAPHICS_I2C_DEVICE_DOES_NOT_EXIST
     //
@@ -32866,6 +36797,7 @@ public interface WinError {
     // No device on the I2C bus has the specified address.
     //
     int ERROR_GRAPHICS_I2C_DEVICE_DOES_NOT_EXIST = 0xC0262581;
+
     //
     // MessageId: ERROR_GRAPHICS_I2C_ERROR_TRANSMITTING_DATA
     //
@@ -32874,6 +36806,7 @@ public interface WinError {
     // An error occurred while transmitting data to the device on the I2C bus.
     //
     int ERROR_GRAPHICS_I2C_ERROR_TRANSMITTING_DATA = 0xC0262582;
+
     //
     // MessageId: ERROR_GRAPHICS_I2C_ERROR_RECEIVING_DATA
     //
@@ -32882,6 +36815,7 @@ public interface WinError {
     // An error occurred while receiving data from the device on the I2C bus.
     //
     int ERROR_GRAPHICS_I2C_ERROR_RECEIVING_DATA = 0xC0262583;
+
     //
     // MessageId: ERROR_GRAPHICS_DDCCI_VCP_NOT_SUPPORTED
     //
@@ -32890,6 +36824,7 @@ public interface WinError {
     // The monitor does not support the specified VCP code.
     //
     int ERROR_GRAPHICS_DDCCI_VCP_NOT_SUPPORTED = 0xC0262584;
+
     //
     // MessageId: ERROR_GRAPHICS_DDCCI_INVALID_DATA
     //
@@ -32898,6 +36833,7 @@ public interface WinError {
     // The data received from the monitor is invalid.
     //
     int ERROR_GRAPHICS_DDCCI_INVALID_DATA = 0xC0262585;
+
     //
     // MessageId:
     // ERROR_GRAPHICS_DDCCI_MONITOR_RETURNED_INVALID_TIMING_STATUS_BYTE
@@ -32909,6 +36845,7 @@ public interface WinError {
     // Message command to get a timing report from a monitor.
     //
     int ERROR_GRAPHICS_DDCCI_MONITOR_RETURNED_INVALID_TIMING_STATUS_BYTE = 0xC0262586;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_INVALID_CAPABILITIES_STRING
     //
@@ -32918,6 +36855,7 @@ public interface WinError {
     // with the ACCESS.bus=3.0, DDC/CI=1.1, or MCCS=2 Revision=1 specification.
     //
     int ERROR_GRAPHICS_MCA_INVALID_CAPABILITIES_STRING = 0xC0262587;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_INTERNAL_ERROR
     //
@@ -32926,6 +36864,7 @@ public interface WinError {
     // An internal Monitor Configuration API error occured.
     //
     int ERROR_GRAPHICS_MCA_INTERNAL_ERROR = 0xC0262588;
+
     //
     // MessageId: ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_COMMAND
     //
@@ -32935,6 +36874,7 @@ public interface WinError {
     // command field.
     //
     int ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_COMMAND = 0xC0262589;
+
     //
     // MessageId: ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_LENGTH
     //
@@ -32944,6 +36884,7 @@ public interface WinError {
     // an invalid value.
     //
     int ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_LENGTH = 0xC026258A;
+
     //
     // MessageId: ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_CHECKSUM
     //
@@ -32955,6 +36896,7 @@ public interface WinError {
     // computer.
     //
     int ERROR_GRAPHICS_DDCCI_INVALID_MESSAGE_CHECKSUM = 0xC026258B;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_PHYSICAL_MONITOR_HANDLE
     //
@@ -32963,6 +36905,7 @@ public interface WinError {
     // This function failed because an invalid monitor handle was passed to it.
     //
     int ERROR_GRAPHICS_INVALID_PHYSICAL_MONITOR_HANDLE = 0xC026258C;
+
     //
     // MessageId: ERROR_GRAPHICS_MONITOR_NO_LONGER_EXISTS
     //
@@ -32976,6 +36919,7 @@ public interface WinError {
     // when windows sends a WM_DISPLAYCHANGE windows message to applications.
     //
     int ERROR_GRAPHICS_MONITOR_NO_LONGER_EXISTS = 0xC026258D;
+
     //
     // MessageId:
     // ERROR_GRAPHICS_DDCCI_CURRENT_CURRENT_VALUE_GREATER_THAN_MAXIMUM_VALUE
@@ -32986,6 +36930,7 @@ public interface WinError {
     // This error code indicates that a monitor returned an invalid value.
     //
     int ERROR_GRAPHICS_DDCCI_CURRENT_CURRENT_VALUE_GREATER_THAN_MAXIMUM_VALUE = 0xC02625D8;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_INVALID_VCP_VERSION
     //
@@ -32995,6 +36940,7 @@ public interface WinError {
     // value.
     //
     int ERROR_GRAPHICS_MCA_INVALID_VCP_VERSION = 0xC02625D9;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_MONITOR_VIOLATES_MCCS_SPECIFICATION
     //
@@ -33004,6 +36950,7 @@ public interface WinError {
     // support.
     //
     int ERROR_GRAPHICS_MCA_MONITOR_VIOLATES_MCCS_SPECIFICATION = 0xC02625DA;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_MCCS_VERSION_MISMATCH
     //
@@ -33014,6 +36961,7 @@ public interface WinError {
     // used.
     //
     int ERROR_GRAPHICS_MCA_MCCS_VERSION_MISMATCH = 0xC02625DB;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_UNSUPPORTED_MCCS_VERSION
     //
@@ -33024,6 +36972,7 @@ public interface WinError {
     // specification.
     //
     int ERROR_GRAPHICS_MCA_UNSUPPORTED_MCCS_VERSION = 0xC02625DC;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_INVALID_TECHNOLOGY_TYPE_RETURNED
     //
@@ -33035,6 +36984,7 @@ public interface WinError {
     // specification.
     //
     int ERROR_GRAPHICS_MCA_INVALID_TECHNOLOGY_TYPE_RETURNED = 0xC02625DE;
+
     //
     // MessageId: ERROR_GRAPHICS_MCA_UNSUPPORTED_COLOR_TEMPERATURE
     //
@@ -33045,6 +36995,7 @@ public interface WinError {
     // monitor violated the MCCS=2.0 or MCCS=2.0 Revision=1 specification.
     //
     int ERROR_GRAPHICS_MCA_UNSUPPORTED_COLOR_TEMPERATURE = 0xC02625DF;
+
     //
     // OPM, UAB, PVP and DDC/CI shared error codes {0x25E0..0x25ff}
     //
@@ -33058,6 +37009,7 @@ public interface WinError {
     // desktop session or on a terminal server session.
     //
     int ERROR_GRAPHICS_ONLY_CONSOLE_SESSION_SUPPORTED = 0xC02625E0;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_DISPLAY_DEVICE_CORRESPONDS_TO_NAME
     //
@@ -33067,6 +37019,7 @@ public interface WinError {
     // to the specified GDI display device name.
     //
     int ERROR_GRAPHICS_NO_DISPLAY_DEVICE_CORRESPONDS_TO_NAME = 0xC02625E1;
+
     //
     // MessageId: ERROR_GRAPHICS_DISPLAY_DEVICE_NOT_ATTACHED_TO_DESKTOP
     //
@@ -33076,6 +37029,7 @@ public interface WinError {
     // attached to the Windows desktop.
     //
     int ERROR_GRAPHICS_DISPLAY_DEVICE_NOT_ATTACHED_TO_DESKTOP = 0xC02625E2;
+
     //
     // MessageId: ERROR_GRAPHICS_MIRRORING_DEVICES_NOT_SUPPORTED
     //
@@ -33086,6 +37040,7 @@ public interface WinError {
     // with them.
     //
     int ERROR_GRAPHICS_MIRRORING_DEVICES_NOT_SUPPORTED = 0xC02625E3;
+
     //
     // MessageId: ERROR_GRAPHICS_INVALID_POINTER
     //
@@ -33096,6 +37051,7 @@ public interface WinError {
     // address, points to a kernel mode address, or is not correctly aligned.
     //
     int ERROR_GRAPHICS_INVALID_POINTER = 0xC02625E4;
+
     //
     // MessageId: ERROR_GRAPHICS_NO_MONITORS_CORRESPOND_TO_DISPLAY_DEVICE
     //
@@ -33105,6 +37061,7 @@ public interface WinError {
     // monitors associated with it.
     //
     int ERROR_GRAPHICS_NO_MONITORS_CORRESPOND_TO_DISPLAY_DEVICE = 0xC02625E5;
+
     //
     // MessageId: ERROR_GRAPHICS_PARAMETER_ARRAY_TOO_SMALL
     //
@@ -33114,6 +37071,7 @@ public interface WinError {
     // function must copy into the array.
     //
     int ERROR_GRAPHICS_PARAMETER_ARRAY_TOO_SMALL = 0xC02625E6;
+
     //
     // MessageId: ERROR_GRAPHICS_INTERNAL_ERROR
     //
@@ -33122,6 +37080,7 @@ public interface WinError {
     // An internal error caused an operation to fail.
     //
     int ERROR_GRAPHICS_INTERNAL_ERROR = 0xC02625E7;
+
     //
     // MessageId: ERROR_GRAPHICS_SESSION_TYPE_CHANGE_IN_PROGRESS
     //
@@ -33133,6 +37092,7 @@ public interface WinError {
     // and remote (RDP or ICA).
     //
     int ERROR_GRAPHICS_SESSION_TYPE_CHANGE_IN_PROGRESS = 0xC02605E8;
+
     //
     // =
     // TPM Services and TPM Software Error Messages
@@ -33179,6 +37139,7 @@ public interface WinError {
     // This is an error mask to convert TPM hardware errors to win errors.
     //
     int TPM_E_ERROR_MASK = 0x80280000;
+
     //
     // MessageId: TPM_E_AUTHFAIL
     //
@@ -33187,6 +37148,7 @@ public interface WinError {
     // Authentication failed.
     //
     int TPM_E_AUTHFAIL = 0x80280001;
+
     //
     // MessageId: TPM_E_BADINDEX
     //
@@ -33195,6 +37157,7 @@ public interface WinError {
     // The index to a PCR, DIR or other register is incorrect.
     //
     int TPM_E_BADINDEX = 0x80280002;
+
     //
     // MessageId: TPM_E_BAD_PARAMETER
     //
@@ -33203,6 +37166,7 @@ public interface WinError {
     // One or more parameter is bad.
     //
     int TPM_E_BAD_PARAMETER = 0x80280003;
+
     //
     // MessageId: TPM_E_AUDITFAILURE
     //
@@ -33212,6 +37176,7 @@ public interface WinError {
     // failed.
     //
     int TPM_E_AUDITFAILURE = 0x80280004;
+
     //
     // MessageId: TPM_E_CLEAR_DISABLED
     //
@@ -33221,6 +37186,7 @@ public interface WinError {
     // physical access.
     //
     int TPM_E_CLEAR_DISABLED = 0x80280005;
+
     //
     // MessageId: TPM_E_DEACTIVATED
     //
@@ -33229,6 +37195,7 @@ public interface WinError {
     // Activate the Trusted Platform Module (TPM).
     //
     int TPM_E_DEACTIVATED = 0x80280006;
+
     //
     // MessageId: TPM_E_DISABLED
     //
@@ -33237,6 +37204,7 @@ public interface WinError {
     // Enable the Trusted Platform Module (TPM).
     //
     int TPM_E_DISABLED = 0x80280007;
+
     //
     // MessageId: TPM_E_DISABLED_CMD
     //
@@ -33245,6 +37213,7 @@ public interface WinError {
     // The target command has been disabled.
     //
     int TPM_E_DISABLED_CMD = 0x80280008;
+
     //
     // MessageId: TPM_E_FAIL
     //
@@ -33253,6 +37222,7 @@ public interface WinError {
     // The operation failed.
     //
     int TPM_E_FAIL = 0x80280009;
+
     //
     // MessageId: TPM_E_BAD_ORDINAL
     //
@@ -33261,6 +37231,7 @@ public interface WinError {
     // The ordinal was unknown or inconsistent.
     //
     int TPM_E_BAD_ORDINAL = 0x8028000A;
+
     //
     // MessageId: TPM_E_INSTALL_DISABLED
     //
@@ -33269,6 +37240,7 @@ public interface WinError {
     // The ability to install an owner is disabled.
     //
     int TPM_E_INSTALL_DISABLED = 0x8028000B;
+
     //
     // MessageId: TPM_E_INVALID_KEYHANDLE
     //
@@ -33277,6 +37249,7 @@ public interface WinError {
     // The key handle cannot be intrepreted.
     //
     int TPM_E_INVALID_KEYHANDLE = 0x8028000C;
+
     //
     // MessageId: TPM_E_KEYNOTFOUND
     //
@@ -33285,6 +37258,7 @@ public interface WinError {
     // The key handle points to an invalid key.
     //
     int TPM_E_KEYNOTFOUND = 0x8028000D;
+
     //
     // MessageId: TPM_E_INAPPROPRIATE_ENC
     //
@@ -33293,6 +37267,7 @@ public interface WinError {
     // Unacceptable encryption scheme.
     //
     int TPM_E_INAPPROPRIATE_ENC = 0x8028000E;
+
     //
     // MessageId: TPM_E_MIGRATEFAIL
     //
@@ -33301,6 +37276,7 @@ public interface WinError {
     // Migration authorization failed.
     //
     int TPM_E_MIGRATEFAIL = 0x8028000F;
+
     //
     // MessageId: TPM_E_INVALID_PCR_INFO
     //
@@ -33309,6 +37285,7 @@ public interface WinError {
     // PCR information could not be interpreted.
     //
     int TPM_E_INVALID_PCR_INFO = 0x80280010;
+
     //
     // MessageId: TPM_E_NOSPACE
     //
@@ -33317,6 +37294,7 @@ public interface WinError {
     // No room to load key.
     //
     int TPM_E_NOSPACE = 0x80280011;
+
     //
     // MessageId: TPM_E_NOSRK
     //
@@ -33325,6 +37303,7 @@ public interface WinError {
     // There is no Storage Root Key (SRK) set.
     //
     int TPM_E_NOSRK = 0x80280012;
+
     //
     // MessageId: TPM_E_NOTSEALED_BLOB
     //
@@ -33333,6 +37312,7 @@ public interface WinError {
     // An encrypted blob is invalid or was not created by this TPM.
     //
     int TPM_E_NOTSEALED_BLOB = 0x80280013;
+
     //
     // MessageId: TPM_E_OWNER_SET
     //
@@ -33341,6 +37321,7 @@ public interface WinError {
     // The Trusted Platform Module (TPM) already has an owner.
     //
     int TPM_E_OWNER_SET = 0x80280014;
+
     //
     // MessageId: TPM_E_RESOURCES
     //
@@ -33350,6 +37331,7 @@ public interface WinError {
     // action.
     //
     int TPM_E_RESOURCES = 0x80280015;
+
     //
     // MessageId: TPM_E_SHORTRANDOM
     //
@@ -33358,6 +37340,7 @@ public interface WinError {
     // A random string was too short.
     //
     int TPM_E_SHORTRANDOM = 0x80280016;
+
     //
     // MessageId: TPM_E_SIZE
     //
@@ -33366,6 +37349,7 @@ public interface WinError {
     // The TPM does not have the space to perform the operation.
     //
     int TPM_E_SIZE = 0x80280017;
+
     //
     // MessageId: TPM_E_WRONGPCRVAL
     //
@@ -33374,6 +37358,7 @@ public interface WinError {
     // The named PCR value does not match the current PCR value.
     //
     int TPM_E_WRONGPCRVAL = 0x80280018;
+
     //
     // MessageId: TPM_E_BAD_PARAM_SIZE
     //
@@ -33382,6 +37367,7 @@ public interface WinError {
     // The paramSize argument to the command has the incorrect value .
     //
     int TPM_E_BAD_PARAM_SIZE = 0x80280019;
+
     //
     // MessageId: TPM_E_SHA_THREAD
     //
@@ -33390,6 +37376,7 @@ public interface WinError {
     // There is no existing SHA-1 thread.
     //
     int TPM_E_SHA_THREAD = 0x8028001A;
+
     //
     // MessageId: TPM_E_SHA_ERROR
     //
@@ -33399,6 +37386,7 @@ public interface WinError {
     // has already encountered an error.
     //
     int TPM_E_SHA_ERROR = 0x8028001B;
+
     //
     // MessageId: TPM_E_FAILEDSELFTEST
     //
@@ -33407,6 +37395,7 @@ public interface WinError {
     // Self-test has failed and the TPM has shutdown.
     //
     int TPM_E_FAILEDSELFTEST = 0x8028001C;
+
     //
     // MessageId: TPM_E_AUTH2FAIL
     //
@@ -33416,6 +37405,7 @@ public interface WinError {
     // authorization.
     //
     int TPM_E_AUTH2FAIL = 0x8028001D;
+
     //
     // MessageId: TPM_E_BADTAG
     //
@@ -33424,6 +37414,7 @@ public interface WinError {
     // The tag value sent to for a command is invalid.
     //
     int TPM_E_BADTAG = 0x8028001E;
+
     //
     // MessageId: TPM_E_IOERROR
     //
@@ -33432,6 +37423,7 @@ public interface WinError {
     // An IO error occurred transmitting information to the TPM.
     //
     int TPM_E_IOERROR = 0x8028001F;
+
     //
     // MessageId: TPM_E_ENCRYPT_ERROR
     //
@@ -33440,6 +37432,7 @@ public interface WinError {
     // The encryption process had a problem.
     //
     int TPM_E_ENCRYPT_ERROR = 0x80280020;
+
     //
     // MessageId: TPM_E_DECRYPT_ERROR
     //
@@ -33448,6 +37441,7 @@ public interface WinError {
     // The decryption process did not complete.
     //
     int TPM_E_DECRYPT_ERROR = 0x80280021;
+
     //
     // MessageId: TPM_E_INVALID_AUTHHANDLE
     //
@@ -33456,6 +37450,7 @@ public interface WinError {
     // An invalid handle was used.
     //
     int TPM_E_INVALID_AUTHHANDLE = 0x80280022;
+
     //
     // MessageId: TPM_E_NO_ENDORSEMENT
     //
@@ -33464,6 +37459,7 @@ public interface WinError {
     // The TPM does not have an Endorsement Key (EK) installed.
     //
     int TPM_E_NO_ENDORSEMENT = 0x80280023;
+
     //
     // MessageId: TPM_E_INVALID_KEYUSAGE
     //
@@ -33472,6 +37468,7 @@ public interface WinError {
     // The usage of a key is not allowed.
     //
     int TPM_E_INVALID_KEYUSAGE = 0x80280024;
+
     //
     // MessageId: TPM_E_WRONG_ENTITYTYPE
     //
@@ -33480,6 +37477,7 @@ public interface WinError {
     // The submitted entity type is not allowed.
     //
     int TPM_E_WRONG_ENTITYTYPE = 0x80280025;
+
     //
     // MessageId: TPM_E_INVALID_POSTINIT
     //
@@ -33489,6 +37487,7 @@ public interface WinError {
     // subsequent TPM_Startup.
     //
     int TPM_E_INVALID_POSTINIT = 0x80280026;
+
     //
     // MessageId: TPM_E_INAPPROPRIATE_SIG
     //
@@ -33497,6 +37496,7 @@ public interface WinError {
     // Signed data cannot include additional DER information.
     //
     int TPM_E_INAPPROPRIATE_SIG = 0x80280027;
+
     //
     // MessageId: TPM_E_BAD_KEY_PROPERTY
     //
@@ -33505,6 +37505,7 @@ public interface WinError {
     // The key properties in TPM_KEY_PARMs are not supported by this TPM.
     //
     int TPM_E_BAD_KEY_PROPERTY = 0x80280028;
+
     //
     // MessageId: TPM_E_BAD_MIGRATION
     //
@@ -33513,6 +37514,7 @@ public interface WinError {
     // The migration properties of this key are incorrect.
     //
     int TPM_E_BAD_MIGRATION = 0x80280029;
+
     //
     // MessageId: TPM_E_BAD_SCHEME
     //
@@ -33522,6 +37524,7 @@ public interface WinError {
     // permitted in this situation.
     //
     int TPM_E_BAD_SCHEME = 0x8028002A;
+
     //
     // MessageId: TPM_E_BAD_DATASIZE
     //
@@ -33531,6 +37534,7 @@ public interface WinError {
     // referenced key.
     //
     int TPM_E_BAD_DATASIZE = 0x8028002B;
+
     //
     // MessageId: TPM_E_BAD_MODE
     //
@@ -33541,6 +37545,7 @@ public interface WinError {
     // migrationType for TPM_CreateMigrationBlob.
     //
     int TPM_E_BAD_MODE = 0x8028002C;
+
     //
     // MessageId: TPM_E_BAD_PRESENCE
     //
@@ -33550,6 +37555,7 @@ public interface WinError {
     // value.
     //
     int TPM_E_BAD_PRESENCE = 0x8028002D;
+
     //
     // MessageId: TPM_E_BAD_VERSION
     //
@@ -33558,6 +37564,7 @@ public interface WinError {
     // The TPM cannot perform this version of the capability.
     //
     int TPM_E_BAD_VERSION = 0x8028002E;
+
     //
     // MessageId: TPM_E_NO_WRAP_TRANSPORT
     //
@@ -33566,6 +37573,7 @@ public interface WinError {
     // The TPM does not allow for wrapped transport sessions.
     //
     int TPM_E_NO_WRAP_TRANSPORT = 0x8028002F;
+
     //
     // MessageId: TPM_E_AUDITFAIL_UNSUCCESSFUL
     //
@@ -33575,6 +37583,7 @@ public interface WinError {
     // failure code also.
     //
     int TPM_E_AUDITFAIL_UNSUCCESSFUL = 0x80280030;
+
     //
     // MessageId: TPM_E_AUDITFAIL_SUCCESSFUL
     //
@@ -33584,6 +37593,7 @@ public interface WinError {
     // success.
     //
     int TPM_E_AUDITFAIL_SUCCESSFUL = 0x80280031;
+
     //
     // MessageId: TPM_E_NOTRESETABLE
     //
@@ -33593,6 +37603,7 @@ public interface WinError {
     // attribute.
     //
     int TPM_E_NOTRESETABLE = 0x80280032;
+
     //
     // MessageId: TPM_E_NOTLOCAL
     //
@@ -33602,6 +37613,7 @@ public interface WinError {
     // modifier not part of command transport.
     //
     int TPM_E_NOTLOCAL = 0x80280033;
+
     //
     // MessageId: TPM_E_BAD_TYPE
     //
@@ -33610,6 +37622,7 @@ public interface WinError {
     // Make identity blob not properly typed.
     //
     int TPM_E_BAD_TYPE = 0x80280034;
+
     //
     // MessageId: TPM_E_INVALID_RESOURCE
     //
@@ -33619,6 +37632,7 @@ public interface WinError {
     // resource.
     //
     int TPM_E_INVALID_RESOURCE = 0x80280035;
+
     //
     // MessageId: TPM_E_NOTFIPS
     //
@@ -33628,6 +37642,7 @@ public interface WinError {
     // mode.
     //
     int TPM_E_NOTFIPS = 0x80280036;
+
     //
     // MessageId: TPM_E_INVALID_FAMILY
     //
@@ -33636,6 +37651,7 @@ public interface WinError {
     // The command is attempting to use an invalid family ID.
     //
     int TPM_E_INVALID_FAMILY = 0x80280037;
+
     //
     // MessageId: TPM_E_NO_NV_PERMISSION
     //
@@ -33644,6 +37660,7 @@ public interface WinError {
     // The permission to manipulate the NV storage is not available.
     //
     int TPM_E_NO_NV_PERMISSION = 0x80280038;
+
     //
     // MessageId: TPM_E_REQUIRES_SIGN
     //
@@ -33652,6 +37669,7 @@ public interface WinError {
     // The operation requires a signed command.
     //
     int TPM_E_REQUIRES_SIGN = 0x80280039;
+
     //
     // MessageId: TPM_E_KEY_NOTSUPPORTED
     //
@@ -33660,6 +37678,7 @@ public interface WinError {
     // Wrong operation to load an NV key.
     //
     int TPM_E_KEY_NOTSUPPORTED = 0x8028003A;
+
     //
     // MessageId: TPM_E_AUTH_CONF;ICT
     //
@@ -33668,6 +37687,7 @@ public interface WinError {
     // NV_LoadKey blob requires both owner and blob authorization.
     //
     int TPM_E_AUTH_CONFLICT = 0x8028003B;
+
     //
     // MessageId: TPM_E_AREA_LOCKED
     //
@@ -33676,6 +37696,7 @@ public interface WinError {
     // The NV area is locked and not writtable.
     //
     int TPM_E_AREA_LOCKED = 0x8028003C;
+
     //
     // MessageId: TPM_E_BAD_LOCALITY
     //
@@ -33684,6 +37705,7 @@ public interface WinError {
     // The locality is incorrect for the attempted operation.
     //
     int TPM_E_BAD_LOCALITY = 0x8028003D;
+
     //
     // MessageId: TPM_E_READ_ONLY
     //
@@ -33692,6 +37714,7 @@ public interface WinError {
     // The NV area is read only and can't be written to.
     //
     int TPM_E_READ_ONLY = 0x8028003E;
+
     //
     // MessageId: TPM_E_PER_NOWRITE
     //
@@ -33700,6 +37723,7 @@ public interface WinError {
     // There is no protection on the write to the NV area.
     //
     int TPM_E_PER_NOWRITE = 0x8028003F;
+
     //
     // MessageId: TPM_E_FAMILYCOUNT
     //
@@ -33708,6 +37732,7 @@ public interface WinError {
     // The family count value does not match.
     //
     int TPM_E_FAMILYCOUNT = 0x80280040;
+
     //
     // MessageId: TPM_E_WRITE_LOCKED
     //
@@ -33716,6 +37741,7 @@ public interface WinError {
     // The NV area has already been written to.
     //
     int TPM_E_WRITE_LOCKED = 0x80280041;
+
     //
     // MessageId: TPM_E_BAD_ATTRIBUTES
     //
@@ -33724,6 +37750,7 @@ public interface WinError {
     // The NV area attributes conFLIct.
     //
     int TPM_E_BAD_ATTRIBUTES = 0x80280042;
+
     //
     // MessageId: TPM_E_INVALID_STRUCTURE
     //
@@ -33732,6 +37759,7 @@ public interface WinError {
     // The structure tag and version are invalid or inconsistent.
     //
     int TPM_E_INVALID_STRUCTURE = 0x80280043;
+
     //
     // MessageId: TPM_E_KEY_OWNER_CONTROL
     //
@@ -33741,6 +37769,7 @@ public interface WinError {
     // TPM Owner.
     //
     int TPM_E_KEY_OWNER_CONTROL = 0x80280044;
+
     //
     // MessageId: TPM_E_BAD_COUNTER
     //
@@ -33749,6 +37778,7 @@ public interface WinError {
     // The counter handle is incorrect.
     //
     int TPM_E_BAD_COUNTER = 0x80280045;
+
     //
     // MessageId: TPM_E_NOT_FULLWRITE
     //
@@ -33757,6 +37787,7 @@ public interface WinError {
     // The write is not a complete write of the area.
     //
     int TPM_E_NOT_FULLWRITE = 0x80280046;
+
     //
     // MessageId: TPM_E_CONTEXT_GAP
     //
@@ -33765,6 +37796,7 @@ public interface WinError {
     // The gap between saved context counts is too large.
     //
     int TPM_E_CONTEXT_GAP = 0x80280047;
+
     //
     // MessageId: TPM_E_MAXNVWRITES
     //
@@ -33773,6 +37805,7 @@ public interface WinError {
     // The maximum number of NV writes without an owner has been exceeded.
     //
     int TPM_E_MAXNVWRITES = 0x80280048;
+
     //
     // MessageId: TPM_E_NOOPERATOR
     //
@@ -33781,6 +37814,7 @@ public interface WinError {
     // No operator AuthData value is set.
     //
     int TPM_E_NOOPERATOR = 0x80280049;
+
     //
     // MessageId: TPM_E_RESOURCEMISSING
     //
@@ -33789,6 +37823,7 @@ public interface WinError {
     // The resource pointed to by context is not loaded.
     //
     int TPM_E_RESOURCEMISSING = 0x8028004A;
+
     //
     // MessageId: TPM_E_DELEGATE_LOCK
     //
@@ -33797,6 +37832,7 @@ public interface WinError {
     // The delegate administration is locked.
     //
     int TPM_E_DELEGATE_LOCK = 0x8028004B;
+
     //
     // MessageId: TPM_E_DELEGATE_FAMILY
     //
@@ -33805,6 +37841,7 @@ public interface WinError {
     // Attempt to manage a family other then the delegated family.
     //
     int TPM_E_DELEGATE_FAMILY = 0x8028004C;
+
     //
     // MessageId: TPM_E_DELEGATE_ADMIN
     //
@@ -33813,6 +37850,7 @@ public interface WinError {
     // Delegation table management not enabled.
     //
     int TPM_E_DELEGATE_ADMIN = 0x8028004D;
+
     //
     // MessageId: TPM_E_TRANSPORT_NOTEXCLUSIVE
     //
@@ -33821,6 +37859,7 @@ public interface WinError {
     // There was a command executed outside of an exclusive transport session.
     //
     int TPM_E_TRANSPORT_NOTEXCLUSIVE = 0x8028004E;
+
     //
     // MessageId: TPM_E_OWNER_CONTROL
     //
@@ -33829,6 +37868,7 @@ public interface WinError {
     // Attempt to context save a owner evict controlled key.
     //
     int TPM_E_OWNER_CONTROL = 0x8028004F;
+
     //
     // MessageId: TPM_E_DAA_RESOURCES
     //
@@ -33837,6 +37877,7 @@ public interface WinError {
     // The DAA command has no resources availble to execute the command.
     //
     int TPM_E_DAA_RESOURCES = 0x80280050;
+
     //
     // MessageId: TPM_E_DAA_INPUT_DATA0
     //
@@ -33845,6 +37886,7 @@ public interface WinError {
     // The consistency check on DAA parameter inputData0 has failed.
     //
     int TPM_E_DAA_INPUT_DATA0 = 0x80280051;
+
     //
     // MessageId: TPM_E_DAA_INPUT_DATA1
     //
@@ -33853,6 +37895,7 @@ public interface WinError {
     // The consistency check on DAA parameter inputData1 has failed.
     //
     int TPM_E_DAA_INPUT_DATA1 = 0x80280052;
+
     //
     // MessageId: TPM_E_DAA_ISSUER_SETTINGS
     //
@@ -33861,6 +37904,7 @@ public interface WinError {
     // The consistency check on DAA_issuerSettings has failed.
     //
     int TPM_E_DAA_ISSUER_SETTINGS = 0x80280053;
+
     //
     // MessageId: TPM_E_DAA_TPM_SETTINGS
     //
@@ -33869,6 +37913,7 @@ public interface WinError {
     // The consistency check on DAA_tpmSpecific has failed.
     //
     int TPM_E_DAA_TPM_SETTINGS = 0x80280054;
+
     //
     // MessageId: TPM_E_DAA_STAGE
     //
@@ -33878,6 +37923,7 @@ public interface WinError {
     // expected process.
     //
     int TPM_E_DAA_STAGE = 0x80280055;
+
     //
     // MessageId: TPM_E_DAA_ISSUER_VALIDITY
     //
@@ -33886,6 +37932,7 @@ public interface WinError {
     // The issuer's validity check has detected an inconsistency.
     //
     int TPM_E_DAA_ISSUER_VALIDITY = 0x80280056;
+
     //
     // MessageId: TPM_E_DAA_WRONG_W
     //
@@ -33894,6 +37941,7 @@ public interface WinError {
     // The consistency check on w has failed.
     //
     int TPM_E_DAA_WRONG_W = 0x80280057;
+
     //
     // MessageId: TPM_E_BAD_HANDLE
     //
@@ -33902,6 +37950,7 @@ public interface WinError {
     // The handle is incorrect.
     //
     int TPM_E_BAD_HANDLE = 0x80280058;
+
     //
     // MessageId: TPM_E_BAD_DELEGATE
     //
@@ -33910,6 +37959,7 @@ public interface WinError {
     // Delegation is not correct.
     //
     int TPM_E_BAD_DELEGATE = 0x80280059;
+
     //
     // MessageId: TPM_E_BADCONTEXT
     //
@@ -33918,6 +37968,7 @@ public interface WinError {
     // The context blob is invalid.
     //
     int TPM_E_BADCONTEXT = 0x8028005A;
+
     //
     // MessageId: TPM_E_TOOMANYCONTEXTS
     //
@@ -33926,6 +37977,7 @@ public interface WinError {
     // Too many contexts held by the TPM.
     //
     int TPM_E_TOOMANYCONTEXTS = 0x8028005B;
+
     //
     // MessageId: TPM_E_MA_TICKET_SIGNATURE
     //
@@ -33934,6 +37986,7 @@ public interface WinError {
     // Migration authority signature validation failure.
     //
     int TPM_E_MA_TICKET_SIGNATURE = 0x8028005C;
+
     //
     // MessageId: TPM_E_MA_DESTINATION
     //
@@ -33942,6 +37995,7 @@ public interface WinError {
     // Migration destination not authenticated.
     //
     int TPM_E_MA_DESTINATION = 0x8028005D;
+
     //
     // MessageId: TPM_E_MA_SOURCE
     //
@@ -33950,6 +38004,7 @@ public interface WinError {
     // Migration source incorrect.
     //
     int TPM_E_MA_SOURCE = 0x8028005E;
+
     //
     // MessageId: TPM_E_MA_AUTHORITY
     //
@@ -33958,6 +38013,7 @@ public interface WinError {
     // Incorrect migration authority.
     //
     int TPM_E_MA_AUTHORITY = 0x8028005F;
+
     //
     // MessageId: TPM_E_PERMANENTEK
     //
@@ -33966,6 +38022,7 @@ public interface WinError {
     // Attempt to revoke the EK and the EK is not revocable.
     //
     int TPM_E_PERMANENTEK = 0x80280061;
+
     //
     // MessageId: TPM_E_BAD_SIGNATURE
     //
@@ -33974,6 +38031,7 @@ public interface WinError {
     // Bad signature of CMK ticket.
     //
     int TPM_E_BAD_SIGNATURE = 0x80280062;
+
     //
     // MessageId: TPM_E_NOCONTEXTSPACE
     //
@@ -33982,6 +38040,7 @@ public interface WinError {
     // There is no room in the context list for additional contexts.
     //
     int TPM_E_NOCONTEXTSPACE = 0x80280063;
+
     //
     // TPM vendor specific hardware errors {0x0400..0x04ff}
     //
@@ -33993,6 +38052,7 @@ public interface WinError {
     // The command was blocked.
     //
     int TPM_E_COMMAND_BLOCKED = 0x80280400;
+
     //
     // MessageId: TPM_E_INVALID_HANDLE
     //
@@ -34001,6 +38061,7 @@ public interface WinError {
     // The specified handle was not found.
     //
     int TPM_E_INVALID_HANDLE = 0x80280401;
+
     //
     // MessageId: TPM_E_DUPLICATE_VHANDLE
     //
@@ -34010,6 +38071,7 @@ public interface WinError {
     // resubmitted.
     //
     int TPM_E_DUPLICATE_VHANDLE = 0x80280402;
+
     //
     // MessageId: TPM_E_EMBEDDED_COMMAND_BLOCKED
     //
@@ -34018,6 +38080,7 @@ public interface WinError {
     // The command within the transport was blocked.
     //
     int TPM_E_EMBEDDED_COMMAND_BLOCKED = 0x80280403;
+
     //
     // MessageId: TPM_E_EMBEDDED_COMMAND_UNSUPPORTED
     //
@@ -34026,6 +38089,7 @@ public interface WinError {
     // The command within the transport is not supported.
     //
     int TPM_E_EMBEDDED_COMMAND_UNSUPPORTED = 0x80280404;
+
     //
     // TPM non-fatal hardware errors {0x0800..0x08ff}
     //
@@ -34038,6 +38102,7 @@ public interface WinError {
     // command could be resubmitted at a later time.
     //
     int TPM_E_RETRY = 0x80280800;
+
     //
     // MessageId: TPM_E_NEEDS_SELFTEST
     //
@@ -34046,6 +38111,7 @@ public interface WinError {
     // SelfTestFull has not been run.
     //
     int TPM_E_NEEDS_SELFTEST = 0x80280801;
+
     //
     // MessageId: TPM_E_DOING_SELFTEST
     //
@@ -34054,6 +38120,7 @@ public interface WinError {
     // The TPM is currently executing a full selftest.
     //
     int TPM_E_DOING_SELFTEST = 0x80280802;
+
     //
     // MessageId: TPM_E_DEFEND_LOCK_RUNNING
     //
@@ -34063,6 +38130,7 @@ public interface WinError {
     // period.
     //
     int TPM_E_DEFEND_LOCK_RUNNING = 0x80280803;
+
     //
     // TPM Base Services error codes {0x4000..0x40ff}
     //
@@ -34074,6 +38142,7 @@ public interface WinError {
     // An internal software error has been detected.
     //
     int TBS_E_INTERNAL_ERROR = 0x80284001;
+
     //
     // MessageId: TBS_E_BAD_PARAMETER
     //
@@ -34082,6 +38151,7 @@ public interface WinError {
     // One or more input parameters is bad.
     //
     int TBS_E_BAD_PARAMETER = 0x80284002;
+
     //
     // MessageId: TBS_E_INVALID_OUTPUT_POINTER
     //
@@ -34090,6 +38160,7 @@ public interface WinError {
     // A specified output pointer is bad.
     //
     int TBS_E_INVALID_OUTPUT_POINTER = 0x80284003;
+
     //
     // MessageId: TBS_E_INVALID_CONTEXT
     //
@@ -34098,6 +38169,7 @@ public interface WinError {
     // The specified context handle does not refer to a valid context.
     //
     int TBS_E_INVALID_CONTEXT = 0x80284004;
+
     //
     // MessageId: TBS_E_INSUFFICIENT_BUFFER
     //
@@ -34106,6 +38178,7 @@ public interface WinError {
     // A specified output buffer is too small.
     //
     int TBS_E_INSUFFICIENT_BUFFER = 0x80284005;
+
     //
     // MessageId: TBS_E_IOERROR
     //
@@ -34114,6 +38187,7 @@ public interface WinError {
     // An error occurred while communicating with the TPM.
     //
     int TBS_E_IOERROR = 0x80284006;
+
     //
     // MessageId: TBS_E_INVALID_CONTEXT_PARAM
     //
@@ -34122,6 +38196,7 @@ public interface WinError {
     // One or more context parameters is invalid.
     //
     int TBS_E_INVALID_CONTEXT_PARAM = 0x80284007;
+
     //
     // MessageId: TBS_E_SERVICE_NOT_RUNNING
     //
@@ -34130,6 +38205,7 @@ public interface WinError {
     // The TBS service is not running and could not be started.
     //
     int TBS_E_SERVICE_NOT_RUNNING = 0x80284008;
+
     //
     // MessageId: TBS_E_TOO_MANY_TBS_CONTEXTS
     //
@@ -34139,6 +38215,7 @@ public interface WinError {
     // contexts.
     //
     int TBS_E_TOO_MANY_TBS_CONTEXTS = 0x80284009;
+
     //
     // MessageId: TBS_E_TOO_MANY_RESOURCES
     //
@@ -34149,6 +38226,7 @@ public interface WinError {
     // virtual resources.
     //
     int TBS_E_TOO_MANY_RESOURCES = 0x8028400A;
+
     //
     // MessageId: TBS_E_SERVICE_START_PENDING
     //
@@ -34157,6 +38235,7 @@ public interface WinError {
     // The TBS service has been started but is not yet running.
     //
     int TBS_E_SERVICE_START_PENDING = 0x8028400B;
+
     //
     // MessageId: TBS_E_PPI_NOT_SUPPORTED
     //
@@ -34165,6 +38244,7 @@ public interface WinError {
     // The physical presence interface is not supported.
     //
     int TBS_E_PPI_NOT_SUPPORTED = 0x8028400C;
+
     //
     // MessageId: TBS_E_COMMAND_CANCELED
     //
@@ -34173,6 +38253,7 @@ public interface WinError {
     // The command was canceled.
     //
     int TBS_E_COMMAND_CANCELED = 0x8028400D;
+
     //
     // MessageId: TBS_E_BUFFER_TOO_LARGE
     //
@@ -34181,6 +38262,7 @@ public interface WinError {
     // The input or output buffer is too large.
     //
     int TBS_E_BUFFER_TOO_LARGE = 0x8028400E;
+
     //
     // MessageId: TBS_E_TPM_NOT_FOUND
     //
@@ -34190,6 +38272,7 @@ public interface WinError {
     // found on this computer.
     //
     int TBS_E_TPM_NOT_FOUND = 0x8028400F;
+
     //
     // MessageId: TBS_E_SERVICE_DISABLED
     //
@@ -34198,6 +38281,7 @@ public interface WinError {
     // The TBS service has been disabled.
     //
     int TBS_E_SERVICE_DISABLED = 0x80284010;
+
     //
     // TPM API error codes {0x0100..0x01ff}
     //
@@ -34209,6 +38293,7 @@ public interface WinError {
     // The command buffer is not in the correct state.
     //
     int TPMAPI_E_INVALID_STATE = 0x80290100;
+
     //
     // MessageId: TPMAPI_E_NOT_ENOUGH_DATA
     //
@@ -34217,6 +38302,7 @@ public interface WinError {
     // The command buffer does not contain enough data to satisfy the request.
     //
     int TPMAPI_E_NOT_ENOUGH_DATA = 0x80290101;
+
     //
     // MessageId: TPMAPI_E_TOO_MUCH_DATA
     //
@@ -34225,6 +38311,7 @@ public interface WinError {
     // The command buffer cannot contain any more data.
     //
     int TPMAPI_E_TOO_MUCH_DATA = 0x80290102;
+
     //
     // MessageId: TPMAPI_E_INVALID_OUTPUT_POINTER
     //
@@ -34233,6 +38320,7 @@ public interface WinError {
     // One or more output parameters was NULL or invalid.
     //
     int TPMAPI_E_INVALID_OUTPUT_POINTER = 0x80290103;
+
     //
     // MessageId: TPMAPI_E_INVALID_PARAMETER
     //
@@ -34241,6 +38329,7 @@ public interface WinError {
     // One or more input parameters is invalid.
     //
     int TPMAPI_E_INVALID_PARAMETER = 0x80290104;
+
     //
     // MessageId: TPMAPI_E_OUT_OF_MEMORY
     //
@@ -34249,6 +38338,7 @@ public interface WinError {
     // Not enough memory was available to satisfy the request.
     //
     int TPMAPI_E_OUT_OF_MEMORY = 0x80290105;
+
     //
     // MessageId: TPMAPI_E_BUFFER_TOO_SMALL
     //
@@ -34257,6 +38347,7 @@ public interface WinError {
     // The specified buffer was too small.
     //
     int TPMAPI_E_BUFFER_TOO_SMALL = 0x80290106;
+
     //
     // MessageId: TPMAPI_E_INTERNAL_ERROR
     //
@@ -34265,6 +38356,7 @@ public interface WinError {
     // An internal error was detected.
     //
     int TPMAPI_E_INTERNAL_ERROR = 0x80290107;
+
     //
     // MessageId: TPMAPI_E_ACCESS_DENIED
     //
@@ -34274,6 +38366,7 @@ public interface WinError {
     // operation.
     //
     int TPMAPI_E_ACCESS_DENIED = 0x80290108;
+
     //
     // MessageId: TPMAPI_E_AUTHORIZATION_FAILED
     //
@@ -34282,6 +38375,7 @@ public interface WinError {
     // The specified authorization information was invalid.
     //
     int TPMAPI_E_AUTHORIZATION_FAILED = 0x80290109;
+
     //
     // MessageId: TPMAPI_E_INVALID_CONTEXT_HANDLE
     //
@@ -34290,6 +38384,7 @@ public interface WinError {
     // The specified context handle was not valid.
     //
     int TPMAPI_E_INVALID_CONTEXT_HANDLE = 0x8029010A;
+
     //
     // MessageId: TPMAPI_E_TBS_COMMUNICATION_ERROR
     //
@@ -34298,6 +38393,7 @@ public interface WinError {
     // An error occurred while communicating with the TBS.
     //
     int TPMAPI_E_TBS_COMMUNICATION_ERROR = 0x8029010B;
+
     //
     // MessageId: TPMAPI_E_TPM_COMMAND_ERROR
     //
@@ -34306,6 +38402,7 @@ public interface WinError {
     // The TPM returned an unexpected result.
     //
     int TPMAPI_E_TPM_COMMAND_ERROR = 0x8029010C;
+
     //
     // MessageId: TPMAPI_E_MESSAGE_TOO_LARGE
     //
@@ -34314,6 +38411,7 @@ public interface WinError {
     // The message was too large for the encoding scheme.
     //
     int TPMAPI_E_MESSAGE_TOO_LARGE = 0x8029010D;
+
     //
     // MessageId: TPMAPI_E_INVALID_ENCODING
     //
@@ -34322,6 +38420,7 @@ public interface WinError {
     // The encoding in the blob was not recognized.
     //
     int TPMAPI_E_INVALID_ENCODING = 0x8029010E;
+
     //
     // MessageId: TPMAPI_E_INVALID_KEY_SIZE
     //
@@ -34330,6 +38429,7 @@ public interface WinError {
     // The key size is not valid.
     //
     int TPMAPI_E_INVALID_KEY_SIZE = 0x8029010F;
+
     //
     // MessageId: TPMAPI_E_ENCRYPTION_FAILED
     //
@@ -34338,6 +38438,7 @@ public interface WinError {
     // The encryption operation failed.
     //
     int TPMAPI_E_ENCRYPTION_FAILED = 0x80290110;
+
     //
     // MessageId: TPMAPI_E_INVALID_KEY_PARAMS
     //
@@ -34346,6 +38447,7 @@ public interface WinError {
     // The key parameters structure was not valid
     //
     int TPMAPI_E_INVALID_KEY_PARAMS = 0x80290111;
+
     //
     // MessageId: TPMAPI_E_INVALID_MIGRATION_AUTHORIZATION_BLOB
     //
@@ -34355,6 +38457,7 @@ public interface WinError {
     // authorization blob.
     //
     int TPMAPI_E_INVALID_MIGRATION_AUTHORIZATION_BLOB = 0x80290112;
+
     //
     // MessageId: TPMAPI_E_INVALID_PCR_INDEX
     //
@@ -34363,6 +38466,7 @@ public interface WinError {
     // The specified PCR index was invalid
     //
     int TPMAPI_E_INVALID_PCR_INDEX = 0x80290113;
+
     //
     // MessageId: TPMAPI_E_INVALID_DELEGATE_BLOB
     //
@@ -34371,6 +38475,7 @@ public interface WinError {
     // The data given does not appear to be a valid delegate blob.
     //
     int TPMAPI_E_INVALID_DELEGATE_BLOB = 0x80290114;
+
     //
     // MessageId: TPMAPI_E_INVALID_CONTEXT_PARAMS
     //
@@ -34379,6 +38484,7 @@ public interface WinError {
     // One or more of the specified context parameters was not valid.
     //
     int TPMAPI_E_INVALID_CONTEXT_PARAMS = 0x80290115;
+
     //
     // MessageId: TPMAPI_E_INVALID_KEY_BLOB
     //
@@ -34387,6 +38493,7 @@ public interface WinError {
     // The data given does not appear to be a valid key blob
     //
     int TPMAPI_E_INVALID_KEY_BLOB = 0x80290116;
+
     //
     // MessageId: TPMAPI_E_INVALID_PCR_DATA
     //
@@ -34395,6 +38502,7 @@ public interface WinError {
     // The specified PCR data was invalid.
     //
     int TPMAPI_E_INVALID_PCR_DATA = 0x80290117;
+
     //
     // MessageId: TPMAPI_E_INVALID_OWNER_AUTH
     //
@@ -34403,6 +38511,7 @@ public interface WinError {
     // The format of the owner auth data was invalid.
     //
     int TPMAPI_E_INVALID_OWNER_AUTH = 0x80290118;
+
     //
     // MessageId: TPMAPI_E_FIPS_RNG_CHECK_FAILED
     //
@@ -34411,6 +38520,7 @@ public interface WinError {
     // The random number generated did not pass FIPS RNG check.
     //
     int TPMAPI_E_FIPS_RNG_CHECK_FAILED = 0x80290119;
+
     //
     // TBS implementation error codes {0x0200..0x02ff}
     //
@@ -34422,6 +38532,7 @@ public interface WinError {
     // The specified buffer was too small.
     //
     int TBSIMP_E_BUFFER_TOO_SMALL = 0x80290200;
+
     //
     // MessageId: TBSIMP_E_CLEANUP_FAILED
     //
@@ -34430,6 +38541,7 @@ public interface WinError {
     // The context could not be cleaned up.
     //
     int TBSIMP_E_CLEANUP_FAILED = 0x80290201;
+
     //
     // MessageId: TBSIMP_E_INVALID_CONTEXT_HANDLE
     //
@@ -34438,6 +38550,7 @@ public interface WinError {
     // The specified context handle is invalid.
     //
     int TBSIMP_E_INVALID_CONTEXT_HANDLE = 0x80290202;
+
     //
     // MessageId: TBSIMP_E_INVALID_CONTEXT_PARAM
     //
@@ -34446,6 +38559,7 @@ public interface WinError {
     // An invalid context parameter was specified.
     //
     int TBSIMP_E_INVALID_CONTEXT_PARAM = 0x80290203;
+
     //
     // MessageId: TBSIMP_E_TPM_ERROR
     //
@@ -34454,6 +38568,7 @@ public interface WinError {
     // An error occurred while communicating with the TPM
     //
     int TBSIMP_E_TPM_ERROR = 0x80290204;
+
     //
     // MessageId: TBSIMP_E_HASH_BAD_KEY
     //
@@ -34462,6 +38577,7 @@ public interface WinError {
     // No entry with the specified key was found.
     //
     int TBSIMP_E_HASH_BAD_KEY = 0x80290205;
+
     //
     // MessageId: TBSIMP_E_DUPLICATE_VHANDLE
     //
@@ -34470,6 +38586,7 @@ public interface WinError {
     // The specified virtual handle matches a virtual handle already in use.
     //
     int TBSIMP_E_DUPLICATE_VHANDLE = 0x80290206;
+
     //
     // MessageId: TBSIMP_E_INVALID_OUTPUT_POINTER
     //
@@ -34478,6 +38595,7 @@ public interface WinError {
     // The pointer to the returned handle location was NULL or invalid
     //
     int TBSIMP_E_INVALID_OUTPUT_POINTER = 0x80290207;
+
     //
     // MessageId: TBSIMP_E_INVALID_PARAMETER
     //
@@ -34486,6 +38604,7 @@ public interface WinError {
     // One or more parameters is invalid
     //
     int TBSIMP_E_INVALID_PARAMETER = 0x80290208;
+
     //
     // MessageId: TBSIMP_E_RPC_INIT_FAILED
     //
@@ -34494,6 +38613,7 @@ public interface WinError {
     // The RPC subsystem could not be initialized.
     //
     int TBSIMP_E_RPC_INIT_FAILED = 0x80290209;
+
     //
     // MessageId: TBSIMP_E_SCHEDULER_NOT_RUNNING
     //
@@ -34502,6 +38622,7 @@ public interface WinError {
     // The TBS scheduler is not running.
     //
     int TBSIMP_E_SCHEDULER_NOT_RUNNING = 0x8029020A;
+
     //
     // MessageId: TBSIMP_E_COMMAND_CANCELED
     //
@@ -34510,6 +38631,7 @@ public interface WinError {
     // The command was canceled.
     //
     int TBSIMP_E_COMMAND_CANCELED = 0x8029020B;
+
     //
     // MessageId: TBSIMP_E_OUT_OF_MEMORY
     //
@@ -34518,6 +38640,7 @@ public interface WinError {
     // There was not enough memory to fulfill the request
     //
     int TBSIMP_E_OUT_OF_MEMORY = 0x8029020C;
+
     //
     // MessageId: TBSIMP_E_LIST_NO_MORE_ITEMS
     //
@@ -34527,6 +38650,7 @@ public interface WinError {
     // list.
     //
     int TBSIMP_E_LIST_NO_MORE_ITEMS = 0x8029020D;
+
     //
     // MessageId: TBSIMP_E_LIST_NOT_FOUND
     //
@@ -34535,6 +38659,7 @@ public interface WinError {
     // The specified item was not found in the list.
     //
     int TBSIMP_E_LIST_NOT_FOUND = 0x8029020E;
+
     //
     // MessageId: TBSIMP_E_NOT_ENOUGH_SPACE
     //
@@ -34543,6 +38668,7 @@ public interface WinError {
     // The TPM does not have enough space to load the requested resource.
     //
     int TBSIMP_E_NOT_ENOUGH_SPACE = 0x8029020F;
+
     //
     // MessageId: TBSIMP_E_NOT_ENOUGH_TPM_CONTEXTS
     //
@@ -34551,6 +38677,7 @@ public interface WinError {
     // There are too many TPM contexts in use.
     //
     int TBSIMP_E_NOT_ENOUGH_TPM_CONTEXTS = 0x80290210;
+
     //
     // MessageId: TBSIMP_E_COMMAND_FAILED
     //
@@ -34559,6 +38686,7 @@ public interface WinError {
     // The TPM command failed.
     //
     int TBSIMP_E_COMMAND_FAILED = 0x80290211;
+
     //
     // MessageId: TBSIMP_E_UNKNOWN_ORDINAL
     //
@@ -34567,6 +38695,7 @@ public interface WinError {
     // The TBS does not recognize the specified ordinal.
     //
     int TBSIMP_E_UNKNOWN_ORDINAL = 0x80290212;
+
     //
     // MessageId: TBSIMP_E_RESOURCE_EXPIRED
     //
@@ -34575,6 +38704,7 @@ public interface WinError {
     // The requested resource is no longer available.
     //
     int TBSIMP_E_RESOURCE_EXPIRED = 0x80290213;
+
     //
     // MessageId: TBSIMP_E_INVALID_RESOURCE
     //
@@ -34583,6 +38713,7 @@ public interface WinError {
     // The resource type did not match.
     //
     int TBSIMP_E_INVALID_RESOURCE = 0x80290214;
+
     //
     // MessageId: TBSIMP_E_NOTHING_TO_UNLOAD
     //
@@ -34591,6 +38722,7 @@ public interface WinError {
     // No resources can be unloaded.
     //
     int TBSIMP_E_NOTHING_TO_UNLOAD = 0x80290215;
+
     //
     // MessageId: TBSIMP_E_HASH_TABLE_FULL
     //
@@ -34599,6 +38731,7 @@ public interface WinError {
     // No new entries can be added to the hash table.
     //
     int TBSIMP_E_HASH_TABLE_FULL = 0x80290216;
+
     //
     // MessageId: TBSIMP_E_TOO_MANY_TBS_CONTEXTS
     //
@@ -34608,6 +38741,7 @@ public interface WinError {
     // contexts.
     //
     int TBSIMP_E_TOO_MANY_TBS_CONTEXTS = 0x80290217;
+
     //
     // MessageId: TBSIMP_E_TOO_MANY_RESOURCES
     //
@@ -34617,6 +38751,7 @@ public interface WinError {
     // open virtual resources.
     //
     int TBSIMP_E_TOO_MANY_RESOURCES = 0x80290218;
+
     //
     // MessageId: TBSIMP_E_PPI_NOT_SUPPORTED
     //
@@ -34625,6 +38760,7 @@ public interface WinError {
     // The physical presence interface is not supported.
     //
     int TBSIMP_E_PPI_NOT_SUPPORTED = 0x80290219;
+
     //
     // MessageId: TBSIMP_E_TPM_INCOMPATIBLE
     //
@@ -34633,6 +38769,7 @@ public interface WinError {
     // TBS is not compatible with the version of TPM found on the system.
     //
     int TBSIMP_E_TPM_INCOMPATIBLE = 0x8029021A;
+
     //
     // TPM Physical Presence implementation error codes {0x0300..0x03ff}
     //
@@ -34645,6 +38782,7 @@ public interface WinError {
     // response to a Physical Presence command.
     //
     int TPM_E_PPI_ACPI_FAILURE = 0x80290300;
+
     //
     // MessageId: TPM_E_PPI_USER_ABORT
     //
@@ -34653,6 +38791,7 @@ public interface WinError {
     // The user failed to confirm the TPM operation request.
     //
     int TPM_E_PPI_USER_ABORT = 0x80290301;
+
     //
     // MessageId: TPM_E_PPI_BIOS_FAILURE
     //
@@ -34663,6 +38802,7 @@ public interface WinError {
     // with the TPM).
     //
     int TPM_E_PPI_BIOS_FAILURE = 0x80290302;
+
     //
     // MessageId: TPM_E_PPI_NOT_SUPPORTED
     //
@@ -34671,6 +38811,7 @@ public interface WinError {
     // The BIOS does not support the physical presence interface.
     //
     int TPM_E_PPI_NOT_SUPPORTED = 0x80290303;
+
     //
     // ==
     // Facility Performance Logs & Alerts (PLA) Error Messages
@@ -34684,6 +38825,7 @@ public interface WinError {
     // Data Collector Set was not found.
     //
     int PLA_E_DCS_NOT_FOUND = 0x80300002;
+
     //
     // MessageId: PLA_E_DCS_IN_USE
     //
@@ -34692,6 +38834,7 @@ public interface WinError {
     // The Data Collector Set or one of its dependencies is already in use.
     //
     int PLA_E_DCS_IN_USE = 0x803000AA;
+
     //
     // MessageId: PLA_E_TOO_MANY_FOLDERS
     //
@@ -34700,6 +38843,7 @@ public interface WinError {
     // Unable to start Data Collector Set because there are too many folders.
     //
     int PLA_E_TOO_MANY_FOLDERS = 0x80300045;
+
     //
     // MessageId: PLA_E_NO_MIN_DISK
     //
@@ -34708,6 +38852,7 @@ public interface WinError {
     // Not enough free disk space to start Data Collector Set.
     //
     int PLA_E_NO_MIN_DISK = 0x80300070;
+
     //
     // MessageId: PLA_E_DCS_ALREADY_EXISTS
     //
@@ -34716,6 +38861,7 @@ public interface WinError {
     // Data Collector Set already exists.
     //
     int PLA_E_DCS_ALREADY_EXISTS = 0x803000B7;
+
     //
     // MessageId: PLA_S_PROPERTY_IGNORED
     //
@@ -34724,6 +38870,7 @@ public interface WinError {
     // Property value will be ignored.
     //
     int PLA_S_PROPERTY_IGNORED = 0x00300100;
+
     //
     // MessageId: PLA_E_PROPERTY_CONFLICT
     //
@@ -34732,6 +38879,7 @@ public interface WinError {
     // Property value conFLIct.
     //
     int PLA_E_PROPERTY_CONFLICT = 0x80300101;
+
     //
     // MessageId: PLA_E_DCS_SINGLETON_REQUIRED
     //
@@ -34741,6 +38889,7 @@ public interface WinError {
     // contain exactly one Data Collector.
     //
     int PLA_E_DCS_SINGLETON_REQUIRED = 0x80300102;
+
     //
     // MessageId: PLA_E_CREDENTIALS_REQUIRED
     //
@@ -34750,6 +38899,7 @@ public interface WinError {
     // Set properties.
     //
     int PLA_E_CREDENTIALS_REQUIRED = 0x80300103;
+
     //
     // MessageId: PLA_E_DCS_NOT_RUNNING
     //
@@ -34758,6 +38908,7 @@ public interface WinError {
     // Data Collector Set is not running.
     //
     int PLA_E_DCS_NOT_RUNNING = 0x80300104;
+
     //
     // MessageId: PLA_E_CONFLICT_INCL_EXCL_API
     //
@@ -34767,6 +38918,7 @@ public interface WinError {
     // specify the same API in both the include list and the exclude list.
     //
     int PLA_E_CONFLICT_INCL_EXCL_API = 0x80300105;
+
     //
     // MessageId: PLA_E_NETWORK_EXE_NOT_VALID
     //
@@ -34776,6 +38928,7 @@ public interface WinError {
     // path.
     //
     int PLA_E_NETWORK_EXE_NOT_VALID = 0x80300106;
+
     //
     // MessageId: PLA_E_EXE_ALREADY_CONFIGURED
     //
@@ -34785,6 +38938,7 @@ public interface WinError {
     // tracing.
     //
     int PLA_E_EXE_ALREADY_CONFIGURED = 0x80300107;
+
     //
     // MessageId: PLA_E_EXE_PATH_NOT_VALID
     //
@@ -34794,6 +38948,7 @@ public interface WinError {
     // specified path is correct.
     //
     int PLA_E_EXE_PATH_NOT_VALID = 0x80300108;
+
     //
     // MessageId: PLA_E_DC_ALREADY_EXISTS
     //
@@ -34802,6 +38957,7 @@ public interface WinError {
     // Data Collector already exists.
     //
     int PLA_E_DC_ALREADY_EXISTS = 0x80300109;
+
     //
     // MessageId: PLA_E_DCS_START_WAIT_TIMEOUT
     //
@@ -34810,6 +38966,7 @@ public interface WinError {
     // The wait for the Data Collector Set start notification has timed out.
     //
     int PLA_E_DCS_START_WAIT_TIMEOUT = 0x8030010A;
+
     //
     // MessageId: PLA_E_DC_START_WAIT_TIMEOUT
     //
@@ -34818,6 +38975,7 @@ public interface WinError {
     // The wait for the Data Collector to start has timed out.
     //
     int PLA_E_DC_START_WAIT_TIMEOUT = 0x8030010B;
+
     //
     // MessageId: PLA_E_REPORT_WAIT_TIMEOUT
     //
@@ -34826,6 +38984,7 @@ public interface WinError {
     // The wait for the report generation tool to finish has timed out.
     //
     int PLA_E_REPORT_WAIT_TIMEOUT = 0x8030010C;
+
     //
     // MessageId: PLA_E_NO_DUPLICATES
     //
@@ -34834,6 +38993,7 @@ public interface WinError {
     // Duplicate items are not allowed.
     //
     int PLA_E_NO_DUPLICATES = 0x8030010D;
+
     //
     // MessageId: PLA_E_EXE_FULL_PATH_REQUIRED
     //
@@ -34843,6 +39003,7 @@ public interface WinError {
     // full path to the executable and not just a filename.
     //
     int PLA_E_EXE_FULL_PATH_REQUIRED = 0x8030010E;
+
     //
     // MessageId: PLA_E_INVALID_SESSION_NAME
     //
@@ -34851,6 +39012,7 @@ public interface WinError {
     // The session name provided is invalid.
     //
     int PLA_E_INVALID_SESSION_NAME = 0x8030010F;
+
     //
     // MessageId: PLA_E_PLA_CHANNEL_NOT_ENABLED
     //
@@ -34860,6 +39022,7 @@ public interface WinError {
     // enabled to perform this operation.
     //
     int PLA_E_PLA_CHANNEL_NOT_ENABLED = 0x80300110;
+
     //
     // MessageId: PLA_E_TASKSCHED_CHANNEL_NOT_ENABLED
     //
@@ -34869,6 +39032,7 @@ public interface WinError {
     // perform this operation.
     //
     int PLA_E_TASKSCHED_CHANNEL_NOT_ENABLED = 0x80300111;
+
     //
     // MessageId: PLA_E_RULES_MANAGER_FAILED
     //
@@ -34877,6 +39041,7 @@ public interface WinError {
     // The execution of the Rules Manager failed.
     //
     int PLA_E_RULES_MANAGER_FAILED = 0x80300112;
+
     //
     // MessageId: PLA_E_CABAPI_FAILURE
     //
@@ -34885,6 +39050,7 @@ public interface WinError {
     // An error occured while attemption to compress or extract the data.
     //
     int PLA_E_CABAPI_FAILURE = 0x80300113;
+
     //
     // ==
     // Full Volume Encryption Error Messages
@@ -34899,6 +39065,7 @@ public interface WinError {
     // control panel to unlock volume.
     //
     int FVE_E_LOCKED_VOLUME = 0x80310000;
+
     //
     // MessageId: FVE_E_NOT_ENCRYPTED
     //
@@ -34907,6 +39074,7 @@ public interface WinError {
     // The volume is not encrypted, no key is available.
     //
     int FVE_E_NOT_ENCRYPTED = 0x80310001;
+
     //
     // MessageId: FVE_E_NO_TPM_BIOS
     //
@@ -34916,6 +39084,7 @@ public interface WinError {
     // manufacturer for BIOS upgrade instructions.
     //
     int FVE_E_NO_TPM_BIOS = 0x80310002;
+
     //
     // MessageId: FVE_E_NO_MBR_METRIC
     //
@@ -34925,6 +39094,7 @@ public interface WinError {
     // Contact the computer manufacturer for BIOS upgrade instructions.
     //
     int FVE_E_NO_MBR_METRIC = 0x80310003;
+
     //
     // MessageId: FVE_E_NO_BOOTSECTOR_METRIC
     //
@@ -34935,6 +39105,7 @@ public interface WinError {
     // computer manufacturer for BIOS upgrade instructions.
     //
     int FVE_E_NO_BOOTSECTOR_METRIC = 0x80310004;
+
     //
     // MessageId: FVE_E_NO_BOOTMGR_METRIC
     //
@@ -34943,6 +39114,7 @@ public interface WinError {
     // You have an incompatible boot sector. Update the boot manager (BOOTMGR).
     //
     int FVE_E_NO_BOOTMGR_METRIC = 0x80310005;
+
     //
     // MessageId: FVE_E_WRONG_BOOTMGR
     //
@@ -34951,6 +39123,7 @@ public interface WinError {
     // You have an incompatible boot manager. Update the boot manager (BOOTMGR).
     //
     int FVE_E_WRONG_BOOTMGR = 0x80310006;
+
     //
     // MessageId: FVE_E_SECURE_KEY_REQUIRED
     //
@@ -34959,6 +39132,7 @@ public interface WinError {
     // No secure key protector has been defined.
     //
     int FVE_E_SECURE_KEY_REQUIRED = 0x80310007;
+
     //
     // MessageId: FVE_E_NOT_ACTIVATED
     //
@@ -34968,6 +39142,7 @@ public interface WinError {
     // BitLocker.
     //
     int FVE_E_NOT_ACTIVATED = 0x80310008;
+
     //
     // MessageId: FVE_E_ACTION_NOT_ALLOWED
     //
@@ -34977,6 +39152,7 @@ public interface WinError {
     // condition may occur when two requests are issued at the same time.
     //
     int FVE_E_ACTION_NOT_ALLOWED = 0x80310009;
+
     //
     // MessageId: FVE_E_AD_SCHEMA_NOT_INSTALLED
     //
@@ -34987,6 +39163,7 @@ public interface WinError {
     // Platform Module information.
     //
     int FVE_E_AD_SCHEMA_NOT_INSTALLED = 0x8031000A;
+
     //
     // MessageId: FVE_E_AD_INVALID_DATATYPE
     //
@@ -34995,6 +39172,7 @@ public interface WinError {
     // The type of the data obtained from Active Directory was not expected.
     //
     int FVE_E_AD_INVALID_DATATYPE = 0x8031000B;
+
     //
     // MessageId: FVE_E_AD_INVALID_DATASIZE
     //
@@ -35003,6 +39181,7 @@ public interface WinError {
     // The size of the data obtained from Active Directory was not expected.
     //
     int FVE_E_AD_INVALID_DATASIZE = 0x8031000C;
+
     //
     // MessageId: FVE_E_AD_NO_VALUES
     //
@@ -35011,6 +39190,7 @@ public interface WinError {
     // The attribute read from Active Directory has no (zero) values.
     //
     int FVE_E_AD_NO_VALUES = 0x8031000D;
+
     //
     // MessageId: FVE_E_AD_ATTR_NOT_SET
     //
@@ -35019,6 +39199,7 @@ public interface WinError {
     // The attribute was not set.
     //
     int FVE_E_AD_ATTR_NOT_SET = 0x8031000E;
+
     //
     // MessageId: FVE_E_AD_GUID_NOT_FOUND
     //
@@ -35027,6 +39208,7 @@ public interface WinError {
     // The specified GUID could not be found.
     //
     int FVE_E_AD_GUID_NOT_FOUND = 0x8031000F;
+
     //
     // MessageId: FVE_E_BAD_INFORMATION
     //
@@ -35035,6 +39217,7 @@ public interface WinError {
     // The control block for the encrypted volume is not valid.
     //
     int FVE_E_BAD_INFORMATION = 0x80310010;
+
     //
     // MessageId: FVE_E_TOO_SMALL
     //
@@ -35044,6 +39227,7 @@ public interface WinError {
     // space.
     //
     int FVE_E_TOO_SMALL = 0x80310011;
+
     //
     // MessageId: FVE_E_SYSTEM_VOLUME
     //
@@ -35053,6 +39237,7 @@ public interface WinError {
     // information.
     //
     int FVE_E_SYSTEM_VOLUME = 0x80310012;
+
     //
     // MessageId: FVE_E_FAILED_WRONG_FS
     //
@@ -35061,6 +39246,7 @@ public interface WinError {
     // The volume cannot be encrypted because the file system is not supported.
     //
     int FVE_E_FAILED_WRONG_FS = 0x80310013;
+
     //
     // MessageId: FVE_E_FAILED_BAD_FS
     //
@@ -35069,6 +39255,7 @@ public interface WinError {
     // The file system is corrupt. Run CHKDSK.
     //
     int FVE_E_FAILED_BAD_FS = 0x80310014;
+
     //
     // MessageId: FVE_E_NOT_SUPPORTED
     //
@@ -35077,6 +39264,7 @@ public interface WinError {
     // This volume cannot be encrypted.
     //
     int FVE_E_NOT_SUPPORTED = 0x80310015;
+
     //
     // MessageId: FVE_E_BAD_DATA
     //
@@ -35085,6 +39273,7 @@ public interface WinError {
     // Data supplied is malformed.
     //
     int FVE_E_BAD_DATA = 0x80310016;
+
     //
     // MessageId: FVE_E_VOLUME_NOT_BOUND
     //
@@ -35093,6 +39282,7 @@ public interface WinError {
     // Volume is not bound to the system.
     //
     int FVE_E_VOLUME_NOT_BOUND = 0x80310017;
+
     //
     // MessageId: FVE_E_TPM_NOT_OWNED
     //
@@ -35101,6 +39291,7 @@ public interface WinError {
     // You must take ownership of the Trusted Platform Module (TPM).
     //
     int FVE_E_TPM_NOT_OWNED = 0x80310018;
+
     //
     // MessageId: FVE_E_NOT_DATA_VOLUME
     //
@@ -35109,6 +39300,7 @@ public interface WinError {
     // The volume specified is not a data volume.
     //
     int FVE_E_NOT_DATA_VOLUME = 0x80310019;
+
     //
     // MessageId: FVE_E_AD_INSUFFICIENT_BUFFER
     //
@@ -35118,6 +39310,7 @@ public interface WinError {
     // returned data.
     //
     int FVE_E_AD_INSUFFICIENT_BUFFER = 0x8031001A;
+
     //
     // MessageId: FVE_E_CONV_READ
     //
@@ -35126,6 +39319,7 @@ public interface WinError {
     // A read operation failed while converting the volume.
     //
     int FVE_E_CONV_READ = 0x8031001B;
+
     //
     // MessageId: FVE_E_CONV_WRITE
     //
@@ -35134,6 +39328,7 @@ public interface WinError {
     // A write operation failed while converting the volume.
     //
     int FVE_E_CONV_WRITE = 0x8031001C;
+
     //
     // MessageId: FVE_E_KEY_REQUIRED
     //
@@ -35142,6 +39337,7 @@ public interface WinError {
     // One or more key protectors are required for this volume.
     //
     int FVE_E_KEY_REQUIRED = 0x8031001D;
+
     //
     // MessageId: FVE_E_CLUSTERING_NOT_SUPPORTED
     //
@@ -35150,6 +39346,7 @@ public interface WinError {
     // Cluster configurations are not supported.
     //
     int FVE_E_CLUSTERING_NOT_SUPPORTED = 0x8031001E;
+
     //
     // MessageId: FVE_E_VOLUME_BOUND_ALREADY
     //
@@ -35158,6 +39355,7 @@ public interface WinError {
     // The volume is already bound to the system.
     //
     int FVE_E_VOLUME_BOUND_ALREADY = 0x8031001F;
+
     //
     // MessageId: FVE_E_OS_NOT_PROTECTED
     //
@@ -35167,6 +39365,7 @@ public interface WinError {
     // Encryption.
     //
     int FVE_E_OS_NOT_PROTECTED = 0x80310020;
+
     //
     // MessageId: FVE_E_PROTECTION_DISABLED
     //
@@ -35175,6 +39374,7 @@ public interface WinError {
     // All protectors are effectively disabled (clear key exists).
     //
     int FVE_E_PROTECTION_DISABLED = 0x80310021;
+
     //
     // MessageId: FVE_E_RECOVERY_KEY_REQUIRED
     //
@@ -35183,6 +39383,7 @@ public interface WinError {
     // A recovery key protector is required.
     //
     int FVE_E_RECOVERY_KEY_REQUIRED = 0x80310022;
+
     //
     // MessageId: FVE_E_FOREIGN_VOLUME
     //
@@ -35191,6 +39392,7 @@ public interface WinError {
     // This volume cannot be bound to a TPM.
     //
     int FVE_E_FOREIGN_VOLUME = 0x80310023;
+
     //
     // MessageId: FVE_E_OVERLAPPED_UPDATE
     //
@@ -35200,6 +39402,7 @@ public interface WinError {
     // Try again.
     //
     int FVE_E_OVERLAPPED_UPDATE = 0x80310024;
+
     //
     // MessageId: FVE_E_TPM_SRK_AUTH_NOT_ZERO
     //
@@ -35210,6 +39413,7 @@ public interface WinError {
     // BitLocker.
     //
     int FVE_E_TPM_SRK_AUTH_NOT_ZERO = 0x80310025;
+
     //
     // MessageId: FVE_E_FAILED_SECTOR_SIZE
     //
@@ -35218,6 +39422,7 @@ public interface WinError {
     // The volume encryption algorithm cannot be used on this sector size.
     //
     int FVE_E_FAILED_SECTOR_SIZE = 0x80310026;
+
     //
     // MessageId: FVE_E_FAILED_AUTHENTICATION
     //
@@ -35227,6 +39432,7 @@ public interface WinError {
     // information to unlock the volume. Confirm the information and try again.
     //
     int FVE_E_FAILED_AUTHENTICATION = 0x80310027;
+
     //
     // MessageId: FVE_E_NOT_OS_VOLUME
     //
@@ -35235,6 +39441,7 @@ public interface WinError {
     // The volume specified is not the operating system volume.
     //
     int FVE_E_NOT_OS_VOLUME = 0x80310028;
+
     //
     // MessageId: FVE_E_AUTOUNLOCK_ENABLED
     //
@@ -35245,6 +39452,7 @@ public interface WinError {
     // volume.
     //
     int FVE_E_AUTOUNLOCK_ENABLED = 0x80310029;
+
     //
     // MessageId: FVE_E_WRONG_BOOTSECTOR
     //
@@ -35253,6 +39461,7 @@ public interface WinError {
     // The system partition boot sector does not perform TPM measurements.
     //
     int FVE_E_WRONG_BOOTSECTOR = 0x8031002A;
+
     //
     // MessageId: FVE_E_WRONG_SYSTEM_FS
     //
@@ -35262,6 +39471,7 @@ public interface WinError {
     // NTFS, then enable BitLocker.
     //
     int FVE_E_WRONG_SYSTEM_FS = 0x8031002B;
+
     //
     // MessageId: FVE_E_POLICY_PASSWORD_REQUIRED
     //
@@ -35270,6 +39480,7 @@ public interface WinError {
     // Group policy requires a recovery password before encryption may begin.
     //
     int FVE_E_POLICY_PASSWORD_REQUIRED = 0x8031002C;
+
     //
     // MessageId: FVE_E_CANNOT_SET_FVEK_ENCRYPTED
     //
@@ -35279,6 +39490,7 @@ public interface WinError {
     // volume.
     //
     int FVE_E_CANNOT_SET_FVEK_ENCRYPTED = 0x8031002D;
+
     //
     // MessageId: FVE_E_CANNOT_ENCRYPT_NO_KEY
     //
@@ -35287,6 +39499,7 @@ public interface WinError {
     // A key must be specified before encryption may begin.
     //
     int FVE_E_CANNOT_ENCRYPT_NO_KEY = 0x8031002E;
+
     //
     // MessageId: FVE_E_BOOTABLE_CDDVD
     //
@@ -35296,6 +39509,7 @@ public interface WinError {
     // the computer. Remove the media and restart the computer.
     //
     int FVE_E_BOOTABLE_CDDVD = 0x80310030;
+
     //
     // MessageId: FVE_E_PROTECTOR_EXISTS
     //
@@ -35304,6 +39518,7 @@ public interface WinError {
     // An instance of this key protector already exists on the volume.
     //
     int FVE_E_PROTECTOR_EXISTS = 0x80310031;
+
     //
     // MessageId: FVE_E_RELATIVE_PATH
     //
@@ -35312,6 +39527,7 @@ public interface WinError {
     // The file cannot be saved to a relative path.
     //
     int FVE_E_RELATIVE_PATH = 0x80310032;
+
     //
     // MessageId: FVE_E_PROTECTOR_NOT_FOUND
     //
@@ -35321,6 +39537,7 @@ public interface WinError {
     // protector.
     //
     int FVE_E_PROTECTOR_NOT_FOUND = 0x80310033;
+
     //
     // MessageId: FVE_E_INVALID_KEY_FORMAT
     //
@@ -35330,6 +39547,7 @@ public interface WinError {
     // device.
     //
     int FVE_E_INVALID_KEY_FORMAT = 0x80310034;
+
     //
     // MessageId: FVE_E_INVALID_PASSWORD_FORMAT
     //
@@ -35339,6 +39557,7 @@ public interface WinError {
     // recovery password and try again.
     //
     int FVE_E_INVALID_PASSWORD_FORMAT = 0x80310035;
+
     //
     // MessageId: FVE_E_FIPS_RNG_CHECK_FAILED
     //
@@ -35347,6 +39566,7 @@ public interface WinError {
     // The random number generator check test failed.
     //
     int FVE_E_FIPS_RNG_CHECK_FAILED = 0x80310036;
+
     //
     // MessageId: FVE_E_FIPS_PREVENTS_RECOVERY_PASSWORD
     //
@@ -35357,6 +39577,7 @@ public interface WinError {
     // administrator for more information.
     //
     int FVE_E_FIPS_PREVENTS_RECOVERY_PASSWORD = 0x80310037;
+
     //
     // MessageId: FVE_E_FIPS_PREVENTS_EXTERNAL_KEY_EXPORT
     //
@@ -35367,6 +39588,7 @@ public interface WinError {
     // more information.
     //
     int FVE_E_FIPS_PREVENTS_EXTERNAL_KEY_EXPORT = 0x80310038;
+
     //
     // MessageId: FVE_E_NOT_DECRYPTED
     //
@@ -35375,6 +39597,7 @@ public interface WinError {
     // The volume must be fully decrypted to complete this operation.
     //
     int FVE_E_NOT_DECRYPTED = 0x80310039;
+
     //
     // MessageId: FVE_E_INVALID_PROTECTOR_TYPE
     //
@@ -35383,6 +39606,7 @@ public interface WinError {
     // The specified key protector is not of the correct type.
     //
     int FVE_E_INVALID_PROTECTOR_TYPE = 0x8031003A;
+
     //
     // MessageId: FVE_E_NO_PROTECTORS_TO_TEST
     //
@@ -35391,6 +39615,7 @@ public interface WinError {
     // No TPM protectors exist on the volume to perform the hardware test.
     //
     int FVE_E_NO_PROTECTORS_TO_TEST = 0x8031003B;
+
     //
     // MessageId: FVE_E_KEYFILE_NOT_FOUND
     //
@@ -35402,6 +39627,7 @@ public interface WinError {
     // manufacturer for BIOS upgrade instructions.
     //
     int FVE_E_KEYFILE_NOT_FOUND = 0x8031003C;
+
     //
     // MessageId: FVE_E_KEYFILE_INVALID
     //
@@ -35411,6 +39637,7 @@ public interface WinError {
     // invalid.
     //
     int FVE_E_KEYFILE_INVALID = 0x8031003D;
+
     //
     // MessageId: FVE_E_KEYFILE_NO_VMK
     //
@@ -35420,6 +39647,7 @@ public interface WinError {
     // or recovery password.
     //
     int FVE_E_KEYFILE_NO_VMK = 0x8031003E;
+
     //
     // MessageId: FVE_E_TPM_DISABLED
     //
@@ -35428,6 +39656,7 @@ public interface WinError {
     // The Trusted Platform Module (TPM) is disabled.
     //
     int FVE_E_TPM_DISABLED = 0x8031003F;
+
     //
     // MessageId: FVE_E_NOT_ALLOWED_IN_SAFE_MODE
     //
@@ -35437,6 +39666,7 @@ public interface WinError {
     // Safe-Mode.
     //
     int FVE_E_NOT_ALLOWED_IN_SAFE_MODE = 0x80310040;
+
     //
     // MessageId: FVE_E_TPM_INVALID_PCR
     //
@@ -35446,6 +39676,7 @@ public interface WinError {
     // because the system boot information changed.
     //
     int FVE_E_TPM_INVALID_PCR = 0x80310041;
+
     //
     // MessageId: FVE_E_TPM_NO_VMK
     //
@@ -35455,6 +39686,7 @@ public interface WinError {
     // Platform Module (TPM).
     //
     int FVE_E_TPM_NO_VMK = 0x80310042;
+
     //
     // MessageId: FVE_E_PIN_INVALID
     //
@@ -35464,6 +39696,7 @@ public interface WinError {
     // Platform Module (TPM) and PIN.
     //
     int FVE_E_PIN_INVALID = 0x80310043;
+
     //
     // MessageId: FVE_E_AUTH_INVALID_APPLICATION
     //
@@ -35472,6 +39705,7 @@ public interface WinError {
     // A boot application has changed since BitLocker was enabled.
     //
     int FVE_E_AUTH_INVALID_APPLICATION = 0x80310044;
+
     //
     // MessageId: FVE_E_AUTH_INVALID_CONFIG
     //
@@ -35481,6 +39715,7 @@ public interface WinError {
     // was enabled.
     //
     int FVE_E_AUTH_INVALID_CONFIG = 0x80310045;
+
     //
     // MessageId: FVE_E_FIPS_DISABLE_PROTECTION_NOT_ALLOWED
     //
@@ -35491,6 +39726,7 @@ public interface WinError {
     // information.
     //
     int FVE_E_FIPS_DISABLE_PROTECTION_NOT_ALLOWED = 0x80310046;
+
     //
     // MessageId: FVE_E_FS_NOT_EXTENDED
     //
@@ -35499,6 +39735,7 @@ public interface WinError {
     // The file system does not extend to the end of the volume.
     //
     int FVE_E_FS_NOT_EXTENDED = 0x80310047;
+
     //
     // MessageId: FVE_E_FIRMWARE_TYPE_NOT_SUPPORTED
     //
@@ -35508,6 +39745,7 @@ public interface WinError {
     // the computer manufacturer for BIOS upgrade instructions.
     //
     int FVE_E_FIRMWARE_TYPE_NOT_SUPPORTED = 0x80310048;
+
     //
     // MessageId: FVE_E_NO_LICENSE
     //
@@ -35517,6 +39755,7 @@ public interface WinError {
     // BitLocker Drive Encryption, please upgrade your Windows license.
     //
     int FVE_E_NO_LICENSE = 0x80310049;
+
     //
     // MessageId: FVE_E_NOT_ON_STACK
     //
@@ -35526,6 +39765,7 @@ public interface WinError {
     // Windows Startup Repair to restore files.
     //
     int FVE_E_NOT_ON_STACK = 0x8031004A;
+
     //
     // MessageId: FVE_E_FS_MOUNTED
     //
@@ -35534,6 +39774,7 @@ public interface WinError {
     // This operation cannot be performed while the volume is in use.
     //
     int FVE_E_FS_MOUNTED = 0x8031004B;
+
     //
     // MessageId: FVE_E_TOKEN_NOT_IMPERSONATED
     //
@@ -35543,6 +39784,7 @@ public interface WinError {
     // impersonated token.
     //
     int FVE_E_TOKEN_NOT_IMPERSONATED = 0x8031004C;
+
     //
     // MessageId: FVE_E_DRY_RUN_FAILED
     //
@@ -35551,6 +39793,7 @@ public interface WinError {
     // The BitLocker encryption key could not be obtained.
     //
     int FVE_E_DRY_RUN_FAILED = 0x8031004D;
+
     //
     // MessageId: FVE_E_REBOOT_REQUIRED
     //
@@ -35559,6 +39802,7 @@ public interface WinError {
     // No action was taken as a system reboot is required.
     //
     int FVE_E_REBOOT_REQUIRED = 0x8031004E;
+
     //
     // MessageId: FVE_E_DEBUGGER_ENABLED
     //
@@ -35567,6 +39811,7 @@ public interface WinError {
     // Boot debugging is enabled. Run bcdedit to turn it off.
     //
     int FVE_E_DEBUGGER_ENABLED = 0x8031004F;
+
     //
     // MessageId: FVE_E_RAW_ACCESS
     //
@@ -35575,6 +39820,7 @@ public interface WinError {
     // No action was taken as BitLocker Drive Encryption is in raw access mode.
     //
     int FVE_E_RAW_ACCESS = 0x80310050;
+
     //
     // MessageId: FVE_E_RAW_BLOCKED
     //
@@ -35583,6 +39829,7 @@ public interface WinError {
     // BitLocker Drive Encryption cannot enter raw access mode for this volume.
     //
     int FVE_E_RAW_BLOCKED = 0x80310051;
+
     //
     // MessageId: FVE_E_BCD_APPLICATIONS_PATH_INCORRECT
     //
@@ -35593,6 +39840,7 @@ public interface WinError {
     // verify and correct your BCD settings and try again.
     //
     int FVE_E_BCD_APPLICATIONS_PATH_INCORRECT = 0x80310052;
+
     //
     // MessageId: FVE_E_NOT_ALLOWED_IN_VERSION
     //
@@ -35602,6 +39850,7 @@ public interface WinError {
     // version of Windows.
     //
     int FVE_E_NOT_ALLOWED_IN_VERSION = 0x80310053;
+
     //
     // ==
     // Windows Filtering Platform Error Messages
@@ -35615,6 +39864,7 @@ public interface WinError {
     // The callout does not exist.
     //
     int FWP_E_CALLOUT_NOT_FOUND = 0x80320001;
+
     //
     // MessageId: FWP_E_CONDITION_NOT_FOUND
     //
@@ -35623,6 +39873,7 @@ public interface WinError {
     // The filter condition does not exist.
     //
     int FWP_E_CONDITION_NOT_FOUND = 0x80320002;
+
     //
     // MessageId: FWP_E_FILTER_NOT_FOUND
     //
@@ -35631,6 +39882,7 @@ public interface WinError {
     // The filter does not exist.
     //
     int FWP_E_FILTER_NOT_FOUND = 0x80320003;
+
     //
     // MessageId: FWP_E_LAYER_NOT_FOUND
     //
@@ -35639,6 +39891,7 @@ public interface WinError {
     // The layer does not exist.
     //
     int FWP_E_LAYER_NOT_FOUND = 0x80320004;
+
     //
     // MessageId: FWP_E_PROVIDER_NOT_FOUND
     //
@@ -35647,6 +39900,7 @@ public interface WinError {
     // The provider does not exist.
     //
     int FWP_E_PROVIDER_NOT_FOUND = 0x80320005;
+
     //
     // MessageId: FWP_E_PROVIDER_CONTEXT_NOT_FOUND
     //
@@ -35655,6 +39909,7 @@ public interface WinError {
     // The provider context does not exist.
     //
     int FWP_E_PROVIDER_CONTEXT_NOT_FOUND = 0x80320006;
+
     //
     // MessageId: FWP_E_SUBLAYER_NOT_FOUND
     //
@@ -35663,6 +39918,7 @@ public interface WinError {
     // The sublayer does not exist.
     //
     int FWP_E_SUBLAYER_NOT_FOUND = 0x80320007;
+
     //
     // MessageId: FWP_E_NOT_FOUND
     //
@@ -35671,6 +39927,7 @@ public interface WinError {
     // The object does not exist.
     //
     int FWP_E_NOT_FOUND = 0x80320008;
+
     //
     // MessageId: FWP_E_ALREADY_EXISTS
     //
@@ -35679,6 +39936,7 @@ public interface WinError {
     // An object with that GUID or LUID already exists.
     //
     int FWP_E_ALREADY_EXISTS = 0x80320009;
+
     //
     // MessageId: FWP_E_IN_USE
     //
@@ -35687,6 +39945,7 @@ public interface WinError {
     // The object is referenced by other objects so cannot be deleted.
     //
     int FWP_E_IN_USE = 0x8032000A;
+
     //
     // MessageId: FWP_E_DYNAMIC_SESSION_IN_PROGRESS
     //
@@ -35695,6 +39954,7 @@ public interface WinError {
     // The call is not allowed from within a dynamic session.
     //
     int FWP_E_DYNAMIC_SESSION_IN_PROGRESS = 0x8032000B;
+
     //
     // MessageId: FWP_E_WRONG_SESSION
     //
@@ -35703,6 +39963,7 @@ public interface WinError {
     // The call was made from the wrong session so cannot be completed.
     //
     int FWP_E_WRONG_SESSION = 0x8032000C;
+
     //
     // MessageId: FWP_E_NO_TXN_IN_PROGRESS
     //
@@ -35711,6 +39972,7 @@ public interface WinError {
     // The call must be made from within an explicit transaction.
     //
     int FWP_E_NO_TXN_IN_PROGRESS = 0x8032000D;
+
     //
     // MessageId: FWP_E_TXN_IN_PROGRESS
     //
@@ -35719,6 +39981,7 @@ public interface WinError {
     // The call is not allowed from within an explicit transaction.
     //
     int FWP_E_TXN_IN_PROGRESS = 0x8032000E;
+
     //
     // MessageId: FWP_E_TXN_ABORTED
     //
@@ -35727,6 +39990,7 @@ public interface WinError {
     // The explicit transaction has been forcibly cancelled.
     //
     int FWP_E_TXN_ABORTED = 0x8032000F;
+
     //
     // MessageId: FWP_E_SESSION_ABORTED
     //
@@ -35735,6 +39999,7 @@ public interface WinError {
     // The session has been cancelled.
     //
     int FWP_E_SESSION_ABORTED = 0x80320010;
+
     //
     // MessageId: FWP_E_INCOMPATIBLE_TXN
     //
@@ -35743,6 +40008,7 @@ public interface WinError {
     // The call is not allowed from within a read-only transaction.
     //
     int FWP_E_INCOMPATIBLE_TXN = 0x80320011;
+
     //
     // MessageId: FWP_E_TIMEOUT
     //
@@ -35751,6 +40017,7 @@ public interface WinError {
     // The call timed out while waiting to acquire the transaction lock.
     //
     int FWP_E_TIMEOUT = 0x80320012;
+
     //
     // MessageId: FWP_E_NET_EVENTS_DISABLED
     //
@@ -35759,6 +40026,7 @@ public interface WinError {
     // Collection of network diagnostic events is disabled.
     //
     int FWP_E_NET_EVENTS_DISABLED = 0x80320013;
+
     //
     // MessageId: FWP_E_INCOMPATIBLE_LAYER
     //
@@ -35767,6 +40035,7 @@ public interface WinError {
     // The operation is not supported by the specified layer.
     //
     int FWP_E_INCOMPATIBLE_LAYER = 0x80320014;
+
     //
     // MessageId: FWP_E_KM_CLIENTS_ONLY
     //
@@ -35775,6 +40044,7 @@ public interface WinError {
     // The call is allowed for kernel-mode callers only.
     //
     int FWP_E_KM_CLIENTS_ONLY = 0x80320015;
+
     //
     // MessageId: FWP_E_LIFETIME_MISMATCH
     //
@@ -35783,6 +40053,7 @@ public interface WinError {
     // The call tried to associate two objects with incompatible lifetimes.
     //
     int FWP_E_LIFETIME_MISMATCH = 0x80320016;
+
     //
     // MessageId: FWP_E_BUILTIN_OBJECT
     //
@@ -35791,6 +40062,7 @@ public interface WinError {
     // The object is built in so cannot be deleted.
     //
     int FWP_E_BUILTIN_OBJECT = 0x80320017;
+
     //
     // MessageId: FWP_E_TOO_MANY_CALLOUTS
     //
@@ -35799,6 +40071,7 @@ public interface WinError {
     // The maximum number of callouts has been reached.
     //
     int FWP_E_TOO_MANY_CALLOUTS = 0x80320018;
+
     //
     // MessageId: FWP_E_NOTIFICATION_DROPPED
     //
@@ -35808,6 +40081,7 @@ public interface WinError {
     // maximum capacity.
     //
     int FWP_E_NOTIFICATION_DROPPED = 0x80320019;
+
     //
     // MessageId: FWP_E_TRAFFIC_MISMATCH
     //
@@ -35817,6 +40091,7 @@ public interface WinError {
     // context.
     //
     int FWP_E_TRAFFIC_MISMATCH = 0x8032001A;
+
     //
     // MessageId: FWP_E_INCOMPATIBLE_SA_STATE
     //
@@ -35825,6 +40100,7 @@ public interface WinError {
     // The call is not allowed for the current security association state.
     //
     int FWP_E_INCOMPATIBLE_SA_STATE = 0x8032001B;
+
     //
     // MessageId: FWP_E_NULL_POINTER
     //
@@ -35833,6 +40109,7 @@ public interface WinError {
     // A required pointer is null.
     //
     int FWP_E_NULL_POINTER = 0x8032001C;
+
     //
     // MessageId: FWP_E_INVALID_ENUMERATOR
     //
@@ -35841,6 +40118,7 @@ public interface WinError {
     // An enumerator is not valid.
     //
     int FWP_E_INVALID_ENUMERATOR = 0x8032001D;
+
     //
     // MessageId: FWP_E_INVALID_F;AGS
     //
@@ -35849,6 +40127,7 @@ public interface WinError {
     // The F;ags field contains an invalid value.
     //
     int FWP_E_INVALID_FLAGS = 0x8032001E;
+
     //
     // MessageId: FWP_E_INVALID_NET_MASK
     //
@@ -35857,6 +40136,7 @@ public interface WinError {
     // A network mask is not valid.
     //
     int FWP_E_INVALID_NET_MASK = 0x8032001F;
+
     //
     // MessageId: FWP_E_INVALID_RANGE
     //
@@ -35865,6 +40145,7 @@ public interface WinError {
     // An FWP_RANGE is not valid.
     //
     int FWP_E_INVALID_RANGE = 0x80320020;
+
     //
     // MessageId: FWP_E_INVALID_INTERVAL
     //
@@ -35873,6 +40154,7 @@ public interface WinError {
     // The time interval is not valid.
     //
     int FWP_E_INVALID_INTERVAL = 0x80320021;
+
     //
     // MessageId: FWP_E_ZERO_LENGTH_ARRAY
     //
@@ -35881,6 +40163,7 @@ public interface WinError {
     // An array that must contain at least one element is zero length.
     //
     int FWP_E_ZERO_LENGTH_ARRAY = 0x80320022;
+
     //
     // MessageId: FWP_E_NULL_DISPLAY_NAME
     //
@@ -35889,6 +40172,7 @@ public interface WinError {
     // The displayData.name field cannot be null.
     //
     int FWP_E_NULL_DISPLAY_NAME = 0x80320023;
+
     //
     // MessageId: FWP_E_INVALID_ACTION_TYPE
     //
@@ -35897,6 +40181,7 @@ public interface WinError {
     // The action type is not one of the allowed action types for a filter.
     //
     int FWP_E_INVALID_ACTION_TYPE = 0x80320024;
+
     //
     // MessageId: FWP_E_INVALID_WEIGHT
     //
@@ -35905,6 +40190,7 @@ public interface WinError {
     // The filter weight is not valid.
     //
     int FWP_E_INVALID_WEIGHT = 0x80320025;
+
     //
     // MessageId: FWP_E_MATCH_TYPE_MISMATCH
     //
@@ -35914,6 +40200,7 @@ public interface WinError {
     // operands.
     //
     int FWP_E_MATCH_TYPE_MISMATCH = 0x80320026;
+
     //
     // MessageId: FWP_E_TYPE_MISMATCH
     //
@@ -35922,6 +40209,7 @@ public interface WinError {
     // An FWP_VALUE or FWPM_CONDITION_VALUE is of the wrong type.
     //
     int FWP_E_TYPE_MISMATCH = 0x80320027;
+
     //
     // MessageId: FWP_E_OUT_OF_BOUNDS
     //
@@ -35930,6 +40218,7 @@ public interface WinError {
     // An integer value is outside the allowed range.
     //
     int FWP_E_OUT_OF_BOUNDS = 0x80320028;
+
     //
     // MessageId: FWP_E_RESERVED
     //
@@ -35938,6 +40227,7 @@ public interface WinError {
     // A reserved field is non-zero.
     //
     int FWP_E_RESERVED = 0x80320029;
+
     //
     // MessageId: FWP_E_DUPLICATE_CONDITION
     //
@@ -35946,6 +40236,7 @@ public interface WinError {
     // A filter cannot contain multiple conditions operating on a single field.
     //
     int FWP_E_DUPLICATE_CONDITION = 0x8032002A;
+
     //
     // MessageId: FWP_E_DUPLICATE_KEYMOD
     //
@@ -35954,6 +40245,7 @@ public interface WinError {
     // A policy cannot contain the same keying module more than once.
     //
     int FWP_E_DUPLICATE_KEYMOD = 0x8032002B;
+
     //
     // MessageId: FWP_E_ACTION_INCOMPATIBLE_WITH_LAYER
     //
@@ -35962,6 +40254,7 @@ public interface WinError {
     // The action type is not compatible with the layer.
     //
     int FWP_E_ACTION_INCOMPATIBLE_WITH_LAYER = 0x8032002C;
+
     //
     // MessageId: FWP_E_ACTION_INCOMPATIBLE_WITH_SUBLAYER
     //
@@ -35970,6 +40263,7 @@ public interface WinError {
     // The action type is not compatible with the sublayer.
     //
     int FWP_E_ACTION_INCOMPATIBLE_WITH_SUBLAYER = 0x8032002D;
+
     //
     // MessageId: FWP_E_CONTEXT_INCOMPATIBLE_WITH_LAYER
     //
@@ -35978,6 +40272,7 @@ public interface WinError {
     // The raw context or the provider context is not compatible with the layer.
     //
     int FWP_E_CONTEXT_INCOMPATIBLE_WITH_LAYER = 0x8032002E;
+
     //
     // MessageId: FWP_E_CONTEXT_INCOMPATIBLE_WITH_CALLOUT
     //
@@ -35987,6 +40282,7 @@ public interface WinError {
     // callout.
     //
     int FWP_E_CONTEXT_INCOMPATIBLE_WITH_CALLOUT = 0x8032002F;
+
     //
     // MessageId: FWP_E_INCOMPATIBLE_AUTH_METHOD
     //
@@ -35995,6 +40291,7 @@ public interface WinError {
     // The authentication method is not compatible with the policy type.
     //
     int FWP_E_INCOMPATIBLE_AUTH_METHOD = 0x80320030;
+
     //
     // MessageId: FWP_E_INCOMPATIBLE_DH_GROUP
     //
@@ -36003,6 +40300,7 @@ public interface WinError {
     // The Diffie-Hellman group is not compatible with the policy type.
     //
     int FWP_E_INCOMPATIBLE_DH_GROUP = 0x80320031;
+
     //
     // MessageId: FWP_E_EM_NOT_SUPPORTED
     //
@@ -36011,6 +40309,7 @@ public interface WinError {
     // An IKE policy cannot contain an Extended Mode policy.
     //
     int FWP_E_EM_NOT_SUPPORTED = 0x80320032;
+
     //
     // MessageId: FWP_E_NEVER_MATCH
     //
@@ -36019,6 +40318,7 @@ public interface WinError {
     // The enumeration template or subscription will never match any objects.
     //
     int FWP_E_NEVER_MATCH = 0x80320033;
+
     //
     // MessageId: FWP_E_PROVIDER_CONTEXT_MISMATCH
     //
@@ -36027,6 +40327,7 @@ public interface WinError {
     // The provider context is of the wrong type.
     //
     int FWP_E_PROVIDER_CONTEXT_MISMATCH = 0x80320034;
+
     //
     // MessageId: FWP_E_INVALID_PARAMETER
     //
@@ -36035,6 +40336,7 @@ public interface WinError {
     // The parameter is incorrect.
     //
     int FWP_E_INVALID_PARAMETER = 0x80320035;
+
     //
     // MessageId: FWP_E_TOO_MANY_SUBLAYERS
     //
@@ -36043,6 +40345,7 @@ public interface WinError {
     // The maximum number of sublayers has been reached.
     //
     int FWP_E_TOO_MANY_SUBLAYERS = 0x80320036;
+
     //
     // MessageId: FWP_E_CALLOUT_NOTIFICATION_FAILED
     //
@@ -36051,6 +40354,7 @@ public interface WinError {
     // The notification function for a callout returned an error.
     //
     int FWP_E_CALLOUT_NOTIFICATION_FAILED = 0x80320037;
+
     //
     // MessageId: FWP_E_INVALID_AUTH_TRANSFORM
     //
@@ -36059,6 +40363,7 @@ public interface WinError {
     // The IPsec authentication transform is not valid.
     //
     int FWP_E_INVALID_AUTH_TRANSFORM = 0x80320038;
+
     //
     // MessageId: FWP_E_INVALID_CIPHER_TRANSFORM
     //
@@ -36067,6 +40372,7 @@ public interface WinError {
     // The IPsec cipher transform is not valid.
     //
     int FWP_E_INVALID_CIPHER_TRANSFORM = 0x80320039;
+
     //
     // NDIS error codes (ndis.sys)
     //
@@ -36078,6 +40384,7 @@ public interface WinError {
     // The binding to the network interface is being closed.
     //
     int ERROR_NDIS_INTERFACE_CLOSING = 0x80340002;
+
     //
     // MessageId: ERROR_NDIS_BAD_VERSION
     //
@@ -36086,6 +40393,7 @@ public interface WinError {
     // An invalid version was specified.
     //
     int ERROR_NDIS_BAD_VERSION = 0x80340004;
+
     //
     // MessageId: ERROR_NDIS_BAD_CHARACTERISTICS
     //
@@ -36094,6 +40402,7 @@ public interface WinError {
     // An invalid characteristics table was used.
     //
     int ERROR_NDIS_BAD_CHARACTERISTICS = 0x80340005;
+
     //
     // MessageId: ERROR_NDIS_ADAPTER_NOT_FOUND
     //
@@ -36102,6 +40411,7 @@ public interface WinError {
     // Failed to find the network interface or network interface is not ready.
     //
     int ERROR_NDIS_ADAPTER_NOT_FOUND = 0x80340006;
+
     //
     // MessageId: ERROR_NDIS_OPEN_FAILED
     //
@@ -36110,6 +40420,7 @@ public interface WinError {
     // Failed to open the network interface.
     //
     int ERROR_NDIS_OPEN_FAILED = 0x80340007;
+
     //
     // MessageId: ERROR_NDIS_DEVICE_FAILED
     //
@@ -36118,6 +40429,7 @@ public interface WinError {
     // Network interface has encountered an internal unrecoverable failure.
     //
     int ERROR_NDIS_DEVICE_FAILED = 0x80340008;
+
     //
     // MessageId: ERROR_NDIS_MULTICAST_FULL
     //
@@ -36126,6 +40438,7 @@ public interface WinError {
     // The multicast list on the network interface is full.
     //
     int ERROR_NDIS_MULTICAST_FULL = 0x80340009;
+
     //
     // MessageId: ERROR_NDIS_MULTICAST_EXISTS
     //
@@ -36134,6 +40447,7 @@ public interface WinError {
     // An attempt was made to add a duplicate multicast address to the list.
     //
     int ERROR_NDIS_MULTICAST_EXISTS = 0x8034000A;
+
     //
     // MessageId: ERROR_NDIS_MULTICAST_NOT_FOUND
     //
@@ -36142,6 +40456,7 @@ public interface WinError {
     // At attempt was made to remove a multicast address that was never added.
     //
     int ERROR_NDIS_MULTICAST_NOT_FOUND = 0x8034000B;
+
     //
     // MessageId: ERROR_NDIS_REQUEST_ABORTED
     //
@@ -36150,6 +40465,7 @@ public interface WinError {
     // Netowork interface aborted the request.
     //
     int ERROR_NDIS_REQUEST_ABORTED = 0x8034000C;
+
     //
     // MessageId: ERROR_NDIS_RESET_IN_PROGRESS
     //
@@ -36158,6 +40474,7 @@ public interface WinError {
     // Network interface can not process the request because it is being reset.
     //
     int ERROR_NDIS_RESET_IN_PROGRESS = 0x8034000D;
+
     //
     // MessageId: ERROR_NDIS_NOT_SUPPORTED
     //
@@ -36166,6 +40483,7 @@ public interface WinError {
     // Netword interface does not support this request.
     //
     int ERROR_NDIS_NOT_SUPPORTED = 0x803400BB;
+
     //
     // MessageId: ERROR_NDIS_INVALID_PACKET
     //
@@ -36174,6 +40492,7 @@ public interface WinError {
     // An attempt was made to send an invalid packet on a network interface.
     //
     int ERROR_NDIS_INVALID_PACKET = 0x8034000F;
+
     //
     // MessageId: ERROR_NDIS_ADAPTER_NOT_READY
     //
@@ -36182,6 +40501,7 @@ public interface WinError {
     // Network interface is not ready to complete this operation.
     //
     int ERROR_NDIS_ADAPTER_NOT_READY = 0x80340011;
+
     //
     // MessageId: ERROR_NDIS_INVALID_LENGTH
     //
@@ -36190,6 +40510,7 @@ public interface WinError {
     // The length of the buffer submitted for this operation is not valid.
     //
     int ERROR_NDIS_INVALID_LENGTH = 0x80340014;
+
     //
     // MessageId: ERROR_NDIS_INVALID_DATA
     //
@@ -36198,6 +40519,7 @@ public interface WinError {
     // The data used for this operation is not valid.
     //
     int ERROR_NDIS_INVALID_DATA = 0x80340015;
+
     //
     // MessageId: ERROR_NDIS_BUFFER_TOO_SHORT
     //
@@ -36206,6 +40528,7 @@ public interface WinError {
     // The length of buffer submitted for this operation is too small.
     //
     int ERROR_NDIS_BUFFER_TOO_SHORT = 0x80340016;
+
     //
     // MessageId: ERROR_NDIS_INVALID_OID
     //
@@ -36214,6 +40537,7 @@ public interface WinError {
     // Network interface does not support this OID (Object Identifier)
     //
     int ERROR_NDIS_INVALID_OID = 0x80340017;
+
     //
     // MessageId: ERROR_NDIS_ADAPTER_REMOVED
     //
@@ -36222,6 +40546,7 @@ public interface WinError {
     // The network interface has been removed.
     //
     int ERROR_NDIS_ADAPTER_REMOVED = 0x80340018;
+
     //
     // MessageId: ERROR_NDIS_UNSUPPORTED_MEDIA
     //
@@ -36230,6 +40555,7 @@ public interface WinError {
     // Network interface does not support this media type.
     //
     int ERROR_NDIS_UNSUPPORTED_MEDIA = 0x80340019;
+
     //
     // MessageId: ERROR_NDIS_GROUP_ADDRESS_IN_USE
     //
@@ -36239,6 +40565,7 @@ public interface WinError {
     // by other components.
     //
     int ERROR_NDIS_GROUP_ADDRESS_IN_USE = 0x8034001A;
+
     //
     // MessageId: ERROR_NDIS_FILE_NOT_FOUND
     //
@@ -36247,6 +40574,7 @@ public interface WinError {
     // An attempt was made to map a file that can not be found.
     //
     int ERROR_NDIS_FILE_NOT_FOUND = 0x8034001B;
+
     //
     // MessageId: ERROR_NDIS_ERROR_READING_FILE
     //
@@ -36255,6 +40583,7 @@ public interface WinError {
     // An error occured while NDIS tried to map the file.
     //
     int ERROR_NDIS_ERROR_READING_FILE = 0x8034001C;
+
     //
     // MessageId: ERROR_NDIS_ALREADY_MAPPED
     //
@@ -36263,6 +40592,7 @@ public interface WinError {
     // An attempt was made to map a file that is alreay mapped.
     //
     int ERROR_NDIS_ALREADY_MAPPED = 0x8034001D;
+
     //
     // MessageId: ERROR_NDIS_RESOURCE_CONFLICT
     //
@@ -36272,6 +40602,7 @@ public interface WinError {
     // used by another component.
     //
     int ERROR_NDIS_RESOURCE_CONFLICT = 0x8034001E;
+
     //
     // MessageId: ERROR_NDIS_MEDIA_DISCONNECTED
     //
@@ -36281,6 +40612,7 @@ public interface WinError {
     // wireless access point is out of range.
     //
     int ERROR_NDIS_MEDIA_DISCONNECTED = 0x8034001F;
+
     //
     // MessageId: ERROR_NDIS_INVALID_ADDRESS
     //
@@ -36289,6 +40621,7 @@ public interface WinError {
     // The network address used in the request is invalid.
     //
     int ERROR_NDIS_INVALID_ADDRESS = 0x80340022;
+
     //
     // MessageId: ERROR_NDIS_INVALID_DEVICE_REQUEST
     //
@@ -36297,6 +40630,7 @@ public interface WinError {
     // The specified request is not a valid operation for the target device.
     //
     int ERROR_NDIS_INVALID_DEVICE_REQUEST = 0x80340010;
+
     //
     // MessageId: ERROR_NDIS_PAUSED
     //
@@ -36305,6 +40639,7 @@ public interface WinError {
     // The ofF;oad operation on the network interface has been paused.
     //
     int ERROR_NDIS_PAUSED = 0x8034002A;
+
     //
     // MessageId: ERROR_NDIS_INTERFACE_NOT_FOUND
     //
@@ -36313,6 +40648,7 @@ public interface WinError {
     // Network interface was not found.
     //
     int ERROR_NDIS_INTERFACE_NOT_FOUND = 0x8034002B;
+
     //
     // MessageId: ERROR_NDIS_UNSUPPORTED_REVISION
     //
@@ -36321,6 +40657,7 @@ public interface WinError {
     // The revision number specified in the structure is not supported.
     //
     int ERROR_NDIS_UNSUPPORTED_REVISION = 0x8034002C;
+
     //
     // MessageId: ERROR_NDIS_INVALID_PORT
     //
@@ -36329,6 +40666,7 @@ public interface WinError {
     // The specified port does not exist on this network interface.
     //
     int ERROR_NDIS_INVALID_PORT = 0x8034002D;
+
     //
     // MessageId: ERROR_NDIS_INVALID_PORT_STATE
     //
@@ -36338,6 +40676,7 @@ public interface WinError {
     // not support the requested operation.
     //
     int ERROR_NDIS_INVALID_PORT_STATE = 0x8034002E;
+
     //
     // MessageId: ERROR_NDIS_LOW_POWER_STATE
     //
@@ -36346,6 +40685,7 @@ public interface WinError {
     // The miniport adapter is in low power state.
     //
     int ERROR_NDIS_LOW_POWER_STATE = 0x8034002F;
+
     //
     // NDIS error codes (802.11 wireless LAN)
     //
@@ -36358,6 +40698,7 @@ public interface WinError {
     // and doesn't support the requested parameter change operation.
     //
     int ERROR_NDIS_DOT11_AUTO_CONFIG_ENABLED = 0x80342000;
+
     //
     // MessageId: ERROR_NDIS_DOT11_MEDIA_IN_USE
     //
@@ -36367,6 +40708,7 @@ public interface WinError {
     // requested operation.
     //
     int ERROR_NDIS_DOT11_MEDIA_IN_USE = 0x80342001;
+
     //
     // MessageId: ERROR_NDIS_DOT11_POWER_STATE_INVALID
     //
@@ -36376,6 +40718,7 @@ public interface WinError {
     // support the requested operation.
     //
     int ERROR_NDIS_DOT11_POWER_STATE_INVALID = 0x80342002;
+
     //
     // NDIS informational code (ndis.sys)
     //

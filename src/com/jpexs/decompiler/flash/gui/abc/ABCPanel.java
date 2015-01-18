@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -114,32 +114,53 @@ import jsyntaxpane.TokenType;
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
     private MainPanel mainPanel;
+
     public TraitsList navigator;
+
     public ABC abc;
+
     public JComboBox<ABCContainerTag> abcComboBox;
+
     public DecompiledEditorPane decompiledTextArea;
+
     public JScrollPane decompiledScrollPane;
+
     public JSplitPane splitPane;
+
     //public JSplitPane splitPaneTreeVSNavigator;
     //public JSplitPane splitPaneTreeNavVSDecompiledDetail;
     private JTable constantTable;
+
     public JComboBox<String> constantTypeList;
+
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
+
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
+
     public DetailPanel detailPanel;
+
     public JPanel navPanel;
+
     public JTabbedPane tabbedPane;
+
     public SearchPanel<ABCPanelSearchResult> searchPanel;
+
     private NewTraitDialog newTraitDialog;
+
     public JLabel scriptNameLabel;
 
     private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+
     private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+
     private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     private static final String ACTION_ADD_TRAIT = "ADDTRAIT";
@@ -634,7 +655,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 decompiledTextArea.setCursor(Cursor.getDefaultCursor());
             }
         }
-
     }
 
     public void reload() {
@@ -709,8 +729,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     }
 
     public String lastDecompiled = null;
+
     public boolean directEditing = false;
+
     private int detWidth = 0;
+
     private int detsp = 0;
 
     public void setDecompiledEditMode(boolean val) {
@@ -807,7 +830,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     decompiledTextArea.markError();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException | InterruptedException ex) {
-                    //ignore                    
+                    //ignore
                 }
                 break;
             case ACTION_ADD_TRAIT:
@@ -913,5 +936,4 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 break;
         }
     }
-
 }

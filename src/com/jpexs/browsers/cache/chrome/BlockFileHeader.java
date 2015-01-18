@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,18 +26,31 @@ import java.io.InputStream;
 public class BlockFileHeader {
 
     protected static final int kBlockHeaderSize = 8192;  // Two pages: almost 64k entries
+
     private static final int kMaxBlocks = (kBlockHeaderSize - 80) * 8;
-    private final long magic;   // c3 ca 04 c1 
+
+    private final long magic;   // c3 ca 04 c1
+
     private final long version; // 00 00 02 00
+
     private final int this_file;
+
     private final int next_file;
+
     private final int entry_size;
+
     private final int num_entries;
+
     private final int max_entries;
+
     private int empty[] = new int[4];
+
     private int hints[] = new int[4];
+
     private final int updating;
+
     private int user[] = new int[5];
+
     private final long allocation_map[];
 
     public BlockFileHeader(InputStream is) throws IOException {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -58,20 +58,31 @@ import javax.swing.JPanel;
 public class FolderPreviewPanel extends JPanel {
 
     private static ExecutorService executor;
+
     private List<TreeItem> items;
+
     private int selectedIndex = -1;
+
     private boolean repaintQueued;
+
     private int lastWidth;
+
     private int lastHeight;
 
     public Map<Integer, TreeItem> selectedItems = new HashMap<>();
 
     private Cache<Integer, SerializableImage> cachedPreviews;
+
     private static final int PREVIEW_SIZE = 150;
+
     private static final int BORDER_SIZE = 5;
+
     private static final int LABEL_HEIGHT = 20;
+
     private static final int CELL_HEIGHT = 2 * BORDER_SIZE + PREVIEW_SIZE + LABEL_HEIGHT;
+
     private static final int CELL_WIDTH = 2 * BORDER_SIZE + PREVIEW_SIZE;
+
     private static final SerializableImage noImage = new SerializableImage(PREVIEW_SIZE, PREVIEW_SIZE, BufferedImage.TYPE_INT_ARGB);
 
     static {

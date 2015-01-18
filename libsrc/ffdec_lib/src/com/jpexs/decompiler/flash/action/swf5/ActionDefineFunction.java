@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -39,12 +40,18 @@ import java.util.Set;
 public class ActionDefineFunction extends Action implements GraphSourceItemContainer {
 
     public String functionName;
+
     public String replacedFunctionName;
+
     public List<String> paramNames = new ArrayList<>();
+
     public List<String> replacedParamNames;
+
     //public List<Action> code;
     public int codeSize;
+
     private int version;
+
     public List<String> constantPool;
 
     public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, int version) {

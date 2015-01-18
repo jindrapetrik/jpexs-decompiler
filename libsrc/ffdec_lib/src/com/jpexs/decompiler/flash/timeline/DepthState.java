@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -32,22 +33,39 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DepthState {
 
     public int characterId = -1;
+
     public MATRIX matrix = null;
+
     public String instanceName = null;
+
     public ColorTransform colorTransForm = null;
+
     public boolean cacheAsBitmap = false;
+
     public int blendMode = 0;
+
     public List<FILTER> filters = new ArrayList<>();
+
     public boolean isVisible = true;
+
     public RGBA backGroundColor = null;
+
     public CLIPACTIONS clipActions = null;
+
     public int ratio = -1;
+
     public boolean key = false;
+
     public int clipDepth = -1;
+
     public int time = 0;
+
     private final SWF swf;
+
     public Frame frame;
+
     public long instanceId;
+
     public boolean motionTween = false;
 
     private static AtomicLong lastInstanceId = new AtomicLong(0);
@@ -85,5 +103,4 @@ public class DepthState {
             instanceId = getNewInstanceId();
         }
     }
-
 }

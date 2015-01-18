@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.xfl;
 
 import java.util.HashMap;
@@ -28,17 +29,18 @@ public enum FLAVersion {
     CS5_5("CS5.5", "Flash CS 5.5", "2.1", 11),
     CS6("CS6", "Flash CS 6", "2.2", 17),
     CC("CC", "Flash CC", "2.4", Integer.MAX_VALUE) {
-
                 @Override
                 public int minASVersion() {
                     return 3; //AS 1/2 not supported anymore
                 }
-
             };
 
     private final String xflVersion;
+
     private final String shortName;
+
     private final String applicationName;
+
     private final int maxSwfVersion;
 
     private static final Map<Integer, String> versionToPlayerMap = new HashMap<>();

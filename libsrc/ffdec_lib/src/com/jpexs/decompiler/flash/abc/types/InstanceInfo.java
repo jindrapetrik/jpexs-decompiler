@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -27,15 +28,25 @@ import java.util.List;
 public class InstanceInfo {
 
     public int name_index;
+
     public int super_index;
+
     public int flags; // 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs
+
     public int protectedNS; //if flags & 8
+
     public int[] interfaces;
+
     public int iinit_index; // MethodInfo - constructor
+
     public Traits instance_traits = new Traits();
+
     public static final int CLASS_SEALED = 1; //not dynamic
+
     public static final int CLASS_FINAL = 2;
+
     public static final int CLASS_INTERFACE = 4;
+
     public static final int CLASS_PROTECTEDNS = 8;
 
     public boolean deleted;

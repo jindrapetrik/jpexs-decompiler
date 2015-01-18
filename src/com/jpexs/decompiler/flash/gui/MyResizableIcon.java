@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,6 +32,7 @@ import org.pushingpixels.flamingo.internal.utils.FlamingoUtilities;
 public class MyResizableIcon implements Icon {
 
     protected BufferedImage originalImage;
+
     protected Map<String, BufferedImage> cachedImages = new HashMap<>();
 
     public MyResizableIcon(BufferedImage originalImage) {
@@ -41,7 +42,9 @@ public class MyResizableIcon implements Icon {
     }
 
     protected int width;
+
     protected int height;
+
     protected BufferedImage image;
 
     public void setDimension(Dimension dim) {
@@ -91,5 +94,4 @@ public class MyResizableIcon implements Icon {
     public int getIconHeight() {
         return height;
     }
-
 }

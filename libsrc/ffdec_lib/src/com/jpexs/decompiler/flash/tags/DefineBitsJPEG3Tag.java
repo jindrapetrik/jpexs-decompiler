@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -94,15 +95,15 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             } else {
                 stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
             }
-            
+
             BufferedImage image = ImageHelper.read(stream);
             SerializableImage img = image == null ? null : new SerializableImage(image);
             if (bitmapAlphaData.length == 0) {
                 cachedImage = img;
                 return img;
             }
-            
-            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData(); 
+
+            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = bitmapAlphaData[i] & 0xff;
                 pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));

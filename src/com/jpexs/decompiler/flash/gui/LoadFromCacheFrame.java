@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -58,16 +58,25 @@ import javax.swing.filechooser.FileFilter;
 public class LoadFromCacheFrame extends AppFrame implements ActionListener {
 
     private static final String ACTION_OPEN = "OPEN";
+
     private static final String ACTION_SAVE = "SAVE";
+
     private static final String ACTION_REFRESH = "REFRESH";
 
     private final JList<CacheEntry> list;
+
     private final JTextField searchField;
+
     private List<CacheImplementation> caches;
+
     private List<CacheEntry> entries;
+
     private final JProgressBar progressBar;
+
     private final JButton saveButton;
+
     private final JButton refreshButton;
+
     private final JButton openButton;
 
     public LoadFromCacheFrame() {

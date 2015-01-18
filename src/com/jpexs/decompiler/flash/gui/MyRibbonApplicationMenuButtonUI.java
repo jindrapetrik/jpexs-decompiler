@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,8 +45,11 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         ActionPopupTransitionAwareUI {
 
     private MyResizableIcon hoverIcon = null;
+
     private MyResizableIcon clickIcon = null;
+
     private MyResizableIcon normalIcon = null;
+
     private final boolean buttonResized = false;
 
     public MyResizableIcon getClickIcon() {
@@ -64,6 +67,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
      * Model change listener for ghost image effects.
      */
     private GhostingListener substanceModelChangeListener;
+
     /**
      * Tracker for visual state transitions.
      */
@@ -75,7 +79,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.jvnet.flamingo.common.ui.BasicCommandButtonUI#installListeners()
      */
     @Override
@@ -92,7 +96,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.jvnet.flamingo.common.ui.BasicCommandButtonUI#uninstallListeners()
      */
@@ -118,7 +122,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.plaf.basic.BasicButtonUI#paint(java.awt.Graphics,
      * javax.swing.JComponent)
      */
@@ -163,7 +167,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.jvnet.flamingo.common.ui.BasicCommandButtonUI#paintButtonIcon(java
      * .awt.Graphics, java.awt.Rectangle)
@@ -182,7 +186,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.jvnet.flamingo.ribbon.ui.appmenu.BasicRibbonApplicationMenuButtonUI
      * #update(java.awt.Graphics, javax.swing.JComponent)
@@ -194,7 +198,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.jvnet.substance.SubstanceButtonUI#contains(javax.swing.JComponent,
      * int, int)

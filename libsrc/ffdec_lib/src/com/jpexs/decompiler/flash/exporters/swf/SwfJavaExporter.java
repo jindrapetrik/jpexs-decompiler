@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -44,17 +44,17 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class SwfJavaExporter {
-    
+
     private static final String javaIndentString = "    ";
-    
-    private static final String[] allowedSubTypes = new String[] { "List", "String", "ByteArrayRange", "RECT", "MATRIX", "CXFORMWITHALPHA", 
-        "CXFORM", "CLIPEVENTFLAGS", "CLIPACTIONRECORD", "CLIPACTIONS", "COLORMATRIXFILTER", "RGBA", "ARGB", "RGB", 
-        "CONVOLUTIONFILTER", "BLURFILTER", "DROPSHADOWFILTER", "GLOWFILTER", "BEVELFILTER", "GRADIENTGLOWFILTER", "GRADIENTBEVELFILTER", 
-        "FILTERLIST", "FILTER", "BUTTONRECORD", "BUTTONCONDACTION", "GRADRECORD", "GRADIENT", "FOCALGRADIENT", "FILLSTYLE", 
-        "FILLSTYLEARRAY", "LINESTYLE", "LINESTYLE2", "LINESTYLEARRAY", "SHAPERECORD", "SHAPE", "SHAPEWITHSTYLE", "SHAPERECORDS", 
-        "SOUNDINFO", "SOUNDENVELOPE", "GLYPHENTRY", "TEXTRECORD", "MORPHGRADRECORD", "MORPHGRADIENT", "MORPHFOCALGRADIENT", 
-        "MORPHFILLSTYLE", "MORPHFILLSTYLEARRAY", "MORPHLINESTYLE", "MORPHLINESTYLE2", "MORPHLINESTYLEARRAY", "KERNINGRECORD", 
-        "LANGCODE", "ZONERECORD", "ZONEDATA", "PIX15", "PIX24", "COLORMAPDATA", "BITMAPDATA", "ALPHABITMAPDATA", "ALPHACOLORMAPDATA" };
+
+    private static final String[] allowedSubTypes = new String[]{"List", "String", "ByteArrayRange", "RECT", "MATRIX", "CXFORMWITHALPHA",
+        "CXFORM", "CLIPEVENTFLAGS", "CLIPACTIONRECORD", "CLIPACTIONS", "COLORMATRIXFILTER", "RGBA", "ARGB", "RGB",
+        "CONVOLUTIONFILTER", "BLURFILTER", "DROPSHADOWFILTER", "GLOWFILTER", "BEVELFILTER", "GRADIENTGLOWFILTER", "GRADIENTBEVELFILTER",
+        "FILTERLIST", "FILTER", "BUTTONRECORD", "BUTTONCONDACTION", "GRADRECORD", "GRADIENT", "FOCALGRADIENT", "FILLSTYLE",
+        "FILLSTYLEARRAY", "LINESTYLE", "LINESTYLE2", "LINESTYLEARRAY", "SHAPERECORD", "SHAPE", "SHAPEWITHSTYLE", "SHAPERECORDS",
+        "SOUNDINFO", "SOUNDENVELOPE", "GLYPHENTRY", "TEXTRECORD", "MORPHGRADRECORD", "MORPHGRADIENT", "MORPHFOCALGRADIENT",
+        "MORPHFILLSTYLE", "MORPHFILLSTYLEARRAY", "MORPHLINESTYLE", "MORPHLINESTYLE2", "MORPHLINESTYLEARRAY", "KERNINGRECORD",
+        "LANGCODE", "ZONERECORD", "ZONEDATA", "PIX15", "PIX24", "COLORMAPDATA", "BITMAPDATA", "ALPHABITMAPDATA", "ALPHACOLORMAPDATA"};
 
     public List<File> exportJavaCode(SWF swf, String outdir) throws IOException {
         final File file = new File(outdir + File.separator + Helper.makeFileName("SwfFile.java"));
@@ -90,7 +90,7 @@ public class SwfJavaExporter {
         writer.newLine();
         writer.indent();
         IndentedStringBuilder sb = new IndentedStringBuilder(javaIndentString);
-        generateJavaCode(writer, sb, objectNames, swf, 0);            
+        generateJavaCode(writer, sb, objectNames, swf, 0);
         writer.unindent();
         writer.append("    public SWF getSwf() {").newLine();
         writer.append("        SWF swf = swf();").newLine();
@@ -107,7 +107,7 @@ public class SwfJavaExporter {
         writer.append("    }").newLine();
         writer.append("}").newLine();
     }
-    
+
     private static String getNextId(Map<String, Integer> objectNames, String type) {
         Integer nextId = objectNames.get(type);
         if (nextId == null) {
@@ -115,11 +115,11 @@ public class SwfJavaExporter {
         } else {
             nextId++;
         }
-        
+
         objectNames.put(type, nextId);
         return type + nextId;
     }
-    
+
     private static String getIndent(int indent, String indentStr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < indent; i++) {
@@ -127,30 +127,30 @@ public class SwfJavaExporter {
         }
         return sb.toString();
     }
-    
-    private static Object generateJavaCode(GraphTextWriter writer, IndentedStringBuilder sb, Map<String, Integer> objectNames, Object obj, int level){
+
+    private static Object generateJavaCode(GraphTextWriter writer, IndentedStringBuilder sb, Map<String, Integer> objectNames, Object obj, int level) {
         if (obj == null) {
             return null;
         }
-        
+
         Class cls = obj.getClass();
         Object value = null;
 
-        if (cls == Byte.class || cls == byte.class ||
-            cls == Short.class || cls == short.class ||
-            cls == Integer.class || cls == int.class ||
-            cls == Long.class || cls == long.class ||
-            cls == Float.class || cls == float.class ||
-            cls == Double.class || cls == double.class ||
-            cls == Boolean.class || cls == boolean.class ||
-            cls == Character.class || cls == char.class ||
-            cls == String.class) {
-                value = obj;
-                if (value instanceof Float) {
-                    value = value + "f";
-                } else if (value instanceof String) {
-                    value = "\"" + Helper.escapeJavaString((String) value) + "\"";
-                }
+        if (cls == Byte.class || cls == byte.class
+                || cls == Short.class || cls == short.class
+                || cls == Integer.class || cls == int.class
+                || cls == Long.class || cls == long.class
+                || cls == Float.class || cls == float.class
+                || cls == Double.class || cls == double.class
+                || cls == Boolean.class || cls == boolean.class
+                || cls == Character.class || cls == char.class
+                || cls == String.class) {
+            value = obj;
+            if (value instanceof Float) {
+                value = value + "f";
+            } else if (value instanceof String) {
+                value = "\"" + Helper.escapeJavaString((String) value) + "\"";
+            }
         } else if (cls.isEnum()) {
             value = cls.getSimpleName() + "." + obj;
         } else if (obj instanceof ByteArrayRange) {
@@ -165,29 +165,29 @@ public class SwfJavaExporter {
                 // string should be splitted to avoid "constant string too long" compile error
                 sb2.append("String.join(\"\", ");
             }
-            
+
             int stringCount = (int) Math.ceil(data.length / (double) maxBytePerString);
             for (int i = 0; i < stringCount; i++) {
                 if (i != 0) {
                     sb2.append(", ");
                 }
-                
+
                 sb2.append("\"");
                 int from = i * maxBytePerString;
                 int to = Math.min(from + maxBytePerString, data.length);
                 for (int j = from; j < to; j++) {
                     sb2.append(String.format("%02x", data[j]));
                 }
-                
+
                 sb2.append("\"");
             }
 
             if (isLong) {
                 sb2.append(")");
             }
-            
+
             sb.appendLine(className + " " + tagObjName + " = new ByteArrayRange(" + sb2.toString() + ");");
-            value = tagObjName; 
+            value = tagObjName;
         } else if (List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
             String tagObjName = getNextId(objectNames, "objList");
@@ -211,7 +211,7 @@ public class SwfJavaExporter {
             if (obj instanceof LazyObject) {
                 ((LazyObject) obj).load();
             }
-            
+
             String className = obj.getClass().getSimpleName();
             boolean isSwf = level == 0;
             String resultName = isSwf ? "swf" : "result";
@@ -241,7 +241,7 @@ public class SwfJavaExporter {
                     Logger.getLogger(SwfJavaExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             writer.append("private " + className + " " + tagObjName + "(" + (isSwf ? "" : "SWF swf") + ") {").newLine();
             writer.indent();
             writer.append(className + " " + resultName + " = new " + className + "(" + (obj instanceof Tag ? "swf" : "") + ");" + Helper.newLine);
@@ -249,7 +249,7 @@ public class SwfJavaExporter {
             writer.append(indent + "return " + resultName + ";").newLine();
             writer.unindent();
             writer.append("}").newLine().newLine();
-            value = tagObjName + "(swf)"; 
+            value = tagObjName + "(swf)";
         }
 
         return value;

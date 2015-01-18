@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -62,11 +63,17 @@ public class DefineTextTag extends TextTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
+
     private final int glyphBits;
+
     private final int advanceBits;
+
     public RECT textBounds;
+
     public MATRIX textMatrix;
+
     public List<TEXTRECORD> textRecords;
+
     public static final int ID = 11;
 
     @Override
@@ -565,14 +572,14 @@ public class DefineTextTag extends TextTag {
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, colorTransform);
         /*try {
-            DefineTextTag originalTag = (DefineTextTag) getOriginalTag();
-            if (isModified()) {
-                originalTag.toImage(frame, time, ratio, stateUnderCursor, mouseButton, image, transformation, new ConstantColorColorTransform(0xFFC0C0C0));
-            }
-            staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, new ConstantColorColorTransform(0xFF000000));
-        } catch (InterruptedException | IOException ex) {
-            Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+         DefineTextTag originalTag = (DefineTextTag) getOriginalTag();
+         if (isModified()) {
+         originalTag.toImage(frame, time, ratio, stateUnderCursor, mouseButton, image, transformation, new ConstantColorColorTransform(0xFFC0C0C0));
+         }
+         staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, new ConstantColorColorTransform(0xFF000000));
+         } catch (InterruptedException | IOException ex) {
+         Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
     }
 
     @Override

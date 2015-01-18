@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,25 +44,43 @@ import javax.swing.border.BevelBorder;
 public class DetailPanel extends JPanel implements ActionListener {
 
     private static final String ACTION_SAVE_DETAIL = "SAVEDETAIL";
+
     private static final String ACTION_EDIT_DETAIL = "EDITDETAIL";
+
     private static final String ACTION_CANCEL_DETAIL = "CANCELDETAIL";
 
     public MethodTraitDetailPanel methodTraitPanel;
+
     public JPanel unsupportedTraitPanel;
+
     public SlotConstTraitDetailPanel slotConstTraitPanel;
+
     public static final String METHOD_TRAIT_CARD = AppStrings.translate("abc.detail.methodtrait");
+
     public static final String UNSUPPORTED_TRAIT_CARD = AppStrings.translate("abc.detail.unsupported");
+
     public static final String SLOT_CONST_TRAIT_CARD = AppStrings.translate("abc.detail.slotconsttrait");
+
     private final JPanel innerPanel;
+
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+
     public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+
     private final HashMap<String, JComponent> cardMap = new HashMap<>();
+
     private String selectedCard;
+
     private final JLabel selectedLabel;
+
     private boolean editMode = false;
+
     private final JPanel buttonsPanel;
+
     private final ABCPanel abcPanel;
+
     private final JLabel traitNameLabel;
 
     public DetailPanel(ABCPanel abcPanel) {

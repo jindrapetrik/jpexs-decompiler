@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,15 +33,21 @@ import javax.swing.JScrollPane;
 public class TimelinePanel extends JPanel {
 
     private TimelineBodyPanel timelineBodyPanel;
+
     private TimelineTimePanel timePanel;
+
     private TimelineDepthPanel depthPanel;
+
     private Timeline timeline;
 
     public static final int FRAME_WIDTH = 8;
+
     public static final int FRAME_HEIGHT = 18;
 
     public static Color selectedColor = new Color(0xff, 0x99, 0x99);
+
     public static Color selectedBorderColor = new Color(0xcc, 0, 0);
+
     public static Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
 
     public Timeline getTimeline() {
@@ -120,5 +126,4 @@ public class TimelinePanel extends JPanel {
         });
         this.revalidate();
     }
-
 }

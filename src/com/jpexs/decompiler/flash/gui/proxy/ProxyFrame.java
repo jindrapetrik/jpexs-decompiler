@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -92,21 +92,35 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     private static final String REPLACEMENTS_NAME = "replacements.cfg";
 
     private static final String ACTION_SWITCH_STATE = "SWITCHSTATE";
+
     private static final String ACTION_OPEN = "OPEN";
+
     private static final String ACTION_CLEAR = "CLEAR";
+
     private static final String ACTION_RENAME = "RENAME";
+
     private static final String ACTION_REMOVE = "REMOVE";
+
     private static final String ACTION_COPYURL = "COPYURL";
+
     private static final String ACTION_SAVEAS = "SAVEAS";
+
     private static final String ACTION_REPLACE = "REPLACE";
 
     private JTable replacementsTable;
+
     private JButton switchButton = new JButton(translate("proxy.start"));
+
     private boolean started = false;
+
     private JTextField portField = new JTextField("55555");
+
     private JCheckBox sniffSWFCheckBox = new JCheckBox("SWF", false);
+
     private JCheckBox sniffOSCheckBox = new JCheckBox("OctetStream", false);
+
     private JCheckBox sniffJSCheckBox = new JCheckBox("JS", false);
+
     private JCheckBox sniffXMLCheckBox = new JCheckBox("XML", false);
 
     /**
@@ -144,10 +158,10 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         public int compareTo(SizeItem o) {
             return (int) (new File(file).length() - new File(o.file).length());
         }
-
     }
 
     DefaultTableModel tableModel;
+
     private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
     /**

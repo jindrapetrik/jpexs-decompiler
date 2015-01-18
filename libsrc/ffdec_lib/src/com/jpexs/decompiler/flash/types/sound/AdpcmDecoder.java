@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -31,15 +32,19 @@ public class AdpcmDecoder extends SoundDecoder {
     private static final int[] indexAdjustTable2bit = {
         -1, 2,
         -1, 2};
+
     private static final int[] indexAdjustTable3bit = {
         -1, -1, 2, 4,
         -1, -1, 2, 4};
+
     private static final int[] indexAdjustTable4bit = {
         -1, -1, -1, -1, 2, 4, 6, 8,
         -1, -1, -1, -1, 2, 4, 6, 8};
+
     private static final int[] indexAdjustTable5bit = {
         -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, 4, 6, 8, 10, 13, 16,
         -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, 4, 6, 8, 10, 13, 16};
+
     private static final int[] stepSizeTable = {
         7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34,
         37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143,
@@ -58,6 +63,7 @@ public class AdpcmDecoder extends SoundDecoder {
     private static class AdpcmState {
 
         public int index;
+
         public int sample;
     };
 

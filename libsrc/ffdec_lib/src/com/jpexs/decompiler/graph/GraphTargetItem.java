@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -35,28 +36,51 @@ import java.util.Set;
 public abstract class GraphTargetItem implements Serializable {
 
     public static final int PRECEDENCE_PRIMARY = 0;
+
     public static final int PRECEDENCE_POSTFIX = 1;
+
     public static final int PRECEDENCE_UNARY = 2;
+
     public static final int PRECEDENCE_MULTIPLICATIVE = 3;
+
     public static final int PRECEDENCE_ADDITIVE = 4;
+
     public static final int PRECEDENCE_BITWISESHIFT = 5;
+
     public static final int PRECEDENCE_RELATIONAL = 6;
+
     public static final int PRECEDENCE_EQUALITY = 7;
+
     public static final int PRECEDENCE_BITWISEAND = 8;
+
     public static final int PRECEDENCE_BITWISEXOR = 9;
+
     public static final int PRECEDENCE_BITWISEOR = 10;
+
     public static final int PRECEDENCE_LOGICALAND = 11;
+
     public static final int PRECEDENCE_LOGICALOR = 12;
+
     public static final int PRECEDENCE_CONDITIONAL = 13;
+
     public static final int PRECEDENCE_ASSIGMENT = 14;
+
     public static final int PRECEDENCE_COMMA = 15;
+
     public static final int NOPRECEDENCE = 16;
+
     public GraphSourceItem src;
+
     public int pos = -1;
+
     protected int precedence;
+
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
+
     public GraphPart firstPart;
+
     public GraphTargetItem value;
+
     protected HighlightData srcData = new HighlightData();
 
     public GraphPart getFirstPart() {

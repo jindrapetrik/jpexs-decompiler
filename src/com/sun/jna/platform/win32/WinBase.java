@@ -1,14 +1,14 @@
 /* Copyright (c) 2010 Daniel Doubrovkine, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.  
+ * Lesser General Public License for more details.
  */
 package com.sun.jna.platform.win32;
 
@@ -37,11 +37,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     HANDLE INVALID_HANDLE_VALUE
             = new HANDLE(Pointer.createConstant(Pointer.SIZE == 8
                                     ? -1 : 0xFFFFFFFFL));
+
     /**
      * Maximum computer name length. The value is 15 on Mac, 31 on everything
      * else.
      */
     int MAX_COMPUTERNAME_LENGTH = Platform.isMac() ? 15 : 31;
+
     /**
      * This logon type is intended for users who will be interactively using the
      * computer, such as a user being logged on by a terminal server, remote
@@ -50,12 +52,14 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * inappropriate for some client/server applications, such as a mail server.
      */
     int LOGON32_LOGON_INTERACTIVE = 2;
+
     /**
      * This logon type is intended for high performance servers to authenticate
      * plaintext passwords. The LogonUser function does not cache credentials
      * for this logon type.
      */
     int LOGON32_LOGON_NETWORK = 3;
+
     /**
      * This logon type is intended for batch servers, where processes may be
      * executing on behalf of a user without their direct intervention. This
@@ -64,17 +68,20 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * LogonUser function does not cache credentials for this logon type.
      */
     int LOGON32_LOGON_BATCH = 4;
+
     /**
      * Indicates a service-type logon. The account provided must have the
      * service privilege enabled.
      */
     int LOGON32_LOGON_SERVICE = 5;
+
     /**
      * This logon type is for GINA DLLs that log on users who will be
      * interactively using the computer. This logon type can generate a unique
      * audit record that shows when the workstation was unlocked.
      */
     int LOGON32_LOGON_UNLOCK = 7;
+
     /**
      * This logon type preserves the name and password in the authentication
      * package, which allows the server to make connections to other network
@@ -84,6 +91,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * servers.
      */
     int LOGON32_LOGON_NETWORK_CLEARTEXT = 8;
+
     /**
      * This logon type allows the caller to clone its current token and specify
      * new credentials for outbound connections. The new logon session has the
@@ -92,6 +100,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * LOGON32_PROVIDER_WINNT50 logon provider.
      */
     int LOGON32_LOGON_NEW_CREDENTIALS = 9;
+
     /**
      * Use the standard logon provider for the system. The default security
      * provider is negotiate, unless you pass NULL for the domain name and the
@@ -99,61 +108,95 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * NTLM.
      */
     int LOGON32_PROVIDER_DEFAULT = 0;
+
     /**
      * Use the Windows NT 3.5 logon provider.
      */
     int LOGON32_PROVIDER_WINNT35 = 1;
+
     /**
      * Use the NTLM logon provider.
      */
     int LOGON32_PROVIDER_WINNT40 = 2;
+
     /**
      * Use the negotiate logon provider.
      */
     int LOGON32_PROVIDER_WINNT50 = 3;
+
     /**
      * If this flag is set, a child process created with the bInheritHandles
      * parameter of CreateProcess set to TRUE will inherit the object handle.
      */
     int HANDLE_FLAG_INHERIT = 1;
+
     /**
      * If this flag is set, calling the {@link Kernel32#CloseHandle} function
      * will not close the object handle.
      */
     int HANDLE_FLAG_PROTECT_FROM_CLOSE = 2;
+
     // STARTUPINFO flags
     int STARTF_USESHOWWINDOW = 0x001;
+
     int STARTF_USESIZE = 0x002;
+
     int STARTF_USEPOSITION = 0x004;
+
     int STARTF_USECOUNTCHARS = 0x008;
+
     int STARTF_USEFILLATTRIBUTE = 0x010;
+
     int STARTF_RUNFULLSCREEN = 0x020;
+
     int STARTF_FORCEONFEEDBACK = 0x040;
+
     int STARTF_FORCEOFFFEEDBACK = 0x080;
+
     int STARTF_USESTDHANDLES = 0x100;
+
     // Process Creation flags
     int DEBUG_PROCESS = 0x00000001;
+
     int DEBUG_ONLY_THIS_PROCESS = 0x00000002;
+
     int CREATE_SUSPENDED = 0x00000004;
+
     int DETACHED_PROCESS = 0x00000008;
+
     int CREATE_NEW_CONSOLE = 0x00000010;
+
     int CREATE_NEW_PROCESS_GROUP = 0x00000200;
+
     int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
+
     int CREATE_SEPARATE_WOW_VDM = 0x00000800;
+
     int CREATE_SHARED_WOW_VDM = 0x00001000;
+
     int CREATE_FORCEDOS = 0x00002000;
+
     int INHERIT_PARENT_AFFINITY = 0x00010000;
+
     int CREATE_PROTECTED_PROCESS = 0x00040000;
+
     int EXTENDED_STARTUPINFO_PRESENT = 0x00080000;
+
     int CREATE_BREAKAWAY_FROM_JOB = 0x01000000;
+
     int CREATE_PRESERVE_CODE_AUTHZ_LEVEL = 0x02000000;
+
     int CREATE_DEFAULT_ERROR_MODE = 0x04000000;
+
     int CREATE_NO_WINDOW = 0x08000000;
 
     /* Invalid return values */
     int INVALID_FILE_SIZE = 0xFFFFFFFF;
+
     int INVALID_SET_FILE_POINTER = 0xFFFFFFFF;
+
     int INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
+
     /**
      * Return code for a process still active.
      */
@@ -170,6 +213,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     public static class FILETIME extends Structure {
 
         public int dwLowDateTime;
+
         public int dwHighDateTime;
 
         @Override
@@ -200,6 +244,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             super(memory);
             read();
         }
+
         /**
          * <p>
          * The difference between the Windows epoch (1601-01-01 00:00:00) and
@@ -259,20 +304,32 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
         }
     }
     /* Local Memory Flags */
+
     int LMEM_FIXED = 0x0000;
+
     int LMEM_MOVEABLE = 0x0002;
+
     int LMEM_NOCOMPACT = 0x0010;
+
     int LMEM_NODISCARD = 0x0020;
+
     int LMEM_ZEROINIT = 0x0040;
+
     int LMEM_MODIFY = 0x0080;
+
     int LMEM_DISCARDABLE = 0x0F00;
+
     int LMEM_VALID_FLAGS = 0x0F72;
+
     int LMEM_INVALID_HANDLE = 0x8000;
+
     int LHND = (LMEM_MOVEABLE | LMEM_ZEROINIT);
+
     int LPTR = (LMEM_FIXED | LMEM_ZEROINIT);
 
     /* Flags returned by LocalFlags (in addition to LMEM_DISCARDABLE) */
     int LMEM_DISCARDED = 0x4000;
+
     int LMEM_LOCKCOUNT = 0x00FF;
 
     /**
@@ -286,18 +343,25 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
         // The year. The valid values for this member are 1601 through 30827.
 
         public short wYear;
+
         // The month. The valid values for this member are 1 through 12.
         public short wMonth;
+
         // The day of the week. The valid values for this member are 0 through 6.
         public short wDayOfWeek;
+
         // The day of the month. The valid values for this member are 1 through 31.
         public short wDay;
+
         // The hour. The valid values for this member are 0 through 23.
         public short wHour;
+
         // The minute. The valid values for this member are 0 through 59.
         public short wMinute;
+
         // The second. The valid values for this member are 0 through 59.
         public short wSecond;
+
         // The millisecond. The valid values for this member are 0 through 999.
         public short wMilliseconds;
 
@@ -306,6 +370,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             return Arrays.asList(new String[]{"wYear", "wMonth", "wDayOfWeek", "wDay", "wHour", "wMinute", "wSecond", "wMilliseconds"});
         }
     }
+
     /**
      * The lpBuffer parameter is a pointer to a PVOID pointer, and that the
      * nSize parameter specifies the minimum number of TCHARs to allocate for an
@@ -315,6 +380,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * function to free the buffer when it is no longer needed.
      */
     int FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100;
+
     /**
      * Insert sequences in the message definition are to be ignored and passed
      * through to the output buffer unchanged. This flag is useful for fetching
@@ -322,6 +388,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * parameter is ignored.
      */
     int FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
+
     /**
      * The lpSource parameter is a pointer to a null-terminated message
      * definition. The message definition may contain insert sequences, just as
@@ -329,6 +396,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * FORMAT_MESSAGE_FROM_HMODULE or FORMAT_MESSAGE_FROM_SYSTEM.
      */
     int FORMAT_MESSAGE_FROM_STRING = 0x00000400;
+
     /**
      * The lpSource parameter is a module handle containing the message-table
      * resource(s) to search. If this lpSource handle is NULL, the current
@@ -336,6 +404,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * FORMAT_MESSAGE_FROM_STRING.
      */
     int FORMAT_MESSAGE_FROM_HMODULE = 0x00000800;
+
     /**
      * The function should search the system message-table resource(s) for the
      * requested message. If this flag is specified with
@@ -346,6 +415,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * function to retrieve the message text for a system-defined error.
      */
     int FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
+
     /**
      * The Arguments parameter is not a va_list structure, but is a pointer to
      * an array of values that represent the arguments. This flag cannot be used
@@ -353,32 +423,39 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * the va_list structure.
      */
     int FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x00002000;
+
     /**
      * The drive type cannot be determined.
      */
     int DRIVE_UNKNOWN = 0;
+
     /**
      * The root path is invalid, for example, no volume is mounted at the path.
      */
     int DRIVE_NO_ROOT_DIR = 1;
+
     /**
      * The drive is a type that has removable media, for example, a floppy drive
      * or removable hard disk.
      */
     int DRIVE_REMOVABLE = 2;
+
     /**
      * The drive is a type that cannot be removed, for example, a fixed hard
      * drive.
      */
     int DRIVE_FIXED = 3;
+
     /**
      * The drive is a remote (network) drive.
      */
     int DRIVE_REMOTE = 4;
+
     /**
      * The drive is a CD-ROM drive.
      */
     int DRIVE_CDROM = 5;
+
     /**
      * The drive is a RAM disk.
      */
@@ -391,9 +468,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     public static class OVERLAPPED extends Structure {
 
         public ULONG_PTR Internal;
+
         public ULONG_PTR InternalHigh;
+
         public int Offset;
+
         public int OffsetHigh;
+
         public HANDLE hEvent;
 
         @Override
@@ -401,6 +482,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             return Arrays.asList(new String[]{"Internal", "InternalHigh", "Offset", "OffsetHigh", "hEvent"});
         }
     }
+
     int INFINITE = 0xFFFFFFFF;
 
     /**
@@ -417,6 +499,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
 
             public static class ByReference extends PI implements Structure.ByReference {
             }
+
             /**
              * System's processor architecture. This value can be one of the
              * following values:
@@ -425,6 +508,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
              * PROCESSOR_ARCHITECTURE_IA64 PROCESSOR_ARCHITECTURE_AMD64
              */
             public WORD wProcessorArchitecture;
+
             /**
              * Reserved for future use.
              */
@@ -443,6 +527,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
 
             public static class ByReference extends UNION implements Structure.ByReference {
             }
+
             /**
              * An obsolete member that is retained for compatibility with
              * Windows NT 3.5 and earlier. New applications should use the
@@ -451,38 +536,46 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
              * PROCESSOR_ARCHITECTURE_INTEL.
              */
             public DWORD dwOemID;
+
             /**
              * Processor architecture (unnamed struct).
              */
             public PI pi;
         }
+
         /**
          * Processor architecture (unnamed union).
          */
         public UNION processorArchitecture;
+
         /**
          * Page size and the granularity of page protection and commitment.
          */
         public DWORD dwPageSize;
+
         /**
          * Pointer to the lowest memory address accessible to applications and
          * dynamic-link libraries (DLLs).
          */
         public Pointer lpMinimumApplicationAddress;
+
         /**
          * Pointer to the highest memory address accessible to applications and
          * DLLs.
          */
         public Pointer lpMaximumApplicationAddress;
+
         /**
          * Mask representing the set of processors configured into the system.
          * Bit 0 is processor 0; bit 31 is processor 31.
          */
         public DWORD_PTR dwActiveProcessorMask;
+
         /**
          * Number of processors in the system.
          */
         public DWORD dwNumberOfProcessors;
+
         /**
          * An obsolete member that is retained for compatibility with Windows NT
          * 3.5 and Windows Me/98/95. Use the wProcessorArchitecture,
@@ -491,11 +584,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * PROCESSOR_INTEL_PENTIUM
          */
         public DWORD dwProcessorType;
+
         /**
          * Granularity for the starting address at which virtual memory can be
          * allocated.
          */
         public DWORD dwAllocationGranularity;
+
         /**
          * System's architecture-dependent processor level. It should be used
          * only for display purposes. To determine the feature set of a
@@ -506,6 +601,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * wProcessorLevel is set to 1.
          */
         public WORD wProcessorLevel;
+
         /**
          * Architecture-dependent processor revision.
          */
@@ -528,16 +624,19 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * The size of the structure, in bytes.
          */
         public DWORD dwLength;
+
         /**
          * A number between 0 and 100 that specifies the approximate percentage
          * of physical memory that is in use (0 indicates no memory use and 100
          * indicates full memory use).
          */
         public DWORD dwMemoryLoad;
+
         /**
          * The amount of actual physical memory, in bytes.
          */
         public DWORDLONG ullTotalPhys;
+
         /**
          * The amount of physical memory currently available, in bytes. This is
          * the amount of physical memory that can be immediately reused without
@@ -545,28 +644,33 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * of the standby, free, and zero lists.
          */
         public DWORDLONG ullAvailPhys;
+
         /**
          * The current committed memory limit for the system or the current
          * process, whichever is smaller, in bytes.
          */
         public DWORDLONG ullTotalPageFile;
+
         /**
          * The maximum amount of memory the current process can commit, in
          * bytes. This value is equal to or smaller than the system-wide
          * available commit value.
          */
         public DWORDLONG ullAvailPageFile;
+
         /**
          * The size of the user-mode portion of the virtual address space of the
          * calling process, in bytes.
          */
         public DWORDLONG ullTotalVirtual;
+
         /**
          * The amount of unreserved and uncommitted memory currently in the
          * user-mode portion of the virtual address space of the calling
          * process, in bytes.
          */
         public DWORDLONG ullAvailVirtual;
+
         /**
          * Reserved. This value is always 0.
          */
@@ -595,11 +699,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * The size of the structure, in bytes.
          */
         public DWORD dwLength;
+
         /**
          * A pointer to a SECURITY_DESCRIPTOR structure that controls access to
          * the object.
          */
         public Pointer lpSecurityDescriptor;
+
         /**
          * A Boolean value that specifies whether the returned handle is
          * inherited when a new process is created
@@ -626,10 +732,12 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * The size of the structure, in bytes.
          */
         public DWORD cb;
+
         /**
          * Reserved; must be NULL.
          */
         public String lpReserved;
+
         /**
          * The name of the desktop, or the name of both the desktop and window
          * station for this process. A backslash in the string indicates that
@@ -637,6 +745,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * more information, see Thread Connection to a Desktop.
          */
         public String lpDesktop;
+
         /**
          * For console processes, this is the title displayed in the title bar
          * if a new console window is created. If NULL, the name of the
@@ -645,6 +754,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * console window.
          */
         public String lpTitle;
+
         /**
          * If dwFlags specifies STARTF_USEPOSITION, this member is the x offset
          * of the upper left corner of a window if a new window is created, in
@@ -656,6 +766,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * parameter of CreateWindow is CW_USEDEFAULT.
          */
         public DWORD dwX;
+
         /**
          * If dwFlags specifies STARTF_USEPOSITION, this member is the y offset
          * of the upper left corner of a window if a new window is created, in
@@ -667,6 +778,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * parameter of CreateWindow is CW_USEDEFAULT.
          */
         public DWORD dwY;
+
         /**
          * If dwFlags specifies STARTF_USESIZE, this member is the width of the
          * window if a new window is created, in pixels. Otherwise, this member
@@ -677,6 +789,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * parameter of CreateWindow is CW_USEDEFAULT.
          */
         public DWORD dwXSize;
+
         /**
          * If dwFlags specifies STARTF_USESIZE, this member is the height of the
          * window if a new window is created, in pixels. Otherwise, this member
@@ -687,18 +800,21 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * parameter of CreateWindow is CW_USEDEFAULT.
          */
         public DWORD dwYSize;
+
         /**
          * If dwFlags specifies STARTF_USECOUNTCHARS, if a new console window is
          * created in a console process, this member specifies the screen buffer
          * width, in character columns. Otherwise, this member is ignored.
          */
         public DWORD dwXCountChars;
+
         /**
          * If dwFlags specifies STARTF_USECOUNTCHARS, if a new console window is
          * created in a console process, this member specifies the screen buffer
          * height, in character rows. Otherwise, this member is ignored.
          */
         public DWORD dwYCountChars;
+
         /**
          * If dwFlags specifies STARTF_USEFILLATTRIBUTE, this member is the
          * initial text and background colors if a new console window is created
@@ -713,11 +829,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * FOREGROUND_RED| BACKGROUND_RED| BACKGROUND_GREEN| BACKGROUND_BLUE
          */
         public DWORD dwFillAttribute;
+
         /**
          * A bit field that determines whether certain STARTUPINFO members are
          * used when the process creates a window.
          */
         public int dwFlags;
+
         /**
          * If dwFlags specifies STARTF_USESHOWWINDOW, this member can be any of
          * the values that can be specified in the nCmdShow parameter for the
@@ -730,14 +848,17 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * nCmdShow parameter of ShowWindow is set to SW_SHOWDEFAULT.
          */
         public WORD wShowWindow;
+
         /**
          * Reserved for use by the C Run-time; must be zero.
          */
         public WORD cbReserved2;
+
         /**
          * Reserved for use by the C Run-time; must be NULL.
          */
         public ByteByReference lpReserved2;
+
         /**
          * If dwFlags specifies STARTF_USESTDHANDLES, this member is the
          * standard input handle for the process. If STARTF_USESTDHANDLES is not
@@ -753,6 +874,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * Otherwise, this member is ignored.
          */
         public HANDLE hStdInput;
+
         /**
          * If dwFlags specifies STARTF_USESTDHANDLES, this member is the
          * standard output handle for the process. Otherwise, this member is
@@ -760,6 +882,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * buffer.
          */
         public HANDLE hStdOutput;
+
         /**
          * If dwFlags specifies STARTF_USESTDHANDLES, this member is the
          * standard error handle for the process. Otherwise, this member is
@@ -791,12 +914,14 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * object.
          */
         public HANDLE hProcess;
+
         /**
          * A handle to the primary thread of the newly created process. The
          * handle is used to specify the thread in all functions that perform
          * operations on the thread object.
          */
         public HANDLE hThread;
+
         /**
          * A value that can be used to identify a process. The value is valid
          * from the time the process is created until all handles to the process
@@ -804,6 +929,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * identifier may be reused.
          */
         public DWORD dwProcessId;
+
         /**
          * A value that can be used to identify a thread. The value is valid
          * from the time the thread is created until all handles to the thread
@@ -835,6 +961,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             read();
         }
     }
+
     /**
      * If the file is to be moved to a different volume, the function simulates
      * the move by using the CopyFile and DeleteFile functions.
@@ -842,10 +969,12 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * This value cannot be used with MOVEFILE_DELAY_UNTIL_REBOOT.
      */
     int MOVEFILE_COPY_ALLOWED = 0x2;
+
     /**
      * Reserved for future use.
      */
     int MOVEFILE_CREATE_HARDLINK = 0x10;
+
     /**
      * The system does not move the file until the operating system is
      * restarted. The system moves the file immediately after AUTOCHK is
@@ -869,12 +998,14 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * lpExistingFileName with "\\?".
      */
     int MOVEFILE_DELAY_UNTIL_REBOOT = 0x4;
+
     /**
      * The function fails if the source file is a link source, but the file
      * cannot be tracked after the move. This situation can occur if the
      * destination is a volume formatted with the FAT file system.
      */
     int MOVEFILE_FAIL_IF_NOT_TRACKABLE = 0x20;
+
     /**
      * If a file named lpNewFileName exists, the function replaces its contents
      * with the contents of the lpExistingFileName file, provided that security
@@ -885,6 +1016,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * directory.
      */
     int MOVEFILE_REPLACE_EXISTING = 0x1;
+
     /**
      * The function does not return until the file is actually moved on the
      * disk.

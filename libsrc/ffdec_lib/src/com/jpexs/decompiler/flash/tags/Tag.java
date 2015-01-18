@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -53,19 +53,25 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * Identifier of tag type
      */
     protected int id;
+
     /**
      * If true, then Tag is written to the stream as longer than 0x3f even if it
      * is not
      */
     @Internal
     public boolean forceWriteAsLong = false;
+
     protected String tagName;
+
     @Internal
     protected transient SWF swf;
+
     @Internal
     protected transient Timelined timelined;
+
     @Internal
     private boolean modified;
+
     /**
      * Original tag data
      */
@@ -129,14 +135,17 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (swf == null) {
             throw new Error("swf parameter cannot be null.");
         }
-        if (data == null) { // it is tag build by constructor        
+        if (data == null) { // it is tag build by constructor
             modified = true;
         }
     }
 
     private static final Object lockObject = new Object();
+
     private volatile static List<Integer> knownTagIds;
+
     private volatile static Map<Integer, Class> knownTagClasses;
+
     private volatile static List<Integer> requiredTagIds;
 
     public static List<Integer> getKnownTags() {
@@ -431,7 +440,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             sos.write(originalRange.getArray(), originalRange.getPos(), originalRange.getLength());
         }
     }
-    
+
     public Tag cloneTag() throws InterruptedException, IOException {
         byte[] data = getData();
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
@@ -513,7 +522,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (originalRange == null) {
             return -1;
         }
-        
+
         return originalRange.getPos();
     }
 
@@ -521,7 +530,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (originalRange == null) {
             return -1;
         }
-        
+
         return originalRange.getPos() + (isLongOriginal() ? 6 : 2);
     }
 

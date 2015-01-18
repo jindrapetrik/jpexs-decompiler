@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,22 +31,39 @@ import java.util.Map;
 public class Location {
 
     public int locationSelector;
+
     public int extraBlocks;
+
     public long blockNumber;
+
     public int fileGeneration;
+
     public int fileSize;
+
     public boolean isMetadata;
+
     public long hash;
+
     private final File rootDir;
+
     public static final long eReservedMask = 0x4C000000L;
+
     public static final long eLocationSelectorMask = 0x30000000L;
+
     public static final int eLocationSelectorOffset = 28;
+
     public static final long eExtraBlocksMask = 0x03000000L;
+
     public static final int eExtraBlocksOffset = 24;
+
     public static final long eBlockNumberMask = 0x00FFFFFFL;
+
     public static final long eFileGenerationMask = 0x000000FFL;
+
     public static final long eFileSizeMask = 0x00FFFF00L;
+
     public static final int eFileSizeOffset = 8;
+
     public static final long eFileReservedMask = 0x4F000000L;
 
     public static int size_shift(int idx) {
@@ -64,6 +81,7 @@ public class Location {
      #define BLOCK_SIZE_FOR_INDEX(idx)  ((idx) ? (256    << SIZE_SHIFT(idx)) : 0)
      #define BITMAP_SIZE_FOR_INDEX(idx) ((idx) ? (131072 >> SIZE_SHIFT(idx)) : 0)
      */
+
     private final Map<Integer, RandomAccessFile> dataFiles;
 
     public InputStream getInputStream() throws IOException {

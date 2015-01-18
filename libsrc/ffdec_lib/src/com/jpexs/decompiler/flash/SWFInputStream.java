@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -293,11 +293,17 @@ import java.util.zip.InflaterInputStream;
 public class SWFInputStream implements AutoCloseable {
 
     private MemoryInputStream is;
+
     private long startingPos;
+
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
+
     private final List<ProgressListener> listeners = new ArrayList<>();
+
     private long percentMax;
+
     private SWF swf;
+
     public DumpInfo dumpInfo;
 
     public void addPercentListener(ProgressListener listener) {
@@ -848,7 +854,9 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(result);
         return result;
     }
+
     private int bitPos = 0;
+
     private int tempByte = 0;
 
     /**
@@ -1000,9 +1008,13 @@ public class SWFInputStream implements AutoCloseable {
     private class TagResolutionTask implements Callable<Tag> {
 
         private final TagStub tag;
+
         private final DumpInfo dumpInfo;
+
         private final int level;
+
         private final boolean parallel;
+
         private final boolean skipUnusualTags;
 
         public TagResolutionTask(TagStub tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags) {
@@ -1244,7 +1256,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 26:
                     ret = new PlaceObject2Tag(sis, data);
                     break;
-                //case 27: 
+                //case 27:
                 case 28:
                     ret = new RemoveObject2Tag(sis, data);
                     break;
@@ -2893,7 +2905,7 @@ public class SWFInputStream implements AutoCloseable {
     public MORPHGRADIENT readMORPHGRADIENT(String name) throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
         newDumpLevel(name, "MORPHGRADIENT");
-        // Despite of documentation (UI8 1-8), there are two fields 
+        // Despite of documentation (UI8 1-8), there are two fields
         // spreadMode and interPolationMode which are same as in GRADIENT
         ret.spreadMode = (int) readUB(2, "spreadMode");
         ret.interPolationMode = (int) readUB(2, "interPolationMode");

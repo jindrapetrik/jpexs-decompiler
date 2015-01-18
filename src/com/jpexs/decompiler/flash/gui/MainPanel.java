@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -194,52 +194,97 @@ import javax.swing.tree.TreePath;
 public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, SearchListener<TextTag>, Freed {
 
     private final MainFrame mainFrame;
+
     private final List<SWFList> swfs;
+
     private ABCPanel abcPanel;
+
     private ActionPanel actionPanel;
+
     private final JPanel welcomePanel;
+
     private final TimelineViewPanel timelineViewPanel;
+
     private final MainFrameStatusPanel statusPanel;
+
     private final MainFrameMenu mainMenu;
+
     private final JProgressBar progressBar = new JProgressBar(0, 100);
+
     private DeobfuscationDialog deobfuscationDialog;
+
     public TagTree tagTree;
+
     public DumpTree dumpTree;
+
     private final FlashPlayerPanel flashPanel;
+
     private final JPanel contentPanel;
+
     private final JPanel displayPanel;
+
     public FolderPreviewPanel folderPreviewPanel;
+
     private boolean isWelcomeScreen = true;
+
     private static final String CARDPREVIEWPANEL = "Preview card";
+
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
+
     private static final String CARDEMPTYPANEL = "Empty card";
+
     private static final String CARDDUMPVIEW = "Dump view";
+
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
+
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
+
     private static final String CARDHEADER = "Header card";
+
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
+
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
+
     private static final String SPLIT_PANE1 = "SPLITPANE1";
+
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
+
     private static final String TIMELINE_PANEL = "TIMELINEPANEL";
+
     private final JSplitPane splitPane1;
+
     private final JSplitPane splitPane2;
+
     private boolean splitsInited = false;
+
     private JPanel detailPanel;
+
     private JTextField filterField = new MyTextField("");
+
     private JPanel searchPanel;
+
     private final PreviewPanel previewPanel;
+
     private final HeaderInfoPanel headerPanel;
+
     private DumpViewPanel dumpViewPanel;
+
     private final JPanel treePanel;
+
     private TreePanelMode treePanelMode;
+
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+
     private CancellableWorker setSourceWorker;
+
     public TreeItem oldItem;
+
     private SearchDialog searchDialog;
+
     private SearchDialog replaceDialog;
 
     public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+
     public static final String ACTION_REPLACE = "REPLACE";
 
     // play morph shape in 2 second(s)
@@ -1487,6 +1532,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                 // "configuration items" for the current replace only
                 private final ConfigurationItem<Boolean> showAgainImportError = new ConfigurationItem<>("showAgainImportError", true, true);
+
                 private final ConfigurationItem<Boolean> showAgainInvalidText = new ConfigurationItem<>("showAgainInvalidText", true, true);
 
                 private String getTextTagInfo(TextTag textTag) {
@@ -1883,6 +1929,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             // "configuration items" for the current replace only
             private final ConfigurationItem<Boolean> showAgainIgnoreMissingCharacters = new ConfigurationItem<>("showAgainIgnoreMissingCharacters", true, true);
+
             private boolean ignoreMissingCharacters = false;
 
             @Override
@@ -2169,7 +2216,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public static final int VIEW_RESOURCES = 0;
+
     public static final int VIEW_DUMP = 1;
+
     public static final int VIEW_TIMELINE = 2;
 
     private int getCurrentView() {

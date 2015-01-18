@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -48,7 +49,9 @@ import javax.swing.JOptionPane;
 public class Configuration {
 
     private static final String CONFIG_NAME = "config.bin";
+
     private static final File unspecifiedFile = new File("unspecified");
+
     private static File directory = unspecifiedFile;
 
     public static final Level logLevel;
@@ -142,30 +145,35 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> debugMode = null;
+
     /**
      * Turn off resolving constants in ActionScript 2
      */
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> resolveConstants = null;
+
     /**
      * Limit of code subs (for obfuscated code)
      */
     @ConfigurationDefaultInt(500)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> sublimiter = null;
+
     /**
      * Total export timeout in seconds
      */
     @ConfigurationDefaultInt(30 * 60)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> exportTimeout = null;
+
     /**
      * Decompilation timeout in seconds for a single file
      */
     @ConfigurationDefaultInt(5 * 60)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
+
     /**
      * Using parameter names in decompiling may cause problems because official
      * programs like Flash CS 5.5 inserts wrong parameter names indices
@@ -177,9 +185,11 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> displayFileName = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> debugCopy = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> dumpTags = null;
@@ -187,6 +197,7 @@ public class Configuration {
     @ConfigurationDefaultInt(60)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
+
     @ConfigurationDefaultInt(1)
     public static final ConfigurationItem<Integer> lastRenameType = null;
 
@@ -219,25 +230,34 @@ public class Configuration {
     @ConfigurationDefaultInt(1000)
     @ConfigurationName("gui.window.width")
     public static final ConfigurationItem<Integer> guiWindowWidth = null;
+
     @ConfigurationDefaultInt(700)
     @ConfigurationName("gui.window.height")
     public static final ConfigurationItem<Integer> guiWindowHeight = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("gui.window.maximized.horizontal")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedHorizontal = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
+
     @ConfigurationName("gui.avm2.splitPane.dividerLocation")
     public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocation = null;
+
     @ConfigurationName("guiActionSplitPaneDividerLocation")
     public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocation = null;
+
     @ConfigurationName("guiPreviewSplitPaneDividerLocation")
     public static final ConfigurationItem<Integer> guiPreviewSplitPaneDividerLocation = null;
+
     @ConfigurationName("gui.splitPane1.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
+
     @ConfigurationName("gui.splitPane2.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
+
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
@@ -245,13 +265,18 @@ public class Configuration {
     @ConfigurationDefaultInt(1024 * 1024/*1MiB*/)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
+
     public static final ConfigurationItem<Integer> guiFontPreviewSampleText = null;
+
     @ConfigurationName("gui.fontPreviewWindow.width")
     public static final ConfigurationItem<Integer> guiFontPreviewWidth = null;
+
     @ConfigurationName("gui.fontPreviewWindow.height")
     public static final ConfigurationItem<Integer> guiFontPreviewHeight = null;
+
     @ConfigurationName("gui.fontPreviewWindow.posX")
     public static final ConfigurationItem<Integer> guiFontPreviewPosX = null;
+
     @ConfigurationName("gui.fontPreviewWindow.posY")
     public static final ConfigurationItem<Integer> guiFontPreviewPosY = null;
 

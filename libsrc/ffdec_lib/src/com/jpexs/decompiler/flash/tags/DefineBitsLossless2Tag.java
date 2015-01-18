@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -64,12 +64,15 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public ByteArrayRange zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
 
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
+
     public static final int FORMAT_32BIT_ARGB = 5;
 
     @HideInRawEdit
     private ALPHACOLORMAPDATA colorMapData;
+
     @HideInRawEdit
     private ALPHABITMAPDATA bitmapData;
+
     @Internal
     private boolean decompressed = false;
 
@@ -106,7 +109,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         int width = image.getWidth();
         int height = image.getHeight();
         bitmapData.bitmapPixelData = new ARGB[width * height];
-        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); 
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         for (int pos = 0; pos < pixels.length; pos++) {
             int argb = pixels[pos];
             int a = (argb >> 24) & 0xff;
@@ -166,7 +169,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         }
         zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData");
     }
-    
+
     public ALPHACOLORMAPDATA getColorMapData() {
         if (!decompressed) {
             uncompressData();

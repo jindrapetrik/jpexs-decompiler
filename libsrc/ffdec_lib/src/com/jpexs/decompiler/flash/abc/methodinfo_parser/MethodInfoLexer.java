@@ -2,17 +2,17 @@
 
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -40,6 +40,7 @@ public final class MethodInfoLexer {
      * lexical states
      */
     public static final int YYINITIAL = 0;
+
     public static final int STRING = 2;
 
     /**
@@ -482,7 +483,9 @@ public final class MethodInfoLexer {
 
     /* error codes */
     private static final int ZZ_UNKNOWN_ERROR = 0;
+
     private static final int ZZ_NO_MATCH = 1;
+
     private static final int ZZ_PUSHBACK_2BIG = 2;
 
     /* error messages for the codes above */
@@ -611,7 +614,9 @@ public final class MethodInfoLexer {
 
     /* user code: */
     StringBuffer string = new StringBuffer();
+
     boolean isMultiname = false;
+
     long multinameId = 0;
 
     /**
@@ -1206,5 +1211,4 @@ public final class MethodInfoLexer {
             }
         }
     }
-
 }

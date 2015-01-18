@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -73,27 +73,49 @@ import javax.swing.JPanel;
 public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
     private Timelined timelined;
+
     private boolean stillFrame = false;
+
     private Timer timer;
+
     private int frame = -1;
+
     private boolean zoomAvailable = false;
+
     private int counter = 0;
+
     private AtomicBoolean shouldDraw = new AtomicBoolean();
+
     private SWF swf;
+
     private boolean loaded;
+
     private int mouseButton;
+
     private final JLabel debugLabel = new JLabel("-");
+
     private DepthState stateUnderCursor = null;
+
     private MouseEvent lastMouseEvent = null;
+
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
+
     private final IconPanel iconPanel;
+
     private int time = 0;
+
     private int selectedDepth = -1;
+
     private Zoom zoom = new Zoom();
+
     private final Object delayObject = new Object();
+
     private boolean drawReady;
+
     private final int drawWaitLimit = 50; // ms
+
     private TextTag textTag;
+
     private TextTag newTextTag;
 
     public synchronized void selectDepth(int depth) {
@@ -108,7 +130,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         private SerializableImage img;
 
         private Rectangle rect = null;
+
         private List<DepthState> dss;
+
         private List<Shape> outlines;
 
         public BufferedImage getLastImage() {
@@ -837,6 +861,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             shouldDraw.set(true);
             TimerTask task = new TimerTask() {
                 public int counter = cnt;
+
                 private final AtomicBoolean first = shouldDraw;
 
                 @Override

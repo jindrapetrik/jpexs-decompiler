@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
@@ -36,15 +37,21 @@ import java.util.regex.Pattern;
 public class IdentifiersDeobfuscation {
 
     private final Random rnd = new Random();
+
     private final int DEFAULT_FOO_SIZE = 10;
+
     public HashSet<String> allVariableNamesStr = new HashSet<>();
+
     private final HashMap<String, Integer> typeCounts = new HashMap<>();
 
     public static final String VALID_FIRST_CHARACTERS = "\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}_$";
+
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}";
+
     public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*$");
 
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
+
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
     // http://help.adobe.com/en_US/AS2LCR/Flash_10.0/help.html?content=00000477.html
@@ -68,10 +75,11 @@ public class IdentifiersDeobfuscation {
         "interface", "internal", "is", "new", "null", "package", "private", "protected", "public",
         "return", "super", "switch", "this", "throw",
         // is "to" really a keyword? documentation says yes, but I can create "to" variable...
-        // "to",   
+        // "to",
         "true", "try", "typeof", "use", "var",
         "void", "while", "with"
     };
+
     //syntactic keywords - can be used as identifiers, but that have special meaning in certain contexts
     public static final String[] syntacticKeywordsAS3 = {"each", "get", "set", "namespace", "include", "dynamic", "final", "native", "override", "static"};
 
@@ -290,6 +298,7 @@ public class IdentifiersDeobfuscation {
     }
 
     private static final Cache<String, String> as3NameCache = Cache.getInstance(false, "as3_ident");
+
     private static final Cache<String, String> as2NameCache = Cache.getInstance(false, "as2_ident");
 
     /**

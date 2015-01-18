@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,13 +40,17 @@ import javax.swing.JScrollPane;
 public class SearchResultsDialog<E> extends AppDialog implements ActionListener {
 
     private final JList<E> resultsList;
+
     private final DefaultListModel<E> model;
+
     private final SearchListener<E> listener;
 
     private static final String ACTION_GOTO = "GOTO";
+
     private static final String ACTION_CANCEL = "CLOSE";
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
+
     private final JButton closeButton = new JButton(translate("button.close"));
 
     public SearchResultsDialog(Window owner, String text, SearchListener<E> listener) {
@@ -118,5 +122,4 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
             });
         }
     }
-
 }

@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import java.awt.Font;
@@ -82,14 +83,14 @@ public class FontHelper {
 
             fonts = (Font[]) clFm.getDeclaredMethod("getAllInstalledFonts").invoke(fm);
         } catch (Throwable ex) {
-            // ignore            
+            // ignore
         }
-        
+
         if (fonts == null) {
             fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         }
-        
-        List<String> javaFonts = Arrays.asList("Dialog", "DialogInput", "Monospaced", "Serif", "SansSerif"); 
+
+        List<String> javaFonts = Arrays.asList("Dialog", "DialogInput", "Monospaced", "Serif", "SansSerif");
         for (Font f : fonts) {
             String fam = f.getFamily(Locale.ENGLISH);
             //Do not want Java logical fonts
@@ -102,7 +103,7 @@ public class FontHelper {
 
             ret.get(fam).put(f.getFontName(Locale.ENGLISH), f);
         }
-        
+
         return ret;
     }
 
@@ -216,7 +217,9 @@ public class FontHelper {
     public static class KerningPair {
 
         public char char1;
+
         public char char2;
+
         public int kerning;
 
         public KerningPair(char char1, char char2, int kerning) {
@@ -259,7 +262,6 @@ public class FontHelper {
         public String toString() {
             return "'" + char1 + "','" + char2 + "' => " + kerning;
         }
-
     }
 
     private static Object getFont2d(Font f) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -295,11 +297,17 @@ public class FontHelper {
     private static class KerningLoader {
 
         private int size = -1;
+
         private float scale;
+
         private long bytePosition;
+
         private long headOffset = -1;
+
         private long kernOffset = -1;
+
         private Font font;
+
         private Map<Integer, Character> charmap;
 
         public List<KerningPair> loadFromTTF(File file, int size) throws IOException, FontFormatException {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -316,7 +316,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     BitmapExporter.export(swf, shape, textColor2, image, mat, colorTransform);
-                    if (SHAPERECORD.DRAW_BOUNDING_BOX){
+                    if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
                         RECT bounds = shape.getBounds();
@@ -382,12 +382,12 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
         }
-        
+
         return result;
     }
 
     public void updateTextBounds(RECT textBounds) {
-        TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get(); 
+        TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get();
         if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
             ExportRectangle newBounds = calculateTextBounds();
             if (newBounds != null) {
@@ -409,7 +409,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             }
         }
     }
-    
+
     public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         int textColor = 0;
         String ret = "";

@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -82,21 +83,37 @@ public class DefineEditTextTag extends TextTag {
     public int characterID;
 
     public RECT bounds;
+
     public boolean hasText;
+
     public boolean wordWrap;
+
     public boolean multiline;
+
     public boolean password;
+
     public boolean readOnly;
+
     public boolean hasTextColor;
+
     public boolean hasMaxLength;
+
     public boolean hasFont;
+
     public boolean hasFontClass;
+
     public boolean autoSize;
+
     public boolean hasLayout;
+
     public boolean noSelect;
+
     public boolean border;
+
     public boolean wasStatic;
+
     public boolean html;
+
     public boolean useOutlines;
 
     @SWFType(BasicType.UI16)
@@ -982,7 +999,7 @@ public class DefineEditTextTag extends TextTag {
                 staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
             }
         }
-        
+
         return "";
     }
 

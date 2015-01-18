@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,7 +54,9 @@ import jsyntaxpane.actions.ActionUtils;
 public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHandler {
 
     private static final int truncateLimit = 2 * 1024 * 1024;
+
     private int lastLine = -1;
+
     private boolean error = false;
 
     public int getLine() {
@@ -141,13 +143,17 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                     }
                 });
     }
+
     private Token lastUnderlined = null;
+
     private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
+
     private LinkHandler linkHandler = this;
 
     private class LinkAdapter extends MouseAdapter implements KeyListener {
 
         private Point lastPos = new Point(0, 0);
+
         private boolean ctrlDown = false;
 
         @Override

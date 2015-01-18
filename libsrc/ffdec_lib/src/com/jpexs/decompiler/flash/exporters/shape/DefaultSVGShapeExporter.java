@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -29,10 +30,13 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected static final String DRAW_COMMAND_L = "L";
+
     protected static final String DRAW_COMMAND_Q = "Q";
 
     protected String currentDrawCommand = "";
+
     protected String pathData;
+
     protected double zoom;
 
     public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform, double zoom) {

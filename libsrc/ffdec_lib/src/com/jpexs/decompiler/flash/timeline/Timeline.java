@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -55,19 +55,31 @@ import java.util.Stack;
 public class Timeline {
 
     public int id;
+
     public SWF swf;
+
     public RECT displayRect;
+
     public int frameRate;
+
     public Timelined timelined;
+
     public Tag parentTag;
+
     public List<Tag> tags;
 
     private final List<Frame> frames = new ArrayList<>();
+
     private final Map<Integer, Integer> depthMaxFrame = new HashMap<>();
+
     private final List<ASMSource> asmSources = new ArrayList<>();
+
     private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
+
     private AS2Package as2RootPackage;
+
     private final List<Tag> otherTags = new ArrayList<>();
+
     private boolean initialized = false;
 
     private void ensureInitialized() {

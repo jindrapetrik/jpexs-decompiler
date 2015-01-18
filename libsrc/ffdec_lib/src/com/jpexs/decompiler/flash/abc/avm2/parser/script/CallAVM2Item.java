@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -48,7 +48,9 @@ import java.util.List;
 public class CallAVM2Item extends AVM2Item {
 
     public GraphTargetItem name;
+
     public List<GraphTargetItem> arguments;
+
     public int line;
 
     public CallAVM2Item(int line, GraphTargetItem name, List<GraphTargetItem> arguments) {
@@ -137,12 +139,12 @@ public class CallAVM2Item extends AVM2Item {
             if (obj == null) {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex});
             }
-            
+
             boolean isSuper = (obj instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) obj).getVariableName());
-            
-            InstructionDefinition insDef = isSuper ?
-                    (needsReturn ? new CallSuperIns() : new CallSuperVoidIns()) :
-                    (needsReturn ? new CallPropertyIns() : new CallPropVoidIns());
+
+            InstructionDefinition insDef = isSuper
+                    ? (needsReturn ? new CallSuperIns() : new CallSuperVoidIns())
+                    : (needsReturn ? new CallPropertyIns() : new CallPropVoidIns());
             return toSourceMerge(localData, generator, obj, arguments,
                     ins(insDef, propIndex, arguments.size())
             );

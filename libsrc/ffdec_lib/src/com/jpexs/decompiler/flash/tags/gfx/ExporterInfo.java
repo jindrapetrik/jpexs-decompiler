@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -33,18 +34,29 @@ import java.util.List;
 public class ExporterInfo extends Tag {
 
     public static final int ID = 1000;
+
     //Version (1.10 will be encoded as 0x10A)
     public int version;
+
     //Version 1.10 (0x10A) and above - flags
     public long flags;
+
     public int bitmapFormat;
+
     public byte[] prefix;
+
     public String swfName;
+
     public List<Long> codeOffsets;
+
     public static final int BITMAP_FORMAT_TGA = 1;
+
     public static final int BITMAP_FORMAT_DDS = 2;
+
     public static final int FLAG_CONTAINS_GLYPH_TEXTURES = 1;
+
     public static final int FLAG_GLYPHS_STRIPPED_FROM_DEFINEFONT = 2;
+
     public static final int FLAG_GRADIENT_IMAGES_EXPORTED = 4;
 
     /**
@@ -98,7 +110,7 @@ public class ExporterInfo extends Tag {
         prefix = sis.readBytesEx(prefixLen, "prefix");
         int swfNameLen = sis.readUI8("swfNameLen");
         swfName = new String(sis.readBytesEx(swfNameLen, "swfName"));
-        if (sis.available() > 0) // (version >= 0x401) //?                
+        if (sis.available() > 0) // (version >= 0x401) //?
         {
             codeOffsets = new ArrayList<>();
             int numCodeOffsets = sis.readUI16("numCodeOffsets");

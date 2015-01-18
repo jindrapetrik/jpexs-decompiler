@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -88,7 +88,7 @@ public class RecompileTest {
                 for (ABCContainerTag ct : swf.getAbcList()) {
                     allAbcs.add(ct.getABC());
                 }
-                for (ABC abc : allAbcs) {                   
+                for (ABC abc : allAbcs) {
                     for (int s = 0; s < abc.script_info.size(); s++) {
                         String startAfter = null;
                         HighlightedTextWriter htw = new HighlightedTextWriter(new CodeFormatting(), false);
@@ -106,7 +106,7 @@ public class RecompileTest {
                         String original = htw.toString();
                         com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, abc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
                         //remove last compiled script:
-                        abc.script_info.remove(abc.script_info.size()-1);
+                        abc.script_info.remove(abc.script_info.size() - 1);
                     }
                 }
             } else {
@@ -166,7 +166,7 @@ public class RecompileTest {
             // ignore
         }
     }
-    
+
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {
         File dir = new File(TESTDATADIR);

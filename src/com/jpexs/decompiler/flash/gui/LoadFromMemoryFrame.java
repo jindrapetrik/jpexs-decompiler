@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -78,20 +78,33 @@ import javax.swing.table.TableRowSorter;
 public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
     private static final String ACTION_SELECT_PROCESS = "SELECTPROCESS";
+
     private static final String ACTION_REFRESH_PROCESS_LIST = "REFRESHPROCESSLIST";
+
     private static final String ACTION_OPEN_SWF = "OPENSWF";
+
     private static final String ACTION_SAVE = "SAVE";
 
     private MainFrame mainFrame;
+
     private List<com.jpexs.process.Process> processlist;
+
     private List<SwfInMemory> foundIs;
+
     private List<com.jpexs.process.Process> selProcesses;
+
     private JList<com.jpexs.process.Process> list;
+
     private DefaultListModel<com.jpexs.process.Process> model;
+
     private DefaultTableModel resTableModel;
+
     private final JTable tableRes;
+
     private final JLabel stateLabel;
+
     private boolean processing = false;
+
     private final JProgressBar progress;
 
     private class SelectProcessWorker extends SwingWorker<List<SwfInMemory>, Object> {

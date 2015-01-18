@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -31,12 +32,19 @@ import java.io.OutputStream;
 public class DefineExternalGradient extends Tag {
 
     public static final int ID = 1003;
+
     public static final int BITMAP_FORMAT_DEFAULT = 0;
+
     public static final int BITMAP_FORMAT_TGA = 1;
+
     public static final int BITMAP_FORMAT_DDS = 2;
+
     public int gradientId;
+
     public int bitmapsFormat;
+
     public int gradientSize;
+
     public String fileName;
 
     /**

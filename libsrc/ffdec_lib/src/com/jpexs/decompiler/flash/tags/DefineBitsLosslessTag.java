@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -63,14 +63,19 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     public int bitmapColorTableSize;
 
     public ByteArrayRange zlibBitmapData; //TODO: Parse COLORMAPDATA,BITMAPDATA
+
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
+
     public static final int FORMAT_15BIT_RGB = 4;
+
     public static final int FORMAT_24BIT_RGB = 5;
 
     @HideInRawEdit
     private COLORMAPDATA colorMapData;
+
     @HideInRawEdit
     private BITMAPDATA bitmapData;
+
     @Internal
     private boolean decompressed = false;
 
@@ -102,7 +107,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         int height = image.getHeight();
         bitmapData = new BITMAPDATA();
         bitmapData.bitmapPixelDataPix24 = new PIX24[width * height];
-        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); 
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         for (int pos = 0; pos < pixels.length; pos++) {
             int argb = pixels[pos];
             //int a = (argb >> 24) & 0xff;

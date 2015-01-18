@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -60,11 +61,17 @@ import java.util.List;
 public class PropertyAVM2Item extends AssignableAVM2Item {
 
     public String propertyName;
+
     public GraphTargetItem object;
+
     public ABC abc;
+
     public List<ABC> otherABCs;
+
     private final List<Integer> openedNamespaces;
+
     private final List<MethodBody> callStack;
+
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
     @Override
@@ -148,7 +155,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                      nsname = name.substring(0,name.lastIndexOf("."));
                      name = name.substring(name.lastIndexOf(".")+1);
                      }
-            
+
                      List<ABC> abcs = new ArrayList<>();
                      abcs.add(abc);
                      abcs.addAll(otherABCs);
@@ -394,7 +401,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      for (int i = 0; i < openedNamespaces.size(); i++) {
      int nsindex = openedNamespaces.get(i);
      int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-     String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants);                
+     String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants);
      int name_index = 0;
      for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
      Multiname mname = abc.constants.constant_multiname.get(m);
@@ -680,5 +687,4 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 killTemp(localData, generator, Arrays.asList(ret_temp, obj_temp)));
         return ret;
     }
-
 }

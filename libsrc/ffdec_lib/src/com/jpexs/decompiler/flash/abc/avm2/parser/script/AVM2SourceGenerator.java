@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -142,11 +142,15 @@ import java.util.logging.Logger;
 public class AVM2SourceGenerator implements SourceGenerator {
 
     public final ABC abc;
+
     public List<ABC> allABCs;
 
     public static final int MARK_E_START = 0;
+
     public static final int MARK_E_END = 1;
+
     public static final int MARK_E_TARGET = 2;
+
     public static final int MARK_E_FINALLYPART = 3;
 
     private AVM2Instruction ins(InstructionDefinition def, int... operands) {
@@ -249,7 +253,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
-        //ret.addAll(notCondition(localData, expression));        
+        //ret.addAll(notCondition(localData, expression));
         List<AVM2Instruction> onTrue = null;
         List<AVM2Instruction> onFalse = null;
         if (ternar) {
@@ -594,6 +598,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         fixLoop(forBody, forBodyLen + forFinalCLen + forExprLen, forBodyLen, item.loop.id);
         return ret;
     }
+
     private long uniqLast = 0;
 
     public String uniqId() {
@@ -814,7 +819,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
 
-            //catchCmds.add(catchCmd);  
+            //catchCmds.add(catchCmd);
             preCatches.addAll(catchCmds.get(c));
             catches.addAll(0, preCatches);
             catches.add(0, new ExceptionMarkAVM2Instruction(currentExceptionIds.get(c), MARK_E_TARGET));
@@ -1322,7 +1327,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
          }
          if (!nameItem.subtypes.isEmpty()) { //It's vector => TypeName
          List<Integer> params = new ArrayList<>();
-         for (GraphTargetItem p : nameItem.subtypes) {                
+         for (GraphTargetItem p : nameItem.subtypes) {
          params.add(typeName(localData, p));//abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(p), namespace(Namespace.KIND_PACKAGE, ppkg), 0, 0, new ArrayList<Integer>()), true));
          }
          int qname = abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(Namespace.KIND_PACKAGE, pkg), 0, 0, new ArrayList<Integer>()), true);
@@ -1381,7 +1386,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     public int method(boolean subMethod, boolean isInterface, List<MethodBody> callStack, String pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
         //Reference<Boolean> hasArgs = new Reference<>(Boolean.FALSE);
-        //calcRegisters(localData,needsActivation,paramNames,subvariables,body, hasArgs);       
+        //calcRegisters(localData,needsActivation,paramNames,subvariables,body, hasArgs);
         SourceGeneratorLocalData newlocalData = new SourceGeneratorLocalData(new HashMap<String, Integer>(), 1, true, 0);
         newlocalData.currentClass = className;
         newlocalData.pkg = localData.pkg;
@@ -1598,7 +1603,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             mi.setFlagNeed_Arguments();
         }
         //No param names like in official
-        /*        
+        /*
          if (!paramNames.isEmpty()) {
          mi.setFlagHas_paramnames();
          }*/
@@ -2326,8 +2331,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             parentNames(a, abcs, a.instance_info.get(i).super_index, indices, names, namespaces, outABCs);
                         }
                         /*parentNames(abc,allABCs,abc.constants.getMultinameId(
-                         new Multiname(superName.kind, 
-                         abc.constants.getStringId(superName.getName(a.constants, new ArrayList<String>()),true), 
+                         new Multiname(superName.kind,
+                         abc.constants.getStringId(superName.getName(a.constants, new ArrayList<String>()),true),
                          abc.constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.constants.getStringId(superName.getNamespace(a.constants).getName(a.constants),true)),0,true), 0, 0, new ArrayList<Integer>()), true),indices,names,namespaces,outABCs);*/
                         return;
                     }
@@ -2337,7 +2342,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     /* public void calcRegisters(Reference<Integer> activationReg, SourceGeneratorLocalData localData, boolean needsActivation, List<String> funParamNames,List<NameAVM2Item> funSubVariables,List<GraphTargetItem> funBody, Reference<Boolean> hasArguments) throws ParseException {
-        
+
      }*/
     /*public int resolveType(String objType) {
      if (objType.equals("*")) {
@@ -2461,5 +2466,4 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.add(ins(new PopIns()));
         return ret;
     }
-
 }

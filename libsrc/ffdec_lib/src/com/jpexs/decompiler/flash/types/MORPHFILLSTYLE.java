@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -31,12 +32,19 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
     public int fillStyleType;
 
     public static final int SOLID = 0x0;
+
     public static final int LINEAR_GRADIENT = 0x10;
+
     public static final int RADIAL_GRADIENT = 0x12;
+
     public static final int FOCAL_RADIAL_GRADIENT = 0x13;
+
     public static final int REPEATING_BITMAP = 0x40;
+
     public static final int CLIPPED_BITMAP = 0x41;
+
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
+
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
 
     @Conditional(value = "fillStyleType", options = {SOLID})

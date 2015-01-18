@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -124,9 +124,11 @@ import org.xml.sax.SAXException;
 public class SwfXmlImporter {
 
     private Map<String, Class> swfTags;
+
     private Map<String, Class> swfObjects;
+
     private Map<String, Class> swfObjectsParam;
-    
+
     public void importSwf(SWF swf, String xml) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -137,7 +139,7 @@ public class SwfXmlImporter {
             Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private Field getField(Class cls, String name) throws NoSuchFieldException {
         Field field;
         try {
@@ -146,10 +148,10 @@ public class SwfXmlImporter {
             field = cls.getDeclaredField(name);
             field.setAccessible(true);
         }
-        
+
         return field;
     }
-    
+
     private void processElement(Element element, Object obj, SWF swf) {
         Class cls = obj.getClass();
         for (int i = 0; i < element.getAttributes().getLength(); i++) {
@@ -175,7 +177,7 @@ public class SwfXmlImporter {
                     Field field = getField(cls, name);
                     Class childCls = field.getType();
                     if (List.class.isAssignableFrom(childCls)) {
-                        List list = new ArrayList(); 
+                        List list = new ArrayList();
                         for (int j = 0; j < child.getChildNodes().getLength(); j++) {
                             Node childChildNode = child.getChildNodes().item(j);
                             if (childChildNode instanceof Element) {
@@ -187,7 +189,7 @@ public class SwfXmlImporter {
 
                         field.set(obj, list);
                     } else if (childCls.isArray()) {
-                        List list = new ArrayList(); 
+                        List list = new ArrayList();
                         for (int j = 0; j < child.getChildNodes().getLength(); j++) {
                             Node childChildNode = child.getChildNodes().item(j);
                             if (childChildNode instanceof Element) {
@@ -201,7 +203,7 @@ public class SwfXmlImporter {
                         for (int j = 0; j < list.size(); j++) {
                             Array.set(array, j, list.get(j));
                         }
-                        
+
                         field.set(obj, array);
                     } else {
                         Object childObj = processObject(child, null, swf);
@@ -213,7 +215,7 @@ public class SwfXmlImporter {
             }
         }
     }
-    
+
     private Object processObject(Element element, Class requiredType, SWF swf) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         String type = element.getAttribute("type");
         if (type != null && !type.isEmpty()) {
@@ -225,11 +227,11 @@ public class SwfXmlImporter {
             if (Boolean.parseBoolean(isNullAttr)) {
                 return null;
             }
-            
+
             return getAs(requiredType, element.getTextContent());
         }
     }
-    
+
     private Object createObject(String type, SWF swf) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (swfTags == null) {
             Map<String, Class> tags = new HashMap<>();
@@ -241,7 +243,7 @@ public class SwfXmlImporter {
                 }
                 tags.put(cls.getSimpleName(), cls);
             }
-            
+
             swfTags = tags;
         }
 
@@ -249,34 +251,32 @@ public class SwfXmlImporter {
         if (cls != null) {
             return cls.getConstructor(SWF.class).newInstance(swf);
         }
-        
+
         if (swfObjects == null) {
             Map<String, Class> objects = new HashMap<>();
-            Class[] knownObjects = new Class[] { ALPHABITMAPDATA.class, ALPHACOLORMAPDATA.class, ARGB.class, BITMAPDATA.class, 
-                BUTTONCONDACTION.class, BUTTONRECORD.class, CLIPACTIONRECORD.class, CLIPACTIONS.class, CLIPEVENTFLAGS.class, 
-                COLORMAPDATA.class, ColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class, 
-                FILLSTYLE.class, FILLSTYLEARRAY.class, FOCALGRADIENT.class, GLYPHENTRY.class, GRADIENT.class, GRADRECORD.class, 
-                KERNINGRECORD.class, LANGCODE.class, LINESTYLE.class, LINESTYLE2.class, LINESTYLEARRAY.class, MATRIX.class, 
-                MORPHFILLSTYLE.class, MORPHFILLSTYLEARRAY.class, MORPHFOCALGRADIENT.class, MORPHGRADIENT.class, 
-                MORPHGRADRECORD.class, MORPHLINESTYLE.class, MORPHLINESTYLE2.class, MORPHLINESTYLEARRAY.class, PIX15.class, 
-                PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class, 
+            Class[] knownObjects = new Class[]{ALPHABITMAPDATA.class, ALPHACOLORMAPDATA.class, ARGB.class, BITMAPDATA.class,
+                BUTTONCONDACTION.class, BUTTONRECORD.class, CLIPACTIONRECORD.class, CLIPACTIONS.class, CLIPEVENTFLAGS.class,
+                COLORMAPDATA.class, ColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class,
+                FILLSTYLE.class, FILLSTYLEARRAY.class, FOCALGRADIENT.class, GLYPHENTRY.class, GRADIENT.class, GRADRECORD.class,
+                KERNINGRECORD.class, LANGCODE.class, LINESTYLE.class, LINESTYLE2.class, LINESTYLEARRAY.class, MATRIX.class,
+                MORPHFILLSTYLE.class, MORPHFILLSTYLEARRAY.class, MORPHFOCALGRADIENT.class, MORPHGRADIENT.class,
+                MORPHGRADRECORD.class, MORPHLINESTYLE.class, MORPHLINESTYLE2.class, MORPHLINESTYLEARRAY.class, PIX15.class,
+                PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class,
                 SOUNDINFO.class, TEXTRECORD.class, ZONEDATA.class, ZONERECORD.class,
                 CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
-                
                 BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
                 DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
-                
                 AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class,
-                ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class, 
-                TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class, 
-                ABCException.class };
+                ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
+                TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
+                ABCException.class};
             for (Class cls2 : knownObjects) {
                 if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
                     System.err.println("Can't instantiate: " + cls2.getName());
                 }
                 objects.put(cls2.getSimpleName(), cls2);
             }
-            
+
             swfObjects = objects;
         }
 
@@ -287,14 +287,14 @@ public class SwfXmlImporter {
 
         if (swfObjectsParam == null) {
             Map<String, Class> objects = new HashMap<>();
-            Class[] knownObjects = new Class[] { ABC.class };
+            Class[] knownObjects = new Class[]{ABC.class};
             for (Class cls2 : knownObjects) {
                 if (!ReflectionTools.canInstantiate(cls2)) {
                     System.err.println("Can't instantiate: " + cls2.getName());
                 }
                 objects.put(cls2.getSimpleName(), cls2);
             }
-            
+
             swfObjectsParam = objects;
         }
 
@@ -306,7 +306,7 @@ public class SwfXmlImporter {
         System.err.println("Type not found: " + type);
         return null;
     }
-    
+
     private Object getAs(Class cls, String stringValue) throws IllegalArgumentException, IllegalAccessException {
         if (cls == Byte.class || cls == byte.class) {
             return Byte.parseByte(stringValue);

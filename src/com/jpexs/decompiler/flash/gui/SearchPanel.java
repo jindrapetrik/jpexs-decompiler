@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,17 +36,25 @@ import jsyntaxpane.actions.DocumentSearchData;
 public class SearchPanel<E> extends JPanel implements ActionListener {
 
     private static final String ACTION_SEARCH_PREV = "SEARCHPREV";
+
     private static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
+
     private static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
 
     private final SearchListener<E> listener;
 
     private final JLabel searchPos;
+
     private int foundPos = 0;
+
     private final JLabel searchForLabel;
+
     private String searchFor;
+
     private boolean searchIgnoreCase;
+
     private boolean searchRegexp;
+
     private List<E> found = new ArrayList<>();
 
     public SearchPanel(LayoutManager lm, SearchListener<E> listener) {

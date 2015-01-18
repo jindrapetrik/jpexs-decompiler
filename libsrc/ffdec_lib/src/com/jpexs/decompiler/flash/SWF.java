@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -215,50 +215,63 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Default version of SWF file format
      */
     public static final int DEFAULT_VERSION = 10;
+
     /**
      * Tags inside of file
      */
     public List<Tag> tags = new ArrayList<>();
+
     @Internal
     public boolean hasEndTag;
+
     /**
      * ExportRectangle for the display
      */
     public RECT displayRect;
+
     /**
      * Movie frame rate
      */
     public int frameRate;
+
     /**
      * Number of frames in movie
      */
     public int frameCount;
+
     /**
      * Version of SWF
      */
     public int version;
+
     /**
      * Uncompressed size of the file
      */
     @Internal
     public long fileSize;
+
     /**
      * Used compression mode
      */
     public SWFCompression compression = SWFCompression.NONE;
+
     /**
      * Compressed size of the file (LZMA)
      */
     @Internal
     public long compressedSize;
+
     /**
      * LZMA Properties
      */
     public byte[] lzmaProperties;
+
     @Internal
     public byte[] uncompressedData;
+
     @Internal
     public byte[] originalUncompressedData;
+
     /**
      * ScaleForm GFx
      */
@@ -266,19 +279,27 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     public SWFList swfList;
+
     @Internal
     public String file;
+
     @Internal
     public String fileTitle;
+
     @Internal
     private Map<Integer, CharacterTag> characters;
+
     @Internal
     private List<ABCContainerTag> abcList;
+
     @Internal
     private JPEGTablesTag jtt;
+
     @Internal
     public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
+
     public static final double unitDivisor = 20;
+
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
 
     @Internal
@@ -286,25 +307,29 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     public DumpInfoSwfNode dumpInfo;
+
     @Internal
     public DefineBinaryDataTag binaryData;
 
     @Internal
     private final HashMap<String, String> deobfuscated = new HashMap<>();
+
     @Internal
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     @Internal
     private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, "frame");
+
     @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, "as2");
+
     @Internal
     private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, "as3");
 
     public void updateCharacters() {
         characters = null;
     }
-    
+
     public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
             synchronized (this) {
@@ -315,10 +340,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             }
         }
-        
+
         return characters;
     }
-    
+
     public CharacterTag getCharacter(int characterId) {
         return getCharacters().get(characterId);
     }
@@ -336,7 +361,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return abcList;
     }
-            
+
     public boolean isAS3() {
         FileAttributesTag fileAttributes = getFileAttributes();
         return (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !getAbcList().isEmpty());
@@ -348,7 +373,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 return (FileAttributesTag) t;
             }
         }
-        
+
         return null;
     }
 
@@ -379,7 +404,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return jtt;
     }
-    
+
     public String getDocumentClass() {
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
@@ -391,10 +416,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public void fixCharactersOrder(boolean checkAll) {
         Set<Integer> addedCharacterIds = new HashSet<>();
         Set<CharacterTag> movedTags = new HashSet<>();
@@ -638,7 +663,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         return false;
     }
-    
+
     public void clearModified() {
         for (Tag tag : tags) {
             if (tag.isModified()) {
@@ -658,9 +683,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public SWF() {
-        
+
     }
-    
+
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
         this(is, null, parallelRead, false);
     }
@@ -920,7 +945,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     header.compression = SWFCompression.ZLIB;
                     break;
                 }
-                case 'Z': { // ZWS                   
+                case 'Z': { // ZWS
                     byte lzmaprop[] = new byte[9];
                     is.read(lzmaprop);
                     sis = new SWFInputStream(null, lzmaprop);
@@ -1025,14 +1050,23 @@ public final class SWF implements SWFContainerItem, Timelined {
     private class ExportPackTask implements Callable<File> {
 
         ScriptPack pack;
+
         String directory;
+
         ScriptExportMode exportMode;
+
         ClassPath path;
+
         AtomicInteger index;
+
         int count;
+
         boolean parallel;
+
         AbortRetryIgnoreHandler handler;
+
         long startTime;
+
         long stopTime;
 
         public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportMode exportMode, boolean parallel) {
@@ -1178,7 +1212,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
     }
-    
+
     private static void addASM(Map<String, ASMSource> asms, ASMSource asm, String path) {
         String npath = path;
         int ppos = 1;

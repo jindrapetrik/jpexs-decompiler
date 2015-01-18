@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -99,14 +100,17 @@ public abstract class Action implements GraphSourceItem {
     private static final int INFORM_LISTENER_RESOLUTION = 100;
 
     private boolean ignored = false;
+
     /**
      * Action type identifier
      */
     public int actionCode;
+
     /**
      * Length of action data
      */
     public int actionLength;
+
     private long address;
 
     /**
@@ -136,7 +140,9 @@ public abstract class Action implements GraphSourceItem {
         "_xmouse",
         "_ymouse"
     };
+
     public static final List<String> propertyNamesList = Arrays.asList(propertyNames);
+
     private static final Logger logger = Logger.getLogger(Action.class.getName());
 
     /**
@@ -800,8 +806,11 @@ public abstract class Action implements GraphSourceItem {
     private static class Loop {
 
         public long loopContinue;
+
         public long loopBreak;
+
         public int continueCount = 0;
+
         public int breakCount = 0;
 
         public Loop(long loopContinue, long loopBreak) {
@@ -848,7 +857,7 @@ public abstract class Action implements GraphSourceItem {
             }
             if (action instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;
-                //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new TranslateStack(), src, ip+1,endip-1 , version);            
+                //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new TranslateStack(), src, ip+1,endip-1 , version);
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
@@ -978,7 +987,7 @@ public abstract class Action implements GraphSourceItem {
              }
              }
              } while (ip < end);
-               
+
              for (int i = 0; i < caseBodyIps.size(); i++) {
              int caseEnd = ip - 1;
              if (i < caseBodyIps.size() - 1) {

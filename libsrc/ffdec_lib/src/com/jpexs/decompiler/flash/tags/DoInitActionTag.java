@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -46,12 +46,14 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      */
     @SWFType(BasicType.UI16)
     public int spriteId = 0;
+
     /**
      * List of actions to perform
      */
     //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
+
     public static final int ID = 59;
 
     /**
@@ -171,6 +173,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public int getCharacterId() {
         return spriteId;
     }
+
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override

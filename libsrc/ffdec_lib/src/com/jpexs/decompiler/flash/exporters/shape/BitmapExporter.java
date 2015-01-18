@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -52,18 +53,31 @@ import java.util.List;
 public class BitmapExporter extends ShapeExporterBase {
 
     private SerializableImage image;
+
     private Graphics2D graphics;
+
     private final Color defaultColor;
+
     private double deltaX;
+
     private double deltaY;
+
     private final SWF swf;
+
     private GeneralPath path;
+
     private Paint fillPathPaint;
+
     private Paint fillPaint;
+
     private AffineTransform fillTransform;
+
     private Color lineColor;
+
     private Stroke lineStroke;
+
     private Stroke defaultStroke;
+
     private double unitDivisor;
 
     private class TransformedStroke implements Stroke {
@@ -77,6 +91,7 @@ public class BitmapExporter extends ShapeExporterBase {
          * the AffineTransform used to transform the shape before stroking.
          */
         private final AffineTransform transform;
+
         /**
          * The inverse of {@link #transform}, used to transform back after
          * stroking.
@@ -382,7 +397,7 @@ public class BitmapExporter extends ShapeExporterBase {
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
-        
+
         // Do not scale strokes automatically:
         try {
             lineStroke = new TransformedStroke(lineStroke, graphics.getTransform());
@@ -424,10 +439,10 @@ public class BitmapExporter extends ShapeExporterBase {
                     graphics.setClip(path);
                     Matrix inverse = null;
                     try {
-                        double scx = fillTransform.getScaleX(); 
-                        double scy = fillTransform.getScaleY(); 
-                        double shx = fillTransform.getShearX(); 
-                        double shy = fillTransform.getShearY(); 
+                        double scx = fillTransform.getScaleX();
+                        double scy = fillTransform.getScaleY();
+                        double shx = fillTransform.getShearX();
+                        double shy = fillTransform.getShearY();
                         double det = scx * scy - shx * shy;
                         if (Math.abs(det) <= Double.MIN_VALUE) {
                             // use only the translate values
@@ -436,7 +451,7 @@ public class BitmapExporter extends ShapeExporterBase {
                         }
 
                         inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
-                        
+
                     } catch (NoninvertibleTransformException ex) {
                         // it should never happen as we already checked the determinant of the matrix
                     }
@@ -459,10 +474,10 @@ public class BitmapExporter extends ShapeExporterBase {
                     graphics.setClip(path);
                     Matrix inverse = null;
                     try {
-                        double scx = fillTransform.getScaleX(); 
-                        double scy = fillTransform.getScaleY(); 
-                        double shx = fillTransform.getShearX(); 
-                        double shy = fillTransform.getShearY(); 
+                        double scx = fillTransform.getScaleX();
+                        double scy = fillTransform.getScaleY();
+                        double shx = fillTransform.getShearX();
+                        double shy = fillTransform.getShearY();
                         double det = scx * scy - shx * shy;
                         if (Math.abs(det) <= Double.MIN_VALUE) {
                             // use only the translate values

@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -32,23 +33,38 @@ import java.util.Map;
 public class SourceGeneratorLocalData implements Serializable {
 
     public HashMap<String, Integer> registerVars;
+
     public Integer inFunction;
+
     public Boolean inMethod;
+
     public Integer forInLevel;
 
     // TODO: handle AVM2 separately
     public List<ABCException> exceptions = new ArrayList<>();
+
     public List<Integer> finallyCatches = new ArrayList<>();
+
     public Map<Integer, Integer> finallyCounter = new HashMap<>();
+
     public int finallyRegister = -1;
+
     public String currentClass;
+
     public int activationReg = 0;
+
     public List<MethodBody> callStack = new ArrayList<>();
+
     public Map<MethodBody, List<Integer>> traitUsages = new HashMap<>();
+
     public String pkg = "";
+
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
+
     public boolean documentClass;
+
     public ScriptInfo currentScript;
+
     public boolean subMethod = false;
 
     public String getFullClass() {

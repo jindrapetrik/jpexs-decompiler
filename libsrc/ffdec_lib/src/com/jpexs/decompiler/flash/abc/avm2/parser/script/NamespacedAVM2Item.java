@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -51,10 +52,15 @@ import java.util.List;
 public class NamespacedAVM2Item extends AssignableAVM2Item {
 
     public GraphTargetItem ns;
+
     public String name;
+
     public GraphTargetItem nameItem;
+
     public GraphTargetItem obj;
+
     public boolean attr;
+
     public List<Integer> openedNamespaces;
 
     public NamespacedAVM2Item(GraphTargetItem ns, String name, GraphTargetItem nameItem, GraphTargetItem obj, boolean attr, List<Integer> openedNamespaces, GraphTargetItem storeValue) {
@@ -219,5 +225,4 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>(), false, false);
     }
-
 }

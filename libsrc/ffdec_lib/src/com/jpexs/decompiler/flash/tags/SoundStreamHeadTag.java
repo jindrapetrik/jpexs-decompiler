@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -44,22 +45,33 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
     @Reserved
     @SWFType(value = BasicType.UB, count = 4)
     public int reserved;
+
     @SWFType(value = BasicType.UB, count = 2)
     public int playBackSoundRate;
+
     public boolean playBackSoundSize;
+
     public boolean playBackSoundType;
+
     @SWFType(value = BasicType.UB, count = 4)
     public int streamSoundCompression;
+
     @SWFType(value = BasicType.UB, count = 2)
     public int streamSoundRate;
+
     public boolean streamSoundSize;
+
     public boolean streamSoundType;
+
     @SWFType(value = BasicType.UI16)
     public int streamSoundSampleCount;
+
     @Conditional(value = "streamSoundCompression", options = {2})
     public int latencySeek;
+
     @Internal
     private int virtualCharacterId = 0;
+
     public static final int ID = 18;
 
     @Override

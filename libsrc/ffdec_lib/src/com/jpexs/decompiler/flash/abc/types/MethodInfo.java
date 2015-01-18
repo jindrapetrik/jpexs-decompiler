@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -44,22 +44,36 @@ public class MethodInfo {
             }
         }
     }
+
     public int[] param_types;
+
     public int ret_type;
+
     public int name_index; //0=no name
     // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
+
     public static int FLAG_NEED_ARGUMENTS = 1;
+
     public static int FLAG_NEED_ACTIVATION = 2;
+
     public static int FLAG_NEED_REST = 4;
+
     public static int FLAG_HAS_OPTIONAL = 8;
+
     public static int FLAG_IGNORE_REST = 16;
+
     public static int FLAG_EXPLICIT = 32;
+
     public static int FLAG_SETSDXNS = 64;
+
     public static int FLAG_HAS_PARAMNAMES = 128;
 
     public int flags;
+
     public ValueKind[] optional;
+
     public int[] paramNames;
+
     private MethodBody body;
 
     public void setFlagIgnore_Rest() {
@@ -198,7 +212,7 @@ public class MethodInfo {
 
     public MethodInfo() {
     }
-    
+
     public MethodInfo(int[] param_types, int ret_type, int name_index, int flags, ValueKind[] optional, int[] paramNames) {
         this.param_types = param_types;
         this.ret_type = ret_type;

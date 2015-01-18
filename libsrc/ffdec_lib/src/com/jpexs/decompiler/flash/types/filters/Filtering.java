@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.helpers.SerializableImage;
@@ -37,7 +38,9 @@ import java.awt.image.Kernel;
 public class Filtering {
 
     public static final int INNER = 1;
+
     public static final int OUTER = 2;
+
     public static final int FULL = 3;
 
     private static void boxBlurHorizontal(int[] pixels, int[] mask, int w, int h, int radius) {
@@ -271,7 +274,7 @@ public class Filtering {
         BufferedImage hilightInner = null;
         if (type != OUTER) {
             BufferedImage hilightIm = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);            
+            BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
             Graphics2D hc = h2.createGraphics();
@@ -286,12 +289,12 @@ public class Filtering {
             shadowInner = s2;
             hilightInner = h2;
         }
-        
+
         BufferedImage shadowOuter = null;
         BufferedImage hilightOuter = null;
         if (type != INNER) {
             BufferedImage hilightIm = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);            
+            BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
             Graphics2D hc = h2.createGraphics();
@@ -354,7 +357,7 @@ public class Filtering {
             int ra = cut(ah - as, -255, 255);
             ret[i] = gradientPixels[255 + ra];
         }
-        
+
         setRGB(retImg, width, height, ret);
 
         if (!knockout) {
@@ -395,7 +398,7 @@ public class Filtering {
             }
             shadow[i] = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255 * strength)).getRGB();
         }
-        
+
         Color colorFirst = Color.BLACK;
         Color colorAlpha = new Color(0, 0, 0, 0);
         double angleRad = angle / 180 * Math.PI;
@@ -414,7 +417,7 @@ public class Filtering {
             }
             shadow[i] = shadow[i] & 0xffffff + ((mask * ((shadow[i] >> 24) & 0xff) / 255) << 24);
         }
-        
+
         BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
         setRGB(retCanvas, width, height, shadow);
 
@@ -452,12 +455,12 @@ public class Filtering {
         for (int i = 0; i < srcPixels.length; i++) {
             revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
         }
-        
+
         int shadow[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             shadow[i] = 0 + ((cut(strength * ((srcPixels[i] >> 24) & 0xff))) << 24);
         }
-        
+
         Color colorAlpha = new Color(0, 0, 0, 0);
         shadow = moveRGB(width, height, shadow, moveX, moveY, colorAlpha);
 
@@ -500,7 +503,7 @@ public class Filtering {
     private static int[] getRGB(BufferedImage image) {
         int type = image.getType();
         if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
-            return ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); 
+            return ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         }
         int width = image.getWidth();
         return image.getRGB(0, 0, width, image.getHeight(), null, 0, width);
@@ -541,10 +544,10 @@ public class Filtering {
 
     public static SerializableImage colorMatrix(SerializableImage src, float[][] matrix) {
         /*BandCombineOp changeColors = new BandCombineOp(matrix, new RenderingHints(null));
-        Raster sourceRaster = src.getRaster();
-        WritableRaster displayRaster = sourceRaster.createCompatibleWritableRaster();
-        changeColors.filter(sourceRaster, displayRaster);
-        return new SerializableImage(src.getColorModel(), displayRaster, true, null);*/
+         Raster sourceRaster = src.getRaster();
+         WritableRaster displayRaster = sourceRaster.createCompatibleWritableRaster();
+         changeColors.filter(sourceRaster, displayRaster);
+         return new SerializableImage(src.getColorModel(), displayRaster, true, null);*/
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
         int pixels[] = getRGB(src.getBufferedImage()).clone();
         for (int i = 0; i < pixels.length; i++) {

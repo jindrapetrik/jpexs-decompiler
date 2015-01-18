@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -54,7 +54,7 @@ import org.w3c.dom.Node;
  * @author JPEXS
  */
 public class SwfXmlExporter {
-    
+
     public List<File> exportXml(SWF swf, String outdir) throws IOException {
         final File file = new File(outdir + File.separator + Helper.makeFileName("swf.xml"));
 
@@ -92,33 +92,33 @@ public class SwfXmlExporter {
     }
 
     public void exportXml(SWF swf, Document doc, Node node) throws IOException {
-        generateXml(doc, node, "swf", swf, false, 0);            
+        generateXml(doc, node, "swf", swf, false, 0);
     }
-    
-    private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level){
+
+    private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
         Class cls = obj != null ? obj.getClass() : null;
 
-        if (cls == Byte.class || cls == byte.class ||
-            cls == Short.class || cls == short.class ||
-            cls == Integer.class || cls == int.class ||
-            cls == Long.class || cls == long.class ||
-            cls == Float.class || cls == float.class ||
-            cls == Double.class || cls == double.class ||
-            cls == Boolean.class || cls == boolean.class ||
-            cls == Character.class || cls == char.class ||
-            cls == String.class) {
-                Object value = obj;
-                if (value instanceof String) {
-                    value = Helper.removeInvalidXMLCharacters((String) value);
-                }
+        if (cls == Byte.class || cls == byte.class
+                || cls == Short.class || cls == short.class
+                || cls == Integer.class || cls == int.class
+                || cls == Long.class || cls == long.class
+                || cls == Float.class || cls == float.class
+                || cls == Double.class || cls == double.class
+                || cls == Boolean.class || cls == boolean.class
+                || cls == Character.class || cls == char.class
+                || cls == String.class) {
+            Object value = obj;
+            if (value instanceof String) {
+                value = Helper.removeInvalidXMLCharacters((String) value);
+            }
 
-                if (isListItem) {
-                    Element childNode = doc.createElement(name);
-                    childNode.setTextContent(value.toString());
-                    node.appendChild(childNode);
-                } else {
-                    ((Element) node).setAttribute(name, value.toString());
-                } 
+            if (isListItem) {
+                Element childNode = doc.createElement(name);
+                childNode.setTextContent(value.toString());
+                node.appendChild(childNode);
+            } else {
+                ((Element) node).setAttribute(name, value.toString());
+            }
         } else if (cls != null && cls.isEnum()) {
             ((Element) node).setAttribute(name, obj.toString());
         } else if (obj instanceof ByteArrayRange) {
@@ -128,7 +128,7 @@ public class SwfXmlExporter {
             for (int i = 0; i < data.length; i++) {
                 sb.append(String.format("%02x", data[i]));
             }
-            
+
             ((Element) node).setAttribute(name, sb.toString());
         } else if (cls != null && List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
@@ -149,7 +149,7 @@ public class SwfXmlExporter {
             if (obj instanceof LazyObject) {
                 ((LazyObject) obj).load();
             }
-            
+
             String className = obj.getClass().getSimpleName();
             List<Field> fields = ReflectionTools.getSwfFields(obj.getClass());
             Element objNode = doc.createElement(name);
@@ -159,7 +159,7 @@ public class SwfXmlExporter {
             if (level == 0) {
                 objNode.appendChild(doc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
             }
-            
+
             for (Field f : fields) {
                 if (Modifier.isStatic(f.getModifiers())) {
                     continue;

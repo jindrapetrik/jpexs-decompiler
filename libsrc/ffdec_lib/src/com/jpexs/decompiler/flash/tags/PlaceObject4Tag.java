@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -58,119 +58,144 @@ public class PlaceObject4Tag extends CharacterIdTag implements ASMSourceContaine
      * @since SWF 5 has clip actions (sprite characters only)
      */
     public boolean placeFlagHasClipActions;
+
     /**
      * Has clip depth
      */
     public boolean placeFlagHasClipDepth;
+
     /**
      * Has name
      */
     public boolean placeFlagHasName;
+
     /**
      * Has ratio
      */
     public boolean placeFlagHasRatio;
+
     /**
      * Has color transform
      */
     public boolean placeFlagHasColorTransform;
+
     /**
      * Has matrix
      */
     public boolean placeFlagHasMatrix;
+
     /**
      * Places a character
      */
     public boolean placeFlagHasCharacter;
+
     /**
      * Defines a character to be moved
      */
     public boolean placeFlagMove;
+
     /**
      * Has class name or character ID of bitmap to place. If
      * PlaceFlagHasClassName, use ClassName. If PlaceFlagHasCharacter, use
      * CharacterId
      */
     public boolean placeFlagHasImage;
+
     /**
      * Has class name of object to place
      */
     public boolean placeFlagHasClassName;
+
     /**
      * Enables bitmap caching
      */
     public boolean placeFlagHasCacheAsBitmap;
+
     /**
      * Has blend mode
      */
     public boolean placeFlagHasBlendMode;
+
     /**
      * Has filter list
      */
     public boolean placeFlagHasFilterList;
+
     /**
      * Has opaque background. SWF 11 and higher.
      */
     public boolean placeFlagOpaqueBackground;
+
     /**
      * Has visibility flag. SWF 11 and higher.
      */
     public boolean placeFlagHasVisible;
+
     /**
      * Depth of character
      */
     @SWFType(BasicType.UI16)
     public int depth;
+
     /**
      * If PlaceFlagHasClassName or (PlaceFlagHasImage and
      * PlaceFlagHasCharacter), Name of the class to place
      */
     @Conditional("placeFlagHasClassName")
     public String className;
+
     /**
      * If PlaceFlagHasCharacter, ID of character to place
      */
     @SWFType(BasicType.UI16)
     @Conditional("placeFlagHasCharacter")
     public int characterId;
+
     /**
      * If PlaceFlagHasMatrix, Transform matrix data
      */
     @Conditional("placeFlagHasMatrix")
     public MATRIX matrix;
+
     /**
      * If PlaceFlagHasColorTransform, Color transform data
      */
     @Conditional("placeFlagHasColorTransform")
     public CXFORMWITHALPHA colorTransform;
+
     /**
      * If PlaceFlagHasRatio, Ratio
      */
     @SWFType(BasicType.UI16)
     @Conditional("placeFlagHasRatio")
     public int ratio;
+
     /**
      * If PlaceFlagHasName, Name of character
      */
     @Conditional("placeFlagHasName")
     public String name;
+
     /**
      * If PlaceFlagHasClipDepth, Clip depth
      */
     @SWFType(BasicType.UI16)
     @Conditional("placeFlagHasClipDepth")
     public int clipDepth;
+
     /**
      * If PlaceFlagHasFilterList, List of filters on this object
      */
     @Conditional("placeFlagHasFilterList")
     public List<FILTER> surfaceFilterList;
+
     /**
      * If PlaceFlagHasBlendMode, Blend mode
      */
     @SWFType(BasicType.UI8)
     @Conditional("placeFlagHasBlendMode")
     public int blendMode;
+
     /**
      * If PlaceFlagHasCacheAsBitmap, 0 = Bitmap cache disabled, 1-255 = Bitmap
      * cache enabled
@@ -178,29 +203,35 @@ public class PlaceObject4Tag extends CharacterIdTag implements ASMSourceContaine
     @SWFType(BasicType.UI8)
     @Conditional("placeFlagHasCacheAsBitmap")
     public int bitmapCache;
+
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional(value = "placeFlagHasClipActions", minSwfVersion = 5)
     @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
+
     /**
      * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible
      */
     @Conditional("placeFlagHasVisible")
     public int visible;
+
     /**
      * If PlaceFlagHasVisible, Background color
      */
     @Conditional("placeFlagOpaqueBackground")
     public RGBA backgroundColor;
-    // FIXME bug found in ecoDrive.swf, 
+
+    // FIXME bug found in ecoDrive.swf,
     @Internal
     private boolean bitmapCacheBug;
+
     @Reserved
     public boolean reserved;
 
     public static final int ID = 94;
+
     public byte[] amfData;  //TODO: Parse AMF data?
 
     @Override

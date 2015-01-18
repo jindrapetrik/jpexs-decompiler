@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -31,20 +31,35 @@ import java.util.List;
 public abstract class Trait implements Serializable {
 
     public int name_index;
+
     public int kindType;
+
     public int kindFlags;
+
     public int[] metadata = new int[0];
+
     public long fileOffset;
+
     public byte[] bytes;
+
     public static final int ATTR_Final = 0x1;
+
     public static final int ATTR_Override = 0x2;
+
     public static final int ATTR_Metadata = 0x4;
+
     public static final int TRAIT_SLOT = 0;
+
     public static final int TRAIT_METHOD = 1;
+
     public static final int TRAIT_GETTER = 2;
+
     public static final int TRAIT_SETTER = 3;
+
     public static final int TRAIT_CLASS = 4;
+
     public static final int TRAIT_FUNCTION = 5;
+
     public static final int TRAIT_CONST = 6;
 
     public abstract void delete(ABC abc, boolean d);

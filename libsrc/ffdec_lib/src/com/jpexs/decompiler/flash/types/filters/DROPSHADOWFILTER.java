@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -31,43 +32,52 @@ public class DROPSHADOWFILTER extends FILTER {
      * Color of the shadow
      */
     public RGBA dropShadowColor;
+
     /**
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
     public double blurX;
+
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
     public double blurY;
+
     /**
      * Radian angle of the drop shadow
      */
     @SWFType(BasicType.FIXED)
     public double angle;
+
     /**
      * Distance of the drop shadow
      */
     @SWFType(BasicType.FIXED)
     public double distance;
+
     /**
      * Strength of the drop shadow
      */
     @SWFType(BasicType.FIXED8)
     public float strength;
+
     /**
      * Inner shadow mode
      */
     public boolean innerShadow;
+
     /**
      * Knockout mode
      */
     public boolean knockout;
+
     /**
      * Composite source
      */
     public boolean compositeSource;
+
     /**
      * Number of blur passes
      */

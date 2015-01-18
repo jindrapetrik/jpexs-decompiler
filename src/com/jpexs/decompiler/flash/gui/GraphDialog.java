@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,14 +44,23 @@ public class GraphDialog extends AppDialog {
     private class GraphPanel extends JPanel {
 
         private static final int SPACE_VERTICAL = 16;
+
         private static final int SPACE_HORIZONTAL = 10;
+
         private static final int SPACE_BACKLINKS = 5;
+
         private static final int BLOCK_WIDTH = 200;
+
         private static final int BLOCK_HEIGHT = 20;
+
         private final HashMap<GraphPart, Point> partPos = new HashMap<>();
+
         private final Point size;
+
         private int backLinksLeft = 0;
+
         private int backLinksRight = 0;
+
         private final GraphPart head;
 
         public GraphPanel(Graph graph) throws InterruptedException {
@@ -241,10 +250,15 @@ public class GraphDialog extends AppDialog {
             return w;
         }
     }
+
     GraphPanel gp;
+
     int scrollBarWidth;
+
     int scrollBarHeight;
+
     int frameWidthDiff;
+
     int frameHeightDiff;
 
     public GraphDialog(Window owner, Graph graph, String name) throws InterruptedException {
@@ -277,7 +291,7 @@ public class GraphDialog extends AppDialog {
         Dimension screen = getToolkit().getScreenSize();
         Dimension dim = new Dimension(0, 0);
         Dimension panDim = gp.getPreferredSize();
-        // add some magic constants 
+        // add some magic constants
         panDim = new Dimension(panDim.width + 3, panDim.height + 2);
 
         boolean tooHigh = false;

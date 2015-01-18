@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 public class AVM2Deobfuscation {
 
     private static final Random rnd = new Random();
+
     private static final int DEFAULT_FOO_SIZE = 10;
 
     public static final String[] reservedWords = {
@@ -38,13 +40,19 @@ public class AVM2Deobfuscation {
         "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
         "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
         "with", "dynamic", "default", "final", "in", "static"};
+
     public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
+
     public static final String VALID_NS_CHARACTERS = ".:$";
+
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
+
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
     private final AVM2ConstantPool constants;
+
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
 
     public AVM2Deobfuscation(AVM2ConstantPool constants) {
@@ -241,5 +249,4 @@ public class AVM2Deobfuscation {
         }
         return strIndex;
     }
-
 }

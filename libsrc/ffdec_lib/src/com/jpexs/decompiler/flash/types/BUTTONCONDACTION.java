@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
 
     private final SWF swf;
+
     private final Tag tag;
 
     @Override
@@ -59,7 +60,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
         swf = null;
         tag = null;
     }
-    
+
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
@@ -77,53 +78,65 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
         condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
         actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes");
     }
+
     /**
      * Is this BUTTONCONDACTION last in the list?
      */
     @Internal
     public boolean isLast;
+
     /**
      * Idle to OverDown
      */
     public boolean condIdleToOverDown;
+
     /**
      * OutDown to Idle
      */
     public boolean condOutDownToIdle;
+
     /**
      * OutDown to OverDown
      */
     public boolean condOutDownToOverDown;
+
     /**
      * OverDown to OutDown
      */
     public boolean condOverDownToOutDown;
+
     /**
      * OverDown to OverUp
      */
     public boolean condOverDownToOverUp;
+
     /**
      * OverUp to OverDown
      */
     public boolean condOverUpToOverDown;
+
     /**
      * OverUp to Idle
      */
     public boolean condOverUpToIddle;
+
     /**
      * Idle to OverUp
      */
     public boolean condIdleToOverUp;
+
     /**
      * @since SWF 4 key code
      */
     @SWFType(value = BasicType.UB, count = 7)
     @Conditional(minSwfVersion = 4)
     public int condKeyPress;
+
     /**
      * OverDown to Idle
      */
     public boolean condOverDownToIdle;
+
     /**
      * Actions to perform
      */
@@ -316,5 +329,4 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
     public Tag getSourceTag() {
         return tag;
     }
-
 }

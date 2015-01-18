@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,66 +40,119 @@ import javax.swing.JOptionPane;
 public class MainFrameClassicMenu extends MainFrameMenu implements ActionListener {
 
     private static final String ACTION_RELOAD = "RELOAD";
+
     private static final String ACTION_ADVANCED_SETTINGS = "ADVANCEDSETTINGS";
+
     private static final String ACTION_LOAD_MEMORY = "LOADMEMORY";
+
     private static final String ACTION_LOAD_CACHE = "LOADCACHE";
+
     private static final String ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP = "GOTODOCUMENTCLASSONSTARTUP";
+
     private static final String ACTION_AUTO_RENAME_IDENTIFIERS = "AUTORENAMEIDENTIFIERS";
+
     private static final String ACTION_CACHE_ON_DISK = "CACHEONDISK";
+
     private static final String ACTION_SET_LANGUAGE = "SETLANGUAGE";
+
     private static final String ACTION_DISABLE_DECOMPILATION = "DISABLEDECOMPILATION";
+
     private static final String ACTION_ASSOCIATE = "ASSOCIATE";
+
     private static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
+
     private static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
+
     private static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
+
     private static final String ACTION_SEARCH = "SEARCH";
+
     private static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
+
     private static final String ACTION_EXIT = "EXIT";
 
     private static final String ACTION_RENAME_ONE_IDENTIFIER = "RENAMEONEIDENTIFIER";
+
     private static final String ACTION_ABOUT = "ABOUT";
+
     private static final String ACTION_SHOW_PROXY = "SHOWPROXY";
+
     private static final String ACTION_SUB_LIMITER = "SUBLIMITER";
+
     private static final String ACTION_SAVE = "SAVE";
+
     private static final String ACTION_SAVE_AS = "SAVEAS";
+
     private static final String ACTION_SAVE_AS_EXE = "SAVEASEXE";
+
     private static final String ACTION_OPEN = "OPEN";
+
     private static final String ACTION_EXPORT_FLA = "EXPORTFLA";
+
     private static final String ACTION_EXPORT_SEL = "EXPORTSEL";
+
     private static final String ACTION_EXPORT = "EXPORT";
+
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
+
     private static final String ACTION_HELP_US = "HELPUS";
+
     private static final String ACTION_HOMEPAGE = "HOMEPAGE";
+
     private static final String ACTION_RESTORE_CONTROL_FLOW = "RESTORECONTROLFLOW";
+
     private static final String ACTION_RESTORE_CONTROL_FLOW_ALL = "RESTORECONTROLFLOWALL";
+
     private static final String ACTION_RENAME_IDENTIFIERS = "RENAMEIDENTIFIERS";
+
     private static final String ACTION_DEOBFUSCATE = "DEOBFUSCATE";
+
     private static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
+
     private static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
+
     private static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
 
     private final MainFrameClassic mainFrame;
 
     private JCheckBoxMenuItem miAutoDeobfuscation;
+
     private JCheckBoxMenuItem miInternalViewer;
+
     private JCheckBoxMenuItem miParallelSpeedUp;
+
     private JCheckBoxMenuItem miAssociate;
+
     private JCheckBoxMenuItem miDecompile;
+
     private JCheckBoxMenuItem miCacheDisk;
+
     private JCheckBoxMenuItem miGotoMainClassOnStartup;
+
     private JCheckBoxMenuItem miAutoRenameIdentifiers;
+
     private JMenuItem saveCommandButton;
+
     private JMenuItem saveasCommandButton;
+
     private JMenuItem saveasexeCommandButton;
+
     private JMenuItem exportAllCommandButton;
+
     private JMenuItem exportFlaCommandButton;
+
     private JMenuItem exportSelectionCommandButton;
 
     private JMenuItem reloadCommandButton;
+
     private JMenuItem renameInvalidCommandButton;
+
     private JMenuItem globalRenameCommandButton;
+
     private JMenuItem deobfuscationCommandButton;
+
     private JMenuItem searchCommandButton;
+
     private JMenuItem gotoDocumentClassCommandButton;
 
     public MainFrameClassicMenu(MainFrameClassic mainFrame, boolean externalFlashPlayerUnavailable) {
@@ -501,5 +554,4 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 break;
         }
     }
-
 }

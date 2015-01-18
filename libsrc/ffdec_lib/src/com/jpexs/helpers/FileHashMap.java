@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.helpers.Freed;
@@ -42,17 +43,25 @@ import java.util.logging.Logger;
 public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
     private final Map<K, Integer> lengths = new HashMap<>();
+
     private final Map<K, Long> offsets = new HashMap<>();
+
     private long fileLen = 0;
+
     private final RandomAccessFile file;
+
     private final File fileName;
+
     private final Set<Gap> gaps = new TreeSet<>();
+
     private int maxGapLen = 0;
+
     private boolean deleted = false;
 
     private static class Gap implements Comparable<Gap> {
 
         public long offset;
+
         public int length;
 
         public Gap(long offset, int length) {
@@ -86,12 +95,12 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
             }
             return true;
         }
-
     }
 
     public static class FileEntry<K, V> implements Map.Entry<K, V> {
 
         private final FileHashMap<K, V> parent;
+
         private final K key;
 
         public FileEntry(FileHashMap<K, V> parent, K key) {
@@ -113,7 +122,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         public V setValue(V value) {
             return parent.put(key, value);
         }
-
     }
 
     public FileHashMap(File file) throws IOException {
@@ -322,5 +330,4 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
     public int size() {
         return offsets.size();
     }
-
 }

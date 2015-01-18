@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -91,44 +91,81 @@ import jsyntaxpane.actions.ActionUtils;
 public class ActionPanel extends JPanel implements ActionListener, SearchListener<ActionSearchResult> {
 
     private static final String ACTION_GRAPH = "GRAPH";
+
     private static final String ACTION_HEX = "HEX";
+
     private static final String ACTION_HEX_ONLY = "HEXONLY";
+
     private static final String ACTION_SAVE_ACTION = "SAVEACTION";
+
     private static final String ACTION_EDIT_ACTION = "EDITACTION";
+
     private static final String ACTION_CANCEL_ACTION = "CANCELACTION";
+
     private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+
     private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+
     private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
     private MainPanel mainPanel;
+
     public LineMarkedEditorPane editor;
+
     public LineMarkedEditorPane decompiledEditor;
+
     public JSplitPane splitPane;
+
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+
     public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+
     public JToggleButton hexButton;
+
     public JToggleButton hexOnlyButton;
+
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
+
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
+
     public List<Highlighting> decompiledHilights = new ArrayList<>();
+
     public List<Highlighting> disassembledHilights = new ArrayList<>();
+
     private boolean ignoreCarret = false;
+
     private boolean editMode = false;
+
     private boolean editDecompiledMode = false;
+
     private ActionList lastCode;
+
     private ASMSource src;
+
     public JPanel topButtonsPan;
+
     private HighlightedText srcWithHex;
+
     private HighlightedText srcNoHex;
+
     private HighlightedText srcHexOnly;
+
     private String lastDecompiled = "";
+
     private ASMSource lastASM;
+
     public SearchPanel<ActionSearchResult> searchPanel;
+
     private CancellableWorker setSourceWorker;
 
     public void clearSource() {
@@ -348,6 +385,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private DisassemblyListener getDisassemblyListener() {
         DisassemblyListener listener = new DisassemblyListener() {
             int percent = 0;
+
             String phase = "";
 
             private void progress(String phase, long pos, long total) {

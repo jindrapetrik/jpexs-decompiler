@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,6 +44,7 @@ import javax.swing.event.AncestorListener;
 public class NewTraitDialog extends AppDialog implements ActionListener {
 
     private static final String ACTION_OK = "OK";
+
     private static final String ACTION_CANCEL = "CANCEL";
 
     private static final int modifiers[] = new int[]{
@@ -55,6 +56,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         Namespace.KIND_EXPLICIT,
         Namespace.KIND_STATIC_PROTECTED
     };
+
     private static final int types[] = new int[]{
         Trait.TRAIT_METHOD,
         Trait.TRAIT_GETTER,
@@ -62,9 +64,13 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         Trait.TRAIT_CONST,
         Trait.TRAIT_SLOT
     };
+
     private final JComboBox<String> accessComboBox;
+
     private final JComboBox<String> typeComboBox;
+
     private final JCheckBox staticCheckbox;
+
     private final JTextField nameField;
 
     public boolean getStatic() {
@@ -156,6 +162,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         setVisible(true);
         return result;
     }
+
     private boolean result = false;
 
     @Override

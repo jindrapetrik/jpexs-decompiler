@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,9 +48,13 @@ public class Debugger {
     private static class DebugHandler extends Thread {
 
         private final Socket s;
+
         private final int serverPort;
+
         private static int maxid = 0;
+
         private final int id;
+
         public boolean finished = false;
 
         public DebugHandler(int serverPort, Socket s) {
@@ -135,13 +139,14 @@ public class Debugger {
                 l.onFinish(clientName);
             }
         }
-
     }
 
     private static class DebugServerThread extends Thread {
 
         private final int port;
+
         private ServerSocket ss;
+
         private final Map<Integer, DebugHandler> handlers = new WeakHashMap<>();
 
         public DebugServerThread(int port) {
@@ -165,7 +170,6 @@ public class Debugger {
                 //ignore
             }
         }
-
     }
 
     private final int port;
@@ -205,5 +209,4 @@ public class Debugger {
             server = null;
         }
     }
-
 }

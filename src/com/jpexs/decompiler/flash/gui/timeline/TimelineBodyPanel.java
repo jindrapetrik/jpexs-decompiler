@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,20 +44,33 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private final Timeline timeLine;
 
     public static Color motionTweenColor = new Color(0x59, 0xfe, 0x7c);
+
     public static Color shapeTweenColor = new Color(0xd1, 0xac, 0xf1);
+
     public static Color frameColor = new Color(0xbd, 0xd8, 0xfc);
+
     public static Color emptyFrameColor = Color.white;
+
     public static Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
+
     public static Color borderColor = Color.black;
+
     public static Color emptyBorderColor = new Color(0xbd, 0xd8, 0xfc);
+
     public static Color keyColor = Color.black;
+
     public static Color aColor = Color.black;
+
     public static Color stopColor = Color.white;
+
     public static Color stopBorderColor = Color.black;
+
     public static Color borderLinesColor = new Color(0xde, 0xde, 0xde);
 
     public static Color selectedColor = new Color(113, 174, 235);
+
     public static final int borderLinesLength = 2;
+
     public static final float fontSize = 10.0f;
 
     private final List<FrameSelectionListener> listeners = new ArrayList<>();
@@ -409,5 +422,4 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     @Override
     public void keyReleased(KeyEvent e) {
     }
-
 }

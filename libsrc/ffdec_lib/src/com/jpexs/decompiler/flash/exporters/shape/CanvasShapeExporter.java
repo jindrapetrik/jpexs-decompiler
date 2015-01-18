@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -39,28 +40,49 @@ import com.jpexs.helpers.SerializableImage;
 public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected static final String DRAW_COMMAND_M = "M";
+
     protected static final String DRAW_COMMAND_L = "L";
+
     protected static final String DRAW_COMMAND_Q = "Q";
+
     protected String currentDrawCommand = "";
 
     protected String pathData = "";
+
     protected String shapeData = "";
+
     protected String html = "";
+
     protected String strokeData = "";
+
     protected String fillData = "";
+
     protected double deltaX = 0;
+
     protected double deltaY = 0;
+
     protected Matrix fillMatrix = null;
+
     protected String lastRadColor = null;
+
     protected SWF swf;
+
     protected int repeatCnt = 0;
+
     protected double unitDivisor;
+
     protected RGB basicFill;
+
     protected String lineFillData = null;
+
     protected String lineLastRadColor = null;
+
     protected Matrix lineFillMatrix = null;
+
     protected int lineRepeatCnt = 0;
+
     protected int fillWidth = 0;
+
     protected int fillHeight = 0;
 
     public static String getJsPrefix() {
@@ -176,7 +198,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
 
-        //TODO: How many repeats is ideal?        
+        //TODO: How many repeats is ideal?
         final int REPEAT_CNT = 5;
 
         repeatCnt = spreadMethod == GRADIENT.SPREAD_PAD_MODE ? 0 : REPEAT_CNT;
@@ -320,7 +342,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         lineFillData = "";
 
-        //TODO: How many repeats is ideal?        
+        //TODO: How many repeats is ideal?
         final int REPEAT_CNT = 5;
 
         lineRepeatCnt = spreadMethod == GRADIENT.SPREAD_PAD_MODE ? 0 : REPEAT_CNT;
@@ -510,5 +532,4 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         fillWidth = 0;
         fillHeight = 0;
     }
-
 }

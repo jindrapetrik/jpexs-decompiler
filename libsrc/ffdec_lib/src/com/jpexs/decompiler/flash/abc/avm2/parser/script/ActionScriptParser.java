@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -125,10 +125,13 @@ import java.util.logging.Logger;
 public class ActionScriptParser {
 
     private long uniqLast = 0;
+
     private final boolean debugMode = false;
+
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
     private final ABC abc;
+
     private final List<ABC> otherABCs;
 
     private static final List<ABC> playerABCs = new ArrayList<>();
@@ -305,7 +308,7 @@ public class ActionScriptParser {
         boolean attrBracket = false;
 
         while (s.isType(SymbolType.DOT)) {
-            name += s.value.toString(); //. or ::            
+            name += s.value.toString(); //. or ::
             s = lex();
             if (s.type == SymbolType.ATTRIBUTE) {
                 name += "@";
@@ -932,7 +935,7 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
         switch (s.type) {
             /*case INT:
-             expectedType(SymbolType.PARENT_OPEN);                
+             expectedType(SymbolType.PARENT_OPEN);
              ret = new ToIntegerAVM2Item(null, expression(thisType,pkg,needsActivation, importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
              expectedType(SymbolType.PARENT_CLOSE);
              break;
@@ -1092,7 +1095,7 @@ public class ActionScriptParser {
                     addS(rets, sb);
                     lexer.yybegin(ActionScriptLexer.XML);
                     break;
-                case XML_STARTVARTAG_BEGIN: //add                    
+                case XML_STARTVARTAG_BEGIN: //add
                     //openedTags.add("*");
 
                     //ret = add(ret, );
@@ -1123,7 +1126,7 @@ public class ActionScriptParser {
                     rets.addAll(st);
                     closedVarTags.setVal(subclose.getVal() + subclose.getVal());
                     break;
-                /*case XML_STARTTAG_END:                    
+                /*case XML_STARTTAG_END:
                  sb.append(s.value.toString());
                  ret = addstr(ret,sb);
                  break;*/
@@ -1631,7 +1634,7 @@ public class ActionScriptParser {
             System.out.println("/command");
         }
         lexer.removeListener(buf);
-        if (ret == null) {  //can be popped expression            
+        if (ret == null) {  //can be popped expression
             buf.pushAllBack(lexer);
             ret = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
         }
@@ -2196,6 +2199,7 @@ public class ActionScriptParser {
     }
 
     private ActionScriptLexer lexer = null;
+
     private List<String> constantPool;
 
     private PackageAVM2Item parsePackage(List<Integer> openedNamespaces) throws IOException, AVM2ParseException, CompilationException {
@@ -2352,5 +2356,4 @@ public class ActionScriptParser {
         }
         System.exit(0);
     }
-
 }

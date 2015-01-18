@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -33,18 +34,31 @@ import java.util.List;
 public class FunctionAVM2Item extends AVM2Item {
 
     public String calculatedFunctionName;
+
     public String functionName;
+
     public int namespace;
+
     public List<String> paramNames;
+
     public List<GraphTargetItem> body;
+
     public List<AssignableAVM2Item> subvariables;
+
     public List<GraphTargetItem> paramTypes;
+
     public List<GraphTargetItem> paramValues;
+
     public GraphTargetItem retType;
+
     public int line;
+
     public boolean hasRest;
+
     public boolean needsActivation;
+
     public boolean isInterface;
+
     public String pkg;
 
     public FunctionAVM2Item(String pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
@@ -83,5 +97,4 @@ public class FunctionAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
-
 }

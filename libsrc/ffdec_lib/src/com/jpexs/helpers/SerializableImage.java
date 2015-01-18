@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -38,11 +39,15 @@ import java.util.Hashtable;
 public class SerializableImage implements Serializable {
 
     public static int TYPE_INT_ARGB = BufferedImage.TYPE_INT_ARGB;
+
     public static int TYPE_INT_RGB = BufferedImage.TYPE_INT_RGB;
+
     public static int TYPE_INT_ARGB_PRE = BufferedImage.TYPE_INT_ARGB_PRE;
+
     public static int TYPE_4BYTE_ABGR = BufferedImage.TYPE_4BYTE_ABGR;
 
     private BufferedImage image;
+
     private transient Graphics graphics;
 
     private SerializableImage() {

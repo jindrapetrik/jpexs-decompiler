@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -103,7 +103,7 @@ public class ReflectionTools {
         if (!canInstantiate(cls)) {
             return false;
         }
-        
+
         try {
             cls.getConstructor();
         } catch (NoSuchMethodException | SecurityException ex) {
@@ -317,7 +317,7 @@ public class ReflectionTools {
         }
         return true;
     }
-    
+
     public static List<Field> getSwfFields(Class cls) {
         List<Field> result = new ArrayList<>();
         Field[] fields = cls.getFields();
@@ -333,7 +333,7 @@ public class ReflectionTools {
 
             result.add(f);
         }
-        
+
         fields = cls.getDeclaredFields();
         // Add private fields marked with SWFField annotation
         for (Field f : fields) {
@@ -344,7 +344,7 @@ public class ReflectionTools {
             if (!Modifier.isPrivate(f.getModifiers())) {
                 continue;
             }
-            
+
             SWFField swfField = f.getAnnotation(SWFField.class);
             if (swfField != null) {
                 result.add(f);

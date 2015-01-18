@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,15 +50,25 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 public class ColorEditor extends JPanel implements GenericTagEditor, ActionListener {
 
     private final Object obj;
+
     private final Field field;
+
     private final int index;
+
     private final Class<?> type;
+
     private final String fieldName;
+
     private Color color;
+
     public static final int COLOR_TYPE_RGB = 0;
+
     public static final int COLOR_TYPE_RGBA = 1;
+
     public static final int COLOR_TYPE_ARGB = 2;
+
     private int colorType;
+
     private JButton buttonChange;
 
     public int getColorType() {
@@ -236,5 +246,4 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         int h = System.identityHashCode(this);
         return "<cite style=\"background-color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">&nbsp;&nbsp;&nbsp;&nbsp;</cite> " + getChangedValue().toString();
     }
-
 }

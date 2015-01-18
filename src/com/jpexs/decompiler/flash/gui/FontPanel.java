@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -56,6 +56,7 @@ import layout.TableLayout;
 public class FontPanel extends javax.swing.JPanel {
 
     private final MainPanel mainPanel;
+
     private FontTag fontTag;
 
     /**
@@ -152,7 +153,7 @@ public class FontPanel extends javax.swing.JPanel {
                     }
                 }
                 if (yestoall) {
-                    opt = 0; //yes                
+                    opt = 0; //yes
                 } else if (notoall) {
                     opt = 1; //no
                 } else {
@@ -296,7 +297,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontParamsPanel.add(fontNameIntagLabel, "1,0");
 
         JLabel fontNameNameLabLabel = new JLabel();
-        fontNameNameLabLabel.setText(AppStrings.translate("font.name")); // NOI18N        
+        fontNameNameLabLabel.setText(AppStrings.translate("font.name")); // NOI18N
         fontParamsPanel.add(fontNameNameLabLabel, "0,1,R");
 
         fontDisplayNameScrollPane.setBorder(null);
@@ -334,7 +335,7 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontParamsPanel.add(fontCopyrightScrollPane, "1,2");
 
-        jLabel4.setText(AppStrings.translate("font.isbold")); // NOI18N       
+        jLabel4.setText(AppStrings.translate("font.isbold")); // NOI18N
         fontParamsPanel.add(jLabel4, "0,3,R");
 
         fontIsBoldCheckBox.setEnabled(false);
@@ -354,7 +355,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontAscentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
         fontParamsPanel.add(fontAscentLabel, "1,5");
 
-        jLabel7.setText(AppStrings.translate("font.descent")); // NOI18N        
+        jLabel7.setText(AppStrings.translate("font.descent")); // NOI18N
         fontParamsPanel.add(jLabel7, "0,6,R");
 
         fontDescentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
@@ -363,10 +364,10 @@ public class FontPanel extends javax.swing.JPanel {
         jLabel8.setText(AppStrings.translate("font.leading")); // NOI18N
         fontParamsPanel.add(jLabel8, "0,7,R");
 
-        fontLeadingLabel.setText(AppStrings.translate("value.unknown")); // NOI18N        
+        fontLeadingLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
         fontParamsPanel.add(fontLeadingLabel, "1,7");
 
-        jLabel9.setText(AppStrings.translate("font.characters")); // NOI18N        
+        jLabel9.setText(AppStrings.translate("font.characters")); // NOI18N
         fontParamsPanel.add(jLabel9, "0,8,R");
 
         fontCharactersScrollPane.setBorder(null);
@@ -662,29 +663,52 @@ public class FontPanel extends javax.swing.JPanel {
     }
 
     private javax.swing.JButton buttonCancel;
-    private javax.swing.JButton buttonEdit;
-    private javax.swing.JButton buttonPreviewFont;
-    private javax.swing.JButton buttonSetAdvanceValues;
-    private javax.swing.JButton buttonSave;
-    private javax.swing.JTextField fontAddCharactersField;
-    private javax.swing.JButton fontAddCharsButton;
-    private javax.swing.JLabel fontAscentLabel;
-    private javax.swing.JScrollPane fontCharactersScrollPane;
-    private javax.swing.JTextArea fontCharactersTextArea;
-    private javax.swing.JTextArea fontCopyrightTextArea;
-    private javax.swing.JLabel fontDescentLabel;
-    private javax.swing.JTextArea fontNameTextArea;
-    private javax.swing.JButton fontEmbedButton;
-    private javax.swing.JCheckBox fontIsBoldCheckBox;
-    private javax.swing.JCheckBox fontIsItalicCheckBox;
-    private javax.swing.JLabel fontLeadingLabel;
-    private javax.swing.JLabel fontNameIntagLabel;
-    private javax.swing.JComboBox<FontFamily> fontFamilyNameSelection;
-    private javax.swing.JComboBox<FontFace> fontFaceSelection;
-    private javax.swing.JLabel fontSourceLabel;
-    private javax.swing.JPanel fontParamsPanel;
-    private javax.swing.JPanel addCharsPanel;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JCheckBox updateTextsCheckBox;
 
+    private javax.swing.JButton buttonEdit;
+
+    private javax.swing.JButton buttonPreviewFont;
+
+    private javax.swing.JButton buttonSetAdvanceValues;
+
+    private javax.swing.JButton buttonSave;
+
+    private javax.swing.JTextField fontAddCharactersField;
+
+    private javax.swing.JButton fontAddCharsButton;
+
+    private javax.swing.JLabel fontAscentLabel;
+
+    private javax.swing.JScrollPane fontCharactersScrollPane;
+
+    private javax.swing.JTextArea fontCharactersTextArea;
+
+    private javax.swing.JTextArea fontCopyrightTextArea;
+
+    private javax.swing.JLabel fontDescentLabel;
+
+    private javax.swing.JTextArea fontNameTextArea;
+
+    private javax.swing.JButton fontEmbedButton;
+
+    private javax.swing.JCheckBox fontIsBoldCheckBox;
+
+    private javax.swing.JCheckBox fontIsItalicCheckBox;
+
+    private javax.swing.JLabel fontLeadingLabel;
+
+    private javax.swing.JLabel fontNameIntagLabel;
+
+    private javax.swing.JComboBox<FontFamily> fontFamilyNameSelection;
+
+    private javax.swing.JComboBox<FontFace> fontFaceSelection;
+
+    private javax.swing.JLabel fontSourceLabel;
+
+    private javax.swing.JPanel fontParamsPanel;
+
+    private javax.swing.JPanel addCharsPanel;
+
+    private javax.swing.JScrollPane jScrollPane1;
+
+    private javax.swing.JCheckBox updateTextsCheckBox;
 }

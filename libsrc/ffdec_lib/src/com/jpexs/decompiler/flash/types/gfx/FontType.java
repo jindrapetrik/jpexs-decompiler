@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -29,15 +30,25 @@ import java.util.List;
 public class FontType implements Serializable {
 
     public static final int FF_Italic = 0x0001;
+
     public static final int FF_Bold = 0x0002;
+
     public String fontName;
+
     public int flags;
+
     public int nominalSize;
+
     public int ascent;
+
     public int descent;
+
     public int leading;
+
     public List<GlyphType> glyphs;
+
     public List<GlyphInfoType> glyphInfo;
+
     public List<KerningPairType> kerning;
 
     public FontType() {

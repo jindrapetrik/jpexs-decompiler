@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,21 +59,33 @@ import javax.swing.filechooser.FileFilter;
 public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private static final String ACTION_OK = "OK";
+
     private static final String ACTION_CANCEL = "CANCEL";
+
     private static final String ACTION_LOAD_FROM_DISK = "LOAD_FROM_DISK";
 
     private static final int SAMPLE_MAX_LENGTH = 50;
 
     private final JComboBox<FontFamily> familyNamesSelection;
+
     private final JComboBox<FontFace> faceSelection;
+
     private final JCheckBox[] rangeCheckboxes;
+
     private final String rangeNames[];
+
     private final JLabel[] rangeSamples;
+
     private final JTextField individualCharsField;
+
     private boolean result = false;
+
     private JLabel individialSample;
+
     private Font customFont;
+
     private final JCheckBox allCheckbox;
+
     private final JCheckBox updateTextsCheckbox;
 
     public Font getSelectedFont() {
@@ -121,6 +133,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     }
 
     private JRadioButton ttfFileRadio;
+
     private JRadioButton installedRadio;
 
     private void updateFaceSelection() {

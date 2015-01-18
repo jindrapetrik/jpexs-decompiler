@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,24 +34,43 @@ import java.util.logging.Logger;
 public class EntryStore extends CacheEntry {
 
     public static final int ENTRY_NORMAL = 0;
+
     public static final int ENTRY_EVICTED = 1;    // The entry was recently evicted from the cache.
+
     public static final int ENTRY_DOOMED = 2;      // The entry was doomed
+
     public static final int PARENT_ENTRY = 1;         // This entry has children (sparse) entries.
+
     public static final int CHILD_ENTRY = 1 << 1;
+
     public long hash;               // Full hash of the key.
+
     public CacheAddr next;               // Next entry with the same hash or bucket.
+
     public CacheAddr rankings_node;      // Rankings node for this entry.
+
     public int reuse_count;        // How often is this entry used.
+
     public int refetch_count;      // How often is this fetched from the net.
+
     public int state;              // Current state.
+
     public long creation_time;
+
     public int key_len;
+
     public CacheAddr long_key;           // Optional address of a long key.
+
     public int data_size[] = new int[4];       // We can store up to 4 data streams for each
+
     public CacheAddr data_addr[] = new CacheAddr[4];       // entry.
+
     public long flags;              // Any combination of EntryFlags.
+
     public int pad[] = new int[4];
+
     public long self_hash;          // The hash of EntryStore up to this point.
+
     public byte key[] = new byte[256 - 24 * 4];  // null terminated
 
     public EntryStore(InputStream is, File rootDir, Map<Integer, RandomAccessFile> dataFiles, File externalFilesDir) throws IOException {

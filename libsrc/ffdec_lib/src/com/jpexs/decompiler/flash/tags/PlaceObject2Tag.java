@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -55,77 +55,93 @@ public class PlaceObject2Tag extends CharacterIdTag implements ASMSourceContaine
      * @since SWF 5 Has clip actions (sprite characters only)
      */
     public boolean placeFlagHasClipActions;
+
     /**
      * Has clip depth
      */
     public boolean placeFlagHasClipDepth;
+
     /**
      * Has name
      */
     public boolean placeFlagHasName;
+
     /**
      * Has ratio
      */
     public boolean placeFlagHasRatio;
+
     /**
      * Has color transform
      */
     public boolean placeFlagHasColorTransform;
+
     /**
      * Has matrix
      */
     public boolean placeFlagHasMatrix;
+
     /**
      * Places a character
      */
     public boolean placeFlagHasCharacter;
+
     /**
      * Defines a character to be moved
      */
     public boolean placeFlagMove;
+
     /**
      * Depth of character
      */
     @SWFType(BasicType.UI16)
     public int depth;
+
     /**
      * If PlaceFlagHasCharacter, ID of character to place
      */
     @SWFType(BasicType.UI16)
     @Conditional("placeFlagHasCharacter")
     public int characterId;
+
     /**
      * If PlaceFlagHasMatrix, Transform matrix data
      */
     @Conditional("placeFlagHasMatrix")
     public MATRIX matrix;
+
     /**
      * If PlaceFlagHasColorTransform, Color transform data
      */
     @Conditional("placeFlagHasColorTransform")
     public CXFORMWITHALPHA colorTransform;
+
     /**
      * If PlaceFlagHasRatio, ratio
      */
     @SWFType(BasicType.UI16)
     @Conditional("placeFlagHasRatio")
     public int ratio;
+
     /**
      * If PlaceFlagHasName, Name of character
      */
     @Conditional("placeFlagHasName")
     public String name;
+
     /**
      * If PlaceFlagHasClipDepth, Clip depth
      */
     @Conditional("placeFlagHasClipDepth")
     public int clipDepth;
+
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional("placeFlagHasClipActions")
     @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
+
     public static final int ID = 26;
 
     @Override

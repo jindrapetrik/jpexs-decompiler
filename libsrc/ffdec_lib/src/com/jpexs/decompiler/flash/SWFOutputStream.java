@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -91,9 +92,13 @@ import java.util.zip.DeflaterOutputStream;
 public class SWFOutputStream extends OutputStream {
 
     private final OutputStream os;
+
     private final int version;
+
     private long pos = 0;
+
     private int bitPos = 0;
+
     private int tempByte = 0;
 
     public long getPos() {
@@ -1551,7 +1556,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        // Despite of documentation (UI8 1-8), there are two fields 
+        // Despite of documentation (UI8 1-8), there are two fields
         // spreadMode and interPolationMode which are same as in GRADIENT
         writeUB(2, value.spreadMode);
         writeUB(2, value.interPolationMode);

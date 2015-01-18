@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -56,19 +57,31 @@ import org.w3c.dom.Node;
 public class SVGExporter {
 
     protected static final String sNamespace = "http://www.w3.org/2000/svg";
+
     protected static final String xlinkNamespace = "http://www.w3.org/1999/xlink";
 
     protected Document _svg;
+
     protected Element _svgDefs;
+
     protected CDATASection _svgStyle;
+
     protected Stack<Element> _svgGs = new Stack<>();
+
     public List<Element> gradients;
+
     protected int lastPatternId;
+
     public Map<Tag, String> exportedTags = new HashMap<>();
+
     public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
+
     private final Map<String, Integer> lastIds = new HashMap<>();
+
     private final HashSet<String> fontFaces = new HashSet<>();
+
     private String clip;
+
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     public SVGExporter(ExportRectangle bounds) {

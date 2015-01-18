@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,30 +59,51 @@ import javax.swing.tree.TreePath;
 public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
     private static final String ACTION_RAW_EDIT = "RAWEDIT";
+
     private static final String ACTION_JUMP_TO_CHARACTER = "JUMPTOCHARACTER";
+
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
+
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
+
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
+
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
+
     private static final String ACTION_OPEN_SWFINSIDE = "OPENSWFINSIDE";
 
     private final MainPanel mainPanel;
+
     private final TagTree tagTree;
 
     private JMenuItem expandRecursiveMenuItem;
+
     private JMenuItem removeMenuItem;
+
     private JMenuItem removeWithDependenciesMenuItem;
+
     private JMenuItem exportSelectionMenuItem;
+
     private JMenuItem replaceMenuItem;
+
     private JMenuItem rawEditMenuItem;
+
     private JMenuItem jumpToCharacterMenuItem;
+
     private JMenuItem exportJavaSourceMenuItem;
+
     private JMenuItem exportSwfXmlMenuItem;
+
     private JMenuItem importSwfXmlMenuItem;
+
     private JMenuItem closeMenuItem;
+
     private JMenu addTagMenu;
+
     private JMenu moveTagMenu;
+
     private JMenu copyTagMenu;
+
     private JMenuItem openSWFInsideTagMenuItem;
 
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {

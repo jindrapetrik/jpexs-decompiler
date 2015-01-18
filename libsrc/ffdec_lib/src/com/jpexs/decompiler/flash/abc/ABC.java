@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -75,20 +75,35 @@ import java.util.logging.Logger;
 public class ABC {
 
     public int major_version = 46;
+
     public int minor_version = 16;
+
     public AVM2ConstantPool constants = new AVM2ConstantPool();
+
     public List<MethodInfo> method_info = new ArrayList<>();
+
     public List<MetadataInfo> metadata_info = new ArrayList<>();
+
     public List<InstanceInfo> instance_info = new ArrayList<>();
+
     public List<ClassInfo> class_info = new ArrayList<>();
+
     public List<ScriptInfo> script_info = new ArrayList<>();
+
     public List<MethodBody> bodies = new ArrayList<>();
+
     private Map<Integer, Integer> bodyIdxFromMethodIdx;
+
     private long[] stringOffsets;
+
     public static final int MINORwithDECIMAL = 17;
+
     protected Set<EventListener> listeners = new HashSet<>();
+
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
+
     private AVM2Deobfuscation deobfuscation;
+
     @Internal
     public ABCContainerTag parentTag;
 
@@ -109,7 +124,6 @@ public class ABC {
     public SWF getSwf() {
         return parentTag.getSwf();
     }
-    
 
     public List<ABCContainerTag> getAbcTags() {
         return getSwf().getAbcList();
@@ -258,7 +272,7 @@ public class ABC {
         Set<Integer> stringUsages = getStringUsages();
         Set<Integer> namespaceUsages = getNsStringUsages();
         int strIndex = constants.getMultiname(multinameIndex).name_index;
-        if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // name is used elsewhere as string literal            
+        if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // name is used elsewhere as string literal
             strIndex = constants.getStringId(newname, true);
             constants.getMultiname(multinameIndex).name_index = strIndex;
         } else {
@@ -361,7 +375,7 @@ public class ABC {
         }
         if (constant_int_pool_count > 1) {
             ais.newDumpLevel("integers", "integer[]");
-            for (int i = 1; i < constant_int_pool_count; i++) { // index 0 not used. Values 1..n-1         
+            for (int i = 1; i < constant_int_pool_count; i++) { // index 0 not used. Values 1..n-1
                 constants.addInt(ais.readS32("int"));
             }
             ais.endDumpLevel();
@@ -560,9 +574,9 @@ public class ABC {
 
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
-        
+
         /*for(int i=0;i<script_count;i++){
-         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
+         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
          GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
          try {
          bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
@@ -572,7 +586,6 @@ public class ABC {
          System.out.println(""+t.toString());
          }
          //System.exit(0);*/
-
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
@@ -809,18 +822,18 @@ public class ABC {
             }
             namespaceMap = map;
         }
-        
+
         return namespaceMap;
     }
-    
+
     private AVM2Deobfuscation getDeobfuscation() {
         if (deobfuscation == null) {
             deobfuscation = new AVM2Deobfuscation(constants);
         }
-        
+
         return deobfuscation;
     }
-    
+
     private Map<Integer, Integer> getBodyIdxFromMethodIdx() {
         if (bodyIdxFromMethodIdx == null) {
             Map<Integer, Integer> map = new HashMap<>(bodies.size());
@@ -828,10 +841,10 @@ public class ABC {
                 MethodBody mb = bodies.get(i);
                 map.put(mb.method_info, i);
             }
-            
+
             bodyIdxFromMethodIdx = map;
         }
-        
+
         return bodyIdxFromMethodIdx;
     }
 

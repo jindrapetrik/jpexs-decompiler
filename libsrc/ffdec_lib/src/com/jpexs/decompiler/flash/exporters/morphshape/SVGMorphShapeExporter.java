@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -44,9 +45,13 @@ import org.w3c.dom.Element;
 public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     protected Element path;
+
     protected int lastPatternId;
+
     private final Color defaultColor;
+
     private final SWF swf;
+
     private final SVGExporter exporter;
 
     public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
@@ -331,7 +336,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
         /*
          // LDU decomposition
-        
+
          double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
          double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);
          double a = matrix.scaleX;
@@ -447,7 +452,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             gradientEntry.appendChild(createAnimateElement("offset", record.ratio / 255.0, recordEnd.ratio / 255.0));
             RGB color = record.color;
             RGB colorEnd = recordEnd.color;
-            //if(colors.get(i) != 0) { 
+            //if(colors.get(i) != 0) {
             gradientEntry.setAttribute("stop-color", color.toHexRGB());
             gradientEntry.appendChild(createAnimateElement("stop-color", color.toHexRGB(), colorEnd.toHexRGB()));
             //}

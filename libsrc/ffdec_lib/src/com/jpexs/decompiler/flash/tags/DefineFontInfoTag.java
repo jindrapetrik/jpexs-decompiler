@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -38,18 +39,28 @@ public class DefineFontInfoTag extends Tag {
 
     @SWFType(BasicType.UI16)
     public int fontId;
+
     public String fontName;
+
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
+
     public boolean fontFlagsSmallText;
+
     public boolean fontFlagsShiftJIS;
+
     public boolean fontFlagsANSI;
+
     public boolean fontFlagsItalic;
+
     public boolean fontFlagsBold;
+
     public boolean fontFlagsWideCodes;
+
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
+
     public static final int ID = 13;
 
     /**

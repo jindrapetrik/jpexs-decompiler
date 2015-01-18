@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -33,37 +34,45 @@ public class CONVOLUTIONFILTER extends FILTER {
      */
     @SWFType(BasicType.UI8)
     public int matrixX;
+
     /**
      * Vertical matrix size
      */
     @SWFType(BasicType.UI8)
     public int matrixY;
+
     /**
      * Divisor applied to the matrix values
      */
     @SWFType(BasicType.FLOAT)
     public float divisor;
+
     /**
      * Bias applied to the matrix values
      */
     @SWFType(BasicType.FLOAT)
     public float bias;
+
     /**
      * Matrix values
      */
     @SWFType(BasicType.FLOAT)
     public float[][] matrix = new float[0][0];
+
     /**
      * Default color for pixels outside the image
      */
     public RGBA defaultColor;
+
     @Reserved
     @SWFType(value = BasicType.UB, count = 6)
     public int reserved;
+
     /**
      * Clamp mode
      */
     public boolean clamp;
+
     /**
      * Preserve the alpha
      */
