@@ -46,7 +46,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
     public String languageCode = null;
 
-    public static final String[] languages = new String[]{"en", "ca", "cs", "zh", "de", "es", "fr", "hu", "nl", "pl", "pt", "pt-BR", "ru", "sv", "uk"};
+    protected static final String[] languages = new String[]{"en", "ca", "cs", "zh", "de", "es", "fr", "hu", "nl", "pl", "pt", "pt-BR", "ru", "sv", "uk"};
 
     public SelectLanguageDialog() {
         setSize(350, 130);

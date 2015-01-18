@@ -44,11 +44,11 @@ public class TimelinePanel extends JPanel {
 
     public static final int FRAME_HEIGHT = 18;
 
-    public static Color selectedColor = new Color(0xff, 0x99, 0x99);
+    public static final Color selectedColor = new Color(0xff, 0x99, 0x99);
 
-    public static Color selectedBorderColor = new Color(0xcc, 0, 0);
+    public static final Color selectedBorderColor = new Color(0xcc, 0, 0);
 
-    public static Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
+    public static final Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
 
     public Timeline getTimeline() {
         return timeline;

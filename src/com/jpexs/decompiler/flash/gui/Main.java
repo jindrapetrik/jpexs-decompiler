@@ -107,11 +107,11 @@ import javax.swing.filechooser.FileFilter;
  */
 public class Main {
 
-    public static ProxyFrame proxyFrame;
+    protected static ProxyFrame proxyFrame;
 
     private static List<SWFSourceInfo> sourceInfos = new ArrayList<>();
 
-    public static LoadingDialog loadingDialog;
+    protected static LoadingDialog loadingDialog;
 
     public static ModeFrame modeFrame;
 
@@ -127,9 +127,9 @@ public class Main {
 
     public static final int UPDATE_SYSTEM_MINOR = 2;
 
-    public static LoadFromMemoryFrame loadFromMemoryFrame;
+    private static LoadFromMemoryFrame loadFromMemoryFrame;
 
-    public static LoadFromCacheFrame loadFromCacheFrame;
+    private static LoadFromCacheFrame loadFromCacheFrame;
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
 
@@ -171,12 +171,18 @@ public class Main {
 
     public static void ensureMainFrame() {
         if (mainFrame == null) {
-            if (Configuration.useRibbonInterface.get()) {
-                mainFrame = new MainFrameRibbon();
-            } else {
-                mainFrame = new MainFrameClassic();
+            synchronized (Main.class) {
+                if (mainFrame == null) {
+                    MainFrame frame;
+                    if (Configuration.useRibbonInterface.get()) {
+                        frame = new MainFrameRibbon();
+                    } else {
+                        frame = new MainFrameClassic();
+                    }
+                    frame.getPanel().setErrorState(ErrorLogFrame.getInstance().getErrorState());
+                    mainFrame = frame;
+                }
             }
-            mainFrame.getPanel().setErrorState(ErrorLogFrame.getInstance().getErrorState());
         }
     }
 
@@ -1277,8 +1283,13 @@ public class Main {
 
     private static void initDebugger() {
         if (debugger == null) {
-            debugger = new Debugger(Configuration.debuggerPort.get());
-            debugger.start();
+            synchronized (Main.class) {
+                if (debugger == null) {
+                    Debugger dbg = new Debugger(Configuration.debuggerPort.get());
+                    dbg.start();
+                    debugger = dbg;
+                }
+            }
         }
     }
 
@@ -1467,10 +1478,13 @@ public class Main {
 
     public static void clearLogFile() {
         Logger logger = Logger.getLogger("");
-        if (fileTxt != null) {
-            fileTxt.flush();
-            fileTxt.close();
+
+        FileHandler oldFileTxt = fileTxt;
+        fileTxt = null;
+        if (oldFileTxt != null) {
             logger.removeHandler(fileTxt);
+            oldFileTxt.flush();
+            oldFileTxt.close();
         }
 
         String fileName;

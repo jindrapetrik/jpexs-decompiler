@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,9 +38,9 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
         public void stateChanged(ChangeEvent e) {
             SubstanceCoreUtilities.testComponentStateChangeThreadingViolation(progressBar);
 
-            if (displayTimeline != null) { //Main Change - this should be first                
-                //displayTimeline.abort();                
-            }
+            //if (displayTimeline != null) { //Main Change - this should be first
+            //    displayTimeline.abort();
+            //}
             int currValue = progressBar.getValue();
             int span = progressBar.getMaximum() - progressBar.getMinimum();
 
@@ -69,12 +69,12 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
              displayTimeline);*/
             boolean isInCellRenderer = (SwingUtilities.getAncestorOfClass(
                     CellRendererPane.class, progressBar) != null);
-            if (false) {//currValue > 0 && !isInCellRenderer && Math.abs(pixelDelta) > 5) {
-                displayTimeline.play();
-            } else {
-                displayedValue = currValue;
-                progressBar.repaint();
-            }
+            //if (false) {//currValue > 0 && !isInCellRenderer && Math.abs(pixelDelta) > 5) {
+            //    displayTimeline.play();
+            //} else {
+            displayedValue = currValue;
+            progressBar.repaint();
+            //}
         }
     }
 

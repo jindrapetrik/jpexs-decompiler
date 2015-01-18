@@ -223,7 +223,7 @@ public class SoundTagPlayer implements MediaDisplay {
             if (active) {
                 clip.stop();
             }
-            clip.setMicrosecondPosition(frame * FRAME_DIVISOR);
+            clip.setMicrosecondPosition((long) frame * FRAME_DIVISOR);
 
             if (active) {
                 clip.start();

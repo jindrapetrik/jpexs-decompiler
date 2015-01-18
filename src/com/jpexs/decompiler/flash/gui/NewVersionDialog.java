@@ -101,9 +101,11 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         }
         changesText.setContentType("text/html");
         changesText.setText("<html>" + changesStr + "</html>");
-        JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
-        newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(newAvailableLabel);
+        if (latestVersion != null) {
+            JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
+            newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+            cnt.add(newAvailableLabel);
+        }
 
         JLabel changeslogLabel = new JLabel("<html>" + translate("changeslog") + "</html>");
         changeslogLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);

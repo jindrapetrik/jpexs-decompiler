@@ -60,10 +60,7 @@ public class FontFace implements Comparable<FontFace> {
             return false;
         }
         final FontFace other = (FontFace) obj;
-        if (!Objects.equals(this.font, other.font)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.font, other.font);
     }
 
     @Override

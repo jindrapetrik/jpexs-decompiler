@@ -491,13 +491,6 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     Replacement r = replacements.get(sel[0]);
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                    String n = r.urlPattern;
-                    if (n.contains("?")) {
-                        n = n.substring(0, n.indexOf('?'));
-                    }
-                    if (n.contains("/")) {
-                        n = n.substring(n.lastIndexOf('/'));
-                    }
                     String ext = ".swf";
                     final String extension = ext;
                     FileFilter swfFilter = new FileFilter() {

@@ -291,11 +291,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             try {
                 //If countField exists, decrement, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfType.countField());
-                if (countField != null) {
-                    int cnt = countField.getInt(obj);
-                    cnt--;
-                    countField.setInt(obj, cnt);
-                }
+                int cnt = countField.getInt(obj);
+                cnt--;
+                countField.setInt(obj, cnt);
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 //ignored
             }
@@ -343,11 +341,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             try {
                 //If countField exists, increment, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfType.countField());
-                if (countField != null) {
-                    int cnt = countField.getInt(obj);
-                    cnt++;
-                    countField.setInt(obj, cnt);
-                }
+                int cnt = countField.getInt(obj);
+                cnt++;
+                countField.setInt(obj, cnt);
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 //ignored
             }

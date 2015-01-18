@@ -138,10 +138,11 @@ public class PlayerControls extends JPanel implements ActionListener {
     private static Font notUnderlinedFont = null;
 
     static {
-        notUnderlinedFont = new JLabel().getFont();
+        Font font = new JLabel().getFont();
+        notUnderlinedFont = font;
         Map<TextAttribute, Integer> fontAttributes = new HashMap<>();
         fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        underlinedFont = notUnderlinedFont.deriveFont(fontAttributes);
+        underlinedFont = font.deriveFont(fontAttributes);
     }
 
     public PlayerControls(final MainPanel mainPanel, MediaDisplay display) {

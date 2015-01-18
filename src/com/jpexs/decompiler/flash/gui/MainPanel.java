@@ -572,7 +572,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 if (splitsInited) {
-                    Configuration.guiSplitPane1DividerLocation.set((int) pce.getNewValue());
+                    Configuration.guiSplitPane1DividerLocation.set((Integer) pce.getNewValue());
                 }
             }
         });
@@ -581,7 +581,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 if (detailPanel.isVisible()) {
-                    Configuration.guiSplitPane2DividerLocation.set((int) pce.getNewValue());
+                    Configuration.guiSplitPane2DividerLocation.set((Integer) pce.getNewValue());
                 }
             }
         });
@@ -2368,9 +2368,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             preferScript = true;
         }
 
-        if (flashPanel != null) {
-            //flashPanel.specialPlayback = false;
-        }
+        //if (flashPanel != null) {
+        //    flashPanel.specialPlayback = false;
+        //}
         folderPreviewPanel.setItems(new ArrayList<TreeItem>());
         previewPanel.clear();
         stopFlashPlayer();

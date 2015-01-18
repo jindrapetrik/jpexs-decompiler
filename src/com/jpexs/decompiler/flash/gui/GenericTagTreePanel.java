@@ -129,7 +129,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 try {
                     type = ReflectionTools.getValue(obj, field, index).getClass();
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
                     return null;
                 }
                 SWFType swfType = field.getAnnotation(SWFType.class);
@@ -197,7 +197,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             Object obj = path.getLastPathComponent();
 
             boolean ret = super.isCellEditable(e)
-                    && path != null && (tree.getModel().isLeaf(obj));
+                    && tree.getModel().isLeaf(obj);
             return ret;
         }
 
@@ -320,8 +320,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 }
                             }
                         }
-                    } else if (e.getClickCount() == 2) {
-                        //myDoubleClick(selRow, selPath);
+                        //} else if (e.getClickCount() == 2) {
+                        //    myDoubleClick(selRow, selPath);
                     }
                 }
             }
@@ -479,10 +479,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             if (!Objects.equals(this.field, other.field)) {
                 return false;
             }
-            if (this.index != other.index) {
-                return false;
-            }
-            return true;
+            return this.index == other.index;
         }
     }
 
@@ -797,7 +794,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 if (value instanceof Boolean) {
                                     fieldMap.put(sf, (Boolean) value);
                                 } else if (value instanceof Integer) {
-                                    int intValue = (int) value;
+                                    int intValue = (Integer) value;
                                     boolean found = false;
                                     for (int i : cond.options()) {
                                         if (i == intValue) {
@@ -866,11 +863,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             try {
                 //If countField exists, increment, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfArray.countField());
-                if (countField != null) {
-                    int cnt = countField.getInt(obj);
-                    cnt++;
-                    countField.setInt(obj, cnt);
-                }
+                int cnt = countField.getInt(obj);
+                cnt++;
+                countField.setInt(obj, cnt);
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 //ignored
             }
@@ -903,11 +898,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             try {
                 //If countField exists, decrement, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfArray.countField());
-                if (countField != null) {
-                    int cnt = countField.getInt(obj);
-                    cnt--;
-                    countField.setInt(obj, cnt);
-                }
+                int cnt = countField.getInt(obj);
+                cnt--;
+                countField.setInt(obj, cnt);
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 //ignored
             }

@@ -17,12 +17,10 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
@@ -68,10 +66,6 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         setClassIndex(-1, -1);
     }
 
-    private List<ABCContainerTag> getAbcTags() {
-        return abc == null ? null : abc.getSwf().getAbcList();
-    }
-
     public void setClassIndex(int classIndex, int scriptIndex) {
         if (classIndex >= abc.instance_info.size()) {
             return;
@@ -80,9 +74,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         if (classIndex == -1) {
             setModel(new DefaultListModel<>());
         } else {
-            if (abc != null) {
-                setModel(new TraitsListModel(abc, classIndex, scriptIndex, sorted));
-            }
+            setModel(new TraitsListModel(abc, classIndex, scriptIndex, sorted));
         }
     }
 

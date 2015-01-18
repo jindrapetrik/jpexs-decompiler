@@ -177,11 +177,10 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         if (regular == null) {
             return;
         }
-        if (regular != null) {
-            Graphics2D g2d = (Graphics2D) g.create();
-            regular.paintIcon(this.applicationMenuButton, g2d, 0, 0);
-            g2d.dispose();
-        }
+
+        Graphics2D g2d = (Graphics2D) g.create();
+        regular.paintIcon(this.applicationMenuButton, g2d, 0, 0);
+        g2d.dispose();
     }
 
     /*

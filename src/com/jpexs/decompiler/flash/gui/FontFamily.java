@@ -60,10 +60,7 @@ public class FontFamily implements Comparable<FontFamily> {
             return false;
         }
         final FontFamily other = (FontFamily) obj;
-        if (!Objects.equals(this.familyEn, other.familyEn)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.familyEn, other.familyEn);
     }
 
     @Override

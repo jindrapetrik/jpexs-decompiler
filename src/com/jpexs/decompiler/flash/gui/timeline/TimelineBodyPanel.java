@@ -43,31 +43,31 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private final Timeline timeLine;
 
-    public static Color motionTweenColor = new Color(0x59, 0xfe, 0x7c);
+    public static final Color motionTweenColor = new Color(0x59, 0xfe, 0x7c);
 
-    public static Color shapeTweenColor = new Color(0xd1, 0xac, 0xf1);
+    public static final Color shapeTweenColor = new Color(0xd1, 0xac, 0xf1);
 
-    public static Color frameColor = new Color(0xbd, 0xd8, 0xfc);
+    public static final Color frameColor = new Color(0xbd, 0xd8, 0xfc);
 
-    public static Color emptyFrameColor = Color.white;
+    public static final Color emptyFrameColor = Color.white;
 
-    public static Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
+    public static final Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
 
-    public static Color borderColor = Color.black;
+    public static final Color borderColor = Color.black;
 
-    public static Color emptyBorderColor = new Color(0xbd, 0xd8, 0xfc);
+    public static final Color emptyBorderColor = new Color(0xbd, 0xd8, 0xfc);
 
-    public static Color keyColor = Color.black;
+    public static final Color keyColor = Color.black;
 
-    public static Color aColor = Color.black;
+    public static final Color aColor = Color.black;
 
-    public static Color stopColor = Color.white;
+    public static final Color stopColor = Color.white;
 
-    public static Color stopBorderColor = Color.black;
+    public static final Color stopBorderColor = Color.black;
 
-    public static Color borderLinesColor = new Color(0xde, 0xde, 0xde);
+    public static final Color borderLinesColor = new Color(0xde, 0xde, 0xde);
 
-    public static Color selectedColor = new Color(113, 174, 235);
+    public static final Color selectedColor = new Color(113, 174, 235);
 
     public static final int borderLinesLength = 2;
 

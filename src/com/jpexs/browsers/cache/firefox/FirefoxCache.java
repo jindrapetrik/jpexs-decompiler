@@ -40,7 +40,11 @@ public class FirefoxCache implements CacheImplementation {
 
     public static FirefoxCache getInstance() {
         if (instance == null) {
-            instance = new FirefoxCache();
+            synchronized (FirefoxCache.class) {
+                if (instance == null) {
+                    instance = new FirefoxCache();
+                }
+            }
         }
         return instance;
     }

@@ -597,7 +597,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.guiActionSplitPaneDividerLocation.set((int) pce.getNewValue());
+                Configuration.guiActionSplitPaneDividerLocation.set((Integer) pce.getNewValue());
             }
         });
 

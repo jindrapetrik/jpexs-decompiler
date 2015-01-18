@@ -54,7 +54,11 @@ public class ChromeCache implements CacheImplementation {
 
     public static ChromeCache getInstance() {
         if (instance == null) {
-            instance = new ChromeCache();
+            synchronized (ChromeCache.class) {
+                if (instance == null) {
+                    instance = new ChromeCache();
+                }
+            }
         }
         return instance;
     }

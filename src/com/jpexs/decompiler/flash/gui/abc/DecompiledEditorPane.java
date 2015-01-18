@@ -182,7 +182,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    public synchronized void setClassIndex(int classIndex) {
+    public void setClassIndex(int classIndex) {
         this.classIndex = classIndex;
     }
 
@@ -529,16 +529,15 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
             if (tm != null) {
                 String name = "";
-                if (abc != null) {
-                    if (classIndex > -1) {
-                        name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
-                    }
+                if (classIndex > -1) {
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
                 }
+
                 Trait currentTrait = null;
                 currentTraitHighlight = Highlighting.searchPos(traitHighlights, pos);
                 if (currentTraitHighlight != null) {
                     lastTraitIndex = (int) currentTraitHighlight.getProperties().index;
-                    if ((abc != null) && (classIndex != -1)) {
+                    if (classIndex != -1) {
                         currentTrait = getCurrentTrait();
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (currentTrait != null) {
@@ -579,13 +578,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 currentMethodHighlight = null;
                 String name = "";
                 currentTrait = null;
-                if (abc != null) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
-                    currentTrait = getCurrentTrait();
-                    isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
-                    if (currentTrait != null) {
-                        name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>(), false);
-                    }
+                name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+                currentTrait = getCurrentTrait();
+                isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
+                if (currentTrait != null) {
+                    name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>(), false);
                 }
 
                 displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, isStatic);
