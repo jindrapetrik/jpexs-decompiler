@@ -307,9 +307,13 @@ public final class SWF implements SWFContainerItem, Timelined {
     
     public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
-            Map<Integer, CharacterTag> chars = new HashMap<>();
-            parseCharacters(tags, chars);
-            characters = chars; 
+            synchronized (this) {
+                if (characters == null) {
+                    Map<Integer, CharacterTag> chars = new HashMap<>();
+                    parseCharacters(tags, chars);
+                    characters = chars;
+                }
+            }
         }
         
         return characters;
@@ -321,9 +325,13 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public List<ABCContainerTag> getAbcList() {
         if (abcList == null) {
-            ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
-            getAbcTags(tags, newAbcList);
-            abcList = newAbcList;
+            synchronized (this) {
+                if (abcList == null) {
+                    ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
+                    getAbcTags(tags, newAbcList);
+                    abcList = newAbcList;
+                }
+            }
         }
 
         return abcList;
@@ -357,10 +365,14 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public synchronized JPEGTablesTag getJtt() {
         if (jtt == null) {
-            for (Tag t : tags) {
-                if (t instanceof JPEGTablesTag) {
-                    jtt = (JPEGTablesTag) t;
-                    break;
+            synchronized (this) {
+                if (jtt == null) {
+                    for (Tag t : tags) {
+                        if (t instanceof JPEGTablesTag) {
+                            jtt = (JPEGTablesTag) t;
+                            break;
+                        }
+                    }
                 }
             }
         }
