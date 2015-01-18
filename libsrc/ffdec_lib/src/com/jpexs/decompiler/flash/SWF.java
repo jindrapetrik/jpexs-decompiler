@@ -2220,6 +2220,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearAllCache() {
         characters = null;
         abcList = null;
+        timeline = null;
         clearImageCache();
         clearScriptCache();
         Cache.clearAll();
