@@ -95,13 +95,8 @@ public class SwfXmlExporter {
         generateXml(doc, node, "swf", swf, false, 0);            
     }
     
-    private static void generateXml(Document doc, Node node, String name, Object obj, boolean addAsChildNode, int level){
-        if (obj == null) {
-            return;
-        }
-
-        Class cls = obj.getClass();
-        Object value = null;
+    private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level){
+        Class cls = obj != null ? obj.getClass() : null;
 
         if (cls == Byte.class || cls == byte.class ||
             cls == Short.class || cls == short.class ||
@@ -112,19 +107,19 @@ public class SwfXmlExporter {
             cls == Boolean.class || cls == boolean.class ||
             cls == Character.class || cls == char.class ||
             cls == String.class) {
-                value = obj;
+                Object value = obj;
                 if (value instanceof String) {
-                    value = Helper.escapeXML((String) value);
+                    value = Helper.removeInvalidXMLCharacters((String) value);
                 }
 
-                if (addAsChildNode) {
+                if (isListItem) {
                     Element childNode = doc.createElement(name);
                     childNode.setTextContent(value.toString());
                     node.appendChild(childNode);
                 } else {
                     ((Element) node).setAttribute(name, value.toString());
                 } 
-        } else if (cls.isEnum()) {
+        } else if (cls != null && cls.isEnum()) {
             ((Element) node).setAttribute(name, obj.toString());
         } else if (obj instanceof ByteArrayRange) {
             ByteArrayRange range = (ByteArrayRange) obj;
@@ -135,22 +130,22 @@ public class SwfXmlExporter {
             }
             
             ((Element) node).setAttribute(name, sb.toString());
-        } else if (List.class.isAssignableFrom(cls)) {
+        } else if (cls != null && List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
             Element listNode = doc.createElement(name);
             node.appendChild(listNode);
             for (int i = 0; i < list.size(); i++) {
                 generateXml(doc, listNode, "item", list.get(i), true, level + 1);
             }
-        } else if (cls.isArray()) {
-            String arrayType = cls.getComponentType().getSimpleName();
+        } else if (cls != null && cls.isArray()) {
+            Class arrayType = cls.getComponentType();
             Element arrayNode = doc.createElement(name);
             node.appendChild(arrayNode);
             int length = Array.getLength(obj);
             for (int i = 0; i < length; i++) {
                 generateXml(doc, arrayNode, "item", Array.get(obj, i), true, level + 1);
             }
-        } else {
+        } else if (obj != null) {
             if (obj instanceof LazyObject) {
                 ((LazyObject) obj).load();
             }
@@ -181,6 +176,12 @@ public class SwfXmlExporter {
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        } else {
+            if (isListItem) {
+                Element childNode = doc.createElement(name);
+                childNode.setAttribute("isNull", Boolean.TRUE.toString());
+                node.appendChild(childNode);
             }
         }
     }

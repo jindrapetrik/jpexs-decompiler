@@ -81,6 +81,14 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.ZONEDATA;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
+import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
+import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
+import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
+import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
@@ -213,6 +221,11 @@ public class SwfXmlImporter {
             processElement(element, childObj, swf);
             return childObj;
         } else {
+            String isNullAttr = element.getAttribute("isNull");
+            if (Boolean.parseBoolean(isNullAttr)) {
+                return null;
+            }
+            
             return getAs(requiredType, element.getTextContent());
         }
     }
@@ -249,6 +262,10 @@ public class SwfXmlImporter {
                 PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class, 
                 SOUNDINFO.class, TEXTRECORD.class, ZONEDATA.class, ZONERECORD.class,
                 CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
+                
+                BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
+                DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
+                
                 AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class,
                 ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class, 
                 TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class, 

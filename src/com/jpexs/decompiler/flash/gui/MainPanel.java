@@ -1671,6 +1671,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     try {
                         new SwfXmlImporter().importSwf(swf, xml);
                         swf.clearAllCache();
+                        swf.assignExportNamesToSymbols();
+                        swf.assignClassesToSymbols();
                         refreshTree();
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, null, ex);

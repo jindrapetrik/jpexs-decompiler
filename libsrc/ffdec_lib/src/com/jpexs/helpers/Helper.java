@@ -869,7 +869,7 @@ public class Helper {
         return text;
     }
 
-    public static String escapeXML(String text) {
+    public static String removeInvalidXMLCharacters(String text) {
         StringBuilder sb = new StringBuilder(text.length());
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
@@ -878,9 +878,9 @@ public class Helper {
             }
         }
         
-        return escapeHTML(sb.toString());
+        return sb.toString();
     }
-
+    
     public static Shape imageToShape(BufferedImage image) {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
