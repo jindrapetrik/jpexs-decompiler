@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -41,6 +42,9 @@ public class ValueKind {
     public int value_index;
     public int value_kind;
 
+    public ValueKind() {
+    }
+    
     public ValueKind(int value_index, int value_kind) {
         this.value_index = value_index;
         this.value_kind = value_kind;

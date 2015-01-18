@@ -17,6 +17,24 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.ClassInfo;
+import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
@@ -31,7 +49,6 @@ import com.jpexs.decompiler.flash.types.COLORMAPDATA;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
@@ -100,6 +117,7 @@ public class SwfXmlImporter {
 
     private Map<String, Class> swfTags;
     private Map<String, Class> swfObjects;
+    private Map<String, Class> swfObjectsParam;
     
     public void importSwf(SWF swf, String xml) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -112,6 +130,18 @@ public class SwfXmlImporter {
         }
     }
     
+    private Field getField(Class cls, String name) throws NoSuchFieldException {
+        Field field;
+        try {
+            field = cls.getField(name);
+        } catch (NoSuchFieldException ex) {
+            field = cls.getDeclaredField(name);
+            field.setAccessible(true);
+        }
+        
+        return field;
+    }
+    
     private void processElement(Element element, Object obj, SWF swf) {
         Class cls = obj.getClass();
         for (int i = 0; i < element.getAttributes().getLength(); i++) {
@@ -119,7 +149,7 @@ public class SwfXmlImporter {
             String name = attr.getName();
             if (!name.equals("type")) {
                 try {
-                    Field field = cls.getField(name);
+                    Field field = getField(cls, name);
                     String attrValue = attr.getValue();
                     field.set(obj, getAs(field.getType(), attrValue));
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
@@ -134,7 +164,7 @@ public class SwfXmlImporter {
                 Element child = (Element) childNode;
                 String name = child.getTagName();
                 try {
-                    Field field = cls.getField(name);
+                    Field field = getField(cls, name);
                     Class childCls = field.getType();
                     if (List.class.isAssignableFrom(childCls)) {
                         List list = new ArrayList(); 
@@ -193,12 +223,15 @@ public class SwfXmlImporter {
             Map<Integer, Class> knownTags = Tag.getKnownClasses();
             for (Integer key : knownTags.keySet()) {
                 Class cls = knownTags.get(key);
+                if (!ReflectionTools.canInstantiate(cls)) {
+                    System.err.println("Can't instantiate: " + cls.getName());
+                }
                 tags.put(cls.getSimpleName(), cls);
             }
             
             swfTags = tags;
         }
-        
+
         Class cls = swfTags.get(type);
         if (cls != null) {
             return cls.getConstructor(SWF.class).newInstance(swf);
@@ -208,15 +241,22 @@ public class SwfXmlImporter {
             Map<String, Class> objects = new HashMap<>();
             Class[] knownObjects = new Class[] { ALPHABITMAPDATA.class, ALPHACOLORMAPDATA.class, ARGB.class, BITMAPDATA.class, 
                 BUTTONCONDACTION.class, BUTTONRECORD.class, CLIPACTIONRECORD.class, CLIPACTIONS.class, CLIPEVENTFLAGS.class, 
-                COLORMAPDATA.class, ColorTransform.class, ConstantColorColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class, 
+                COLORMAPDATA.class, ColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class, 
                 FILLSTYLE.class, FILLSTYLEARRAY.class, FOCALGRADIENT.class, GLYPHENTRY.class, GRADIENT.class, GRADRECORD.class, 
                 KERNINGRECORD.class, LANGCODE.class, LINESTYLE.class, LINESTYLE2.class, LINESTYLEARRAY.class, MATRIX.class, 
                 MORPHFILLSTYLE.class, MORPHFILLSTYLEARRAY.class, MORPHFOCALGRADIENT.class, MORPHGRADIENT.class, 
                 MORPHGRADRECORD.class, MORPHLINESTYLE.class, MORPHLINESTYLE2.class, MORPHLINESTYLEARRAY.class, PIX15.class, 
                 PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class, 
                 SOUNDINFO.class, TEXTRECORD.class, ZONEDATA.class, ZONERECORD.class,
-                CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class };
+                CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
+                AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class,
+                ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class, 
+                TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class, 
+                ABCException.class };
             for (Class cls2 : knownObjects) {
+                if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
+                    System.err.println("Can't instantiate: " + cls2.getName());
+                }
                 objects.put(cls2.getSimpleName(), cls2);
             }
             
@@ -228,6 +268,25 @@ public class SwfXmlImporter {
             return cls.getConstructor().newInstance();
         }
 
+        if (swfObjectsParam == null) {
+            Map<String, Class> objects = new HashMap<>();
+            Class[] knownObjects = new Class[] { ABC.class };
+            for (Class cls2 : knownObjects) {
+                if (!ReflectionTools.canInstantiate(cls2)) {
+                    System.err.println("Can't instantiate: " + cls2.getName());
+                }
+                objects.put(cls2.getSimpleName(), cls2);
+            }
+            
+            swfObjectsParam = objects;
+        }
+
+        cls = swfObjectsParam.get(type);
+        if (cls != null) {
+            return cls.getConstructor(SWF.class).newInstance(swf);
+        }
+
+        System.err.println("Type not found: " + type);
         return null;
     }
     

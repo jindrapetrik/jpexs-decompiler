@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;

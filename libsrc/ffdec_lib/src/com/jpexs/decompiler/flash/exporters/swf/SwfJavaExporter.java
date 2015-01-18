@@ -220,7 +220,7 @@ public class SwfJavaExporter {
             sb2.indent();
             sb2.indent();
             String indent = getIndent(writer.getIndent() + 1, javaIndentString);
-            Field fields[] = obj.getClass().getFields();
+            Field[] fields = obj.getClass().getFields();
             for (Field f : fields) {
                 if (Modifier.isStatic(f.getModifiers())) {
                     continue;

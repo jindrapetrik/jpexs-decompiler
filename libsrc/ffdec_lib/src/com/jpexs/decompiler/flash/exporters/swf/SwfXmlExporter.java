@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -61,7 +62,6 @@ public class SwfXmlExporter {
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document xmlDoc = docBuilder.newDocument();
-            xmlDoc.appendChild(xmlDoc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
             exportXml(swf, xmlDoc, xmlDoc);
             try (Writer writer = new BufferedWriter(new Utf8OutputStreamWriter(new FileOutputStream(file)))) {
                 writer.append(getXml(xmlDoc));
@@ -99,7 +99,7 @@ public class SwfXmlExporter {
         if (obj == null) {
             return;
         }
-        
+
         Class cls = obj.getClass();
         Object value = null;
 
@@ -156,10 +156,14 @@ public class SwfXmlExporter {
             }
             
             String className = obj.getClass().getSimpleName();
-            Field fields[] = obj.getClass().getFields();
+            List<Field> fields = ReflectionTools.getSwfFields(obj.getClass());
             Element objNode = doc.createElement(name);
             objNode.setAttribute("type", className);
             node.appendChild(objNode);
+
+            if (level == 0) {
+                objNode.appendChild(doc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
+            }
             
             for (Field f : fields) {
                 if (Modifier.isStatic(f.getModifiers())) {

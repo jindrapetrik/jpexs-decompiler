@@ -57,8 +57,8 @@ import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
@@ -83,14 +83,19 @@ public class ABC {
     public List<ClassInfo> class_info = new ArrayList<>();
     public List<ScriptInfo> script_info = new ArrayList<>();
     public List<MethodBody> bodies = new ArrayList<>();
-    private List<Integer> bodyIdxFromMethodIdx = new ArrayList<>();
-    public long[] stringOffsets;
+    private Map<Integer, Integer> bodyIdxFromMethodIdx;
+    private long[] stringOffsets;
     public static final int MINORwithDECIMAL = 17;
     protected Set<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
-    private final AVM2Deobfuscation deobfuscation;
+    private AVM2Deobfuscation deobfuscation;
+    @Internal
     public SWF swf;
+    @Internal
     public ABCContainerTag parentTag;
+
+    /* Map from multiname index of namespace value to namespace name**/
+    private Map<String, String> namespaceMap;
 
     public ABC(SWF swf) {
         this.deobfuscation = null;
@@ -106,14 +111,7 @@ public class ABC {
 
     public int addMethodBody(MethodBody body) {
         bodies.add(body);
-        if (body.method_info >= bodyIdxFromMethodIdx.size()) {
-            int newlen = body.method_info + 1;
-            int oldlen = bodyIdxFromMethodIdx.size();
-            for (int i = oldlen; i < newlen; i++) {
-                bodyIdxFromMethodIdx.add(-1);
-            }
-            bodyIdxFromMethodIdx.set(body.method_info, bodies.size() - 1);
-        }
+        bodyIdxFromMethodIdx = null;
         return bodies.size() - 1;
     }
 
@@ -268,6 +266,7 @@ public class ABC {
         Map<Integer, String> stringUsageTypes = new HashMap<>();
         informListeners("deobfuscate", "Getting usage types...");
         getStringUsageTypes(stringUsageTypes, classesOnly);
+        AVM2Deobfuscation deobfuscation = getDeobfuscation();
         for (int i = 0; i < instance_info.size(); i++) {
             informListeners("deobfuscate", "class " + i + "/" + instance_info.size());
             InstanceInfo insti = instance_info.get(i);
@@ -347,7 +346,6 @@ public class ABC {
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
 
         constants = new AVM2ConstantPool();
-        deobfuscation = new AVM2Deobfuscation(constants);
         ais.newDumpLevel("constant_pool", "cpool_info");
 
         // constant integers
@@ -481,10 +479,8 @@ public class ABC {
         // method info
         int methods_count = ais.readU30("methods_count");
         method_info = new ArrayList<>(methods_count); // MethodInfo[methods_count];
-        bodyIdxFromMethodIdx = new ArrayList<>(methods_count);
         for (int i = 0; i < methods_count; i++) {
             method_info.add(ais.readMethodInfo("method"));
-            bodyIdxFromMethodIdx.add(-1);
         }
 
         // metadata info
@@ -555,12 +551,11 @@ public class ABC {
             mb.traits = ais.readTraits("traits");
             bodies.add(mb);
             method_info.get(mb.method_info).setBody(mb);
-            bodyIdxFromMethodIdx.set(mb.method_info, i);
             ais.endDumpLevel();
 
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
-        loadNamespaceMap();
+        
         /*for(int i=0;i<script_count;i++){
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
          GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
@@ -689,7 +684,7 @@ public class ABC {
         if (methodInfo == -1) {
             return -1;
         }
-        return bodyIdxFromMethodIdx.get(methodInfo);
+        return getBodyIdxFromMethodIdx().get(methodInfo);
     }
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
@@ -791,30 +786,55 @@ public class ABC {
             }
         }
     }
-    /* Map from multiname index of namespace value to namespace name**/
-    private HashMap<String, String> namespaceMap;
 
-    private void loadNamespaceMap() {
-        namespaceMap = new HashMap<>();
-        for (ScriptInfo si : script_info) {
-            for (Trait t : si.traits.traits) {
-                if (t instanceof TraitSlotConst) {
-                    TraitSlotConst s = ((TraitSlotConst) t);
-                    if (s.isNamespace()) {
-                        String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
-                        String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
-                        namespaceMap.put(key, val);
+    private Map<String, String> getNamespaceMap() {
+        if (namespaceMap == null) {
+            Map<String, String> map = new HashMap<>();
+            for (ScriptInfo si : script_info) {
+                for (Trait t : si.traits.traits) {
+                    if (t instanceof TraitSlotConst) {
+                        TraitSlotConst s = ((TraitSlotConst) t);
+                        if (s.isNamespace()) {
+                            String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
+                            String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
+                            map.put(key, val);
+                        }
                     }
                 }
             }
+            namespaceMap = map;
         }
+        
+        return namespaceMap;
+    }
+    
+    private AVM2Deobfuscation getDeobfuscation() {
+        if (deobfuscation == null) {
+            deobfuscation = new AVM2Deobfuscation(constants);
+        }
+        
+        return deobfuscation;
+    }
+    
+    private Map<Integer, Integer> getBodyIdxFromMethodIdx() {
+        if (bodyIdxFromMethodIdx == null) {
+            Map<Integer, Integer> map = new HashMap<>(bodies.size());
+            for (int i = 0; i < bodies.size(); i++) {
+                MethodBody mb = bodies.get(i);
+                map.put(mb.method_info, i);
+            }
+            
+            bodyIdxFromMethodIdx = map;
+        }
+        
+        return bodyIdxFromMethodIdx;
     }
 
     public String nsValueToName(String value) {
-        if (namespaceMap.containsKey(value)) {
-            return namespaceMap.get(value);
+        if (getNamespaceMap().containsKey(value)) {
+            return getNamespaceMap().get(value);
         } else {
-            String ns = deobfuscation.builtInNs(value);
+            String ns = getDeobfuscation().builtInNs(value);
             if (ns == null) {
                 return "";
             } else {
@@ -1178,14 +1198,7 @@ public class ABC {
             removeMethodFromTraits(si.traits, index);
         }
 
-        if (bindex > -1) {
-            for (int mi = 0; mi < bodyIdxFromMethodIdx.size(); mi++) {
-                if (bodyIdxFromMethodIdx.get(mi) > bindex) {
-                    bodyIdxFromMethodIdx.set(mi, bodyIdxFromMethodIdx.get(mi) - 1);
-                }
-            }
-        }
-        bodyIdxFromMethodIdx.remove(index);
+        bodyIdxFromMethodIdx = null;
 
         method_info.remove(index);
     }

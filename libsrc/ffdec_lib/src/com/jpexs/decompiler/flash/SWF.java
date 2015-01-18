@@ -240,6 +240,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     /**
      * Uncompressed size of the file
      */
+    @Internal
     public long fileSize;
     /**
      * Used compression mode
@@ -248,6 +249,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     /**
      * Compressed size of the file (LZMA)
      */
+    @Internal
     public long compressedSize;
     /**
      * LZMA Properties

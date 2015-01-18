@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -51,6 +53,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public boolean preloadArgumentsFlag;
     public boolean suppressThisFlag;
     public boolean preloadThisFlag;
+    @Reserved
     public int reserved;
     public boolean preloadGlobalFlag;
     public int registerCount;

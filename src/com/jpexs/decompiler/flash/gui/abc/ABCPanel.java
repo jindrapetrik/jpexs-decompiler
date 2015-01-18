@@ -444,8 +444,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             }
         });
 
-        Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
-
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
         add(splitPane, BorderLayout.CENTER);

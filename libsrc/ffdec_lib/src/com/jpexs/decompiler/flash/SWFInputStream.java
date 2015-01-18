@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -2361,7 +2362,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public BUTTONCONDACTION readBUTTONCONDACTION(SWF swf, Tag tag, String name) throws IOException {
         newDumpLevel(name, "BUTTONCONDACTION");
-        BUTTONCONDACTION ret = new BUTTONCONDACTION(swf, this, getPos(), tag);
+        BUTTONCONDACTION ret = new BUTTONCONDACTION(swf, this, tag);
         //ret.actions = readActionList();
         endDumpLevel();
         return ret;

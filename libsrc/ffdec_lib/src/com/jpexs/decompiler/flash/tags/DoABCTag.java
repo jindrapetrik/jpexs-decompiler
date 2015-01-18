@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
+import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +40,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * ActionScript 3 bytecodes
      */
     @HideInRawEdit
+    @SWFField
     private final ABC abc;
     public static final int ID = 72;
 

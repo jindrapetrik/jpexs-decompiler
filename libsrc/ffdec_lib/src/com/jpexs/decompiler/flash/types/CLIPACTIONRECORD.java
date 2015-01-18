@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -92,7 +93,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, Serializable {
     @Internal
     private final Tag tag;
 
-    //Constructor for Generic tag editor. TODO:Handle this somehow better
+    // Constructor for Generic tag editor. TODO:Handle this somehow better
     public CLIPACTIONRECORD() {
         swf = null;
         tag = null;

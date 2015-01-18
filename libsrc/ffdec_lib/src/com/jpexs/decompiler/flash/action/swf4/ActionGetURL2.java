@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +49,7 @@ public class ActionGetURL2 extends Action {
     public static final int POST = 2;
     public boolean loadTargetFlag;
     public boolean loadVariablesFlag;
+    @Reserved
     public int reserved;
 
     public ActionGetURL2(int sendVarsMethod, boolean loadVariablesFlag, boolean loadTargetFlag) {

@@ -235,6 +235,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
+        importSwfXmlMenuItem.setVisible(allSelectedIsSwf);
         closeMenuItem.setVisible(allSelectedIsSwf);
         addTagMenu.setVisible(false);
         moveTagMenu.setVisible(false);

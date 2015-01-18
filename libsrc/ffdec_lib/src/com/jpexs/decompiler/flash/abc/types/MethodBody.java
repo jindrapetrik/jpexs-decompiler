@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -54,6 +56,7 @@ public final class MethodBody implements Cloneable {
     public int max_regs;
     public int init_scope_depth;
     public int max_scope_depth;
+    @SWFField
     private byte[] codeBytes = new byte[0];
     private AVM2Code code;
     public ABCException[] exceptions = new ABCException[0];

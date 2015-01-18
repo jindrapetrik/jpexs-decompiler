@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -40,6 +42,7 @@ import java.util.Set;
 
 public class ActionTry extends Action implements GraphSourceItemContainer {
 
+    @Reserved
     public int reserved;
     public boolean catchInRegisterFlag;
     public boolean finallyBlockFlag;

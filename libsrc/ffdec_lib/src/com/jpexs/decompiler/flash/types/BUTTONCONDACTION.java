@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -47,17 +48,21 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
 
     private final SWF swf;
     private final Tag tag;
-    private final long pos;
 
     @Override
     public SWF getSwf() {
         return swf;
     }
 
-    public BUTTONCONDACTION(SWF swf, SWFInputStream sis, long containerOffset, Tag tag) throws IOException {
+    // Constructor for Generic tag editor. TODO:Handle this somehow better
+    public BUTTONCONDACTION() {
+        swf = null;
+        tag = null;
+    }
+    
+    public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
-        pos = containerOffset;
         int condActionSize = sis.readUI16("condActionSize");
         isLast = condActionSize <= 0;
         condIdleToOverDown = sis.readUB(1, "condIdleToOverDown") == 1;

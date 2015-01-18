@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -195,6 +196,9 @@ public class MethodInfo {
         return (flags & FLAG_HAS_PARAMNAMES) == FLAG_HAS_PARAMNAMES;
     }
 
+    public MethodInfo() {
+    }
+    
     public MethodInfo(int[] param_types, int ret_type, int name_index, int flags, ValueKind[] optional, int[] paramNames) {
         this.param_types = param_types;
         this.ret_type = ret_type;

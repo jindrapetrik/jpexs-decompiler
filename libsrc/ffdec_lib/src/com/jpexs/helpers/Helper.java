@@ -873,7 +873,7 @@ public class Helper {
         StringBuilder sb = new StringBuilder(text.length());
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (i > 31 || i == 9 || i == 10 || i == 13) {
+            if (ch > 31 || ch == 9 || ch == 10 || ch == 13) {
                 sb.append(ch);
             }
         }

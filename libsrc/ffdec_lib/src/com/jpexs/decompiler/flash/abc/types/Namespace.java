@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -53,6 +54,9 @@ public class Namespace {
         return null;
     }
 
+    public Namespace() {
+    }
+    
     public Namespace(int kind, int name_index) {
         this.kind = kind;
         this.name_index = name_index;

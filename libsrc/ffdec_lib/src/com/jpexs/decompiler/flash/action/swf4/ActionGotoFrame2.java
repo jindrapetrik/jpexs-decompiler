@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -21,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.ByteArrayOutputStream;
@@ -33,6 +35,7 @@ public class ActionGotoFrame2 extends Action {
     boolean sceneBiasFlag;
     boolean playFlag;
     public int sceneBias;
+    @Reserved
     int reserved;
 
     public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias) {

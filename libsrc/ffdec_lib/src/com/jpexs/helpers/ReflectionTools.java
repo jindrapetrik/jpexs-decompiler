@@ -16,10 +16,13 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,6 +96,20 @@ public class ReflectionTools {
         if (Modifier.isAbstract(cls.getModifiers())) {
             return false;
         }
+        return true;
+    }
+
+    public static boolean canInstantiateDefaultConstructor(Class<?> cls) {
+        if (!canInstantiate(cls)) {
+            return false;
+        }
+        
+        try {
+            cls.getConstructor();
+        } catch (NoSuchMethodException | SecurityException ex) {
+            return false;
+        }
+
         return true;
     }
 
@@ -299,5 +316,41 @@ public class ReflectionTools {
             return false;
         }
         return true;
+    }
+    
+    public static List<Field> getSwfFields(Class cls) {
+        List<Field> result = new ArrayList<>();
+        Field[] fields = cls.getFields();
+        for (Field f : fields) {
+            if (Modifier.isStatic(f.getModifiers())) {
+                continue;
+            }
+
+            Internal inter = f.getAnnotation(Internal.class);
+            if (inter != null) {
+                continue;
+            }
+
+            result.add(f);
+        }
+        
+        fields = cls.getDeclaredFields();
+        // Add private fields marked with SWFField annotation
+        for (Field f : fields) {
+            if (Modifier.isStatic(f.getModifiers())) {
+                continue;
+            }
+
+            if (!Modifier.isPrivate(f.getModifiers())) {
+                continue;
+            }
+            
+            SWFField swfField = f.getAnnotation(SWFField.class);
+            if (swfField != null) {
+                result.add(f);
+            }
+        }
+
+        return result;
     }
 }

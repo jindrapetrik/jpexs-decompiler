@@ -1560,7 +1560,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
 
                 String variableName = n.getVariableName();
-                if ("this".equals(variableName) || "super".equals(variableName) || paramNames.contains(variableName) || "argmuments".equals(variableName)) {
+                if ("this".equals(variableName) || "super".equals(variableName) || paramNames.contains(variableName) || "arguments".equals(variableName)) {
                     continue;
                 }
 

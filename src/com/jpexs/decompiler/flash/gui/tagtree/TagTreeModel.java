@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -73,6 +74,7 @@ public class TagTreeModel implements TreeModel {
         this.swfs = new ArrayList<>();
         this.swfFolders = new HashMap<>();
         this.addAllFolders = addAllFolders;
+        Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
         for (SWFList swfList : swfs) {
             if (swfList.isBundle) {
                 this.swfs.add(swfList);
@@ -85,6 +87,7 @@ public class TagTreeModel implements TreeModel {
                 createTagList(swf);
             }
         }
+        Main.stopWork();
     }
 
     private String translate(String key) {
