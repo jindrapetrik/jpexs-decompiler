@@ -681,7 +681,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABC getABC() {
         return script == null ? null : script.abc;
     }
-    
+
     @Override
     public void setText(String t) {
         super.setText(t);

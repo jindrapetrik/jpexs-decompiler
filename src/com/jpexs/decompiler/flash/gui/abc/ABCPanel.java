@@ -255,12 +255,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public SWF getSwf() {
         return abc == null ? null : abc.getSwf();
     }
-    
+
     public List<ABCContainerTag> getAbcList() {
         SWF swf = getSwf();
         return swf == null ? null : swf.getAbcList();
     }
-    
+
     public void clearSwf() {
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());

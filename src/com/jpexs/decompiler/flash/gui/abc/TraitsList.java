@@ -64,7 +64,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         setModel(new DefaultListModel<>());
         setClassIndex(-1, -1);
     }
-    
+
     private List<ABCContainerTag> getAbcTags() {
         return abc == null ? null : abc.getSwf().getAbcList();
     }

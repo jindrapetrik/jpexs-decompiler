@@ -1320,7 +1320,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf == null) {
             return;
         }
-        
+
         FileAttributesTag fileAttributes = swf.getFileAttributes();
         if (fileAttributes != null && fileAttributes.actionScript3) {
             final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret();
@@ -1643,7 +1643,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void exportSwfXml() {
         List<TreeItem> sel = tagTree.getSelected(tagTree);
         for (TreeItem item : sel) {
@@ -1661,7 +1661,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void importSwfXml() {
         List<TreeItem> sel = tagTree.getSelected(tagTree);
         for (TreeItem item : sel) {
@@ -1684,7 +1684,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void restoreControlFlow(final boolean all) {
         Main.startWork(translate("work.restoringControlFlow"));
         if ((!all) || confirmExperimental()) {
@@ -2091,7 +2091,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-            File result = fc.getSelectedFile(); 
+            File result = fc.getSelectedFile();
             Configuration.lastOpenDir.set(Helper.fixDialogFile(result).getParentFile().getAbsolutePath());
             return result;
         }
