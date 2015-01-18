@@ -102,7 +102,7 @@ public class RecompileTest {
                         }
 
                         System.out.println("Recompiling:" + en.getKey().toString() + "...");
-                        en.getValue().toSource(htw, swf.getAbcList(), abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                        en.getValue().toSource(htw, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
                         com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, abc, allAbcs, false, en.getKey().className + ".as", abc.instance_info.size());
                         //remove last compiled script:
