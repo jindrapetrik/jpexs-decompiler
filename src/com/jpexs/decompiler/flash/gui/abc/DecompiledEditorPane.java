@@ -61,7 +61,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<Highlighting> classHighlights = new ArrayList<>();
     private Highlighting currentMethodHighlight;
     private Highlighting currentTraitHighlight;
-    private ABC abc;
     private ScriptPack script;
     public int lastTraitIndex = 0;
     public boolean ignoreCarret = false;
@@ -91,7 +90,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public Trait getCurrentTrait() {
-        return abc.findTraitByTraitId(classIndex, lastTraitIndex);
+        return script.abc.findTraitByTraitId(classIndex, lastTraitIndex);
     }
 
     public ScriptPack getScriptLeaf() {
@@ -175,6 +174,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, boolean isStatic) {
+        ABC abc = getABC();
         if (abc == null) {
             return false;
         }
@@ -261,6 +261,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if ("this".equals(lname)) {
                 Highlighting ch = Highlighting.searchPos(classHighlights, pos);
                 int cindex = (int) ch.getProperties().index;
+                ABC abc = getABC();
                 type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
                 return ch.startPos;
             }
@@ -327,6 +328,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             t = sd.getNextToken(t);
             String ident = t.getString(sd);
             found = false;
+            List<ABCContainerTag> abcList = getABC().getSwf().getAbcList();
             loopi:
             for (int i = 0; i < abcList.size(); i++) {
                 ABC a = abcList.get(i).getABC();
@@ -383,6 +385,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
         Trait currentTrait = null;
         int currentMethod = -1;
+        ABC abc = getABC();
         if (tm != null) {
 
             int mi = (int) tm.getProperties().index;
@@ -491,6 +494,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             });
             return;
         }
+
+        ABC abc = getABC();
         if (abc == null) {
             return;
         }
@@ -622,9 +627,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         addCaretListener(this);
         this.abcPanel = abcPanel;
     }
-    private List<ABCContainerTag> abcList;
 
-    public void setScript(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
+    public void setScript(ScriptPack scriptLeaf) {
         abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
         int scriptIndex = scriptLeaf.scriptIndex;
         ScriptInfo script = null;
@@ -642,8 +646,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         setText("// " + AppStrings.translate("pleasewait") + "...");
 
-        this.abc = abc;
-        this.abcList = abcList;
         this.script = scriptLeaf;
         CachedDecompilation cd = null;
         try {
@@ -665,8 +667,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void reloadClass() {
         int ci = classIndex;
         SWF.uncache(script);
-        if ((script != null) && (abc != null)) {
-            setScript(script, abcList);
+        if (script != null && getABC() != null) {
+            setScript(script);
         }
         setNoTrait();
         setClassIndex(ci);
@@ -676,11 +678,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return classIndex;
     }
 
-    public void setABC(ABC abc) {
-        this.abc = abc;
-        setText("");
+    private ABC getABC() {
+        return script == null ? null : script.abc;
     }
-
+    
     @Override
     public void setText(String t) {
         super.setText(t);

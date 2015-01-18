@@ -12,12 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import java.util.List;
 
 /**
  *
@@ -28,8 +27,8 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
     public int multinameIndex;
     public int classIndex;
 
-    public InsideClassMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex) {
-        super(abcTags, abc);
+    public InsideClassMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
+        super(abc);
         this.multinameIndex = multinameIndex;
         this.classIndex = classIndex;
     }

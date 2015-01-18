@@ -12,13 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -28,8 +27,8 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     public int typename_index;
 
-    public TypeNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int typename_index) {
-        super(abcTags, abc);
+    public TypeNameMultinameUsage(ABC abc, int typename_index) {
+        super(abc);
         this.typename_index = typename_index;
     }
 

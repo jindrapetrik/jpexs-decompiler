@@ -86,7 +86,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private boolean parseUsagesFromNS(ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
@@ -100,7 +100,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
             String oldimport = newimport;
             newimport = null;
-            for (ABCContainerTag abcTag : abcTags) {
+            for (ABCContainerTag abcTag : abc.getAbcTags()) {
                 String newname = abcTag.getABC().nsValueToName(oldimport);
                 if (newname.equals("-")) {
                     return true;
@@ -158,13 +158,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return false;
     }
 
-    private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private void parseImportsUsagesFromNS(ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
         String newimport = ns.getName(abc.constants, false);
-        if (parseUsagesFromNS(abcTags, abc, imports, uses, namespace_index, ignorePackage, name)) {
+        if (parseUsagesFromNS(abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
@@ -189,15 +189,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //}
     }
 
-    private void parseUsagesFromMultiname(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseUsagesFromMultiname(ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
+                    parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
+                        parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
                     }
                 }
                 return;
@@ -206,29 +206,29 @@ public class TraitClass extends Trait implements TraitWithSlot {
             String name = m.getName(abc.constants, fullyQualifiedNames, false);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
-                parseUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
+                parseUsagesFromNS(abc, imports, uses, m.namespace_index, ignorePackage, name);
             }
             if (nss != null) {
                 if (nss.namespaces.length == 1) {
-                    parseUsagesFromNS(abcTags, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
+                    parseUsagesFromNS(abc, imports, uses, nss.namespaces[0], ignorePackage, name);
                 } else {
                     for (int n : nss.namespaces) {
-                        parseUsagesFromNS(abcTags, abc, imports, uses, n, ignorePackage, "");
+                        parseUsagesFromNS(abc, imports, uses, n, ignorePackage, "");
                     }
                 }
             }
         }
     }
 
-    private void parseImportsUsagesFromMultiname(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromMultiname(ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
+                    parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
+                        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
                     }
                 }
                 return;
@@ -237,40 +237,40 @@ public class TraitClass extends Trait implements TraitWithSlot {
             String name = m.getName(abc.constants, fullyQualifiedNames, false);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
-                parseImportsUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
+                parseImportsUsagesFromNS(abc, imports, uses, m.namespace_index, ignorePackage, name);
             }
             if (nss != null) {
                 for (int n : nss.namespaces) {
-                    parseImportsUsagesFromNS(abcTags, abc, imports, uses, n, ignorePackage, nss.namespaces.length > 1 ? "" : name);
+                    parseImportsUsagesFromNS(abc, imports, uses, n, ignorePackage, nss.namespaces.length > 1 ? "" : name);
                 }
             }
         }
     }
 
-    private void parseImportsUsagesFromMethodInfo(List<ABCContainerTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
+    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
         visitedMethods.add(method_index);
         if (abc.method_info.get(method_index).ret_type != 0) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames);
         }
         for (int t : abc.method_info.get(method_index).param_types) {
             if (t != 0) {
-                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames);
+                parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames);
             }
         }
         MethodBody body = abc.findBody(method_index);
         if (body != null) {
-            parseImportsUsagesFromTraits(abcTags, abc, body.traits, imports, uses, ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromTraits(abc, body.traits, imports, uses, ignorePackage, fullyQualifiedNames);
             for (ABCException ex : body.exceptions) {
-                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
+                parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
             }
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ins.operands[0] != method_index) {
                         if (!visitedMethods.contains(ins.operands[0])) {
-                            parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
+                            parseImportsUsagesFromMethodInfo(abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
                         }
                     }
                 }
@@ -281,14 +281,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         || (ins.definition instanceof AsTypeIns)) {
                     int m = ins.operands[0];
                     if (m != 0) {
-                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
+                        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
                     }
                 } else {
                     for (int k = 0; k < ins.definition.operands.length; k++) {
 
                         if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                             int multinameIndex = ins.operands[k];
-                            parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
+                            parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
                         }
                     }
                 }
@@ -296,73 +296,73 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromTraits(List<ABCContainerTag> abcTags, ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         for (Trait t : ts.traits) {
-            parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromTrait(abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private void parseImportsUsagesFromTrait(List<ABCContainerTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
             if (tm.method_info != 0) {
-                parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<Integer>());
+                parseImportsUsagesFromMethodInfo(abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<Integer>());
             }
         }
-        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
         if (t instanceof TraitSlotConst) {
             TraitSlotConst ts = (TraitSlotConst) t;
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ts.name_index), ignorePackage, fullyQualifiedNames);
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ts.type_index), ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(ts.name_index), ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(ts.type_index), ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private List<String> getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
+    private List<String> getImportsUsages(ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
         String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
 
-        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).name_index), packageName, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).name_index), packageName, fullyQualifiedNames);
 
         if (abc.instance_info.get(class_info).super_index > 0) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).super_index), packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).super_index), packageName, fullyQualifiedNames);
         }
         for (int i : abc.instance_info.get(class_info).interfaces) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
         }
 
         //static
-        parseImportsUsagesFromTraits(abcTags, abc, abc.class_info.get(class_info).static_traits, imports, uses, packageName, fullyQualifiedNames);
+        parseImportsUsagesFromTraits(abc, abc.class_info.get(class_info).static_traits, imports, uses, packageName, fullyQualifiedNames);
 
         //static initializer
-        parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info.get(class_info).cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
+        parseImportsUsagesFromMethodInfo(abc, abc.class_info.get(class_info).cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
 
         //instance
-        parseImportsUsagesFromTraits(abcTags, abc, abc.instance_info.get(class_info).instance_traits, imports, uses, packageName, fullyQualifiedNames);
+        parseImportsUsagesFromTraits(abc, abc.instance_info.get(class_info).instance_traits, imports, uses, packageName, fullyQualifiedNames);
 
         //instance initializer
-        parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info.get(class_info).iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
+        parseImportsUsagesFromMethodInfo(abc, abc.instance_info.get(class_info).iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
         return imports;
     }
 
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
         return writer;
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         writer.startClass(class_info);
         String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
-        for (ABCContainerTag tag : abcTags) {
+        for (ABCContainerTag tag : abc.getAbcTags()) {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
                     String spath = t.getPath(tag.getABC());
@@ -382,7 +382,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //imports
         List<String> imports = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        getImportsUsages(abcTags, abc, imports, uses, new ArrayList<String>());
+        getImportsUsages(abc, imports, uses, new ArrayList<String>());
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -506,9 +506,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static variables,constants & methods
-        abc.class_info.get(class_info).static_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.class_info.get(class_info).static_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         writer.endBlock(); // class
         writer.endClass();
@@ -517,7 +517,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -537,9 +537,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static variables,constants & methods
-        abc.class_info.get(class_info).static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.class_info.get(class_info).static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info.get(class_info).instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.instance_info.get(class_info).instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
     }
 
     @Override

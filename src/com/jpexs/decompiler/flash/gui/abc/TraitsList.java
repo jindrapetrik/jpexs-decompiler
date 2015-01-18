@@ -30,9 +30,8 @@ import javax.swing.event.ListSelectionListener;
 
 public class TraitsList extends JList<Object> implements ListSelectionListener {
 
-    ABC abc;
-    List<ABCContainerTag> abcTags;
-    int classIndex = -1;
+    private ABC abc;
+    private int classIndex = -1;
     private final ABCPanel abcPanel;
     private boolean sorted = false;
 
@@ -57,15 +56,17 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
 
     public void clearAbc() {
         this.abc = null;
-        this.abcTags = null;
         setModel(new DefaultListModel<>());
     }
 
-    public void setAbc(List<ABCContainerTag> abcTags, ABC abc) {
+    public void setAbc(ABC abc) {
         this.abc = abc;
-        this.abcTags = abcTags;
         setModel(new DefaultListModel<>());
         setClassIndex(-1, -1);
+    }
+    
+    private List<ABCContainerTag> getAbcTags() {
+        return abc == null ? null : abc.getSwf().getAbcList();
     }
 
     public void setClassIndex(int classIndex, int scriptIndex) {
@@ -77,7 +78,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
             setModel(new DefaultListModel<>());
         } else {
             if (abc != null) {
-                setModel(new TraitsListModel(abcTags, abc, classIndex, scriptIndex, sorted));
+                setModel(new TraitsListModel(abc, classIndex, scriptIndex, sorted));
             }
         }
     }

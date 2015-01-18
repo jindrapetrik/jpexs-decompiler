@@ -12,13 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import java.util.List;
 
 /**
  *
@@ -26,8 +25,8 @@ import java.util.List;
  */
 public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage {
 
-    public ConstVarTypeMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abcTags, abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public ConstVarTypeMultinameUsage(ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
     }
 
     @Override

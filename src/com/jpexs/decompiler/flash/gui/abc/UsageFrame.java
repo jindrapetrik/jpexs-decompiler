@@ -55,20 +55,20 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
     private final UsageListModel usageListModel;
     private final ABCPanel abcPanel;
 
-    public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel, boolean definitions) {
+    public UsageFrame(ABC abc, int multinameIndex, ABCPanel abcPanel, boolean definitions) {
         super(abcPanel.getMainPanel().getMainFrame().getWindow());
         this.abcPanel = abcPanel;
-        List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(abcTags, multinameIndex) : abc.findMultinameUsage(abcTags, multinameIndex);
+        List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(multinameIndex) : abc.findMultinameUsage(multinameIndex);
         Multiname m = abc.constants.constant_multiname.get(multinameIndex);
         if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
-            for (ABCContainerTag at : abcTags) {
+            for (ABCContainerTag at : abc.getAbcTags()) {
                 ABC a = at.getABC();
                 if (a == abc) {
                     continue;
                 }
                 int mid = a.constants.getMultinameId(m, false);
                 if (mid > 0) {
-                    usages.addAll(definitions ? a.findMultinameDefinition(abcTags, mid) : a.findMultinameUsage(abcTags, mid));
+                    usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid));
                 }
             }
         }
@@ -134,7 +134,7 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
                 settrait.run();
             } else {
                 abcPanel.decompiledTextArea.addScriptListener(settrait);
-                abcPanel.hilightScript(abcPanel.swf, abcPanel.abc.instance_info.get(icu.classIndex).getName(abcPanel.abc.constants).getNameWithNamespace(abcPanel.abc.constants, false));
+                abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.abc.instance_info.get(icu.classIndex).getName(abcPanel.abc.constants).getNameWithNamespace(abcPanel.abc.constants, false));
             }
         }
     }

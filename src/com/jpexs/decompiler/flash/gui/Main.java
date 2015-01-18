@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.exporters.swf.SwfFile;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -318,7 +317,6 @@ public class Main {
                     startWork(AppStrings.translate("work.reading.swf"), p);
                 }
             }, Configuration.parallelSpeedUp.get());
-            swf = new SwfFile().getSwf();
             swf.file = sourceInfo.getFile();
             swf.fileTitle = sourceInfo.getFileTitle();
             result.add(swf);

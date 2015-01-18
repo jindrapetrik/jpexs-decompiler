@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +27,6 @@ import javax.swing.event.ListDataListener;
 public final class TraitsListModel implements ListModel<Object> {
 
     private List<TraitsListItem> items;
-    private final List<ABCContainerTag> abcTags;
     private final ABC abc;
     private final int classIndex;
     private final int scriptIndex;
@@ -49,17 +47,16 @@ public final class TraitsListModel implements ListModel<Object> {
     private void reset() {
         items = new ArrayList<>();
         for (int t = 0; t < abc.class_info.get(classIndex).static_traits.traits.size(); t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info.get(classIndex).static_traits.traits.get(t)), t, true, abcTags, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info.get(classIndex).static_traits.traits.get(t)), t, true, abc, classIndex, scriptIndex));
         }
         for (int t = 0; t < abc.instance_info.get(classIndex).instance_traits.traits.size(); t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info.get(classIndex).instance_traits.traits.get(t)), t, false, abcTags, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info.get(classIndex).instance_traits.traits.get(t)), t, false, abc, classIndex, scriptIndex));
         }
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex, scriptIndex));
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex, scriptIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
     }
 
-    public TraitsListModel(List<ABCContainerTag> abcTags, ABC abc, int classIndex, int scriptIndex, boolean sorted) {
-        this.abcTags = abcTags;
+    public TraitsListModel(ABC abc, int classIndex, int scriptIndex, boolean sorted) {
         this.abc = abc;
         this.classIndex = classIndex;
         this.scriptIndex = scriptIndex;

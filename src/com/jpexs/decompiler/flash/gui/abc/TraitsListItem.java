@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +37,6 @@ public class TraitsListItem {
 
     private final Type type;
     private final boolean isStatic;
-    private final List<ABCContainerTag> abcTags;
     private final ABC abc;
     private final int classIndex;
     private final int index;
@@ -47,11 +44,10 @@ public class TraitsListItem {
     public String STR_INSTANCE_INITIALIZER = AppStrings.translate("abc.traitslist.instanceinitializer");
     public String STR_CLASS_INITIALIZER = AppStrings.translate("abc.traitslist.classinitializer");
 
-    public TraitsListItem(Type type, int index, boolean isStatic, List<ABCContainerTag> abcTags, ABC abc, int classIndex, int scriptIndex) {
+    public TraitsListItem(Type type, int index, boolean isStatic, ABC abc, int classIndex, int scriptIndex) {
         this.type = type;
         this.index = index;
         this.isStatic = isStatic;
-        this.abcTags = abcTags;
         this.abc = abc;
         this.classIndex = classIndex;
         this.scriptIndex = scriptIndex;
@@ -89,14 +85,14 @@ public class TraitsListItem {
         String s = "";
         try {
             if ((type != Type.INITIALIZER) && isStatic) {
-                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if (!isStatic) {
                 s = STR_INSTANCE_INITIALIZER;

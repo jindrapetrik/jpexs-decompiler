@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -20,7 +21,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,6 @@ public class Traits implements Serializable {
         Trait trait;
         boolean makePackages;
         String path;
-        List<ABCContainerTag> abcTags;
         ABC abc;
         boolean isStatic;
         ScriptExportMode exportMode;
@@ -95,12 +94,11 @@ public class Traits implements Serializable {
         boolean parallel;
         Trait parent;
 
-        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.makePackages = makePackages;
             this.path = path;
-            this.abcTags = abcTags;
             this.abc = abc;
             this.isStatic = isStatic;
             this.exportMode = exportMode;
@@ -115,15 +113,15 @@ public class Traits implements Serializable {
         @Override
         public Void call() throws InterruptedException {
             if (makePackages) {
-                trait.convertPackaged(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convertPackaged(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convert(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             return null;
         }
     }
 
-    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         for (int t = 0; t < traits.size(); t++) {
             writer.newLine();
             Trait trait = traits.get(t);
@@ -139,9 +137,9 @@ public class Traits implements Serializable {
                 writer.startTrait(h);
             }
             if (makePackages) {
-                trait.toStringPackaged(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toStringPackaged(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.toString(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toString(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             if (trait instanceof TraitClass) {
                 writer.endClass();
@@ -152,10 +150,10 @@ public class Traits implements Serializable {
         return writer;
     }
 
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         if (!parallel || traits.size() < 2) {
             for (int t = 0; t < traits.size(); t++) {
-                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
                 task.call();
             }
         } else {
@@ -165,7 +163,7 @@ public class Traits implements Serializable {
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.size(); t++) {
                 // each convert task needs a separate NulWriter, because they are executed parallel
-                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, new NulWriter(), fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, new NulWriter(), fullyQualifiedNames, t, parallel);
                 Future<Void> future = executor.submit(task);
                 futureResults.add(future);
             }

@@ -974,7 +974,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcList.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("exporting", exStr);
-                scr.export(outdir, abcList, exportMode, parallel);
+                scr.export(outdir, exportMode, parallel);
                 exStr = "Exported " + "tag " + (i + 1) + "/" + abcList.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("exported", exStr);
                 exported = true;
@@ -1014,7 +1014,6 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         ScriptPack pack;
         String directory;
-        List<ABCContainerTag> abcList;
         ScriptExportMode exportMode;
         ClassPath path;
         AtomicInteger index;
@@ -1024,10 +1023,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         long startTime;
         long stopTime;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, ScriptExportMode exportMode, boolean parallel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportMode exportMode, boolean parallel) {
             this.pack = pack;
             this.directory = directory;
-            this.abcList = abcList;
             this.exportMode = exportMode;
             this.path = path;
             this.index = index;
@@ -1042,7 +1040,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 @Override
                 public void run() throws IOException {
                     startTime = System.currentTimeMillis();
-                    this.result = pack.export(directory, abcList, exportMode, parallel);
+                    this.result = pack.export(directory, exportMode, parallel);
                     stopTime = System.currentTimeMillis();
                 }
             };
@@ -1083,7 +1081,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     @Override
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, getAbcList(), exportMode, parallel);
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, exportMode, parallel);
                             ret.add(task.call());
                         }
                         return null;
@@ -1098,7 +1096,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, getAbcList(), exportMode, parallel));
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, exportMode, parallel));
                 futureResults.add(future);
             }
 
@@ -2278,7 +2276,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         boolean parallel = Configuration.parallelSpeedUp.get();
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        pack.toSource(writer, swf.getAbcList(), script.traits.traits, ScriptExportMode.AS, parallel);
+        pack.toSource(writer, script.traits.traits, ScriptExportMode.AS, parallel);
         HighlightedText hilightedCode = new HighlightedText(writer);
         CachedDecompilation res = new CachedDecompilation(hilightedCode);
         swf.as3Cache.put(pack, res);

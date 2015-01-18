@@ -636,7 +636,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         boolean hasAbc = !abcList.isEmpty();
 
         if (hasAbc) {
-            getABCPanel().setSwf(swf);
+            getABCPanel().setAbc(abcList.get(0).getABC());
         }
 
         if (isWelcomeScreen) {
@@ -706,7 +706,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         swfs.remove(swfList);
         if (abcPanel != null) {
             for (SWF swf : swfList) {
-                if (abcPanel.swf == swf) {
+                if (abcPanel.getSwf() == swf) {
                     abcPanel.clearSwf();
                 }
             }
@@ -857,7 +857,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 updateClassesList();
                 reload(true);
-                getABCPanel().hilightScript(getABCPanel().swf, getABCPanel().decompiledTextArea.getScriptLeaf().getClassPath().toString());
+                getABCPanel().hilightScript(getABCPanel().getSwf(), getABCPanel().decompiledTextArea.getScriptLeaf().getClassPath().toString());
             }
         }
     }
@@ -1095,10 +1095,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         String documentClass = swf.getDocumentClass();
         if (documentClass != null && !Configuration.dumpView.get()) {
-            showDetail(DETAILCARDAS3NAVIGATOR);
-            showCard(CARDACTIONSCRIPT3PANEL);
-            getABCPanel().setSwf(swf);
-            getABCPanel().hilightScript(swf, documentClass);
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (!abcList.isEmpty()) {
+                showDetail(DETAILCARDAS3NAVIGATOR);
+                showCard(CARDACTIONSCRIPT3PANEL);
+                getABCPanel().setAbc(abcList.get(0).getABC());
+                getABCPanel().hilightScript(swf, documentClass);
+            }
         }
     }
 
@@ -1690,7 +1693,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     int cnt = 0;
                     if (all) {
-                        for (ABCContainerTag tag : getABCPanel().swf.getAbcList()) {
+                        for (ABCContainerTag tag : getABCPanel().getAbcList()) {
                             tag.getABC().restoreControlFlow();
                         }
                     } else {
@@ -1778,7 +1781,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Object doInBackground() throws Exception {
                     try {
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : getABCPanel().swf.getAbcList()) {
+                            for (ABCContainerTag tag : getABCPanel().getAbcList()) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
@@ -2324,7 +2327,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         stopFlashPlayer();
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
-            final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.getAbcList();
             if (setSourceWorker != null) {
                 setSourceWorker.cancel(true);
                 setSourceWorker = null;
@@ -2343,10 +2345,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                         }
                         getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.clear();
-                        getABCPanel().navigator.setAbc(abcList, scriptLeaf.abc);
+                        getABCPanel().navigator.setAbc(scriptLeaf.abc);
                         getABCPanel().navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         getABCPanel().setAbc(scriptLeaf.abc);
-                        getABCPanel().decompiledTextArea.setScript(scriptLeaf, abcList);
+                        getABCPanel().decompiledTextArea.setScript(scriptLeaf);
                         getABCPanel().decompiledTextArea.setClassIndex(classIndex);
                         getABCPanel().decompiledTextArea.setNoTrait();
                         return null;
