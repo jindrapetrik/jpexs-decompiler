@@ -1004,12 +1004,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
                         new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom())));
             }
-            List<ABCContainerTag> abcList = swf.getAbcList();
+
             if (swf.isAS3()) {
                 for (int i = 0; i < as3scripts.size(); i++) {
                     ScriptPack tls = as3scripts.get(i);
                     Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
-                    ret.add(tls.export(selFile, abcList, scriptMode, Configuration.parallelSpeedUp.get()));
+                    ret.add(tls.export(selFile, scriptMode, Configuration.parallelSpeedUp.get()));
                 }
             } else {
                 TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
