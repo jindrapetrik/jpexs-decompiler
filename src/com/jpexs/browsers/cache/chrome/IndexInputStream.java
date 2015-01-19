@@ -74,7 +74,10 @@ public class IndexInputStream extends InputStream {
     public String readString() throws IOException {
         int len = (int) readInt();
         byte data[] = new byte[len];
-        read(data);
+        if (read(data) != len) {
+            throw new IOException();
+        }
+
         return new String(data);
     }
 }

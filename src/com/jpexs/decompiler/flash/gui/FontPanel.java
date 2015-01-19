@@ -287,17 +287,17 @@ public class FontPanel extends javax.swing.JPanel {
         }));
 
         JLabel fontNameIntagLabLabel = new JLabel();
-        fontNameIntagLabLabel.setText(AppStrings.translate("font.name.intag")); // NOI18N
+        fontNameIntagLabLabel.setText(AppStrings.translate("font.name.intag"));
         fontParamsPanel.add(fontNameIntagLabLabel, "0,0,R");
 
-        fontNameIntagLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontNameIntagLabel.setText(AppStrings.translate("value.unknown"));
         fontNameIntagLabel.setMaximumSize(new java.awt.Dimension(250, 14));
         fontNameIntagLabel.setMinimumSize(new java.awt.Dimension(250, 14));
         fontNameIntagLabel.setPreferredSize(new java.awt.Dimension(250, 14));
         fontParamsPanel.add(fontNameIntagLabel, "1,0");
 
         JLabel fontNameNameLabLabel = new JLabel();
-        fontNameNameLabLabel.setText(AppStrings.translate("font.name")); // NOI18N
+        fontNameNameLabLabel.setText(AppStrings.translate("font.name"));
         fontParamsPanel.add(fontNameNameLabLabel, "0,1,R");
 
         fontDisplayNameScrollPane.setBorder(null);
@@ -308,7 +308,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontNameTextArea.setColumns(20);
         fontNameTextArea.setFont(new JLabel().getFont());
         fontNameTextArea.setLineWrap(true);
-        fontNameTextArea.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontNameTextArea.setText(AppStrings.translate("value.unknown"));
         fontNameTextArea.setWrapStyleWord(true);
         fontNameTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontNameTextArea.setOpaque(false);
@@ -316,7 +316,7 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontParamsPanel.add(fontDisplayNameScrollPane, "1,1");
 
-        jLabel3.setText(AppStrings.translate("fontName.copyright")); // NOI18N
+        jLabel3.setText(AppStrings.translate("fontName.copyright"));
         fontParamsPanel.add(jLabel3, "0,2,R");
 
         fontCopyrightScrollPane.setBorder(null);
@@ -327,7 +327,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontCopyrightTextArea.setColumns(20);
         fontCopyrightTextArea.setFont(new JLabel().getFont());
         fontCopyrightTextArea.setLineWrap(true);
-        fontCopyrightTextArea.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontCopyrightTextArea.setText(AppStrings.translate("value.unknown"));
         fontCopyrightTextArea.setWrapStyleWord(true);
         fontCopyrightTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontCopyrightTextArea.setOpaque(false);
@@ -335,39 +335,39 @@ public class FontPanel extends javax.swing.JPanel {
 
         fontParamsPanel.add(fontCopyrightScrollPane, "1,2");
 
-        jLabel4.setText(AppStrings.translate("font.isbold")); // NOI18N
+        jLabel4.setText(AppStrings.translate("font.isbold"));
         fontParamsPanel.add(jLabel4, "0,3,R");
 
         fontIsBoldCheckBox.setEnabled(false);
 
         fontParamsPanel.add(fontIsBoldCheckBox, "1,3");
 
-        jLabel5.setText(AppStrings.translate("font.isitalic")); // NOI18N
+        jLabel5.setText(AppStrings.translate("font.isitalic"));
 
         fontParamsPanel.add(jLabel5, "0,4,R");
 
         fontIsItalicCheckBox.setEnabled(false);
         fontParamsPanel.add(fontIsItalicCheckBox, "1,4");
 
-        jLabel6.setText(AppStrings.translate("font.ascent")); // NOI18N
+        jLabel6.setText(AppStrings.translate("font.ascent"));
         fontParamsPanel.add(jLabel6, "0,5,R");
 
-        fontAscentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontAscentLabel.setText(AppStrings.translate("value.unknown"));
         fontParamsPanel.add(fontAscentLabel, "1,5");
 
-        jLabel7.setText(AppStrings.translate("font.descent")); // NOI18N
+        jLabel7.setText(AppStrings.translate("font.descent"));
         fontParamsPanel.add(jLabel7, "0,6,R");
 
-        fontDescentLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontDescentLabel.setText(AppStrings.translate("value.unknown"));
         fontParamsPanel.add(fontDescentLabel, "1,6");
 
-        jLabel8.setText(AppStrings.translate("font.leading")); // NOI18N
+        jLabel8.setText(AppStrings.translate("font.leading"));
         fontParamsPanel.add(jLabel8, "0,7,R");
 
-        fontLeadingLabel.setText(AppStrings.translate("value.unknown")); // NOI18N
+        fontLeadingLabel.setText(AppStrings.translate("value.unknown"));
         fontParamsPanel.add(fontLeadingLabel, "1,7");
 
-        jLabel9.setText(AppStrings.translate("font.characters")); // NOI18N
+        jLabel9.setText(AppStrings.translate("font.characters"));
         fontParamsPanel.add(jLabel9, "0,8,R");
 
         fontCharactersScrollPane.setBorder(null);
@@ -384,9 +384,9 @@ public class FontPanel extends javax.swing.JPanel {
         fontCharactersScrollPane.setViewportView(fontCharactersTextArea);
         fontParamsPanel.add(fontCharactersScrollPane, "1,8");
 
-        fontCharsAddLabel.setText(AppStrings.translate("font.characters.add")); // NOI18N
+        fontCharsAddLabel.setText(AppStrings.translate("font.characters.add"));
 
-        fontAddCharsButton.setText(AppStrings.translate("button.ok")); // NOI18N
+        fontAddCharsButton.setText(AppStrings.translate("button.ok"));
         fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -394,9 +394,9 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        updateTextsCheckBox.setText(AppStrings.translate("font.updateTexts")); // NOI18N
+        updateTextsCheckBox.setText(AppStrings.translate("font.updateTexts"));
 
-        fontSourceLabel.setText(AppStrings.translate("font.source")); // NOI18N
+        fontSourceLabel.setText(AppStrings.translate("font.source"));
 
         fontFamilyNameSelection.setModel(getFamilyModel());
         fontFamilyNameSelection.setSelectedItem(FontTag.defaultFontName);
@@ -416,7 +416,7 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        fontEmbedButton.setText(AppStrings.translate("button.font.embed")); // NOI18N
+        fontEmbedButton.setText(AppStrings.translate("button.font.embed"));
         fontEmbedButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -424,8 +424,8 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        buttonEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/edit16.png"))); // NOI18N
-        buttonEdit.setText(AppStrings.translate("button.edit")); // NOI18N
+        buttonEdit.setIcon(View.getIcon("edit16"));
+        buttonEdit.setText(AppStrings.translate("button.edit"));
         buttonEdit.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -433,8 +433,8 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        buttonSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/save16.png"))); // NOI18N
-        buttonSave.setText(AppStrings.translate("button.save")); // NOI18N
+        buttonSave.setIcon(View.getIcon("save16"));
+        buttonSave.setText(AppStrings.translate("button.save"));
         buttonSave.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -442,8 +442,8 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        buttonCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/cancel16.png"))); // NOI18N
-        buttonCancel.setText(AppStrings.translate("button.cancel")); // NOI18N
+        buttonCancel.setIcon(View.getIcon("cancel16"));
+        buttonCancel.setText(AppStrings.translate("button.cancel"));
         buttonCancel.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -451,7 +451,7 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        buttonPreviewFont.setText(AppStrings.translate("button.preview")); // NOI18N
+        buttonPreviewFont.setText(AppStrings.translate("button.preview"));
         buttonPreviewFont.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -459,7 +459,7 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
-        buttonSetAdvanceValues.setText(AppStrings.translate("button.setAdvanceValues")); // NOI18N
+        buttonSetAdvanceValues.setText(AppStrings.translate("button.setAdvanceValues"));
         buttonSetAdvanceValues.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {

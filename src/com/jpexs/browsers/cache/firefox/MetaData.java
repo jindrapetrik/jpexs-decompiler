@@ -67,7 +67,10 @@ public class MetaData {
         requestSize = cis.readInt32();
         infoSize = cis.readInt32();
         byte req[] = new byte[(int) requestSize];
-        cis.read(req);
+        if (cis.read(req) != req.length) {
+            throw new IOException();
+        }
+
         request = new String(req, 0, (int) requestSize - 1/*Ends with char 0*/);
         byte res[] = new byte[(int) infoSize];
         cis.read(res);

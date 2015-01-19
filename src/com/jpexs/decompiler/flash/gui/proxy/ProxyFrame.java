@@ -708,7 +708,10 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         if (!cont) {
             try {
                 byte[] hdr = new byte[3];
-                data.read(hdr);
+                if (data.read(hdr) != 3) {
+                    throw new IOException();
+                }
+
                 String shdr = new String(hdr);
                 if (swfOnly && ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS")))) {
                     return null; //NOT SWF

@@ -84,11 +84,11 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         wrapCheckbox = new javax.swing.JCheckBox();
         statusLabel = new javax.swing.JLabel();
 
-        setName("QuickFindDialog"); // NOI18N
+        setName("QuickFindDialog");
 
         jLabel1.setLabelFor(findTextField);
-        ResourceBundle bundle = ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("QuickFindDialog.jLabel1.text")); // NOI18N
+        ResourceBundle bundle = ResourceBundle.getBundle("jsyntaxpane/Bundle");
+        jLabel1.setText(bundle.getString("QuickFindDialog.jLabel1.text"));
         pan1.add(jLabel1);
 
         findTextField.setColumns(30);
@@ -97,7 +97,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         findTextField.setMinimumSize(new java.awt.Dimension(60, 24));
         pan1.add(findTextField);
 
-        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-up.png"))); // NOI18N
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-up.png")));
         prevButton.setFocusable(false);
         prevButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         prevButton.setOpaque(false);
@@ -106,7 +106,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         prevButton.addActionListener(this);
         pan1.add(prevButton);
 
-        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-down.png"))); // NOI18N
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-down.png")));
         nextButton.setFocusable(false);
         nextButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         nextButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -117,7 +117,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         pan1.add(nextButton);
 
         ignoreCaseCheckbox.setMnemonic('C');
-        ignoreCaseCheckbox.setText(bundle.getString("QuickFindDialog.jChkIgnoreCase.text")); // NOI18N
+        ignoreCaseCheckbox.setText(bundle.getString("QuickFindDialog.jChkIgnoreCase.text"));
         ignoreCaseCheckbox.setFocusable(false);
         ignoreCaseCheckbox.setOpaque(false);
         ignoreCaseCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -125,7 +125,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         ignoreCaseCheckbox.addActionListener(this);
 
         regExpCheckbox.setMnemonic('R');
-        regExpCheckbox.setText(bundle.getString("QuickFindDialog.jChkRegExp.text")); // NOI18N
+        regExpCheckbox.setText(bundle.getString("QuickFindDialog.jChkRegExp.text"));
         regExpCheckbox.setFocusable(false);
         regExpCheckbox.setOpaque(false);
         regExpCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -133,7 +133,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         regExpCheckbox.addActionListener(this);
 
         wrapCheckbox.setMnemonic('W');
-        wrapCheckbox.setText(bundle.getString("QuickFindDialog.jChkWrap.text")); // NOI18N
+        wrapCheckbox.setText(bundle.getString("QuickFindDialog.jChkWrap.text"));
         wrapCheckbox.setFocusable(false);
         wrapCheckbox.setOpaque(false);
         wrapCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

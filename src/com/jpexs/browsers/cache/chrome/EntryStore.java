@@ -99,7 +99,9 @@ public class EntryStore extends CacheEntry {
         }
         self_hash = iis.readUInt32();
         key = new byte[256 - 24 * 4];
-        iis.read(key);
+        if (iis.read(key) != key.length) {
+            throw new IOException();
+        }
     }
 
     public HttpResponseInfo getResponseInfo() {
