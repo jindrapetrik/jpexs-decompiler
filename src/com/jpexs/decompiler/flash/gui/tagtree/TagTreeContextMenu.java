@@ -24,12 +24,15 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -220,6 +223,13 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         boolean allSelectedIsTagOrFrame = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag) && !(item instanceof Frame)) {
+                if (item instanceof TagScript) {
+                    Tag tag = ((TagScript) item).getTag();
+                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        continue;
+                    }
+                }
+
                 allSelectedIsTagOrFrame = false;
                 break;
             }
@@ -459,6 +469,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 for (TreeItem tag : sel) {
                     if (tag instanceof Tag) {
                         tagsToRemove.add((Tag) tag);
+                    } else if (tag instanceof TagScript) {
+                        tagsToRemove.add(((TagScript) tag).getTag());
                     } else if (tag instanceof Frame) {
                         Frame frameNode = (Frame) tag;
                         Frame frame = frameNode.timeline.getFrames().get(frameNode.frame);

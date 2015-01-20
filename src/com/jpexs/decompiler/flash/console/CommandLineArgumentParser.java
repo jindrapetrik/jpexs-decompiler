@@ -272,6 +272,10 @@ public class CommandLineArgumentParser {
         out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
         out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
         out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
+        printCmdLineUsageExamples(out);
+    }
+
+    private static void printCmdLineUsageExamples(PrintStream out) {
         out.println();
         out.println("Examples:");
         out.println("java -jar ffdec.jar myfile.swf");
@@ -380,39 +384,51 @@ public class CommandLineArgumentParser {
                 return null;
             }
         }
-        if (nextParam.equals("-removefromcontextmenu")) {
+
+        String command = "";
+        if (nextParam.startsWith("-")) {
+            command = nextParam.substring(1);
+        }
+
+        if (command.equals("removefromcontextmenu")) {
+            if (!args.isEmpty()) {
+                badArguments(command);
+            }
             ContextMenuTools.addToContextMenu(false, true);
             System.exit(0);
-        } else if (nextParam.equals("-addtocontextmenu")) {
+        } else if (command.equals("addtocontextmenu")) {
+            if (!args.isEmpty()) {
+                badArguments(command);
+            }
             ContextMenuTools.addToContextMenu(true, true);
             System.exit(0);
-        } else if (nextParam.equals("-proxy")) {
+        } else if (command.equals("proxy")) {
             parseProxy(args);
-        } else if (nextParam.equals("-export")) {
+        } else if (command.equals("export")) {
             parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom);
-        } else if (nextParam.equals("-compress")) {
+        } else if (command.equals("compress")) {
             parseCompress(args);
-        } else if (nextParam.equals("-decompress")) {
+        } else if (command.equals("decompress")) {
             parseDecompress(args);
-        } else if (nextParam.equals("-swf2xml")) {
+        } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args);
-        } else if (nextParam.equals("-xml2swf")) {
+        } else if (command.equals("xml2swf")) {
             parseXml2Swf(args);
-        } else if (nextParam.equals("-extract")) {
+        } else if (command.equals("extract")) {
             parseExtract(args);
-        } else if (nextParam.equals("-renameinvalididentifiers")) {
+        } else if (command.equals("renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
-        } else if (nextParam.equals("-dumpswf")) {
+        } else if (command.equals("dumpswf")) {
             parseDumpSwf(args);
-        } else if (nextParam.equals("-dumpas2")) {
+        } else if (command.equals("dumpas2")) {
             parseDumpAS2(args);
-        } else if (nextParam.equals("-dumpas3")) {
+        } else if (command.equals("dumpas3")) {
             parseDumpAS3(args);
-        } else if (nextParam.equals("-flashpaper2pdf")) {
+        } else if (command.equals("flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args);
-        } else if (nextParam.equals("-replace")) {
+        } else if (command.equals("replace")) {
             parseReplace(args);
-        } else if (nextParam.equals("-as3compiler")) {
+        } else if (command.equals("as3compiler")) {
             ActionScriptParser.compile(null /*?*/, args.pop(), args.pop(), 0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
@@ -454,6 +470,10 @@ public class CommandLineArgumentParser {
     }
 
     public static void badArguments() {
+        badArguments(null);
+    }
+
+    public static void badArguments(String command) {
         System.err.println("Error: Bad Commandline Arguments!");
         printCmdLineUsage();
         System.exit(1);
@@ -1149,9 +1169,9 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            Helper.readTextFile(args.pop());
+            String xml = Helper.readTextFile(args.pop());
             SWF swf = new SWF();
-            new SwfXmlImporter().importSwf(swf, null);
+            new SwfXmlImporter().importSwf(swf, xml);
             swf.saveTo(new BufferedOutputStream(new FileOutputStream(args.pop())));
         } catch (IOException ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);

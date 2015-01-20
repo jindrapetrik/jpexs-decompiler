@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -46,6 +47,8 @@ public class Frame implements TreeItem {
     public List<String> soundClasses = new ArrayList<>();
 
     public List<DoActionTag> actions = new ArrayList<>();
+
+    public List<ASMSourceContainer> actionContainers = new ArrayList<>();
 
     public List<Tag> innerTags = new ArrayList<>();
 

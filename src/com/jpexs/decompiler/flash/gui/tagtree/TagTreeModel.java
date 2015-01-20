@@ -86,10 +86,13 @@ public class TagTreeModel implements TreeModel {
 
     private final boolean addAllFolders;
 
+    private final Map<Tag, TagScript> tagScriptCache;
+
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
         this.swfs = new ArrayList<>();
         this.swfFolders = new HashMap<>();
         this.addAllFolders = addAllFolders;
+        this.tagScriptCache = new HashMap<>();
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
         for (SWFList swfList : swfs) {
             if (swfList.isBundle) {
@@ -256,35 +259,32 @@ public class TagTreeModel implements TreeModel {
             subNodes.addAll(timeline.getAS2RootPackage().subPackages.values());
             subNodes.addAll(timeline.getAS2RootPackage().scripts.values());
 
-            for (Tag tag : swf.tags) {
+            for (Tag tag : timeline.otherTags) {
+                boolean hasInnerFrames = false;
+                List<TreeItem> tagSubNodes = new ArrayList<>();
                 if (tag instanceof Timelined) {
-                    List<TreeItem> tagSubNodes = new ArrayList<>();
-                    boolean hasInnerFrames = false;
-                    for (Frame frame : ((Timelined) tag).getTimeline().getFrames()) {
-                        if (!frame.actions.isEmpty()) {
+                    Timeline timeline2 = ((Timelined) tag).getTimeline();
+                    for (Frame frame : timeline2.getFrames()) {
+                        if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
                             FrameScript frameScript = new FrameScript(swf, frame);
                             tagSubNodes.add(frameScript);
                             hasInnerFrames = true;
                         }
                     }
+                }
 
-                    if (!hasInnerFrames) {
-                        if (tag instanceof ASMSourceContainer) {
-                            for (ASMSource asm : ((ASMSourceContainer) tag).getSubItems()) {
-                                tagSubNodes.add(asm);
-                            }
-                        }
+                if (tag instanceof ASMSourceContainer) {
+                    for (ASMSource asm : ((ASMSourceContainer) tag).getSubItems()) {
+                        tagSubNodes.add(asm);
                     }
+                }
 
-                    if (!tagSubNodes.isEmpty()) {
-                        TagScript ts = new TagScript(swf, tag, tagSubNodes);
-                        if (hasInnerFrames) {
-                            subFrames.add(ts);
-                        } else {
-                            subNodes.add(ts);
-                        }
-                    } else if (tag instanceof ASMSource) {
-                        TagScript ts = new TagScript(swf, tag, tagSubNodes);
+                if (!tagSubNodes.isEmpty()) {
+                    TagScript ts = new TagScript(swf, tag, tagSubNodes);
+                    tagScriptCache.put(tag, ts);
+                    if (hasInnerFrames) {
+                        subFrames.add(ts);
+                    } else {
                         subNodes.add(ts);
                     }
                 }
@@ -293,7 +293,7 @@ public class TagTreeModel implements TreeModel {
             subNodes.addAll(subFrames);
 
             for (Frame frame : timeline.getFrames()) {
-                if (!frame.actions.isEmpty()) {
+                if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
                     FrameScript frameScript = new FrameScript(swf, frame);
                     subNodes.add(frameScript);
                 }
@@ -463,7 +463,30 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChild(index);
         } else if (parentNode instanceof FrameScript) {
-            return ((FrameScript) parentNode).getFrame().actions.get(index);
+            Frame parentFrame = ((FrameScript) parentNode).getFrame();
+            TreeItem result;
+            if (index < parentFrame.actionContainers.size()) {
+                result = parentFrame.actionContainers.get(index);
+            } else {
+                index -= parentFrame.actionContainers.size();
+                result = parentFrame.actions.get(index);
+            }
+            if (result instanceof Tag) {
+                Tag resultTag = (Tag) result;
+                TagScript tagScript = tagScriptCache.get(resultTag);
+                if (tagScript == null) {
+                    List<TreeItem> subNodes = new ArrayList<>();
+                    if (result instanceof ASMSourceContainer) {
+                        for (ASMSource item : ((ASMSourceContainer) result).getSubItems()) {
+                            subNodes.add(item);
+                        }
+                    }
+                    tagScript = new TagScript(result.getSwf(), resultTag, subNodes);
+                    tagScriptCache.put(resultTag, tagScript);
+                }
+                result = tagScript;
+            }
+            return result;
         } else if (parentNode instanceof TagScript) {
             return ((TagScript) parentNode).getFrames().get(index);
         } else if (parentNode instanceof ClassesListTreeModel) {
@@ -498,7 +521,8 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChildCount();
         } else if (parentNode instanceof FrameScript) {
-            return ((FrameScript) parentNode).getFrame().actions.size();
+            Frame parentFrame = ((FrameScript) parentNode).getFrame();
+            return parentFrame.actionContainers.size() + parentFrame.actions.size();
         } else if (parentNode instanceof TagScript) {
             return ((TagScript) parentNode).getFrames().size();
         } else if (parentNode instanceof ClassesListTreeModel) {
@@ -541,7 +565,15 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getIndexOfChild(childNode);
         } else if (parentNode instanceof FrameScript) {
-            return ((FrameScript) parentNode).getFrame().actions.indexOf(childNode);
+            Frame parentFrame = ((FrameScript) parentNode).getFrame();
+            if (childNode instanceof TagScript) {
+                childNode = ((TagScript) childNode).getTag();
+            }
+            if (childNode instanceof ASMSourceContainer) {
+                return parentFrame.actionContainers.indexOf(childNode);
+            } else {
+                return parentFrame.actionContainers.size() + parentFrame.actions.indexOf(childNode);
+            }
         } else if (parentNode instanceof TagScript) {
             return ((TagScript) parentNode).getFrames().indexOf(childNode);
         } else if (parentNode instanceof ClassesListTreeModel) {

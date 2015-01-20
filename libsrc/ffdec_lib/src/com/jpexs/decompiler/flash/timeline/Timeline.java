@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -74,11 +75,13 @@ public class Timeline {
 
     private final List<ASMSource> asmSources = new ArrayList<>();
 
+    private final List<ASMSourceContainer> asmSourceContainers = new ArrayList<>();
+
     private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
 
     private AS2Package as2RootPackage;
 
-    private final List<Tag> otherTags = new ArrayList<>();
+    public final List<Tag> otherTags = new ArrayList<>();
 
     private boolean initialized = false;
 
@@ -109,6 +112,7 @@ public class Timeline {
         frames.clear();
         depthMaxFrame.clear();
         asmSources.clear();
+        asmSourceContainers.clear();
         actionFrames.clear();
         otherTags.clear();
         as2RootPackage = new AS2Package(null, null, swf);
@@ -168,10 +172,23 @@ public class Timeline {
         frame.layersChanged = true;
         boolean newFrameNeeded = false;
         for (Tag t : tags) {
-            if (ShowFrameTag.isNestedTagType(t.getId())) {
+            boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
+            if (isNested) {
                 newFrameNeeded = true;
                 frame.innerTags.add(t);
             }
+
+            if (t instanceof ASMSourceContainer) {
+                ASMSourceContainer asmSourceContainer = (ASMSourceContainer) t;
+                if (!asmSourceContainer.getSubItems().isEmpty()) {
+                    if (isNested) {
+                        frame.actionContainers.add(asmSourceContainer);
+                    } else {
+                        asmSourceContainers.add(asmSourceContainer);
+                    }
+                }
+            }
+
             if (t instanceof StartSoundTag) {
                 newFrameNeeded = true;
                 frame.sounds.add(((StartSoundTag) t).soundId);
