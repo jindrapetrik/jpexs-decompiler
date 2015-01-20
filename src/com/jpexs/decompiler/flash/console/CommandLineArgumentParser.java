@@ -881,7 +881,7 @@ public class CommandLineArgumentParser {
                 SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
-                    Path.combine(outDir, exfile.getShortFileName());
+                    outDir = Path.combine(outDir, inFile.getName());
                 }
 
                 List<Tag> extags = new ArrayList<>();

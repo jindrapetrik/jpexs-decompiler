@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
@@ -67,10 +66,9 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
     /**
      * Constructor
      *
-     * @param owner
      */
-    public LoadingDialog(Window owner) {
-        super(owner);
+    public LoadingDialog() {
+        super();
         setResizable(false);
         setTitle(ApplicationInfo.shortApplicationVerName);
         Container cntp = getContentPane();

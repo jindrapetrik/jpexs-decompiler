@@ -2306,10 +2306,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void loadFromBinaryTag(final List<DefineBinaryDataTag> binaryDataTags) {
 
-        if (Main.loadingDialog == null || Main.loadingDialog.getOwner() == null) {
-            Main.loadingDialog = new LoadingDialog(mainFrame == null ? null : mainFrame.getWindow());
-        }
-        Main.loadingDialog.setVisible(true);
+        Main.getLoadingDialog().setVisible(true);
         Main.startWork(AppStrings.translate("work.reading.swf") + "...");
         new Thread() {
 
@@ -2322,7 +2319,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                                 @Override
                                 public void progress(int p) {
-                                    Main.loadingDialog.setPercent(p);
+                                    Main.getLoadingDialog().setPercent(p);
                                 }
                             }, Configuration.parallelSpeedUp.get());
                             bswf.fileTitle = "(SWF Data)";
@@ -2336,7 +2333,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     //ignore
                 }
 
-                Main.loadingDialog.setVisible(false);
+                Main.getLoadingDialog().setVisible(false);
                 Main.stopWork();
             }
 
