@@ -330,6 +330,10 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<Boolean> addCharacterIdToExportFileName = null;
+
     @ConfigurationCategory("import")
     public static final ConfigurationItem<TextImportResizeTextBoundsMode> textImportResizeTextBoundsMode = null;
 
