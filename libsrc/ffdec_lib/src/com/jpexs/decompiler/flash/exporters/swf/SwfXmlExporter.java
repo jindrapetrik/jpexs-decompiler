@@ -55,15 +55,13 @@ import org.w3c.dom.Node;
  */
 public class SwfXmlExporter {
 
-    public List<File> exportXml(SWF swf, String outdir) throws IOException {
-        final File file = new File(outdir + File.separator + Helper.makeFileName("swf.xml"));
-
+    public List<File> exportXml(SWF swf, File outFile) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document xmlDoc = docBuilder.newDocument();
             exportXml(swf, xmlDoc, xmlDoc);
-            try (Writer writer = new BufferedWriter(new Utf8OutputStreamWriter(new FileOutputStream(file)))) {
+            try (Writer writer = new BufferedWriter(new Utf8OutputStreamWriter(new FileOutputStream(outFile)))) {
                 writer.append(getXml(xmlDoc));
             }
         } catch (ParserConfigurationException ex) {
@@ -71,7 +69,7 @@ public class SwfXmlExporter {
         }
 
         List<File> ret = new ArrayList<>();
-        ret.add(file);
+        ret.add(outFile);
         return ret;
     }
 

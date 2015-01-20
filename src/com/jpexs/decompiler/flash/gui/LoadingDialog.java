@@ -106,7 +106,9 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                System.exit(0);
+                if (Main.shouldCloseWhenClosingLoadingDialog) {
+                    System.exit(0);
+                }
             }
         });
         pack();

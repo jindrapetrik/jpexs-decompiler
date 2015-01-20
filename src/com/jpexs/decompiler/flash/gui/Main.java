@@ -137,6 +137,8 @@ public class Main {
 
     public static DebugLogDialog debugDialog;
 
+    public static boolean shouldCloseWhenClosingLoadingDialog;
+
     public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
 
     private static ABCContainerTag getDebuggerABCTag(SWF swf) {
@@ -481,6 +483,8 @@ public class Main {
             }
 
             loadingDialog.setVisible(false);
+            shouldCloseWhenClosingLoadingDialog = false;
+
             final SWF fswf = firstSWF;
             View.execInEventDispatch(new Runnable() {
                 @Override
@@ -1044,10 +1048,13 @@ public class Main {
             initGui();
             showModeFrame();
         } else {
-            String fileToOpen = CommandLineArgumentParser.parseArguments(args);
-            if (fileToOpen != null) {
+            String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
+            if (filesToOpen != null && filesToOpen.length > 0) {
                 initGui();
-                openFile(fileToOpen, null);
+                shouldCloseWhenClosingLoadingDialog = true;
+                for (String fileToOpen : filesToOpen) {
+                    openFile(fileToOpen, null);
+                }
             }
         }
     }

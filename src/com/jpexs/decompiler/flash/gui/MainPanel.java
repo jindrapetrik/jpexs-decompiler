@@ -1698,7 +1698,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 final String selFile = selectExportDir();
                 if (selFile != null) {
                     try {
-                        new SwfXmlExporter().exportXml(swf, selFile);
+                        File outFile = new File(selFile + File.separator + Helper.makeFileName("swf.xml"));
+                        new SwfXmlExporter().exportXml(swf, outFile);
                         Main.stopWork();
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
