@@ -1139,7 +1139,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 logger.log(Level.SEVERE, "Error during ABC export", ex);
             }
         } else {
-            ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
+            ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
                 Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, exportMode, parallel));

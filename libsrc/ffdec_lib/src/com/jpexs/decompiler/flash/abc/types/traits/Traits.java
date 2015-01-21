@@ -169,7 +169,7 @@ public class Traits implements Serializable {
                 task.call();
             }
         } else {
-            ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
+            ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<Void>> futureResults = null;
 
             futureResults = new ArrayList<>();

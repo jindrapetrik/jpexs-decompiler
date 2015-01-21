@@ -1059,7 +1059,7 @@ public class SWFInputStream implements AutoCloseable {
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
-            executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
+            executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             futureResults = new ArrayList<>();
         }
         List<Tag> tags = new ArrayList<>();

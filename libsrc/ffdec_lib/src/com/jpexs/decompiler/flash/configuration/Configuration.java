@@ -690,6 +690,15 @@ public class Configuration {
         return ret;
     }
 
+    public static int getParallelThreadCount() {
+        int count = parallelThreadCount.get();
+        if (count < 2) {
+            count = 2;
+        }
+
+        return count;
+    }
+
     public static File getFlashLibPath() {
         String home = getFFDecHome();
         File libsdir = new File(home + "flashlib");

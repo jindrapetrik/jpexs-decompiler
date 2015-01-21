@@ -87,7 +87,7 @@ public class FolderPreviewPanel extends JPanel {
 
     static {
         noImage.fillTransparent();
-        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
+        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.getParallelThreadCount() : 1);
     }
 
     public FolderPreviewPanel(final MainPanel mainPanel, List<TreeItem> items) {
@@ -156,7 +156,7 @@ public class FolderPreviewPanel extends JPanel {
     public synchronized void setItems(List<TreeItem> items) {
         this.items = items;
         executor.shutdownNow();
-        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
+        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.getParallelThreadCount() : 1);
         cachedPreviews.clear();
         revalidate();
         repaint();
