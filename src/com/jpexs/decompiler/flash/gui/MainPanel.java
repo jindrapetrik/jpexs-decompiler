@@ -80,6 +80,8 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -971,6 +973,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     continue;
                 }
 
+                if (d instanceof TagScript) {
+                    Tag tag = ((TagScript) d).getTag();
+                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        as12scripts.add(d);
+                    }
+                }
+
                 if (d instanceof Tag || d instanceof ASMSource) {
                     TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                     if (nodeType == TreeNodeType.IMAGE) {
@@ -1068,8 +1077,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private static void getASMs(TagTreeModel ttm, TreeItem node, List<TreeItem> nodesToExport, boolean exportAll, List<ASMSource> asmsToExport) throws IOException {
         boolean exportNode = nodesToExport.contains(node);
-        if (node instanceof ASMSource && (exportAll || exportNode)) {
-            asmsToExport.add((ASMSource) node);
+        TreeItem realNode = node instanceof TagScript ? ((TagScript) node).getTag() : node;
+        if (realNode instanceof ASMSource && (exportAll || exportNode)) {
+            asmsToExport.add((ASMSource) realNode);
         }
         int childCount = ttm.getChildCount(node);
         for (int i = 0; i < childCount; i++) {

@@ -474,6 +474,13 @@ public class TagTree extends JTree {
                 continue;
             }
 
+            if (d instanceof TagScript) {
+                Tag tag = ((TagScript) d).getTag();
+                if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                    d = tag;
+                }
+            }
+
             if (d instanceof Tag || d instanceof ASMSource) {
                 TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                 if (nodeType == TreeNodeType.IMAGE) {
