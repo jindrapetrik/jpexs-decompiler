@@ -1069,7 +1069,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
                 List<ASMSource> asmsToExport = new ArrayList<>();
                 getASMs(ttm, ttm.getScriptsNode(swf), as12scripts, false, asmsToExport);
-                ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, selFile, asmsToExport, scriptMode, null));
+                ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, selFile + File.separator + "scripts", asmsToExport, scriptMode, null));
             }
         }
         return ret;

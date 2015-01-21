@@ -163,11 +163,12 @@ public class CommandLineArgumentParser {
         out.println("        shape - Shapes (Default format: SVG)");
         out.println("   morphshape - MorphShapes (Default format: SVG)");
         out.println("        movie - Movies (Default format: FLV without sound)");
+        out.println("        font - Fonts (Default format: TTF)");
         out.println("        frame - Frames (Default format: PNG)");
         out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
         out.println("        binaryData - Binary data (Default format:  Raw data)");
-        out.println("        text - Texts (Default format: Formatted text)");
-        out.println("        all - Every resource");
+        out.println("        text - Texts (Default format: Plain text)");
+        out.println("        all - Every resource (but not FLA and XFL)");
         out.println("        fla - Everything to FLA compressed format");
         out.println("        xfl - Everything to uncompressed FLA format (XFL)");
         out.println("   You can export multiple types of items by using colon \",\"");
@@ -185,7 +186,8 @@ public class CommandLineArgumentParser {
         out.println("         script:hex - ActionScript Hex only");
         out.println("         shape:svg - SVG format for Shapes");
         out.println("         shape:png - PNG format for Shapes");
-        out.println("         shape:canvas - HTML5 Canvas  format for Shapes");
+        out.println("         shape:canvas - HTML5 Canvas format for Shapes");
+        out.println("         shape:bmp - BMP format for Shapes");
         out.println("         morphshape:svg - SVG format for MorphShapes");
         out.println("         morphshape:canvas - HTML5 Canvas  format for MorphShapes");
         out.println("         frame:png - PNG format for Frames");
@@ -193,15 +195,20 @@ public class CommandLineArgumentParser {
         out.println("         frame:avi - AVI format for Frames");
         out.println("         frame:canvas - HTML5 Canvas format for Frames");
         out.println("         frame:pdf - PDF format for Frames");
+        out.println("         frame:bmp - BMP format for Frames");
         out.println("         image:png_jpeg - PNG/JPEG format for Images");
         out.println("         image:png - PNG format for Images");
         out.println("         image:jpeg - JPEG format for Images");
+        out.println("         image:bmp - BMP format for Images");
         out.println("         text:plain - Plain text format for Texts");
         out.println("         text:formatted - Formatted text format for Texts");
+        out.println("         text:svg - SVG format for Texts");
         out.println("         sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds");
         out.println("         sound:mp3_wav - MP3/WAV format for Sounds");
         out.println("         sound:wav - WAV format for Sounds");
         out.println("         sound:flv - FLV format for Sounds");
+        out.println("         font:ttf - TTF format for Fonts");
+        out.println("         font:woff - WOFF format for Fonts");
         out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
         out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
 
@@ -527,19 +534,6 @@ public class CommandLineArgumentParser {
         return bValue;
     }
 
-    private static ScriptExportMode strToExportFormat(String exportFormatStr) {
-        switch (exportFormatStr) {
-            case "pcode":
-                return ScriptExportMode.PCODE;
-            case "pcodehex":
-                return ScriptExportMode.PCODE_HEX;
-            case "hex":
-                return ScriptExportMode.HEX;
-            default:
-                return ScriptExportMode.AS;
-        }
-    }
-
     private static void parseConfig(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("Config values expected");
@@ -833,14 +827,14 @@ public class CommandLineArgumentParser {
             "shape",
             "morphshape",
             "movie",
+            "font",
+            "frame",
             "sound",
             "binarydata",
             "text",
             "all",
-            "frame",
             "fla",
-            "xfl",
-            "font"
+            "xfl"
         };
 
         String[] removedExportFormats = new String[]{
@@ -859,12 +853,7 @@ public class CommandLineArgumentParser {
             handler = new ConsoleAbortRetryIgnoreHandler(AbortRetryIgnoreHandler.UNDEFINED, 0);
         }
         String exportFormatString = args.pop().toLowerCase();
-        String exportFormats[];
-        if (exportFormatString.contains(",")) {
-            exportFormats = exportFormatString.split(",");
-        } else {
-            exportFormats = new String[]{exportFormatString};
-        }
+        List<String> exportFormats = Arrays.asList(exportFormatString.split(","));
         long startTime = System.currentTimeMillis();
 
         File outDirBase = new File(args.pop());
@@ -931,150 +920,108 @@ public class CommandLineArgumentParser {
                     }
                 });
 
+                // First check all the specified eport formats
                 for (String exportFormat : exportFormats) {
-                    if (!Arrays.asList(validExportItems).contains(exportFormat) && !Arrays.asList(removedExportFormats).contains(exportFormat)) {
-                        System.err.println("Invalid export item:" + exportFormat);
-                        badArguments();
-                    }
                     if (Arrays.asList(removedExportFormats).contains(exportFormat)) {
                         System.err.println("Error: Export format : " + exportFormat + " was REMOVED. Run application with --help parameter to see available formats.");
                         System.exit(1);
+                    } else if (!Arrays.asList(validExportItems).contains(exportFormat)) {
+                        System.err.println("Invalid export item:" + exportFormat);
+                        badArguments();
                     }
+                }
 
-                    commandLineMode = true;
+                // Here the exportFormats array should contain only validitems
+                commandLineMode = true;
+                boolean exportAll = exportFormats.contains("all");
+                boolean multipleExportTypes = exportAll || exportFormats.size() > 1;
 
-                    switch (exportFormat) {
-                        case "all": {
-                            ScriptExportMode allExportMode = ScriptExportMode.AS;
-                            if (!exportFormat.equals("all")) {
-                                allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
-                            } else if (formats.containsKey("script")) {
-                                allExportMode = strToExportFormat(formats.get("script"));
-                            }
-                            System.out.println("Exporting images...");
-                            new ImageExporter().exportImages(handler, outDir + File.separator + "images", extags, new ImageExportSettings(ImageExportMode.PNG_JPEG));
-                            System.out.println("Exporting shapes...");
-                            new ShapeExporter().exportShapes(handler, outDir + File.separator + "shapes", extags, new ShapeExportSettings(ShapeExportMode.SVG, zoom));
-                            System.out.println("Exporting morphshapes...");
-                            new MorphShapeExporter().exportMorphShapes(handler, outDir + File.separator + "morphshapes", extags, new MorphShapeExportSettings(MorphShapeExportMode.SVG, zoom));
-                            System.out.println("Exporting scripts...");
-                            exfile.exportActionScript(handler, outDir + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
-                            System.out.println("Exporting movies...");
-                            new MovieExporter().exportMovies(handler, outDir + File.separator + "movies", extags, new MovieExportSettings(MovieExportMode.FLV));
-                            System.out.println("Exporting sounds...");
-                            new SoundExporter().exportSounds(handler, outDir + File.separator + "sounds", extags, new SoundExportSettings(SoundExportMode.MP3_WAV_FLV));
-                            System.out.println("Exporting binaryData...");
-                            new BinaryDataExporter().exportBinaryData(handler, outDir + File.separator + "binaryData", extags, new BinaryDataExportSettings(BinaryDataExportMode.RAW));
-                            System.out.println("Exporting texts...");
+                if (exportAll || exportFormats.contains("image")) {
+                    System.out.println("Exporting images...");
+                    new ImageExporter().exportImages(handler, outDir + (multipleExportTypes ? File.separator + "images" : ""), extags, new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)));
+                }
 
-                            String allTextFormat = formats.get("text");
-                            if (allTextFormat == null) {
-                                allTextFormat = "formatted";
-                            }
-                            Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
-                            if (singleTextFile == null) {
-                                singleTextFile = Configuration.textExportSingleFile.get();
-                            }
-                            new TextExporter().exportTexts(handler, outDir + File.separator + "texts", extags, new TextExportSettings(allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN, singleTextFile, zoom));
-                        }
-                        break;
-                        case "image": {
-                            System.out.println("Exporting images...");
-                            new ImageExporter().exportImages(handler, outDir + (exportFormats.length > 1 ? File.separator + "images" : ""), extags, new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)));
-                        }
-                        break;
-                        case "shape": {
-                            System.out.println("Exporting shapes...");
-                            new ShapeExporter().exportShapes(handler, outDir + (exportFormats.length > 1 ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom));
-                        }
-                        break;
-                        case "morphshape": {
-                            System.out.println("Exporting morphshapes...");
-                            new MorphShapeExporter().exportMorphShapes(handler, outDir + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom));
-                        }
-                        break;
-                        case "script": {
-                            System.out.println("Exporting scripts...");
-                            boolean parallel = Configuration.parallelSpeedUp.get();
-                            if (as3classes.isEmpty()) {
-                                as3classes = parseSelectClassOld(args);
-                            }
-                            if (!as3classes.isEmpty()) {
-                                for (String as3class : as3classes) {
-                                    exportOK = exportOK && exfile.exportAS3Class(as3class, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel);
-                                }
-                            } else {
-                                exportOK = exportOK && exfile.exportActionScript(handler, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel) != null;
-                            }
-                        }
-                        break;
-                        case "movie": {
-                            System.out.println("Exporting movies...");
-                            new MovieExporter().exportMovies(handler, outDir + (exportFormats.length > 1 ? File.separator + "movies" : ""), extags,
-                                    new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)));
-                        }
-                        break;
-                        case "font": {
-                            System.out.println("Exporting fonts...");
-                            new FontExporter().exportFonts(handler, outDir + (exportFormats.length > 1 ? File.separator + "fonts" : ""), extags,
-                                    new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)));
-                        }
-                        break;
-                        case "frame": {
-                            System.out.println("Exporting frames...");
-                            List<Integer> frames = new ArrayList<>();
-                            for (int i = 0; i < exfile.frameCount; i++) {
-                                if (selection.contains(i + 1)) {
-                                    frames.add(i);
-                                }
-                            }
-                            exfile.exportFrames(handler, outDir + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, frames,
-                                    new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom));
-                        }
-                        break;
-                        case "sound": {
-                            System.out.println("Exporting sounds...");
-                            new SoundExporter().exportSounds(handler, outDir + (exportFormats.length > 1 ? File.separator + "sounds" : ""), extags,
-                                    new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)));
-                        }
-                        break;
-                        case "binarydata": {
-                            System.out.println("Exporting binaryData...");
-                            new BinaryDataExporter().exportBinaryData(handler, outDir + (exportFormats.length > 1 ? File.separator + "binaryData" : ""), extags,
-                                    new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)));
-                        }
-                        break;
-                        case "text": {
-                            System.out.println("Exporting texts...");
-                            Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
-                            if (singleTextFile == null) {
-                                singleTextFile = Configuration.textExportSingleFile.get();
-                            }
-                            new TextExporter().exportTexts(handler, outDir + (exportFormats.length > 1 ? File.separator + "texts" : ""), extags,
-                                    new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom));
-                        }
-                        break;
-                        case "fla": {
-                            System.out.println("Exporting FLA...");
-                            FLAVersion flaVersion = FLAVersion.fromString(formats.get("fla"));
-                            if (flaVersion == null) {
-                                flaVersion = FLAVersion.CS6; //Defaults to CS6
-                            }
-                            exfile.exportFla(handler, outDir + (exportFormats.length > 1 ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
-                        }
-                        break;
-                        case "xfl": {
-                            System.out.println("Exporting XFL...");
-                            FLAVersion xflVersion = FLAVersion.fromString(formats.get("xfl"));
-                            if (xflVersion == null) {
-                                xflVersion = FLAVersion.CS6; //Defaults to CS6
-                            }
-                            exfile.exportXfl(handler, outDir + (exportFormats.length > 1 ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
-                        }
-                        break;
-                        default:
-                            exportOK = false;
+                if (exportAll || exportFormats.contains("shape")) {
+                    System.out.println("Exporting shapes...");
+                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom));
+                }
+
+                if (exportAll || exportFormats.contains("morphshape")) {
+                    System.out.println("Exporting morphshapes...");
+                    new MorphShapeExporter().exportMorphShapes(handler, outDir + (multipleExportTypes ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom));
+                }
+
+                if (exportAll || exportFormats.contains("movie")) {
+                    System.out.println("Exporting movies...");
+                    new MovieExporter().exportMovies(handler, outDir + (multipleExportTypes ? File.separator + "movies" : ""), extags, new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)));
+                }
+
+                if (exportAll || exportFormats.contains("font")) {
+                    System.out.println("Exporting fonts...");
+                    new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + "fonts" : ""), extags, new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)));
+                }
+
+                if (exportAll || exportFormats.contains("sound")) {
+                    System.out.println("Exporting sounds...");
+                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + "sounds" : ""), extags, new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)));
+                }
+
+                if (exportAll || exportFormats.contains("binarydata")) {
+                    System.out.println("Exporting binaryData...");
+                    new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + "binaryData" : ""), extags, new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)));
+                }
+
+                if (exportAll || exportFormats.contains("text")) {
+                    System.out.println("Exporting texts...");
+                    Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
+                    if (singleTextFile == null) {
+                        singleTextFile = Configuration.textExportSingleFile.get();
                     }
+                    new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + "texts" : ""), extags, new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom));
+                }
+
+                if (exportAll || exportFormats.contains("frame")) {
+                    System.out.println("Exporting frames...");
+                    List<Integer> frames = new ArrayList<>();
+                    for (int i = 0; i < exfile.frameCount; i++) {
+                        if (selection.contains(i + 1)) {
+                            frames.add(i);
+                        }
+                    }
+                    exfile.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + "frames" : ""), 0, frames, new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom));
+                }
+
+                if (exportAll || exportFormats.contains("script")) {
+                    System.out.println("Exporting scripts...");
+                    boolean parallel = Configuration.parallelSpeedUp.get();
+                    if (as3classes.isEmpty()) {
+                        as3classes = parseSelectClassOld(args);
+                    }
+                    if (!as3classes.isEmpty()) {
+                        for (String as3class : as3classes) {
+                            exportOK = exportOK && exfile.exportAS3Class(as3class, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel);
+                        }
+                    } else {
+                        exportOK = exportOK && exfile.exportActionScript(handler, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel) != null;
+                    }
+                }
+
+                if (exportFormats.contains("fla")) {
+                    System.out.println("Exporting FLA...");
+                    FLAVersion flaVersion = FLAVersion.fromString(formats.get("fla"));
+                    if (flaVersion == null) {
+                        flaVersion = FLAVersion.CS6; //Defaults to CS6
+                    }
+                    exfile.exportFla(handler, outDir + (multipleExportTypes ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
+                }
+
+                if (exportFormats.contains("xfl")) {
+                    System.out.println("Exporting XFL...");
+                    FLAVersion xflVersion = FLAVersion.fromString(formats.get("xfl"));
+                    if (xflVersion == null) {
+                        xflVersion = FLAVersion.CS6; //Defaults to CS6
+                    }
+                    exfile.exportXfl(handler, outDir + (multipleExportTypes ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
                 }
             }
         } catch (OutOfMemoryError | Exception ex) {
