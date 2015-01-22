@@ -249,7 +249,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             SWF swf = mainPanel.getCurrentSwf();
-            Map<String, ASMSource> asms = swf.getASMs();
+            Map<String, ASMSource> asms = swf.getASMs(false);
             final List<ActionSearchResult> found = new ArrayList<>();
             Pattern pat;
             if (regexp) {

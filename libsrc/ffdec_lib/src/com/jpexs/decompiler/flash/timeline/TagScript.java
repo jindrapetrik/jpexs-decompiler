@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class TagScript implements TreeItem {
+public class TagScript implements TreeItem, Exportable {
 
     private final SWF swf;
 
@@ -55,5 +56,24 @@ public class TagScript implements TreeItem {
     @Override
     public String toString() {
         return tag.toString();
+    }
+
+    @Override
+    public String getExportFileName() {
+        return tag.getExportFileName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TagScript) {
+            return tag.equals(((TagScript) obj).getTag());
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return tag.hashCode();
     }
 }

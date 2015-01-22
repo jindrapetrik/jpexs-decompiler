@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -44,7 +43,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource, Exportable, Serializable {
+public class BUTTONCONDACTION implements ASMSource, Serializable {
 
     private final SWF swf;
 

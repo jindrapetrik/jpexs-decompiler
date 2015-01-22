@@ -254,50 +254,7 @@ public class TagTreeModel implements TreeModel {
                 nodeList.add(new ClassesListTreeModel(swf));
             }
         } else {
-            List<TreeItem> subNodes = new ArrayList<>();
-            List<TreeItem> subFrames = new ArrayList<>();
-            subNodes.addAll(timeline.getAS2RootPackage().subPackages.values());
-            subNodes.addAll(timeline.getAS2RootPackage().scripts.values());
-
-            for (Tag tag : timeline.otherTags) {
-                boolean hasInnerFrames = false;
-                List<TreeItem> tagSubNodes = new ArrayList<>();
-                if (tag instanceof Timelined) {
-                    Timeline timeline2 = ((Timelined) tag).getTimeline();
-                    for (Frame frame : timeline2.getFrames()) {
-                        if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
-                            FrameScript frameScript = new FrameScript(swf, frame);
-                            tagSubNodes.add(frameScript);
-                            hasInnerFrames = true;
-                        }
-                    }
-                }
-
-                if (tag instanceof ASMSourceContainer) {
-                    for (ASMSource asm : ((ASMSourceContainer) tag).getSubItems()) {
-                        tagSubNodes.add(asm);
-                    }
-                }
-
-                if (!tagSubNodes.isEmpty()) {
-                    TagScript ts = new TagScript(swf, tag, tagSubNodes);
-                    tagScriptCache.put(tag, ts);
-                    if (hasInnerFrames) {
-                        subFrames.add(ts);
-                    } else {
-                        subNodes.add(ts);
-                    }
-                }
-            }
-
-            subNodes.addAll(subFrames);
-
-            for (Frame frame : timeline.getFrames()) {
-                if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
-                    FrameScript frameScript = new FrameScript(swf, frame);
-                    subNodes.add(frameScript);
-                }
-            }
+            List<TreeItem> subNodes = swf.getFirstLevelASMNodes(tagScriptCache);
 
             if (subNodes.size() > 0) {
                 TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);

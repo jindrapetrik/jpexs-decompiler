@@ -17,13 +17,14 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class FrameScript implements TreeItem {
+public class FrameScript implements TreeItem, Exportable {
 
     private final SWF swf;
 
@@ -46,5 +47,10 @@ public class FrameScript implements TreeItem {
     @Override
     public String toString() {
         return frame.toString();
+    }
+
+    @Override
+    public String getExportFileName() {
+        return frame.getExportFileName();
     }
 }

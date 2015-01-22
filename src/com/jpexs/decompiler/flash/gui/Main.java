@@ -1036,6 +1036,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
 
+        //args = new String[]{"-export", "script", "C:\\Projects\\FFDec\\FFDec\\exp", "C:\\Projects\\FFDec\\FFDec\\ATG_-_Reconstruction.v1696.swf"};
         clearTemp();
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {

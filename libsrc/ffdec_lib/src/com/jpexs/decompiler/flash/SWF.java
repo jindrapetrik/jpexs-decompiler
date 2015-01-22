@@ -58,29 +58,13 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
-import com.jpexs.decompiler.flash.exporters.FontExporter;
-import com.jpexs.decompiler.flash.exporters.ImageExporter;
-import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
-import com.jpexs.decompiler.flash.exporters.MovieExporter;
-import com.jpexs.decompiler.flash.exporters.ShapeExporter;
-import com.jpexs.decompiler.flash.exporters.SoundExporter;
-import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
-import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
@@ -110,6 +94,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -120,10 +105,13 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.SvgClip;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -1105,13 +1093,13 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     private List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
-        Map<String, ASMSource> asms = getASMs();
 
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, asms.values(), exportMode, evl));
+
+        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportMode, evl));
         return ret;
     }
 
@@ -1171,9 +1159,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
-        List<File> ret = new ArrayList<>();
-        final EventListener evl = new EventListener() {
+    public EventListener getExportEventListener() {
+        EventListener evl = new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
                 if (event.equals("exporting") || event.equals("exported")) {
@@ -1181,6 +1168,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             }
         };
+
+        return evl;
+    }
+
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel) throws IOException {
+        List<File> ret = new ArrayList<>();
+        final EventListener evl = getExportEventListener();
 
         if (isAS3()) {
             ret.addAll(exportActionScript3(handler, outdir, exportMode, parallel));
@@ -1190,37 +1184,130 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public Map<String, ASMSource> getASMs() {
-        Map<String, ASMSource> asms = new HashMap<>();
-        getASMs("", tags, asms);
-        return asms;
+    public Map<String, ASMSource> getASMs(boolean exportFileNames) {
+        return getASMs(exportFileNames, new ArrayList<TreeItem>(), true);
     }
 
-    private static void getASMs(String path, List<Tag> items, Map<String, ASMSource> asms) {
-        for (Tag t : items) {
-            String subPath = path + "/" + t.toString();
-            if (t instanceof ASMSource) {
-                addASM(asms, (ASMSource) t, subPath);
+    public Map<String, ASMSource> getASMs(boolean exportFileNames, List<TreeItem> nodesToExport, boolean exportAll) {
+        Map<String, ASMSource> asmsToExport = new HashMap<>();
+        for (TreeItem treeItem : getFirstLevelASMNodes(null)) {
+            getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport, File.separator + getASMPath(exportFileNames, treeItem));
+        }
+
+        return asmsToExport;
+    }
+
+    private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String path) {
+        boolean exportNode = nodesToExport.contains(treeItem);
+        TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
+        if (realItem instanceof ASMSource && (exportAll || exportNode)) {
+            String npath = path;
+            int ppos = 1;
+            while (asmsToExport.containsKey(npath)) {
+                ppos++;
+                npath = path + (exportFileNames ? "[" + ppos + "]" : "_" + ppos);
             }
-            if (t instanceof ASMSourceContainer) {
-                for (ASMSource asm : ((ASMSourceContainer) t).getSubItems()) {
-                    addASM(asms, asm, subPath + "/" + asm.toString());
+            asmsToExport.put(npath, (ASMSource) realItem);
+        }
+
+        if (treeItem instanceof TagScript) {
+            TagScript tagScript = (TagScript) treeItem;
+            for (TreeItem subItem : tagScript.getFrames()) {
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+            }
+        } else if (treeItem instanceof FrameScript) {
+            FrameScript frameScript = (FrameScript) treeItem;
+            Frame parentFrame = frameScript.getFrame();
+            for (TreeItem subItem : parentFrame.actionContainers) {
+                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+            }
+            for (TreeItem subItem : parentFrame.actions) {
+                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+            }
+        }
+    }
+
+    private String getASMPath(boolean exportFileName, TreeItem treeItem) {
+        if (!exportFileName) {
+            return treeItem.toString();
+        }
+
+        String result;
+        if (treeItem instanceof Exportable) {
+            result = ((Exportable) treeItem).getExportFileName();
+        } else {
+            result = treeItem.toString();
+        }
+
+        return Helper.makeFileName(result);
+    }
+
+    private TreeItem getASMWrapToTagScript(TreeItem treeItem) {
+        if (treeItem instanceof Tag) {
+            Tag resultTag = (Tag) treeItem;
+            List<TreeItem> subNodes = new ArrayList<>();
+            if (treeItem instanceof ASMSourceContainer) {
+                for (ASMSource item : ((ASMSourceContainer) treeItem).getSubItems()) {
+                    subNodes.add(item);
                 }
             }
-            if (t instanceof DefineSpriteTag) {
-                getASMs(subPath, ((DefineSpriteTag) t).getSubTags(), asms);
-            }
+
+            TagScript tagScript = new TagScript(treeItem.getSwf(), resultTag, subNodes);
+            return tagScript;
         }
+
+        return treeItem;
     }
 
-    private static void addASM(Map<String, ASMSource> asms, ASMSource asm, String path) {
-        String npath = path;
-        int ppos = 1;
-        while (asms.containsKey(npath)) {
-            ppos++;
-            npath = path + "[" + ppos + "]";
+    public List<TreeItem> getFirstLevelASMNodes(Map<Tag, TagScript> tagScriptCache) {
+        Timeline timeline = getTimeline();
+        List<TreeItem> subNodes = new ArrayList<>();
+        List<TreeItem> subFrames = new ArrayList<>();
+        subNodes.addAll(timeline.getAS2RootPackage().subPackages.values());
+        subNodes.addAll(timeline.getAS2RootPackage().scripts.values());
+
+        for (Tag tag : timeline.otherTags) {
+            boolean hasInnerFrames = false;
+            List<TreeItem> tagSubNodes = new ArrayList<>();
+            if (tag instanceof Timelined) {
+                Timeline timeline2 = ((Timelined) tag).getTimeline();
+                for (Frame frame : timeline2.getFrames()) {
+                    if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
+                        FrameScript frameScript = new FrameScript(this, frame);
+                        tagSubNodes.add(frameScript);
+                        hasInnerFrames = true;
+                    }
+                }
+            }
+
+            if (tag instanceof ASMSourceContainer) {
+                for (ASMSource asm : ((ASMSourceContainer) tag).getSubItems()) {
+                    tagSubNodes.add(asm);
+                }
+            }
+
+            if (!tagSubNodes.isEmpty()) {
+                TagScript ts = new TagScript(this, tag, tagSubNodes);
+                if (tagScriptCache != null) {
+                    tagScriptCache.put(tag, ts);
+                }
+                if (hasInnerFrames) {
+                    subFrames.add(ts);
+                } else {
+                    subNodes.add(ts);
+                }
+            }
         }
-        asms.put(npath, asm);
+
+        subNodes.addAll(subFrames);
+        for (Frame frame : timeline.getFrames()) {
+            if (!frame.actions.isEmpty() || !frame.actionContainers.isEmpty()) {
+                FrameScript frameScript = new FrameScript(this, frame);
+                subNodes.add(frameScript);
+            }
+        }
+
+        return subNodes;
     }
 
     private final HashSet<EventListener> listeners = new HashSet<>();
@@ -1272,18 +1359,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                 populateVideoFrames(streamId, ((DefineSpriteTag) t).getSubTags(), output);
             }
         }
-    }
-
-    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportSettings settings) throws IOException {
-        new MovieExporter().exportMovies(handler, outdir, tags, settings);
-    }
-
-    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportSettings settings) throws IOException {
-        new SoundExporter().exportSounds(handler, outdir, tags, settings);
-    }
-
-    public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportSettings settings) throws IOException {
-        new FontExporter().exportFonts(handler, outdir, tags, settings);
     }
 
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
@@ -1699,26 +1774,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         return ret;
-    }
-
-    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportSettings settings) throws IOException {
-        new TextExporter().exportTexts(handler, outdir, tags, settings);
-    }
-
-    public void exportImages(AbortRetryIgnoreHandler handler, String outdir, ImageExportSettings settings) throws IOException {
-        new ImageExporter().exportImages(handler, outdir, tags, settings);
-    }
-
-    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportSettings settings) throws IOException {
-        new ShapeExporter().exportShapes(handler, outdir, tags, settings);
-    }
-
-    public void exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, MorphShapeExportSettings settings) throws IOException {
-        new MorphShapeExporter().exportMorphShapes(handler, outdir, tags, settings);
-    }
-
-    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportSettings settings) throws IOException {
-        new BinaryDataExporter().exportBinaryData(handler, outdir, tags, settings);
     }
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {

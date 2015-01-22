@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -32,7 +33,7 @@ import java.util.TreeMap;
  *
  * @author JPEXS
  */
-public class Frame implements TreeItem {
+public class Frame implements TreeItem, Exportable {
 
     public final int frame;
 
@@ -80,5 +81,10 @@ public class Frame implements TreeItem {
     @Override
     public String toString() {
         return "frame " + (frame + 1);
+    }
+
+    @Override
+    public String getExportFileName() {
+        return "frame_" + (frame + 1);
     }
 }

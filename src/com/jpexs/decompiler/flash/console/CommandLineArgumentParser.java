@@ -1406,7 +1406,7 @@ public class CommandLineArgumentParser {
                             System.exit(1);
                         }
                     } else {
-                        Map<String, ASMSource> asms = swf.getASMs();
+                        Map<String, ASMSource> asms = swf.getASMs(false);
                         boolean found = false;
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
@@ -1590,7 +1590,7 @@ public class CommandLineArgumentParser {
         try {
             try (FileInputStream is = new FileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
-                Map<String, ASMSource> asms = swf.getASMs();
+                Map<String, ASMSource> asms = swf.getASMs(false);
                 for (String as2 : asms.keySet()) {
                     System.out.println(as2);
                 }

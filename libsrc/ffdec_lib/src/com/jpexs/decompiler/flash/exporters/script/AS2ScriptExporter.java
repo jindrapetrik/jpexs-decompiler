@@ -22,11 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
-import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -34,11 +30,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +47,7 @@ import java.util.logging.Logger;
  */
 public class AS2ScriptExporter {
 
-    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Collection<ASMSource> asms, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
+    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
@@ -68,7 +62,7 @@ public class AS2ScriptExporter {
         return new ArrayList<>();
     }
 
-    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Collection<ASMSource> asms, ScriptExportMode exportMode, EventListener ev) throws IOException {
+    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportMode exportMode, EventListener ev) throws IOException {
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
@@ -76,8 +70,9 @@ public class AS2ScriptExporter {
 
         Map<String, List<String>> existingNamesMap = new HashMap<>();
         AtomicInteger cnt = new AtomicInteger(1);
-        for (ASMSource asm : asms) {
-            String currentOutDir = outdir + getFilePath(asm) + File.separator;
+        for (String key : asms.keySet()) {
+            ASMSource asm = asms.get(key);
+            String currentOutDir = outdir + key + File.separator;
             currentOutDir = new File(currentOutDir).getParentFile().toString() + File.separator;
 
             List<String> existingNames = existingNamesMap.get(currentOutDir);
@@ -172,45 +167,5 @@ public class AS2ScriptExporter {
         } while (retry);
 
         return null;
-    }
-
-    // todo: honfika: get the path from the tree
-    private String getFilePath(ASMSource asm) {
-        if (asm instanceof DoInitActionTag) {
-            String exportName = ((DoInitActionTag) asm).getExportName();
-
-            if (exportName != null) {
-                String path = "";
-                StringTokenizer st = new StringTokenizer(exportName, ".");
-                while (st.hasMoreTokens()) {
-                    String pathElement = st.nextToken();
-                    if (path.length() > 0) {
-                        path += File.separator;
-                    }
-
-                    path += Helper.makeFileName(pathElement);
-                }
-
-                return path;
-            }
-        }
-
-        if (!(asm instanceof Tag)) {
-            return Helper.makeFileName(asm.getSourceTag().getExportFileName()) + File.separator + Helper.makeFileName(asm.getExportFileName());
-        } else {
-            String result = "";
-            Timelined timelined = asm.getSourceTag().getTimelined();
-            if (timelined instanceof Tag) {
-                result += Helper.makeFileName(((Tag) timelined).getExportFileName()) + File.separator;
-            }
-
-            Timeline timeline = timelined.getTimeline();
-            int frame = timeline.getFrameForAction(asm);
-            if (frame != -1) {
-                result += "frame_" + (frame + 1) + File.separator;
-            }
-
-            return result + Helper.makeFileName(asm.getExportFileName());
-        }
     }
 }
