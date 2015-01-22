@@ -110,7 +110,7 @@ public class RecompileTest {
                     }
                 }
             } else {
-                Map<String, ASMSource> asms = swf.getASMs();
+                Map<String, ASMSource> asms = swf.getASMs(false);
 
                 for (ASMSource asm : asms.values()) {
                     try {
