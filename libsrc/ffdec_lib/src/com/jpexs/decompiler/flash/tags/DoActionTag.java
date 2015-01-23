@@ -118,16 +118,6 @@ public class DoActionTag extends Tag implements ASMSource {
         return true;
     }
 
-    /**
-     * Returns string representation of the object
-     *
-     * @return String representation of the object
-     */
-    @Override
-    public String toString() {
-        return "DoAction";
-    }
-
     @Override
     public ActionList getActions() throws InterruptedException {
         try {

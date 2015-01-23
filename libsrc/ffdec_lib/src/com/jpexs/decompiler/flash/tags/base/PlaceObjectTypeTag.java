@@ -1,26 +1,29 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,41 +31,53 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface PlaceObjectTypeTag {
+public abstract class PlaceObjectTypeTag extends CharacterIdTag {
 
-    public int getCharacterId();
+    public PlaceObjectTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
+        super(swf, id, name, data);
+    }
 
-    public int getDepth();
+    public abstract int getDepth();
 
-    public MATRIX getMatrix();
+    public abstract MATRIX getMatrix();
 
-    public String getInstanceName();
+    public abstract String getInstanceName();
 
-    public void setInstanceName(String name);
+    public abstract void setInstanceName(String name);
 
-    public void setClassName(String className);
+    public abstract void setClassName(String className);
 
-    public ColorTransform getColorTransform();
+    public abstract ColorTransform getColorTransform();
 
-    public int getBlendMode();
+    public abstract int getBlendMode();
 
-    public List<FILTER> getFilters();
+    public abstract List<FILTER> getFilters();
 
-    public int getClipDepth();
+    public abstract int getClipDepth();
 
-    public String getClassName();
+    public abstract String getClassName();
 
-    public boolean cacheAsBitmap();
+    public abstract boolean cacheAsBitmap();
 
-    public boolean isVisible();
+    public abstract boolean isVisible();
 
-    public RGBA getBackgroundColor();
+    public abstract RGBA getBackgroundColor();
 
-    public boolean flagMove();
+    public abstract boolean flagMove();
 
-    public int getRatio();
+    public abstract int getRatio();
 
-    public CLIPACTIONS getClipActions();
+    public abstract CLIPACTIONS getClipActions();
 
-    public void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
+    public abstract void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
+
+    @Override
+    public String getName() {
+        return super.getName() + " Depth: " + getDepth();
+    }
+
+    @Override
+    public String getExportFileName() {
+        return super.getExportFileName() + "_" + getDepth();
+    }
 }

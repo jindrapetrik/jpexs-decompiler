@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -52,7 +51,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObject4Tag extends CharacterIdTag implements ASMSourceContainer, PlaceObjectTypeTag {
+public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceContainer {
 
     /**
      * @since SWF 5 has clip actions (sprite characters only)
@@ -543,11 +542,11 @@ public class PlaceObject4Tag extends CharacterIdTag implements ASMSourceContaine
     }
 
     @Override
-    public String toString() {
+    public String getName() {
         if (placeFlagHasName) {
-            return super.toString() + " (" + name + ")";
+            return super.getName() + " (" + name + ")";
         } else {
-            return super.toString();
+            return super.getName();
         }
     }
 

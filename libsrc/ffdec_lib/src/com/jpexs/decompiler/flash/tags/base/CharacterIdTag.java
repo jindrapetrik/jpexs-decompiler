@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
 
@@ -59,11 +58,7 @@ public abstract class CharacterIdTag extends Tag {
 
     @Override
     public String getExportFileName() {
-        String result = super.getName();
-        if (Configuration.addCharacterIdToExportFileName.get()) {
-            result += "_" + getCharacterId();
-        }
-
+        String result = super.getName() + "_" + getCharacterId();
         return result + (exportName != null ? "_" + exportName : "");
     }
 

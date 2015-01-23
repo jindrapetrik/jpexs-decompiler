@@ -202,7 +202,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     }
 
     @Override
-    public String toString() {
+    public String getName() {
         String expName = getExportName();
         if ((expName == null) || expName.isEmpty()) {
             return super.toString();
