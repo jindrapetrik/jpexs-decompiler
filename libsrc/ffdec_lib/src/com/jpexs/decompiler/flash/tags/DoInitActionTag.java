@@ -205,7 +205,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public String getName() {
         String expName = getExportName();
         if ((expName == null) || expName.isEmpty()) {
-            return super.toString();
+            return super.getName();
         }
         String[] pathParts;
         if (expName.contains(".")) {
