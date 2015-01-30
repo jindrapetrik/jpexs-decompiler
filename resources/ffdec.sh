@@ -52,7 +52,7 @@ cd "`dirname \"$PROGRAM\"`"
 # Check default java
 if [ -x "`which java`" ]; then
 	JAVA_VERSION_OUTPUT=`java -version 2>&1`
-    JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
+	JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
 	check_java_version && exec java -Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@"
 fi
 
@@ -60,7 +60,7 @@ fi
 for JRE_PATH in $LOOKUP_JRE_DIRS; do
 	if [ -x "$JRE_PATH/bin/java" ]; then
 		JAVA_VERSION_OUTPUT=`"$JRE_PATH/bin/java" -version 2>&1`
-        JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
+		JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
 		check_java_version && {
 			export JRE_PATH
 			exec $JRE_PATH/bin/java -Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@"
