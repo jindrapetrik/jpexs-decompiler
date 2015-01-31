@@ -92,7 +92,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     private boolean isSingleFrame;
 
-    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, "rect_button");
+    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, true, "rect_button");
 
     @Override
     public List<BUTTONRECORD> getRecords() {

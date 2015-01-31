@@ -308,13 +308,13 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     @Internal
-    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, "frame");
+    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
 
     @Internal
-    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, "as2");
+    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
 
     @Internal
-    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, "as3");
+    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, false, "as3");
 
     public void updateCharacters() {
         characters = null;

@@ -91,7 +91,7 @@ public class FolderPreviewPanel extends JPanel {
 
     public FolderPreviewPanel(final MainPanel mainPanel, List<TreeItem> items) {
         this.items = items;
-        cachedPreviews = Cache.getInstance(false, "preview");
+        cachedPreviews = Cache.getInstance(false, false, "preview");
 
         addMouseListener(new MouseAdapter() {
 

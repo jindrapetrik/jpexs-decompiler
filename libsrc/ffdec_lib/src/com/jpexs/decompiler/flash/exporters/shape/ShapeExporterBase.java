@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Cache;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,17 +48,19 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected final SHAPE shape;
 
-    protected List<FILLSTYLE> _fillStyles;
+    private final List<FILLSTYLE> _fillStyles;
 
-    protected List<LINESTYLE> _lineStyles;
+    private final List<LINESTYLE> _lineStyles;
 
-    protected List<Map<Integer, List<IEdge>>> _fillEdgeMaps;
+    private final List<Map<Integer, List<IEdge>>> _fillEdgeMaps;
 
-    protected List<Map<Integer, List<IEdge>>> _lineEdgeMaps;
+    private final List<Map<Integer, List<IEdge>>> _lineEdgeMaps;
 
-    private boolean edgeMapsCreated;
+    private final ColorTransform colorTransform;
 
-    protected ColorTransform colorTransform;
+    private static final Cache<SHAPE, List<Map<Integer, List<IEdge>>>> fillEdgeMapCache = Cache.getInstance(true, true, "fillEdgeMap");
+
+    private static final Cache<SHAPE, List<Map<Integer, List<IEdge>>>> lineEdgeMapCache = Cache.getInstance(true, true, "lineEdgeMap");
 
     public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
@@ -69,14 +72,23 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             _fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
             _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
         }
+
+        List<Map<Integer, List<IEdge>>> fillEdgeMaps = fillEdgeMapCache.get(shape);
+        List<Map<Integer, List<IEdge>>> lineEdgeMaps = lineEdgeMapCache.get(shape);
+        if (fillEdgeMaps == null || lineEdgeMaps == null) {
+            // Create edge maps
+            fillEdgeMaps = new ArrayList<>();
+            lineEdgeMaps = new ArrayList<>();
+            createEdgeMaps(shape, _fillStyles, _lineStyles, fillEdgeMaps, lineEdgeMaps);
+            fillEdgeMapCache.put(shape, fillEdgeMaps);
+            lineEdgeMapCache.put(shape, lineEdgeMaps);
+        }
+
+        _fillEdgeMaps = fillEdgeMaps;
+        _lineEdgeMaps = lineEdgeMaps;
     }
 
     public void export() {
-        // Create edge maps
-        _fillEdgeMaps = new ArrayList<>();
-        _lineEdgeMaps = new ArrayList<>();
-        createEdgeMaps(_fillStyles, _lineStyles, _fillEdgeMaps, _lineEdgeMaps);
-
         // Let the doc handler know that a shape export starts
         beginShape();
         // Export fills and strokes for each group separately
@@ -90,107 +102,104 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         endShape();
     }
 
-    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
+    private void createEdgeMaps(SHAPE shape, List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
             List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
-        if (!edgeMapsCreated) {
-            int xPos = 0;
-            int yPos = 0;
-            int fillStyleIdxOffset = 0;
-            int lineStyleIdxOffset = 0;
-            int currentFillStyleIdx0 = 0;
-            int currentFillStyleIdx1 = 0;
-            int currentLineStyleIdx = 0;
-            List<IEdge> subPath = new ArrayList<>();
-            Map<Integer, List<IEdge>> currentFillEdgeMap = new HashMap<>();
-            Map<Integer, List<IEdge>> currentLineEdgeMap = new HashMap<>();
-            List<SHAPERECORD> records = shape.shapeRecords;
-            for (int i = 0; i < records.size(); i++) {
-                SHAPERECORD shapeRecord = records.get(i);
-                if (shapeRecord instanceof StyleChangeRecord) {
-                    StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
-                    if (styleChangeRecord.stateLineStyle || styleChangeRecord.stateFillStyle0 || styleChangeRecord.stateFillStyle1) {
-                        processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
-                        subPath = new ArrayList<>();
-                    }
-                    if (styleChangeRecord.stateNewStyles) {
-                        fillStyleIdxOffset = fillStyles.size();
-                        lineStyleIdxOffset = lineStyles.size();
-                        appendFillStyles(fillStyles, styleChangeRecord.fillStyles.fillStyles);
-                        appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
-                    }
-                    // Check if all styles are reset to 0.
-                    // This (probably) means that a new group starts with the next record
-                    if (styleChangeRecord.stateLineStyle && styleChangeRecord.lineStyle == 0
-                            && styleChangeRecord.stateFillStyle0 && styleChangeRecord.fillStyle0 == 0
-                            && styleChangeRecord.stateFillStyle1 && styleChangeRecord.fillStyle1 == 0) {
-                        cleanEdgeMap(currentFillEdgeMap);
-                        cleanEdgeMap(currentLineEdgeMap);
-                        fillEdgeMaps.add(currentFillEdgeMap);
-                        lineEdgeMaps.add(currentLineEdgeMap);
-                        currentFillEdgeMap = new HashMap<>();
-                        currentLineEdgeMap = new HashMap<>();
-                        currentLineStyleIdx = 0;
-                        currentFillStyleIdx0 = 0;
-                        currentFillStyleIdx1 = 0;
-                    } else {
-                        if (styleChangeRecord.stateLineStyle) {
-                            currentLineStyleIdx = styleChangeRecord.lineStyle;
-                            if (currentLineStyleIdx > 0) {
-                                currentLineStyleIdx += lineStyleIdxOffset;
-                            }
-                        }
-                        if (styleChangeRecord.stateFillStyle0) {
-                            currentFillStyleIdx0 = styleChangeRecord.fillStyle0;
-                            if (currentFillStyleIdx0 > 0) {
-                                currentFillStyleIdx0 += fillStyleIdxOffset;
-                            }
-                        }
-                        if (styleChangeRecord.stateFillStyle1) {
-                            currentFillStyleIdx1 = styleChangeRecord.fillStyle1;
-                            if (currentFillStyleIdx1 > 0) {
-                                currentFillStyleIdx1 += fillStyleIdxOffset;
-                            }
-                        }
-                    }
-                    if (styleChangeRecord.stateMoveTo) {
-                        xPos = styleChangeRecord.moveDeltaX;
-                        yPos = styleChangeRecord.moveDeltaY;
-                    }
-                } else if (shapeRecord instanceof StraightEdgeRecord) {
-                    StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
-                    PointInt from = new PointInt(xPos, yPos);
-                    if (straightEdgeRecord.generalLineFlag) {
-                        xPos += straightEdgeRecord.deltaX;
-                        yPos += straightEdgeRecord.deltaY;
-                    } else {
-                        if (straightEdgeRecord.vertLineFlag) {
-                            yPos += straightEdgeRecord.deltaY;
-                        } else {
-                            xPos += straightEdgeRecord.deltaX;
-                        }
-                    }
-                    PointInt to = new PointInt(xPos, yPos);
-                    subPath.add(new StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1));
-                } else if (shapeRecord instanceof CurvedEdgeRecord) {
-                    CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
-                    PointInt from = new PointInt(xPos, yPos);
-                    int xPosControl = xPos + curvedEdgeRecord.controlDeltaX;
-                    int yPosControl = yPos + curvedEdgeRecord.controlDeltaY;
-                    xPos = xPosControl + curvedEdgeRecord.anchorDeltaX;
-                    yPos = yPosControl + curvedEdgeRecord.anchorDeltaY;
-                    PointInt control = new PointInt(xPosControl, yPosControl);
-                    PointInt to = new PointInt(xPos, yPos);
-                    subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
-                } else if (shapeRecord instanceof EndShapeRecord) {
-                    // We're done. Process the last subpath, if any
+        int xPos = 0;
+        int yPos = 0;
+        int fillStyleIdxOffset = 0;
+        int lineStyleIdxOffset = 0;
+        int currentFillStyleIdx0 = 0;
+        int currentFillStyleIdx1 = 0;
+        int currentLineStyleIdx = 0;
+        List<IEdge> subPath = new ArrayList<>();
+        Map<Integer, List<IEdge>> currentFillEdgeMap = new HashMap<>();
+        Map<Integer, List<IEdge>> currentLineEdgeMap = new HashMap<>();
+        List<SHAPERECORD> records = shape.shapeRecords;
+        for (int i = 0; i < records.size(); i++) {
+            SHAPERECORD shapeRecord = records.get(i);
+            if (shapeRecord instanceof StyleChangeRecord) {
+                StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+                if (styleChangeRecord.stateLineStyle || styleChangeRecord.stateFillStyle0 || styleChangeRecord.stateFillStyle1) {
                     processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
+                    subPath = new ArrayList<>();
+                }
+                if (styleChangeRecord.stateNewStyles) {
+                    fillStyleIdxOffset = fillStyles.size();
+                    lineStyleIdxOffset = lineStyles.size();
+                    appendFillStyles(fillStyles, styleChangeRecord.fillStyles.fillStyles);
+                    appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                }
+                // Check if all styles are reset to 0.
+                // This (probably) means that a new group starts with the next record
+                if (styleChangeRecord.stateLineStyle && styleChangeRecord.lineStyle == 0
+                        && styleChangeRecord.stateFillStyle0 && styleChangeRecord.fillStyle0 == 0
+                        && styleChangeRecord.stateFillStyle1 && styleChangeRecord.fillStyle1 == 0) {
                     cleanEdgeMap(currentFillEdgeMap);
                     cleanEdgeMap(currentLineEdgeMap);
                     fillEdgeMaps.add(currentFillEdgeMap);
                     lineEdgeMaps.add(currentLineEdgeMap);
+                    currentFillEdgeMap = new HashMap<>();
+                    currentLineEdgeMap = new HashMap<>();
+                    currentLineStyleIdx = 0;
+                    currentFillStyleIdx0 = 0;
+                    currentFillStyleIdx1 = 0;
+                } else {
+                    if (styleChangeRecord.stateLineStyle) {
+                        currentLineStyleIdx = styleChangeRecord.lineStyle;
+                        if (currentLineStyleIdx > 0) {
+                            currentLineStyleIdx += lineStyleIdxOffset;
+                        }
+                    }
+                    if (styleChangeRecord.stateFillStyle0) {
+                        currentFillStyleIdx0 = styleChangeRecord.fillStyle0;
+                        if (currentFillStyleIdx0 > 0) {
+                            currentFillStyleIdx0 += fillStyleIdxOffset;
+                        }
+                    }
+                    if (styleChangeRecord.stateFillStyle1) {
+                        currentFillStyleIdx1 = styleChangeRecord.fillStyle1;
+                        if (currentFillStyleIdx1 > 0) {
+                            currentFillStyleIdx1 += fillStyleIdxOffset;
+                        }
+                    }
                 }
+                if (styleChangeRecord.stateMoveTo) {
+                    xPos = styleChangeRecord.moveDeltaX;
+                    yPos = styleChangeRecord.moveDeltaY;
+                }
+            } else if (shapeRecord instanceof StraightEdgeRecord) {
+                StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
+                PointInt from = new PointInt(xPos, yPos);
+                if (straightEdgeRecord.generalLineFlag) {
+                    xPos += straightEdgeRecord.deltaX;
+                    yPos += straightEdgeRecord.deltaY;
+                } else {
+                    if (straightEdgeRecord.vertLineFlag) {
+                        yPos += straightEdgeRecord.deltaY;
+                    } else {
+                        xPos += straightEdgeRecord.deltaX;
+                    }
+                }
+                PointInt to = new PointInt(xPos, yPos);
+                subPath.add(new StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1));
+            } else if (shapeRecord instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
+                PointInt from = new PointInt(xPos, yPos);
+                int xPosControl = xPos + curvedEdgeRecord.controlDeltaX;
+                int yPosControl = yPos + curvedEdgeRecord.controlDeltaY;
+                xPos = xPosControl + curvedEdgeRecord.anchorDeltaX;
+                yPos = yPosControl + curvedEdgeRecord.anchorDeltaY;
+                PointInt control = new PointInt(xPosControl, yPosControl);
+                PointInt to = new PointInt(xPos, yPos);
+                subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
+            } else if (shapeRecord instanceof EndShapeRecord) {
+                // We're done. Process the last subpath, if any
+                processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
+                cleanEdgeMap(currentFillEdgeMap);
+                cleanEdgeMap(currentLineEdgeMap);
+                fillEdgeMaps.add(currentFillEdgeMap);
+                lineEdgeMaps.add(currentLineEdgeMap);
             }
-            edgeMapsCreated = true;
         }
     }
 

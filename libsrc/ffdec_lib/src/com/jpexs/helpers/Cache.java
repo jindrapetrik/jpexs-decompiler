@@ -43,6 +43,8 @@ public class Cache<K, V> implements Freed {
 
     private final boolean weak;
 
+    private final boolean memoryOnly;
+
     private final String name;
 
     static {
@@ -59,8 +61,8 @@ public class Cache<K, V> implements Freed {
         });
     }
 
-    public static <K, V> Cache<K, V> getInstance(boolean weak, String name) {
-        Cache<K, V> instance = new Cache<>(weak, name);
+    public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name) {
+        Cache<K, V> instance = new Cache<>(weak, memoryOnly, name);
         instances.add(instance);
         return instance;
     }
@@ -97,6 +99,9 @@ public class Cache<K, V> implements Freed {
 
     private void initCache() {
         int thisStorageType = storageType;
+        if (memoryOnly) {
+            thisStorageType = STORAGE_MEMORY;
+        }
         Map<K, V> newCache = null;
         if (thisStorageType == STORAGE_FILES) {
             try {
@@ -118,9 +123,10 @@ public class Cache<K, V> implements Freed {
         this.cache = newCache;
     }
 
-    private Cache(boolean weak, String name) {
+    private Cache(boolean weak, boolean memoryOnly, String name) {
         this.weak = weak;
         this.name = name;
+        this.memoryOnly = memoryOnly;
         initCache();
     }
 

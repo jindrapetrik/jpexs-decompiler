@@ -86,7 +86,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     private boolean isSingleFrame;
 
-    private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true, "rect_button2");
+    private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true, true, "rect_button2");
 
     @Override
     public int getCharacterId() {

@@ -84,7 +84,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     private boolean isSingleFrame;
 
-    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, "rect_sprite");
+    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, true, "rect_sprite");
 
     @Override
     public Timeline getTimeline() {
