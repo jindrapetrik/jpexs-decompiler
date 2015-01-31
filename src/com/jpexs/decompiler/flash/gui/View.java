@@ -487,13 +487,17 @@ public class View {
         List<List<String>> expandedNodes = new ArrayList<>();
         int rowCount = tree.getRowCount();
         for (int i = 0; i < rowCount; i++) {
-            TreePath path = tree.getPathForRow(i);
-            if (tree.isExpanded(path)) {
-                List<String> pathAsStringList = new ArrayList<>();
-                for (Object pathCompnent : path.getPath()) {
-                    pathAsStringList.add(pathCompnent.toString());
+            try {
+                TreePath path = tree.getPathForRow(i);
+                if (tree.isExpanded(path)) {
+                    List<String> pathAsStringList = new ArrayList<>();
+                    for (Object pathCompnent : path.getPath()) {
+                        pathAsStringList.add(pathCompnent.toString());
+                    }
+                    expandedNodes.add(pathAsStringList);
                 }
-                expandedNodes.add(pathAsStringList);
+            } catch (IndexOutOfBoundsException ex) {
+                // TreeNode was removed, ignore
             }
         }
         return expandedNodes;

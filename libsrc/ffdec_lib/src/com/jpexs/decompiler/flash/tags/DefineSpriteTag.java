@@ -300,7 +300,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     @Override
     public int getNumFrames() {
-        return frameCount;
+        // flashplayer ignores the count stored in frameCount
+        return getTimeline().getFrames().size(); // frameCount
     }
 
     private int getRealFrameCount() {
