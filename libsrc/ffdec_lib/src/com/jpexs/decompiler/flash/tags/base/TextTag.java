@@ -95,6 +95,11 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract ExportRectangle calculateTextBounds();
 
+    @Override
+    public RECT getRect() {
+        return getRect(null); // parameter not used
+    }
+
     private static void updateRect(RECT ret, int x, int y) {
         if (x < ret.Xmin) {
             ret.Xmin = x;

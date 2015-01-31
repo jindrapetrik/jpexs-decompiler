@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
@@ -60,6 +61,11 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     public abstract int getShapeNum();
+
+    @Override
+    public RECT getRect() {
+        return getRect(null); // parameter not used
+    }
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {

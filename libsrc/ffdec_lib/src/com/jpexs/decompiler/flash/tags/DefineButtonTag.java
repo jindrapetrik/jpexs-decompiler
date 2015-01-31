@@ -49,7 +49,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -92,6 +91,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     private boolean isSingleFrameInitialized;
 
     private boolean isSingleFrame;
+
+    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, "rect_button");
 
     @Override
     public List<BUTTONRECORD> getRecords() {
@@ -249,8 +250,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         return modified;
     }
 
-    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, "rect_button");
-
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         if (rectCache.contains(this)) {
@@ -264,6 +263,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
                 if (!added.contains(bt)) {
                     added.add(bt);
                     RECT r2 = bt.getRect(added);
+                    added.remove(bt);
                     MATRIX mat = r.placeMatrix;
                     if (mat != null) {
                         r2 = mat.apply(r2);
@@ -278,6 +278,10 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
         rectCache.put(this, rect);
         return rect;
+    }
+
+    public static void clearCache() {
+        rectCache.clear();
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();
@@ -342,7 +346,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
+        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
 
         ColorTransform clrTrans = null;
         for (Tag t : swf.tags) {

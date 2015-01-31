@@ -631,7 +631,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                 }
                                 mat = Helper.deepCopy(mat);
                                 if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect(new HashSet<BoundedTag>());
+                                    RECT r = ((BoundedTag) parent).getRect();
                                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                     mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                 } else {
@@ -680,7 +680,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     mat.translateX = 0;
                     mat.translateY = 0;
                     if (tagObj instanceof BoundedTag) {
-                        RECT r = ((BoundedTag) tagObj).getRect(new HashSet<BoundedTag>());
+                        RECT r = ((BoundedTag) tagObj).getRect();
                         mat.translateX = -r.Xmin;
                         mat.translateY = -r.Ymin;
                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;

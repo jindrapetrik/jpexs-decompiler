@@ -2502,7 +2502,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 DefineSpriteTag parentSprite = (DefineSpriteTag) fn.timeline.timelined;
                 controlTags = parentSprite.subTags;
                 containerId = parentSprite.spriteId;
-                rect = parentSprite.getRect(new HashSet<BoundedTag>());
+                rect = parentSprite.getRect();
                 totalFrameCount = parentSprite.frameCount;
                 timelined = parentSprite;
             }
@@ -2650,7 +2650,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (tim != null) {
                     return tim;
                 }
-                tim = new Timeline(tag.getSwf(), null, new ArrayList<Tag>(), ((CharacterTag) tag).getCharacterId(), getRect(new HashSet<BoundedTag>()));
+                tim = new Timeline(tag.getSwf(), null, new ArrayList<Tag>(), ((CharacterTag) tag).getCharacterId(), getRect());
                 if (tag instanceof MorphShapeTag) {
                     tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
                     int framesCnt = tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH;
@@ -2682,8 +2682,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     f.layers.put(1, ds);
                     tim.getFrames().add(f);
                 }
-                tim.displayRect = getRect(new HashSet<BoundedTag>());
+                tim.displayRect = getRect();
                 return tim;
+            }
+
+            @Override
+            public RECT getRect() {
+                return getRect(new HashSet<BoundedTag>());
             }
 
             @Override

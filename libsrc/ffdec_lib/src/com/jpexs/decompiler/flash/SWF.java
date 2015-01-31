@@ -75,6 +75,8 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
@@ -1028,6 +1030,11 @@ public final class SWF implements SWFContainerItem, Timelined {
             packs.addAll(abcTag.getABC().getScriptPacks());
         }
         return uniqueAS3Packs(packs);
+    }
+
+    @Override
+    public RECT getRect() {
+        return displayRect;
     }
 
     @Override
@@ -2304,6 +2311,9 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void clearImageCache() {
         frameCache.clear();
+        DefineSpriteTag.clearCache();
+        DefineButtonTag.clearCache();
+        DefineButton2Tag.clearCache();
         for (Tag tag : tags) {
             if (tag instanceof ImageTag) {
                 ((ImageTag) tag).clearCache();
@@ -2355,6 +2365,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (actions == null) {
             actions = src.getActions();
         }
+
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
         List<Highlighting> hilights = writer.instructionHilights;
@@ -2694,7 +2705,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
                 String assetName;
                 Tag drawableTag = (Tag) drawable;
-                RECT boundRect = drawable.getRect(new HashSet<BoundedTag>());
+                RECT boundRect = drawable.getRect();
                 if (exporter.exportedTags.containsKey(drawableTag)) {
                     assetName = exporter.exportedTags.get(drawableTag);
                 } else {
@@ -2858,7 +2869,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     }
                 }
 
-                RECT boundRect = drawable.getRect(new HashSet<BoundedTag>());
+                RECT boundRect = drawable.getRect();
                 ExportRectangle rect = new ExportRectangle(boundRect);
                 rect = mat.transform(rect);
                 Matrix m = mat.clone();
@@ -3006,7 +3017,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect(new HashSet<BoundedTag>());
+                RECT r = b.getRect();
                 int div = (int) unzoom;
                 g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
                 g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));

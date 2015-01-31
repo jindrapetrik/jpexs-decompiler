@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -584,7 +583,7 @@ public class DefineTextTag extends TextTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        staticTextToSVG(swf, textRecords, 1, exporter, getRect(new HashSet<BoundedTag>()), getTextMatrix(), colorTransform, zoom);
+        staticTextToSVG(swf, textRecords, 1, exporter, getRect(), getTextMatrix(), colorTransform, zoom);
     }
 
     @Override

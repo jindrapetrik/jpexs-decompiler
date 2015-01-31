@@ -84,10 +84,12 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     private boolean isSingleFrame;
 
+    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, "rect_sprite");
+
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
-            timeline = new Timeline(swf, this, subTags, spriteId, getRect(new HashSet<BoundedTag>()));
+            timeline = new Timeline(swf, this, subTags, spriteId, getRect());
         }
         return timeline;
     }
@@ -108,6 +110,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
                 if (!added.contains(bt)) {
                     added.add(bt);
                     r = bt.getRect(added);
+                    added.remove(bt);
                 }
             }
             if (r != null) {
@@ -124,7 +127,10 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         return ret;
     }
 
-    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, "rect_sprite");
+    @Override
+    public RECT getRect() {
+        return getRect(new HashSet<BoundedTag>());
+    }
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
@@ -134,9 +140,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
         boolean foundSomething = false;
-        int pos = 0;
         for (Tag t : subTags) {
-            pos++;
             MATRIX m = null;
             int characterId = -1;
             if (t instanceof PlaceObjectTypeTag) {
@@ -145,9 +149,9 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
                 int charId = pot.getCharacterId();
                 if (charId > -1) {
                     depthMap.put(pot.getDepth(), charId);
-                    characterId = (charId);
+                    characterId = charId;
                 } else {
-                    Integer chi = (depthMap.get(pot.getDepth()));
+                    Integer chi = depthMap.get(pot.getDepth());
                     if (chi != null) {
                         characterId = chi;
                     }
@@ -260,6 +264,10 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     @Override
     public List<Tag> getSubTags() {
         return subTags;
+    }
+
+    public static void clearCache() {
+        rectCache.clear();
     }
 
     @Override

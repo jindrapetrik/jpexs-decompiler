@@ -44,7 +44,6 @@ import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -315,8 +314,13 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        RECT r = getRect(new HashSet<BoundedTag>());
+        RECT r = getRect();
         return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+    }
+
+    @Override
+    public RECT getRect() {
+        return getRect(null); // parameter not used
     }
 
     @Override

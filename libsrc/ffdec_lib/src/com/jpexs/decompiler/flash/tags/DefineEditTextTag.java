@@ -57,7 +57,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -821,7 +820,7 @@ public class DefineEditTextTag extends TextTag {
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
             if (!canvas) {
-                drawBorder(swf, image, borderColor, fillColor, getRect(new HashSet<BoundedTag>()), getTextMatrix(), transformation, colorTransform);
+                drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
             } else {
                 // TODO: draw border
             }

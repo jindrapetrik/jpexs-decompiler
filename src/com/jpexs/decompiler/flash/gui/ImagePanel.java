@@ -57,7 +57,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -253,7 +252,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             Timeline tim = ((Timelined) timelined).getTimeline();
             BoundedTag bounded = (BoundedTag) timelined;
-            RECT rect = bounded.getRect(new HashSet<BoundedTag>());
+            RECT rect = bounded.getRect();
             int width = rect.getWidth();
             double scale = 1.0;
             /*if (width > swf.displayRect.getWidth()) {
@@ -464,7 +463,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     @Override
     public synchronized double getZoomToFit() {
         if (timelined instanceof BoundedTag) {
-            RECT bounds = ((BoundedTag) timelined).getRect(new HashSet<BoundedTag>());
+            RECT bounds = ((BoundedTag) timelined).getRect();
             double w1 = bounds.getWidth() / SWF.unitDivisor;
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 
@@ -577,7 +576,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
 
-        RECT rect = textTag.getRect(new HashSet<BoundedTag>());
+        RECT rect = textTag.getRect();
         int width = (int) (rect.getWidth() * zoomDouble);
         int height = (int) (rect.getHeight() * zoomDouble);
         SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
@@ -668,7 +667,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (img == null) {
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
-                RECT rect = bounded.getRect(new HashSet<BoundedTag>());
+                RECT rect = bounded.getRect();
                 if (rect == null) { //??? Why?
                     rect = new RECT(0, 0, 1, 1);
                 }

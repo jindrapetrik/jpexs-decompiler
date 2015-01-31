@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -61,7 +60,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
+public class DefineMorphShapeTag extends MorphShapeTag {
 
     @SWFType(BasicType.UI16)
     public int characterId;

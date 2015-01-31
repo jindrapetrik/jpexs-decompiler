@@ -42,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -86,6 +85,8 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     private boolean isSingleFrameInitialized;
 
     private boolean isSingleFrame;
+
+    private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true, "rect_button2");
 
     @Override
     public int getCharacterId() {
@@ -198,8 +199,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         return modified;
     }
 
-    private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true, "rect_button2");
-
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         if (rectCache.contains(this)) {
@@ -213,6 +212,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
                 if (!added.contains(bt)) {
                     added.add(bt);
                     RECT r2 = bt.getRect(added);
+                    added.remove(bt);
                     MATRIX mat = r.placeMatrix;
                     if (mat != null) {
                         r2 = mat.apply(r2);
@@ -226,6 +226,10 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
         rectCache.put(this, rect);
         return rect;
+    }
+
+    public static void clearCache() {
+        rectCache.clear();
     }
 
     @Override
@@ -258,7 +262,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect(new HashSet<BoundedTag>()));
+        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
 
         int maxDepth = 0;
         Frame frameUp = new Frame(timeline, 0);

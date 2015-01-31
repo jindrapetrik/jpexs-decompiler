@@ -702,7 +702,13 @@ public class ABC {
         if (methodInfo == -1) {
             return -1;
         }
-        return getBodyIdxFromMethodIdx().get(methodInfo);
+
+        Integer result = getBodyIdxFromMethodIdx().get(methodInfo);
+        if (result == null) {
+            return -1;
+        }
+
+        return result;
     }
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {

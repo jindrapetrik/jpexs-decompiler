@@ -42,7 +42,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -289,7 +288,7 @@ public class FolderPreviewPanel extends JPanel {
             height = imgSrc.getHeight();
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
-            RECT rect = boundedTag.getRect(new HashSet<BoundedTag>());
+            RECT rect = boundedTag.getRect();
             width = (int) (rect.getWidth() / SWF.unitDivisor) + 1;
             height = (int) (rect.getHeight() / SWF.unitDivisor) + 1;
             m.translate(-rect.Xmin, -rect.Ymin);

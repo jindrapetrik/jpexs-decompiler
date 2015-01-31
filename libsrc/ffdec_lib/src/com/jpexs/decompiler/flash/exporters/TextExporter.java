@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
@@ -35,7 +34,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -73,7 +71,7 @@ public class TextExporter {
                         @Override
                         public void run() throws IOException {
                             try (FileOutputStream fos = new FileOutputStream(file)) {
-                                ExportRectangle rect = new ExportRectangle(textTag.getRect(new HashSet<BoundedTag>()));
+                                ExportRectangle rect = new ExportRectangle(textTag.getRect());
                                 SVGExporter exporter = new SVGExporter(rect);
                                 textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));

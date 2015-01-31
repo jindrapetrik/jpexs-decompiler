@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -28,7 +29,6 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -91,7 +91,7 @@ public class ShapeExporter {
                         switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    ExportRectangle rect = new ExportRectangle(st.getRect(new HashSet<BoundedTag>()));
+                                    ExportRectangle rect = new ExportRectangle(st.getRect());
                                     rect.xMax *= settings.zoom;
                                     rect.yMax *= settings.zoom;
                                     rect.xMin *= settings.zoom;
@@ -103,7 +103,7 @@ public class ShapeExporter {
                                 break;
                             case PNG:
                             case BMP:
-                                RECT rect = st.getRect(new HashSet<BoundedTag>());
+                                RECT rect = st.getRect();
                                 int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor);
                                 int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor);
                                 SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);

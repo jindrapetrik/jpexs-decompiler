@@ -25,11 +25,13 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -53,6 +55,11 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     public abstract List<BUTTONRECORD> getRecords();
 
     public abstract boolean trackAsMenu();
+
+    @Override
+    public RECT getRect() {
+        return getRect(new HashSet<BoundedTag>());
+    }
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {

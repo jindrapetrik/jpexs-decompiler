@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -40,7 +41,6 @@ import java.awt.Shape;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -109,7 +109,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     private SHAPEWITHSTYLE getShape() {
-        RECT rect = getRect(new HashSet<BoundedTag>());
+        RECT rect = getRect();
         return getShape(rect, false);
     }
 
@@ -124,7 +124,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         MATRIX matrix = new MATRIX();
         matrix.hasScale = true;
         if (fill) {
-            RECT imageRect = getRect(new HashSet<BoundedTag>());
+            RECT imageRect = getRect();
             matrix.scaleX = (int) ((((long) SWF.unitDivisor) << 16) * rect.getWidth() / imageRect.getWidth());
             matrix.scaleY = (int) ((((long) SWF.unitDivisor) << 16) * rect.getHeight() / imageRect.getHeight());
         } else {
@@ -168,6 +168,11 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         shape.shapeRecords.add(left);
         shape.shapeRecords.add(new EndShapeRecord());
         return shape;
+    }
+
+    @Override
+    public RECT getRect() {
+        return getRect(null); // parameter not used
     }
 
     @Override
