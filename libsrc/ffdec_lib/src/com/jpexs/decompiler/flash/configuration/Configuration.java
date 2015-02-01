@@ -344,6 +344,14 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
 
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> showCodeSavedMessage = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> showTraitSavedMessage = null;
+
+    @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> packJavaScripts = null;
 

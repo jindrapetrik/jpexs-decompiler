@@ -818,7 +818,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     }
                     setDecompiledEditMode(false);
                     reload();
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
                 } catch (AVM2ParseException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
                     decompiledTextArea.gotoLine((int) ex.line);

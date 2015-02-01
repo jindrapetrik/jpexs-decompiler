@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -33,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
@@ -223,7 +225,7 @@ public class DetailPanel extends JPanel implements ActionListener {
                             @Override
                             protected void done() {
                                 setEditMode(false);
-                                View.showMessageDialog(null, AppStrings.translate("message.trait.saved"));
+                                View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                             }
                         };
                         worker.execute();

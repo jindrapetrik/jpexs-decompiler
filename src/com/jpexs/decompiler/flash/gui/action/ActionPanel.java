@@ -785,7 +785,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     }
                     src.setModified();
                     setSource(this.src, false);
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
                     saveButton.setVisible(false);
                     cancelButton.setVisible(false);
                     editButton.setVisible(true);
@@ -813,7 +813,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     src.setModified();
                     setSource(src, false);
 
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
                     setDecompiledEditMode(false);
                 } catch (IOException ex) {
                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
