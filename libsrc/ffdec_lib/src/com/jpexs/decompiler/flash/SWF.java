@@ -272,10 +272,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     public SWFList swfList;
 
     @Internal
-    public String file;
+    private String file;
 
     @Internal
-    public String fileTitle;
+    private String fileTitle;
 
     @Internal
     private Map<Integer, CharacterTag> characters;
@@ -673,12 +673,37 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    /**
+     * Constructs an empty SWF
+     */
     public SWF() {
 
     }
 
+    /**
+     * Construct SWF from stream
+     *
+     * @param is Stream to read SWF from
+     * @param parallelRead Use parallel threads?
+     * @throws IOException
+     * @throws java.lang.InterruptedException
+     */
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, null, parallelRead, false);
+        this(is, null, null, null, parallelRead, false);
+    }
+
+    /**
+     * Construct SWF from stream
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param parallelRead Use parallel threads?
+     * @throws IOException
+     * @throws java.lang.InterruptedException
+     */
+    public SWF(InputStream is, String file, String fileTitle, boolean parallelRead) throws IOException, InterruptedException {
+        this(is, file, fileTitle, null, parallelRead, false);
     }
 
     /**
@@ -691,7 +716,22 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, listener, parallelRead, false);
+        this(is, null, null, listener, parallelRead, false);
+    }
+
+    /**
+     * Construct SWF from stream
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param listener
+     * @param parallelRead Use parallel threads?
+     * @throws IOException
+     * @throws java.lang.InterruptedException
+     */
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, false);
     }
 
     /**
@@ -708,13 +748,17 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Construct SWF from stream
      *
      * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
      * @param listener
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
+        this.file = file;
+        this.fileTitle = fileTitle;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
@@ -777,6 +821,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         return this;
     }
 
+    public String getFile() {
+        return file;
+    }
+
     /**
      * Get title of the file
      *
@@ -795,6 +843,11 @@ public final class SWF implements SWFContainerItem, Timelined {
             return "";
         }
         return new File(title).getName();
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+        fileTitle = null;
     }
 
     private static void getAbcTags(List<Tag> list, List<ABCContainerTag> actionScripts) {
@@ -1516,7 +1569,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             path = File.separator + Helper.makeFileName(getCharacter(containerId).getExportFileName());
         }
         if (frames == null) {
-            int frameCnt = tim.getFrames().size();
+            int frameCnt = tim.getFrameCount();
             frames = new ArrayList<>();
             for (int i = 0; i < frameCnt; i++) {
                 frames.add(i);
@@ -2450,7 +2503,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
-            Frame frameObj = timeline.getFrames().get(frame);
+            Frame frameObj = timeline.getFrame(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {
                 while (!clipDepths.isEmpty() && clipDepths.peek() <= i) {
                     clipDepths.pop();
@@ -2664,10 +2717,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public static void frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        if (timeline.getFrames().size() <= frame) {
+        if (timeline.getFrameCount() <= frame) {
             return;
         }
-        Frame frameObj = timeline.getFrames().get(frame);
+        Frame frameObj = timeline.getFrame(frame);
         List<SvgClip> clips = new ArrayList<>();
         List<String> prevClips = new ArrayList<>();
 
@@ -2767,7 +2820,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        if (timeline.getFrames().isEmpty()) {
+        if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
 
@@ -2797,7 +2850,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RenderContext renderContext, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform, double zoom) {
         RECT rect = displayRect;
-        for (int f = 0; f < timeline.getFrames().size(); f++) {
+        for (int f = 0; f < timeline.getFrameCount(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             image.fillTransparent();
@@ -2810,10 +2863,10 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void frameToImage(Timeline timeline, int frame, int time, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         double unzoom = SWF.unitDivisor;
-        if (timeline.getFrames().size() <= frame) {
+        if (timeline.getFrameCount() <= frame) {
             return;
         }
-        Frame frameObj = timeline.getFrames().get(frame);
+        Frame frameObj = timeline.getFrame(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(frameObj.backgroundColor.toColor());
         g.fill(new Rectangle(image.getWidth(), image.getHeight()));

@@ -78,11 +78,11 @@ public abstract class MainFrameMenu {
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                 }
-            } else if (swf.file == null) {
+            } else if (swf.getFile() == null) {
                 saved = saveAs(swf, SaveFileMode.SAVEAS);
             } else {
                 try {
-                    Main.saveFile(swf, swf.file);
+                    Main.saveFile(swf, swf.getFile());
                     saved = true;
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);

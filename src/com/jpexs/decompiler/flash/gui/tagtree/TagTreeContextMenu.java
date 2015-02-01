@@ -473,7 +473,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         tagsToRemove.add(((TagScript) tag).getTag());
                     } else if (tag instanceof Frame) {
                         Frame frameNode = (Frame) tag;
-                        Frame frame = frameNode.timeline.getFrames().get(frameNode.frame);
+                        Frame frame = frameNode.timeline.getFrame(frameNode.frame);
                         if (frame.showFrameTag != null) {
                             tagsToRemove.add(frame.showFrameTag);
                         } else {

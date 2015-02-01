@@ -320,7 +320,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private void showSelectedName() {
         if (selectedDepth > -1 && frame > -1) {
-            DepthState ds = timelined.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
+            DepthState ds = timelined.getTimeline().getFrame(frame).layers.get(selectedDepth);
             if (ds != null) {
                 CharacterTag cht = timelined.getTimeline().swf.getCharacter(ds.characterId);
                 if (cht != null) {
@@ -524,7 +524,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             loaded = true;
 
-            if (drawable.getTimeline().getFrames().isEmpty()) {
+            if (drawable.getTimeline().getFrameCount() == 0) {
                 clearImagePanel();
                 return;
             }
@@ -691,7 +691,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
                 List<DepthState> dss = new ArrayList<>();
                 List<Shape> os = new ArrayList<>();
-                DepthState ds = drawable.getTimeline().getFrames().get(frame).layers.get(selectedDepth);
+                DepthState ds = drawable.getTimeline().getFrame(frame).layers.get(selectedDepth);
                 if (ds != null) {
                     CharacterTag cht = swf.getCharacter(ds.characterId);
                     if (cht != null) {

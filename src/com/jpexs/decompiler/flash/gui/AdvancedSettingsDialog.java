@@ -338,7 +338,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                         if (!((JTextField) c).getText().isEmpty()) {
                             c.requestFocusInWindow();
                             return;
-                        }//else null
+                        } // else null
                     }
                     values.put(name, value);
                 }
@@ -356,8 +356,10 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                         throw new Error(ex.getMessage());
                     }
                     if (item.get() == null || !item.get().equals(value)) {
-                        item.set(value);
-                        modified = true;
+                        if (item.hasValue() || value != null) {
+                            item.set(value);
+                            modified = true;
+                        }
                     }
                 }
                 Configuration.saveConfig();

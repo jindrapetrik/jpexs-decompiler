@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -29,6 +30,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
@@ -87,8 +89,8 @@ public class DefineBinaryDataTag extends CharacterTag {
 
         if (Configuration.autoLoadEmbeddedSwfs.get()) {
             try {
-                SWF bswf = new SWF(new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength()), Configuration.parallelSpeedUp.get());
-                bswf.fileTitle = "(SWF Data)";
+                InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
+                SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get());
                 innerSwf = bswf;
                 bswf.binaryData = this;
             } catch (IOException | InterruptedException ex) {

@@ -95,9 +95,14 @@ public class Timeline {
         }
     }
 
-    public List<Frame> getFrames() {
+    public Iterable<Frame> getFrames() {
         ensureInitialized();
         return frames;
+    }
+
+    public Frame getFrame(int index) {
+        ensureInitialized();
+        return frames.get(index);
     }
 
     public void addFrame(Frame frame) {
@@ -149,7 +154,8 @@ public class Timeline {
     }
 
     public int getFrameCount() {
-        return getFrames().size();
+        ensureInitialized();
+        return frames.size();
     }
 
     public int getFrameForAction(ASMSource asm) {
@@ -389,7 +395,7 @@ public class Timeline {
     }
 
     public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
-        Frame frameObj = getFrames().get(frame);
+        Frame frameObj = getFrame(frame);
         for (int depth : frameObj.layers.keySet()) {
             DepthState layer = frameObj.layers.get(depth);
             if (layer.characterId != -1) {
@@ -424,7 +430,7 @@ public class Timeline {
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
-        Frame fr = getFrames().get(frame);
+        Frame fr = getFrame(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
         for (int d = maxDepth; d >= 0; d--) {
@@ -455,7 +461,7 @@ public class Timeline {
     }
 
     public void getObjectsOutlines(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
-        Frame fr = getFrames().get(frame);
+        Frame fr = getFrame(frame);
         Stack<Clip> clips = new Stack<>();
         for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
@@ -527,7 +533,7 @@ public class Timeline {
     }
 
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        Frame fr = getFrames().get(frame);
+        Frame fr = getFrame(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
         for (int d = maxDepth; d >= 0; d--) {
@@ -602,7 +608,7 @@ public class Timeline {
     }
 
     public boolean isSingleFrame(int frame) {
-        Frame frameObj = getFrames().get(frame);
+        Frame frameObj = getFrame(frame);
         for (int i = 1; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;

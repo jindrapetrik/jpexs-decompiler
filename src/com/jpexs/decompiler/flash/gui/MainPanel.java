@@ -149,6 +149,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1450,7 +1451,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (!selDir.endsWith(File.separator)) {
             selDir += File.separator;
         }
-        String fileName = new File(swf.file).getName();
+        String fileName = new File(swf.getFile()).getName();
         fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
         fc.setSelectedFile(new File(selDir + fileName));
         List<FileFilter> flaFilters = new ArrayList<>();
@@ -1518,9 +1519,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     Helper.freeMem();
                     try {
                         if (compressed) {
-                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         } else {
-                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         }
                     } catch (IOException ex) {
                         View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2316,14 +2317,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 try {
                     for (DefineBinaryDataTag binaryDataTag : binaryDataTags) {
                         try {
-                            SWF bswf = new SWF(new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData()), new ProgressListener() {
+                            InputStream is = new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData());
+                            SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
 
                                 @Override
                                 public void progress(int p) {
                                     Main.getLoadingDialog().setPercent(p);
                                 }
                             }, Configuration.parallelSpeedUp.get());
-                            bswf.fileTitle = "(SWF Data)";
                             binaryDataTag.innerSwf = bswf;
                             bswf.binaryData = binaryDataTag;
                         } catch (IOException ex) {

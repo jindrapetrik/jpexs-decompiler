@@ -341,24 +341,21 @@ public class Main {
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
-                SWF swf = new SWF(stream, new ProgressListener() {
+                SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                     @Override
                     public void progress(int p) {
                         startWork(AppStrings.translate("work.reading.swf"), p);
                     }
                 }, Configuration.parallelSpeedUp.get());
-                swf.fileTitle = streamEntry.getKey();
                 result.add(swf);
             }
         } else {
-            SWF swf = new SWF(inputStream, new ProgressListener() {
+            SWF swf = new SWF(inputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
                 @Override
                 public void progress(int p) {
                     startWork(AppStrings.translate("work.reading.swf"), p);
                 }
             }, Configuration.parallelSpeedUp.get());
-            swf.file = sourceInfo.getFile();
-            swf.fileTitle = sourceInfo.getFileTitle();
             result.add(swf);
         }
 
@@ -409,8 +406,7 @@ public class Main {
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
         if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle) {
-            swf.file = outfile;
-            swf.fileTitle = null;
+            swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
         }
         File outfileF = new File(outfile);
@@ -625,8 +621,8 @@ public class Main {
         switch (mode) {
             case SAVE:
             case SAVEAS:
-                if (swf.file != null) {
-                    ext = Path.getExtension(swf.file);
+                if (swf.getFile() != null) {
+                    ext = Path.getExtension(swf.getFile());
                 }
                 break;
             case EXE:

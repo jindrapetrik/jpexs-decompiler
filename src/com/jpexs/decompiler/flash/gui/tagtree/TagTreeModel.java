@@ -185,7 +185,7 @@ public class TagTreeModel implements TreeModel {
         Timeline timeline = swf.getTimeline();
         int frameCount = timeline.getFrameCount();
         for (int i = 0; i < frameCount; i++) {
-            frames.add(timeline.getFrames().get(i));
+            frames.add(timeline.getFrame(i));
         }
 
         for (int i = sounds.size() - 1; i >= 0; i--) {
@@ -414,7 +414,7 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof Frame) {
             return ((Frame) parentNode).innerTags.get(index);
         } else if (parentNode instanceof DefineSpriteTag) {
-            return ((DefineSpriteTag) parentNode).getTimeline().getFrames().get(index);
+            return ((DefineSpriteTag) parentNode).getTimeline().getFrame(index);
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return ((DefineBinaryDataTag) parentNode).innerSwf;
         } else if (parentNode instanceof AS2Package) {

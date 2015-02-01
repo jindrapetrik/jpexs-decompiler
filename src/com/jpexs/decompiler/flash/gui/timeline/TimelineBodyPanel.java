@@ -41,7 +41,7 @@ import javax.swing.JPanel;
  */
 public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListener {
 
-    private final Timeline timeLine;
+    private final Timeline timeline;
 
     public static final Color motionTweenColor = new Color(0x59, 0xfe, 0x7c);
 
@@ -85,10 +85,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         listeners.remove(l);
     }
 
-    public TimelineBodyPanel(Timeline timeLine) {
+    public TimelineBodyPanel(Timeline timeline) {
 
-        this.timeLine = timeLine;
-        Dimension dim = new Dimension(TimelinePanel.FRAME_WIDTH * timeLine.getFrameCount() + 1, TimelinePanel.FRAME_HEIGHT * timeLine.getMaxDepth());
+        this.timeline = timeline;
+        Dimension dim = new Dimension(TimelinePanel.FRAME_WIDTH * timeline.getFrameCount() + 1, TimelinePanel.FRAME_HEIGHT * timeline.getMaxDepth());
         setSize(dim);
         setPreferredSize(dim);
         addMouseListener(this);
@@ -111,11 +111,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         int end_f = (clip.x + clip.width) / TimelinePanel.FRAME_WIDTH;
         int end_d = (clip.y + clip.height) / TimelinePanel.FRAME_HEIGHT;
 
-        int max_d = timeLine.getMaxDepth();
+        int max_d = timeline.getMaxDepth();
         if (max_d < end_d) {
             end_d = max_d;
         }
-        int max_f = timeLine.getFrameCount() - 1;
+        int max_f = timeline.getFrameCount() - 1;
         if (max_f < end_f) {
             end_f = max_f;
         }
@@ -128,7 +128,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         for (int f = start_f; f <= end_f; f++) {
             for (int d = start_d; d <= end_d; d++) {
-                DepthState fl = timeLine.getFrames().get(f).layers.get(d);
+                DepthState fl = timeline.getFrame(f).layers.get(d);
                 if (fl == null) {
                     if ((f + 1) % 5 == 0) {
                         g.setColor(emptyFrameSecondColor);
@@ -143,19 +143,19 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         for (int f = start_f; f <= end_f; f++) {
             for (int d = start_d; d <= end_d; d++) {
-                DepthState fl = timeLine.getFrames().get(f).layers.get(d);
+                DepthState fl = timeline.getFrame(f).layers.get(d);
                 boolean motionTween = fl == null ? false : fl.motionTween;
 
                 DepthState flNext = null;
                 if (f < max_f) {
-                    flNext = timeLine.getFrames().get(f + 1).layers.get(d);
+                    flNext = timeline.getFrame(f + 1).layers.get(d);
                 }
                 DepthState flPrev = null;
                 if (f > 0) {
-                    flPrev = timeLine.getFrames().get(f - 1).layers.get(d);
+                    flPrev = timeline.getFrame(f - 1).layers.get(d);
                 }
 
-                CharacterTag cht = fl == null ? null : timeLine.swf.getCharacter(fl.characterId);
+                CharacterTag cht = fl == null ? null : timeline.swf.getCharacter(fl.characterId);
                 boolean shapeTween = cht != null && (cht instanceof MorphShapeTag);
                 boolean motionTweenStart = (!motionTween) && (flNext != null && flNext.motionTween);
                 boolean motionTweenEnd = (!motionTween) && (flPrev != null && flPrev.motionTween);
@@ -180,18 +180,18 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                 if (fl == null) {
 
-                    if (timeLine.getDepthMaxFrame().containsKey(d) && f < timeLine.getDepthMaxFrame().get(d)) {
+                    if (timeline.getDepthMaxFrame().containsKey(d) && f < timeline.getDepthMaxFrame().get(d)) {
                         int draw_f = f;
 
-                        DepthState prev_ds = f < 1 ? null : timeLine.getFrames().get(f - 1).layers.get(d);
+                        DepthState prev_ds = f < 1 ? null : timeline.getFrame(f - 1).layers.get(d);
 
                         if (f == 0 || prev_ds != null) {
                             draw_f = f;
                             keyfound[d - start_d] = true;
                         } else if (!keyfound[d - start_d]) {
                             for (; draw_f >= 0; draw_f--) {
-                                if (timeLine.getFrames().get(draw_f).layers.get(d) != null) {
-                                    if (timeLine.getFrames().get(draw_f).layers.get(d).characterId != -1) {
+                                if (timeline.getFrame(draw_f).layers.get(d) != null) {
+                                    if (timeline.getFrame(draw_f).layers.get(d).characterId != -1) {
                                         break;
                                     }
                                 }
@@ -200,9 +200,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                             continue;
                         }
                         int num_frames = 1;
-                        for (int i = draw_f + 1; i < timeLine.getFrames().size(); i++) {
-                            if (timeLine.getFrames().get(i).layers.get(d) != null) {
-                                if (timeLine.getFrames().get(i).layers.get(d).characterId != -1) {
+                        for (int i = draw_f + 1; i < timeline.getFrameCount(); i++) {
+                            if (timeline.getFrame(i).layers.get(d) != null) {
+                                if (timeline.getFrame(i).layers.get(d).characterId != -1) {
                                     break;
                                 }
                             }
@@ -241,7 +241,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     }
 
                     if (d == 0) {
-                        if (!timeLine.getFrames().get(f).actions.isEmpty()) {
+                        if (!timeline.getFrame(f).actions.isEmpty()) {
                             g.setColor(aColor);
                             g.setFont(getFont().deriveFont(fontSize));
                             int awidth = g.getFontMetrics().stringWidth("a");
@@ -257,7 +257,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         keyfound[d - start_d] = true;
                     } else if (!keyfound[d - start_d]) {
                         for (int k = f - 1; k >= 0; k--) {
-                            fl = timeLine.getFrames().get(k).layers.get(d);
+                            fl = timeline.getFrame(k).layers.get(d);
                             if (fl == null) {
                                 break;
                             }
@@ -271,8 +271,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         continue;
                     }
                     int num_frames = 1;
-                    for (int n = draw_f + 1; n < timeLine.getFrameCount(); n++) {
-                        fl = timeLine.getFrames().get(n).layers.get(d);
+                    for (int n = draw_f + 1; n < timeline.getFrameCount(); n++) {
+                        fl = timeline.getFrame(n).layers.get(d);
                         if (fl == null) {
                             break;
                         }
@@ -364,10 +364,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         Point p = e.getPoint();
         p.x = p.x / TimelinePanel.FRAME_WIDTH;
         p.y = p.y / TimelinePanel.FRAME_HEIGHT;
-        if (p.x >= timeLine.getFrameCount()) {
-            p.x = timeLine.getFrameCount() - 1;
+        if (p.x >= timeline.getFrameCount()) {
+            p.x = timeline.getFrameCount() - 1;
         }
-        int maxDepth = timeLine.getMaxDepth();
+        int maxDepth = timeline.getMaxDepth();
         if (p.y > maxDepth) {
             p.y = maxDepth;
         }
@@ -402,7 +402,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 break;
             case 39: //right
-                if (cursor.x < timeLine.getFrames().size() - 1) {
+                if (cursor.x < timeline.getFrameCount() - 1) {
                     frameSelect(cursor.x + 1, cursor.y);
                 }
                 break;
@@ -412,7 +412,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 break;
             case 40: //down
-                if (cursor.y < timeLine.getMaxDepth()) {
+                if (cursor.y < timeline.getMaxDepth()) {
                     frameSelect(cursor.x, cursor.y + 1);
                 }
                 break;

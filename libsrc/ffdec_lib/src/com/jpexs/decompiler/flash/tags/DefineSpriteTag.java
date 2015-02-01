@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -301,14 +300,14 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     @Override
     public int getNumFrames() {
         // flashplayer ignores the count stored in frameCount
-        return getTimeline().getFrames().size(); // frameCount
+        return getTimeline().getFrameCount(); // frameCount
     }
 
     private int getRealFrameCount() {
         int cnt = 1;
-        List<Frame> frames = getTimeline().getFrames();
-        for (int i = 1; i < frames.size(); i++) {
-            if (frames.get(i).layersChanged) {
+        Timeline timeline = getTimeline();
+        for (int i = 1; i < timeline.getFrameCount(); i++) {
+            if (timeline.getFrame(i).layersChanged) {
                 cnt++;
             }
         }
