@@ -156,7 +156,7 @@ public abstract class MainFrameMenu {
         mainFrame.getPanel().exportFla(swf);
     }
 
-    protected boolean search(boolean searchInText) {
+    protected boolean search(Boolean searchInText) {
         if (swf != null) {
             mainFrame.getPanel().searchInActionScriptOrText(searchInText);
             return true;

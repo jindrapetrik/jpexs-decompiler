@@ -473,7 +473,7 @@ public class MainFrameClassicMenu extends MainFrameMenu implements ActionListene
                 mainFrame.getPanel().reload(true);
                 break;
             case ACTION_SEARCH:
-                search(false);
+                search(null);
                 break;
             case ACTION_AUTO_DEOBFUSCATE:
                 if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {

@@ -857,7 +857,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 mainFrame.getPanel().autoDeobfuscateChanged();
                 break;
             case ACTION_SEARCH:
-                search(false);
+                search(null);
                 break;
             case ACTION_REPLACE:
                 replace();

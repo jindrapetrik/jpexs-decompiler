@@ -1195,15 +1195,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void searchInActionScriptOrText(boolean searchInText) {
+    public void searchInActionScriptOrText(Boolean searchInText) {
         if (searchDialog == null) {
             searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
         }
 
-        if (searchInText) {
-            searchDialog.searchInTextsRadioButton.setSelected(true);
-        } else {
-            searchDialog.searchInASRadioButton.setSelected(true);
+        if (searchInText != null) {
+            if (searchInText) {
+                searchDialog.searchInTextsRadioButton.setSelected(true);
+            } else {
+                searchDialog.searchInASRadioButton.setSelected(true);
+            }
         }
 
         searchDialog.setVisible(true);
