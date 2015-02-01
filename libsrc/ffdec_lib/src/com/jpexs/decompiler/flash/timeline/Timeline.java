@@ -100,6 +100,12 @@ public class Timeline {
         return frames;
     }
 
+    public void addFrame(Frame frame) {
+        ensureInitialized();
+        frames.add(frame);
+        maxDepth = getMaxDepthInternal();
+    }
+
     public AS2Package getAS2RootPackage() {
         ensureInitialized();
         return as2RootPackage;

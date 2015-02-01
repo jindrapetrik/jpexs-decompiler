@@ -58,42 +58,46 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private final ColorTransform colorTransform;
 
-    private static final Cache<SHAPE, List<List<IEdge>>> fillEdgeMapCache = Cache.getInstance(true, true, "fillEdgeMap");
-
-    private static final Cache<SHAPE, List<List<IEdge>>> lineEdgeMapCache = Cache.getInstance(true, true, "lineEdgeMap");
+    private static final Cache<SHAPE, ShapeExportData> exportDataCache = Cache.getInstance(true, true, "shapeExportDataCache");
 
     public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
-        _fillStyles = new ArrayList<>();
-        _lineStyles = new ArrayList<>();
-        if (shape instanceof SHAPEWITHSTYLE) {
-            SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
-            _fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
-            _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
-        }
 
-        List<List<IEdge>> fillPaths = fillEdgeMapCache.get(shape);
-        List<List<IEdge>> linePaths = lineEdgeMapCache.get(shape);
-        if (fillPaths == null || linePaths == null) {
+        ShapeExportData cachedData = exportDataCache.get(shape);
+        if (cachedData == null) {
+            List<FILLSTYLE> fillStyles = new ArrayList<>();
+            List<LINESTYLE> lineStyles = new ArrayList<>();
+            if (shape instanceof SHAPEWITHSTYLE) {
+                SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
+                fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
+                lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+            }
+
             // Create edge maps
             List<Map<Integer, List<IEdge>>> fillEdgeMaps = new ArrayList<>();
             List<Map<Integer, List<IEdge>>> lineEdgeMaps = new ArrayList<>();
-            createEdgeMaps(shape, _fillStyles, _lineStyles, fillEdgeMaps, lineEdgeMaps);
+            createEdgeMaps(shape, fillStyles, lineStyles, fillEdgeMaps, lineEdgeMaps);
             int count = lineEdgeMaps.size();
-            fillPaths = new ArrayList<>(count);
-            linePaths = new ArrayList<>(count);
+            List<List<IEdge>> fillPaths = new ArrayList<>(count);
+            List<List<IEdge>> linePaths = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 fillPaths.add(createPathFromEdgeMap(fillEdgeMaps.get(i)));
                 linePaths.add(createPathFromEdgeMap(lineEdgeMaps.get(i)));
             }
 
-            fillEdgeMapCache.put(shape, fillPaths);
-            lineEdgeMapCache.put(shape, linePaths);
+            cachedData = new ShapeExportData();
+            cachedData.fillPaths = fillPaths;
+            cachedData.linePaths = linePaths;
+            cachedData.fillStyles = fillStyles;
+            cachedData.lineStyles = lineStyles;
+            exportDataCache.put(shape, cachedData);
         }
 
-        _fillPaths = fillPaths;
-        _linePaths = linePaths;
+        _fillStyles = cachedData.fillStyles;
+        _lineStyles = cachedData.lineStyles;
+        _fillPaths = cachedData.fillPaths;
+        _linePaths = cachedData.linePaths;
     }
 
     public void export() {
