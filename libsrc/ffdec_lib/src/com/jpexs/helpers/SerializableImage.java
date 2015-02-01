@@ -57,16 +57,16 @@ public class SerializableImage implements Serializable {
         this.image = image;
     }
 
-    public SerializableImage(int i, int i1, int i2) {
-        image = new BufferedImage(i, i1, i2);
+    public SerializableImage(int width, int height, int imageType) {
+        image = new BufferedImage(width, height, imageType);
     }
 
-    public SerializableImage(ColorModel cm, WritableRaster wr, boolean bln, Hashtable<?, ?> hshtbl) {
-        image = new BufferedImage(cm, wr, bln, hshtbl);
+    public SerializableImage(ColorModel cm, WritableRaster raster, boolean isRasterPremultiplied, Hashtable<?, ?> properties) {
+        image = new BufferedImage(cm, raster, isRasterPremultiplied, properties);
     }
 
-    public SerializableImage(int i, int i1, int i2, IndexColorModel icm) {
-        image = new BufferedImage(i, i1, i2, icm);
+    public SerializableImage(int width, int height, int imageType, IndexColorModel cm) {
+        image = new BufferedImage(width, height, imageType, cm);
     }
 
     public BufferedImage getBufferedImage() {

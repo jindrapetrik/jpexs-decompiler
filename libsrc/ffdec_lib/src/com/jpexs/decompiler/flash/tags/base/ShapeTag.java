@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
-import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -68,12 +67,12 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShapes().getOutline());
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShapes(), null, image, transformation, colorTransform);
         if (Configuration.debugMode.get()) { // show control points
             List<GeneralPath> paths = PathExporter.export(getShapes());

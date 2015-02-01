@@ -52,15 +52,15 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private final List<LINESTYLE> _lineStyles;
 
-    private final List<Map<Integer, List<IEdge>>> _fillEdgeMaps;
+    private final List<List<IEdge>> _fillPaths;
 
-    private final List<Map<Integer, List<IEdge>>> _lineEdgeMaps;
+    private final List<List<IEdge>> _linePaths;
 
     private final ColorTransform colorTransform;
 
-    private static final Cache<SHAPE, List<Map<Integer, List<IEdge>>>> fillEdgeMapCache = Cache.getInstance(true, true, "fillEdgeMap");
+    private static final Cache<SHAPE, List<List<IEdge>>> fillEdgeMapCache = Cache.getInstance(true, true, "fillEdgeMap");
 
-    private static final Cache<SHAPE, List<Map<Integer, List<IEdge>>>> lineEdgeMapCache = Cache.getInstance(true, true, "lineEdgeMap");
+    private static final Cache<SHAPE, List<List<IEdge>>> lineEdgeMapCache = Cache.getInstance(true, true, "lineEdgeMap");
 
     public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
@@ -73,30 +73,38 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
         }
 
-        List<Map<Integer, List<IEdge>>> fillEdgeMaps = fillEdgeMapCache.get(shape);
-        List<Map<Integer, List<IEdge>>> lineEdgeMaps = lineEdgeMapCache.get(shape);
-        if (fillEdgeMaps == null || lineEdgeMaps == null) {
+        List<List<IEdge>> fillPaths = fillEdgeMapCache.get(shape);
+        List<List<IEdge>> linePaths = lineEdgeMapCache.get(shape);
+        if (fillPaths == null || linePaths == null) {
             // Create edge maps
-            fillEdgeMaps = new ArrayList<>();
-            lineEdgeMaps = new ArrayList<>();
+            List<Map<Integer, List<IEdge>>> fillEdgeMaps = new ArrayList<>();
+            List<Map<Integer, List<IEdge>>> lineEdgeMaps = new ArrayList<>();
             createEdgeMaps(shape, _fillStyles, _lineStyles, fillEdgeMaps, lineEdgeMaps);
-            fillEdgeMapCache.put(shape, fillEdgeMaps);
-            lineEdgeMapCache.put(shape, lineEdgeMaps);
+            int count = lineEdgeMaps.size();
+            fillPaths = new ArrayList<>(count);
+            linePaths = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                fillPaths.add(createPathFromEdgeMap(fillEdgeMaps.get(i)));
+                linePaths.add(createPathFromEdgeMap(lineEdgeMaps.get(i)));
+            }
+
+            fillEdgeMapCache.put(shape, fillPaths);
+            lineEdgeMapCache.put(shape, linePaths);
         }
 
-        _fillEdgeMaps = fillEdgeMaps;
-        _lineEdgeMaps = lineEdgeMaps;
+        _fillPaths = fillPaths;
+        _linePaths = linePaths;
     }
 
     public void export() {
         // Let the doc handler know that a shape export starts
         beginShape();
         // Export fills and strokes for each group separately
-        for (int i = 0; i < _lineEdgeMaps.size(); i++) {
+        for (int i = 0; i < _linePaths.size(); i++) {
             // Export fills first
-            exportFillPath(i);
+            exportFillPath(_fillPaths.get(i));
             // Export strokes last
-            exportLinePath(i);
+            exportLinePath(_linePaths.get(i));
         }
         // Let the doc handler know that we're done exporting a shape
         endShape();
@@ -203,7 +211,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1,
+    private void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1,
             Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap) {
         List<IEdge> path;
         if (fillStyleIdx0 != 0) {
@@ -234,8 +242,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected void exportFillPath(int groupIndex) {
-        List<IEdge> path = createPathFromEdgeMap(_fillEdgeMaps.get(groupIndex));
+    private void exportFillPath(List<IEdge> path) {
         PointInt pos = PointInt.MAX;
         int fillStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
@@ -309,8 +316,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected void exportLinePath(int groupIndex) {
-        List<IEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
+    private void exportLinePath(List<IEdge> path) {
         PointInt pos = PointInt.MAX;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
@@ -399,7 +405,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected List<IEdge> createPathFromEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
+    private List<IEdge> createPathFromEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
         List<IEdge> newPath = new ArrayList<>();
         List<Integer> styleIdxArray = new ArrayList<>();
         for (Integer styleIdx : edgeMap.keySet()) {
@@ -412,7 +418,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return newPath;
     }
 
-    protected void cleanEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
+    private void cleanEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
         for (Integer styleIdx : edgeMap.keySet()) {
             List<IEdge> subPath = edgeMap.get(styleIdx);
             if (subPath != null && subPath.size() > 0) {
@@ -444,7 +450,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected Map<String, List<IEdge>> createCoordMap(List<IEdge> path) {
+    private Map<String, List<IEdge>> createCoordMap(List<IEdge> path) {
         Map<String, List<IEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
@@ -461,7 +467,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return coordMap;
     }
 
-    protected void removeEdgeFromCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
+    private void removeEdgeFromCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
         String key = edge.getFrom().getX() + "_" + edge.getFrom().getY();
         List<IEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null) {
@@ -476,7 +482,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected IEdge findNextEdgeInCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
+    private IEdge findNextEdgeInCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
         String key = edge.getTo().getX() + "_" + edge.getTo().getY();
         List<IEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null && coordMapArray.size() > 0) {
@@ -485,15 +491,15 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return null;
     }
 
-    protected void appendFillStyles(List<FILLSTYLE> v1, FILLSTYLE[] v2) {
+    private void appendFillStyles(List<FILLSTYLE> v1, FILLSTYLE[] v2) {
         v1.addAll(Arrays.asList(v2));
     }
 
-    protected void appendLineStyles(List<LINESTYLE> v1, LINESTYLE[] v2) {
+    private void appendLineStyles(List<LINESTYLE> v1, LINESTYLE[] v2) {
         v1.addAll(Arrays.asList(v2));
     }
 
-    protected void appendEdges(List<IEdge> v1, List<IEdge> v2) {
+    private void appendEdges(List<IEdge> v1, List<IEdge> v2) {
         for (int i = 0; i < v2.size(); i++) {
             v1.add(v2.get(i));
         }

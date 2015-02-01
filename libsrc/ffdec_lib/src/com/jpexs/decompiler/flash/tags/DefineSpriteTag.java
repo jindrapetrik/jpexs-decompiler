@@ -28,7 +28,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -289,8 +289,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, time, renderContext, image, transformation, colorTransform);
     }
 
     @Override
@@ -337,8 +337,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        return getTimeline().getOutline(frame, time, ratio, stateUnderCursor, mouseButton, transformation);
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+        return getTimeline().getOutline(frame, time, ratio, renderContext, transformation);
     }
 
     @Override

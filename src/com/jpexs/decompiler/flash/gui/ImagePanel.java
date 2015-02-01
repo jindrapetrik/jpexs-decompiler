@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -585,10 +586,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, null, 0, image, m, new ConstantColorColorTransform(0xFFC0C0C0));
+        textTag.toImage(0, 0, 0, new RenderContext(), image, m, new ConstantColorColorTransform(0xFFC0C0C0));
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, null, 0, image, m, new ConstantColorColorTransform(0xFF000000));
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, m, new ConstantColorColorTransform(0xFF000000));
         }
 
         iconPanel.setImg(image);
@@ -679,7 +680,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
                 m.scale(zoom);
-                drawable.getTimeline().toImage(frame, time, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
+                RenderContext renderContext = new RenderContext();
+                renderContext.stateUnderCursor = stateUnderCursor;
+                renderContext.mouseButton = mouseButton;
+                drawable.getTimeline().toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
 
                 Graphics2D gg = (Graphics2D) image.getGraphics();
                 gg.setStroke(new BasicStroke(3));
@@ -693,7 +697,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     if (cht != null) {
                         if (cht instanceof DrawableTag) {
                             DrawableTag dt = (DrawableTag) cht;
-                            Shape outline = dt.getOutline(0, ds.time, ds.ratio, stateUnderCursor, mouseButton, new Matrix(ds.matrix));
+                            Shape outline = dt.getOutline(0, ds.time, ds.ratio, renderContext, new Matrix(ds.matrix));
                             Rectangle bounds = outline.getBounds();
                             bounds.x *= zoom;
                             bounds.y *= zoom;
@@ -740,8 +744,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             lastMouseEvent = this.lastMouseEvent;
         }
 
-        updatePos(timelined, lastMouseEvent, counter);
-
         synchronized (ImagePanel.class) {
             frame = this.frame;
             time = this.time;
@@ -762,10 +764,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         getOutlines(timelined, frame, time, zoomDouble, stateUnderCursor, mouseButton, counter);
+        updatePos(timelined, lastMouseEvent, counter);
+
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
         SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoomDouble);
+
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
@@ -822,7 +827,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
-    private void getOutlines(Timelined timelined, int frame, int time, double zoom, DepthState stateUnderCursor, int mouseButton, int counter) {
+    private List<Shape> getOutlines(Timelined timelined, int frame, int time, double zoom, DepthState stateUnderCursor, int mouseButton, int counter) {
         List<DepthState> objs = new ArrayList<>();
         List<Shape> outlines = new ArrayList<>();
         Matrix m = new Matrix();
@@ -841,6 +846,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 iconPanel.setOutlines(objs, outlines);
             }
         }
+
+        return outlines;
     }
 
     public synchronized void stop() {

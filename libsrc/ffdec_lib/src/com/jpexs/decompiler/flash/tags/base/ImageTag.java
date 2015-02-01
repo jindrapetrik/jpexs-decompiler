@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
-import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -184,7 +183,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShape(), null, image, transformation, colorTransform);
     }
 
@@ -212,7 +211,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShape().getOutline());
     }
 

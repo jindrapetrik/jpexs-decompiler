@@ -26,11 +26,11 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
-import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -549,7 +549,7 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         staticTextToImage(swf, textRecords, 2, image, getTextMatrix(), transformation, colorTransform);
         /*try {
          DefineText2Tag originalTag = (DefineText2Tag) getOriginalTag();

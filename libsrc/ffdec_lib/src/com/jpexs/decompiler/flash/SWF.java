@@ -102,6 +102,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
@@ -2784,12 +2785,17 @@ public final class SWF implements SWFContainerItem, Timelined {
         Matrix m = transformation.clone();
         m.translate(-rect.Xmin, -rect.Ymin);
         m.scale(zoom);
-        frameToImage(timeline, frame, time, stateUnderCursor, mouseButton, image, m, colorTransform);
-        putToCache(key, image);
+        RenderContext renderContext = new RenderContext();
+        renderContext.stateUnderCursor = stateUnderCursor;
+        renderContext.mouseButton = mouseButton;
+        frameToImage(timeline, frame, time, renderContext, image, m, colorTransform);
+        if (useCache) {
+            putToCache(key, image);
+        }
         return image;
     }
 
-    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, DepthState stateUnderCursor, int mouseButton, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RenderContext renderContext, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform, double zoom) {
         RECT rect = displayRect;
         for (int f = 0; f < timeline.getFrames().size(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
@@ -2797,12 +2803,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, 0, stateUnderCursor, mouseButton, image, m, colorTransform);
+            frameToImage(timeline, f, 0, renderContext, image, m, colorTransform);
             ret.add(image);
         }
     }
 
-    public static void frameToImage(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame, int time, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         double unzoom = SWF.unitDivisor;
         if (timeline.getFrames().size() <= frame) {
             return;
@@ -2850,7 +2856,6 @@ public final class SWF implements SWFContainerItem, Timelined {
             boolean showPlaceholder = false;
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                SerializableImage img;
                 Matrix drawMatrix = new Matrix();
                 int drawableFrameCount = drawable.getNumFrames();
                 if (drawableFrameCount == 0) {
@@ -2858,10 +2863,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 int dframe = (time + layer.time) % drawableFrameCount;
                 if (character instanceof ButtonTag) {
-                    ButtonTag bt = (ButtonTag) character;
                     dframe = ButtonTag.FRAME_UP;
-                    if (stateUnderCursor == layer) {
-                        if (mouseButton > 0) {
+                    if (renderContext.stateUnderCursor == layer) {
+                        if (renderContext.mouseButton > 0) {
                             dframe = ButtonTag.FRAME_DOWN;
                         } else {
                             dframe = ButtonTag.FRAME_OVER;
@@ -2905,22 +2909,40 @@ public final class SWF implements SWFContainerItem, Timelined {
                     continue;
                 }
 
-                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
-                img.fillTransparent();
-
                 m.translate(-rect.xMin, -rect.yMin);
                 drawMatrix.translate(rect.xMin, rect.yMin);
 
-                drawable.toImage(dframe, layer.time + time, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
-                //if(stateUnderCursor == layer){
-              /* if(true){
-                 Graphics2D gg = (Graphics2D)img.getGraphics();
+                SerializableImage img = null;
+                String cacheKey = null;
+                if (drawable instanceof ShapeTag) {
+                    cacheKey = m.toString() + clrTrans.toString();
+                    img = renderContext.shapeCache.get(cacheKey);
+                }
+
+                if (img == null) {
+                    img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                    img.fillTransparent();
+
+                    drawable.toImage(dframe, layer.time + time, layer.ratio, renderContext, img, m, clrTrans);
+
+                    if (cacheKey != null) {
+                        renderContext.shapeCache.put(cacheKey, img);
+                    }
+                }
+
+                /*//if (renderContext.stateUnderCursor == layer) {
+                 if (true) {
+                 BufferedImage bi = img.getBufferedImage();
+                 ColorModel cm = bi.getColorModel();
+                 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+                 WritableRaster raster = bi.copyData(null);
+                 img = new SerializableImage(new BufferedImage(cm, raster, isAlphaPremultiplied, null));
+                 Graphics2D gg = (Graphics2D) img.getGraphics();
                  gg.setStroke(new BasicStroke(3));
                  gg.setPaint(Color.red);
                  gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                 gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(frame, layer.ratio, stateUnderCursor, mouseButton, m)));
+                 gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(dframe, layer.time + time, layer.ratio, renderContext, m)));
                  }*/
-
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);

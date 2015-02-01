@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -111,7 +112,7 @@ public class ShapeExporter {
                                 Matrix m = new Matrix();
                                 m.translate(-rect.Xmin, -rect.Ymin);
                                 m.scale(settings.zoom);
-                                st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
+                                st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
                                 if (settings.mode == ShapeExportMode.PNG) {
                                     ImageHelper.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
                                 } else {

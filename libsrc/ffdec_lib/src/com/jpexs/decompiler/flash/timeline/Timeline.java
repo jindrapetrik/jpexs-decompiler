@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -66,6 +67,8 @@ public class Timeline {
     public Timelined timelined;
 
     public Tag parentTag;
+
+    public int maxDepth;
 
     public List<Tag> tags;
 
@@ -120,18 +123,19 @@ public class Timeline {
 
     public final int getMaxDepth() {
         ensureInitialized();
-        return getMaxDepthInternal();
+        return maxDepth;
     }
 
-    public final int getMaxDepthInternal() {
+    private int getMaxDepthInternal() {
         int max_depth = 0;
         for (Frame f : frames) {
             for (int depth : f.layers.keySet()) {
                 if (depth > max_depth) {
                     max_depth = depth;
                 }
-                if (f.layers.get(depth).clipDepth > max_depth) {
-                    max_depth = f.layers.get(depth).clipDepth;
+                int clipDepth = f.layers.get(depth).clipDepth;
+                if (clipDepth > max_depth) {
+                    max_depth = clipDepth;
                 }
             }
         }
@@ -285,9 +289,10 @@ public class Timeline {
             frames.add(frame);
         }
 
+        maxDepth = getMaxDepthInternal();
+
         // todo: enable again after TweenDetector.detectRanges implemented
         //detectTweens();
-        int maxDepth = getMaxDepthInternal();
         for (int d = 1; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
@@ -307,7 +312,6 @@ public class Timeline {
     }
 
     private void detectTweens() {
-        int maxDepth = getMaxDepthInternal();
         for (int d = 1; d <= maxDepth; d++) {
             int characterId = -1;
             int len = 0;
@@ -405,8 +409,8 @@ public class Timeline {
         return modified;
     }
 
-    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(this, frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(this, frame, time, renderContext, image, transformation, colorTransform);
     }
 
     public String toHtmlCanvas(double unitDivisor, List<Integer> frames) {
@@ -417,7 +421,6 @@ public class Timeline {
         Frame fr = getFrames().get(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
-        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
@@ -448,7 +451,6 @@ public class Timeline {
     public void getObjectsOutlines(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
         Frame fr = getFrames().get(frame);
         Stack<Clip> clips = new Stack<>();
-        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
@@ -460,27 +462,27 @@ public class Timeline {
             if (!clips.isEmpty()) {
                 currentClip = clips.peek();
             }
-            DepthState ds = fr.layers.get(d);
-            if (ds == null) {
+            DepthState layer = fr.layers.get(d);
+            if (layer == null) {
                 continue;
             }
-            if (!ds.isVisible) {
+            if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag c = swf.getCharacter(ds.characterId);
-            if (c instanceof DrawableTag) {
-                Matrix m = new Matrix(ds.matrix);
+            CharacterTag character = swf.getCharacter(layer.characterId);
+            if (character instanceof DrawableTag) {
+                DrawableTag drawable = (DrawableTag) character;
+                Matrix m = new Matrix(layer.matrix);
                 m = m.preConcatenate(transformation);
 
-                int dframe = 0;
-                if (c instanceof Timelined) {
-                    int frameCount = ((Timelined) c).getTimeline().frames.size();
-                    if (frameCount == 0) {
-                        return;
-                    }
-                    dframe = ds.time % frameCount;
-                    if (c instanceof ButtonTag) {
-                        ButtonTag bt = (ButtonTag) c;
+                int drawableFrameCount = drawable.getNumFrames();
+                if (drawableFrameCount == 0) {
+                    drawableFrameCount = 1;
+                }
+                int dframe = (time + layer.time) % drawableFrameCount;
+                if (character instanceof Timelined) {
+                    if (character instanceof ButtonTag) {
+                        ButtonTag bt = (ButtonTag) character;
                         dframe = ButtonTag.FRAME_HITTEST;
                         /*dframe = ButtonTag.FRAME_UP;
                          if (stateUnderCursor == ds) {
@@ -492,7 +494,11 @@ public class Timeline {
                          }*/
                     }
                 }
-                Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.time + time, ds.ratio, stateUnderCursor, mouseButton, m);
+
+                RenderContext renderContext = new RenderContext();
+                renderContext.stateUnderCursor = stateUnderCursor;
+                renderContext.mouseButton = mouseButton;
+                Shape cshape = ((DrawableTag) character).getOutline(dframe, layer.time + time, layer.ratio, renderContext, m);
 
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
@@ -500,25 +506,24 @@ public class Timeline {
                     a.subtract(new Area(currentClip.shape));
                     addArea.subtract(a);
                 }
-                if (ds.clipDepth > -1) {
-                    Clip clip = new Clip(addArea, ds.clipDepth);
+                if (layer.clipDepth > -1) {
+                    Clip clip = new Clip(addArea, layer.clipDepth);
                     clips.push(clip);
                 } else {
-                    objs.add(ds);
+                    objs.add(layer);
                     outlines.add(addArea);
                 }
-                if (c instanceof Timelined) {
-                    ((Timelined) c).getTimeline().getObjectsOutlines(dframe, time + ds.time, ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
+                if (character instanceof Timelined) {
+                    ((Timelined) character).getTimeline().getObjectsOutlines(dframe, time + layer.time, layer.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
                 }
             }
         }
     }
 
-    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
         Frame fr = getFrames().get(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
-        int maxDepth = getMaxDepthInternal();
         for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
@@ -530,30 +535,30 @@ public class Timeline {
             if (!clips.isEmpty()) {
                 currentClip = clips.peek();
             }
-            DepthState ds = fr.layers.get(d);
-            if (ds == null) {
+            DepthState layer = fr.layers.get(d);
+            if (layer == null) {
                 continue;
             }
-            if (!ds.isVisible) {
+            if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag c = swf.getCharacter(ds.characterId);
-            if (c instanceof DrawableTag) {
-                Matrix m = new Matrix(ds.matrix);
+            CharacterTag character = swf.getCharacter(layer.characterId);
+            if (character instanceof DrawableTag) {
+                DrawableTag drawable = (DrawableTag) character;
+                Matrix m = new Matrix(layer.matrix);
                 m = m.preConcatenate(transformation);
 
-                int dframe = 0;
-                if (c instanceof Timelined) {
-                    int frameCount = ((Timelined) c).getTimeline().frames.size();
-                    if (frameCount < 1) {
-                        frameCount = 1;
-                    }
-                    dframe = (time + ds.time) % frameCount;
-                    if (c instanceof ButtonTag) {
-                        ButtonTag bt = (ButtonTag) c;
+                int drawableFrameCount = drawable.getNumFrames();
+                if (drawableFrameCount == 0) {
+                    drawableFrameCount = 1;
+                }
+                int dframe = (time + layer.time) % drawableFrameCount;
+                if (character instanceof Timelined) {
+                    if (character instanceof ButtonTag) {
+                        ButtonTag bt = (ButtonTag) character;
                         dframe = ButtonTag.FRAME_UP;
-                        if (stateUnderCursor == ds) {
-                            if (mouseButton > 0) {
+                        if (renderContext.stateUnderCursor == layer) {
+                            if (renderContext.mouseButton > 0) {
                                 dframe = ButtonTag.FRAME_DOWN;
                             } else {
                                 dframe = ButtonTag.FRAME_OVER;
@@ -561,7 +566,8 @@ public class Timeline {
                         }
                     }
                 }
-                Shape cshape = ((DrawableTag) c).getOutline(dframe, time + ds.time, ds.ratio, stateUnderCursor, mouseButton, m);
+
+                Shape cshape = ((DrawableTag) character).getOutline(dframe, time + layer.time, layer.ratio, renderContext, m);
 
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
@@ -569,8 +575,8 @@ public class Timeline {
                     a.subtract(new Area(currentClip.shape));
                     addArea.subtract(a);
                 }
-                if (ds.clipDepth > -1) {
-                    Clip clip = new Clip(addArea, ds.clipDepth);
+                if (layer.clipDepth > -1) {
+                    Clip clip = new Clip(addArea, layer.clipDepth);
                     clips.push(clip);
                 } else {
                     area.add(addArea);
@@ -590,8 +596,7 @@ public class Timeline {
     }
 
     public boolean isSingleFrame(int frame) {
-        Frame frameObj = frames.get(frame);
-        int maxDepth = getMaxDepthInternal();
+        Frame frameObj = getFrames().get(frame);
         for (int i = 1; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;

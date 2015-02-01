@@ -386,19 +386,21 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             }
 
         }
-        timeline.getFrames().add(frameUp);
+
+        List<Frame> frames = timeline.getFrames();
+        frames.add(frameUp);
         if (frameOver.layers.isEmpty()) {
             frameOver = frameUp;
         }
-        timeline.getFrames().add(frameOver);
+        frames.add(frameOver);
         if (frameDown.layers.isEmpty()) {
             frameDown = frameOver;
         }
-        timeline.getFrames().add(frameDown);
+        frames.add(frameDown);
         if (frameHit.layers.isEmpty()) {
             frameHit = frameUp;
         }
-        timeline.getFrames().add(frameHit);
+        frames.add(frameHit);
 
         return timeline;
     }
