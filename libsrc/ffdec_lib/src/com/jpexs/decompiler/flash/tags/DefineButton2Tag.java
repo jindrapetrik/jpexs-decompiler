@@ -295,19 +295,19 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             }
 
         }
-        timeline.getFrames().add(frameUp);
+        timeline.addFrame(frameUp);
         if (frameOver.layers.isEmpty()) {
             frameOver = frameUp;
         }
-        timeline.getFrames().add(frameOver);
+        timeline.addFrame(frameOver);
         if (frameDown.layers.isEmpty()) {
             frameDown = frameOver;
         }
-        timeline.getFrames().add(frameDown);
+        timeline.addFrame(frameDown);
         if (frameHit.layers.isEmpty()) {
             frameHit = frameUp;
         }
-        timeline.getFrames().add(frameHit);
+        timeline.addFrame(frameHit);
         return timeline;
     }
 }
