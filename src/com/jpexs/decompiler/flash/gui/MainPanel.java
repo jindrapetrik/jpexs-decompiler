@@ -1334,9 +1334,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             List<TextTag> found = new ArrayList<>();
             Pattern pat;
             if (regexp) {
-                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                pat = Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             } else {
-                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             }
             for (Tag tag : swf.tags) {
                 if (tag instanceof TextTag) {
