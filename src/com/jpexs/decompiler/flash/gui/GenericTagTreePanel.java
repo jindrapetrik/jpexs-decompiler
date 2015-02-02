@@ -334,25 +334,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 
-        @Override
-        public Component getTreeCellRendererComponent(
-                JTree tree,
-                Object value,
-                boolean sel,
-                boolean expanded,
-                boolean leaf,
-                int row,
-                boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                    tree, value, sel,
-                    expanded, leaf, row,
-                    hasFocus);
-
+        public MyTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);
             setBackgroundNonSelectionColor(Color.white);
-            return this;
         }
     }
 

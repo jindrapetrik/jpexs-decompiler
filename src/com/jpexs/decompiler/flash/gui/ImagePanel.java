@@ -444,10 +444,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     @Override
     public synchronized void zoom(Zoom zoom) {
-        this.zoom = zoom;
-        shouldDraw.set(true);
-        if (textTag != null) {
-            setText(textTag, newTextTag);
+        boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
+        if (modified) {
+            this.zoom = zoom;
+            shouldDraw.set(true);
+            if (textTag != null) {
+                setText(textTag, newTextTag);
+            }
         }
     }
 
