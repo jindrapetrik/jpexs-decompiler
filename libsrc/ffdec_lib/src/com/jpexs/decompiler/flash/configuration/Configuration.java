@@ -314,6 +314,9 @@ public class Configuration {
     @ConfigurationName("check.updates.enabled")
     public static final ConfigurationItem<Boolean> checkForUpdatesAuto = null;
 
+    @ConfigurationCategory("update")
+    public static final ConfigurationItem<String> updateProxyAddress = null;
+
     @ConfigurationDefaultString("")
     @ConfigurationName("export.formats")
     public static final ConfigurationItem<String> lastSelectedExportFormats = null;

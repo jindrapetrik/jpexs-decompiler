@@ -1351,15 +1351,22 @@ public class Main {
             return false;
         }
 
-        String acceptVersions = "";
-        for (String a : accepted) {
-            if (!acceptVersions.isEmpty()) {
-                acceptVersions += ",";
-            }
-            acceptVersions += a;
-        }
+        String acceptVersions = String.join(",", accepted);
         try {
-            Socket sock = new Socket("www.free-decompiler.com", 80);
+            String proxyAddress = Configuration.updateProxyAddress.get();
+            Socket sock;
+            if (proxyAddress != null) {
+                int port = 8080;
+                if (proxyAddress.contains(":")) {
+                    String[] parts = proxyAddress.split(":");
+                    port = Integer.parseInt(parts[1]);
+                    proxyAddress = parts[0];
+                }
+
+                sock = new Socket(proxyAddress, port);
+            } else {
+                sock = new Socket("www.free-decompiler.com", 80);
+            }
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
             os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8")
