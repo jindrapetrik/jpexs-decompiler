@@ -361,7 +361,12 @@ public class TagTreeModel implements TreeModel {
                     return newPath;
                 }
             } else {
-                if (obj.equals(n)) {
+                TreeItem n2 = n;
+                if (n2 instanceof TagScript) {
+                    n2 = ((TagScript) n2).getTag();
+                }
+
+                if (obj.equals(n2)) {
                     return newPath;
                 }
             }
