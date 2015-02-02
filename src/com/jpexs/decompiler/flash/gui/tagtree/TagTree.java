@@ -372,9 +372,10 @@ public class TagTree extends JTree {
                 ret = Arrays.asList(DefineButtonTag.ID, DefineButton2Tag.ID);
                 break;
             case TagTreeModel.FOLDER_FONTS:
-                ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID);
                 if (gfx) {
-                    ret.add(DefineCompactedFont.ID);
+                    ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID, DefineCompactedFont.ID);
+                } else {
+                    ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID);
                 }
                 break;
             case TagTreeModel.FOLDER_BINARY_DATA:

@@ -86,6 +86,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private Tag editedTag;
 
+    private static final Map<Class, List<Field>> fieldCache = new HashMap<>();
+
     private class MyTree extends JTree {
 
         public MyTree() {
@@ -821,22 +823,26 @@ public class GenericTagTreePanel extends GenericTagPanel {
     }
 
     private static List<Field> getAvailableFields(Class<?> cls) {
-        List<Field> ret = new ArrayList<>();
-        Field fields[] = cls.getFields();
-        for (Field f : fields) {
-            if (Modifier.isStatic(f.getModifiers())) {
-                continue;
+        List<Field> ret = fieldCache.get(cls);
+        if (ret == null) {
+            ret = new ArrayList<>();
+            Field fields[] = cls.getFields();
+            for (Field f : fields) {
+                if (Modifier.isStatic(f.getModifiers())) {
+                    continue;
+                }
+                f.setAccessible(true);
+                Internal inter = f.getAnnotation(Internal.class);
+                if (inter != null) {
+                    continue;
+                }
+                HideInRawEdit hide = f.getAnnotation(HideInRawEdit.class);
+                if (hide != null) {
+                    continue;
+                }
+                ret.add(f);
             }
-            f.setAccessible(true);
-            Internal inter = f.getAnnotation(Internal.class);
-            if (inter != null) {
-                continue;
-            }
-            HideInRawEdit hide = f.getAnnotation(HideInRawEdit.class);
-            if (hide != null) {
-                continue;
-            }
-            ret.add(f);
+            fieldCache.put(cls, ret);
         }
         return ret;
     }
