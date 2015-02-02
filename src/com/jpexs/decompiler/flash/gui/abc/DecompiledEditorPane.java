@@ -576,9 +576,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     }
                 }
                 currentMethodHighlight = null;
-                String name = "";
                 currentTrait = null;
-                name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
