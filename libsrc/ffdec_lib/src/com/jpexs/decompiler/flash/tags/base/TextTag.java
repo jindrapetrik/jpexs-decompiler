@@ -296,7 +296,10 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.getCharacter(rec.fontId);
+                CharacterTag character = swf.getCharacter(rec.fontId);
+                if (character instanceof FontTag) {
+                    font = (FontTag) character;
+                }
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }

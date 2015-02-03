@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -218,18 +219,17 @@ public class DefineText2Tag extends TextTag {
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
-                                    for (Tag t : swf.tags) {
-                                        if (t instanceof FontTag) {
-                                            if (((FontTag) t).getFontId() == fontId) {
-                                                font = (FontTag) t;
-                                                fontName = font.getSystemFontName();
-                                                break;
-                                            }
-                                        }
+                                    CharacterTag characterTag = swf.getCharacter(fontId);
+                                    if (characterTag == null) {
+                                        throw new TextParseException("Font not found.", lexer.yyline());
                                     }
-                                    if (font == null) {
-                                        throw new TextParseException("Font not found", lexer.yyline());
+
+                                    if (!(characterTag instanceof FontTag)) {
+                                        throw new TextParseException("Character tag is not a Font tag. CharacterID: " + fontId, lexer.yyline());
                                     }
+
+                                    font = (FontTag) characterTag;
+                                    fontName = font.getSystemFontName();
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid font id - number expected. Found: " + paramValue, lexer.yyline());
                                 }
