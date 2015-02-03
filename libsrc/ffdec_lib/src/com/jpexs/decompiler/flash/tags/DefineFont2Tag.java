@@ -91,6 +91,7 @@ public class DefineFont2Tag extends FontTag {
     @Conditional("fontFlagsHasLayout")
     public List<RECT> fontBoundsTable;
 
+    @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
 
     public static final int ID = 48;

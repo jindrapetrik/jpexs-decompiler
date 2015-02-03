@@ -33,6 +33,11 @@ import java.util.logging.Logger;
  */
 public class ReflectionTools {
 
+    public static Object getValue(Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
+        Object value = field.get(obj);
+        return value;
+    }
+
     public static Object getValue(Object obj, Field field, int index) throws IllegalArgumentException, IllegalAccessException {
         if (getFieldSubSize(obj, field) <= index) {
             return null;
@@ -72,6 +77,10 @@ public class ReflectionTools {
             return Array.getLength(val);
         }
         return 0;
+    }
+
+    public static void setValue(Object obj, Field field, Object newValue) throws IllegalArgumentException, IllegalAccessException {
+        field.set(obj, newValue);
     }
 
     @SuppressWarnings("unchecked")

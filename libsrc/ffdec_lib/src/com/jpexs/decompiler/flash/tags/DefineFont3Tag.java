@@ -83,10 +83,14 @@ public class DefineFont3Tag extends FontTag {
     @Conditional("fontFlagsHasLayout")
     public int fontLeading;
 
+    @SWFType(BasicType.SI16)
+    @Conditional("fontFlagsHasLayout")
     public List<Integer> fontAdvanceTable;
 
+    @Conditional("fontFlagsHasLayout")
     public List<RECT> fontBoundsTable;
 
+    @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
 
     public static final int ID = 75;

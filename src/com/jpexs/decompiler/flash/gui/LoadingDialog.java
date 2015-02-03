@@ -49,16 +49,16 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(percent);
-                progressBar.setStringPainted(true);
+                if (percent == -1) {
+                    progressBar.setIndeterminate(true);
+                    progressBar.setStringPainted(false);
+                } else {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setValue(percent);
+                    progressBar.setStringPainted(true);
+                }
             }
         });
-    }
-
-    public void hidePercent() {
-        progressBar.setIndeterminate(true);
-        progressBar.setStringPainted(false);
     }
 
     /**

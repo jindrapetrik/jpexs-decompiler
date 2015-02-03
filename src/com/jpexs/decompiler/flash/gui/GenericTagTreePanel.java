@@ -47,6 +47,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -346,7 +347,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     }
 
-    private static class FieldNode extends DefaultMutableTreeNode {
+    private static final class FieldNode extends DefaultMutableTreeNode {
 
         private Object obj;
 
@@ -358,6 +359,18 @@ public class GenericTagTreePanel extends GenericTagPanel {
             this.obj = obj;
             this.field = field;
             this.index = index;
+
+            if (getValue() == null) {
+                try {
+                    if (List.class.isAssignableFrom(field.getType())) {
+                        ReflectionTools.setValue(obj, field, new ArrayList<>());
+                    } else if (field.getType().isArray()) {
+                        ReflectionTools.setValue(obj, field, Array.newInstance(field.getType().getComponentType(), 0));
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
 
         @Override
@@ -424,7 +437,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public Object getValue() {
             try {
                 if (ReflectionTools.needsIndex(field) && (index == -1)) {
-                    return obj;
+                    return ReflectionTools.getValue(obj, field);
                 }
                 Object val = ReflectionTools.getValue(obj, field, index);
                 if (val == null) {

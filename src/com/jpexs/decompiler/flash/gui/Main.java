@@ -111,7 +111,7 @@ public class Main {
 
     private static List<SWFSourceInfo> sourceInfos = new ArrayList<>();
 
-    private static LoadingDialog loadingDialog;
+    public static LoadingDialog loadingDialog;
 
     public static ModeFrame modeFrame;
 
@@ -186,23 +186,6 @@ public class Main {
                 }
             }
         }
-    }
-
-    protected static LoadingDialog getLoadingDialog() {
-        if (loadingDialog == null) {
-            synchronized (Main.class) {
-                if (loadingDialog == null) {
-                    View.execInEventDispatch(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingDialog = new LoadingDialog();
-                        }
-                    });
-                }
-            }
-        }
-
-        return loadingDialog;
     }
 
     public static MainFrame getMainFrame() {
@@ -283,12 +266,8 @@ public class Main {
                     }
                 }
                 if (loadingDialog != null) {
-                    getLoadingDialog().setDetail(name);
-                    if (percent == -1) {
-                        getLoadingDialog().hidePercent();
-                    } else {
-                        getLoadingDialog().setPercent(percent);
-                    }
+                    loadingDialog.setDetail(name);
+                    loadingDialog.setPercent(percent);
                 }
                 if (CommandLineArgumentParser.isCommandLineMode()) {
                     System.out.println(name);
@@ -307,7 +286,7 @@ public class Main {
                     mainFrame.getPanel().setWorkStatus("", null);
                 }
                 if (loadingDialog != null) {
-                    getLoadingDialog().setDetail("");
+                    loadingDialog.setDetail("");
                 }
             }
         });
@@ -495,7 +474,7 @@ public class Main {
                 }
             }
 
-            getLoadingDialog().setVisible(false);
+            loadingDialog.setVisible(false);
             shouldCloseWhenClosingLoadingDialog = false;
 
             final SWF fswf = firstSWF;
@@ -597,7 +576,7 @@ public class Main {
             Helper.freeMem();
         }
 
-        getLoadingDialog().setVisible(true);
+        loadingDialog.setVisible(true);
         OpenFileWorker wrk = new OpenFileWorker(newSourceInfos);
         wrk.execute();
         sourceInfos.addAll(Arrays.asList(newSourceInfos));
@@ -823,6 +802,12 @@ public class Main {
         }
         autoCheckForUpdates();
         offerAssociation();
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog = new LoadingDialog();
+            }
+        });
     }
 
     public static void showModeFrame() {
