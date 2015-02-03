@@ -142,7 +142,7 @@ public class FontPanel extends javax.swing.JPanel {
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) > -1) {
-                int opt; //yes
+                int opt = -1;
                 if (!(yestoall || notoall)) {
                     opt = View.showOptionDialog(null, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
                     if (opt == 2) {
@@ -152,12 +152,11 @@ public class FontPanel extends javax.swing.JPanel {
                         notoall = true;
                     }
                 }
+
                 if (yestoall) {
-                    opt = 0; //yes
+                    opt = 0; // yes
                 } else if (notoall) {
-                    opt = 1; //no
-                } else {
-                    opt = 1;
+                    opt = 1; // no
                 }
 
                 if (opt == 1) {
