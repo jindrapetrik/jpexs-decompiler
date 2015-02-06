@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.google.typography.font.sfntly.Font;
@@ -129,6 +130,7 @@ public class FontExporter {
         f.setAscender(Math.round(t.getAscent() / divider));
         f.setDescender(Math.round(t.getDescent() / divider));
 
+        int glyphCount = 0;
         for (int i = 0; i < shapes.size(); i++) {
             SHAPE s = shapes.get(i);
             final List<FPoint[]> contours = new ArrayList<>();
@@ -178,7 +180,21 @@ public class FontExporter {
             if (contours.isEmpty()) {
                 continue;
             }
-            final FGlyph g = f.addGlyph(c);
+
+            boolean hasContour = false;
+            for (FPoint[] cnt : contours) {
+                if (cnt.length > 0) {
+                    hasContour = true;
+                    break;
+                }
+            }
+
+            if (!hasContour) {
+                continue;
+            }
+
+            FGlyph g = f.addGlyph(c);
+            glyphCount++;
             double adv = t.getGlyphAdvance(i);
             if (adv != -1) {
                 g.setAdvanceWidth((int) Math.round(adv / divider));
@@ -193,6 +209,11 @@ public class FontExporter {
             }
 
         }
+
+        if (glyphCount == 0) {
+            return;
+        }
+
         f.buildFont();
 
         if (mode == FontExportMode.WOFF) {
@@ -214,7 +235,6 @@ public class FontExporter {
                 woffData.copyTo(fos);
             }
             ttfFile.delete();
-
         }
     }
 }

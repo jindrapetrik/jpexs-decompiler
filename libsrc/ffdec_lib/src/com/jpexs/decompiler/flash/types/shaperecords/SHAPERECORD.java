@@ -175,6 +175,10 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         int w2 = (int) (prevWidth * SWF.unitDivisor / cols);
         int h2 = (int) (prevHeight * SWF.unitDivisor / cols);
 
+        if (maxw == 0) {
+            return;
+        }
+
         int mh = maxh * w2 / maxw;
         int mw;
         if (mh > h2) {
