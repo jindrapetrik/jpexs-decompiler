@@ -948,6 +948,16 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    private static void decodeLZMAStream(InputStream is, OutputStream os, byte[] lzmaProperties, long fileSize) throws IOException {
+        Decoder decoder = new Decoder();
+        if (!decoder.SetDecoderProperties(lzmaProperties)) {
+            throw new IOException("LZMA:Incorrect stream properties");
+        }
+        if (!decoder.Code(is, os, fileSize - 8)) {
+            throw new IOException("LZMA:Error in data stream");
+        }
+    }
+
     private static SWFHeader decompress(InputStream is, OutputStream os, boolean allowUncompressed) throws IOException {
         byte[] hdr = new byte[8];
 
@@ -962,7 +972,8 @@ public final class SWF implements SWFContainerItem, Timelined {
                 "CWS", // ZLib compressed Flash
                 "ZWS", // LZMA compressed Flash
                 "GFX", // Uncompressed ScaleForm GFx
-                "CFX" // Compressed ScaleForm GFx
+                "CFX", // Compressed ScaleForm GFx
+                "ABC" // Non-standard LZMA compressed Flash
         ).contains(signature)) {
             throw new IOException("Invalid SWF file");
         }
@@ -1000,13 +1011,21 @@ public final class SWF implements SWFContainerItem, Timelined {
                     if (lzmaProperties.length != propertiesSize) {
                         throw new IOException("LZMA:input .lzma file is too short");
                     }
-                    Decoder decoder = new Decoder();
-                    if (!decoder.SetDecoderProperties(lzmaProperties)) {
-                        throw new IOException("LZMA:Incorrect stream properties");
-                    }
-                    if (!decoder.Code(is, os, fileSize - 8)) {
-                        throw new IOException("LZMA:Error in data stream");
-                    }
+
+                    decodeLZMAStream(is, os, lzmaProperties, fileSize);
+
+                    header.compression = SWFCompression.LZMA;
+                    header.lzmaProperties = lzmaProperties;
+                    break;
+                }
+                case 'A': { // ABC
+                    /* For details of ABC format, see ./ABCFormat.txt */
+                    byte[] lzmaProperties = new byte[5];
+                    is.read(lzmaProperties);
+                    byte[] uncompressedLength = new byte[8];
+                    is.read(uncompressedLength);
+
+                    decodeLZMAStream(is, os, lzmaProperties, fileSize);
 
                     header.compression = SWFCompression.LZMA;
                     header.lzmaProperties = lzmaProperties;

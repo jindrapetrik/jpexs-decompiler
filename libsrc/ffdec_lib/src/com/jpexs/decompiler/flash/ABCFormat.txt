@@ -1,0 +1,22 @@
+ABC format is a non-standard LZMA format. It's seen in letv.com. The file layout is depicted as below:
+
+| 4 bytes       | 4 bytes   | The remaining part
+| 'ABC'+version | scriptLen | Standard LZMA data
+
+And standard LZMA data is encoded as:
+
+| 5 bytes           | 8 bytes               | The remaining part
+| LZMA properties   | uncompressed length   | LZMA-compressed data
+
+For more information, visit the following pages:
+
+1. Difference between standard LZMA format and ZWC (LZMA-compressed SWF) format
+   https://helpx.adobe.com/flash-player/kb/exception-thrown-you-decompress-lzma-compressed.html
+2. How to decrypt KLetvPlayer.swf from letv.com
+   http://blog.csdn.net/lingedeng/article/details/37599347
+3. The source codes for encoding and decoding ABC format
+   com/alex/encrypt/ABCSwfEncrypt.as in LetvPlayer.swf
+
+LetvPlayer.swf and KLetvPlayer.swf mentioned above can be found at:
+http://player.letvcdn.com/p/201502/05/17/newplayer/LetvPlayer.swf
+http://player.letvcdn.com/p/201502/05/17/newplayer/1/KLetvPlayer.swf
