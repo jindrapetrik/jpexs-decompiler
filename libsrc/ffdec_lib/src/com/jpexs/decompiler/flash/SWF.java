@@ -1815,7 +1815,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                         @Override
                         public void run() throws IOException {
                             File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                            ImageHelper.write(frameImages.next(), "PNG", new FileOutputStream(f));
+                            try (FileOutputStream fos = new FileOutputStream(f)) {
+                                ImageHelper.write(frameImages.next(), "PNG", fos);
+                            }
                             ret.add(f);
                         }
                     }, handler).run();

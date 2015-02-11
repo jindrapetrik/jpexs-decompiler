@@ -2350,7 +2350,9 @@ public class ActionScriptParser {
             ABC abc = new ABC(swf);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
             parser.addScript(new String(Helper.readFile(src), "UTF-8"), true, src, classPos);
-            abc.saveToStream(new FileOutputStream(new File(dst)));
+            try (FileOutputStream fos = new FileOutputStream(new File(dst))) {
+                abc.saveToStream(fos);
+            }
         } catch (Exception ex) {
             Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);
         }

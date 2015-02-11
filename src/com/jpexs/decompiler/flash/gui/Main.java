@@ -390,27 +390,28 @@ public class Main {
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        FileOutputStream fos = new FileOutputStream(tmpFile);
-        if (mode == SaveFileMode.EXE) {
-            InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = exeStream.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
+        try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
+            if (mode == SaveFileMode.EXE) {
+                InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = exeStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                }
+                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                fos.write(width & 0xff);
+                fos.write((width >> 8) & 0xff);
+                fos.write((width >> 16) & 0xff);
+                fos.write((width >> 24) & 0xff);
+                fos.write(height & 0xff);
+                fos.write((height >> 8) & 0xff);
+                fos.write((height >> 16) & 0xff);
+                fos.write((height >> 24) & 0xff);
+                fos.write(Configuration.saveAsExeScaleMode.get());
             }
-            int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-            int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-            fos.write(width & 0xff);
-            fos.write((width >> 8) & 0xff);
-            fos.write((width >> 16) & 0xff);
-            fos.write((width >> 24) & 0xff);
-            fos.write(height & 0xff);
-            fos.write((height >> 8) & 0xff);
-            fos.write((height >> 16) & 0xff);
-            fos.write((height >> 24) & 0xff);
-            fos.write(Configuration.saveAsExeScaleMode.get());
+            swf.saveTo(fos);
         }
-        swf.saveTo(fos);
         if (tmpFile.exists()) {
             if (tmpFile.length() > 0) {
                 outfileF.delete();

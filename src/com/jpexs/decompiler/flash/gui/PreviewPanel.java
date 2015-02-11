@@ -980,7 +980,9 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         }
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
-            swf.saveTo(new BufferedOutputStream(new FileOutputStream(tempFile)));
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                swf.saveTo(new BufferedOutputStream(fos));
+            }
             flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
         } catch (IOException iex) {
             Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);

@@ -1119,7 +1119,9 @@ public class CommandLineArgumentParser {
             String xml = Helper.readTextFile(args.pop());
             SWF swf = new SWF();
             new SwfXmlImporter().importSwf(swf, xml);
-            swf.saveTo(new BufferedOutputStream(new FileOutputStream(args.pop())));
+            try (FileOutputStream fos = new FileOutputStream(new File(args.pop()))) {
+                swf.saveTo(new BufferedOutputStream(fos));
+            }
         } catch (IOException ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
         }
