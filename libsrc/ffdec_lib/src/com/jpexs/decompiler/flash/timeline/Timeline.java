@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -426,7 +427,7 @@ public class Timeline {
     }
 
     public String toHtmlCanvas(double unitDivisor, List<Integer> frames) {
-        return SWF.framesToHtmlCanvas(unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(), null);
+        return FrameExporter.framesToHtmlCanvas(unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(), null);
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {

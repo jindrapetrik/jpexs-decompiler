@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -48,7 +49,7 @@ public class TextExporter {
 
     public static final String TEXT_EXPORT_FILENAME_PLAIN = "textsplain.txt";
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings) throws IOException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -62,9 +63,21 @@ public class TextExporter {
             }
         }
 
+        int count = 0;
+        for (Tag t : tags) {
+            if (t instanceof TextTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
         if (settings.mode == TextExportMode.SVG) {
             for (Tag t : tags) {
                 if (t instanceof TextTag) {
+                    if (evl != null) {
+                        evl.handleExportingEvent("text", currentIndex, count, t.getName());
+                    }
+
                     final TextTag textTag = (TextTag) t;
                     final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".svg"));
                     new RetryTask(new RunnableIOEx() {
@@ -79,6 +92,12 @@ public class TextExporter {
                         }
                     }, handler).run();
                     ret.add(file);
+
+                    if (evl != null) {
+                        evl.handleExportedEvent("text", currentIndex, count, t.getName());
+                    }
+
+                    currentIndex++;
                 }
             }
             return ret;
@@ -119,6 +138,10 @@ public class TextExporter {
         } else {
             for (Tag t : tags) {
                 if (t instanceof TextTag) {
+                    if (evl != null) {
+                        evl.handleExportingEvent("text", currentIndex, count, t.getName());
+                    }
+
                     final TextTag textTag = (TextTag) t;
                     final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".txt"));
                     new RetryTask(new RunnableIOEx() {
@@ -137,6 +160,12 @@ public class TextExporter {
                         }
                     }, handler).run();
                     ret.add(file);
+
+                    if (evl != null) {
+                        evl.handleExportedEvent("text", currentIndex, count, t.getName());
+                    }
+
+                    currentIndex++;
                 }
             }
         }

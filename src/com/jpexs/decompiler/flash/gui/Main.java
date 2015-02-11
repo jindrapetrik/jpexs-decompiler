@@ -359,9 +359,29 @@ public class Main {
             swf.swfList = result;
             swf.addEventListener(new EventListener() {
                 @Override
+                public void handleExportingEvent(String type, int index, int count, Object data) {
+                    // todo honfika: localize
+                    String text = "Exporting ";
+                    if (type != null && type.length() > 0) {
+                        text += type + " ";
+                    }
+                    startWork(text + index + "/" + count + " " + data);
+                }
+
+                @Override
+                public void handleExportedEvent(String type, int index, int count, Object data) {
+                    // todo honfika: localize
+                    String text = "Exported ";
+                    if (type != null && type.length() > 0) {
+                        text += type + " ";
+                    }
+                    startWork(text + index + "/" + count + " " + data);
+                }
+
+                @Override
                 public void handleEvent(String event, Object data) {
-                    if (event.equals("exporting")) {
-                        startWork((String) data);
+                    if (event.equals("exporting") || event.equals("exported")) {
+                        throw new Error("Event is not supported by this handler.");
                     }
                     if (event.equals("getVariables")) {
                         startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);

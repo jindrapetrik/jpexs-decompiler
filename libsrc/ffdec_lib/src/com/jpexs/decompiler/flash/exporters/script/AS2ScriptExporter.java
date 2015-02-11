@@ -47,13 +47,13 @@ import java.util.logging.Logger;
  */
 public class AS2ScriptExporter {
 
-    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
+    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportMode exportMode, final EventListener evl) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
                 @Override
                 public List<File> call() throws Exception {
-                    return exportAS2Scripts(handler, outdir, asms, exportMode, ev);
+                    return exportAS2Scripts(handler, outdir, asms, exportMode, evl);
                 }
             }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
@@ -62,7 +62,7 @@ public class AS2ScriptExporter {
         return new ArrayList<>();
     }
 
-    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportMode exportMode, EventListener ev) throws IOException {
+    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportMode exportMode, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
@@ -90,7 +90,7 @@ public class AS2ScriptExporter {
             }
             existingNames.add(name);
 
-            File f = exportAS2Script(handler, currentOutDir, asm, exportMode, ev, cnt, asms.size(), name);
+            File f = exportAS2Script(handler, currentOutDir, asm, exportMode, evl, cnt, asms.size(), name);
             if (f != null) {
                 ret.add(f);
             }
@@ -99,7 +99,7 @@ public class AS2ScriptExporter {
         return ret;
     }
 
-    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportMode exportMode, EventListener ev, AtomicInteger index, int count, String name) throws IOException {
+    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportMode exportMode, EventListener evl, AtomicInteger index, int count, String name) throws IOException {
         boolean retry;
         do {
             retry = false;
@@ -116,8 +116,8 @@ public class AS2ScriptExporter {
                 }
 
                 String f = outdir + name + ".as";
-                if (ev != null) {
-                    ev.handleEvent("exporting", "Exporting " + currentIndex + "/" + count + " " + f);
+                if (evl != null) {
+                    evl.handleExportingEvent("script", currentIndex, count, f);
                 }
 
                 long startTime = System.currentTimeMillis();
@@ -141,9 +141,9 @@ public class AS2ScriptExporter {
 
                 long stopTime = System.currentTimeMillis();
 
-                if (ev != null) {
+                if (evl != null) {
                     long time = stopTime - startTime;
-                    ev.handleEvent("exported", "Exported " + currentIndex + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
+                    evl.handleExportedEvent("script", currentIndex, count, f + ", " + Helper.formatTimeSec(time));
                 }
 
                 return file;

@@ -22,6 +22,7 @@ import com.google.typography.font.sfntly.data.WritableFontData;
 import com.google.typography.font.tools.conversion.woff.WoffWriter;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
@@ -51,7 +52,7 @@ import java.util.logging.Logger;
  */
 public class FontExporter {
 
-    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings) throws IOException {
+    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -64,16 +65,27 @@ public class FontExporter {
                 }
             }
         }
+
+        int count = 0;
         for (Tag t : tags) {
-            File newfile = null;
             if (t instanceof FontTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
+        for (Tag t : tags) {
+            if (t instanceof FontTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("font", currentIndex, count, t.getName());
+                }
+
                 final FontTag st = (FontTag) t;
                 String ext = ".ttf";
                 if (settings.mode == FontExportMode.WOFF) {
                     ext = ".woff";
                 }
                 final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + ext));
-                newfile = file;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -81,11 +93,16 @@ public class FontExporter {
                     }
                 }, handler).run();
 
-                ret.add(newfile);
+                ret.add(file);
 
+                if (evl != null) {
+                    evl.handleExportedEvent("font", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
-
         }
+
         return ret;
     }
 
@@ -120,7 +137,12 @@ public class FontExporter {
             ttfFile = File.createTempFile("ffdec_export", ".ttf");
         }
 
-        Fontastic f = new Fontastic(t.getFontNameIntag(), ttfFile);
+        String fontName = t.getFontNameIntag();
+        if (fontName.length() == 0) {
+            fontName = "noname";
+        }
+
+        Fontastic f = new Fontastic(fontName, ttfFile);
         String cop = t.getCopyright();
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);

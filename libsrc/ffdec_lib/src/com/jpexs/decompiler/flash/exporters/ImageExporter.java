@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -39,7 +40,7 @@ import java.util.Locale;
  */
 public class ImageExporter {
 
-    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ImageExportSettings settings) throws IOException {
+    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, ImageExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -52,10 +53,24 @@ public class ImageExporter {
                 }
             }
         }
-        for (final Tag t : tags) {
-            if (t instanceof ImageTag) {
 
-                String fileFormat = ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH);
+        int count = 0;
+        for (Tag t : tags) {
+            if (t instanceof ImageTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
+        for (Tag t : tags) {
+            if (t instanceof ImageTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("image", currentIndex, count, t.getName());
+                }
+
+                final ImageTag imageTag = (ImageTag) t;
+
+                String fileFormat = imageTag.getImageFormat().toUpperCase(Locale.ENGLISH);
                 if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = "png";
                 }
@@ -66,9 +81,8 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = "bmp";
                 }
-                {
 
-                    final ImageTag imageTag = (ImageTag) t;
+                {
                     final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
                     final String ffileFormat = fileFormat;
 
@@ -87,8 +101,14 @@ public class ImageExporter {
                     ret.add(file);
                 }
 
+                if (evl != null) {
+                    evl.handleExportedEvent("image", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
         }
+
         return ret;
     }
 }

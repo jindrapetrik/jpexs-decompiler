@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
@@ -48,7 +49,7 @@ import java.util.List;
  */
 public class SoundExporter {
 
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings) throws IOException {
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -61,14 +62,21 @@ public class SoundExporter {
                 }
             }
         }
-        for (Tag t : tags) {
-            File newfile = null;
-            int id = 0;
-            if (t instanceof DefineSoundTag) {
-                id = ((DefineSoundTag) t).soundId;
-            }
 
+        int count = 0;
+        for (Tag t : tags) {
             if (t instanceof SoundTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
+        for (Tag t : tags) {
+            if (t instanceof SoundTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("sound", currentIndex, count, t.getName());
+                }
+
                 final SoundTag st = (SoundTag) t;
 
                 String ext = "wav";
@@ -90,7 +98,6 @@ public class SoundExporter {
                 }
 
                 final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + "." + ext);
-                newfile = file;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -100,10 +107,14 @@ public class SoundExporter {
                     }
                 }, handler).run();
 
-                ret.add(newfile);
+                ret.add(file);
 
+                if (evl != null) {
+                    evl.handleExportedEvent("sound", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
-
         }
         return ret;
     }

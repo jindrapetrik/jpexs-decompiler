@@ -3064,7 +3064,7 @@ public class XFLConverter {
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), ScriptExportMode.AS, parallel);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), ScriptExportMode.AS, parallel, null);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public class BinaryDataExporter {
 
-    public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings) throws IOException {
+    public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -48,9 +49,22 @@ public class BinaryDataExporter {
             }
         }
 
+        int count = 0;
+        for (Tag t : tags) {
+            if (t instanceof DefineBinaryDataTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("binarydata", currentIndex, count, t.getName());
+                }
+
                 int characterID = ((DefineBinaryDataTag) t).getCharacterId();
+
                 final File file = new File(outdir + File.separator + characterID + ".bin");
                 new RetryTask(new RunnableIOEx() {
                     @Override
@@ -61,8 +75,15 @@ public class BinaryDataExporter {
                     }
                 }, handler).run();
                 ret.add(file);
+
+                if (evl != null) {
+                    evl.handleExportedEvent("binarydata", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
         }
+
         return ret;
     }
 }

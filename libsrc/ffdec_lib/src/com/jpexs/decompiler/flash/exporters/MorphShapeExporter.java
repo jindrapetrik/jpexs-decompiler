@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
@@ -48,7 +49,7 @@ import java.util.Set;
 public class MorphShapeExporter {
 
     //TODO: implement morphshape export. How to handle 65536 frames?
-    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphShapeExportSettings settings) throws IOException {
+    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphShapeExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -62,8 +63,20 @@ public class MorphShapeExporter {
             }
         }
 
+        int count = 0;
+        for (Tag t : tags) {
+            if (t instanceof MorphShapeTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof MorphShapeTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("morphshape", currentIndex, count, t.getName());
+                }
+
                 int characterID = 0;
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
@@ -71,7 +84,6 @@ public class MorphShapeExporter {
                 String ext = settings.mode == MorphShapeExportMode.CANVAS ? "html" : "svg";
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
-                final int fcharacterID = characterID;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -109,6 +121,12 @@ public class MorphShapeExporter {
                     }
                 }, handler).run();
                 ret.add(file);
+
+                if (evl != null) {
+                    evl.handleExportedEvent("morphshape", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
         }
 

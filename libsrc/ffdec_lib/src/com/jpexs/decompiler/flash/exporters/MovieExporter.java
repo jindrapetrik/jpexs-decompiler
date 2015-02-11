@@ -1,21 +1,23 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
@@ -45,7 +47,7 @@ import java.util.List;
  */
 public class MovieExporter {
 
-    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings) throws IOException {
+    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -58,8 +60,21 @@ public class MovieExporter {
                 }
             }
         }
+
+        int count = 0;
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
+        for (Tag t : tags) {
+            if (t instanceof DefineVideoStreamTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("movie", currentIndex, count, t.getName());
+                }
+
                 final DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
                 final File file = new File(outdir + File.separator + Helper.makeFileName(videoStream.getCharacterExportFileName() + ".flv"));
                 new RetryTask(new RunnableIOEx() {
@@ -71,6 +86,11 @@ public class MovieExporter {
                     }
                 }, handler).run();
 
+                if (evl != null) {
+                    evl.handleExportedEvent("movie", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
         }
         return ret;

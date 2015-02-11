@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
@@ -53,7 +54,7 @@ import java.util.Set;
  */
 public class ShapeExporter {
 
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings) throws IOException {
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -67,8 +68,20 @@ public class ShapeExporter {
             }
         }
 
+        int count = 0;
+        for (Tag t : tags) {
+            if (t instanceof ShapeTag) {
+                count++;
+            }
+        }
+
+        int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof ShapeTag) {
+                if (evl != null) {
+                    evl.handleExportingEvent("shape", currentIndex, count, t.getName());
+                }
+
                 int characterID = 0;
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
@@ -141,6 +154,12 @@ public class ShapeExporter {
                     }
                 }, handler).run();
                 ret.add(file);
+
+                if (evl != null) {
+                    evl.handleExportedEvent("shape", currentIndex, count, t.getName());
+                }
+
+                currentIndex++;
             }
         }
         if (settings.mode == ShapeExportMode.CANVAS) {
