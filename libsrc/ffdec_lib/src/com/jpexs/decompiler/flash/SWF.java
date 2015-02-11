@@ -1145,13 +1145,17 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             };
             int currentIndex = index.getAndIncrement();
-            synchronized (ABC.class) {
-                eventListener.handleExportingEvent("script", currentIndex, count, path);
+            if (eventListener != null) {
+                synchronized (ABC.class) {
+                    eventListener.handleExportingEvent("script", currentIndex, count, path);
+                }
             }
             new RetryTask(rio, handler).run();
-            synchronized (ABC.class) {
-                long time = stopTime - startTime;
-                eventListener.handleExportedEvent("script", currentIndex, count, path + ", " + Helper.formatTimeSec(time));
+            if (eventListener != null) {
+                synchronized (ABC.class) {
+                    long time = stopTime - startTime;
+                    eventListener.handleExportedEvent("script", currentIndex, count, path + ", " + Helper.formatTimeSec(time));
+                }
             }
             return rio.result;
         }
