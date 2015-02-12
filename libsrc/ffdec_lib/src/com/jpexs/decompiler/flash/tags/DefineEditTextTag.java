@@ -894,9 +894,9 @@ public class DefineEditTextTag extends TextTag {
             List<List<SameStyleTextRecord>> lines;
             if (multiline && wordWrap) {
                 lines = new ArrayList<>();
-                int lineLength = 0;
                 for (Paragraph paragraph : textModel.paragraphs) {
                     List<SameStyleTextRecord> line = new ArrayList<>();
+                    int lineLength = 0;
                     for (Word word : paragraph.words) {
                         if (lineLength + word.width <= bounds.getWidth()) {
                             line.addAll(word.records);
