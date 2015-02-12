@@ -883,10 +883,8 @@ public class DefineEditTextTag extends TextTag {
                         lastWasWhiteSpace = true;
                     }
                 } else {
-                    if (c == '\r' || prevChar != '\r') {
-                        if (multiline) {
-                            textModel.newParagraph();
-                        }
+                    if (multiline) {
+                        textModel.newParagraph();
                     }
                 }
                 prevChar = c;
@@ -950,14 +948,21 @@ public class DefineEditTextTag extends TextTag {
             textModel.calculateTextWidths();
 
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
+            int lastHeight = 0;
             int yOffset = 0;
             for (List<SameStyleTextRecord> line : lines) {
                 int width = 0;
                 int currentOffset = 0;
-                for (SameStyleTextRecord tr : line) {
-                    width += tr.width;
-                    if (tr.style.fontHeight + tr.style.fontLeading > currentOffset) {
-                        currentOffset = tr.style.fontHeight + tr.style.fontLeading;
+                if (line.isEmpty()) {
+                    currentOffset = lastHeight;
+                } else {
+                    for (SameStyleTextRecord tr : line) {
+                        width += tr.width;
+                        int lineHeight = tr.style.fontHeight + tr.style.fontLeading;
+                        lastHeight = lineHeight;
+                        if (lineHeight > currentOffset) {
+                            currentOffset = lineHeight;
+                        }
                     }
                 }
                 yOffset += currentOffset;

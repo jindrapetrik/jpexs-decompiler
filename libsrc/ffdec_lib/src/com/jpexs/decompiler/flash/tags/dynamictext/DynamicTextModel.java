@@ -50,6 +50,11 @@ public class DynamicTextModel {
 
     public void newParagraph() {
 
+        if (paragraph == null) {
+            // add empty paragraph
+            paragraph = new Paragraph(this);
+            paragraphs.add(paragraph);
+        }
         paragraph = null;
     }
 
