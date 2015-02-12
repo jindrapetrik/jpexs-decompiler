@@ -33,6 +33,7 @@ package com.jpexs.decompiler.flash.tags.text;
 
     StringBuffer string = null;
     boolean finish = false;
+    boolean parameter = false;
     String parameterName = null;
 
     /**
@@ -64,6 +65,7 @@ HexDigit          = [0-9a-fA-F]
 
 <YYINITIAL> {
   "["                            {
+                                    parameter = true;
                                     yybegin(PARAMETER);
                                     if (string != null){
                                         String ret = string.toString();
@@ -99,6 +101,7 @@ HexDigit          = [0-9a-fA-F]
                                  }
     "]"                          {
                                     yybegin(YYINITIAL);
+                                    parameter = false;
                                  }
 }
 
@@ -110,9 +113,10 @@ HexDigit          = [0-9a-fA-F]
                                  }
     "]"                          {
                                     yybegin(YYINITIAL);
+                                    parameter = false;
                                  }
 }
 
 /* error fallback */
-[^]                              { }
+[^]                              { if (!parameter) { if (string == null) string = new StringBuffer(); string.append(yytext()); } }
 <<EOF>>                          { return null; }
