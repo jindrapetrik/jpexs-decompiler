@@ -395,7 +395,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public void updateTextBounds(RECT textBounds) {
         TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get();
-        if (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK)) {
+        if (resizeMode != null && (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK))) {
             ExportRectangle newBounds = calculateTextBounds();
             if (newBounds != null) {
                 int xMin = (int) Math.floor(newBounds.xMin);

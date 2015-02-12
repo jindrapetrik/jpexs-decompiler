@@ -345,6 +345,14 @@ public class DefineText2Tag extends TextTag {
                             throw new TextParseException("Font not defined", lexer.yyline());
                         }
 
+                        while (txt.charAt(0) == '\r' || txt.charAt(0) == '\n') {
+                            txt = txt.substring(1);
+                        }
+
+                        while (txt.charAt(txt.length() - 1) == '\r' || txt.charAt(txt.length() - 1) == '\n') {
+                            txt = txt.substring(0, txt.length() - 1);
+                        }
+
                         StringBuilder txtSb = new StringBuilder();
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
