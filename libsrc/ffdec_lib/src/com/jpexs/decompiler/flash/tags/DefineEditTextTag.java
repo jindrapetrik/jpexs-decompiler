@@ -597,7 +597,9 @@ public class DefineEditTextTag extends TextTag {
                         if (s2 == null) {
                             s2 = "";
                         }
+
                         formattedText += (texts == null || textIdx >= texts.length) ? s2 : texts[textIdx++];
+                        formattedText = formattedText.replace("\r\n", "\r");
                         break;
                 }
             }
