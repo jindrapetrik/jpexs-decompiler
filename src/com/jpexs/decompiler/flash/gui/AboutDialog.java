@@ -45,7 +45,7 @@ public class AboutDialog extends AppDialog {
     private static final String[] DEVELOPERS = new String[]{
         "JPEXS",
         "honfika",
-        "+ others from GitHub and Google code"
+        "others"
     };
 
     private static final String AUTHOR = "JPEXS";
@@ -54,6 +54,8 @@ public class AboutDialog extends AppDialog {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         //setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
+
+        DEVELOPERS[DEVELOPERS.length - 1] = translate("developers.others"); // translate "others" text
 
         JPanel twoPanes = new JPanel();
         twoPanes.setLayout(new BoxLayout(twoPanes, BoxLayout.X_AXIS));
