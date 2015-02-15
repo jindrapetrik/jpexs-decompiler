@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.helpers;
 
 import com.jpexs.decompiler.flash.gui.AboutDialog;
 import com.jpexs.decompiler.flash.gui.AdvancedSettingsDialog;
+import com.jpexs.decompiler.flash.gui.DebugLogDialog;
 import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
 import com.jpexs.decompiler.flash.gui.FontEmbedDialog;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.ModeFrame;
 import com.jpexs.decompiler.flash.gui.NewVersionDialog;
 import com.jpexs.decompiler.flash.gui.RenameDialog;
+import com.jpexs.decompiler.flash.gui.ReplaceTraceDialog;
 import com.jpexs.decompiler.flash.gui.SearchDialog;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.SelectLanguageDialog;
@@ -41,8 +43,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +59,7 @@ public class CheckResources {
         Class[] classes = new Class[]{
             AboutDialog.class,
             AdvancedSettingsDialog.class,
+            DebugLogDialog.class,
             ErrorLogFrame.class,
             ExportDialog.class,
             FontEmbedDialog.class,
@@ -69,49 +73,73 @@ public class CheckResources {
             ModeFrame.class,
             NewVersionDialog.class,
             RenameDialog.class,
+            ReplaceTraceDialog.class,
             SearchDialog.class,
             SearchResultsDialog.class,
             SelectLanguageDialog.class,
-            ProxyFrame.class,
+            // ABC
             DeobfuscationDialog.class,
             NewTraitDialog.class,
-            UsageFrame.class,};
-        for (Class clazz : classes) {
-            checkResources(clazz, stream);
-        }
+            UsageFrame.class,
+            // Proxy
+            ProxyFrame.class,};
+        checkResources(classes, stream);
     }
 
-    public static void checkResources(Class clazz, PrintStream stream) {
+    private static void checkResources(Class[] classes, PrintStream stream) {
         try {
-            Properties prop = new Properties();
             String[] languages = SelectLanguageDialog.getAvailableLanguages();
-            String resourcePath = getResourcePath(clazz, null);
-            InputStream is = CheckResources.class.getResourceAsStream(resourcePath);
-            if (is == null) {
-                stream.println("Resource file not found: " + resourcePath);
-                return;
+            Map<Class, Properties> properties = new HashMap<>();
+            for (Class clazz : classes) {
+                String resourcePath = getResourcePath(clazz, null);
+                InputStream is = CheckResources.class.getResourceAsStream(resourcePath);
+                if (is == null) {
+                    stream.println("Resource file not found: " + resourcePath);
+                    return;
+                }
+                Properties prop = new Properties();
+                prop.load(is);
+                properties.put(clazz, prop);
             }
-            prop.load(is);
-            Set<Object> keys = prop.keySet();
 
             for (String lang : languages) {
                 if (lang.equals("en")) {
                     continue;
                 }
-                Properties prop2 = new Properties();
-                resourcePath = getResourcePath(clazz, lang);
-                is = CheckResources.class.getResourceAsStream(resourcePath);
-                if (is == null) {
-                    stream.println(lang + ": Resource file not found: " + resourcePath);
-                    continue;
-                }
-                prop2.load(is);
 
-                for (Object key : keys) {
-                    String value = prop2.getProperty((String) key);
-                    if (value == null) {
-                        stream.println(lang + ": Property not found in resource file: " + clazz.getSimpleName() + ", property: " + key);
+                boolean firstMissing = true;
+                for (Class clazz : classes) {
+                    Properties prop = properties.get(clazz);
+                    Properties prop2 = new Properties();
+                    String resourcePath = getResourcePath(clazz, lang);
+                    InputStream is = CheckResources.class.getResourceAsStream(resourcePath);
+                    if (is == null) {
+                        stream.println(lang + ": Resource file not found: " + resourcePath);
+                        continue;
                     }
+                    try {
+                        prop2.load(is);
+                    } catch (Exception ex) {
+                        Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, "Cannot load resource:" + clazz.getSimpleName() + " " + lang, ex);
+                    }
+
+                    for (Object key : prop.keySet()) {
+                        String keyStr = (String) key;
+                        String value = prop2.getProperty(keyStr);
+                        if (value == null) {
+                            if (firstMissing) {
+                                stream.println(lang);
+                                stream.println("-----------------------------");
+                                firstMissing = false;
+                            }
+
+                            stream.println(clazz.getSimpleName() + ", property: " + key + "=" + prop.getProperty(keyStr));
+                        }
+                    }
+                }
+
+                if (!firstMissing) {
+                    stream.println();
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -127,7 +155,7 @@ public class CheckResources {
             name = name.substring("com.jpexs.decompiler.flash.gui.".length());
             name = "/com/jpexs/decompiler/flash/gui/locales/" + name.replace(".", "/");
             if (lang != null) {
-                name += "_" + lang;
+                name += "_" + lang.replace("-", "_");
             }
             name += ".properties";
         }
