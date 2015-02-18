@@ -117,6 +117,39 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         }
     }
 
+    public static void alignText(List<TEXTRECORD> textRecords, TextAlign textAlign) {
+        int maxWidth = 0;
+        for (TEXTRECORD tr : textRecords) {
+            int width = tr.getTotalAdvance();
+
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        }
+
+        for (TEXTRECORD tr : textRecords) {
+            int width = tr.getTotalAdvance();
+            switch (textAlign) {
+                case LEFT:
+                    tr.xOffset = 0;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case CENTER:
+                    tr.xOffset = (maxWidth - width) / 2;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case RIGHT:
+                    tr.xOffset = maxWidth - width;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case JUSTIFY:
+                    tr.xOffset = 0;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+            }
+        }
+    }
+
     public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, List<Tag> tags) {
         Map<String, Object> att = new HashMap<>();
         RECT textBounds = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
