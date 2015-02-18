@@ -536,7 +536,7 @@ public class TagTree extends JTree {
 
     public TreeItem getCurrentTreeItem() {
         if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
-            return mainPanel.folderPreviewPanel.selectedItems.get(0);
+            return mainPanel.folderPreviewPanel.selectedItems.entrySet().iterator().next().getValue();
         }
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;

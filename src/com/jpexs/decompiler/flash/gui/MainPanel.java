@@ -100,6 +100,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -1985,6 +1986,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         } catch (TextParseException ex) {
             View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
+
+        return false;
+    }
+
+    public boolean alignText(TextTag textTag, TextAlign textAlign) {
+        if (textTag.alignText(textAlign)) {
+            return true;
         }
 
         return false;

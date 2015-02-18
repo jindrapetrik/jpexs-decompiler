@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
+import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -425,7 +426,6 @@ public class DefineTextTag extends TextTag {
                             tr.glyphEntries[i].glyphAdvance = advance;
 
                             currentX += advance;
-
                         }
 
                         if (currentX > maxX) {
@@ -450,6 +450,41 @@ public class DefineTextTag extends TextTag {
         }
 
         updateTextBounds(textBounds);
+        return true;
+    }
+
+    @Override
+    public boolean alignText(TextAlign textAlign) {
+        int maxWidth = 0;
+        for (TEXTRECORD tr : textRecords) {
+            int width = tr.getTotalAdvance();
+
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        }
+
+        for (TEXTRECORD tr : textRecords) {
+            int width = tr.getTotalAdvance();
+            switch (textAlign) {
+                case LEFT:
+                    tr.xOffset = 0;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case CENTER:
+                    tr.xOffset = (maxWidth - width) / 2;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case RIGHT:
+                    tr.xOffset = maxWidth - width;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+                case JUSTIFY:
+                    tr.xOffset = 0;
+                    tr.styleFlagsHasXOffset = true;
+                    break;
+            }
+        }
         return true;
     }
 

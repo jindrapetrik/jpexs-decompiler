@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.tags.dynamictext.SameStyleTextRecord;
 import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.Word;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
+import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -660,6 +661,11 @@ public class DefineEditTextTag extends TextTag {
             return false;
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean alignText(TextAlign textAlign) {
         return true;
     }
 

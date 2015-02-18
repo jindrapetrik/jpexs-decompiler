@@ -70,4 +70,12 @@ public class TEXTRECORD implements Serializable {
         }
         return ret.toString();
     }
+
+    public int getTotalAdvance() {
+        int width = 0;
+        for (GLYPHENTRY ge : glyphEntries) {
+            width += ge.glyphAdvance;
+        }
+        return width;
+    }
 }

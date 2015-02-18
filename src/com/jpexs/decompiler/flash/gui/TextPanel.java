@@ -18,9 +18,11 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
@@ -49,6 +51,14 @@ public class TextPanel extends JPanel implements ActionListener {
 
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
 
+    private static final String ACTION_TEXT_ALIGN_LEFT = "TEXTALIGNLEFT";
+
+    private static final String ACTION_TEXT_ALIGN_CENTER = "TEXTALIGNCENTER";
+
+    private static final String ACTION_TEXT_ALIGN_RIGHT = "TEXTALIGNRIGHT";
+
+    private static final String ACTION_TEXT_ALIGN_JUSTIFY = "TEXTALIGNJUSTIFY";
+
     private final MainPanel mainPanel;
 
     private final SearchPanel<TextTag> textSearchPanel;
@@ -60,6 +70,14 @@ public class TextPanel extends JPanel implements ActionListener {
     private final JButton textEditButton;
 
     private final JButton textCancelButton;
+
+    private final JButton textAlignLeftButton;
+
+    private final JButton textAlignCenterButton;
+
+    private final JButton textAlignRightButton;
+
+    private final JButton textAlignJustifyButton;
 
     public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
@@ -109,9 +127,33 @@ public class TextPanel extends JPanel implements ActionListener {
         textCancelButton.setActionCommand(ACTION_CANCEL_TEXT);
         textCancelButton.addActionListener(this);
 
+        textAlignLeftButton = new JButton("", View.getIcon("textalignleft16"));
+        textAlignLeftButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignLeftButton.setActionCommand(ACTION_TEXT_ALIGN_LEFT);
+        textAlignLeftButton.addActionListener(this);
+
+        textAlignCenterButton = new JButton("", View.getIcon("textaligncenter16"));
+        textAlignCenterButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignCenterButton.setActionCommand(ACTION_TEXT_ALIGN_CENTER);
+        textAlignCenterButton.addActionListener(this);
+
+        textAlignRightButton = new JButton("", View.getIcon("textalignright16"));
+        textAlignRightButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignRightButton.setActionCommand(ACTION_TEXT_ALIGN_RIGHT);
+        textAlignRightButton.addActionListener(this);
+
+        textAlignJustifyButton = new JButton("", View.getIcon("textalignjustify16"));
+        textAlignJustifyButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignJustifyButton.setActionCommand(ACTION_TEXT_ALIGN_JUSTIFY);
+        textAlignJustifyButton.addActionListener(this);
+
         textButtonsPanel.add(textEditButton);
         textButtonsPanel.add(textSaveButton);
         textButtonsPanel.add(textCancelButton);
+        textButtonsPanel.add(textAlignLeftButton);
+        textButtonsPanel.add(textAlignCenterButton);
+        textButtonsPanel.add(textAlignRightButton);
+        textButtonsPanel.add(textAlignJustifyButton);
 
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
@@ -133,6 +175,17 @@ public class TextPanel extends JPanel implements ActionListener {
         textSaveButton.setVisible(edit);
         textEditButton.setVisible(!edit);
         textCancelButton.setVisible(edit);
+
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        boolean alignable = false;
+        if (item instanceof TextTag && !(item instanceof DefineEditTextTag)) {
+            alignable = !edit;
+        }
+
+        textAlignLeftButton.setVisible(alignable);
+        textAlignCenterButton.setVisible(alignable);
+        textAlignRightButton.setVisible(alignable);
+        textAlignJustifyButton.setVisible(false); // todo
     }
 
     public void updateSearchPos() {
@@ -157,7 +210,7 @@ public class TextPanel extends JPanel implements ActionListener {
                 setEditText(false);
                 mainPanel.reload(true);
                 break;
-            case ACTION_SAVE_TEXT:
+            case ACTION_SAVE_TEXT: {
                 TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
                 if (item instanceof TextTag) {
                     TextTag textTag = (TextTag) item;
@@ -168,6 +221,38 @@ public class TextPanel extends JPanel implements ActionListener {
                     }
                 }
                 break;
+            }
+            case ACTION_TEXT_ALIGN_LEFT:
+            case ACTION_TEXT_ALIGN_CENTER:
+            case ACTION_TEXT_ALIGN_RIGHT:
+            case ACTION_TEXT_ALIGN_JUSTIFY: {
+                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+                if (item instanceof TextTag) {
+                    TextTag textTag = (TextTag) item;
+                    TextAlign ta = null;
+                    switch (e.getActionCommand()) {
+                        case ACTION_TEXT_ALIGN_LEFT:
+                            ta = TextAlign.LEFT;
+                            break;
+                        case ACTION_TEXT_ALIGN_CENTER:
+                            ta = TextAlign.CENTER;
+                            break;
+                        case ACTION_TEXT_ALIGN_RIGHT:
+                            ta = TextAlign.RIGHT;
+                            break;
+                        case ACTION_TEXT_ALIGN_JUSTIFY:
+                            ta = TextAlign.JUSTIFY;
+                            break;
+                    }
+
+                    if (mainPanel.alignText(textTag, ta)) {
+                        setEditText(false);
+                        item.getSwf().clearImageCache();
+                        mainPanel.refreshTree();
+                    }
+                }
+                break;
+            }
         }
     }
 
