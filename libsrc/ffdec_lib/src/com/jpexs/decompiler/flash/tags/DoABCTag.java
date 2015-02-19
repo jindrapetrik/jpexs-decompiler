@@ -41,7 +41,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      */
     @HideInRawEdit
     @SWFField
-    private final ABC abc;
+    private ABC abc;
 
     public static final int ID = 72;
 
@@ -74,7 +74,11 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      */
     public DoABCTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoABC", data);
+        readData(sis, data, 0, false, false, false);
+    }
 
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         ABCInputStream ais = new ABCInputStream(sis.getBaseStream());
         // put it to the dumpview:
         sis.readByteRangeEx(sis.available(), "abcBytes");

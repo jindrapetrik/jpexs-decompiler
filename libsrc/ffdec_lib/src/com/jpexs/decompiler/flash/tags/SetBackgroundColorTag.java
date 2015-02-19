@@ -40,14 +40,19 @@ public class SetBackgroundColorTag extends Tag {
         backgroundColor = new RGB();
     }
 
-    public SetBackgroundColorTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SetBackgroundColor", data);
-        backgroundColor = sis.readRGB("backgroundColor");
-    }
-
     public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {
         super(swf, ID, "SetBackgroundColor", null);
         this.backgroundColor = backgroundColor;
+    }
+
+    public SetBackgroundColorTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, "SetBackgroundColor", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        backgroundColor = sis.readRGB("backgroundColor");
     }
 
     @Override

@@ -44,6 +44,11 @@ public class JPEGTablesTag extends Tag {
 
     public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "JPEGTables", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         jpegData = sis.readBytesEx(sis.available(), "jpegData");
     }
 

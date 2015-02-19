@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -32,6 +33,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -59,6 +62,8 @@ public class TextPanel extends JPanel implements ActionListener {
 
     private static final String ACTION_TEXT_ALIGN_JUSTIFY = "TEXTALIGNJUSTIFY";
 
+    private static final String ACTION_UNDO_CHANGES = "UNDOCHANGES";
+
     private final MainPanel mainPanel;
 
     private final SearchPanel<TextTag> textSearchPanel;
@@ -78,6 +83,8 @@ public class TextPanel extends JPanel implements ActionListener {
     private final JButton textAlignRightButton;
 
     private final JButton textAlignJustifyButton;
+
+    private final JButton undoChangesButton;
 
     public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
@@ -147,6 +154,11 @@ public class TextPanel extends JPanel implements ActionListener {
         textAlignJustifyButton.setActionCommand(ACTION_TEXT_ALIGN_JUSTIFY);
         textAlignJustifyButton.addActionListener(this);
 
+        undoChangesButton = new JButton("", View.getIcon("reload16"));
+        undoChangesButton.setMargin(new Insets(3, 3, 3, 10));
+        undoChangesButton.setActionCommand(ACTION_UNDO_CHANGES);
+        undoChangesButton.addActionListener(this);
+
         textButtonsPanel.add(textEditButton);
         textButtonsPanel.add(textSaveButton);
         textButtonsPanel.add(textCancelButton);
@@ -154,6 +166,7 @@ public class TextPanel extends JPanel implements ActionListener {
         textButtonsPanel.add(textAlignCenterButton);
         textButtonsPanel.add(textAlignRightButton);
         textButtonsPanel.add(textAlignJustifyButton);
+        textButtonsPanel.add(undoChangesButton);
 
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
@@ -186,6 +199,8 @@ public class TextPanel extends JPanel implements ActionListener {
         textAlignCenterButton.setVisible(alignable);
         textAlignRightButton.setVisible(alignable);
         textAlignJustifyButton.setVisible(false); // todo
+
+        undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
     }
 
     public void updateSearchPos() {
@@ -250,6 +265,20 @@ public class TextPanel extends JPanel implements ActionListener {
                         item.getSwf().clearImageCache();
                         mainPanel.refreshTree();
                     }
+                }
+                break;
+            }
+            case ACTION_UNDO_CHANGES: {
+                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+                if (item instanceof TextTag) {
+                    try {
+                        ((Tag) item).undo();
+                    } catch (InterruptedException | IOException ex) {
+                        Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    item.getSwf().clearImageCache();
+                    mainPanel.refreshTree();
                 }
                 break;
             }

@@ -82,6 +82,11 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      */
     public ImportAssets2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "ImportAssets2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         tags = new ArrayList<>();
         names = new ArrayList<>();
         url = sis.readString("url");

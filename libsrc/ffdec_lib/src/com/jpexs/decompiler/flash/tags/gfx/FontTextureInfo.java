@@ -105,6 +105,11 @@ public class FontTextureInfo extends Tag {
      */
     public FontTextureInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "FontTextureInfo", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         textureID = sis.readUI32("textureID");
         textureFormat = sis.readUI16("textureFormat");
         int fileNameLen = sis.readUI8("fileNameLen");

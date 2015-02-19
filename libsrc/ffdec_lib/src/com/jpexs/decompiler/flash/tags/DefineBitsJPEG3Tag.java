@@ -130,6 +130,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public DefineBitsJPEG3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBitsJPEG3", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         long alphaDataOffset = sis.readUI32("alphaDataOffset");
         imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");

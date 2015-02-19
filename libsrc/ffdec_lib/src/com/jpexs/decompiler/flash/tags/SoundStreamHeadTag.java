@@ -156,6 +156,11 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
      */
     public SoundStreamHeadTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "SoundStreamHead", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         reserved = (int) sis.readUB(4, "reserved");
         playBackSoundRate = (int) sis.readUB(2, "playBackSoundRate");
         playBackSoundSize = sis.readUB(1, "playBackSoundSize") == 1;

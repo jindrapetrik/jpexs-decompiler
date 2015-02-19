@@ -64,6 +64,11 @@ public class FileAttributesTag extends Tag {
 
     public FileAttributesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "FileAttributes", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         reserved1 = sis.readUB(1, "reserved1") == 1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1, "useDirectBlit") != 0;

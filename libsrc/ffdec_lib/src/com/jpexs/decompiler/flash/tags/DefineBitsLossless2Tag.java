@@ -160,6 +160,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     public DefineBitsLossless2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineBitsLossless2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         bitmapFormat = sis.readUI8("bitmapFormat");
         bitmapWidth = sis.readUI16("bitmapWidth");

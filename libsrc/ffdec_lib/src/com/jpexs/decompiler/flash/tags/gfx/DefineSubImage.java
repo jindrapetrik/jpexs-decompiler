@@ -77,6 +77,11 @@ public class DefineSubImage extends Tag {
      */
     public DefineSubImage(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineSubImage", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterId = sis.readUI16("characterId");
         imageCharacterId = sis.readUI16("imageCharacterId");
         x1 = sis.readUI16("x1");

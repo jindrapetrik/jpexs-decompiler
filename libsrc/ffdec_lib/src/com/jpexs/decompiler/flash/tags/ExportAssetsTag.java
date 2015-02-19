@@ -68,6 +68,11 @@ public class ExportAssetsTag extends Tag {
      */
     public ExportAssetsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "ExportAssets", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         int count = sis.readUI16("count");
         tags = new ArrayList<>();
         names = new ArrayList<>();

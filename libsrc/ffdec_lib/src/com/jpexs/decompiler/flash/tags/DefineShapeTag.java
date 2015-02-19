@@ -99,6 +99,11 @@ public class DefineShapeTag extends ShapeTag {
 
     public DefineShapeTag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
         super(sis.getSwf(), ID, "DefineShape", data);
+        readData(sis, data, 0, false, false, lazy);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
         if (!lazy) {

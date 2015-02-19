@@ -120,6 +120,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      */
     public DefineButtonTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineButton", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");

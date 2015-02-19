@@ -101,6 +101,11 @@ public class ExporterInfo extends Tag {
      */
     public ExporterInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "ExporterInfo", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         this.version = sis.readUI16("version");
         if (this.version >= 0x10a) {
             flags = sis.readUI32("flags");

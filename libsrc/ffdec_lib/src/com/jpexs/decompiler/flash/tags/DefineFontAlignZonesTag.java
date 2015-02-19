@@ -60,6 +60,11 @@ public class DefineFontAlignZonesTag extends Tag {
 
     public DefineFontAlignZonesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFontAlignZones", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontID = sis.readUI16("fontID");
         CSMTableHint = (int) sis.readUB(2, "CSMTableHint");
         reserved = (int) sis.readUB(6, "reserved");

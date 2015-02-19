@@ -120,6 +120,11 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
      */
     public PlaceObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "PlaceObject", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterId = sis.readUI16("characterId");
         depth = sis.readUI16("depth");
         matrix = sis.readMatrix("matrix");

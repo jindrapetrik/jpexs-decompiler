@@ -64,9 +64,9 @@ public class DefineText2Tag extends TextTag {
     @SWFType(BasicType.UI16)
     public int characterID;
 
-    private final int glyphBits;
+    private int glyphBits;
 
-    private final int advanceBits;
+    private int advanceBits;
 
     public RECT textBounds;
 
@@ -527,6 +527,11 @@ public class DefineText2Tag extends TextTag {
      */
     public DefineText2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineText2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         textBounds = sis.readRECT("textBounds");
         textMatrix = sis.readMatrix("textMatrix");

@@ -218,6 +218,11 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
      */
     public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         super(sis.getSwf(), ID, "DefineSprite", data);
+        readData(sis, data, level, parallel, skipUnusualTags, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
         spriteId = sis.readUI16("spriteId");
         frameCount = sis.readUI16("frameCount");
         List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true);

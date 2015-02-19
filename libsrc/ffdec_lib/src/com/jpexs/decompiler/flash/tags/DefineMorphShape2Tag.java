@@ -191,6 +191,11 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
      */
     public DefineMorphShape2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineMorphShape2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterId = sis.readUI16("characterId");
         startBounds = sis.readRECT("startBounds");
         endBounds = sis.readRECT("endBounds");

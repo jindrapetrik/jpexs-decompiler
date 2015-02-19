@@ -84,6 +84,11 @@ public class SetTabIndexTag extends Tag {
      */
     public SetTabIndexTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "SetTabIndex", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         depth = sis.readUI16("depth");
         tabIndex = sis.readUI16("tabIndex");
     }

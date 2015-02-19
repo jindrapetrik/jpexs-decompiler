@@ -90,6 +90,11 @@ public class DefineExternalStreamSound extends Tag {
      */
     public DefineExternalStreamSound(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineExternalStreamSound", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         soundFormat = sis.readUI16("soundFormat");
         bits = sis.readUI16("bits");
         channels = sis.readUI16("channels");

@@ -69,6 +69,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
 
+    private static final String ACTION_UNDO_TAG = "UNDOTAG";
+
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
 
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
@@ -84,6 +86,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
     private JMenuItem removeMenuItem;
 
     private JMenuItem removeWithDependenciesMenuItem;
+
+    private JMenuItem undoTagMenuItem;
 
     private JMenuItem exportSelectionMenuItem;
 
@@ -126,6 +130,11 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         removeWithDependenciesMenuItem.addActionListener(this);
         removeWithDependenciesMenuItem.setActionCommand(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
         add(removeWithDependenciesMenuItem);
+
+        undoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.undo"));
+        undoTagMenuItem.addActionListener(this);
+        undoTagMenuItem.setActionCommand(ACTION_UNDO_TAG);
+        add(undoTagMenuItem);
 
         exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
@@ -235,6 +244,21 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             }
         }
 
+        boolean allSelectedIsTag = true;
+        for (TreeItem item : items) {
+            if (!(item instanceof Tag)) {
+                if (item instanceof TagScript) {
+                    Tag tag = ((TagScript) item).getTag();
+                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        continue;
+                    }
+                }
+
+                allSelectedIsTag = false;
+                break;
+            }
+        }
+
         boolean allSelectedIsBinaryData = true;
         for (TreeItem item : items) {
             if (!(item instanceof DefineBinaryDataTag)) {
@@ -260,6 +284,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(allSelectedIsTagOrFrame);
         removeWithDependenciesMenuItem.setVisible(allSelectedIsTagOrFrame);
+        undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
@@ -432,8 +457,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 }
 
                 mainPanel.loadFromBinaryTag(binaryDatas);
+                break;
             }
-            break;
             case ACTION_RAW_EDIT: {
                 TreeItem itemr = tagTree.getCurrentTreeItem();
                 if (itemr == null) {
@@ -441,8 +466,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 }
 
                 mainPanel.showGenericTag((Tag) itemr);
+                break;
             }
-            break;
             case ACTION_JUMP_TO_CHARACTER: {
                 TreeItem itemj = tagTree.getCurrentTreeItem();
                 if (itemj == null || !(itemj instanceof CharacterIdTag)) {
@@ -451,28 +476,28 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
                 CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
                 mainPanel.setTagTreeSelectedNode(itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
+                break;
             }
-            break;
             case ACTION_EXPAND_RECURSIVE: {
                 TreePath path = tagTree.getSelectionPath();
                 if (path == null) {
                     return;
                 }
                 View.expandTreeNodes(tagTree, path, true);
+                break;
             }
-            break;
             case ACTION_REMOVE_ITEM:
             case ACTION_REMOVE_ITEM_WITH_DEPENDENCIES: {
                 List<TreeItem> sel = tagTree.getSelected(tagTree);
 
                 List<Tag> tagsToRemove = new ArrayList<>();
-                for (TreeItem tag : sel) {
-                    if (tag instanceof Tag) {
-                        tagsToRemove.add((Tag) tag);
-                    } else if (tag instanceof TagScript) {
-                        tagsToRemove.add(((TagScript) tag).getTag());
-                    } else if (tag instanceof Frame) {
-                        Frame frameNode = (Frame) tag;
+                for (TreeItem item : sel) {
+                    if (item instanceof Tag) {
+                        tagsToRemove.add((Tag) item);
+                    } else if (item instanceof TagScript) {
+                        tagsToRemove.add(((TagScript) item).getTag());
+                    } else if (item instanceof Frame) {
+                        Frame frameNode = (Frame) item;
                         Frame frame = frameNode.timeline.getFrame(frameNode.frame);
                         if (frame.showFrameTag != null) {
                             tagsToRemove.add(frame.showFrameTag);
@@ -498,8 +523,26 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         mainPanel.refreshTree();
                     }
                 }
+                break;
             }
-            break;
+            case ACTION_UNDO_TAG: {
+                List<TreeItem> sel = tagTree.getSelected(tagTree);
+
+                for (TreeItem item : sel) {
+                    if (item instanceof Tag) {
+                        try {
+                            Tag tag = (Tag) item;
+                            tag.undo();
+                            tag.getSwf().clearAllCache();
+                        } catch (InterruptedException | IOException ex) {
+                            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
+                mainPanel.refreshTree();
+                break;
+            }
             case ACTION_CLOSE_SWF: {
                 List<TreeItem> sel = tagTree.getSelected(tagTree);
                 for (TreeItem item : sel) {
@@ -516,8 +559,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         Main.closeFile((SWFList) item);
                     }
                 }
+                break;
             }
-            break;
         }
     }
 }

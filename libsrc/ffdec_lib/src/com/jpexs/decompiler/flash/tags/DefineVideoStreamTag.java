@@ -121,6 +121,11 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      */
     public DefineVideoStreamTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineVideoStream", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         numFrames = sis.readUI16("numFrames");
         width = sis.readUI16("width");

@@ -38,7 +38,7 @@ public class DefineShape2Tag extends ShapeTag {
     @SWFType(BasicType.UI16)
     public int shapeId;
 
-    private final RECT shapeBounds;
+    private RECT shapeBounds;
 
     public SHAPEWITHSTYLE shapes;
 
@@ -105,6 +105,11 @@ public class DefineShape2Tag extends ShapeTag {
 
     public DefineShape2Tag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
         super(sis.getSwf(), ID, "DefineShape2", data);
+        readData(sis, data, 0, false, false, lazy);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
         if (!lazy) {

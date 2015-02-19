@@ -140,6 +140,11 @@ public class DefineFont3Tag extends FontTag {
 
     public DefineFont3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFont3", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontId = sis.readUI16("fontId");
         fontFlagsHasLayout = sis.readUB(1, "fontFlagsHasLayout") == 1;
         fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;

@@ -117,6 +117,11 @@ public class DefineButtonSoundTag extends CharacterIdTag {
      */
     public DefineButtonSoundTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineButtonSound", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         buttonSoundChar0 = sis.readUI16("buttonSoundChar0");
         if (buttonSoundChar0 != 0) {

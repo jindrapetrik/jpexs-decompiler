@@ -79,6 +79,11 @@ public class DefineExternalGradient extends Tag {
      */
     public DefineExternalGradient(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineExternalGradient", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         gradientId = sis.readUI16("gradientId");
         bitmapsFormat = sis.readUI16("bitmapsFormat");
         gradientSize = sis.readUI16("gradientSize");

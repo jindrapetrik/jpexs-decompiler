@@ -65,6 +65,11 @@ public class DefineGradientMap extends Tag {
      */
     public DefineGradientMap(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineGradientMap", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         int numGradients = sis.readUI16("numGradients");
         indices = new int[numGradients];
         for (int i = 0; i < numGradients; i++) {

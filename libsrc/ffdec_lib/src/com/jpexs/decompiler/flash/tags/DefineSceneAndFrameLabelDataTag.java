@@ -101,6 +101,11 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      */
     public DefineSceneAndFrameLabelDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineSceneAndFrameLabelData", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         int sceneCount = (int) sis.readEncodedU32("sceneCount");
         sceneOffsets = new long[sceneCount];
         sceneNames = new String[sceneCount];

@@ -77,6 +77,11 @@ public class ProtectTag extends Tag {
      */
     public ProtectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "Protect", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         if (sis.available() > 0) {
             passwordHash = sis.readString("passwordHash");
         } else {

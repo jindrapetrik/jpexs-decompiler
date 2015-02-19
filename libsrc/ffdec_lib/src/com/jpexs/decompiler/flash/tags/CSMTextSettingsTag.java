@@ -101,6 +101,11 @@ public class CSMTextSettingsTag extends Tag {
      */
     public CSMTextSettingsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "CSMTextSettings", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         textID = sis.readUI16("textID");
         useFlashType = (int) sis.readUB(2, "useFlashType");
         gridFit = (int) sis.readUB(3, "gridFit");

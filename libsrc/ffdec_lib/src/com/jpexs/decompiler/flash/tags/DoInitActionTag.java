@@ -74,6 +74,11 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      */
     public DoInitActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoInitAction", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         spriteId = sis.readUI16("spriteId");
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
     }

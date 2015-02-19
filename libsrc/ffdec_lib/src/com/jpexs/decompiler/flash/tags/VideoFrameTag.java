@@ -82,6 +82,11 @@ public class VideoFrameTag extends Tag {
      */
     public VideoFrameTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "VideoFrame", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         streamID = sis.readUI16("streamID");
         frameNum = sis.readUI16("frameNum");
         videoData = sis.readByteRangeEx(sis.available(), "videoData"); //TODO: Parse video packets

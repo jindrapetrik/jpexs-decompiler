@@ -43,7 +43,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      */
     @HideInRawEdit
     @SWFField
-    private final ABC abc;
+    private ABC abc;
 
     /**
      * A 32-bit flags value, which may contain the following bits set:
@@ -91,6 +91,11 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      */
     public DoABCDefineTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoABCDefine", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         flags = sis.readUI32("flags");
         name = sis.readString("name");
 

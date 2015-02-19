@@ -52,6 +52,11 @@ public class FrameLabelTag extends Tag {
 
     public FrameLabelTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "FrameLabel", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         name = sis.readString("name");
         if (sis.available() > 0) {
             if (sis.readUI8("namedAnchor") == 1) {

@@ -79,6 +79,11 @@ public class StartSoundTag extends Tag {
      */
     public StartSoundTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "StartSound", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         soundId = sis.readUI16("soundId");
         soundInfo = sis.readSOUNDINFO("soundInfo");
     }

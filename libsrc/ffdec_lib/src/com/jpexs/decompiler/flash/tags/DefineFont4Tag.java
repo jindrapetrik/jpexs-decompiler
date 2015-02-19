@@ -68,6 +68,11 @@ public class DefineFont4Tag extends CharacterTag {
 
     public DefineFont4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFont4", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontID = sis.readUI16("fontID");
         reserved = (int) sis.readUB(5, "reserved");
         fontFlagsHasFontData = sis.readUB(1, "fontFlagsHasFontData") == 1;

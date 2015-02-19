@@ -1182,10 +1182,10 @@ public class SWFInputStream implements AutoCloseable {
         try {
             switch (tag.getId()) {
                 case 0:
-                    ret = new EndTag(swf, data);
+                    ret = new EndTag(sis, data);
                     break;
                 case 1:
-                    ret = new ShowFrameTag(swf, data);
+                    ret = new ShowFrameTag(sis, data);
                     break;
                 case 2:
                     ret = new DefineShapeTag(sis, data, lazy);

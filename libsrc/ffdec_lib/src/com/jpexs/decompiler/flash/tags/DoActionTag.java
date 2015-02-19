@@ -67,6 +67,11 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DoAction", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
     }
 

@@ -160,6 +160,11 @@ public class DefineFontTag extends FontTag {
      */
     public DefineFontTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFont", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontId = sis.readUI16("fontId");
         glyphShapeTable = new ArrayList<>();
 

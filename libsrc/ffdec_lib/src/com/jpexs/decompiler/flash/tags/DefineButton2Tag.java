@@ -118,6 +118,11 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      */
     public DefineButton2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineButton2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         reserved = (int) sis.readUB(7, "reserved");
         trackAsMenu = sis.readUB(1, "trackAsMenu") == 1;

@@ -44,6 +44,11 @@ public class MetadataTag extends Tag {
 
     public MetadataTag(SWFInputStream sis, ByteArrayRange data) {
         super(sis.getSwf(), ID, "Metadata", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) {
         try {
             xmlMetadata = sis.readString("xmlMetadata");
         } catch (IOException ex) {

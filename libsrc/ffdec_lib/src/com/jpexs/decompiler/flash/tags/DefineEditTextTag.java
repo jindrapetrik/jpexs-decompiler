@@ -762,6 +762,11 @@ public class DefineEditTextTag extends TextTag {
      */
     public DefineEditTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineEditText", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         bounds = sis.readRECT("bounds");
         hasText = sis.readUB(1, "hasText") == 1;

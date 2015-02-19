@@ -119,6 +119,11 @@ public class DefineFontInfo2Tag extends Tag {
      */
     public DefineFontInfo2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "DefineFontInfo2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontID = sis.readUI16("fontID");
         int fontNameLen = sis.readUI8("fontNameLen");
         if (swf.version >= 6) {

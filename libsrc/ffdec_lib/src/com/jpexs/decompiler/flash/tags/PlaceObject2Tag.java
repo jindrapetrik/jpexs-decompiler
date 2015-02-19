@@ -245,6 +245,11 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
      */
     public PlaceObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, "PlaceObject2", data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         placeFlagHasClipActions = sis.readUB(1, "placeFlagHasClipActions") == 1;
         placeFlagHasClipDepth = sis.readUB(1, "placeFlagHasClipDepth") == 1;
         placeFlagHasName = sis.readUB(1, "placeFlagHasName") == 1;

@@ -140,6 +140,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    public abstract void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException;
+
     private static final Object lockObject = new Object();
 
     private volatile static List<Integer> knownTagIds;
@@ -455,6 +457,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
         return SWFInputStream.resolveTag(copy, 0, false, true, false);
+    }
+
+    public void undo() throws InterruptedException, IOException {
+        byte[] data = getOriginalData();
+        SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
+        readData(tagDataStream, getOriginalRange(), 0, false, true, false);
+        setModified(false);
     }
 
     /**
