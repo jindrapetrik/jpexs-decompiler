@@ -435,11 +435,12 @@ public class FrameExporter {
                 if (!layer.isVisible) {
                     continue;
                 }
-                CharacterTag character = timeline.swf.getCharacter(layer.characterId);
 
+                CharacterTag character = timeline.swf.getCharacter(layer.characterId);
                 if (colorTransform == null) {
                     colorTransform = new ColorTransform();
                 }
+
                 Matrix placeMatrix = new Matrix(layer.matrix);
                 placeMatrix.scaleX /= unitDivisor;
                 placeMatrix.scaleY /= unitDivisor;

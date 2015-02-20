@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -503,13 +502,9 @@ public class DefineEditTextTag extends TextTag {
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
-                                    CharacterTag characterTag = swf.getCharacter(fontId);
-                                    if (characterTag == null) {
+                                    FontTag ft = swf.getFont(fontId);
+                                    if (ft == null) {
                                         throw new TextParseException("Font not found.", lexer.yyline());
-                                    }
-
-                                    if (!(characterTag instanceof FontTag)) {
-                                        throw new TextParseException("Character tag is not a Font tag. CharacterID: " + fontId, lexer.yyline());
                                     }
                                 } catch (NumberFormatException ne) {
                                     throw new TextParseException("Invalid font value. Number expected. Found: " + paramValue, lexer.yyline());
@@ -641,6 +636,7 @@ public class DefineEditTextTag extends TextTag {
                 hasFontClass = true;
             }
             this.autoSize = autoSize;
+            this.align = align;
             if ((leftMargin > -1)
                     || (rightMargin > -1)
                     || (indent > -1)

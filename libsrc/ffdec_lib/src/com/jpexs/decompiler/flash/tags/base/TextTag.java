@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -117,9 +116,15 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         }
     }
 
-    public static void alignText(List<TEXTRECORD> textRecords, TextAlign textAlign) {
+    public static void alignText(SWF swf, List<TEXTRECORD> textRecords, TextAlign textAlign) {
+        int xMin = Integer.MAX_VALUE;
         int maxWidth = 0;
         for (TEXTRECORD tr : textRecords) {
+            int xOffset = tr.styleFlagsHasXOffset ? tr.xOffset : 0;
+            if (xOffset < xMin) {
+                xMin = xOffset;
+            }
+
             int width = tr.getTotalAdvance();
 
             if (width > maxWidth) {
@@ -127,30 +132,98 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             }
         }
 
+        FontTag font = null;
+
         for (TEXTRECORD tr : textRecords) {
+            if (tr.styleFlagsHasFont) {
+                FontTag font2 = swf.getFont(tr.fontId);
+                if (font2 != null) {
+                    font = font2;
+                }
+            }
+
+            /*if (tr.justified) {
+             // Text record was aligned in Justify mode earier
+             // restore the advances
+             for (GLYPHENTRY ge : tr.glyphEntries) {
+             char ch = font.glyphToChar(ge.glyphIndex);
+             if (Character.isWhitespace(ch)) {
+             ge.glyphAdvance = ge.originalAdvance;
+             }
+             }
+             }*/
             int width = tr.getTotalAdvance();
             switch (textAlign) {
                 case LEFT:
-                    tr.xOffset = 0;
+                    tr.xOffset = xMin;
                     tr.styleFlagsHasXOffset = true;
                     break;
                 case CENTER:
-                    tr.xOffset = (maxWidth - width) / 2;
+                    tr.xOffset = xMin + (maxWidth - width) / 2;
                     tr.styleFlagsHasXOffset = true;
                     break;
                 case RIGHT:
-                    tr.xOffset = maxWidth - width;
+                    tr.xOffset = xMin + maxWidth - width;
                     tr.styleFlagsHasXOffset = true;
                     break;
                 case JUSTIFY:
-                    tr.xOffset = 0;
+                    tr.xOffset = xMin;
                     tr.styleFlagsHasXOffset = true;
+
+                    if (font != null) {
+                        int diff = maxWidth - width;
+                        if (diff > 0) {
+                            int spaces = 0;
+                            int spaces2 = 0;
+                            int state = 0;
+                            List<GLYPHENTRY> glyphEntries = new ArrayList<>();
+                            List<GLYPHENTRY> glyphEntries2 = new ArrayList<>();
+                            for (GLYPHENTRY ge : tr.glyphEntries) {
+                                char ch = font.glyphToChar(ge.glyphIndex);
+                                boolean whitespace = Character.isWhitespace(ch);
+                                switch (state) {
+                                    case 0:
+                                        if (!whitespace) {
+                                            state = 1;
+                                        }
+                                        break;
+                                    case 1:
+                                        if (whitespace) {
+                                            spaces2++;
+                                            glyphEntries2.add(ge);
+                                        } else {
+                                            spaces += spaces2;
+                                            spaces2 = 0;
+                                            glyphEntries.addAll(glyphEntries2);
+                                            glyphEntries2.clear();
+                                        }
+                                        break;
+                                }
+                            }
+
+                            if (spaces > 0) {
+                                int fix = diff / spaces;
+                                int remaining = diff - fix * spaces;
+                                for (GLYPHENTRY ge : glyphEntries) {
+                                    int diff2 = fix;
+                                    if (remaining-- > 0) {
+                                        diff2++;
+                                    }
+
+                                    //ge.originalAdvance = ge.glyphAdvance;
+                                    ge.glyphAdvance += diff2;
+                                }
+
+                                //tr.justified = true;
+                            }
+                        }
+                    }
                     break;
             }
         }
     }
 
-    public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, List<Tag> tags) {
+    public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, SWF swf) {
         Map<String, Object> att = new HashMap<>();
         RECT textBounds = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         FontTag font = null;
@@ -176,13 +249,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (int r = 0; r < list.size(); r++) {
             TEXTRECORD rec = list.get(r);
             if (rec.styleFlagsHasFont) {
-                for (Tag t : tags) {
-                    if (t instanceof FontTag) {
-                        FontTag ft = (FontTag) t;
-                        if (ft.getFontId() == rec.fontId) {
-                            font = ft;
-                        }
-                    }
+                FontTag font2 = swf.getFont(rec.fontId);
+                if (font2 != null) {
+                    font = font2;
                 }
                 textHeight = rec.textHeight;
                 glyphs = font.getGlyphShapeTable();
@@ -332,9 +401,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                CharacterTag character = swf.getCharacter(rec.fontId);
-                if (character instanceof FontTag) {
-                    font = (FontTag) character;
+                FontTag font2 = swf.getFont(rec.fontId);
+                if (font2 != null) {
+                    font = font2;
                 }
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
@@ -381,7 +450,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         ExportRectangle result = null;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.getCharacter(rec.fontId);
+                font = swf.getFont(rec.fontId);
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -472,7 +541,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.getCharacter(rec.fontId);
+                font = swf.getFont(rec.fontId);
                 fontId = rec.fontId;
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
@@ -518,7 +587,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = (FontTag) swf.getCharacter(rec.fontId);
+                font = swf.getFont(rec.fontId);
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }

@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -220,16 +219,12 @@ public class DefineText2Tag extends TextTag {
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
-                                    CharacterTag characterTag = swf.getCharacter(fontId);
-                                    if (characterTag == null) {
+                                    FontTag ft = swf.getFont(fontId);
+                                    if (ft == null) {
                                         throw new TextParseException("Font not found.", lexer.yyline());
                                     }
 
-                                    if (!(characterTag instanceof FontTag)) {
-                                        throw new TextParseException("Character tag is not a Font tag. CharacterID: " + fontId, lexer.yyline());
-                                    }
-
-                                    font = (FontTag) characterTag;
+                                    font = (FontTag) ft;
                                     fontName = font.getSystemFontName();
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid font id - number expected. Found: " + paramValue, lexer.yyline());
@@ -447,7 +442,7 @@ public class DefineText2Tag extends TextTag {
 
     @Override
     public boolean alignText(TextAlign textAlign) {
-        alignText(textRecords, textAlign);
+        alignText(swf, textRecords, textAlign);
         setModified(true);
         return true;
     }

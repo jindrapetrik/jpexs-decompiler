@@ -1282,7 +1282,7 @@ public class XFLConverter {
                                     MATRIX matrix = rec.placeMatrix;
                                     String recCharStr;
                                     if (character instanceof TextTag) {
-                                        recCharStr = convertText(null, tags, (TextTag) character, matrix, filters, null);
+                                        recCharStr = convertText(null, (TextTag) character, matrix, filters, null);
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
                                     } else {
@@ -1904,7 +1904,7 @@ public class XFLConverter {
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
-                            elements += convertText(instanceName, tags, (TextTag) character, matrix, filters, clipActions);
+                            elements += convertText(instanceName, (TextTag) character, matrix, filters, clipActions);
                         } else if (character instanceof DefineVideoStreamTag) {
                             elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
                         } else {
@@ -2332,7 +2332,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
+    public static String convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
         StringBuilder ret = new StringBuilder();
 
         if (m == null) {
@@ -2349,7 +2349,8 @@ public class XFLConverter {
             filterStr += "</filters>";
         }
 
-        for (Tag t : tags) {
+        SWF swf = tag.getSwf();
+        for (Tag t : swf.tags) {
             if (t instanceof CSMTextSettingsTag) {
                 CSMTextSettingsTag c = (CSMTextSettingsTag) t;
                 if (c.textID == tag.getCharacterId()) {
@@ -2358,6 +2359,7 @@ public class XFLConverter {
                 }
             }
         }
+
         String fontRenderingMode = "standard";
         String antiAlias = "";
         if (csmts != null) {
@@ -2386,19 +2388,12 @@ public class XFLConverter {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
 
-            looprec:
             for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {
-                    for (Tag t : tags) {
-                        if (t instanceof FontTag) {
-                            FontTag ft = (FontTag) t;
-                            if (ft.getFontId() == rec.fontId) {
-                                if (ft.isSmall()) {
-                                    fontRenderingMode = "bitmap";
-                                    break looprec;
-                                }
-                            }
-                        }
+                    FontTag ft = swf.getFont(rec.fontId);
+                    if (ft != null && ft.isSmall()) {
+                        fontRenderingMode = "bitmap";
+                        break;
                     }
                 }
             }
@@ -2412,7 +2407,7 @@ public class XFLConverter {
                 ret.append(" instanceName=\"").append(xmlString(instanceName)).append("\"");
             }
             ret.append(antiAlias);
-            Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, tags);
+            Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
 
             ret.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
             ret.append(matStr);
@@ -2444,13 +2439,8 @@ public class XFLConverter {
                     fontId = rec.fontId;
                     fontName = null;
                     textHeight = rec.textHeight;
-                    font = null;
-                    for (Tag t : tags) {
-                        if (t instanceof FontTag) {
-                            if (((FontTag) t).getFontId() == fontId) {
-                                font = (FontTag) t;
-                            }
-                        }
+                    font = swf.getFont(fontId);
+                    for (Tag t : swf.tags) {
                         if (t instanceof DefineFontNameTag) {
                             if (((DefineFontNameTag) t).fontId == fontId) {
                                 fontName = ((DefineFontNameTag) t).fontName;
@@ -2506,16 +2496,9 @@ public class XFLConverter {
         } else if (tag instanceof DefineEditTextTag) {
             DefineEditTextTag det = (DefineEditTextTag) tag;
             String tagName;
-            for (Tag t : tags) {
-                if (t instanceof FontTag) {
-                    FontTag ft = (FontTag) t;
-                    if (ft.getFontId() == det.fontId) {
-                        if (ft.isSmall()) {
-                            fontRenderingMode = "bitmap";
-                            break;
-                        }
-                    }
-                }
+            FontTag ft = swf.getFont(det.fontId);
+            if (ft != null && ft.isSmall()) {
+                fontRenderingMode = "bitmap";
             }
             if (!det.useOutlines) {
                 fontRenderingMode = "device";
@@ -2579,7 +2562,7 @@ public class XFLConverter {
             }
 
             if (det.html) {
-                ret.append(convertHTMLText(tags, det, txt));
+                ret.append(convertHTMLText(swf.tags, det, txt));
             } else {
                 ret.append("<DOMTextRun>");
                 ret.append("<characters>").append(xmlString(txt)).append("</characters>");
@@ -2598,16 +2581,10 @@ public class XFLConverter {
                 }
                 if (det.hasFont) {
                     String fontName = null;
-                    FontTag ft = null;
-                    for (Tag u : tags) {
+                    for (Tag u : swf.tags) {
                         if (u instanceof DefineFontNameTag) {
                             if (((DefineFontNameTag) u).fontId == det.fontId) {
                                 fontName = ((DefineFontNameTag) u).fontName;
-                            }
-                        }
-                        if (u instanceof FontTag) {
-                            if (((FontTag) u).getFontId() == det.fontId) {
-                                ft = (FontTag) u;
                             }
                         }
                         if (fontName != null && ft != null) {

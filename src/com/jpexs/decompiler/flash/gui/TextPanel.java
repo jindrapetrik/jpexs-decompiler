@@ -198,7 +198,7 @@ public class TextPanel extends JPanel implements ActionListener {
         textAlignLeftButton.setVisible(alignable);
         textAlignCenterButton.setVisible(alignable);
         textAlignRightButton.setVisible(alignable);
-        textAlignJustifyButton.setVisible(false); // todo
+        textAlignJustifyButton.setVisible(alignable);
 
         undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
     }

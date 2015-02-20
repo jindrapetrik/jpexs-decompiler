@@ -318,6 +318,19 @@ public final class SWF implements SWFContainerItem, Timelined {
         return getCharacters().get(characterId);
     }
 
+    public FontTag getFont(int fontId) {
+        CharacterTag characterTag = getCharacters().get(fontId);
+        if (characterTag instanceof FontTag) {
+            return (FontTag) characterTag;
+        }
+
+        if (characterTag != null) {
+            logger.log(Level.SEVERE, "CharacterTag should be a FontTag. characterId: {0}", fontId);
+        }
+
+        return null;
+    }
+
     public List<ABCContainerTag> getAbcList() {
         if (abcList == null) {
             synchronized (this) {
@@ -1550,7 +1563,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                 fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
             } else {
-
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
                     String format = image.getImageFormat();
@@ -2248,8 +2260,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
 
+            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
             if (colorTransform == null) {
                 colorTransform = new ColorTransform();
             }
@@ -2398,6 +2410,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (!layer.isVisible) {
                 continue;
             }
+
             CharacterTag character = timeline.swf.getCharacter(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
