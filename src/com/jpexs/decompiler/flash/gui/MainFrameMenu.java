@@ -244,14 +244,14 @@ public abstract class MainFrameMenu {
     }
 
     protected void helpUs() {
-        String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
+        String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html?ref=app";
         if (!View.navigateUrl(helpUsURL)) {
             View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
         }
     }
 
     protected void homePage() {
-        String homePageURL = ApplicationInfo.PROJECT_PAGE;
+        String homePageURL = ApplicationInfo.PROJECT_PAGE+"?ref=app";
         if (!View.navigateUrl(homePageURL)) {
             View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
         }
