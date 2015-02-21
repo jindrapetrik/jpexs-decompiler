@@ -32,18 +32,24 @@ public class LinkLabel extends JLabel {
      * The normal text set by the user.
      */
     private String text;
+    
+    private String url;
 
     /**
      * Creates a new LinkLabel with the given text.
      *
      * @param text
      */
-    public LinkLabel(String text) {
+    public LinkLabel(String text,String url) {
         super(text);
-
+        this.url = url;
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         enableEvents(MouseEvent.MOUSE_EVENT_MASK);
+    }
+    
+    public LinkLabel(String text) {
+        this(text,text);
     }
 
     /**
@@ -80,6 +86,6 @@ public class LinkLabel extends JLabel {
     }
 
     protected void clicked() {
-        View.navigateUrl(getNormalText());
+        View.navigateUrl(url);
     }
 }
