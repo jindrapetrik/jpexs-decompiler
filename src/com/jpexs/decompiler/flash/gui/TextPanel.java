@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -35,9 +36,11 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -92,7 +95,10 @@ public class TextPanel extends JPanel implements ActionListener {
         DefaultSyntaxKit.initKit();
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);
-        add(textSearchPanel, BorderLayout.NORTH);
+        textSearchPanel.setAlignmentX(0);
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.add(textSearchPanel);
         textValue = new LineMarkedEditorPane();
         add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setEditable(false);
@@ -117,8 +123,52 @@ public class TextPanel extends JPanel implements ActionListener {
         });
 
         JPanel textButtonsPanel = new JPanel();
-        textButtonsPanel.setLayout(new FlowLayout());
+        textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
+        
 
+        textAlignLeftButton = new JButton("", View.getIcon("textalignleft16"));
+        textAlignLeftButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignLeftButton.setActionCommand(ACTION_TEXT_ALIGN_LEFT);
+        textAlignLeftButton.addActionListener(this);
+        textAlignLeftButton.setToolTipText(AppStrings.translate("text.align.left"));
+
+        textAlignCenterButton = new JButton("", View.getIcon("textaligncenter16"));
+        textAlignCenterButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignCenterButton.setActionCommand(ACTION_TEXT_ALIGN_CENTER);
+        textAlignCenterButton.addActionListener(this);
+        textAlignCenterButton.setToolTipText(AppStrings.translate("text.align.center"));
+
+        textAlignRightButton = new JButton("", View.getIcon("textalignright16"));
+        textAlignRightButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignRightButton.setActionCommand(ACTION_TEXT_ALIGN_RIGHT);
+        textAlignRightButton.addActionListener(this);
+        textAlignRightButton.setToolTipText(AppStrings.translate("text.align.right"));
+
+        textAlignJustifyButton = new JButton("", View.getIcon("textalignjustify16"));
+        textAlignJustifyButton.setMargin(new Insets(3, 3, 3, 10));
+        textAlignJustifyButton.setActionCommand(ACTION_TEXT_ALIGN_JUSTIFY);
+        textAlignJustifyButton.addActionListener(this);
+        textAlignJustifyButton.setToolTipText(AppStrings.translate("text.align.justify"));
+
+        undoChangesButton = new JButton("", View.getIcon("reload16"));
+        undoChangesButton.setMargin(new Insets(3, 3, 3, 10));
+        undoChangesButton.setActionCommand(ACTION_UNDO_CHANGES);
+        undoChangesButton.addActionListener(this);
+        undoChangesButton.setToolTipText(AppStrings.translate("text.undo"));
+
+        
+        textButtonsPanel.add(textAlignLeftButton);
+        textButtonsPanel.add(textAlignCenterButton);
+        textButtonsPanel.add(textAlignRightButton);
+        textButtonsPanel.add(textAlignJustifyButton);
+        textButtonsPanel.add(undoChangesButton);
+
+        
+        textButtonsPanel.setAlignmentX(0);
+        topPanel.add(textButtonsPanel);
+        add(topPanel,BorderLayout.NORTH);
+        
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
         textSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         textSaveButton.setMargin(new Insets(3, 3, 3, 10));
         textSaveButton.setActionCommand(ACTION_SAVE_TEXT);
@@ -133,45 +183,15 @@ public class TextPanel extends JPanel implements ActionListener {
         textCancelButton.setMargin(new Insets(3, 3, 3, 10));
         textCancelButton.setActionCommand(ACTION_CANCEL_TEXT);
         textCancelButton.addActionListener(this);
-
-        textAlignLeftButton = new JButton("", View.getIcon("textalignleft16"));
-        textAlignLeftButton.setMargin(new Insets(3, 3, 3, 10));
-        textAlignLeftButton.setActionCommand(ACTION_TEXT_ALIGN_LEFT);
-        textAlignLeftButton.addActionListener(this);
-
-        textAlignCenterButton = new JButton("", View.getIcon("textaligncenter16"));
-        textAlignCenterButton.setMargin(new Insets(3, 3, 3, 10));
-        textAlignCenterButton.setActionCommand(ACTION_TEXT_ALIGN_CENTER);
-        textAlignCenterButton.addActionListener(this);
-
-        textAlignRightButton = new JButton("", View.getIcon("textalignright16"));
-        textAlignRightButton.setMargin(new Insets(3, 3, 3, 10));
-        textAlignRightButton.setActionCommand(ACTION_TEXT_ALIGN_RIGHT);
-        textAlignRightButton.addActionListener(this);
-
-        textAlignJustifyButton = new JButton("", View.getIcon("textalignjustify16"));
-        textAlignJustifyButton.setMargin(new Insets(3, 3, 3, 10));
-        textAlignJustifyButton.setActionCommand(ACTION_TEXT_ALIGN_JUSTIFY);
-        textAlignJustifyButton.addActionListener(this);
-
-        undoChangesButton = new JButton("", View.getIcon("reload16"));
-        undoChangesButton.setMargin(new Insets(3, 3, 3, 10));
-        undoChangesButton.setActionCommand(ACTION_UNDO_CHANGES);
-        undoChangesButton.addActionListener(this);
-
-        textButtonsPanel.add(textEditButton);
-        textButtonsPanel.add(textSaveButton);
-        textButtonsPanel.add(textCancelButton);
-        textButtonsPanel.add(textAlignLeftButton);
-        textButtonsPanel.add(textAlignCenterButton);
-        textButtonsPanel.add(textAlignRightButton);
-        textButtonsPanel.add(textAlignJustifyButton);
-        textButtonsPanel.add(undoChangesButton);
-
+        
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
-
-        add(textButtonsPanel, BorderLayout.SOUTH);
+        
+        buttonsPanel.add(textEditButton);
+        buttonsPanel.add(textSaveButton);
+        buttonsPanel.add(textCancelButton);
+        add(buttonsPanel,BorderLayout.SOUTH);
+        
     }
 
     public SearchPanel<TextTag> getSearchPanel() {
@@ -266,6 +286,7 @@ public class TextPanel extends JPanel implements ActionListener {
                         mainPanel.refreshTree();
                     }
                 }
+                undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
                 break;
             }
             case ACTION_UNDO_CHANGES: {
