@@ -18,8 +18,12 @@
     !error "JRE_VERSION must be defined"
   !endif
 
-  !ifndef JRE_URL
-    !error "JRE_URL must be defined"
+  !ifndef JRE_URL_64
+    !error "JRE_URL_64 must be defined"
+  !endif
+  
+  !ifndef JRE_URL_32
+    !error "JRE_URL_32 must be defined"
   !endif
 
 
@@ -80,6 +84,9 @@ FunctionEnd
 ; the JRE_VERSION variable.  The JRE will be downloaded and installed if necessary
 ; The full path of java.exe will be returned on the stack
 
+
+var JRE_URL
+
 Function DownloadAndInstallJREIfNecessary
   Push $0
   Push $1
@@ -95,8 +102,16 @@ Function DownloadAndInstallJREIfNecessary
   strcmp $0 "OK" End downloadJRE
 
 downloadJRE:
-  DetailPrint "About to download JRE from ${JRE_URL}"
-  Inetc::get "${JRE_URL}" "$TEMP\jre_Setup.exe" /END
+
+  ${If} ${RunningX64}
+    Push ${JRE_URL_64} 
+  ${Else}
+    Push ${JRE_URL_32}
+  ${EndIf}
+  Pop $JRE_URL
+
+  DetailPrint "About to download JRE from $JRE_URL"
+  Inetc::get "$JRE_URL" "$TEMP\jre_Setup.exe" /END
   Pop $0 # return value = exit code, "OK" if OK
   DetailPrint "Download result = $0"
 

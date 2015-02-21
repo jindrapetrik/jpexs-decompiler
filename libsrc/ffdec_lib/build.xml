@@ -12,13 +12,13 @@
     
     <property name="PREFIXFILENAME" value="ffdec_lib"/>
     <property name="JARFILENAME" value="${PREFIXFILENAME}"/>
-    <property name="TARGETJAVA" value="1.7"/>
-    <property name="MINJAVAVERSION" value="1.7.0"/>
+    <property name="TARGETJAVA" value="1.8"/>
+    <property name="MINJAVAVERSION" value="1.8.0"/>
     <property name="VENDOR" value="JPEXS" />
     <property name="INTERNALNAME" value="FFDec_Lib" />
     <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler Library" />
        
-    
+        
     <property name="SOURCEDIR" value="${basedir}/src"/>
     
     <property name="TESTDIR" value="${basedir}/test"/>

@@ -15,8 +15,8 @@
     <property name="CORELIBSCRIPT" value="${basedir}/libsrc/ffdec_lib/build.xml"/>
     
     <property name="EXEICON" value="${basedir}/graphics/icon_ffdec_round.ico"/>
-    <property name="TARGETJAVA" value="1.7"/>
-    <property name="MINJAVAVERSION" value="1.7.0"/>
+    <property name="TARGETJAVA" value="1.8"/>
+    <property name="MINJAVAVERSION" value="1.8.0"/>
     <property name="VENDOR" value="JPEXS" />
     <property name="INTERNALNAME" value="FFDec" />
     <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler" />

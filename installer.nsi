@@ -13,7 +13,7 @@
 ;!define APP_URL "http://www.free-decompiler.com/flash/"
 ;!define APP_PUBLISHER "JPEXS"
 ;!define APP_NAME "JPEXS Free Flash Decompiler"
-;!define JRE_VERSION "1.7"
+;!define JRE_VERSION "1.8"
 !define APP_EXENAME "ffdec.exe"
 
 !addplugindir "nsis_plugins\ansi\"
@@ -21,7 +21,9 @@
 
 
 SetCompressor /SOLID lzma
-!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52252"
+;Java 8 Update 31 JRE
+!define JRE_URL_32 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=101406"
+!define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=101408"
 !include "nsis_plugins\JREDyna_Inetc.nsh"
 
 !define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
