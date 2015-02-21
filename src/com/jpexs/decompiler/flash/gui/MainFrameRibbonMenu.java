@@ -134,7 +134,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private static final String ACTION_EXPORT = "EXPORT";
 
-    private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
+    private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";        
 
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
 
@@ -199,6 +199,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private JCommandButton exportSelectionCommandButton;
 
     private JCommandButton importTextCommandButton;
+    private JCommandButton importXmlCommandButton;
+    private JCommandButton exportXmlCommandButton;
 
     private JCommandToggleButton viewModeResourcesToggleButton;
 
@@ -409,11 +411,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
         reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
         assignListener(reloadCommandButton, ACTION_RELOAD);
+        
+        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveasexe16"));
+        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
 
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
-        editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
+        editBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
+        editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);        
 
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
         exportBand.setResizePolicies(getResizePolicies(exportBand));
@@ -423,20 +429,27 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         assignListener(exportAllCommandButton, ACTION_EXPORT);
         exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
         assignListener(exportSelectionCommandButton, ACTION_EXPORT_SEL);
-        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveasexe16"));
-        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
+        
+        
+        exportXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.xml")), View.getResizableIcon("exportxml32"));
+        assignListener(exportXmlCommandButton, ACTION_EXPORT_SWF_XML);
 
         exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
         exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
         exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
-        exportBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
+        exportBand.addCommandButton(exportXmlCommandButton, RibbonElementPriority.MEDIUM);
+        
 
         JRibbonBand importBand = new JRibbonBand(translate("menu.import"), null);
         importBand.setResizePolicies(getResizePolicies(importBand));
-        importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("import32"));
+        importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("importtext32"));
         assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
+        
+        importXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.xml")), View.getResizableIcon("importxml32"));
+        assignListener(importXmlCommandButton, ACTION_IMPORT_SWF_XML);
 
-        importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);
+        importBand.addCommandButton(importXmlCommandButton, RibbonElementPriority.TOP);
+        importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);        
 
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
         viewBand.setResizePolicies(getResizePolicies(viewBand));
@@ -721,8 +734,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         saveasexeCommandButton.setEnabled(swfLoaded);
         exportAllCommandButton.setEnabled(swfLoaded);
         exportFlaCommandButton.setEnabled(swfLoaded);
+        exportXmlCommandButton.setEnabled(swfLoaded);
         exportSelectionCommandButton.setEnabled(swfLoaded);
         importTextCommandButton.setEnabled(swfLoaded);
+        importXmlCommandButton.setEnabled(swfLoaded);
         reloadCommandButton.setEnabled(swfLoaded);
 
         renameInvalidCommandButton.setEnabled(swfLoaded);
@@ -932,6 +947,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 break;
             case ACTION_IMPORT_TEXT:
                 importText();
+                break;
+                
+            case ACTION_EXPORT_SWF_XML:
+                mainFrame.getPanel().exportSwfXml();
+                break;
+            case ACTION_IMPORT_SWF_XML:
+                mainFrame.getPanel().importSwfXml();
                 break;
             case ACTION_EXPORT_SEL:
             case ACTION_EXPORT:

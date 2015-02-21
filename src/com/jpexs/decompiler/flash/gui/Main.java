@@ -641,7 +641,21 @@ public class Main {
                 return AppStrings.translate("filter.swf");
             }
         };
-        if (!swf.gfx) {
+        
+        FileFilter exeFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".exe")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.exe");
+            }
+        };
+        if(mode == SaveFileMode.EXE){
+            fc.setFileFilter(exeFilter);
+        } else if (!swf.gfx) {
             fc.setFileFilter(swfFilter);
         } else {
             fc.addChoosableFileFilter(swfFilter);

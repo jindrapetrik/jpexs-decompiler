@@ -1704,18 +1704,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void exportSwfXml() {
         List<TreeItem> sel = tagTree.getSelected(tagTree);
+        Set<SWF> swfs = new HashSet<>();
+
         for (TreeItem item : sel) {
-            if (item instanceof SWF) {
-                SWF swf = (SWF) item;
-                final String selFile = selectExportDir();
-                if (selFile != null) {
-                    try {
-                        File outFile = new File(selFile + File.separator + Helper.makeFileName("swf.xml"));
-                        new SwfXmlExporter().exportXml(swf, outFile);
-                        Main.stopWork();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
+            swfs.add(item.getSwf());
+        }
+
+        for (SWF swf : swfs) {
+            final String selFile = selectExportDir();
+            if (selFile != null) {
+                try {
+                    File outFile = new File(selFile + File.separator + Helper.makeFileName("swf.xml"));
+                    new SwfXmlExporter().exportXml(swf, outFile);
+                    Main.stopWork();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -1723,22 +1726,27 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void importSwfXml() {
         List<TreeItem> sel = tagTree.getSelected(tagTree);
+        Set<SWF> swfs = new HashSet<>();
         for (TreeItem item : sel) {
-            if (item instanceof SWF) {
-                SWF swf = (SWF) item;
-                File selectedFile = showImportFileChooser("filter.xml|*.xml");
-                if (selectedFile != null) {
-                    File selfile = Helper.fixDialogFile(selectedFile);
-                    String xml = Helper.readTextFile(selfile.getPath());
-                    try {
-                        new SwfXmlImporter().importSwf(swf, xml);
-                        swf.clearAllCache();
-                        swf.assignExportNamesToSymbols();
-                        swf.assignClassesToSymbols();
-                        refreshTree();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
+            swfs.add(item.getSwf());
+        }
+        if (swfs.size() > 1) {
+            return;
+        }
+
+        for (SWF swf : swfs) {
+            File selectedFile = showImportFileChooser("filter.xml|*.xml");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                String xml = Helper.readTextFile(selfile.getPath());
+                try {
+                    new SwfXmlImporter().importSwf(swf, xml);
+                    swf.clearAllCache();
+                    swf.assignExportNamesToSymbols();
+                    swf.assignClassesToSymbols();
+                    refreshTree();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
