@@ -251,7 +251,7 @@ public abstract class MainFrameMenu {
     }
 
     protected void homePage() {
-        String homePageURL = ApplicationInfo.PROJECT_PAGE+"?utm_source=app&utm_medium=menu&utm_campaign=app";
+        String homePageURL = ApplicationInfo.PROJECT_PAGE + "?utm_source=app&utm_medium=menu&utm_campaign=app";
         if (!View.navigateUrl(homePageURL)) {
             View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
         }

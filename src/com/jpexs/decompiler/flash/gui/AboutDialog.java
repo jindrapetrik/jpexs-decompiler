@@ -123,7 +123,7 @@ public class AboutDialog extends AppDialog {
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(dateLabel);
 
-        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE,ApplicationInfo.PROJECT_PAGE+"?utm_source=app&utm_medium=about&utm_campaign=app");
+        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE, ApplicationInfo.PROJECT_PAGE + "?utm_source=app&utm_medium=about&utm_campaign=app");
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
         //wwwLabel.setPreferredSize(new Dimension(300, 25));

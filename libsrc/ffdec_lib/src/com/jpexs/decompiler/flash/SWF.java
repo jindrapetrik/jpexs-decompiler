@@ -99,6 +99,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -1317,6 +1318,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
             for (TreeItem subItem : parentFrame.actions) {
                 getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+            }
+        } else if (treeItem instanceof AS2Package) {
+            AS2Package as2Package = (AS2Package) treeItem;
+            for (TreeItem subItem : as2Package.subPackages.values()) {
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+            }
+            for (TreeItem subItem : as2Package.scripts.values()) {
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
             }
         }
     }

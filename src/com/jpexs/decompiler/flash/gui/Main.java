@@ -641,7 +641,7 @@ public class Main {
                 return AppStrings.translate("filter.swf");
             }
         };
-        
+
         FileFilter exeFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -653,7 +653,7 @@ public class Main {
                 return AppStrings.translate("filter.exe");
             }
         };
-        if(mode == SaveFileMode.EXE){
+        if (mode == SaveFileMode.EXE) {
             fc.setFileFilter(exeFilter);
         } else if (!swf.gfx) {
             fc.setFileFilter(swfFilter);
