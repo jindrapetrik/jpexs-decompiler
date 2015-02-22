@@ -2362,7 +2362,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             g.fill(new Rectangle(image.getWidth(), image.getHeight()));
         }
         Matrix m = transformation.clone();
-        m.translate(-rect.Xmin, -rect.Ymin);
+        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
         RenderContext renderContext = new RenderContext();
         renderContext.stateUnderCursor = stateUnderCursor;
