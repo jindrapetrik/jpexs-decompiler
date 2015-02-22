@@ -200,7 +200,7 @@
             <subprojects/>
             <project-license>gpl30</project-license>
         </general-data>
-        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar;lib/jl1.0.1.jar;lib/nellymoser.jar;lib/gif.jar;lib/avi.jar;lib/ttf.jar;lib/jpacker.jar;lib/sfntly.jar;lib/gnujpdf.jar;libsrc/ffdec_lib/src;lib/tablelayout.jar;lib/jsyntaxpane-0.9.5.jar;lib/JavactiveX.jar</classpath>
@@ -208,24 +208,24 @@
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>
                 <built-to>locales</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar;lib/ffdec_lib.jar</classpath>
                 <built-to>build/test</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>libsrc/ffdec_lib/src</package-root>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>libsrc/ffdec_lib/test</package-root>
                 <unit-tests/>
                 <classpath mode="compile">lib/ffdec_lib.jar;libsrc/ffdec_lib/src;libsrc/ffdec_lib/testlib/emma.jar;libsrc/ffdec_lib/testlib/emma_ant.jar;libsrc/ffdec_lib/testlib/testng-6.8.jar</classpath>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
         </java-data>
     </configuration>
