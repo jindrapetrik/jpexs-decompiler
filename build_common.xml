@@ -60,11 +60,11 @@
     <target name="coverage.instrumentation">
         <mkdir dir="${INSTRDIR}"/>
         <mkdir dir="${COVERAGEDIR}"/>
-        <emma>
+        <!--<emma>
             <instr instrpath="${COMPILEDIR}" destdir="${INSTRDIR}" metadatafile="${COVERAGEDIR}/metadata.emma"
                    mode="copy">
             </instr>
-        </emma>
+        </emma>-->
         <copy todir="${INSTRDIR}">
             <fileset dir="${SOURCEDIR}">
                 <patternset refid="compiler.resources" />
@@ -132,14 +132,14 @@
         </testng>                
         <!-- Coverage report -->
         <mkdir dir="${COVERAGERESULTSDIR}"/>
-        <emma>
+        <!--<emma>
             <report sourcepath="${SOURCEDIR}" depth="method">
                 <fileset dir="${COVERAGEDIR}">
                     <include name="*.emma"/>
                 </fileset>
                 <html outfile="${COVERAGERESULTSDIR}/index.html" />
             </report>
-        </emma>
+        </emma>-->
     </target>
     
     <condition property="is_windows">
