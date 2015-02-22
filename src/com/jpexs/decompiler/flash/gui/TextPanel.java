@@ -116,7 +116,7 @@ public class TextPanel extends JPanel {
         textAlignCenterButton = createButton(null, "textaligncenter16", "text.align.center", e -> textAlign(TextAlign.CENTER));
         textAlignRightButton = createButton(null, "textalignright16", "text.align.right", e -> textAlign(TextAlign.RIGHT));
         textAlignJustifyButton = createButton(null, "textalignjustify16", "text.align.justify", e -> textAlign(TextAlign.JUSTIFY));
-        decreaseTranslateXButton = createButton(null, "textoutdent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor));
+        decreaseTranslateXButton = createButton(null, "textunindent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor));
         increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor));
         undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
