@@ -169,6 +169,10 @@ public class TextPanel extends JPanel {
 
     public void setEditText(boolean edit) {
         textValue.setEditable(edit);
+        updateButtonsVisibility(edit);
+    }
+
+    private void updateButtonsVisibility(boolean edit) {
         textSaveButton.setVisible(edit);
         textEditButton.setVisible(!edit);
         textCancelButton.setVisible(edit);
@@ -227,7 +231,7 @@ public class TextPanel extends JPanel {
         if (item instanceof TextTag) {
             TextTag textTag = (TextTag) item;
             if (mainPanel.alignText(textTag, textAlign)) {
-                setEditText(false);
+                updateButtonsVisibility(textValue.isEditable());
                 item.getSwf().clearImageCache();
                 mainPanel.refreshTree();
             }
@@ -239,7 +243,7 @@ public class TextPanel extends JPanel {
         if (item instanceof TextTag) {
             TextTag textTag = (TextTag) item;
             if (mainPanel.translateText(textTag, delta)) {
-                setEditText(false);
+                updateButtonsVisibility(textValue.isEditable());
                 item.getSwf().clearImageCache();
                 mainPanel.refreshTree();
             }

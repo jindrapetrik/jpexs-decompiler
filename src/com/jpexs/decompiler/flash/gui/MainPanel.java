@@ -2214,6 +2214,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             reload(false);
             return;
         }
+
         TreeItem treeItem = (TreeItem) e.getPath().getLastPathComponent();
         if (!(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
@@ -2226,7 +2227,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else {
             updateUi();
         }
-        previewPanel.setEditText(false);
+
+        previewPanel.setEditText(Configuration.editorMode.get());
         reload(false);
     }
 

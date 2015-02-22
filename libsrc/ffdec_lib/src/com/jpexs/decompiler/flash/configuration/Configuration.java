@@ -405,6 +405,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> showCloseConfirmation = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> editorMode = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
