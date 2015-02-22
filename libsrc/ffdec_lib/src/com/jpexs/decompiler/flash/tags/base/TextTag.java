@@ -87,6 +87,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract boolean alignText(TextAlign textAlign);
 
+    public abstract boolean translateText(int diff);
+
     @Override
     public abstract int getCharacterId();
 

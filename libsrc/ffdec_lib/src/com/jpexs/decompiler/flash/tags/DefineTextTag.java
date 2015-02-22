@@ -456,6 +456,13 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
+    public boolean translateText(int diff) {
+        textMatrix.translateX += diff;
+        setModified(true);
+        return true;
+    }
+
+    @Override
     public int getCharacterId() {
         return characterID;
     }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
@@ -30,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -48,23 +48,7 @@ import jsyntaxpane.DefaultSyntaxKit;
  *
  * @author JPEXS
  */
-public class TextPanel extends JPanel implements ActionListener {
-
-    private static final String ACTION_EDIT_TEXT = "EDITTEXT";
-
-    private static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
-
-    private static final String ACTION_SAVE_TEXT = "SAVETEXT";
-
-    private static final String ACTION_TEXT_ALIGN_LEFT = "TEXTALIGNLEFT";
-
-    private static final String ACTION_TEXT_ALIGN_CENTER = "TEXTALIGNCENTER";
-
-    private static final String ACTION_TEXT_ALIGN_RIGHT = "TEXTALIGNRIGHT";
-
-    private static final String ACTION_TEXT_ALIGN_JUSTIFY = "TEXTALIGNJUSTIFY";
-
-    private static final String ACTION_UNDO_CHANGES = "UNDOCHANGES";
+public class TextPanel extends JPanel {
 
     private final MainPanel mainPanel;
 
@@ -85,6 +69,10 @@ public class TextPanel extends JPanel implements ActionListener {
     private final JButton textAlignRightButton;
 
     private final JButton textAlignJustifyButton;
+
+    private final JButton decreaseTranslateXButton;
+
+    private final JButton increaseTranslateXButton;
 
     private final JButton undoChangesButton;
 
@@ -124,16 +112,20 @@ public class TextPanel extends JPanel implements ActionListener {
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
 
-        textAlignLeftButton = createButton(null, "textalignleft16", ACTION_TEXT_ALIGN_LEFT, "text.align.left");
-        textAlignCenterButton = createButton(null, "textaligncenter16", ACTION_TEXT_ALIGN_CENTER, "text.align.center");
-        textAlignRightButton = createButton(null, "textalignright16", ACTION_TEXT_ALIGN_RIGHT, "text.align.right");
-        textAlignJustifyButton = createButton(null, "textalignjustify16", ACTION_TEXT_ALIGN_JUSTIFY, "text.align.justify");
-        undoChangesButton = createButton(null, "reload16", ACTION_UNDO_CHANGES, "text.undo");
+        textAlignLeftButton = createButton(null, "textalignleft16", "text.align.left", e -> textAlign(TextAlign.LEFT));
+        textAlignCenterButton = createButton(null, "textaligncenter16", "text.align.center", e -> textAlign(TextAlign.CENTER));
+        textAlignRightButton = createButton(null, "textalignright16", "text.align.right", e -> textAlign(TextAlign.RIGHT));
+        textAlignJustifyButton = createButton(null, "textalignjustify16", "text.align.justify", e -> textAlign(TextAlign.JUSTIFY));
+        decreaseTranslateXButton = createButton(null, "textoutdent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor));
+        increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor));
+        undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
         textButtonsPanel.add(textAlignLeftButton);
         textButtonsPanel.add(textAlignCenterButton);
         textButtonsPanel.add(textAlignRightButton);
         textButtonsPanel.add(textAlignJustifyButton);
+        textButtonsPanel.add(decreaseTranslateXButton);
+        textButtonsPanel.add(increaseTranslateXButton);
         textButtonsPanel.add(undoChangesButton);
 
         textButtonsPanel.setAlignmentX(0);
@@ -141,9 +133,9 @@ public class TextPanel extends JPanel implements ActionListener {
         add(topPanel, BorderLayout.NORTH);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        textSaveButton = createButton("button.save", "save16", ACTION_SAVE_TEXT, null);
-        textEditButton = createButton("button.edit", "edit16", ACTION_EDIT_TEXT, null);
-        textCancelButton = createButton("button.cancel", "cancel16", ACTION_CANCEL_TEXT, null);
+        textSaveButton = createButton("button.save", "save16", null, e -> saveText());
+        textEditButton = createButton("button.edit", "edit16", null, e -> editText());
+        textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
 
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
@@ -154,12 +146,11 @@ public class TextPanel extends JPanel implements ActionListener {
         add(buttonsPanel, BorderLayout.SOUTH);
     }
 
-    private JButton createButton(String textResource, String iconName, String command, String toolTipResource) {
+    private JButton createButton(String textResource, String iconName, String toolTipResource, ActionListener actionListener) {
         String text = textResource == null ? "" : mainPanel.translate(textResource);
         JButton button = new JButton(text, View.getIcon(iconName));
         button.setMargin(new Insets(3, 3, 3, 10));
-        button.setActionCommand(command);
-        button.addActionListener(this);
+        button.addActionListener(actionListener);
         if (toolTipResource != null) {
             button.setToolTipText(mainPanel.translate(toolTipResource));
         }
@@ -192,6 +183,8 @@ public class TextPanel extends JPanel implements ActionListener {
         textAlignCenterButton.setVisible(alignable);
         textAlignRightButton.setVisible(alignable);
         textAlignJustifyButton.setVisible(alignable);
+        increaseTranslateXButton.setVisible(alignable);
+        decreaseTranslateXButton.setVisible(alignable);
 
         undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
     }
@@ -207,75 +200,63 @@ public class TextPanel extends JPanel implements ActionListener {
         });
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_EDIT_TEXT:
-                setEditText(true);
-                textChanged();
-                break;
-            case ACTION_CANCEL_TEXT:
+    private void editText() {
+        setEditText(true);
+        textChanged();
+    }
+
+    private void cancelText() {
+        setEditText(false);
+        mainPanel.reload(true);
+    }
+
+    private void saveText() {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof TextTag) {
+            TextTag textTag = (TextTag) item;
+            if (mainPanel.saveText(textTag, textValue.getText(), null)) {
                 setEditText(false);
-                mainPanel.reload(true);
-                break;
-            case ACTION_SAVE_TEXT: {
-                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-                if (item instanceof TextTag) {
-                    TextTag textTag = (TextTag) item;
-                    if (mainPanel.saveText(textTag, textValue.getText(), null)) {
-                        setEditText(false);
-                        item.getSwf().clearImageCache();
-                        mainPanel.refreshTree();
-                    }
-                }
-                break;
+                item.getSwf().clearImageCache();
+                mainPanel.refreshTree();
             }
-            case ACTION_TEXT_ALIGN_LEFT:
-            case ACTION_TEXT_ALIGN_CENTER:
-            case ACTION_TEXT_ALIGN_RIGHT:
-            case ACTION_TEXT_ALIGN_JUSTIFY: {
-                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-                if (item instanceof TextTag) {
-                    TextTag textTag = (TextTag) item;
-                    TextAlign ta = null;
-                    switch (e.getActionCommand()) {
-                        case ACTION_TEXT_ALIGN_LEFT:
-                            ta = TextAlign.LEFT;
-                            break;
-                        case ACTION_TEXT_ALIGN_CENTER:
-                            ta = TextAlign.CENTER;
-                            break;
-                        case ACTION_TEXT_ALIGN_RIGHT:
-                            ta = TextAlign.RIGHT;
-                            break;
-                        case ACTION_TEXT_ALIGN_JUSTIFY:
-                            ta = TextAlign.JUSTIFY;
-                            break;
-                    }
+        }
+    }
 
-                    if (mainPanel.alignText(textTag, ta)) {
-                        setEditText(false);
-                        item.getSwf().clearImageCache();
-                        mainPanel.refreshTree();
-                    }
-                }
-                undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
-                break;
+    private void textAlign(TextAlign textAlign) {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof TextTag) {
+            TextTag textTag = (TextTag) item;
+            if (mainPanel.alignText(textTag, textAlign)) {
+                setEditText(false);
+                item.getSwf().clearImageCache();
+                mainPanel.refreshTree();
             }
-            case ACTION_UNDO_CHANGES: {
-                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-                if (item instanceof TextTag) {
-                    try {
-                        ((Tag) item).undo();
-                    } catch (InterruptedException | IOException ex) {
-                        Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+        }
+    }
 
-                    item.getSwf().clearImageCache();
-                    mainPanel.refreshTree();
-                }
-                break;
+    private void translateX(int delta) {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof TextTag) {
+            TextTag textTag = (TextTag) item;
+            if (mainPanel.translateText(textTag, delta)) {
+                setEditText(false);
+                item.getSwf().clearImageCache();
+                mainPanel.refreshTree();
             }
+        }
+    }
+
+    private void undoChanges() {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof TextTag) {
+            try {
+                ((Tag) item).undo();
+            } catch (InterruptedException | IOException ex) {
+                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            item.getSwf().clearImageCache();
+            mainPanel.refreshTree();
         }
     }
 

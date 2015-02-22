@@ -448,6 +448,13 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
+    public boolean translateText(int diff) {
+        textMatrix.translateX += diff;
+        setModified(true);
+        return true;
+    }
+
+    @Override
     public RECT getRect(Set<BoundedTag> added) {
         return textBounds;
     }

@@ -2007,6 +2007,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return false;
     }
 
+    public boolean translateText(TextTag textTag, int diff) {
+        if (textTag.translateText(diff)) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {

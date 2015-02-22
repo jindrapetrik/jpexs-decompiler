@@ -666,6 +666,11 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
+    public boolean translateText(int diff) {
+        return true;
+    }
+
+    @Override
     public RECT getRect(Set<BoundedTag> added) {
         return bounds;
     }
