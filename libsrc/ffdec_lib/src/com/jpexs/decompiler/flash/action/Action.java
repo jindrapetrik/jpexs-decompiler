@@ -719,7 +719,11 @@ public abstract class Action implements GraphSourceItem {
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-            logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
+            if (ex instanceof TimeoutException) {
+                logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
+            } else {
+                logger.log(Level.SEVERE, "Decompilation timeout in: " + path, ex);
+            }
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -734,10 +738,8 @@ public abstract class Action implements GraphSourceItem {
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
-            logger.log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendTimeoutComment(writer, timeout);
         } else {
-            logger.log(Level.SEVERE, "Decompilation error in: " + path, convertException);
             Helper.appendErrorComment(writer, convertException);
         }
         if (asm != null) {

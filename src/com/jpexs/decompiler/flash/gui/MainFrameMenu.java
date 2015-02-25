@@ -76,7 +76,7 @@ public abstract class MainFrameMenu {
                     swf.binaryData.setModified(true);
                     saved = true;
                 } catch (IOException ex) {
-                    Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                 }
             } else if (swf.getFile() == null) {
                 saved = saveAs(swf, SaveFileMode.SAVEAS);
@@ -85,7 +85,7 @@ public abstract class MainFrameMenu {
                     Main.saveFile(swf, swf.getFile());
                     saved = true;
                 } catch (IOException ex) {
-                    Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }

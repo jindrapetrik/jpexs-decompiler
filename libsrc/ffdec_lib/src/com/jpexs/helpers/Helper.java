@@ -857,7 +857,7 @@ public class Helper {
             writer.appendNoHilight(" * ").appendNoHilight(decompilationErrorAdd).newLine();
         }
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.errorType")).
-                appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
+                appendNoHilight(": " + ex.getClass().getSimpleName() + " (" + ex.getMessage() + ")").newLine();
         writer.appendNoHilight(" */").newLine();
         writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
                 appendNoHilight(AppResources.translate("decompilationError.error.description")).

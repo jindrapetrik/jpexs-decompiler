@@ -351,7 +351,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                 swf.updateCharacters();
                                 mainPanel.refreshTree();
                             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-                                Logger.getLogger(TagTree.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     });

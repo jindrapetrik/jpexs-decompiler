@@ -207,7 +207,11 @@ public final class MethodBody implements Cloneable {
             } catch (InterruptedException ex) {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+                if (ex instanceof TimeoutException) {
+                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex);
+                } else {
+                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation timeout in " + path, ex);
+                }
                 convertException = ex;
                 Throwable cause = ex.getCause();
                 if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -240,10 +244,10 @@ public final class MethodBody implements Cloneable {
                 Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
                 //writer.endMethod();
             } else if (convertException instanceof TimeoutException) {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
+                // exception was logged in convert method
                 Helper.appendTimeoutComment(writer, timeout);
             } else {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
+                // exception was logged in convert method
                 Helper.appendErrorComment(writer, convertException);
             }
         }

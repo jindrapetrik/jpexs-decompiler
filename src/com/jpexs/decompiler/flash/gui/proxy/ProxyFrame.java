@@ -178,7 +178,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             File rf = new File(replacementsFile);
             if (rf.exists()) {
                 if (!rf.delete()) {
-                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot delete replacements file");
+                    Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, "Cannot delete replacements file");
                 }
             }
         } else {
@@ -188,7 +188,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                     pw.println(r.targetFile);
                 }
             } catch (IOException ex) {
-                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during saving replacements", ex);
+                Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, "Exception during saving replacements", ex);
             }
         }
     }

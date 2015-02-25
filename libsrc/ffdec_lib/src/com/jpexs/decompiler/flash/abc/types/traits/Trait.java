@@ -163,7 +163,8 @@ public abstract class Trait implements Serializable {
     public void convertPackaged(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            convert(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+            String nsname = ns.getName(abc.constants, false);
+            convert(parent, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         }
     }
 
