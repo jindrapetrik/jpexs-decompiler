@@ -56,9 +56,9 @@ public class TextPanel extends JPanel {
 
     private final LineMarkedEditorPane textValue;
 
-    private final JButton textSaveButton;
-
     private final JButton textEditButton;
+
+    private final JButton textSaveButton;
 
     private final JButton textCancelButton;
 
@@ -76,6 +76,8 @@ public class TextPanel extends JPanel {
 
     private final JButton undoChangesButton;
 
+    private boolean modified = false;
+
     public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
 
@@ -88,7 +90,6 @@ public class TextPanel extends JPanel {
         topPanel.add(textSearchPanel);
         textValue = new LineMarkedEditorPane();
         add(new JScrollPane(textValue), BorderLayout.CENTER);
-        textValue.setEditable(false);
         textValue.setFont(new Font("Monospaced", Font.PLAIN, textValue.getFont().getSize()));
         textValue.setContentType("text/swftext");
         textValue.getDocument().addDocumentListener(new DocumentListener() {
@@ -133,12 +134,9 @@ public class TextPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        textSaveButton = createButton("button.save", "save16", null, e -> saveText());
         textEditButton = createButton("button.edit", "edit16", null, e -> editText());
+        textSaveButton = createButton("button.save", "save16", null, e -> saveText());
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
-
-        textSaveButton.setVisible(false);
-        textCancelButton.setVisible(false);
 
         buttonsPanel.add(textEditButton);
         buttonsPanel.add(textSaveButton);
@@ -165,22 +163,28 @@ public class TextPanel extends JPanel {
     public void setText(String text) {
         textValue.setText(text);
         textValue.setCaretPosition(0);
+        modified = false;
+        setEditText(false);
     }
 
-    public void setEditText(boolean edit) {
-        textValue.setEditable(edit);
-        updateButtonsVisibility(edit);
+    private void setEditText(boolean edit) {
+        textValue.setEditable(Configuration.editorMode.get() || edit);
+        updateButtonsVisibility();
     }
 
-    private void updateButtonsVisibility(boolean edit) {
-        textSaveButton.setVisible(edit);
+    private void updateButtonsVisibility() {
+        boolean edit = textValue.isEditable();
+        boolean editorMode = Configuration.editorMode.get();
         textEditButton.setVisible(!edit);
+        textSaveButton.setVisible(edit);
+        textSaveButton.setEnabled(modified);
         textCancelButton.setVisible(edit);
+        textCancelButton.setEnabled(modified || !editorMode);
 
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         boolean alignable = false;
         if (item instanceof TextTag && !(item instanceof DefineEditTextTag)) {
-            alignable = !edit;
+            alignable = !edit || (editorMode && !modified);
         }
 
         textAlignLeftButton.setVisible(alignable);
@@ -206,7 +210,7 @@ public class TextPanel extends JPanel {
 
     private void editText() {
         setEditText(true);
-        textChanged();
+        showTextComparingPreview();
     }
 
     private void cancelText() {
@@ -220,6 +224,7 @@ public class TextPanel extends JPanel {
             TextTag textTag = (TextTag) item;
             if (mainPanel.saveText(textTag, textValue.getText(), null)) {
                 setEditText(false);
+                modified = false;
                 item.getSwf().clearImageCache();
                 mainPanel.refreshTree();
             }
@@ -231,7 +236,7 @@ public class TextPanel extends JPanel {
         if (item instanceof TextTag) {
             TextTag textTag = (TextTag) item;
             if (mainPanel.alignText(textTag, textAlign)) {
-                updateButtonsVisibility(textValue.isEditable());
+                updateButtonsVisibility();
                 item.getSwf().clearImageCache();
                 mainPanel.refreshTree();
             }
@@ -243,7 +248,7 @@ public class TextPanel extends JPanel {
         if (item instanceof TextTag) {
             TextTag textTag = (TextTag) item;
             if (mainPanel.translateText(textTag, delta)) {
-                updateButtonsVisibility(textValue.isEditable());
+                updateButtonsVisibility();
                 item.getSwf().clearImageCache();
                 mainPanel.refreshTree();
             }
@@ -265,6 +270,13 @@ public class TextPanel extends JPanel {
     }
 
     private void textChanged() {
+        modified = true;
+        updateButtonsVisibility();
+
+        showTextComparingPreview();
+    }
+
+    private void showTextComparingPreview() {
         if (!Configuration.showOldTextDuringTextEditing.get()) {
             return;
         }

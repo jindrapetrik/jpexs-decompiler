@@ -458,10 +458,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         textPanel.setText(textTag.getFormattedText());
     }
 
-    public void setEditText(boolean edit) {
-        textPanel.setEditText(edit);
-    }
-
     public void clear() {
         imagePanel.stop();
         if (media != null) {

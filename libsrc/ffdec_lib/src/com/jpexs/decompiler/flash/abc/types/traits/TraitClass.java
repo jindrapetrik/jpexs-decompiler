@@ -380,6 +380,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
             }
         }
+
         //imports
         List<String> imports = new ArrayList<>();
         List<String> uses = new ArrayList<>();

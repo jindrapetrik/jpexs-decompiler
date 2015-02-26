@@ -155,7 +155,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
     }
 
     @Override
-    public HighlightedTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
+    protected HighlightedTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         HighlightData ndata = new HighlightData();
         ndata.merge(data);
         ndata.subtype = type;

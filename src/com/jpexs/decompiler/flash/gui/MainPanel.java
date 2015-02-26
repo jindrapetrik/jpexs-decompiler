@@ -2227,7 +2227,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             updateUi();
         }
 
-        previewPanel.setEditText(Configuration.editorMode.get());
         reload(false);
     }
 

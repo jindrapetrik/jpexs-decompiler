@@ -120,7 +120,7 @@ public abstract class GraphTextWriter {
         return hilightSpecial(text, type, specialValue, new HighlightData());
     }
 
-    public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
+    protected GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         return this;
     }
 
