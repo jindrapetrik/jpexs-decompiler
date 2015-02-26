@@ -208,9 +208,9 @@ public final class MethodBody implements Cloneable {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                 if (ex instanceof TimeoutException) {
-                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex);
-                } else {
                     Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation timeout in " + path, ex);
+                } else {
+                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex);
                 }
                 convertException = ex;
                 Throwable cause = ex.getCause();

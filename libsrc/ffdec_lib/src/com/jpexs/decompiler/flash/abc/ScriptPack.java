@@ -138,8 +138,13 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
     }
 
-    public void appendTo(GraphTextWriter writer, List<Trait> traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
+    private void appendTo(GraphTextWriter writer, List<Trait> traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
+        boolean first = true;
         for (int t : traitIndices) {
+            if (!first) {
+                writer.newLine();
+            }
+
             Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
@@ -148,6 +153,8 @@ public class ScriptPack extends AS3ClassTreeItem {
             } else {
                 trait.toString(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
             }
+
+            first = false;
         }
     }
 

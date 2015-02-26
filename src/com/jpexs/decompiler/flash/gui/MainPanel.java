@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
@@ -2422,19 +2421,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        int classIndex = -1;
-                        for (Trait t : scriptLeaf.abc.script_info.get(scriptLeaf.scriptIndex).traits.traits) {
-                            if (t instanceof TraitClass) {
-                                classIndex = ((TraitClass) t).class_info;
-                                break;
-                            }
-                        }
                         getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.clear();
                         getABCPanel().navigator.setAbc(scriptLeaf.abc);
-                        getABCPanel().navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         getABCPanel().setAbc(scriptLeaf.abc);
                         getABCPanel().decompiledTextArea.setScript(scriptLeaf);
-                        getABCPanel().decompiledTextArea.setClassIndex(classIndex);
                         getABCPanel().decompiledTextArea.setNoTrait();
                         return null;
                     }

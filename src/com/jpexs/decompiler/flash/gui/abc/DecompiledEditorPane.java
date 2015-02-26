@@ -552,6 +552,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             }
 
             if (classIndex == -1) {
+                abcPanel.navigator.setClassIndex(-1, script.scriptIndex);
                 setNoTrait();
                 return;
             }
@@ -599,13 +600,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void gotoTrait(int traitId) {
         if (traitId == -1) {
-            setCaretPosition(0);
             return;
         }
 
         Highlighting tc = Highlighting.searchIndex(classHighlights, classIndex);
         if (tc != null) {
             Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, tc.startPos, tc.startPos + tc.len);
+            int pos;
             if (th != null) {
                 ignoreCarret = true;
                 int startPos = th.startPos + th.len - 1;
@@ -613,20 +614,21 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     setCaretPosition(startPos);
                 }
                 ignoreCarret = false;
-                final int pos = th.startPos;
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (pos <= getDocument().getLength()) {
-                            setCaretPosition(pos);
-                        }
-                    }
-                }, 100);
-                return;
+                pos = th.startPos;
+            } else {
+                pos = tc.startPos;
             }
-        }
 
-        setCaretPosition(0);
+            final int fpos = pos;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (fpos <= getDocument().getLength()) {
+                        setCaretPosition(fpos);
+                    }
+                }
+            }, 100);
+        }
     }
 
     public DecompiledEditorPane(ABCPanel abcPanel) {
@@ -661,14 +663,19 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             cd = SWF.getCached(scriptLeaf);
         } catch (InterruptedException ex) {
         }
+
         if (cd != null) {
-            final String hilightedCode = cd.text;
+            String hilightedCode = cd.text;
             highlights = cd.getInstructionHighlights();
             specialHighlights = cd.getSpecialHighligths();
             traitHighlights = cd.getTraitHighlights();
             methodHighlights = cd.getMethodHighlights();
             classHighlights = cd.getClassHighlights();
             setText(hilightedCode);
+
+            if (classHighlights.size() > 0) {
+                setCaretPosition(classHighlights.get(0).startPos);
+            }
         }
         fireScript();
     }

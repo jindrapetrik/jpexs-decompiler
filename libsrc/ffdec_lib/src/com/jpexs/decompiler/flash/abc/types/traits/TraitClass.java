@@ -361,7 +361,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
     @Override
     public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
-        writer.startClass(class_info);
         String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
@@ -447,6 +446,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (uses.size() > 0) {
             writer.newLine();
         }
+
+        writer.startClass(class_info);
 
         //class header
         abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);

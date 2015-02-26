@@ -720,9 +720,9 @@ public abstract class Action implements GraphSourceItem {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
             if (ex instanceof TimeoutException) {
-                logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
-            } else {
                 logger.log(Level.SEVERE, "Decompilation timeout in: " + path, ex);
+            } else {
+                logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
             }
             convertException = ex;
             Throwable cause = ex.getCause();

@@ -377,7 +377,7 @@ public class View {
         return ret[0];
     }
 
-    public static int showConfirmDialog(final Component parentComponent, final Object message, final String title, final int optionType) {
+    public static int showConfirmDialog(Component parentComponent, Object message, String title, int optionType) {
         return showConfirmDialog(parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE);
     }
 
@@ -392,7 +392,7 @@ public class View {
         return ret[0];
     }
 
-    public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
+    public static int showConfirmDialog(Component parentComponent, String message, String title, int optionType, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
         return showConfirmDialog(parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE, showAgainConfig, defaultOption);
     }
 
