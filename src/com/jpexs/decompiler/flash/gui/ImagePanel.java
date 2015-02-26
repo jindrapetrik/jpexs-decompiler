@@ -853,6 +853,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         return outlines;
     }
 
+    public synchronized void clearAll() {
+        stop();
+        timelined = null;
+        swf = null;
+    }
+
     public synchronized void stop() {
         clear();
         stopAllSounds();

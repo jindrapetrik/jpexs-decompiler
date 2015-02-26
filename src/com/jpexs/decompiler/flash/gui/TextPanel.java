@@ -20,13 +20,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -75,6 +73,8 @@ public class TextPanel extends JPanel {
     private final JButton increaseTranslateXButton;
 
     private final JButton undoChangesButton;
+
+    private TextTag textTag;
 
     private boolean modified = false;
 
@@ -160,11 +160,20 @@ public class TextPanel extends JPanel {
         return textSearchPanel;
     }
 
-    public void setText(String text) {
-        textValue.setText(text);
+    public void setText(TextTag textTag) {
+        this.textTag = textTag;
+        textValue.setText(textTag.getFormattedText());
         textValue.setCaretPosition(0);
         modified = false;
         setEditText(false);
+    }
+
+    public void closeTag() {
+        if (modified && Configuration.autoSaveTagModifications.get()) {
+            saveText();
+        }
+
+        textTag = null;
     }
 
     private void setEditText(boolean edit) {
@@ -181,9 +190,8 @@ public class TextPanel extends JPanel {
         textCancelButton.setVisible(edit);
         textCancelButton.setEnabled(modified || !editorMode);
 
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         boolean alignable = false;
-        if (item instanceof TextTag && !(item instanceof DefineEditTextTag)) {
+        if (textTag != null && !(textTag instanceof DefineEditTextTag)) {
             alignable = !edit || (editorMode && !modified);
         }
 
@@ -194,7 +202,7 @@ public class TextPanel extends JPanel {
         increaseTranslateXButton.setVisible(alignable);
         decreaseTranslateXButton.setVisible(alignable);
 
-        undoChangesButton.setVisible(item != null && item instanceof TextTag && ((Tag) item).isModified());
+        undoChangesButton.setVisible(textTag != null && textTag.isModified());
     }
 
     public void updateSearchPos() {
@@ -219,54 +227,39 @@ public class TextPanel extends JPanel {
     }
 
     private void saveText() {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-        if (item instanceof TextTag) {
-            TextTag textTag = (TextTag) item;
-            if (mainPanel.saveText(textTag, textValue.getText(), null)) {
-                setEditText(false);
-                modified = false;
-                item.getSwf().clearImageCache();
-                mainPanel.refreshTree();
-            }
+        if (mainPanel.saveText(textTag, textValue.getText(), null)) {
+            setEditText(false);
+            modified = false;
+            textTag.getSwf().clearImageCache();
+            mainPanel.refreshTree();
         }
     }
 
     private void textAlign(TextAlign textAlign) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-        if (item instanceof TextTag) {
-            TextTag textTag = (TextTag) item;
-            if (mainPanel.alignText(textTag, textAlign)) {
-                updateButtonsVisibility();
-                item.getSwf().clearImageCache();
-                mainPanel.refreshTree();
-            }
+        if (mainPanel.alignText(textTag, textAlign)) {
+            updateButtonsVisibility();
+            textTag.getSwf().clearImageCache();
+            mainPanel.refreshTree();
         }
     }
 
     private void translateX(int delta) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-        if (item instanceof TextTag) {
-            TextTag textTag = (TextTag) item;
-            if (mainPanel.translateText(textTag, delta)) {
-                updateButtonsVisibility();
-                item.getSwf().clearImageCache();
-                mainPanel.refreshTree();
-            }
+        if (mainPanel.translateText(textTag, delta)) {
+            updateButtonsVisibility();
+            textTag.getSwf().clearImageCache();
+            mainPanel.refreshTree();
         }
     }
 
     private void undoChanges() {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-        if (item instanceof TextTag) {
-            try {
-                ((Tag) item).undo();
-            } catch (InterruptedException | IOException ex) {
-                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            item.getSwf().clearImageCache();
-            mainPanel.refreshTree();
+        try {
+            textTag.undo();
+        } catch (InterruptedException | IOException ex) {
+            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        textTag.getSwf().clearImageCache();
+        mainPanel.refreshTree();
     }
 
     private void textChanged() {
@@ -282,29 +275,25 @@ public class TextPanel extends JPanel {
         }
 
         if (textValue.isEditable()) {
-            TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-            if (item instanceof TextTag) {
-                TextTag textTag = (TextTag) item;
-                boolean ok = false;
-                try {
-                    TextTag copyTextTag = (TextTag) textTag.cloneTag();
-                    if (copyTextTag.setFormattedText(new MissingCharacterHandler() {
+            boolean ok = false;
+            try {
+                TextTag copyTextTag = (TextTag) textTag.cloneTag();
+                if (copyTextTag.setFormattedText(new MissingCharacterHandler() {
 
-                        @Override
-                        public boolean handle(TextTag textTag, FontTag font, char character) {
-                            return false;
-                        }
-
-                    }, textValue.getText(), null)) {
-                        ok = true;
-                        mainPanel.showTextTagWithNewValue(textTag, copyTextTag);
+                    @Override
+                    public boolean handle(TextTag textTag, FontTag font, char character) {
+                        return false;
                     }
-                } catch (TextParseException | InterruptedException | IOException ex) {
-                }
 
-                if (!ok) {
-                    mainPanel.showTextTagWithNewValue(textTag, null);
+                }, textValue.getText(), null)) {
+                    ok = true;
+                    mainPanel.showTextTagWithNewValue(textTag, copyTextTag);
                 }
+            } catch (TextParseException | InterruptedException | IOException ex) {
+            }
+
+            if (!ok) {
+                mainPanel.showTextTagWithNewValue(textTag, null);
             }
         }
     }

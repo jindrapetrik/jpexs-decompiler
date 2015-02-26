@@ -119,7 +119,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JTree;
-import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -218,14 +217,6 @@ public class TagTree extends JTree {
         setBackground(Color.white);
         setRowHeight(16);
         setLargeModel(true);
-
-        TreeUI treeUI = new BasicTreeUI() {
-            {
-                setHashColor(Color.gray);
-            }
-        };
-
-        setUI(treeUI);
     }
 
     public void createContextMenu() {
@@ -545,6 +536,13 @@ public class TagTree extends JTree {
     @Override
     public void setModel(TreeModel tm) {
         super.setModel(tm);
+
+        setUI(new BasicTreeUI() {
+            {
+                setHashColor(Color.gray);
+            }
+        });
+
         if (tm != null) {
             int rowCount = tm.getChildCount(tm.getRoot());
             for (int i = rowCount - 1; i >= 0; i--) {

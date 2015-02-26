@@ -436,8 +436,13 @@ public class DefineText2Tag extends TextTag {
             throw ex;
         }
 
-        updateTextBounds(textBounds);
+        updateTextBounds();
         return true;
+    }
+
+    @Override
+    public void updateTextBounds() {
+        updateTextBounds(textBounds);
     }
 
     @Override
@@ -450,6 +455,7 @@ public class DefineText2Tag extends TextTag {
     @Override
     public boolean translateText(int diff) {
         textMatrix.translateX += diff;
+        updateTextBounds();
         setModified(true);
         return true;
     }

@@ -85,6 +85,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     // use the texts from the "texts" argument when it is not null
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;
 
+    public abstract void updateTextBounds();
+
     public abstract boolean alignText(TextAlign textAlign);
 
     public abstract boolean translateText(int diff);
@@ -500,7 +502,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         return result;
     }
 
-    public void updateTextBounds(RECT textBounds) {
+    protected void updateTextBounds(RECT textBounds) {
         TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get();
         if (resizeMode != null && (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK))) {
             ExportRectangle newBounds = calculateTextBounds();

@@ -661,6 +661,10 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
+    public void updateTextBounds() {
+    }
+
+    @Override
     public boolean alignText(TextAlign textAlign) {
         return true;
     }

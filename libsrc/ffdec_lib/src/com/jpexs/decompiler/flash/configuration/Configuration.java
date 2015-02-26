@@ -409,6 +409,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> editorMode = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> autoSaveTagModifications = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

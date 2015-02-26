@@ -2377,7 +2377,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     }
 
+    private void closeTag() {
+        previewPanel.closeTag();
+    }
+
     public void reload(boolean forceReload) {
+        closeTag();
+
         if (Configuration.dumpView.get()) {
             dumpViewReload(forceReload);
             return;

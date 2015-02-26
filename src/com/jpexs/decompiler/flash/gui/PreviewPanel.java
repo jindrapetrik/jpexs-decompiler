@@ -455,11 +455,11 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         showCardRight(CARDTEXTPANEL);
         parametersPanel.setVisible(true);
         setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(getWidth() / 2));
-        textPanel.setText(textTag.getFormattedText());
+        textPanel.setText(textTag);
     }
 
     public void clear() {
-        imagePanel.stop();
+        imagePanel.clearAll();
         if (media != null) {
             media.pause();
         }
@@ -467,6 +467,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         fontPanel.clear();
+    }
+
+    public void closeTag() {
+        textPanel.closeTag();
     }
 
     public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {

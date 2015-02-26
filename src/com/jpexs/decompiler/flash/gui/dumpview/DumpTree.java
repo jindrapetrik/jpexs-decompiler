@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -44,7 +43,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -92,13 +90,6 @@ public class DumpTree extends JTree implements ActionListener {
         setCellRenderer(new DumpTreeCellRenderer());
         setRootVisible(false);
         setBackground(Color.white);
-        setUI(new BasicTreeUI() {
-            @Override
-            public void paint(Graphics g, JComponent c) {
-                setHashColor(Color.gray);
-                super.paint(g, c);
-            }
-        });
     }
 
     public void createContextMenu() {
@@ -293,6 +284,13 @@ public class DumpTree extends JTree implements ActionListener {
     @Override
     public void setModel(TreeModel tm) {
         super.setModel(tm);
+
+        setUI(new BasicTreeUI() {
+            {
+                setHashColor(Color.gray);
+            }
+        });
+
         if (tm != null) {
             int rowCount = tm.getChildCount(tm.getRoot());
             for (int i = rowCount - 1; i >= 0; i--) {
