@@ -732,14 +732,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
          }*/
         swfs.clear();
         oldItem = null;
-        previewPanel.clear();
-        if (abcPanel != null) {
-            abcPanel.clearSwf();
-        }
-        if (actionPanel != null) {
-            actionPanel.clearSource();
-        }
-        previewPanel.clear();
+        clear();
         updateUi();
         refreshTree();
     }
@@ -759,18 +752,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         swfs.remove(swfList);
-        if (abcPanel != null) {
-            for (SWF swf : swfList) {
-                if (abcPanel.getSwf() == swf) {
-                    abcPanel.clearSwf();
-                }
-            }
-        }
-        if (actionPanel != null) {
-            actionPanel.clearSource();
-        }
         oldItem = null;
-        previewPanel.clear();
+        clear();
         updateUi();
         refreshTree();
     }
@@ -1916,8 +1899,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         refreshTree();
     }
 
-    public void refreshTree() {
+    private void clear() {
+        dumpViewPanel.clear();
         previewPanel.clear();
+        if (abcPanel != null) {
+            abcPanel.clearSwf();
+        }
+        if (actionPanel != null) {
+            actionPanel.clearSource();
+        }
+    }
+
+    public void refreshTree() {
+        clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
         DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();

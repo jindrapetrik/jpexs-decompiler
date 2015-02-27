@@ -138,6 +138,10 @@ public class DumpViewPanel extends JPanel {
         add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
     }
 
+    public void clear() {
+        selectedDumpInfo = null;
+    }
+
     public void setSelectedNode(DumpInfo dumpInfo) {
         if (this.selectedDumpInfo == dumpInfo) {
             skipNextScroll = false;

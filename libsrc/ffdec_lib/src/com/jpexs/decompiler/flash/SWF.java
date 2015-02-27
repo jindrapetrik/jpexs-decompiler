@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -322,14 +323,24 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         tags.clear();
         abcList.clear();
+        swfList.swfs.clear();
 
         as2Cache.clear();
         as3Cache.clear();
 
         timeline = null;
+        clearDumpInfo(dumpInfo);
         dumpInfo = null;
         jtt = null;
         binaryData = null;
+    }
+
+    private void clearDumpInfo(DumpInfo di) {
+        for (DumpInfo childInfo : di.getChildInfos()) {
+            clearDumpInfo(childInfo);
+        }
+
+        di.getChildInfos().clear();
     }
 
     public Map<Integer, CharacterTag> getCharacters() {
