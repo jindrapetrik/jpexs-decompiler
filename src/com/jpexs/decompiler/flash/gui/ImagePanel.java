@@ -855,6 +855,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     public synchronized void clearAll() {
         stop();
+        clearImagePanel();
         timelined = null;
         swf = null;
     }

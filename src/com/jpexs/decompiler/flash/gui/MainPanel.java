@@ -725,6 +725,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
+        /*for (SWFList swfList : swfs) {
+         for (SWF swf : swfList) {
+         swf.clearTagSwfs();
+         }
+         }*/
         swfs.clear();
         oldItem = null;
         previewPanel.clear();
@@ -2442,6 +2447,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                             @Override
                             public void run() {
+                                setSourceWorker = null;
                                 try {
                                     get();
                                 } catch (CancellationException ex) {

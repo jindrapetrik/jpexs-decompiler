@@ -19,6 +19,7 @@ package com.jpexs.helpers;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ public class Cache<K, V> implements Freed {
 
     private Map<K, V> cache;
 
-    private static final List<Cache> instances = new ArrayList<>();
+    private static final List<WeakReference<Cache>> instances = new ArrayList<>();
 
     public static final int STORAGE_FILES = 1;
 
@@ -52,9 +53,12 @@ public class Cache<K, V> implements Freed {
 
             @Override
             public void run() {
-                for (Cache c : instances) {
-                    c.clear();
-                    c.free();
+                for (WeakReference<Cache> cw : instances) {
+                    Cache c = cw.get();
+                    if (c != null) {
+                        c.clear();
+                        c.free();
+                    }
                 }
             }
 
@@ -63,16 +67,19 @@ public class Cache<K, V> implements Freed {
 
     public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name) {
         Cache<K, V> instance = new Cache<>(weak, memoryOnly, name);
-        instances.add(instance);
+        instances.add(new WeakReference<Cache>(instance));
         return instance;
     }
 
     private static int storageType = STORAGE_FILES;
 
     public static void clearAll() {
-        for (Cache c : instances) {
-            c.clear();
-            c.initCache();
+        for (WeakReference<Cache> cw : instances) {
+            Cache c = cw.get();
+            if (c != null) {
+                c.clear();
+                c.initCache();
+            }
         }
     }
 

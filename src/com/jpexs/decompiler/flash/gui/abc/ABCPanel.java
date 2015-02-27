@@ -286,6 +286,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
         navigator.clearAbc();
+        decompiledTextArea.clearScript();
     }
 
     public void initSplits() {

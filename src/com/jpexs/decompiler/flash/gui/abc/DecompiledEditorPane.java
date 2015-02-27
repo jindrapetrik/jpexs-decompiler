@@ -639,6 +639,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.abcPanel = abcPanel;
     }
 
+    public void clearScript() {
+        script = null;
+    }
+
     public void setScript(ScriptPack scriptLeaf) {
         abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
         int scriptIndex = scriptLeaf.scriptIndex;

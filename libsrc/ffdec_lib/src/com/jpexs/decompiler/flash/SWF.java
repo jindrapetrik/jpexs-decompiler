@@ -303,6 +303,35 @@ public final class SWF implements SWFContainerItem, Timelined {
         characters = null;
     }
 
+    public void clearTagSwfs() {
+        resetTimelines(this);
+        updateCharacters();
+
+        for (Tag tag : tags) {
+            if (tag instanceof DefineSpriteTag) {
+                DefineSpriteTag spriteTag = (DefineSpriteTag) tag;
+                for (Tag tag1 : spriteTag.subTags) {
+                    tag1.setSwf(null);
+                }
+
+                spriteTag.subTags.clear();
+            }
+
+            tag.setSwf(null);
+        }
+
+        tags.clear();
+        abcList.clear();
+
+        as2Cache.clear();
+        as3Cache.clear();
+
+        timeline = null;
+        dumpInfo = null;
+        jtt = null;
+        binaryData = null;
+    }
+
     public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
             synchronized (this) {
