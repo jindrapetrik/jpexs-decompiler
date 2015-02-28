@@ -397,7 +397,7 @@ public class DefineTextTag extends TextTag {
                             tr.styleFlagsHasYOffset = true;
                             y = null;
                         }
-                        tr.glyphEntries = new GLYPHENTRY[txt.length()];
+                        tr.glyphEntries = new ArrayList<>(txt.length());
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
                             Character nextChar = null;
@@ -405,8 +405,8 @@ public class DefineTextTag extends TextTag {
                                 nextChar = txt.charAt(i + 1);
                             }
 
-                            tr.glyphEntries[i] = new GLYPHENTRY();
-                            tr.glyphEntries[i].glyphIndex = font.charToGlyph(c);
+                            GLYPHENTRY ge = new GLYPHENTRY();
+                            ge.glyphIndex = font.charToGlyph(c);
 
                             int advance;
                             if (font.hasLayout()) {
@@ -414,11 +414,13 @@ public class DefineTextTag extends TextTag {
                                 if (nextChar != null) {
                                     kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
                                 }
-                                advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
+                                advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
                             } else {
                                 advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
                             }
-                            tr.glyphEntries[i].glyphAdvance = advance;
+
+                            ge.glyphAdvance = advance;
+                            tr.glyphEntries.add(ge);
 
                             currentX += advance;
                         }

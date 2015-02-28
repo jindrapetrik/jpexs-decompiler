@@ -2868,9 +2868,9 @@ public class SWFInputStream implements AutoCloseable {
             ret.textHeight = readUI16("textHeight");
         }
         int glyphCount = readUI8("glyphCount");
-        ret.glyphEntries = new GLYPHENTRY[glyphCount];
+        ret.glyphEntries = new ArrayList<>(glyphCount);
         for (int i = 0; i < glyphCount; i++) {
-            ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits, "glyphEntry");
+            ret.glyphEntries.add(readGLYPHENTRY(glyphBits, advanceBits, "glyphEntry"));
         }
         alignByte();
         endDumpLevel();

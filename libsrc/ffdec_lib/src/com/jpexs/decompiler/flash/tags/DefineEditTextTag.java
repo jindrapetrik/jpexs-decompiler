@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.dynamictext.CharacterWithStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.DynamicTextModel;
+import com.jpexs.decompiler.flash.tags.dynamictext.GlyphCharacter;
 import com.jpexs.decompiler.flash.tags.dynamictext.Paragraph;
 import com.jpexs.decompiler.flash.tags.dynamictext.SameStyleTextRecord;
 import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
@@ -1017,9 +1018,9 @@ public class DefineEditTextTag extends TextTag {
                         tr2.styleFlagsHasYOffset = true;
                         tr2.yOffset = yOffset;
                     }
-                    tr2.glyphEntries = new GLYPHENTRY[tr.glyphEntries.size()];
-                    for (int i = 0; i < tr2.glyphEntries.length; i++) {
-                        tr2.glyphEntries[i] = tr.glyphEntries.get(i).glyphEntry;
+                    tr2.glyphEntries = new ArrayList<>(tr.glyphEntries.size());
+                    for (GlyphCharacter ge : tr.glyphEntries) {
+                        tr2.glyphEntries.add(ge.glyphEntry);
                     }
                     allTextRecords.add(tr2);
                 }

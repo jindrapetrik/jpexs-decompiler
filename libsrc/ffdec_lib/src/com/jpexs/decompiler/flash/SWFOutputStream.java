@@ -1471,7 +1471,7 @@ public class SWFOutputStream extends OutputStream {
         if (value.styleFlagsHasFont) {
             writeUI16(value.textHeight);
         }
-        writeUI8(value.glyphEntries.length);
+        writeUI8(value.glyphEntries.size());
         for (GLYPHENTRY ge : value.glyphEntries) {
             writeGLYPHENTRY(ge, glyphBits, advanceBits);
         }

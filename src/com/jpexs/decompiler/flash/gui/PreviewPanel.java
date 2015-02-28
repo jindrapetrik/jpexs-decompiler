@@ -755,16 +755,17 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             tr.yOffset = 0;
                             tr.styleFlagsHasXOffset = true;
                             tr.styleFlagsHasYOffset = true;
-                            tr.glyphEntries = new GLYPHENTRY[1];
+                            tr.glyphEntries = new ArrayList<>(1);
                             tr.styleFlagsHasColor = true;
                             tr.textColor = new RGB(0, 0, 0);
-                            tr.glyphEntries[0] = new GLYPHENTRY();
+                            GLYPHENTRY ge = new GLYPHENTRY();
 
                             double ga = ft.getGlyphAdvance(f);
                             int cw = ga == -1 ? w : (int) (ga / ft.getDivider() * textHeight / 1024.0);
 
-                            tr.glyphEntries[0].glyphAdvance = 0;
-                            tr.glyphEntries[0].glyphIndex = f;
+                            ge.glyphAdvance = 0;
+                            ge.glyphIndex = f;
+                            tr.glyphEntries.add(ge);
                             rec.add(tr);
 
                             tmat.translateX = x * width / cols + width / cols / 2 - w / 2;

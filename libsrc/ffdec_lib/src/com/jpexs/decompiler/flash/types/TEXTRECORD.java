@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -61,7 +62,7 @@ public class TEXTRECORD implements Serializable {
     public int textHeight;
 
     @SWFArray(countField = "glyphCount")
-    public GLYPHENTRY[] glyphEntries;
+    public List<GLYPHENTRY> glyphEntries;
 
     public String getText(FontTag font) {
         StringBuilder ret = new StringBuilder();

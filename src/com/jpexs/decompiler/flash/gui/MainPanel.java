@@ -661,11 +661,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void ensureActionPanel() {
         if (actionPanel == null) {
-            final MainPanel diz = this;
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
-                    actionPanel = new ActionPanel(diz);
+                    actionPanel = new ActionPanel(MainPanel.this);
                     displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
                 }
             });
@@ -1570,7 +1569,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
-            final MainPanel diz = this;
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
 
                 // "configuration items" for the current replace only
@@ -1591,14 +1589,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
+                    return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
 
                 @Override
                 public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
+                    return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
             });
 

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.controls.JRepeatButton;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -117,8 +118,8 @@ public class TextPanel extends JPanel {
         textAlignCenterButton = createButton(null, "textaligncenter16", "text.align.center", e -> textAlign(TextAlign.CENTER));
         textAlignRightButton = createButton(null, "textalignright16", "text.align.right", e -> textAlign(TextAlign.RIGHT));
         textAlignJustifyButton = createButton(null, "textalignjustify16", "text.align.justify", e -> textAlign(TextAlign.JUSTIFY));
-        decreaseTranslateXButton = createButton(null, "textunindent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor));
-        increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor));
+        decreaseTranslateXButton = createButton(null, "textunindent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor, ((JRepeatButton) e.getSource()).getRepeatCount()), true);
+        increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor, ((JRepeatButton) e.getSource()).getRepeatCount()), true);
         undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
         textButtonsPanel.add(textAlignLeftButton);
@@ -145,8 +146,12 @@ public class TextPanel extends JPanel {
     }
 
     private JButton createButton(String textResource, String iconName, String toolTipResource, ActionListener actionListener) {
+        return createButton(textResource, iconName, toolTipResource, actionListener, false);
+    }
+
+    private JButton createButton(String textResource, String iconName, String toolTipResource, ActionListener actionListener, boolean repeat) {
         String text = textResource == null ? "" : mainPanel.translate(textResource);
-        JButton button = new JButton(text, View.getIcon(iconName));
+        JButton button = repeat ? new JRepeatButton(text, View.getIcon(iconName)) : new JButton(text, View.getIcon(iconName));
         button.setMargin(new Insets(3, 3, 3, 10));
         button.addActionListener(actionListener);
         if (toolTipResource != null) {
@@ -243,8 +248,8 @@ public class TextPanel extends JPanel {
         }
     }
 
-    private void translateX(int delta) {
-        if (mainPanel.translateText(textTag, delta)) {
+    private void translateX(int delta, int repeatCount) {
+        if (mainPanel.translateText(textTag, delta * repeatCount)) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
             mainPanel.refreshTree();

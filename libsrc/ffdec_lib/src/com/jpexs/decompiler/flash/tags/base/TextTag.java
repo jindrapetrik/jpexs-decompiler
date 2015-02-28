@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
+import com.jpexs.decompiler.flash.tags.text.JustifyAlignGlyphEntry;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -121,6 +122,20 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     }
 
     public static void alignText(SWF swf, List<TEXTRECORD> textRecords, TextAlign textAlign) {
+        // Remove Justify align entries
+        for (TEXTRECORD tr : textRecords) {
+            for (int i = 0; i < tr.glyphEntries.size(); i++) {
+                GLYPHENTRY ge = tr.glyphEntries.get(i);
+                if (ge instanceof JustifyAlignGlyphEntry) {
+                    JustifyAlignGlyphEntry jge = (JustifyAlignGlyphEntry) ge;
+                    ge = new GLYPHENTRY();
+                    ge.glyphAdvance = jge.originalAdvance;
+                    ge.glyphIndex = jge.glyphIndex;
+                    tr.glyphEntries.set(i, ge);
+                }
+            }
+        }
+
         int xMin = Integer.MAX_VALUE;
         int maxWidth = 0;
         for (TEXTRECORD tr : textRecords) {
@@ -146,16 +161,6 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
             }
 
-            /*if (tr.justified) {
-             // Text record was aligned in Justify mode earier
-             // restore the advances
-             for (GLYPHENTRY ge : tr.glyphEntries) {
-             char ch = font.glyphToChar(ge.glyphIndex);
-             if (Character.isWhitespace(ch)) {
-             ge.glyphAdvance = ge.originalAdvance;
-             }
-             }
-             }*/
             int width = tr.getTotalAdvance();
             switch (textAlign) {
                 case LEFT:
@@ -205,7 +210,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                                 }
                             }
 
-                            if (spaces > 0) {
+                            if (spaces > 0 && glyphEntries.size() > 0) {
                                 int fix = diff / spaces;
                                 int remaining = diff - fix * spaces;
                                 for (GLYPHENTRY ge : glyphEntries) {
@@ -214,11 +219,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                                         diff2++;
                                     }
 
-                                    //ge.originalAdvance = ge.glyphAdvance;
-                                    ge.glyphAdvance += diff2;
+                                    JustifyAlignGlyphEntry jge = new JustifyAlignGlyphEntry();
+                                    jge.originalAdvance = ge.glyphAdvance;
+                                    jge.glyphAdvance = ge.glyphAdvance + diff2;
+                                    jge.glyphIndex = ge.glyphIndex;
+                                    int idx = tr.glyphEntries.indexOf(ge);
+                                    tr.glyphEntries.set(idx, jge);
                                 }
-
-                                //tr.justified = true;
                             }
                         }
                     }
@@ -295,11 +302,11 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             firstLine = false;
             allLeftMargins.add(currentLeftMargin);
             int letterSpacing = 0;
-            for (int e = 0; e < rec.glyphEntries.length; e++) {
-                GLYPHENTRY entry = rec.glyphEntries[e];
+            for (int e = 0; e < rec.glyphEntries.size(); e++) {
+                GLYPHENTRY entry = rec.glyphEntries.get(e);
                 GLYPHENTRY nextEntry = null;
-                if (e < rec.glyphEntries.length - 1) {
-                    nextEntry = rec.glyphEntries[e + 1];
+                if (e < rec.glyphEntries.size() - 1) {
+                    nextEntry = rec.glyphEntries.get(e + 1);
                 }
                 RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
                 rect.Xmax = (int) Math.round(((double) rect.Xmax * textHeight) / (font.getDivider() * 1024));

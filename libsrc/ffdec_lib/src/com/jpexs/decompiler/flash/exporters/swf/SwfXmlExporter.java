@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.exporters.swf;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.helpers.InternalClass;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
@@ -148,7 +150,12 @@ public class SwfXmlExporter {
                 ((LazyObject) obj).load();
             }
 
-            String className = obj.getClass().getSimpleName();
+            Class clazz = obj.getClass();
+            if (obj instanceof InternalClass) {
+                clazz = clazz.getSuperclass();
+            }
+
+            String className = clazz.getSimpleName();
             List<Field> fields = ReflectionTools.getSwfFields(obj.getClass());
             Element objNode = doc.createElement(name);
             objNode.setAttribute("type", className);
@@ -156,6 +163,7 @@ public class SwfXmlExporter {
 
             if (level == 0) {
                 objNode.appendChild(doc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
+                objNode.appendChild(doc.createComment(ApplicationInfo.applicationVerName));
             }
 
             for (Field f : fields) {
