@@ -709,7 +709,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         mainMenu.updateComponents(null);
     }
 
-    public void closeAll() {
+    private boolean closeConfirmation(SWFList swfList) {
+        if (swfList == null) {
+            if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+                return false;
+            }
+        } else {
+            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean closeAll() {
         boolean modified = false;
         for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
@@ -720,8 +734,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         if (modified) {
-            if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
-                return;
+            boolean closeConfirmResult = closeConfirmation(swfs.size() == 1 ? swfs.get(0) : null);
+            if (!closeConfirmResult) {
+                return false;
             }
         }
 
@@ -735,9 +750,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         clear();
         updateUi();
         refreshTree();
+
+        return true;
     }
 
-    public void close(SWFList swfList) {
+    public boolean close(SWFList swfList) {
         boolean modified = false;
         for (SWF swf : swfList) {
             if (swf.isModified()) {
@@ -746,8 +763,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         if (modified) {
-            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION) {
-                return;
+            boolean closeConfirmResult = closeConfirmation(swfList);
+            if (!closeConfirmResult) {
+                return false;
             }
         }
 
@@ -756,6 +774,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         clear();
         updateUi();
         refreshTree();
+        return true;
     }
 
     public void enableDrop(boolean value) {
@@ -1572,14 +1591,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
 
                 @Override
                 public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
                     logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
-                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) == JOptionPane.CANCEL_OPTION;
+                    return View.showConfirmDialog(diz, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
             });
 
