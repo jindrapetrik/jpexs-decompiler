@@ -46,6 +46,7 @@ public class JRepeatButton extends JButton {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                repeatCount = 0;
                 Runnable runnable = new Runnable() {
                     private int cnt = 0;
 

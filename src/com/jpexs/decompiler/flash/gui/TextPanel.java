@@ -249,7 +249,7 @@ public class TextPanel extends JPanel {
     }
 
     private void translateX(int delta, int repeatCount) {
-        if (mainPanel.translateText(textTag, delta * repeatCount)) {
+        if (mainPanel.translateText(textTag, delta * (repeatCount + 1))) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
             mainPanel.refreshTree();
