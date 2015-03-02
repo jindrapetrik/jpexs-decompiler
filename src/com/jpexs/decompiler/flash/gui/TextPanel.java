@@ -136,7 +136,7 @@ public class TextPanel extends JPanel {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         textEditButton = createButton("button.edit", "edit16", null, e -> editText());
-        textSaveButton = createButton("button.save", "save16", null, e -> saveText());
+        textSaveButton = createButton("button.save", "save16", null, e -> saveText(true));
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
 
         buttonsPanel.add(textEditButton);
@@ -175,7 +175,7 @@ public class TextPanel extends JPanel {
 
     public void closeTag() {
         if (modified && Configuration.autoSaveTagModifications.get()) {
-            saveText();
+            saveText(false);
         }
 
         textTag = null;
@@ -231,12 +231,14 @@ public class TextPanel extends JPanel {
         mainPanel.reload(true);
     }
 
-    private void saveText() {
+    private void saveText(boolean refresh) {
         if (mainPanel.saveText(textTag, textValue.getText(), null)) {
             setEditText(false);
             modified = false;
             textTag.getSwf().clearImageCache();
-            mainPanel.refreshTree();
+            if (refresh) {
+                mainPanel.refreshTree();
+            }
         }
     }
 

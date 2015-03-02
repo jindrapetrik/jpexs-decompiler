@@ -413,6 +413,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> autoSaveTagModifications = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

@@ -2398,8 +2398,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void reload(boolean forceReload) {
-        closeTag();
-
         if (Configuration.dumpView.get()) {
             dumpViewReload(forceReload);
             return;
@@ -2412,6 +2410,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         if (!forceReload && (treeItem == oldItem)) {
             return;
+        }
+
+        if (oldItem != treeItem) {
+            closeTag();
         }
 
         oldItem = treeItem;
@@ -2427,7 +2429,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         //if (flashPanel != null) {
         //    flashPanel.specialPlayback = false;
         //}
-        folderPreviewPanel.setItems(new ArrayList<TreeItem>());
+        folderPreviewPanel.setItems(new ArrayList<>());
         previewPanel.clear();
         stopFlashPlayer();
         if (treeItem instanceof ScriptPack) {
