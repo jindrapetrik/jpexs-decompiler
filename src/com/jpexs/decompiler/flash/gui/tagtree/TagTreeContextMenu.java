@@ -540,7 +540,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                     }
                 }
 
-                mainPanel.refreshTree();
+                mainPanel.repaintTree();
                 break;
             }
             case ACTION_CLOSE_SWF: {

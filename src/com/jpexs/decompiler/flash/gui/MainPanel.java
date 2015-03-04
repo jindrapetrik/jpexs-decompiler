@@ -1331,7 +1331,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                         if (findCount > 0) {
                             swf.clearImageCache();
-                            refreshTree();
+                            repaintTree();
                         }
                         return null;
                     }
@@ -2584,6 +2584,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else {
             showCard(CARDEMPTYPANEL);
         }
+    }
+
+    public void repaintTree() {
+        tagTree.repaint();
+        reload(true);
     }
 
     public void showGenericTag(Tag tag) {

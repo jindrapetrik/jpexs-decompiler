@@ -237,7 +237,7 @@ public class TextPanel extends JPanel {
             modified = false;
             textTag.getSwf().clearImageCache();
             if (refresh) {
-                mainPanel.refreshTree();
+                mainPanel.repaintTree();
             }
         }
     }
@@ -246,7 +246,7 @@ public class TextPanel extends JPanel {
         if (mainPanel.alignText(textTag, textAlign)) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
-            mainPanel.refreshTree();
+            mainPanel.repaintTree();
         }
     }
 
@@ -254,7 +254,7 @@ public class TextPanel extends JPanel {
         if (mainPanel.translateText(textTag, delta * (repeatCount + 1))) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
-            mainPanel.refreshTree();
+            mainPanel.repaintTree();
         }
     }
 
@@ -266,7 +266,7 @@ public class TextPanel extends JPanel {
         }
 
         textTag.getSwf().clearImageCache();
-        mainPanel.refreshTree();
+        mainPanel.repaintTree();
     }
 
     private void textChanged() {
