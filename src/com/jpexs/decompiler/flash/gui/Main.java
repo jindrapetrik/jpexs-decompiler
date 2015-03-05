@@ -73,7 +73,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -125,7 +130,7 @@ public class Main {
 
     public static final int UPDATE_SYSTEM_MAJOR = 1;
 
-    public static final int UPDATE_SYSTEM_MINOR = 2;
+    public static final int UPDATE_SYSTEM_MINOR = 3;
 
     private static LoadFromMemoryFrame loadFromMemoryFrame;
 
@@ -1374,7 +1379,9 @@ public class Main {
         String acceptVersions = String.join(",", accepted);
         try {
             String proxyAddress = Configuration.updateProxyAddress.get();
-            Socket sock;
+            URL url = new URL(ApplicationInfo.updateCheckUrl);
+
+            URLConnection uc = null;
             if (proxyAddress != null) {
                 int port = 8080;
                 if (proxyAddress.contains(":")) {
@@ -1383,30 +1390,21 @@ public class Main {
                     proxyAddress = parts[0];
                 }
 
-                sock = new Socket(proxyAddress, port);
+                uc = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, port)));
             } else {
-                sock = new Socket("www.free-decompiler.com", 80);
+                uc = url.openConnection();
             }
-            OutputStream os = sock.getOutputStream();
+            uc.setRequestProperty("X-Accept-Versions", acceptVersions);
+            uc.setRequestProperty("X-Update-Major", "" + UPDATE_SYSTEM_MAJOR);
+            uc.setRequestProperty("X-Update-Minor", "" + UPDATE_SYSTEM_MINOR);
+            uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8")
-                    + "&currentRevision=" + URLEncoder.encode(ApplicationInfo.revision, "UTF-8")
-                    + "&currentVersionMajor=" + URLEncoder.encode("" + ApplicationInfo.version_major, "UTF-8")
-                    + "&currentVersionMinor=" + URLEncoder.encode("" + ApplicationInfo.version_minor, "UTF-8")
-                    + "&currentVersionRelease=" + URLEncoder.encode("" + ApplicationInfo.version_release, "UTF-8")
-                    + "&currentVersionBuild=" + URLEncoder.encode("" + ApplicationInfo.version_build, "UTF-8")
-                    + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
-                    + "Host: www.free-decompiler.com\r\n"
-                    + "X-Accept-Versions: " + acceptVersions + "\r\n"
-                    + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"
-                    + "X-Update-Minor: " + UPDATE_SYSTEM_MINOR + "\r\n"
-                    + "User-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\n"
-                    + "Accept-Language: " + currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8") + "\r\n"
-                    + "Connection: close\r\n"
-                    + "\r\n").getBytes());
-            BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            uc.setRequestProperty("Accept-Language", currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8"));
+
+            uc.connect();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             String s;
-            boolean start = false;
             final java.util.List<Version> versions = new ArrayList<>();
             String header = "";
             Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
@@ -1414,98 +1412,91 @@ public class Main {
             int updateMinor;
             Version ver = null;
             while ((s = br.readLine()) != null) {
-                if (start) {
-                    Matcher m = headerPat.matcher(s);
-                    if (m.matches()) {
-                        header = m.group(1);
-                        if (header.equals("version")) {
-                            ver = new Version();
-                            versions.add(ver);
-                        }
-                        if (header.equals("noversion")) {
-                            break;
-                        }
-                    } else {
-                        if (s.contains("=")) {
-                            String key = s.substring(0, s.indexOf('='));
-                            String val = s.substring(s.indexOf('=') + 1);
-                            if ("updateSystem".equals(header)) {
-                                if (key.equals("majorVersion")) {
-                                    updateMajor = Integer.parseInt(val);
-                                    if (updateMajor > UPDATE_SYSTEM_MAJOR) {
-                                        break;
-                                    }
-                                }
-                                if (key.equals("minorVersion")) {
-                                    updateMinor = Integer.parseInt(val);
+
+                Matcher m = headerPat.matcher(s);
+                if (m.matches()) {
+                    header = m.group(1);
+                    if (header.equals("version")) {
+                        ver = new Version();
+                        versions.add(ver);
+                    }
+                    if (header.equals("noversion")) {
+                        break;
+                    }
+                } else {
+                    if (s.contains("=")) {
+                        String key = s.substring(0, s.indexOf('='));
+                        String val = s.substring(s.indexOf('=') + 1);
+                        if ("updateSystem".equals(header)) {
+                            if (key.equals("majorVersion")) {
+                                updateMajor = Integer.parseInt(val);
+                                if (updateMajor > UPDATE_SYSTEM_MAJOR) {
+                                    break;
                                 }
                             }
-                            if ("version".equals(header) && (ver != null)) {
-                                if (key.equals("versionId")) {
-                                    ver.versionId = Integer.parseInt(val);
+                            if (key.equals("minorVersion")) {
+                                updateMinor = Integer.parseInt(val);
+                            }
+                        }
+                        if ("version".equals(header) && (ver != null)) {
+                            if (key.equals("versionId")) {
+                                ver.versionId = Integer.parseInt(val);
+                            }
+                            if (key.equals("versionName")) {
+                                ver.versionName = val;
+                            }
+                            if (key.equals("nightly")) {
+                                ver.nightly = val.equals("true");
+                            }
+                            if (key.equals("revision")) {
+                                ver.revision = val;
+                            }
+                            if (key.equals("build")) {
+                                ver.build = Integer.parseInt(val);
+                            }
+                            if (key.equals("major")) {
+                                ver.major = Integer.parseInt(val);
+                            }
+                            if (key.equals("minor")) {
+                                ver.minor = Integer.parseInt(val);
+                            }
+                            if (key.equals("release")) {
+                                ver.release = Integer.parseInt(val);
+                            }
+                            if (key.equals("longVersionName")) {
+                                ver.longVersionName = val;
+                            }
+                            if (key.equals("releaseDate")) {
+                                ver.releaseDate = val;
+                            }
+                            if (key.equals("appName")) {
+                                ver.appName = val;
+                            }
+                            if (key.equals("appFullName")) {
+                                ver.appFullName = val;
+                            }
+                            if (key.equals("updateLink")) {
+                                ver.updateLink = val;
+                            }
+                            if (key.equals("change[]")) {
+                                String changeType = val.substring(0, val.indexOf('|'));
+                                String change = val.substring(val.indexOf('|') + 1);
+                                if (!ver.changes.containsKey(changeType)) {
+                                    ver.changes.put(changeType, new ArrayList<>());
                                 }
-                                if (key.equals("versionName")) {
-                                    ver.versionName = val;
-                                }
-                                if (key.equals("nightly")) {
-                                    ver.nightly = val.equals("true");
-                                }
-                                if (key.equals("revision")) {
-                                    ver.revision = val;
-                                }
-                                if (key.equals("build")) {
-                                    ver.build = Integer.parseInt(val);
-                                }
-                                if (key.equals("major")) {
-                                    ver.major = Integer.parseInt(val);
-                                }
-                                if (key.equals("minor")) {
-                                    ver.minor = Integer.parseInt(val);
-                                }
-                                if (key.equals("release")) {
-                                    ver.release = Integer.parseInt(val);
-                                }
-                                if (key.equals("longVersionName")) {
-                                    ver.longVersionName = val;
-                                }
-                                if (key.equals("releaseDate")) {
-                                    ver.releaseDate = val;
-                                }
-                                if (key.equals("appName")) {
-                                    ver.appName = val;
-                                }
-                                if (key.equals("appFullName")) {
-                                    ver.appFullName = val;
-                                }
-                                if (key.equals("updateLink")) {
-                                    ver.updateLink = val;
-                                }
-                                if (key.equals("change[]")) {
-                                    String changeType = val.substring(0, val.indexOf('|'));
-                                    String change = val.substring(val.indexOf('|') + 1);
-                                    if (!ver.changes.containsKey(changeType)) {
-                                        ver.changes.put(changeType, new ArrayList<String>());
-                                    }
-                                    List<String> chlist = ver.changes.get(changeType);
-                                    chlist.add(change);
-                                }
+                                List<String> chlist = ver.changes.get(changeType);
+                                chlist.add(change);
                             }
                         }
                     }
-                }
-                if (s.isEmpty()) {
-                    start = true;
                 }
             }
 
             if (!versions.isEmpty()) {
-                View.execInEventDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
-                        newVersionDialog.setVisible(true);
-                        Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
-                    }
+                View.execInEventDispatch(() -> {
+                    NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                    newVersionDialog.setVisible(true);
+                    Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
                 });
 
                 return true;

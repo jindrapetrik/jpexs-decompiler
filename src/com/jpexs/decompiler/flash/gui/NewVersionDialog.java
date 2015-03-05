@@ -148,7 +148,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
             if (latestVersion.updateLink != null) {
                 url = latestVersion.updateLink;
             } else {
-                url = ApplicationInfo.updatePage;
+                url = ApplicationInfo.updateUrl;
             }
             if (View.navigateUrl(url)) {
                 Main.exit();
