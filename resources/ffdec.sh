@@ -12,7 +12,7 @@ MEMORY=1024m
 
 search_jar_file() {
     JAR_FILE_CANDIDATES='./ffdec.jar ../dist/ffdec.jar /usr/share/java/ffdec.jar /usr/share/java/jpexs-decompiler/ffdec.jar'
-    for f in "$JAR_FILE_CANDIDATES" ; do
+    for f in $JAR_FILE_CANDIDATES ; do
         [ -r "$f" ] && JAR_FILE="$f" && return 0
     done
     echo Unable to find ffdec.jar in the following locations:
