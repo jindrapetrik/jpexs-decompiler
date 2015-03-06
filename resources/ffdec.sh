@@ -8,8 +8,16 @@ REQ_JVER1=1
 REQ_JVER2=7
 REQ_JVER3=0
 REQ_JVER4=0
-JAR_FILE=ffdec.jar
 MEMORY=1024m
+
+search_jar_file() {
+    JAR_FILE_CANDIDATES=('ffdec.jar' '../dist/ffdec.jar' '/usr/share/java/jpexs-decompiler/ffdec.jar')
+    for f in "${JAR_FILE_CANDIDATES[@]}" ; do
+        [ -r "$f" ] && JAR_FILE="$f" && return 0
+    done
+    echo Unable to find ffdec.jar in ${JAR_FILE_CANDIDATES[@]}
+    return 1
+}
 
 check_java_version () {
 	JVER1=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "\([0-9]*\)\.[0-9]*\.[0-9]*_[0-9]*".*/\1/'`
@@ -48,6 +56,8 @@ while [ -L "$PROGRAM" ]; do
 	PROGRAM=`readlink -f "$PROGRAM"`
 done
 cd "`dirname \"$PROGRAM\"`"
+
+search_jar_file || exit 1
 
 # Check default java
 if [ -x "`which java`" ]; then
