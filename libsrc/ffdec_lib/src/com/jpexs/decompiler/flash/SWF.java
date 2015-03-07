@@ -277,9 +277,6 @@ public final class SWF implements SWFContainerItem, Timelined {
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
 
     @Internal
-    public SWFBundle bundle;
-
-    @Internal
     private Timeline timeline;
 
     @Internal

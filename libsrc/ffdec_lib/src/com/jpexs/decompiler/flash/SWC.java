@@ -42,7 +42,7 @@ public class SWC extends ZippedSWFBundle {
     }
 
     @Override
-    protected void initBundle(InputStream is, File filename) throws IOException {        
+    protected void initBundle(InputStream is, File filename) throws IOException {
         super.initBundle(is, filename);
         keySet.clear();
         this.is.reset();

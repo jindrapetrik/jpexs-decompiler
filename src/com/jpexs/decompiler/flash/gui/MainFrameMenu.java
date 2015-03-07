@@ -50,7 +50,6 @@ public abstract class MainFrameMenu {
     private final MainFrame mainFrame;
 
     private SWF swf;
-    private SWFBundle bundle;
 
     public abstract boolean isInternalFlashViewerSelected();
 
@@ -69,20 +68,20 @@ public abstract class MainFrameMenu {
     }
 
     protected boolean save() {
-        if (swf != null) {           
+        if (swf != null) {
             boolean saved = false;
-            if(swf.bundle!=null){
-                if(!swf.bundle.isReadOnly()){
+            if (swf.swfList != null && swf.swfList.isBundle()) {
+                SWFBundle bundle = swf.swfList.bundle;
+                if (!bundle.isReadOnly()) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
                         swf.saveTo(baos);
-                        saved = swf.bundle.putSWF(swf.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
+                        saved = bundle.putSWF(swf.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
                 }
-            }
-            else if (swf.binaryData != null) {
+            } else if (swf.binaryData != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     swf.saveTo(baos);
@@ -115,7 +114,7 @@ public abstract class MainFrameMenu {
 
     protected boolean saveAs() {
         if (swf != null) {
-            if (saveAs(swf,SaveFileMode.SAVEAS)) {
+            if (saveAs(swf, SaveFileMode.SAVEAS)) {
                 swf.clearModified();
             }
 

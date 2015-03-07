@@ -315,8 +315,6 @@ public class Main {
 
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
-            //result.isBundle = true;
-            //result.bundleClass = bundle.getClass();
             result.bundle = bundle;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
@@ -328,7 +326,6 @@ public class Main {
                         startWork(AppStrings.translate("work.reading.swf"), p);
                     }
                 }, Configuration.parallelSpeedUp.get());
-                swf.bundle = bundle;
                 result.add(swf);
             }
         } else {

@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -44,9 +42,10 @@ public class ZippedSWFBundle implements SWFBundle {
 
     protected Set<String> keySet = new HashSet<>();
 
-    //private final Map<String, SeekableInputStream> cachedSWFs = new HashMap<>();
     protected FileInputStream fis;
+
     protected ReReadableInputStream is;
+
     protected File filename;
 
     public ZippedSWFBundle(InputStream is) throws IOException {

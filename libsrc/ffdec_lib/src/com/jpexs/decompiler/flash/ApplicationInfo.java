@@ -55,7 +55,7 @@ public class ApplicationInfo {
      * URL for checking new updates
      */
     public static String updateCheckUrl = "https://www.free-decompiler.com/flash/update.html?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
-    
+
     /**
      * URL for doing update
      */
@@ -86,22 +86,20 @@ public class ApplicationInfo {
         updateCheckUrl = updateCheckUrl
                 .replace("<revision>", revision)
                 .replace("<version>", version)
-                .replace("<version.major>", ""+version_major)
-                .replace("<version.minor>", ""+version_minor)
-                .replace("<version.release>", ""+version_release)
-                .replace("<version.build>", ""+version_build)
-                .replace("<nightly>", nightly?"1":"0")
-                ;
+                .replace("<version.major>", "" + version_major)
+                .replace("<version.minor>", "" + version_minor)
+                .replace("<version.release>", "" + version_release)
+                .replace("<version.build>", "" + version_build)
+                .replace("<nightly>", nightly ? "1" : "0");
         updateUrl = updateUrl
                 .replace("<revision>", revision)
                 .replace("<version>", version)
-                .replace("<version.major>", ""+version_major)
-                .replace("<version.minor>", ""+version_minor)
-                .replace("<version.release>", ""+version_release)
-                .replace("<version.build>", ""+version_build)
-                .replace("<nightly>", nightly?"1":"0")
-                ;
-        applicationVerName = APPLICATION_NAME + " v." + version;        
+                .replace("<version.major>", "" + version_major)
+                .replace("<version.minor>", "" + version_minor)
+                .replace("<version.release>", "" + version_release)
+                .replace("<version.build>", "" + version_build)
+                .replace("<nightly>", nightly ? "1" : "0");
+        applicationVerName = APPLICATION_NAME + " v." + version;
         shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;
     }
 }
