@@ -349,7 +349,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                 }
                                 timelined.getTimeline().reset();
                                 swf.updateCharacters();
-                                mainPanel.refreshTree();
+                                mainPanel.refreshTree(swf);
                             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
                                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -383,7 +383,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                     targetSwf.assignClassesToSymbols();
                                     sourceSwf.clearImageCache();
                                     targetSwf.clearImageCache();
-                                    mainPanel.refreshTree();
+                                    mainPanel.refreshTree(null); // refresh all opened swfs
                                 }
                             });
                             moveTagMenu.add(swfItem);
@@ -401,7 +401,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                         targetSwf.assignExportNamesToSymbols();
                                         targetSwf.assignClassesToSymbols();
                                         targetSwf.clearImageCache();
-                                        mainPanel.refreshTree();
+                                        mainPanel.refreshTree(targetSwf);
                                     } catch (IOException | InterruptedException ex) {
                                         Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
                                     }
@@ -509,18 +509,21 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 }
 
                 boolean removeDependencies = e.getActionCommand().equals(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
-                if (tagsToRemove.size() == 1) {
-                    Tag tag = tagsToRemove.get(0);
-                    if (View.showConfirmDialog(this, mainPanel.translate("message.confirm.remove").replace("%item%", tag.toString()), mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        tag.getSwf().removeTag(tag, removeDependencies);
-                        mainPanel.refreshTree();
+                if (tagsToRemove.size() > 0) {
+                    String confirmationMessage;
+                    if (tagsToRemove.size() == 1) {
+                        Tag tag = tagsToRemove.get(0);
+                        confirmationMessage = mainPanel.translate("message.confirm.remove").replace("%item%", tag.toString());
+                    } else {
+                        confirmationMessage = mainPanel.translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size()));
                     }
-                } else if (tagsToRemove.size() > 1) {
-                    if (View.showConfirmDialog(this, mainPanel.translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size())), mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                    if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                         for (Tag tag : tagsToRemove) {
                             tag.getSwf().removeTag(tag, removeDependencies);
                         }
-                        mainPanel.refreshTree();
+
+                        mainPanel.refreshTree(null);
                     }
                 }
                 break;
@@ -551,7 +554,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         if (swf.binaryData != null) {
                             // embedded swf
                             swf.binaryData.innerSwf = null;
-                            mainPanel.refreshTree();
+                            mainPanel.refreshTree(null);
                         } else {
                             Main.closeFile(swf.swfList);
                         }

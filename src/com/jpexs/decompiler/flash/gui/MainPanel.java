@@ -613,7 +613,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
         detailPanel.setVisible(false);
 
-        showView(getCurrentView());
         updateUi();
 
         this.swfs.addCollectionChangedListener((e) -> {
@@ -638,6 +637,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     dumpTree.expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
                     dumpTree.expandRow(i);
                 }
+            }
+
+            if (swfs.isEmpty()) {
+                tagTree.setUI(new BasicTreeUI() {
+                    {
+                        setHashColor(Color.gray);
+                    }
+                });
+                dumpTree.setUI(new BasicTreeUI() {
+                    {
+                        setHashColor(Color.gray);
+                    }
+                });
             }
         });
 
@@ -731,6 +743,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
         mainMenu.updateComponents(null);
+
+        showView(getCurrentView());
     }
 
     private boolean closeConfirmation(SWFList swfList) {
@@ -765,7 +779,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         /*for (SWFList swfList : swfs) {
-         for (SWF swf : swfList) {
+         List<SWF> swfs2 = new ArrayList<>(swfList);
+         for (SWF swf : swfs2) {
          swf.clearTagSwfs();
          }
          }*/
@@ -831,7 +846,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        refreshTree();
+        refreshTree(null);
 
         if (updateNeeded) {
             View.execInEventDispatch(new Runnable() {
@@ -1189,7 +1204,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         if (treeItem instanceof Timelined) {
             Timelined t = (Timelined) treeItem;
-            Timeline tim = t.getTimeline();
             Frame f = tagTree.getModel().getFrame(treeItem.getSwf(), t, frame);
             if (f != null) {
                 setTagTreeSelectedNode(f);
@@ -1771,7 +1785,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     swf.clearAllCache();
                     swf.assignExportNamesToSymbols();
                     swf.assignClassesToSymbols();
-                    refreshTree();
+                    refreshTree(swf);
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -1936,7 +1950,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 swf.removeTag(tag, true);
             }
         }
-        refreshTree();
+        refreshTree(swf);
     }
 
     private void clear() {
@@ -2102,11 +2116,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
                                 Tag newTag = new ImageImporter().importImage(it, data);
+                                SWF swf = it.getSwf();
                                 if (newTag != null) {
-                                    refreshTree();
+                                    refreshTree(swf);
                                     setTagTreeSelectedNode(newTag);
                                 }
-                                it.getSwf().clearImageCache();
+                                swf.clearImageCache();
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, "Invalid image", ex);
                                 View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2123,11 +2138,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         try {
                             Tag newTag = new ShapeImporter().importImage(st, data);
+                            SWF swf = st.getSwf();
                             if (newTag != null) {
-                                refreshTree();
+                                refreshTree(swf);
                                 setTagTreeSelectedNode(newTag);
                             }
-                            st.getSwf().clearImageCache();
+                            swf.clearImageCache();
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, "Invalid image", ex);
                             View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2170,7 +2186,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private File showImportFileChooser(String filter) {
-        String[] filterArray = filter.split("\\|");
+        String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));

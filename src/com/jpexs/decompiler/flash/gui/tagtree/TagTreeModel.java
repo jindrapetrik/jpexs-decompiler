@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -85,7 +84,7 @@ public class TagTreeModel implements TreeModel {
 
     private final List<SWFList> swfs;
 
-    private final Map<SWF, TagTreeSwfInfo> swfInfos = new WeakHashMap<>();
+    private final Map<SWF, TagTreeSwfInfo> swfInfos = new HashMap<>();
 
     private final boolean addAllFolders;
 
@@ -101,6 +100,7 @@ public class TagTreeModel implements TreeModel {
     }
 
     public void updateSwfs(CollectionChangedEvent e) {
+        boolean cleanMap = false;
         switch (e.getAction()) {
             case ADD: {
                 TreePath rootPath = new TreePath(new Object[]{root});
@@ -110,15 +110,32 @@ public class TagTreeModel implements TreeModel {
             case REMOVE: {
                 TreePath rootPath = new TreePath(new Object[]{root});
                 fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
+                cleanMap = true;
                 break;
             }
             default:
+                cleanMap = true;
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
+        }
+
+        if (cleanMap) {
+            List<SWF> toRemove = new ArrayList<>();
+            for (SWF swf : swfInfos.keySet()) {
+                SWF swf2 = swf.getRootSwf();
+                if (swf2 != null && !swfs.contains(swf2.swfList)) {
+                    toRemove.add(swf);
+                }
+            }
+
+            for (SWF swf : toRemove) {
+                swfInfos.remove(swf);
+            }
         }
     }
 
     public void updateSwf(SWF swf) {
-        TreePath changedPath = getTreePath(swf == null ? getRoot() : swf);
+        swfInfos.clear();
+        TreePath changedPath = getTreePath(swf == null ? root : swf);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
     }
 
@@ -412,8 +429,10 @@ public class TagTreeModel implements TreeModel {
 
     public TreePath getTreePath(TreeItem obj) {
         List<TreeItem> path = new ArrayList<>();
-        path.add(getRoot());
-        path = searchTreeItem(obj, getRoot(), path);
+        path.add(root);
+        if (obj != root) {
+            path = searchTreeItem(obj, root, path);
+        }
         if (path == null) {
             return null;
         }
