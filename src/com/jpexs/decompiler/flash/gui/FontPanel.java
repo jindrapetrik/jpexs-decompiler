@@ -173,7 +173,7 @@ public class FontPanel extends javax.swing.JPanel {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
                     if (textTag.getFontIds().contains(fontId)) {
-                        String text = textTag.getFormattedText();
+                        String text = textTag.getFormattedText().text;
                         mainPanel.saveText(textTag, text, null);
                     }
                 }

@@ -1361,10 +1361,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 }
                                 if (found) {
                                     String[] textArray = texts.toArray(new String[texts.size()]);
-                                    textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText(), textArray);
+                                    textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText().text, textArray);
                                 }
                             } else {
-                                String text = textTag.getFormattedText();
+                                String text = textTag.getFormattedText().text;
                                 if (pat.matcher(text).find()) {
                                     textTag.setFormattedText(getMissingCharacterHandler(), text.replaceAll(txt, replacement), null);
                                     findCount++;
@@ -1397,7 +1397,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             for (Tag tag : swf.tags) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
-                    if (pat.matcher(textTag.getFormattedText()).find()) {
+                    if (pat.matcher(textTag.getFormattedText().text).find()) {
                         found.add(textTag);
                     }
                 }
@@ -2072,6 +2072,34 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return true;
         }
 
+        return false;
+    }
+
+    public boolean previousTag() {
+        if (getCurrentView() == VIEW_RESOURCES) {
+            if (tagTree.getSelectionRows().length > 0) {
+                int row = tagTree.getSelectionRows()[0];
+                if (row > 0) {
+                    tagTree.setSelectionRow(row - 1);
+                    previewPanel.focusTextPanel();
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean nextTag() {
+        if (getCurrentView() == VIEW_RESOURCES) {
+            if (tagTree.getSelectionRows().length > 0) {
+                int row = tagTree.getSelectionRows()[0];
+                if (row < tagTree.getRowCount() - 1) {
+                    tagTree.setSelectionRow(row + 1);
+                    previewPanel.focusTextPanel();
+                }
+            }
+            return true;
+        }
         return false;
     }
 

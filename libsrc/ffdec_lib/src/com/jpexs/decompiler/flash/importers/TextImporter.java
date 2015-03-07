@@ -77,7 +77,7 @@ public class TextImporter {
                         TextTag textTag = (TextTag) tag;
                         if (textTag.getCharacterId() == characterId) {
                             String[] currentRecords = records.get(characterId);
-                            String text = textTag.getFormattedText();
+                            String text = textTag.getFormattedText().text;
                             if (!saveText(textTag, text, currentRecords)) {
                                 return;
                             }
@@ -138,7 +138,7 @@ public class TextImporter {
                     if (tag instanceof TextTag) {
                         TextTag textTag = (TextTag) tag;
                         if (textTag.getCharacterId() == characterId) {
-                            String text = textTag.getFormattedText();
+                            String text = textTag.getFormattedText().text;
                             if (!saveText(textTag, text, records)) {
                                 return;
                             }

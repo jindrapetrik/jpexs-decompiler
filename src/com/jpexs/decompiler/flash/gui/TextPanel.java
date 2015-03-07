@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JRepeatButton;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -60,6 +63,10 @@ public class TextPanel extends JPanel {
     private final JButton textSaveButton;
 
     private final JButton textCancelButton;
+
+    private final JButton selectPrevousTagButton;
+
+    private final JButton selectNextTagButton;
 
     private final JButton textAlignLeftButton;
 
@@ -114,6 +121,8 @@ public class TextPanel extends JPanel {
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
 
+        selectPrevousTagButton = createButton(null, "arrowup16", "selectPreviousTag", e -> mainPanel.previousTag());
+        selectNextTagButton = createButton(null, "arrowdown16", "selectNextTag", e -> mainPanel.nextTag());
         textAlignLeftButton = createButton(null, "textalignleft16", "text.align.left", e -> textAlign(TextAlign.LEFT));
         textAlignCenterButton = createButton(null, "textaligncenter16", "text.align.center", e -> textAlign(TextAlign.CENTER));
         textAlignRightButton = createButton(null, "textalignright16", "text.align.right", e -> textAlign(TextAlign.RIGHT));
@@ -122,6 +131,8 @@ public class TextPanel extends JPanel {
         increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor, ((JRepeatButton) e.getSource()).getRepeatCount()), true);
         undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
+        textButtonsPanel.add(selectPrevousTagButton);
+        textButtonsPanel.add(selectNextTagButton);
         textButtonsPanel.add(textAlignLeftButton);
         textButtonsPanel.add(textAlignCenterButton);
         textButtonsPanel.add(textAlignRightButton);
@@ -167,10 +178,23 @@ public class TextPanel extends JPanel {
 
     public void setText(TextTag textTag) {
         this.textTag = textTag;
-        textValue.setText(textTag.getFormattedText());
+        textValue.setText(textTag.getFormattedText().text);
         textValue.setCaretPosition(0);
         modified = false;
         setEditText(false);
+    }
+
+    public void focusTextValue() {
+        textValue.requestFocusInWindow();
+        if (!modified) {
+            HighlightedText text = textTag.getFormattedText();
+            for (Highlighting highlight : text.specialHilights) {
+                if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
+                    textValue.select(highlight.startPos, highlight.startPos + highlight.len);
+                    break;
+                }
+            }
+        }
     }
 
     public void closeTag() {

@@ -121,7 +121,7 @@ public class TextExporter {
                             public void run() throws IOException {
                                 fos.write(Utf8Helper.getBytes("ID: " + textTag.getCharacterId() + Helper.newLine));
                                 if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
+                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
                                 } else {
                                     String separator = Configuration.textExportSingleFileRecordSeparator.get();
                                     separator = Helper.newLine + separator + Helper.newLine;
@@ -149,7 +149,7 @@ public class TextExporter {
                         public void run() throws IOException {
                             try (FileOutputStream fos = new FileOutputStream(file)) {
                                 if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
+                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
                                 } else {
                                     String separator = Configuration.textExportSingleFileRecordSeparator.get();
                                     separator = Helper.newLine + separator + Helper.newLine;

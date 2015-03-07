@@ -458,6 +458,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         textPanel.setText(textTag);
     }
 
+    public void focusTextPanel() {
+        textPanel.focusTextValue();
+    }
+
     public void clear() {
         imagePanel.clearAll();
         if (media != null) {

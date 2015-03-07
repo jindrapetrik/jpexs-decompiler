@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.decompiler.flash.tags.text.JustifyAlignGlyphEntry;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
@@ -81,7 +82,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract List<Integer> getFontIds();
 
-    public abstract String getFormattedText();
+    public abstract HighlightedText getFormattedText();
 
     // use the texts from the "texts" argument when it is not null
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;

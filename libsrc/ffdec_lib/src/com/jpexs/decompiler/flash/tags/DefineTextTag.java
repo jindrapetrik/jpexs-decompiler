@@ -24,6 +24,9 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -128,61 +131,63 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public String getFormattedText() {
+    public HighlightedText getFormattedText() {
         FontTag fnt = null;
-        StringBuilder ret = new StringBuilder();
-        ret.append("[\r\nxmin ").append(textBounds.Xmin).
-                append("\r\nymin ").append(textBounds.Ymin).
-                append("\r\nxmax ").append(textBounds.Xmax).
-                append("\r\nymax ").append(textBounds.Ymax);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        writer.append("[").newLine();
+        writer.append("xmin " + textBounds.Xmin).newLine();
+        writer.append("ymin " + textBounds.Ymin).newLine();
+        writer.append("xmax " + textBounds.Xmax).newLine();
+        writer.append("ymax " + textBounds.Ymax).newLine();
         if (textMatrix.translateX != 0) {
-            ret.append("\r\ntranslatex ").append(textMatrix.translateX);
+            writer.append("translatex " + textMatrix.translateX).newLine();
         }
         if (textMatrix.translateY != 0) {
-            ret.append("\r\ntranslatey ").append(textMatrix.translateY);
+            writer.append("translatey " + textMatrix.translateY).newLine();
         }
         if (textMatrix.hasScale) {
-            ret.append("\r\nscalex ").append(textMatrix.scaleX);
-            ret.append("\r\nscaley ").append(textMatrix.scaleY);
+            writer.append("scalex " + textMatrix.scaleX).newLine();
+            writer.append("scaley " + textMatrix.scaleY).newLine();
         }
         if (textMatrix.hasRotate) {
-            ret.append("\r\nrotateskew0 ").append(textMatrix.rotateSkew0);
-            ret.append("\r\nrotateskew1 ").append(textMatrix.rotateSkew1);
+            writer.append("rotateskew0 " + textMatrix.rotateSkew0).newLine();
+            writer.append("rotateskew1 " + textMatrix.rotateSkew1).newLine();
         }
-        ret.append("\r\n]");
+        writer.append("]");
         for (TEXTRECORD rec : textRecords) {
-            String params = "";
-            if (rec.styleFlagsHasFont) {
-                for (Tag t : swf.tags) {
-                    if (t instanceof FontTag) {
-                        if (((FontTag) t).getFontId() == rec.fontId) {
-                            fnt = ((FontTag) t);
-                            break;
+            if (rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
+                writer.append("[").newLine();
+                if (rec.styleFlagsHasFont) {
+                    for (Tag t : swf.tags) {
+                        if (t instanceof FontTag) {
+                            if (((FontTag) t).getFontId() == rec.fontId) {
+                                fnt = ((FontTag) t);
+                                break;
+                            }
                         }
                     }
+                    writer.append("font " + rec.fontId).newLine();
+                    writer.append("height " + rec.textHeight).newLine();
                 }
-                params += "\r\nfont " + rec.fontId + "\r\nheight " + rec.textHeight;
-            }
-            if (rec.styleFlagsHasColor) {
-                params += "\r\ncolor " + rec.textColor.toHexRGB();
-            }
-            if (rec.styleFlagsHasXOffset) {
-                params += "\r\nx " + rec.xOffset;
-            }
-            if (rec.styleFlagsHasYOffset) {
-                params += "\r\ny " + rec.yOffset;
-            }
-            if (params.length() > 0) {
-                ret.append("[").append(params).append("\r\n]");
+                if (rec.styleFlagsHasColor) {
+                    writer.append("color " + rec.textColor.toHexRGB()).newLine();
+                }
+                if (rec.styleFlagsHasXOffset) {
+                    writer.append("x " + rec.xOffset).newLine();
+                }
+                if (rec.styleFlagsHasYOffset) {
+                    writer.append("y " + rec.yOffset).newLine();
+                }
+                writer.append("]");
             }
 
             if (fnt == null) {
-                ret.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
+                writer.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
             } else {
-                ret.append(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"));
+                writer.hilightSpecial(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
             }
         }
-        return ret.toString();
+        return new HighlightedText(writer);
     }
 
     @Override

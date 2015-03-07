@@ -19,9 +19,13 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -357,9 +361,9 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String getFormattedText() {
-        String ret = "";
-        ret += "[";
+    public HighlightedText getFormattedText() {
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        writer.append("[");
         String[] alignNames = {"left", "right", "center", "justify"};
         String alignment;
         if (align < alignNames.length) {
@@ -367,22 +371,70 @@ public class DefineEditTextTag extends TextTag {
         } else {
             alignment = "unknown";
         }
-        ret += "\r\nxmin " + bounds.Xmin + "\r\nymin " + bounds.Ymin + "\r\nxmax " + bounds.Xmax + "\r\nymax " + bounds.Ymax + "\r\n";
-        ret += (wordWrap ? "wordwrap 1\r\n" : "") + (multiline ? "multiline 1\r\n" : "")
-                + (password ? "password 1\r\n" : "") + (readOnly ? "readonly 1\r\n" : "")
-                + (autoSize ? "autosize 1\r\n" : "") + (noSelect ? "noselect 1\r\n" : "")
-                + (border ? "border 1\r\n" : "") + (wasStatic ? "wasstatic 1\r\n" : "")
-                + (html ? "html 1\r\n" : "") + (useOutlines ? "useoutlines 1\r\n" : "")
-                + (hasFont ? "font " + fontId + "\r\n" + "height " + fontHeight + "\r\n" : "") + (hasTextColor ? "color " + textColor.toHexARGB() + "\r\n" : "")
-                + (hasFontClass ? "fontclass " + fontClass + "\r\n" : "") + (hasMaxLength ? "maxlength " + maxLength + "\r\n" : "")
-                + "align " + alignment + "\r\n"
-                + (hasLayout ? "leftmargin " + leftMargin + "\r\nrightmargin " + rightMargin + "\r\nindent " + indent + "\r\nleading " + leading + "\r\n" : "")
-                + (!variableName.isEmpty() ? "variablename " + variableName + "\r\n" : "");
-        ret += "]";
-        if (hasText) {
-            ret += initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
+        writer.newLine();
+        writer.append("xmin " + bounds.Xmin).newLine();
+        writer.append("ymin " + bounds.Ymin).newLine();
+        writer.append("xmax " + bounds.Xmax).newLine();
+        writer.append("ymax " + bounds.Ymax).newLine();
+        if (wordWrap) {
+            writer.append("wordwrap 1").newLine();
         }
-        return ret;
+        if (multiline) {
+            writer.append("multiline 1").newLine();
+        }
+        if (password) {
+            writer.append("password 1").newLine();
+        }
+        if (readOnly) {
+            writer.append("readonly 1").newLine();
+        }
+        if (autoSize) {
+            writer.append("autosize 1").newLine();
+        }
+        if (noSelect) {
+            writer.append("noselect 1").newLine();
+        }
+        if (border) {
+            writer.append("border 1").newLine();
+        }
+        if (wasStatic) {
+            writer.append("wasstatic 1").newLine();
+        }
+        if (html) {
+            writer.append("html 1").newLine();
+        }
+        if (useOutlines) {
+            writer.append("useoutlines 1").newLine();
+        }
+        if (hasFont) {
+            writer.append("font " + fontId).newLine();
+            writer.append("height " + fontHeight).newLine();
+        }
+        if (hasTextColor) {
+            writer.append("color " + textColor.toHexARGB()).newLine();
+        }
+        if (hasFontClass) {
+            writer.append("fontclass " + fontClass).newLine();
+        }
+        if (hasMaxLength) {
+            writer.append("maxlength " + maxLength).newLine();
+        }
+        writer.append("align " + alignment).newLine();
+        if (hasLayout) {
+            writer.append("leftmargin " + leftMargin).newLine();
+            writer.append("rightmargin " + rightMargin).newLine();
+            writer.append("indent " + indent).newLine();
+            writer.append("leading " + leading).newLine();
+        }
+        if (!variableName.isEmpty()) {
+            writer.append("variablename " + variableName).newLine();
+        }
+        writer.append("]");
+        if (hasText) {
+            String text = initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
+            writer.hilightSpecial(text, HighlightSpecialType.TEXT);
+        }
+        return new HighlightedText(writer);
     }
 
     @Override

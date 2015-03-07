@@ -224,6 +224,14 @@ public abstract class MainFrameMenu {
         mainFrame.getPanel().refreshDecompiled();
     }
 
+    protected boolean previousTag() {
+        return mainFrame.getPanel().previousTag();
+    }
+
+    protected boolean nextTag() {
+        return mainFrame.getPanel().nextTag();
+    }
+
     protected void checkResources() {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PrintStream stream = new PrintStream(os);
@@ -323,7 +331,7 @@ public abstract class MainFrameMenu {
 
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
-                if (((JFrame) mainFrame).isActive()) {
+                if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_RELEASED) {
                     int code = e.getKeyCode();
                     if (e.isControlDown() && e.isShiftDown()) {
                         switch (code) {
@@ -345,6 +353,13 @@ public abstract class MainFrameMenu {
                                 return clearLog();
                             case KeyEvent.VK_E:
                                 return export(false);
+                        }
+                    } else if (e.isControlDown() && !e.isShiftDown()) {
+                        switch (code) {
+                            case KeyEvent.VK_UP:
+                                return previousTag();
+                            case KeyEvent.VK_DOWN:
+                                return nextTag();
                         }
                     }
                 }
