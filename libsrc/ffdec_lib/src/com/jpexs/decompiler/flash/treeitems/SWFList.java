@@ -34,15 +34,15 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     public String name;
 
-    //public boolean isBundle;
-    
     public SWFBundle bundle;
-
-    //public Class bundleClass;
 
     public SWFSourceInfo sourceInfo;
 
     public List<SWF> swfs = new ArrayList<>();
+
+    public boolean isBundle() {
+        return bundle != null;
+    }
 
     @Override
     public SWF getSwf() {
@@ -51,7 +51,7 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     @Override
     public String toString() {
-        if (bundle != null) {
+        if (isBundle()) {
             return name;
         } else {
             return swfs.get(0).getFileTitle();

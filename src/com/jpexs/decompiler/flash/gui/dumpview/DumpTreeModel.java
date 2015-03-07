@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -34,19 +35,36 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public class DumpTreeModel implements TreeModel {
+public final class DumpTreeModel implements TreeModel {
 
     private final DumpInfo root;
 
+    private final List<TreeModelListener> listeners = new ArrayList<>();
+
+    private final List<SWFList> swfs;
+
     public DumpTreeModel(List<SWFList> swfs) {
-        DumpInfo root = new DumpInfo("root", "", null, 0, 0);
+        this.swfs = swfs;
+        root = new DumpInfo("root", "", null, 0, 0);
+        updateSwfs();
+    }
+
+    public void updateSwfs() {
+        root.getChildInfos().clear();
         for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
                 swf.dumpInfo.name = swf.getFileTitle();
                 root.getChildInfos().add(swf.dumpInfo);
             }
         }
-        this.root = root;
+
+        fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
+    }
+
+    private void fireTreeStructureChanged(TreeModelEvent e) {
+        for (TreeModelListener listener : listeners) {
+            listener.treeStructureChanged(e);
+        }
     }
 
     private List<DumpInfo> searchDumpInfo(DumpInfo dumpInfo, DumpInfo parent, List<DumpInfo> path) {
@@ -126,10 +144,12 @@ public class DumpTreeModel implements TreeModel {
     }
 
     @Override
-    public void addTreeModelListener(TreeModelListener tl) {
+    public void addTreeModelListener(TreeModelListener l) {
+        listeners.add(l);
     }
 
     @Override
-    public void removeTreeModelListener(TreeModelListener tl) {
+    public void removeTreeModelListener(TreeModelListener l) {
+        listeners.remove(l);
     }
 }

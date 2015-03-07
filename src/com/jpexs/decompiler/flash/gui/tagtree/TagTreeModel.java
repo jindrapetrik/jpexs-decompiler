@@ -17,11 +17,10 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -46,6 +45,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -78,39 +79,65 @@ public class TagTreeModel implements TreeModel {
 
     public static final String FOLDER_SCRIPTS = "scripts";
 
+    private final List<TreeModelListener> listeners = new ArrayList<>();
+
     private final TagTreeRoot root = new TagTreeRoot();
 
-    private final List<SWFContainerItem> swfs;
+    private final List<SWFList> swfs;
 
-    private final Map<SWF, List<TreeItem>> swfFolders;
+    private final Map<SWF, TagTreeSwfInfo> swfInfos = new WeakHashMap<>();
 
     private final boolean addAllFolders;
 
-    private final Map<Tag, TagScript> tagScriptCache;
-
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
-        this.swfs = new ArrayList<>();
-        this.swfFolders = new HashMap<>();
+        this.swfs = swfs;
         this.addAllFolders = addAllFolders;
-        this.tagScriptCache = new HashMap<>();
-        Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
-        for (SWFList swfList : swfs) {
-            if (swfList.bundle != null) {
-                this.swfs.add(swfList);
-                for (SWF swf : swfList) {
-                    createTagList(swf);
-                }
-            } else {
-                SWF swf = swfList.get(0);
-                this.swfs.add(swf);
-                createTagList(swf);
-            }
-        }
-        Main.stopWork();
+        //Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
+        //Main.stopWork();
     }
 
     private String translate(String key) {
         return AppStrings.translate(key);
+    }
+
+    public void updateSwfs(CollectionChangedEvent e) {
+        switch (e.getAction()) {
+            case ADD: {
+                TreePath rootPath = new TreePath(new Object[]{root});
+                fireTreeNodesInserted(new TreeModelEvent(this, rootPath, new int[]{e.getNewIndex()}, new Object[]{e.getNewItem()}));
+                break;
+            }
+            case REMOVE: {
+                TreePath rootPath = new TreePath(new Object[]{root});
+                fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
+                break;
+            }
+            default:
+                fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
+        }
+    }
+
+    public void updateSwf(SWF swf) {
+        TreePath changedPath = getTreePath(swf == null ? getRoot() : swf);
+        fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
+    }
+
+    private void fireTreeNodesRemoved(TreeModelEvent e) {
+        for (TreeModelListener listener : listeners) {
+            listener.treeNodesRemoved(e);
+        }
+    }
+
+    private void fireTreeNodesInserted(TreeModelEvent e) {
+        for (TreeModelListener listener : listeners) {
+            listener.treeNodesInserted(e);
+        }
+    }
+
+    private void fireTreeStructureChanged(TreeModelEvent e) {
+        for (TreeModelListener listener : listeners) {
+            listener.treeStructureChanged(e);
+        }
     }
 
     private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
@@ -249,12 +276,13 @@ public class TagTreeModel implements TreeModel {
             nodeList.add(otherNode);
         }
 
+        Map<Tag, TagScript> currentTagScriptCache = new HashMap<>();
         if (swf.isAS3()) {
             if (!swf.getAbcList().isEmpty()) {
                 nodeList.add(new ClassesListTreeModel(swf));
             }
         } else {
-            List<TreeItem> subNodes = swf.getFirstLevelASMNodes(tagScriptCache);
+            List<TreeItem> subNodes = swf.getFirstLevelASMNodes(currentTagScriptCache);
 
             if (subNodes.size() > 0) {
                 TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);
@@ -262,7 +290,10 @@ public class TagTreeModel implements TreeModel {
             }
         }
 
-        swfFolders.put(swf, nodeList);
+        TagTreeSwfInfo swfInfo = new TagTreeSwfInfo();
+        swfInfo.folders = nodeList;
+        swfInfo.tagScriptCache = currentTagScriptCache;
+        swfInfos.put(swf, swfInfo);
     }
 
     public TreeItem getScriptsNode(SWF swf) {
@@ -337,7 +368,7 @@ public class TagTreeModel implements TreeModel {
         return searchForFrame(swf, swf, t, frame);
     }
 
-    private List<TreeItem> searchTag(TreeItem obj, TreeItem parent, List<TreeItem> path) {
+    private List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
         int cnt = getChildCount(parent);
         for (int i = 0; i < cnt; i++) {
@@ -371,7 +402,7 @@ public class TagTreeModel implements TreeModel {
                 }
             }
 
-            ret = searchTag(obj, n, newPath);
+            ret = searchTreeItem(obj, n, newPath);
             if (ret != null) {
                 return ret;
             }
@@ -379,10 +410,10 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    public TreePath getTagPath(TreeItem obj) {
+    public TreePath getTreePath(TreeItem obj) {
         List<TreeItem> path = new ArrayList<>();
         path.add(getRoot());
-        path = searchTag(obj, getRoot(), path);
+        path = searchTreeItem(obj, getRoot(), path);
         if (path == null) {
             return null;
         }
@@ -396,20 +427,24 @@ public class TagTreeModel implements TreeModel {
     }
 
     private List<TreeItem> getSwfFolders(SWF swf) {
-        List<TreeItem> ret = swfFolders.get(swf);
-        if (ret == null) {
+        TagTreeSwfInfo swfInfo = swfInfos.get(swf);
+        if (swfInfo == null) {
             createTagList(swf);
-            ret = swfFolders.get(swf);
+            swfInfo = swfInfos.get(swf);
         }
 
-        return ret;
+        return swfInfo.folders;
     }
 
     @Override
     public TreeItem getChild(Object parent, int index) {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
-            return swfs.get(index);
+            SWFList swfList = swfs.get(index);
+            if (!swfList.isBundle()) {
+                return swfList.get(0);
+            }
+            return swfList;
         } else if (parentNode instanceof SWFList) {
             return ((SWFList) parentNode).swfs.get(index);
         } else if (parentNode instanceof SWF) {
@@ -435,7 +470,8 @@ public class TagTreeModel implements TreeModel {
             }
             if (result instanceof Tag) {
                 Tag resultTag = (Tag) result;
-                TagScript tagScript = tagScriptCache.get(resultTag);
+                Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(result.getSwf()).tagScriptCache;
+                TagScript tagScript = currentTagScriptCache.get(resultTag);
                 if (tagScript == null) {
                     List<TreeItem> subNodes = new ArrayList<>();
                     if (result instanceof ASMSourceContainer) {
@@ -444,7 +480,7 @@ public class TagTreeModel implements TreeModel {
                         }
                     }
                     tagScript = new TagScript(result.getSwf(), resultTag, subNodes);
-                    tagScriptCache.put(resultTag, tagScript);
+                    currentTagScriptCache.put(resultTag, tagScript);
                 }
                 result = tagScript;
             }
@@ -511,7 +547,10 @@ public class TagTreeModel implements TreeModel {
         TreeItem parentNode = (TreeItem) parent;
         TreeItem childNode = (TreeItem) child;
         if (parentNode == root) {
-            return swfs.indexOf(childNode);
+            SWFList swfList = child instanceof SWFList
+                    ? (SWFList) child
+                    : ((SWF) child).swfList;
+            return swfs.indexOf(swfList);
         } else if (parentNode instanceof SWFList) {
             return ((SWFList) parentNode).swfs.indexOf(childNode);
         } else if (parentNode instanceof SWF) {
@@ -550,9 +589,11 @@ public class TagTreeModel implements TreeModel {
 
     @Override
     public void addTreeModelListener(TreeModelListener l) {
+        listeners.add(l);
     }
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
+        listeners.remove(l);
     }
 }

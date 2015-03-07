@@ -278,7 +278,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     public SWFBundle bundle;
-    
+
     @Internal
     private Timeline timeline;
 
@@ -863,6 +863,15 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Override
     public SWF getSwf() {
         return this;
+    }
+
+    public SWF getRootSwf() {
+        SWF result = this;
+        while (result.binaryData != null) {
+            result = result.binaryData.getSwf();
+        }
+
+        return result;
     }
 
     public String getFile() {

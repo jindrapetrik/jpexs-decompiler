@@ -483,7 +483,7 @@ public class View {
         expandTreeNodes(tree, expandedNodes);
     }
 
-    private static List<List<String>> getExpandedNodes(JTree tree) {
+    public static List<List<String>> getExpandedNodes(JTree tree) {
         List<List<String>> expandedNodes = new ArrayList<>();
         int rowCount = tree.getRowCount();
         for (int i = 0; i < rowCount; i++) {
@@ -503,7 +503,7 @@ public class View {
         return expandedNodes;
     }
 
-    private static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
+    public static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
         for (List<String> pathAsStringList : pathsToExpand) {
             expandTreeNode(tree, pathAsStringList);
         }

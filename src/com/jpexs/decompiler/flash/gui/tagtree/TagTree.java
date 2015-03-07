@@ -122,7 +122,6 @@ import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -217,6 +216,11 @@ public class TagTree extends JTree {
         setBackground(Color.white);
         setRowHeight(16);
         setLargeModel(true);
+        setUI(new BasicTreeUI() {
+            {
+                setHashColor(Color.gray);
+            }
+        });
     }
 
     public void createContextMenu() {
@@ -313,7 +317,7 @@ public class TagTree extends JTree {
 
         if (t instanceof SWFList) {
             SWFList slist = (SWFList) t;
-            if (slist.bundle != null) {
+            if (slist.isBundle()) {
                 if (slist.bundle.getClass() == ZippedSWFBundle.class) {
                     return TreeNodeType.BUNDLE_ZIP;
                 } else if (slist.bundle.getClass() == SWC.class) {
@@ -534,20 +538,7 @@ public class TagTree extends JTree {
     }
 
     @Override
-    public void setModel(TreeModel tm) {
-        super.setModel(tm);
-
-        setUI(new BasicTreeUI() {
-            {
-                setHashColor(Color.gray);
-            }
-        });
-
-        if (tm != null) {
-            int rowCount = tm.getChildCount(tm.getRoot());
-            for (int i = rowCount - 1; i >= 0; i--) {
-                expandRow(i);
-            }
-        }
+    public TagTreeModel getModel() {
+        return (TagTreeModel) super.getModel();
     }
 }

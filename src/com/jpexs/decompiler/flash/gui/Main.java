@@ -71,15 +71,11 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -411,7 +407,7 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
-        if (mode == SaveFileMode.SAVEAS && swf.swfList.bundle==null) {
+        if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle()) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
         }
@@ -505,7 +501,7 @@ public class Main {
             loadingDialog.setVisible(false);
             shouldCloseWhenClosingLoadingDialog = false;
 
-            final SWF fswf = firstSWF;            
+            final SWF fswf = firstSWF;
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
@@ -860,7 +856,6 @@ public class Main {
                 mainFrame.setVisible(true);
             }
         });
-
     }
 
     private static void offerAssociation() {

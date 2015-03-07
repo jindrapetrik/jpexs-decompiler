@@ -1,9 +1,9 @@
 /*
- * @(#)DefaultRegistry.java  
- * 
+ * @(#)DefaultRegistry.java
+ *
  * Copyright (c) 2011 Werner Randelshofer, Goldau, Switzerland.
  * All rights reserved.
- * 
+ *
  * You may not use, copy or modify this file, except in compliance onlyWith the
  * license agreement you entered into onlyWith Werner Randelshofer.
  * For details see accompanying license terms.
@@ -16,13 +16,41 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import static org.monte.media.VideoFormatKeys.*;
-import static org.monte.media.AudioFormatKeys.*;
+import static org.monte.media.AudioFormatKeys.ENCODING_AVI_PCM;
+import static org.monte.media.AudioFormatKeys.ENCODING_PCM_SIGNED;
+import static org.monte.media.AudioFormatKeys.ENCODING_PCM_UNSIGNED;
+import static org.monte.media.AudioFormatKeys.ENCODING_QUICKTIME_IN24_PCM;
+import static org.monte.media.AudioFormatKeys.ENCODING_QUICKTIME_IN32_PCM;
+import static org.monte.media.AudioFormatKeys.ENCODING_QUICKTIME_RAW_PCM;
+import static org.monte.media.AudioFormatKeys.ENCODING_QUICKTIME_SOWT_PCM;
+import static org.monte.media.AudioFormatKeys.ENCODING_QUICKTIME_TWOS_PCM;
+import static org.monte.media.FormatKeys.EncodingKey;
+import static org.monte.media.FormatKeys.MIME_ANIM;
+import static org.monte.media.FormatKeys.MIME_AVI;
+import static org.monte.media.FormatKeys.MIME_JAVA;
+import static org.monte.media.FormatKeys.MIME_QUICKTIME;
+import org.monte.media.FormatKeys.MediaType;
+import static org.monte.media.FormatKeys.MediaTypeKey;
+import static org.monte.media.FormatKeys.MimeTypeKey;
+import static org.monte.media.VideoFormatKeys.COMPRESSOR_NAME_AVI_TECHSMITH_SCREEN_CAPTURE;
+import static org.monte.media.VideoFormatKeys.CompressorNameKey;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_DIB;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_DOSBOX_SCREEN_CAPTURE;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_MJPG;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_PNG;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_RLE;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE;
+import static org.monte.media.VideoFormatKeys.ENCODING_BITMAP_IMAGE;
+import static org.monte.media.VideoFormatKeys.ENCODING_BUFFERED_IMAGE;
+import static org.monte.media.VideoFormatKeys.ENCODING_QUICKTIME_ANIMATION;
+import static org.monte.media.VideoFormatKeys.ENCODING_QUICKTIME_JPEG;
+import static org.monte.media.VideoFormatKeys.ENCODING_QUICKTIME_PNG;
+import static org.monte.media.VideoFormatKeys.ENCODING_QUICKTIME_RAW;
 
 /**
- * {@code DefaultRegistry}. 
+ * {@code DefaultRegistry}.
  * <p>
- * FIXME - The registry should be read from a file. 
+ * FIXME - The registry should be read from a file.
  *
  * @author Werner Randelshofer
  * @version $Id: DefaultRegistry.java 299 2013-01-03 07:40:18Z werner $
@@ -30,8 +58,11 @@ import static org.monte.media.AudioFormatKeys.*;
 public class DefaultRegistry extends Registry {
 
     private HashMap<String, LinkedList<RegistryEntry>> codecMap;
+
     private HashMap<String, LinkedList<RegistryEntry>> readerMap;
+
     private HashMap<String, LinkedList<RegistryEntry>> writerMap;
+
     private HashMap<String, Format> fileFormatMap;
 
     @Override
@@ -52,7 +83,9 @@ public class DefaultRegistry extends Registry {
     private static class RegistryEntry {
 
         Format inputFormat;
+
         Format outputFormat;
+
         String className;
 
         public RegistryEntry(Format inputFormat, Format outputFormat, String className) {
@@ -147,8 +180,8 @@ public class DefaultRegistry extends Registry {
                 "org.monte.media.png.PNGCodec");
 
         putBidiCodec(
-                new Format(MediaTypeKey, MediaType.VIDEO, MimeTypeKey, MIME_QUICKTIME, 
-                EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, COMPRESSOR_NAME_AVI_TECHSMITH_SCREEN_CAPTURE),
+                new Format(MediaTypeKey, MediaType.VIDEO, MimeTypeKey, MIME_QUICKTIME,
+                        EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, COMPRESSOR_NAME_AVI_TECHSMITH_SCREEN_CAPTURE),
                 new Format(MediaTypeKey, MediaType.VIDEO, MimeTypeKey, MIME_JAVA, EncodingKey, ENCODING_BUFFERED_IMAGE),
                 "org.monte.media.avi.TechSmithCodec");
 
@@ -197,7 +230,6 @@ public class DefaultRegistry extends Registry {
                 new Format(MediaTypeKey, MediaType.AUDIO, MimeTypeKey, MIME_QUICKTIME, EncodingKey, ENCODING_QUICKTIME_RAW_PCM),
                 "org.monte.media.quicktime.QuickTimePCMAudioCodec");
 
-
         putReader(new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI), "org.monte.media.avi.AVIReader");
         putReader(new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_QUICKTIME), "org.monte.media.quicktime.QuickTimeReader");
         putReader(new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_ANIM), "org.monte.media.anim.ANIMReader");
@@ -211,10 +243,12 @@ public class DefaultRegistry extends Registry {
     }
 
     /**
-     * 
-     * @param inputFormat Must have {@code MediaTypeKey}, {@code EncodingKey}, {@code MimeTypeKey}.
-     * @param outputFormat Must have {@code MediaTypeKey}, {@code EncodingKey}, {@code MimeTypeKey}.
-     * @param codecClass 
+     *
+     * @param inputFormat Must have {@code MediaTypeKey}, {@code EncodingKey},
+     * {@code MimeTypeKey}.
+     * @param outputFormat Must have {@code MediaTypeKey}, {@code EncodingKey},
+     * {@code MimeTypeKey}.
+     * @param codecClass
      */
     public void putBidiCodec(Format inputFormat, Format outputFormat, String codecClass) {
         putCodec(inputFormat, outputFormat, codecClass);
@@ -222,10 +256,12 @@ public class DefaultRegistry extends Registry {
     }
 
     /**
-     * 
-     * @param inputFormat Must have {@code MediaTypeKey}, {@code EncodingKey}, {@code MimeTypeKey}.
-     * @param outputFormat  Must have {@code MediaTypeKey}, {@code EncodingKey}, {@code MimeTypeKey}.
-     * @param codecClass 
+     *
+     * @param inputFormat Must have {@code MediaTypeKey}, {@code EncodingKey},
+     * {@code MimeTypeKey}.
+     * @param outputFormat Must have {@code MediaTypeKey}, {@code EncodingKey},
+     * {@code MimeTypeKey}.
+     * @param codecClass
      */
     @Override
     public void putCodec(Format inputFormat, Format outputFormat, String codecClass) {
@@ -244,9 +280,9 @@ public class DefaultRegistry extends Registry {
     }
 
     /**
-     * 
+     *
      * @param fileFormat Must have {@code MediaTypeKey}, {@code MimeTypeKey}.
-     * @param readerClass 
+     * @param readerClass
      */
     @Override
     public void putReader(Format fileFormat, String readerClass) {
@@ -261,9 +297,9 @@ public class DefaultRegistry extends Registry {
     }
 
     /**
-     * 
+     *
      * @param fileFormat Must have {@code MediaTypeKey}, {@code MimeTypeKey}.
-     * @param writerClass 
+     * @param writerClass
      */
     @Override
     public void putWriter(Format fileFormat, String writerClass) {
@@ -380,16 +416,14 @@ public class DefaultRegistry extends Registry {
 
     @Override
     public void unregisterCodec(String codecClass) {
-        for (Map.Entry<String, LinkedList<RegistryEntry>> i:codecMap.entrySet()) {
-            LinkedList<RegistryEntry> ll=i.getValue();
-            for (Iterator<RegistryEntry> j=ll.iterator();j.hasNext();) {
-                RegistryEntry e=j.next();
+        for (Map.Entry<String, LinkedList<RegistryEntry>> i : codecMap.entrySet()) {
+            LinkedList<RegistryEntry> ll = i.getValue();
+            for (Iterator<RegistryEntry> j = ll.iterator(); j.hasNext();) {
+                RegistryEntry e = j.next();
                 if (e.className.equals(codecClass)) {
                     j.remove();
                 }
             }
         }
     }
-    
-    
 }

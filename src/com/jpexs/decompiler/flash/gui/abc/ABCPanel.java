@@ -700,7 +700,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        final TreePath tp = ttm.getTagPath(pack);
+        final TreePath tp = ttm.getTreePath(pack);
         View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {

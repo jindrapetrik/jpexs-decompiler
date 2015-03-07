@@ -67,6 +67,7 @@ import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
+import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
@@ -200,7 +201,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private final MainFrame mainFrame;
 
-    private final List<SWFList> swfs;
+    private final ObservableList<SWFList> swfs;
 
     private ABCPanel abcPanel;
 
@@ -409,7 +410,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
 
         setLayout(new BorderLayout());
-        swfs = new ArrayList<>();
+        swfs = new ObservableList<>();
 
         detailPanel = new JPanel();
         detailPanel.setLayout(new CardLayout());
@@ -615,6 +616,31 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showView(getCurrentView());
         updateUi();
 
+        this.swfs.addCollectionChangedListener((e) -> {
+            TagTreeModel ttm = tagTree.getModel();
+            if (ttm != null) {
+                ttm.updateSwfs(e);
+                TreeItem root = ttm.getRoot();
+                int childCount = ttm.getChildCount(root);
+                for (int i = 0; i < childCount; i++) {
+                    tagTree.expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
+                }
+            }
+
+            DumpTreeModel dtm = dumpTree.getModel();
+            if (dtm != null) {
+                List<List<String>> expandedNodes = View.getExpandedNodes(dumpTree);
+                dtm.updateSwfs();
+                View.expandTreeNodes(dumpTree, expandedNodes);
+                DumpInfo root = dtm.getRoot();
+                int childCount = dtm.getChildCount(root);
+                for (int i = 0; i < childCount; i++) {
+                    dumpTree.expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
+                    dumpTree.expandRow(i);
+                }
+            }
+        });
+
         //Opening files with drag&drop to main window
         enableDrop(true);
     }
@@ -647,7 +673,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf != null) {
             updateUi(swf);
         }
-        refreshTree();
     }
 
     private ABCPanel getABCPanel() {
@@ -748,7 +773,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         oldItem = null;
         clear();
         updateUi();
-        refreshTree();
 
         return true;
     }
@@ -772,7 +796,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         oldItem = null;
         clear();
         updateUi();
-        refreshTree();
         return true;
     }
 
@@ -1167,7 +1190,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (treeItem instanceof Timelined) {
             Timelined t = (Timelined) treeItem;
             Timeline tim = t.getTimeline();
-            Frame f = ((TagTreeModel) tagTree.getModel()).getFrame(treeItem.getSwf(), t, frame);
+            Frame f = tagTree.getModel().getFrame(treeItem.getSwf(), t, frame);
             if (f != null) {
                 setTagTreeSelectedNode(f);
             }
@@ -1383,8 +1406,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void setTagTreeSelectedNode(TreeItem treeItem) {
-        TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
-        TreePath tp = ttm.getTagPath(treeItem);
+        TagTreeModel ttm = tagTree.getModel();
+        TreePath tp = ttm.getTreePath(treeItem);
         if (tp != null) {
             tagTree.setSelectionPath(tp);
             tagTree.scrollPathToVisible(tp);
@@ -1928,24 +1951,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void refreshTree() {
+        refreshTree(null);
+    }
+
+    public void refreshTree(SWF swf) {
         clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
-        DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
 
-        if (tagTree.getModel() != null) {
-            View.refreshTree(tagTree, new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
-        }
-
-        if (dumpTree.getModel() != null) {
-            View.refreshTree(dumpTree, new DumpTreeModel(swfs));
+        TagTreeModel ttm = tagTree.getModel();
+        if (ttm != null) {
+            List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
+            ttm.updateSwf(swf);
+            View.expandTreeNodes(tagTree, expandedNodes);
         }
 
         if (treeItem != null) {
-            setTagTreeSelectedNode(treeItem);
-        }
-        if (dumpInfo != null) {
-            setDumpTreeSelectedNode(dumpInfo);
+            SWF treeItemSwf = treeItem.getSwf().getRootSwf();
+            if (swfs.contains(treeItemSwf.swfList)) {
+                setTagTreeSelectedNode(treeItem);
+            }
         }
 
         reload(true);
@@ -2232,7 +2257,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         TreeItem treeItem = (TreeItem) e.getPath().getLastPathComponent();
         if (!(treeItem instanceof SWFList)) {
-            SWF swf = treeItem.getSwf();           
+            SWF swf = treeItem.getSwf();
             if (swfs.isEmpty()) {
                 // show welcome panel after closing swfs
                 updateUi();

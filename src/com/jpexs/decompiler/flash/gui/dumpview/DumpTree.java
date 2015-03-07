@@ -90,6 +90,11 @@ public class DumpTree extends JTree implements ActionListener {
         setCellRenderer(new DumpTreeCellRenderer());
         setRootVisible(false);
         setBackground(Color.white);
+        setUI(new BasicTreeUI() {
+            {
+                setHashColor(Color.gray);
+            }
+        });
     }
 
     public void createContextMenu() {
@@ -282,14 +287,13 @@ public class DumpTree extends JTree implements ActionListener {
     }
 
     @Override
+    public DumpTreeModel getModel() {
+        return (DumpTreeModel) super.getModel();
+    }
+
+    @Override
     public void setModel(TreeModel tm) {
         super.setModel(tm);
-
-        setUI(new BasicTreeUI() {
-            {
-                setHashColor(Color.gray);
-            }
-        });
 
         if (tm != null) {
             int rowCount = tm.getChildCount(tm.getRoot());

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -729,7 +728,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         closeFileMenu.setEnabled(swfLoaded);
         closeAllFilesMenu.setEnabled(swfLoaded);
 
-        boolean isBundle = swfLoaded && (swf.swfList != null) && (swf.swfList.bundle != null);
+        boolean isBundle = swfLoaded && (swf.swfList != null) && (swf.swfList.isBundle());
         saveCommandButton.setEnabled(swfLoaded && ((!isBundle) || (!swf.swfList.bundle.isReadOnly())));
         saveasCommandButton.setEnabled(swfLoaded);
         saveasexeCommandButton.setEnabled(swfLoaded);
