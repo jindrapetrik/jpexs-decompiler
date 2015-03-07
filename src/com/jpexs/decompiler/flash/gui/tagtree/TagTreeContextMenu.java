@@ -554,6 +554,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                         if (swf.binaryData != null) {
                             // embedded swf
                             swf.binaryData.innerSwf = null;
+                            swf.clearTagSwfs();
                             mainPanel.refreshTree(null);
                         } else {
                             Main.closeFile(swf.swfList);

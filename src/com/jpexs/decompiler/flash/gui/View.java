@@ -496,7 +496,7 @@ public class View {
                     }
                     expandedNodes.add(pathAsStringList);
                 }
-            } catch (IndexOutOfBoundsException ex) {
+            } catch (IndexOutOfBoundsException | NullPointerException ex) {
                 // TreeNode was removed, ignore
             }
         }

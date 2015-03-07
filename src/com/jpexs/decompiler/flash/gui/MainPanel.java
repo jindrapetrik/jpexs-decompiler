@@ -778,12 +778,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        /*for (SWFList swfList : swfs) {
-         List<SWF> swfs2 = new ArrayList<>(swfList);
-         for (SWF swf : swfs2) {
-         swf.clearTagSwfs();
-         }
-         }*/
+        for (SWFList swfList : swfs) {
+            List<SWF> swfs2 = new ArrayList<>(swfList);
+            for (SWF swf : swfs2) {
+                swf.clearTagSwfs();
+            }
+        }
+
         swfs.clear();
         oldItem = null;
         clear();
@@ -805,6 +806,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (!closeConfirmResult) {
                 return false;
             }
+        }
+
+        List<SWF> swfs2 = new ArrayList<>(swfList);
+        for (SWF swf : swfs2) {
+            swf.clearTagSwfs();
         }
 
         swfs.remove(swfList);
@@ -2158,6 +2164,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         File selfile = Helper.fixDialogFile(selectedFile);
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         new BinaryDataImporter().importData(bt, data);
+                        refreshTree(bt.getSwf());
                         reload(true);
                     }
                 }

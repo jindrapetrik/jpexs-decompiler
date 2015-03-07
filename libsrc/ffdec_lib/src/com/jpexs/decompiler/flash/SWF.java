@@ -318,12 +318,24 @@ public final class SWF implements SWFContainerItem, Timelined {
                 spriteTag.subTags.clear();
             }
 
+            if (tag instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) tag;
+                if (binaryTag.innerSwf != null) {
+                    binaryTag.innerSwf.clearTagSwfs();
+                }
+            }
+
             tag.setSwf(null);
         }
 
         tags.clear();
-        abcList.clear();
-        swfList.swfs.clear();
+        if (abcList != null) {
+            abcList.clear();
+        }
+
+        if (swfList != null) {
+            swfList.swfs.clear();
+        }
 
         as2Cache.clear();
         as3Cache.clear();
