@@ -160,8 +160,7 @@ public class ZippedSWFBundle implements SWFBundle {
                 while ((entryIn = zis.getNextEntry()) != null) {
                     InputStream src;
                     if (entryIn.getName().equals(key)) {
-                        entryOut = new ZipEntry(entryIn);
-                        entryOut.setSize(swfData.length);
+                        entryOut = new ZipEntry(key);
                         src = new ByteArrayInputStream(swfData);
                     } else {
                         src = zis;
@@ -169,11 +168,11 @@ public class ZippedSWFBundle implements SWFBundle {
                     }
                     zos.putNextEntry(entryOut);
                     Helper.copyStream(src, zos, entryOut.getSize() == -1 ? Long.MAX_VALUE : entryOut.getSize());
+                    zos.closeEntry();
+                    zis.closeEntry();                
                 }
             } finally {
-                zis.closeEntry();
                 zis.close();
-                zos.closeEntry();
                 zos.close();
             }
             this.is.close();
