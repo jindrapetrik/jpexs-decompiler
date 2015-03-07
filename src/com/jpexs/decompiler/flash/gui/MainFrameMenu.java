@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.helpers.ByteArrayRange;
@@ -29,6 +30,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.ScrollPane;
 import java.awt.event.KeyEvent;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -48,6 +50,7 @@ public abstract class MainFrameMenu {
     private final MainFrame mainFrame;
 
     private SWF swf;
+    private SWFBundle bundle;
 
     public abstract boolean isInternalFlashViewerSelected();
 
@@ -66,9 +69,20 @@ public abstract class MainFrameMenu {
     }
 
     protected boolean save() {
-        if (swf != null) {
+        if (swf != null) {           
             boolean saved = false;
-            if (swf.binaryData != null) {
+            if(swf.bundle!=null){
+                if(!swf.bundle.isReadOnly()){
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        swf.saveTo(baos);
+                        saved = swf.bundle.putSWF(swf.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                    }
+                }
+            }
+            else if (swf.binaryData != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     swf.saveTo(baos);
@@ -101,7 +115,7 @@ public abstract class MainFrameMenu {
 
     protected boolean saveAs() {
         if (swf != null) {
-            if (saveAs(swf, SaveFileMode.SAVEAS)) {
+            if (saveAs(swf,SaveFileMode.SAVEAS)) {
                 swf.clearModified();
             }
 

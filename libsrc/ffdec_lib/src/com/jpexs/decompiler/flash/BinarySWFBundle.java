@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.SwfHeaderStreamSearch;
@@ -81,4 +82,14 @@ public class BinarySWFBundle implements SWFBundle {
     public String getExtension() {
         return "bin";
     }
+
+    @Override
+    public boolean isReadOnly() {
+        return true;
+    }
+
+    @Override
+    public boolean putSWF(String key,InputStream is) {
+        throw new UnsupportedOperationException("Save not supported for this type of bundle");
+    }         
 }

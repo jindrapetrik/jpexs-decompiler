@@ -319,8 +319,9 @@ public class Main {
 
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
-            result.isBundle = true;
-            result.bundleClass = bundle.getClass();
+            //result.isBundle = true;
+            //result.bundleClass = bundle.getClass();
+            result.bundle = bundle;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
@@ -331,6 +332,7 @@ public class Main {
                         startWork(AppStrings.translate("work.reading.swf"), p);
                     }
                 }, Configuration.parallelSpeedUp.get());
+                swf.bundle = bundle;
                 result.add(swf);
             }
         } else {
@@ -409,7 +411,7 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
-        if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle) {
+        if (mode == SaveFileMode.SAVEAS && swf.swfList.bundle==null) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
         }
@@ -503,7 +505,7 @@ public class Main {
             loadingDialog.setVisible(false);
             shouldCloseWhenClosingLoadingDialog = false;
 
-            final SWF fswf = firstSWF;
+            final SWF fswf = firstSWF;            
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {

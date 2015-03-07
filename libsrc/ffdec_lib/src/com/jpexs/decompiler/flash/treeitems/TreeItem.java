@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFBundle;
 
 /**
  *

@@ -12,11 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,4 +37,9 @@ public interface SWFBundle {
     public Map<String, SeekableInputStream> getAll() throws IOException;
 
     public String getExtension();
+    
+    public boolean isReadOnly();
+    
+    public boolean putSWF(String key,InputStream is) throws IOException;
+    
 }

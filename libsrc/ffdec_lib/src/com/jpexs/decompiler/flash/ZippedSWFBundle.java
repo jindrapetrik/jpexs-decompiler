@@ -20,6 +20,10 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.streams.SeekableInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -30,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -39,23 +44,39 @@ public class ZippedSWFBundle implements SWFBundle {
 
     protected Set<String> keySet = new HashSet<>();
 
-    private final Map<String, SeekableInputStream> cachedSWFs = new HashMap<>();
-
+    //private final Map<String, SeekableInputStream> cachedSWFs = new HashMap<>();
+    protected FileInputStream fis;
     protected ReReadableInputStream is;
+    protected File filename;
 
-    public ZippedSWFBundle(InputStream is) {
+    public ZippedSWFBundle(InputStream is) throws IOException {
+        this(is, null);
+    }
+
+    public ZippedSWFBundle(File filename) throws IOException {
+        this(null, filename);
+    }
+
+    protected ZippedSWFBundle(InputStream is, File filename) throws IOException {
+        initBundle(is, filename);
+    }
+
+    protected void initBundle(InputStream is, File filename) throws IOException {
+        if (filename != null) {
+            fis = new FileInputStream(filename);
+            is = fis;
+        }
+        this.filename = filename;
         this.is = new ReReadableInputStream(is);
         ZipInputStream zip = new ZipInputStream(this.is);
         ZipEntry entry;
-        try {
-            while ((entry = zip.getNextEntry()) != null) {
-                if (entry.getName().toLowerCase().endsWith(".swf")
-                        || entry.getName().toLowerCase().endsWith(".gfx")) {
-                    keySet.add(entry.getName());
-                }
+        keySet.clear();
+
+        while ((entry = zip.getNextEntry()) != null) {
+            if (entry.getName().toLowerCase().endsWith(".swf")
+                    || entry.getName().toLowerCase().endsWith(".gfx")) {
+                keySet.add(entry.getName());
             }
-        } catch (IOException ex) {
-            Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -74,38 +95,98 @@ public class ZippedSWFBundle implements SWFBundle {
         if (!keySet.contains(key)) {
             return null;
         }
-        if (!cachedSWFs.containsKey(key)) {
+        //if (!cachedSWFs.containsKey(key)) {
+        SeekableInputStream ret = null;
+        this.is.reset();
+        ZipInputStream zip = new ZipInputStream(this.is);
+        ZipEntry entry;
 
-            this.is.reset();
-            ZipInputStream zip = new ZipInputStream(this.is);
-            ZipEntry entry;
-            try {
-                while ((entry = zip.getNextEntry()) != null) {
-                    if (entry.getName().equals(key)) {
-                        MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zip));
-                        cachedSWFs.put(key, mis);
-                        break;
-                    }
-                    zip.closeEntry();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
+        while ((entry = zip.getNextEntry()) != null) {
+            if (entry.getName().equals(key)) {
+                MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zip));
+                ret = mis;
+                //cachedSWFs.put(key, mis);
+                break;
             }
-
+            zip.closeEntry();
         }
-        return cachedSWFs.get(key);
+
+        return ret;
+        //return cachedSWFs.get(key);
     }
 
     @Override
     public Map<String, SeekableInputStream> getAll() throws IOException {
+        Map<String, SeekableInputStream> ret = new HashMap<>();
         for (String key : getKeys()) { // cache everything first
-            getSWF(key);
+            ret.put(key, getSWF(key));
         }
-        return cachedSWFs;
+        return ret;
     }
 
     @Override
     public String getExtension() {
         return "zip";
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return this.filename == null || !this.filename.canWrite();
+    }
+
+    @Override
+    public boolean putSWF(String key, InputStream swfIs) throws IOException {
+        if (this.isReadOnly()) {
+            return false;
+        }
+        if (key == null) {
+            return false;
+        }
+        if (!getKeys().contains(key)) { //replace only existing keys
+            return false;
+        }
+        //Write to temp file first
+        File tempFile = new File((filename.getAbsolutePath()) + ".tmp");
+
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(tempFile));
+            this.is.reset();
+            ZipInputStream zis = new ZipInputStream(this.is);
+            ZipEntry entryIn;
+            ZipEntry entryOut;
+
+            byte swfData[] = Helper.readStream(swfIs);
+
+            try {
+                while ((entryIn = zis.getNextEntry()) != null) {
+                    InputStream src;
+                    if (entryIn.getName().equals(key)) {
+                        entryOut = new ZipEntry(entryIn);
+                        entryOut.setSize(swfData.length);
+                        src = new ByteArrayInputStream(swfData);
+                    } else {
+                        src = zis;
+                        entryOut = entryIn;
+                    }
+                    zos.putNextEntry(entryOut);
+                    Helper.copyStream(src, zos, entryOut.getSize() == -1 ? Long.MAX_VALUE : entryOut.getSize());
+                }
+            } finally {
+                zis.closeEntry();
+                zis.close();
+                zos.closeEntry();
+                zos.close();
+            }
+            this.is.close();
+            this.fis.close();
+        } catch (IOException ex) {
+            tempFile.delete();
+            throw ex;
+        }
+        filename.delete();
+        tempFile.renameTo(filename);
+        initBundle(null, filename);
+
+        return true;
     }
 }

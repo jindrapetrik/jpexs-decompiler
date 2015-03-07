@@ -313,10 +313,10 @@ public class TagTree extends JTree {
 
         if (t instanceof SWFList) {
             SWFList slist = (SWFList) t;
-            if (slist.bundleClass != null) {
-                if (slist.bundleClass == ZippedSWFBundle.class) {
+            if (slist.bundle != null) {
+                if (slist.bundle.getClass() == ZippedSWFBundle.class) {
                     return TreeNodeType.BUNDLE_ZIP;
-                } else if (slist.bundleClass == SWC.class) {
+                } else if (slist.bundle.getClass() == SWC.class) {
                     return TreeNodeType.BUNDLE_SWC;
                 } else {
                     return TreeNodeType.BUNDLE_BINARY;

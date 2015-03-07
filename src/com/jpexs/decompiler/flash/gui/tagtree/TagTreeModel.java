@@ -95,7 +95,7 @@ public class TagTreeModel implements TreeModel {
         this.tagScriptCache = new HashMap<>();
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
         for (SWFList swfList : swfs) {
-            if (swfList.isBundle) {
+            if (swfList.bundle != null) {
                 this.swfs.add(swfList);
                 for (SWF swf : swfList) {
                     createTagList(swf);

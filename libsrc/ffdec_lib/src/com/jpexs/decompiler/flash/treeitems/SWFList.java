@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFContainerItem;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import java.util.ArrayList;
@@ -33,9 +34,11 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     public String name;
 
-    public boolean isBundle;
+    //public boolean isBundle;
+    
+    public SWFBundle bundle;
 
-    public Class bundleClass;
+    //public Class bundleClass;
 
     public SWFSourceInfo sourceInfo;
 
@@ -48,7 +51,7 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     @Override
     public String toString() {
-        if (isBundle) {
+        if (bundle != null) {
             return name;
         } else {
             return swfs.get(0).getFileTitle();

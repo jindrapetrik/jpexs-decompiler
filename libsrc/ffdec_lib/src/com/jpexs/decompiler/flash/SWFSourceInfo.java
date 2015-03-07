@@ -88,14 +88,13 @@ public class SWFSourceInfo {
         }
 
         String extension = Path.getExtension(new File(file));
-        InputStream is = new BufferedInputStream(new FileInputStream(file));
         switch (extension) {
             case ".swc":
-                return new SWC(is);
+                return new SWC(new File(file));
             case ".zip":
-                return new ZippedSWFBundle(is);
+                return new ZippedSWFBundle(new File(file));
             default:
-                return new BinarySWFBundle(is, noCheck, searchMode);
+                return new BinarySWFBundle(new BufferedInputStream(new FileInputStream(file)), noCheck, searchMode);
         }
     }
 }

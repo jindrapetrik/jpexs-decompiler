@@ -275,7 +275,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             } else if (item instanceof SWF) {
                 SWF swf = (SWF) item;
                 // Do not allow to close SWF in bundle
-                if (swf.swfList != null && swf.swfList.isBundle) {
+                if (swf.swfList != null && swf.swfList.bundle!=null) {
                     allSelectedIsSwf = false;
                 }
             }

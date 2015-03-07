@@ -16,10 +16,9 @@
  */
 package com.jpexs.decompiler.flash;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.SAXParser;
@@ -36,38 +35,44 @@ public class SWC extends ZippedSWFBundle {
 
     public SWC(InputStream is) throws IOException {
         super(is);
+    }
+
+    public SWC(File filename) throws IOException {
+        super(filename);
+    }
+
+    @Override
+    protected void initBundle(InputStream is, File filename) throws IOException {        
+        super.initBundle(is, filename);
         keySet.clear();
         this.is.reset();
         ZipInputStream zip = new ZipInputStream(this.is);
         ZipEntry entry;
-        try {
-            while ((entry = zip.getNextEntry()) != null) {
-                if (entry.getName().equals("catalog.xml")) {
-                    try {
-                        SAXParserFactory factory = SAXParserFactory.newInstance();
-                        SAXParser saxParser = factory.newSAXParser();
-                        DefaultHandler handler = new DefaultHandler() {
 
-                            @Override
-                            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                                if (qName.equalsIgnoreCase("library")) {
-                                    String path = attributes.getValue("path");
-                                    if (path != null) {
-                                        keySet.add(path);
-                                    }
+        while ((entry = zip.getNextEntry()) != null) {
+            if (entry.getName().equals("catalog.xml")) {
+                try {
+                    SAXParserFactory factory = SAXParserFactory.newInstance();
+                    SAXParser saxParser = factory.newSAXParser();
+                    DefaultHandler handler = new DefaultHandler() {
+
+                        @Override
+                        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                            if (qName.equalsIgnoreCase("library")) {
+                                String path = attributes.getValue("path");
+                                if (path != null) {
+                                    keySet.add(path);
                                 }
                             }
+                        }
 
-                        };
-                        saxParser.parse(zip, handler);
-                    } catch (Exception ex) {
+                    };
+                    saxParser.parse(zip, handler);
+                } catch (Exception ex) {
 
-                    }
-                    return;
                 }
+                return;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(SWC.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
