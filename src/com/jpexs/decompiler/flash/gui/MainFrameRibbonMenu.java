@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.process.ProcessTools;
@@ -718,7 +719,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         boolean swfLoaded = swf != null;
         List<ABCContainerTag> abcList = swfLoaded ? swf.getAbcList() : null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
-        boolean hasDebugger = hasAbc && Main.hasDebugger(swf);
+        boolean hasDebugger = hasAbc && DebuggerTools.hasDebugger(swf);
 
         exportAllMenu.setEnabled(swfLoaded);
         exportFlaMenu.setEnabled(swfLoaded);
@@ -762,7 +763,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         switch (e.getActionCommand()) {
             case ACTION_DEBUGGER_SWITCH:
                 if (debuggerSwitchGroup.getSelected() == null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-                    Main.switchDebugger();
+                    switchDebugger();
                     mainFrame.getPanel().refreshDecompiled();
                 } else {
                     if (debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton) {
@@ -772,13 +773,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 debuggerReplaceTraceCommandButton.setEnabled(debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton);
                 break;
             case ACTION_DEBUGGER_LOG:
-                Main.debuggerShowLog();
+                debuggerShowLog();
                 break;
             case ACTION_DEBUGGER_REPLACE_TRACE:
                 ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame, Configuration.lastDebuggerReplaceFunction.get());
                 rtd.setVisible(true);
                 if (rtd.getValue() != null) {
-                    Main.replaceTraceCalls(rtd.getValue());
+                    replaceTraceCalls(rtd.getValue());
                     mainFrame.getPanel().refreshDecompiled();
                     Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
                 }

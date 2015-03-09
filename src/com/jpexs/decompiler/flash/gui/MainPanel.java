@@ -2081,6 +2081,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 int row = tagTree.getSelectionRows()[0];
                 if (row > 0) {
                     tagTree.setSelectionRow(row - 1);
+                    tagTree.scrollRowToVisible(row - 1);
                     previewPanel.focusTextPanel();
                 }
             }
@@ -2095,6 +2096,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 int row = tagTree.getSelectionRows()[0];
                 if (row < tagTree.getRowCount() - 1) {
                     tagTree.setSelectionRow(row + 1);
+                    tagTree.scrollRowToVisible(row + 1);
                     previewPanel.focusTextPanel();
                 }
             }

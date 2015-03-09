@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -30,6 +31,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.ScrollPane;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -140,7 +142,11 @@ public abstract class MainFrameMenu {
     }
 
     protected void close() {
-        Main.closeFile(mainFrame.getPanel().getCurrentSwfList());
+        if (swf == null) {
+            return;
+        }
+
+        Main.closeFile(swf.swfList);
     }
 
     protected boolean closeAll() {
@@ -214,6 +220,18 @@ public abstract class MainFrameMenu {
 
     protected void setSubLimiter(boolean value) {
         Main.setSubLimiter(value);
+    }
+
+    protected void switchDebugger() {
+        DebuggerTools.switchDebugger(swf);
+    }
+
+    protected void debuggerShowLog() {
+        DebuggerTools.debuggerShowLog();
+    }
+
+    protected void replaceTraceCalls(String fname) {
+        DebuggerTools.replaceTraceCalls(swf, fname);
     }
 
     protected void removeNonScripts() {
@@ -311,13 +329,8 @@ public abstract class MainFrameMenu {
     }
 
     protected void exit() {
-        mainFrame.getPanel().setVisible(false);
-        if (Main.proxyFrame != null) {
-            if (Main.proxyFrame.isVisible()) {
-                return;
-            }
-        }
-        Main.exit();
+        JFrame frame = (JFrame) mainFrame;
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
     public void updateComponents(SWF swf) {
@@ -331,7 +344,7 @@ public abstract class MainFrameMenu {
 
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
-                if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_RELEASED) {
+                if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_PRESSED) {
                     int code = e.getKeyCode();
                     if (e.isControlDown() && e.isShiftDown()) {
                         switch (code) {
