@@ -38,7 +38,7 @@ public class DefineShape2Tag extends ShapeTag {
     @SWFType(BasicType.UI16)
     public int shapeId;
 
-    private RECT shapeBounds;
+    public RECT shapeBounds;
 
     public SHAPEWITHSTYLE shapes;
 

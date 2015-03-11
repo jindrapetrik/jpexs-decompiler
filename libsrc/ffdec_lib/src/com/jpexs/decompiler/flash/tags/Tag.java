@@ -519,14 +519,6 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return shortLength == 0x3f;
     }
 
-    public boolean hasSubTags() {
-        return false;
-    }
-
-    public List<Tag> getSubTags() {
-        return null;
-    }
-
     public long getPos() {
         if (originalRange == null) {
             return -1;

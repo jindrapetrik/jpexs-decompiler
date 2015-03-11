@@ -260,14 +260,19 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         return baos.toByteArray();
     }
 
-    @Override
-    public boolean hasSubTags() {
-        return true;
+    public List<Tag> getSubTags() {
+        return subTags;
     }
 
     @Override
-    public List<Tag> getSubTags() {
-        return subTags;
+    public void setModified(boolean value) {
+        if (!value) {
+            for (Tag subTag : subTags) {
+                subTag.setModified(false);
+            }
+        }
+
+        super.setModified(value);
     }
 
     public static void clearCache() {

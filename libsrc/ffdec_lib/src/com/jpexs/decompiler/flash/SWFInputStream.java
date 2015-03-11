@@ -994,8 +994,8 @@ public class SWFInputStream implements AutoCloseable {
         sb.append(Helper.bytesToHexString(64, tag.getOriginalData(), 0));
         out.println(sb.toString());
         // out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
-        if (tag.hasSubTags()) {
-            for (Tag subTag : tag.getSubTags()) {
+        if (tag instanceof DefineSpriteTag) {
+            for (Tag subTag : ((DefineSpriteTag) tag).getSubTags()) {
                 dumpTag(out, version, subTag, level + 1);
             }
         }
