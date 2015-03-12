@@ -170,6 +170,16 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return tagName + " (" + getCharacterId() + nameAppend + ")";
     }
 
+    @Override
+    public String getExportFileName() {
+        String result = super.getExportFileName();
+        String fontName = getFontNameIntag();
+        if (fontName != null) {
+            fontName = fontName.replace(" ", "_");
+        }
+        return result + (fontName != null ? "_" + fontName : "");
+    }
+
     public String getSystemFontName() {
         Map<String, String> fontPairs = Configuration.getFontToNameMap();
         String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontNameIntag();

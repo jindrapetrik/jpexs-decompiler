@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -34,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ExportAssetsTag extends Tag {
+public class ExportAssetsTag extends SymbolClassTypeTag {
 
     /**
      * HashMap with assets
@@ -78,8 +79,8 @@ public class ExportAssetsTag extends Tag {
         names = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int characterId = sis.readUI16("characterId");
-            tags.add(characterId);
             String name = sis.readString("name");
+            tags.add(characterId);
             names.add(name);
         }
     }

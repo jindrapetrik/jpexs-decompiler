@@ -190,7 +190,7 @@ public class DetailPanel extends JPanel implements ActionListener {
                     traitNameLabel.setText("-");
                 } else {
                     if (abcPanel != null) {
-                        traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>(), false));
+                        traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<>(), false));
                     }
                 }
             }

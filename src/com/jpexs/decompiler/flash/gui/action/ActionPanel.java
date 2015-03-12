@@ -48,7 +48,6 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -752,7 +751,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             case ACTION_GRAPH:
                 if (lastCode != null) {
                     try {
-                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
                         gf.setVisible(true);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);

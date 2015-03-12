@@ -152,7 +152,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
             ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
             String scat = cat == null ? "other" : cat.value();
             if (!categorized.containsKey(scat)) {
-                categorized.put(scat, new HashMap<String, Field>());
+                categorized.put(scat, new HashMap<>());
             }
             categorized.get(scat).put(name, field);
         }

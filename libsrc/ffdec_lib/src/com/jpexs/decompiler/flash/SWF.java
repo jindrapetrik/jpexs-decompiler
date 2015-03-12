@@ -447,9 +447,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) t;
-                for (int i = 0; i < sc.tags.length; i++) {
-                    if (sc.tags[i] == 0) {
-                        return sc.names[i];
+                for (int i = 0; i < sc.tags.size(); i++) {
+                    if (sc.tags.get(i) == 0) {
+                        return sc.names.get(i);
                     }
                 }
             }
@@ -952,9 +952,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sct = (SymbolClassTag) t;
-                for (int i = 0; i < sct.tags.length; i++) {
-                    if ((!classes.containsKey(sct.tags[i])) && (!classes.containsValue(sct.names[i]))) {
-                        classes.put(sct.tags[i], sct.names[i]);
+                for (int i = 0; i < sct.tags.size(); i++) {
+                    if ((!classes.containsKey(sct.tags.get(i))) && (!classes.containsValue(sct.names.get(i)))) {
+                        classes.put(sct.tags.get(i), sct.names.get(i));
                     }
                 }
             }
@@ -1882,10 +1882,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag tag : tags) {
             if (tag instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) tag;
-                for (int i = 0; i < sc.names.length; i++) {
-                    String newname = deobfuscation.deobfuscateNameWithPackage(true, sc.names[i], deobfuscated, renameType, deobfuscated);
+                for (int i = 0; i < sc.names.size(); i++) {
+                    String newname = deobfuscation.deobfuscateNameWithPackage(true, sc.names.get(i), deobfuscated, renameType, deobfuscated);
                     if (newname != null) {
-                        sc.names[i] = newname;
+                        sc.names.set(i, newname);
                     }
                 }
                 sc.setModified(true);

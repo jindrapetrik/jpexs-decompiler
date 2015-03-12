@@ -58,7 +58,7 @@ public abstract class CharacterIdTag extends Tag {
 
     @Override
     public String getExportFileName() {
-        String result = super.getName() + "_" + getCharacterId();
+        String result = super.getExportFileName() + "_" + getCharacterId();
         return result + (exportName != null ? "_" + exportName : "");
     }
 

@@ -97,6 +97,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
@@ -505,6 +506,11 @@ public class TagTree extends JTree {
                 }
                 if (nodeType == TreeNodeType.FONT) {
                     ret.add(d);
+                }
+                if (nodeType == TreeNodeType.OTHER_TAG) {
+                    if (d instanceof SymbolClassTypeTag) {
+                        ret.add(d);
+                    }
                 }
             }
 

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
+import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
@@ -77,6 +78,7 @@ import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
+import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -98,6 +100,7 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
@@ -380,7 +383,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
-        folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<TreeItem>());
+        folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
         folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
@@ -1012,6 +1015,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             List<Tag> binaryData = new ArrayList<>();
             Map<Integer, List<Integer>> frames = new HashMap<>();
             List<Tag> fonts = new ArrayList<>();
+            List<Tag> symbolNames = new ArrayList<>();
 
             SWF swf = allSwfs.get(j);
             for (TreeItem d : sel) {
@@ -1060,6 +1064,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (nodeType == TreeNodeType.FONT) {
                         fonts.add((Tag) d);
                     }
+                    if (nodeType == TreeNodeType.OTHER_TAG) {
+                        if (d instanceof SymbolClassTypeTag) {
+                            symbolNames.add((Tag) d);
+                        }
+                    }
                 }
 
                 if (d instanceof Frame) {
@@ -1071,7 +1080,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         parentId = ((CharacterTag) parent).getCharacterId();
                     }
                     if (!frames.containsKey(parentId)) {
-                        frames.put(parentId, new ArrayList<Integer>());
+                        frames.put(parentId, new ArrayList<>());
                     }
                     frames.get(parentId).add(frame);
                 }
@@ -1106,11 +1115,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl));
             ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts,
                     new FontExportSettings(export.getValue(FontExportMode.class)), evl));
+            ret.addAll(new SymbolClassExporter().exportNames(selFile, symbolNames, evl));
 
             FrameExporter frameExporter = new FrameExporter();
             FramesExportSettings fes = new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom());
             for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
-                ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + "frames", swf, entry.getKey(), entry.getValue(), fes, evl));
+                int containerId = entry.getKey();
+                String subFolder = containerId == 0 ? "frames" : "sprites";
+                ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
             }
 
             if (swf.isAS3()) {
@@ -1145,13 +1157,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl);
         new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", swf.tags,
                 new FontExportSettings(export.getValue(FontExportMode.class)), evl);
+        new SymbolClassExporter().exportNames(selFile, swf.tags, evl);
 
         FrameExporter frameExporter = new FrameExporter();
         FramesExportSettings fes = new FramesExportSettings(export.getValue(FramesExportMode.class), export.getZoom());
         frameExporter.exportFrames(handler, selFile + File.separator + "frames", swf, 0, null, fes, evl);
         for (CharacterTag c : swf.getCharacters().values()) {
             if (c instanceof DefineSpriteTag) {
-                frameExporter.exportFrames(handler, selFile + File.separator + "frames", swf, c.getCharacterId(), null, fes, evl);
+                frameExporter.exportFrames(handler, selFile + File.separator + "sprites", swf, c.getCharacterId(), null, fes, evl);
             }
         }
 
@@ -1657,6 +1670,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             swf.clearImageCache();
             reload(true);
+        }
+    }
+
+    public void importSymbolClass(final SWF swf) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            File importFile = new File(Path.combine(selFile, SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME));
+            SymbolClassImporter importer = new SymbolClassImporter();
+
+            if (importFile.exists()) {
+                importer.importSymbolClasses(importFile, swf);
+            }
         }
     }
 
@@ -2784,7 +2814,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (tim != null) {
                     return tim;
                 }
-                tim = new Timeline(tag.getSwf(), null, new ArrayList<Tag>(), ((CharacterTag) tag).getCharacterId(), getRect());
+                tim = new Timeline(tag.getSwf(), null, new ArrayList<>(), ((CharacterTag) tag).getCharacterId(), getRect());
                 if (tag instanceof MorphShapeTag) {
                     tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
                     int framesCnt = tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH;
@@ -2822,7 +2852,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             @Override
             public RECT getRect() {
-                return getRect(new HashSet<BoundedTag>());
+                return getRect(new HashSet<>());
             }
 
             @Override

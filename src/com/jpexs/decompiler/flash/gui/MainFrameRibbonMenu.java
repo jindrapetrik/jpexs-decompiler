@@ -137,6 +137,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
 
+    private static final String ACTION_IMPORT_SYMBOL_CLASS = "IMPORTSYMBOLCLASS";
+
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
 
     private static final String ACTION_HELP_US = "HELPUS";
@@ -200,6 +202,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private JCommandButton exportSelectionCommandButton;
 
     private JCommandButton importTextCommandButton;
+
+    private JCommandButton importSymbolClassCommandButton;
 
     private JCommandButton importXmlCommandButton;
 
@@ -446,11 +450,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("importtext32"));
         assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
 
+        importSymbolClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.symbolClass")), View.getResizableIcon("importtext32"));
+        assignListener(importSymbolClassCommandButton, ACTION_IMPORT_SYMBOL_CLASS);
+
         importXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.xml")), View.getResizableIcon("importxml32"));
         assignListener(importXmlCommandButton, ACTION_IMPORT_SWF_XML);
 
         importBand.addCommandButton(importXmlCommandButton, RibbonElementPriority.TOP);
         importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);
+        importBand.addCommandButton(importSymbolClassCommandButton, RibbonElementPriority.TOP);
 
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
         viewBand.setResizePolicies(getResizePolicies(viewBand));
@@ -738,6 +746,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         exportXmlCommandButton.setEnabled(swfLoaded);
         exportSelectionCommandButton.setEnabled(swfLoaded);
         importTextCommandButton.setEnabled(swfLoaded);
+        importSymbolClassCommandButton.setEnabled(swfLoaded);
         importXmlCommandButton.setEnabled(swfLoaded);
         reloadCommandButton.setEnabled(swfLoaded);
 
@@ -948,6 +957,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 break;
             case ACTION_IMPORT_TEXT:
                 importText();
+                break;
+            case ACTION_IMPORT_SYMBOL_CLASS:
+                importSymbolClass();
                 break;
 
             case ACTION_EXPORT_SWF_XML:

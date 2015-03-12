@@ -77,9 +77,9 @@ public class TraitsListItem {
 
     public String toStringName() {
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>(), false);
+            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<>(), false);
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<String>(), false);
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, new ArrayList<>(), false);
         } else if (!isStatic) {
             return "__" + STR_INSTANCE_INITIALIZER;
         } else {
@@ -92,14 +92,14 @@ public class TraitsListItem {
         String s = "";
         try {
             if ((type != Type.INITIALIZER) && isStatic) {
-                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             } else if (!isStatic) {
                 s = STR_INSTANCE_INITIALIZER;

@@ -97,7 +97,7 @@ public class ConstantsListModel implements ListModel {
             case TYPE_NAMESPACESET:
                 return (index + 1) + ":" + constants.getNamespaceSet(index + 1).toString(constants);
             case TYPE_MULTINAME:
-                return (index + 1) + ":" + constants.getMultiname(index + 1).toString(constants, new ArrayList<String>());
+                return (index + 1) + ":" + constants.getMultiname(index + 1).toString(constants, new ArrayList<>());
         }
         return null;
     }

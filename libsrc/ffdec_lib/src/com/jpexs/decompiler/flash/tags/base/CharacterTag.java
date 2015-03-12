@@ -48,13 +48,13 @@ public abstract class CharacterTag extends CharacterIdTag {
         if (className != null) {
             nameAppend = ": " + className;
         }
-        if (getCharacterId() != -1) {
-            return tagName + " (" + getCharacterId() + nameAppend + ")";
-        }
-        if (!nameAppend.isEmpty()) {
-            return tagName + " (" + nameAppend + ")";
-        }
-        return tagName;
+        return tagName + " (" + getCharacterId() + nameAppend + ")";
+    }
+
+    @Override
+    public String getExportFileName() {
+        String result = super.getExportFileName();
+        return result + (className != null ? "_" + className : "");
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -37,6 +38,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -75,7 +77,8 @@ public class ExportDialog extends AppDialog {
         TagTreeModel.FOLDER_BINARY_DATA,
         TagTreeModel.FOLDER_FRAMES,
         TagTreeModel.FOLDER_FONTS,
-        TagTreeModel.FOLDER_MORPHSHAPES
+        TagTreeModel.FOLDER_MORPHSHAPES,
+        "symbolclass"
     };
 
     //Display options only when these classes found
@@ -89,7 +92,8 @@ public class ExportDialog extends AppDialog {
         {DefineBinaryDataTag.class},
         {Frame.class},
         {FontTag.class},
-        {MorphShapeTag.class}
+        {MorphShapeTag.class},
+        {SymbolClassTypeTag.class}
     };
 
     //Enum classes for values
@@ -103,7 +107,8 @@ public class ExportDialog extends AppDialog {
         BinaryDataExportMode.class,
         FramesExportMode.class,
         FontExportMode.class,
-        MorphShapeExportMode.class
+        MorphShapeExportMode.class,
+        SymbolClassExportMode.class
     };
 
     Class[] zoomClasses = {

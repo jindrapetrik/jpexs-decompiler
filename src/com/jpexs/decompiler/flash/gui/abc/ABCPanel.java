@@ -866,7 +866,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     nskind = newTraitDialog.getNamespaceKind();
                     name = newTraitDialog.getTraitName();
                     isStatic = newTraitDialog.getStatic();
-                    m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(nskind, abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<Integer>());
+                    m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(nskind, abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>());
                     int mid = abc.constants.getMultinameId(m);
                     if (mid == 0) {
                         break;

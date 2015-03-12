@@ -90,7 +90,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     @Override
     public String getExportFileName() {
-        return getName();
+        return tagName;
     }
 
     /**

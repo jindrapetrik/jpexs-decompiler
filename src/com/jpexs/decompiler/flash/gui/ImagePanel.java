@@ -562,7 +562,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stillFrame = true;
         zoomAvailable = false;
         iconPanel.setImg(image);
-        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
     }
 
@@ -596,13 +596,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
 
         iconPanel.setImg(image);
-        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
     }
 
     private synchronized void clearImagePanel() {
         iconPanel.setImg(null);
-        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
+        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
     }
 
     @Override

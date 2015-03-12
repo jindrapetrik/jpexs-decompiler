@@ -179,7 +179,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
     private void generateEditControls(Tag tag, boolean readonly) {
         clear();
-        generateEditControlsRecursive(tag, "", new ArrayList<Field>(), new ArrayList<Integer>(), readonly);
+        generateEditControlsRecursive(tag, "", new ArrayList<>(), new ArrayList<>(), readonly);
         change(null);
     }
 

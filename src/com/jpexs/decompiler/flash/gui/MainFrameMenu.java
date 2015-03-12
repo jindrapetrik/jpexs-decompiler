@@ -162,6 +162,10 @@ public abstract class MainFrameMenu {
         mainFrame.getPanel().importText(swf);
     }
 
+    protected void importSymbolClass() {
+        mainFrame.getPanel().importSymbolClass(swf);
+    }
+
     protected boolean export(boolean onlySelected) {
         if (swf != null) {
             mainFrame.getPanel().export(onlySelected);
