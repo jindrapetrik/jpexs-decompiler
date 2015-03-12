@@ -279,8 +279,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private TreePanelMode treePanelMode;
 
-    private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-
     private CancellableWorker setSourceWorker;
 
     public TreeItem oldItem;
@@ -460,7 +458,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                             File ftemp = new File(tempDir);
                             ExportDialog exd = new ExportDialog(null);
-                            files = exportSelection(errorHandler, tempDir, exd);
+                            files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
                             files.clear();
 
                             File[] fs = ftemp.listFiles();
@@ -1576,6 +1574,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 protected Void doInBackground() throws Exception {
                     Helper.freeMem();
                     try {
+                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
                         if (compressed) {
                             swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         } else {
@@ -1699,6 +1698,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     @Override
                     public Void doInBackground() throws Exception {
                         try {
+                            AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
                             if (onlySel) {
                                 exportSelection(errorHandler, selFile, export);
                             } else {

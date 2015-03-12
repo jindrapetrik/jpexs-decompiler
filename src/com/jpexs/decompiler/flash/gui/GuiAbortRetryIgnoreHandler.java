@@ -25,11 +25,29 @@ import javax.swing.JOptionPane;
  */
 public class GuiAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
 
+    private boolean ignoreAll = false;
+
     @Override
     public int handle(Throwable thrown) {
         synchronized (GuiAbortRetryIgnoreHandler.class) {
-            String[] options = new String[]{AppStrings.translate("button.abort"), AppStrings.translate("button.retry"), AppStrings.translate("button.ignore")};
-            return View.showOptionDialog(null, AppStrings.translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
+            String[] options = new String[]{
+                AppStrings.translate("button.abort"),
+                AppStrings.translate("button.retry"),
+                AppStrings.translate("button.ignore"),
+                AppStrings.translate("button.ignoreAll")
+            };
+
+            if (ignoreAll) {
+                return AbortRetryIgnoreHandler.IGNORE;
+            }
+
+            int result = View.showOptionDialog(null, AppStrings.translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
+            if (result == AbortRetryIgnoreHandler.IGNORE_ALL) {
+                ignoreAll = true;
+                result = AbortRetryIgnoreHandler.IGNORE;
+            }
+
+            return result;
         }
     }
 

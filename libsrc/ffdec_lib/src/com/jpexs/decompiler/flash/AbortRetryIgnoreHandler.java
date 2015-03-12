@@ -30,6 +30,8 @@ public interface AbortRetryIgnoreHandler {
 
     public static int IGNORE = 2;
 
+    public static int IGNORE_ALL = 3;
+
     public int handle(Throwable thrown);
 
     public AbortRetryIgnoreHandler getNewInstance();

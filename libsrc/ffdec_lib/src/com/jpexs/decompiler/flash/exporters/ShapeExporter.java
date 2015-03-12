@@ -118,8 +118,8 @@ public class ShapeExporter {
                             case PNG:
                             case BMP:
                                 RECT rect = st.getRect();
-                                int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor);
-                                int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor);
+                                int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
+                                int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                                 SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                                 img.fillTransparent();
                                 Matrix m = new Matrix();
