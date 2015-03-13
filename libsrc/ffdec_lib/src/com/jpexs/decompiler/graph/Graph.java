@@ -1298,6 +1298,18 @@ public class Graph {
             if (currentLoop != null) {
                 currentLoop.phase = 0;
             }
+            switch (part.stopPartType) {
+            case AND_OR:
+              part.setAndOrStack(stack); //Save stack for later use
+              break;
+
+            case COMMONPART:
+              part.setCommonPartStack(stack); //Save stack for later use   
+              break;
+
+            case NONE:
+              break;
+            }
             return ret;
         }
 
@@ -1387,10 +1399,14 @@ public class Graph {
                     currentRet.add(ti);
                 } else {
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                    stopPart2.add(reversed ? sp1 : sp0);
+                    GraphPart andOrStopPart = reversed ? sp1 : sp0;
+                    andOrStopPart.stopPartType = GraphPart.StopPartType.AND_OR;
+                    stopPart2.add(andOrStopPart);
                     printGraph(visited, localData, stack, allParts, parent, next, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                    stack = andOrStopPart.andOrStack; // Use stack that was stored upon reaching AND_OR stopPart
                     GraphTargetItem second = stack.pop();
                     GraphTargetItem first = stack.pop();
+                    andOrStopPart.stopPartType = GraphPart.StopPartType.NONE; // Reset stopPartType
 
                     if (!reversed) {
                         AndItem a = new AndItem(null, first, second);
@@ -1438,10 +1454,14 @@ public class Graph {
                     currentRet.add(ti);
                 } else {
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                    stopPart2.add(reversed ? sp1 : sp0);
+                    GraphPart andOrStopPart = reversed ? sp1 : sp0;
+                    andOrStopPart.stopPartType = GraphPart.StopPartType.AND_OR;
+                    stopPart2.add(andOrStopPart);
                     printGraph(visited, localData, stack, allParts, parent, next, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                    stack = andOrStopPart.andOrStack; // Use stack that was stored upon reaching AND_OR stopPart
                     GraphTargetItem second = stack.pop();
                     GraphTargetItem first = stack.pop();
+                    andOrStopPart.stopPartType = GraphPart.StopPartType.NONE; // Reset stopPartType
 
                     if (reversed) {
                         AndItem a = new AndItem(null, first, second);
@@ -1581,17 +1601,44 @@ public class Graph {
                     }
 
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                    if (next != null) {
+                    GraphPart.CommonPartStack commonPartStack = null;
+                    if ((!isEmpty) && (next != null)) {
+                        commonPartStack=next.new CommonPartStack();
+                        if (next.commonPartStacks == null) {
+                            next.commonPartStacks = new ArrayList<>();
+                        }
+                        next.stopPartType = GraphPart.StopPartType.COMMONPART;
                         stopPart2.add(next);
                     }
                     if (!isEmpty) {
+                        if (next != null) {
+                            next.commonPartStacks.add(commonPartStack);
+                            commonPartStack.isTrueStack=true; //stopPart must know it needs to store trueStack
+                         }
                         onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
                     List<GraphTargetItem> onFalse = new ArrayList<>();
 
                     if (!isEmpty) {
+                        if (next != null) {
+                            commonPartStack.isTrueStack = false; //stopPart must know it needs to store falseStack
+                        }
                         onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
+
+                    /* if there is a stopPart (next), then Graph will be further analyzed starting from the stopPart: 
+                     * trueStack and falseStack must be set equal to corresponding stack that was built upon reaching stopPart. */
+                    if ((!isEmpty) && (next != null)) {
+                        if ((commonPartStack.trueStack != null) && (commonPartStack.falseStack != null)) { 
+                          trueStack = commonPartStack.trueStack;
+                          falseStack = commonPartStack.falseStack;
+                        }
+                        next.commonPartStacks.remove(next.commonPartStacks.size()-1);
+                        if (next.commonPartStacks.isEmpty()) {
+                            next.stopPartType = GraphPart.StopPartType.NONE; /* reset StopPartType */
+                        }
+                    }
+
                     if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() == trueStackSizeBefore + 1) && (falseStack.size() == falseStackSizeBefore + 1)) {
                         stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
                     } else {
