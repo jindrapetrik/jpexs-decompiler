@@ -1056,9 +1056,10 @@ public class SWFInputStream implements AutoCloseable {
      * @throws java.lang.InterruptedException
      */
     public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException, InterruptedException {
+        boolean parallel1 = level == 0 && parallel;
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
-        if (parallel) {
+        if (parallel1) {
             executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             futureResults = new ArrayList<>();
         }
@@ -1069,7 +1070,7 @@ public class SWFInputStream implements AutoCloseable {
             long pos = getPos();
             newDumpLevel(null, "TAG");
             try {
-                tag = readTag(timelined, level, pos, parseTags && !parallel, parallel, skipUnusualTags);
+                tag = readTag(timelined, level, pos, parseTags && !parallel1, parallel1, skipUnusualTags);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
@@ -1083,7 +1084,7 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             tag.setTimelined(timelined);
-            if (!parallel) {
+            if (!parallel1) {
                 tags.add(tag);
             }
             if (Configuration.dumpTags.get() && level == 0) {
@@ -1097,7 +1098,7 @@ public class SWFInputStream implements AutoCloseable {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: // FileAttributes
                         if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, true);
+                            tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, true);
                         }
                         FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
@@ -1138,8 +1139,8 @@ public class SWFInputStream implements AutoCloseable {
 
                 }
             }
-            if (parseTags && doParse && parallel && tag instanceof TagStub) {
-                Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel, skipUnusualTags));
+            if (parseTags && doParse && parallel1 && tag instanceof TagStub) {
+                Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel1, skipUnusualTags));
                 futureResults.add(future);
             } else {
                 Future<Tag> future = new ImmediateFuture<>(tag);
@@ -1156,7 +1157,7 @@ public class SWFInputStream implements AutoCloseable {
             }
         }
 
-        if (parallel) {
+        if (parallel1) {
             for (Future<Tag> future : futureResults) {
                 try {
                     tags.add(future.get());

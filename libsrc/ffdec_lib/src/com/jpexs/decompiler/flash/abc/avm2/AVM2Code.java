@@ -574,7 +574,7 @@ public class AVM2Code implements Cloneable {
         new InstructionDefinition(0x22, "pushuninitialized", new int[]{AVM2Code.OPT_U30}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                    throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException();
             }
 
             @Override
@@ -760,39 +760,6 @@ public class AVM2Code implements Cloneable {
             }
         },
         new InstructionDefinition(0xee, "abs_jump", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfe, "verifyop", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf5, "verifypass", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf8, "wb", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
