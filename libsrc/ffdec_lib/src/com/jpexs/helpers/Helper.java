@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,7 +45,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,6 +65,8 @@ public class Helper {
     public static String newLine = System.getProperty("line.separator");
 
     public static String decompilationErrorAdd = null;
+    
+    private static final Map<String, Area> shapeCache = new HashMap<>();
 
     /**
      * Converts array of int values to string
@@ -899,7 +904,31 @@ public class Helper {
         int y1, y2;
         int width = image.getWidth();
         int height = image.getHeight();
-        int[] imgData = image.getRGB(0, 0, width, height, null, 0, width);
+
+        int[] imgData;
+        int type = image.getType();
+        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+            imgData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        } else{
+            imgData = image.getRGB(0, 0, width, height, null, 0, width);
+        }
+        
+        BitSet bs = new BitSet(width * height);
+        bs.set(type);        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int idx = width * y + x;
+                if ((imgData[idx] >>> 24) > 0) {
+                    bs.set(idx);
+                }
+            }
+        }
+        
+        String key = byteArrayToBase64String(bs.toByteArray());
+        if (shapeCache.containsKey(key)) {
+            return shapeCache.get(key);
+        }
+        
         for (int x = 0; x < width; x++) {
             y1 = Integer.MAX_VALUE;
             y2 = -1;
@@ -924,7 +953,13 @@ public class Helper {
                 area.add(new Area(rectangle));
             }
         }
+
+        shapeCache.put(key, area);
         return area;
+    }
+    
+    public static void clearShapeCache() {
+        shapeCache.clear();
     }
 
     public static String byteArrayToBase64String(byte[] data) {
