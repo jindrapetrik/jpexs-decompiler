@@ -178,7 +178,7 @@ public class ASM3Parser {
         }
         loopn:
         for (int n = 1; n < constants.getNamespaceSetCount(); n++) {
-            int nss[] = constants.getNamespaceSet(n).namespaces;
+            int[] nss = constants.getNamespaceSet(n).namespaces;
             if (nss.length != namespaceList.size()) {
                 continue;
             }
@@ -189,7 +189,7 @@ public class ASM3Parser {
             }
             return n;
         }
-        int nss[] = new int[namespaceList.size()];
+        int[] nss = new int[namespaceList.size()];
         for (int i = 0; i < nss.length; i++) {
             nss[i] = namespaceList.get(i);
         }

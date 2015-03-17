@@ -68,10 +68,10 @@ public class DefineExternalImage2 extends Tag {
             sos.writeUI16(bitmapFormat);
             sos.writeUI16(targetWidth);
             sos.writeUI16(targetHeight);
-            byte exportNameBytes[] = exportName.getBytes();
+            byte[] exportNameBytes = exportName.getBytes();
             sos.writeUI8(exportNameBytes.length);
             sos.write(exportNameBytes);
-            byte fileNameBytes[] = fileName.getBytes();
+            byte[] fileNameBytes = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
             if (extraData != null) {

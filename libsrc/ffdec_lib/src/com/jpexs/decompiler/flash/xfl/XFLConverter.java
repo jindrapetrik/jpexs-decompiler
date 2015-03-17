@@ -1972,7 +1972,7 @@ public class XFLConverter {
                 embeddedCharacters = embeddedCharacters.replace(".", "");
                 boolean hasAllRanges = false;
                 for (int r = 0; r < CharacterRanges.rangeCount(); r++) {
-                    int codes[] = CharacterRanges.rangeCodes(r);
+                    int[] codes = CharacterRanges.rangeCodes(r);
                     boolean hasAllInRange = true;
                     for (int i = 0; i < codes.length; i++) {
                         if (!fontChars.contains("" + (char) codes[i])) {

@@ -77,7 +77,7 @@ public class ExporterInfo extends Tag {
             sos.writeUI16(bitmapFormat);
             sos.writeUI8(prefix.length);
             sos.write(prefix);
-            byte swfNameBytes[] = swfName.getBytes();
+            byte[] swfNameBytes = swfName.getBytes();
             sos.writeUI8(swfNameBytes.length);
             sos.write(swfNameBytes);
             if (codeOffsets != null) {

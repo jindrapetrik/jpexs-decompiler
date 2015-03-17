@@ -132,7 +132,7 @@ public abstract class AVM2Item extends GraphTargetItem {
                 ops.add(o);
             }
         }
-        int opArr[] = new int[ops.size()];
+        int[] opArr = new int[ops.size()];
         for (int i = 0; i < ops.size(); i++) {
             opArr[i] = ops.get(i);
         }

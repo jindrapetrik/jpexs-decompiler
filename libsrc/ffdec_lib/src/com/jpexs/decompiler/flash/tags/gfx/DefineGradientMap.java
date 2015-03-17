@@ -33,7 +33,7 @@ public class DefineGradientMap extends Tag {
 
     public static final int ID = 1004;
 
-    public int indices[];
+    public int[] indices;
 
     /**
      * Gets data bytes

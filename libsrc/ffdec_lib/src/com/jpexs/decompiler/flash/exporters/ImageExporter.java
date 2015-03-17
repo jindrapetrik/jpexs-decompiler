@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.helpers.Helper;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,9 +91,7 @@ public class ImageExporter {
                             if (ffileFormat.equals("bmp")) {
                                 BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
                             } else {
-                                try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), fos);
-                                }
+                                ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
                             }
                         }
                     }, handler).run();

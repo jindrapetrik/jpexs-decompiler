@@ -50,7 +50,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
     }
 
     private int allNsSetWithVec(ABC abc) {
-        int nssa[] = new int[openedNamespaces.size() + 1];
+        int[] nssa = new int[openedNamespaces.size() + 1];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }

@@ -873,8 +873,8 @@ public class Helper {
     }
 
     public static String escapeHTML(String text) {
-        String from[] = new String[]{"&", "<", ">", "\"", "'", "/"};
-        String to[] = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&#x27;", "&#x2F;"};
+        String[] from = new String[]{"&", "<", ">", "\"", "'", "/"};
+        String[] to = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&#x27;", "&#x2F;"};
         for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
@@ -897,11 +897,14 @@ public class Helper {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
         int y1, y2;
-        for (int x = 0; x < image.getWidth(); x++) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int[] imgData = image.getRGB(0, 0, width, height, null, 0, width);
+        for (int x = 0; x < width; x++) {
             y1 = Integer.MAX_VALUE;
             y2 = -1;
-            for (int y = 0; y < image.getHeight(); y++) {
-                int rgb = image.getRGB(x, y);
+            for (int y = 0; y < height; y++) {
+                int rgb = imgData[width * y + x];
                 rgb = rgb >>> 24;
                 if (rgb > 0) {
                     if (y1 == Integer.MAX_VALUE) {

@@ -27,7 +27,7 @@ public class FONTINFO implements Serializable {
 
     public int fontId;
 
-    public GLYPHIDX glyphIndices[];
+    public GLYPHIDX[] glyphIndices;
 
     public FONTINFO(int fontId, int numGlyphs, GLYPHIDX[] glyphIndices) {
         this.fontId = fontId;

@@ -861,12 +861,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        /* preload shape tags
-         for (Tag tag : tags) {
-         if (tag instanceof ShapeTag) {
-         ((ShapeTag) tag).getShapes();
-         }
-         }*/
+        /*preload shape tags*/
+        for (Tag tag : tags) {
+            if (tag instanceof ShapeTag) {
+                ((ShapeTag) tag).getShapes();
+            }
+        }
     }
 
     @Override
@@ -1063,7 +1063,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     break;
                 }
                 case 'Z': { // ZWS
-                    byte lzmaprop[] = new byte[9];
+                    byte[] lzmaprop = new byte[9];
                     is.read(lzmaprop);
                     sis = new SWFInputStream(null, lzmaprop);
                     sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,

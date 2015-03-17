@@ -61,7 +61,7 @@ public class DefineExternalGradient extends Tag {
             sos.writeUI16(gradientId);
             sos.writeUI16(bitmapsFormat);
             sos.writeUI16(gradientSize);
-            byte fileNameBytes[] = fileName.getBytes();
+            byte[] fileNameBytes = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
         } catch (IOException e) {

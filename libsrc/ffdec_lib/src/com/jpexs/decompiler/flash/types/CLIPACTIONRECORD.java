@@ -52,7 +52,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
         }
     }
 
-    public static final String KEYNAMES[] = {
+    public static final String[] KEYNAMES = {
         null,
         "<Left>",
         "<Right>",

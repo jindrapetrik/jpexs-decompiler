@@ -508,4 +508,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             v1.add(v2.get(i));
         }
     }
+
+    public static void clearCache() {
+        exportDataCache.clear();
+    }
 }

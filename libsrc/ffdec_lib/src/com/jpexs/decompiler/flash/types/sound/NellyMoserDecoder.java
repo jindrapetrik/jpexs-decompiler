@@ -40,7 +40,7 @@ public class NellyMoserDecoder extends SoundDecoder {
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
         soundFormat.stereo = false;
-        float audioD[] = new float[NELLY_SAMPLES];
+        float[] audioD = new float[NELLY_SAMPLES];
 
         final float[] state = new float[64];
 
@@ -48,11 +48,11 @@ public class NellyMoserDecoder extends SoundDecoder {
         for (int j = 0; j < blockCount; j++) {
             byte[] block = sis.readBytesEx(NELLY_BLOCK_LEN, "block");
             CodecImpl.decode(state, block, audioD);
-            short audio[] = new short[NELLY_SAMPLES];
+            short[] audio = new short[NELLY_SAMPLES];
             for (int i = 0; i < audioD.length; i++) {
                 audio[i] = (short) (audioD[i]);
             }
-            byte d[] = new byte[audio.length * 2];
+            byte[] d = new byte[audio.length * 2];
             for (int i = 0; i < audio.length; i++) {
                 int s = audio[i];
                 d[i * 2] = (byte) (s & 0xff);

@@ -187,7 +187,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int nssa[] = new int[openedNamespaces.size()];
+        int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
@@ -292,7 +292,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem resolve(GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, ABC abc, List<ABC> otherAbcs, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         List<String> parts = new ArrayList<>();
         if (name.contains(".")) {
-            String partsArr[] = name.split("\\.");
+            String[] partsArr = name.split("\\.");
             parts.addAll(Arrays.asList(partsArr));
         } else {
             parts.add(name);

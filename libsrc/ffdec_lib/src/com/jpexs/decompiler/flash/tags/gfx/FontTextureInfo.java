@@ -52,9 +52,9 @@ public class FontTextureInfo extends Tag {
 
     public int nominalGlyphSz;
 
-    public TEXGLYPH texGlyphs[];
+    public TEXGLYPH[] texGlyphs;
 
-    public FONTINFO fonts[];
+    public FONTINFO[] fonts;
 
     public static final int TEXTURE_FORMAT_DEFAULT = 0;
 
@@ -75,7 +75,7 @@ public class FontTextureInfo extends Tag {
         try {
             sos.writeUI32(textureID);
             sos.writeUI16(textureFormat);
-            byte fileNameBytes[] = fileName.getBytes();
+            byte[] fileNameBytes = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
             sos.writeUI16(textureWidth);

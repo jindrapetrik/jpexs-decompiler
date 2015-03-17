@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.helpers;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,6 +46,10 @@ public class ImageHelper {
         }
 
         return in;
+    }
+
+    public static void write(BufferedImage image, String formatName, File output) throws IOException {
+        ImageIO.write(image, formatName, output);
     }
 
     public static void write(BufferedImage image, String formatName, OutputStream output) throws IOException {

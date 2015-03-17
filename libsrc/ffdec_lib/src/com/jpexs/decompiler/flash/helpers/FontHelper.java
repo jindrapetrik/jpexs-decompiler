@@ -56,7 +56,7 @@ public class FontHelper {
      */
     public static Map<String, Map<String, Font>> getInstalledFonts() {
         Map<String, Map<String, Font>> ret = new HashMap<>();
-        Font fonts[] = null;
+        Font[] fonts = null;
 
         try {
 
@@ -194,7 +194,7 @@ public class FontHelper {
         withKerningAttrs.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         Font withKerningFont = Font.getFont(withKerningAttrs);
         GlyphVector withKerningVector = withKerningFont.layoutGlyphVector(getFontRenderContext(withKerningFont), chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
-        int withKerningX[] = new int[availableChars.size()];
+        int[] withKerningX = new int[availableChars.size()];
         for (int i = 0; i < availableChars.size(); i++) {
             withKerningX[i] = withKerningVector.getGlyphLogicalBounds(i * 2 + 1).getBounds().x;
         }

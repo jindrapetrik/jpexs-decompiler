@@ -68,7 +68,7 @@ public class FontType implements Serializable {
         leading = sis.readSI16("leading");
         long numGlyphs = sis.readUI32("numGlyphs");
         long glyphBytesLen = sis.readUI32("glyphBytesLen");
-        byte glyphBytes[] = new byte[(int) glyphBytesLen];
+        byte[] glyphBytes = new byte[(int) glyphBytesLen];
         sis.read(glyphBytes);
         glyphInfo = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {

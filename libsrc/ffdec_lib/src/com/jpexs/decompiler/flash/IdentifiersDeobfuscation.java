@@ -87,7 +87,7 @@ public class IdentifiersDeobfuscation {
         if (s == null) {
             return false;
         }
-        String reservedWords[] = as3 ? reservedWordsAS3 : reservedWordsAS2;
+        String[] reservedWords = as3 ? reservedWordsAS3 : reservedWordsAS2;
         for (String rw : reservedWords) {
             if (rw.equals(s.trim())) {
                 return true;

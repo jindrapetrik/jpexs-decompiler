@@ -36,9 +36,9 @@ public class BMPFile extends Component {
 
     //--- Private variable declaration
     //--- Bitmap file header
-    private final byte bitmapFileHeader[] = new byte[14];
+    private final byte[] bitmapFileHeader = new byte[14];
 
-    private final byte bfType[] = {'B', 'M'};
+    private final byte[] bfType = {'B', 'M'};
 
     private int bfSize = 0;
 
@@ -49,7 +49,7 @@ public class BMPFile extends Component {
     private final int bfOffBits = BITMAPFILEHEADER_SIZE + BITMAPINFOHEADER_SIZE;
 
     //--- Bitmap info header
-    private final byte bitmapInfoHeader[] = new byte[40];
+    private final byte[] bitmapInfoHeader = new byte[40];
 
     private final int biSize = BITMAPINFOHEADER_SIZE;
 
@@ -74,7 +74,7 @@ public class BMPFile extends Component {
     private final int biClrImportant = 0;
 
     //--- Bitmap raw data
-    private int bitmap[];
+    private int[] bitmap;
 
     //--- File section
     private FileOutputStream fo;
@@ -148,7 +148,7 @@ public class BMPFile extends Component {
         int lastRowIndex;
         int pad;
         int padCount;
-        byte rgb[] = new byte[3];
+        byte[] rgb = new byte[3];
         size = (biWidth * biHeight);
         pad = (biWidth * 3) % 4;
         rowCount = 1;
@@ -221,7 +221,7 @@ public class BMPFile extends Component {
      */
 
     private byte[] intToWord(int parValue) {
-        byte retValue[] = new byte[2];
+        byte[] retValue = new byte[2];
         retValue[0] = (byte) (parValue & 0x00FF);
         retValue[1] = (byte) ((parValue >> 8) & 0x00FF);
         return (retValue);
@@ -234,7 +234,7 @@ public class BMPFile extends Component {
      */
 
     private byte[] intToDWord(int parValue) {
-        byte retValue[] = new byte[4];
+        byte[] retValue = new byte[4];
         retValue[0] = (byte) (parValue & 0x00FF);
         retValue[1] = (byte) ((parValue >> 8) & 0x000000FF);
         retValue[2] = (byte) ((parValue >> 16) & 0x000000FF);

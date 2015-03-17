@@ -127,9 +127,7 @@ public class ShapeExporter {
                                 m.scale(settings.zoom);
                                 st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
                                 if (settings.mode == ShapeExportMode.PNG) {
-                                    try (FileOutputStream fos = new FileOutputStream(file)) {
-                                        ImageHelper.write(img.getBufferedImage(), "PNG", fos);
-                                    }
+                                    ImageHelper.write(img.getBufferedImage(), "PNG", file);
                                 } else {
                                     BMPFile.saveBitmap(img.getBufferedImage(), file);
                                 }

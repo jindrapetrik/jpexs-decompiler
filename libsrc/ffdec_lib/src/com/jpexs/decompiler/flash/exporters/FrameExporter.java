@@ -255,7 +255,7 @@ public class FrameExporter {
                     try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis = new FileInputStream(fmin)) {
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
-                        byte buf[] = new byte[1000];
+                        byte[] buf = new byte[1000];
                         int cnt;
                         while ((cnt = fis.read(buf)) > 0) {
                             fos.write(buf, 0, cnt);
@@ -337,14 +337,14 @@ public class FrameExporter {
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                            try (FileOutputStream fos = new FileOutputStream(f)) {
-                                ImageHelper.write(frameImages.next(), "PNG", fos);
-                            }
-                            ret.add(f);
+                            File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
+                            ImageHelper.write(frameImages.next(), "PNG", file);
+                            ret.add(file);
                         }
                     }, handler).run();
                 }
+
+                //ShapeExporterBase.clearCache();
                 break;
             case PDF:
                 new RetryTask(new RunnableIOEx() {

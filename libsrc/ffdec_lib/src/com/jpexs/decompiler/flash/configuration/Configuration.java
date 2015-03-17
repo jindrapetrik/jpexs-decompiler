@@ -730,7 +730,7 @@ public class Configuration {
     public static File getPlayerSWC() {
         File libsdir = getFlashLibPath();
         if (libsdir != null && libsdir.exists()) {
-            File libs[] = libsdir.listFiles(new FilenameFilter() {
+            File[] libs = libsdir.listFiles(new FilenameFilter() {
 
                 @Override
                 public boolean accept(File dir, String name) {

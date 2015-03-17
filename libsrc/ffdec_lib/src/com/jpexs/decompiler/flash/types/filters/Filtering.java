@@ -254,9 +254,9 @@ public class Filtering {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage retImg = new BufferedImage(width, height, src.getType());
-        int srcPixels[] = getRGB(src);
+        int[] srcPixels = getRGB(src);
 
-        int revPixels[] = new int[srcPixels.length];
+        int[] revPixels = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
         }
@@ -333,7 +333,7 @@ public class Filtering {
                 break;
         }
 
-        int mask[] = null;
+        int[] mask = null;
         if (type == INNER) {
             mask = srcPixels;
         }
@@ -348,7 +348,7 @@ public class Filtering {
         retc.drawImage(shadowIm, 0, 0, null);
         retc.drawImage(hilightIm, 0, 0, null);
 
-        int ret[] = getRGB(retImg);
+        int[] ret = getRGB(retImg);
         blur(ret, width, height, blurX, blurY, iterations, mask);
 
         for (int i = 0; i < srcPixels.length; i++) {
@@ -390,7 +390,7 @@ public class Filtering {
         int width = src.getWidth();
         int height = src.getHeight();
         int[] srcPixels = getRGB(src);
-        int shadow[] = new int[srcPixels.length];
+        int[] shadow = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             int alpha = (srcPixels[i] >> 24) & 0xff;
             if (inner) {
@@ -450,13 +450,13 @@ public class Filtering {
         double angleRad = angle / 180 * Math.PI;
         double moveX = (distance * Math.cos(angleRad));
         double moveY = (distance * Math.sin(angleRad));
-        int srcPixels[] = getRGB(src);
-        int revPixels[] = new int[srcPixels.length];
+        int[] srcPixels = getRGB(src);
+        int[] revPixels = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
         }
 
-        int shadow[] = new int[srcPixels.length];
+        int[] shadow = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
             shadow[i] = 0 + ((cut(strength * ((srcPixels[i] >> 24) & 0xff))) << 24);
         }
@@ -464,7 +464,7 @@ public class Filtering {
         Color colorAlpha = new Color(0, 0, 0, 0);
         shadow = moveRGB(width, height, shadow, moveX, moveY, colorAlpha);
 
-        int mask[] = null;
+        int[] mask = null;
         if (type == INNER) {
             mask = srcPixels;
         }
@@ -549,7 +549,7 @@ public class Filtering {
          changeColors.filter(sourceRaster, displayRaster);
          return new SerializableImage(src.getColorModel(), displayRaster, true, null);*/
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        int pixels[] = getRGB(src.getBufferedImage()).clone();
+        int[] pixels = getRGB(src.getBufferedImage()).clone();
         for (int i = 0; i < pixels.length; i++) {
             int rgb = pixels[i];
             int a = (rgb >> 24) & 0xff;
@@ -599,7 +599,7 @@ public class Filtering {
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        int pixels[] = getRGB(src.getBufferedImage()).clone();
+        int[] pixels = getRGB(src.getBufferedImage()).clone();
         for (int i = 0; i < pixels.length; i++) {
             int rgb = pixels[i];
             int a = (rgb >> 24) & 0xff;

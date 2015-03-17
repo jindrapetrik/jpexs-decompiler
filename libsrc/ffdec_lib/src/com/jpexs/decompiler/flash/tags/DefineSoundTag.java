@@ -205,7 +205,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         boolean newSoundSize = false;
         boolean newSoundType = false;
         long newSoundSampleCount = -1;
-        byte newSoundData[];
+        byte[] newSoundData;
         switch (newSoundFormat) {
             case SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
                 try (AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
@@ -238,7 +238,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
             case SoundFormat.FORMAT_MP3:
                 BufferedInputStream bis = new BufferedInputStream(is);
                 loadID3v2(bis);
-                byte mp3data[] = Helper.readStream(bis);
+                byte[] mp3data = Helper.readStream(bis);
 
                 final int ID3_V1_LENTGH = 128;
                 final int ID3_V1_EXT_LENGTH = 227;

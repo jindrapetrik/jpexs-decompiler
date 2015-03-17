@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class EdgeType implements Serializable {
 
-    private static final int sizes[] = new int[]{1, 2, 1, 2, 1, 2, 3, 4, 2, 3, 4, 5, 6, 7, 8, 9};
+    private static final int[] sizes = new int[]{1, 2, 1, 2, 1, 2, 3, 4, 2, 3, 4, 5, 6, 7, 8, 9};
 
     private static final int Edge_H12 = 0;  //  2 bytes
 
@@ -70,7 +70,7 @@ public class EdgeType implements Serializable {
 
     private static final int Edge_Quad = 3;
 
-    public int data[];
+    public int[] data;
 
     public EdgeType(boolean vertical, int v) {
         data = new int[]{vertical ? Edge_VLine : Edge_HLine, v};
@@ -163,7 +163,7 @@ public class EdgeType implements Serializable {
         int nb = sizes[firstByte & 0xF];
         byte raw1, raw2, raw3, raw4, raw5, raw6, raw7, raw8, raw9;
         raw1 = (byte) sis.readUI8("byte1");
-        int data[] = new int[5];
+        int[] data = new int[5];
 
         switch (firstByte & 0xF) {
             case Edge_H12:

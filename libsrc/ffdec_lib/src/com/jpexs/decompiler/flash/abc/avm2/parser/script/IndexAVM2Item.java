@@ -64,7 +64,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int nssa[] = new int[openedNamespaces.size()];
+        int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }

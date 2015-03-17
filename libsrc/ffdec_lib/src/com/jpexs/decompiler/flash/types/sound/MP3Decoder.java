@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -42,8 +43,8 @@ public class MP3Decoder extends SoundDecoder {
         Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
         SampleBuffer buf;
         while ((buf = readFrame(decoder, bitstream)) != null) {
-            short audio[] = buf.getBuffer();
-            byte d[] = new byte[buf.getBufferLength() * 2];
+            short[] audio = buf.getBuffer();
+            byte[] d = new byte[buf.getBufferLength() * 2];
             for (int i = 0; i < buf.getBufferLength(); i++) {
                 int s = audio[i];
                 d[i * 2] = (byte) (s & 0xff);

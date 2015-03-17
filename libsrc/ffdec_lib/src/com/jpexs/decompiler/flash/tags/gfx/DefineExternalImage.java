@@ -64,7 +64,7 @@ public class DefineExternalImage extends Tag {
             sos.writeUI16(bitmapFormat);
             sos.writeUI16(targetWidth);
             sos.writeUI16(targetHeight);
-            byte fileNameBytes[] = fileName.getBytes();
+            byte[] fileNameBytes = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
         } catch (IOException e) {

@@ -47,6 +47,8 @@ import java.util.logging.Logger;
  */
 public class AS2ScriptExporter {
 
+    private static final Logger logger = Logger.getLogger(AS2ScriptExporter.class.getName());
+
     public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportMode exportMode, final EventListener evl) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
@@ -57,7 +59,10 @@ public class AS2ScriptExporter {
                 }
             }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
-        } catch (ExecutionException | InterruptedException | TimeoutException ex) {
+        } catch (TimeoutException ex) {
+            logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
+        } catch (ExecutionException | InterruptedException ex) {
+            logger.log(Level.SEVERE, "Error during AS2 export", ex);
         }
         return new ArrayList<>();
     }

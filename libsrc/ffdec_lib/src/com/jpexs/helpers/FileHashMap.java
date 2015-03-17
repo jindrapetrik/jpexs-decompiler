@@ -159,7 +159,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
             long ofs = offsets.get(key);
             int len = lengths.get(key);
             file.seek(ofs);
-            byte data[] = new byte[len];
+            byte[] data = new byte[len];
             file.readFully(data);
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
             try {
@@ -187,7 +187,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
             oos = new ObjectOutputStream(baos);
             oos.writeObject(value);
             oos.flush();
-            byte data[] = baos.toByteArray();
+            byte[] data = baos.toByteArray();
             if (offsets.containsKey(key)) {
                 long origOffset = offsets.get(key);
                 int origLen = lengths.get(key);

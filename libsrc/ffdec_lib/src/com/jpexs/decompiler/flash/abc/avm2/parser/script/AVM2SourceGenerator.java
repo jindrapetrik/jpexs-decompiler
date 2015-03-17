@@ -158,7 +158,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, GetDescendantsAVM2Item item) throws CompilationException {
-        int nssa[] = new int[item.openedNamespaces.size()];
+        int[] nssa = new int[item.openedNamespaces.size()];
         for (int i = 0; i < item.openedNamespaces.size(); i++) {
             nssa[i] = item.openedNamespaces.get(i);
         }
@@ -332,7 +332,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, xmlListReg)));
         trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, counterReg)));
         trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, tempVal1)));
-        int nss[] = new int[item.openedNamespaces.size()];
+        int[] nss = new int[item.openedNamespaces.size()];
         for (int i = 0; i < item.openedNamespaces.size(); i++) {
             nss[i] = item.openedNamespaces.get(i);
         }
@@ -1583,9 +1583,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        int param_types[] = new int[paramTypes.size()];
-        ValueKind optional[] = new ValueKind[paramValues.size()];
-        //int param_names[] = new int[paramNames.size()];
+        int[] param_types = new int[paramTypes.size()];
+        ValueKind[] optional = new ValueKind[paramValues.size()];
+        //int[] param_names = new int[paramNames.size()];
         for (int i = 0; i < paramTypes.size(); i++) {
             param_types[i] = typeName(localData, paramTypes.get(i));
             //param_names[i] = str(paramNames.get(i));
@@ -1931,7 +1931,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         TypeItem sup = (TypeItem) un;
         int propId = resolveType(localData, sup, abc, allABCs);
-        int nss[] = new int[]{abc.constants.constant_multiname.get(propId).namespace_index};
+        int[] nss = new int[]{abc.constants.constant_multiname.get(propId).namespace_index};
         return abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.constant_multiname.get(propId).name_index, 0, abc.constants.getNamespaceSetId(new NamespaceSet(nss), true), 0, new ArrayList<Integer>()), true);
 
     }

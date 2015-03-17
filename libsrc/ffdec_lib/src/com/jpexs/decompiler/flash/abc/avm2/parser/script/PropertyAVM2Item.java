@@ -95,7 +95,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet() {
-        int nssa[] = new int[openedNamespaces.size()];
+        int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
