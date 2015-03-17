@@ -149,6 +149,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -861,12 +862,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        /*preload shape tags*/
-        for (Tag tag : tags) {
-            if (tag instanceof ShapeTag) {
-                ((ShapeTag) tag).getShapes();
-            }
-        }
+        /*preload shape tags
+         for (Tag tag : tags) {
+         if (tag instanceof ShapeTag) {
+         ((ShapeTag) tag).getShapes();
+         }
+         }*/
     }
 
     @Override
@@ -2810,9 +2811,32 @@ public final class SWF implements SWFContainerItem, Timelined {
         return modified;
     }
 
-    public void removeTag(Tag t, boolean removeDependencies) {
-        Timelined timelined = t.getTimelined();
-        if (t instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(t.getId())) {
+    public void removeTags(Collection<Tag> tags, boolean removeDependencies) {
+        Set<Timelined> timelineds = new HashSet<>();
+        for (Tag tag : tags) {
+            Timelined timelined = tag.getTimelined();
+            timelineds.add(timelined);
+            removeTagInternal(timelined, tag, removeDependencies);
+        }
+
+        for (Timelined timelined : timelineds) {
+            resetTimelines(timelined);
+        }
+
+        updateCharacters();
+        clearImageCache();
+    }
+
+    public void removeTag(Tag tag, boolean removeDependencies) {
+        Timelined timelined = tag.getTimelined();
+        removeTagInternal(timelined, tag, removeDependencies);
+        resetTimelines(timelined);
+        updateCharacters();
+        clearImageCache();
+    }
+
+    private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies) {
+        if (tag instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(tag.getId())) {
             List<Tag> tags;
             if (timelined instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) timelined;
@@ -2820,7 +2844,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             } else {
                 tags = this.tags;
             }
-            tags.remove(t);
+            tags.remove(tag);
             if (timelined instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) timelined;
                 sprite.setModified(true);
@@ -2829,18 +2853,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         } else {
             // timeline should be always the swf here
             if (removeDependencies) {
-                removeTagWithDependenciesFromTimeline(t, timelined.getTimeline());
+                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 if (timelined instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) timelined;
                     sprite.setModified(true);
                 }
             } else {
-                removeTagFromTimeline(t, timeline);
+                removeTagFromTimeline(tag, timeline);
             }
         }
-        resetTimelines(timelined);
-        updateCharacters();
-        clearImageCache();
     }
 
     @Override

@@ -1979,13 +1979,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf == null) {
             return;
         }
+
         List<Tag> tags = new ArrayList<>(swf.tags);
+        List<Tag> toRemove = new ArrayList<>();
         for (Tag tag : tags) {
             System.out.println(tag.getClass());
             if (!(tag instanceof ABCContainerTag || tag instanceof ASMSource)) {
-                swf.removeTag(tag, true);
+                toRemove.add(tag);
             }
         }
+
+        swf.removeTags(toRemove, true);
         refreshTree(swf);
     }
 

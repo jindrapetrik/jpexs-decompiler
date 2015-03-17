@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Component;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -65,7 +66,7 @@ public class Helper {
     public static String newLine = System.getProperty("line.separator");
 
     public static String decompilationErrorAdd = null;
-    
+
     private static final Map<String, Area> shapeCache = new HashMap<>();
 
     /**
@@ -898,7 +899,7 @@ public class Helper {
         return sb.toString();
     }
 
-    public static Shape imageToShape(BufferedImage image) {
+    public static Shape imageToShapeOld(BufferedImage image) {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
         int y1, y2;
@@ -909,12 +910,12 @@ public class Helper {
         int type = image.getType();
         if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
             imgData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        } else{
+        } else {
             imgData = image.getRGB(0, 0, width, height, null, 0, width);
         }
-        
+
         BitSet bs = new BitSet(width * height);
-        bs.set(type);        
+        bs.set(type);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int idx = width * y + x;
@@ -923,12 +924,12 @@ public class Helper {
                 }
             }
         }
-        
+
         String key = byteArrayToBase64String(bs.toByteArray());
         if (shapeCache.containsKey(key)) {
             return shapeCache.get(key);
         }
-        
+
         for (int x = 0; x < width; x++) {
             y1 = Integer.MAX_VALUE;
             y2 = -1;
@@ -957,7 +958,159 @@ public class Helper {
         shapeCache.put(key, area);
         return area;
     }
-    
+
+    public static Shape imageToShape(BufferedImage image) {
+        Area area = new Area();
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int[] imgData;
+        int type = image.getType();
+        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+            imgData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        } else {
+            imgData = image.getRGB(0, 0, width, height, null, 0, width);
+        }
+
+        BitSet bs = new BitSet(width * height);
+        bs.set(type);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int idx = width * y + x;
+                if ((imgData[idx] >>> 24) > 0) {
+                    bs.set(idx);
+                }
+            }
+        }
+
+        String key = byteArrayToBase64String(bs.toByteArray());
+        if (shapeCache.containsKey(key)) {
+            return shapeCache.get(key);
+        }
+
+        BitSet bsArea = new BitSet(width * height);
+        boolean modified = true;
+
+        List<Integer> leftCoordsX = new ArrayList<>();
+        List<Integer> leftCoordsY = new ArrayList<>();
+        List<Integer> rightCoordsX = new ArrayList<>();
+        List<Integer> rightCoordsY = new ArrayList<>();
+        while (modified) {
+            modified = false;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int idx = width * y + x;
+                    if ((imgData[idx] >>> 24) > 0 && !bsArea.get(idx)) {
+                        leftCoordsX.clear();
+                        leftCoordsY.clear();
+                        rightCoordsX.clear();
+                        rightCoordsY.clear();
+                        int leftX = x;
+                        int rightX = findRight(imgData, x, y, width);
+                        leftCoordsX.add(leftX);
+                        leftCoordsY.add(y);
+                        rightCoordsX.add(rightX);
+                        rightCoordsY.add(y);
+                        setBitSet(bsArea, leftX, rightX, y, width);
+                        int y2 = y + 1;
+                        while (y2 < height) {
+                            leftCoordsX.add(leftX);
+                            leftCoordsY.add(y2);
+                            rightCoordsX.add(rightX);
+                            rightCoordsY.add(y2);
+
+                            int leftX2 = findFirst(imgData, leftX, rightX, y2, width);
+                            if (leftX2 == -1) {
+                                break;
+                            }
+
+                            int rightX2 = findRight(imgData, leftX2, y2, width);
+
+                            if (leftX2 != leftX) {
+                                leftCoordsX.add(leftX2);
+                                leftCoordsY.add(y2);
+                            }
+
+                            if (rightX2 != rightX) {
+                                rightCoordsX.add(rightX2);
+                                rightCoordsY.add(y2);
+                            }
+
+                            leftX = leftX2;
+                            rightX = rightX2;
+
+                            setBitSet(bsArea, leftX, rightX, y2, width);
+                            y2++;
+                        }
+
+                        int cnt = leftCoordsX.size() + rightCoordsX.size();
+                        int[] xCoords = new int[cnt];
+                        int[] yCoords = new int[cnt];
+                        for (int i = 0; i < rightCoordsX.size(); i++) {
+                            xCoords[i] = rightCoordsX.get(i);
+                            yCoords[i] = rightCoordsY.get(i);
+                        }
+
+                        int offset = rightCoordsX.size();
+                        for (int i = 0; i < leftCoordsX.size(); i++) {
+                            int idx2 = leftCoordsX.size() - i - 1;
+                            xCoords[i + offset] = leftCoordsX.get(idx2);
+                            yCoords[i + offset] = leftCoordsY.get(idx2);
+                        }
+
+                        Area area2 = new Area(new Polygon(xCoords, yCoords, xCoords.length));
+                        area.add(area2);
+                        modified = true;
+                    }
+                }
+            }
+        }
+
+        shapeCache.put(key, area);
+        return area;
+    }
+
+    private static void setBitSet(BitSet bitSet, int x1, int x2, int y, int width) {
+        int idx = width * y + x1;
+        int idx2 = width * y + x2;
+        for (; idx < idx2; idx++) {
+            bitSet.set(idx);
+        }
+    }
+
+    private static int findFirst(int[] imgData, int x1, int x2, int y, int width) {
+        int idx = width * y + x1;
+        if ((imgData[idx] >>> 24) > 0) {
+            while (x1 > 0 && (imgData[idx - 1] >>> 24) > 0) {
+                x1--;
+                idx--;
+            }
+            return x1;
+        }
+
+        int idx2 = width * y + x2;
+        for (; idx < idx2; idx++) {
+            if ((imgData[idx] >>> 24) > 0) {
+                return x1;
+            }
+
+            x1++;
+        }
+
+        return -1;
+    }
+
+    private static int findRight(int[] imgData, int x, int y, int width) {
+        int result = x;
+        int idx = width * y + x;
+        while ((imgData[idx] >>> 24) > 0 && result < width) {
+            result++;
+            idx++;
+        }
+
+        return result;
+    }
+
     public static void clearShapeCache() {
         shapeCache.clear();
     }

@@ -45,7 +45,9 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenu;
@@ -519,8 +521,18 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                     }
 
                     if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
                         for (Tag tag : tagsToRemove) {
-                            tag.getSwf().removeTag(tag, removeDependencies);
+                            SWF swf = tag.getSwf();
+                            if (!tagsToRemoveBySwf.containsKey(swf)) {
+                                tagsToRemoveBySwf.put(swf, new ArrayList<>());
+                            }
+
+                            tagsToRemoveBySwf.get(swf).add(tag);
+                        }
+
+                        for (SWF swf : tagsToRemoveBySwf.keySet()) {
+                            swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
                         }
 
                         mainPanel.refreshTree(null);
