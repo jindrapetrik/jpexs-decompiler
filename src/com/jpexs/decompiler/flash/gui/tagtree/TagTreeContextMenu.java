@@ -549,6 +549,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                             Tag tag = (Tag) item;
                             tag.undo();
                             tag.getSwf().clearAllCache();
+                            tagTree.getModel().updateNode(item);
                         } catch (InterruptedException | IOException ex) {
                             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
                         }

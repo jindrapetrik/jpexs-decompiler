@@ -139,6 +139,11 @@ public class TagTreeModel implements TreeModel {
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
     }
 
+    public void updateNode(TreeItem treeItem) {
+        TreePath changedPath = getTreePath(treeItem);
+        fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
+    }
+
     private void fireTreeNodesRemoved(TreeModelEvent e) {
         for (TreeModelListener listener : listeners) {
             listener.treeNodesRemoved(e);
@@ -520,7 +525,7 @@ public class TagTreeModel implements TreeModel {
 
         return new ArrayList<>();
     }
-    
+
     @Override
     public TreeItem getChild(Object parent, int index) {
         TreeItem parentNode = (TreeItem) parent;

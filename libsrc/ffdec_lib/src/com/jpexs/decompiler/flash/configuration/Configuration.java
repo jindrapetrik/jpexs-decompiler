@@ -146,6 +146,10 @@ public class Configuration {
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> debugMode = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("debug")
+    public static final ConfigurationItem<Boolean> showDebugMenu = null;
+
     /**
      * Turn off resolving constants in ActionScript 2
      */

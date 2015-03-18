@@ -2561,7 +2561,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 SerializableImage img = null;
                 String cacheKey = null;
                 if (drawable instanceof ShapeTag) {
-                    cacheKey = m.toString() + clrTrans.toString();
+                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + clrTrans.toString();
                     img = renderContext.shapeCache.get(cacheKey);
                 }
 

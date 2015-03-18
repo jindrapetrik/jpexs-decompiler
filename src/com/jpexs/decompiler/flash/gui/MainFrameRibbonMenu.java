@@ -41,6 +41,7 @@ import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
+import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
@@ -155,13 +156,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
 
-    private static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
-
-    private static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
-
     private static final String ACTION_CLEAR_RECENT_FILES = "CLEARRECENTFILES";
-
-    private static final String ACTION_CHECK_RESOURCES = "CHECKRESOURCES";
 
     private static final String ACTION_VIEWMODE_RESOURCES = "VIEWMODERESOURCES";
 
@@ -270,7 +265,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         ribbon.addTask(createSettingsRibbonTask(externalFlashPlayerUnavailable));
         ribbon.addTask(createHelpRibbonTask());
 
-        if (Configuration.debugMode.get()) {
+        if (Configuration.showDebugMenu.get()) {
             ribbon.addTask(createDebugRibbonTask());
         }
 
@@ -520,7 +515,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, ACTION_SEARCH);
 
-        // todo: change icon
         replaceCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.replace")), View.getResizableIcon("replace32"));
         assignListener(replaceCommandButton, ACTION_REPLACE);
 
@@ -703,21 +697,35 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private RibbonTask createDebugRibbonTask() {
         // ----------------------------------------- DEBUG -----------------------------------
 
+        ResizableIcon icon = View.getResizableIcon("update16");
         JRibbonBand debugBand = new JRibbonBand("Debug", null);
         debugBand.setResizePolicies(getResizePolicies(debugBand));
 
-        JCommandButton removeNonScriptsCommandButton = new JCommandButton(fixCommandTitle("Remove non scripts"), View.getResizableIcon("update16"));
-        assignListener(removeNonScriptsCommandButton, ACTION_REMOVE_NON_SCRIPTS);
+        JCommandButton removeNonScriptsCommandButton = new JCommandButton(fixCommandTitle("Remove non scripts"), icon);
+        removeNonScriptsCommandButton.addActionListener(e -> removeNonScripts());
 
-        JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), View.getResizableIcon("update16"));
-        assignListener(refreshDecompiledCommandButton, ACTION_REFRESH_DECOMPILED);
+        JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), icon);
+        refreshDecompiledCommandButton.addActionListener(e -> refreshDecompiled());
 
-        JCommandButton checkResourcesCommandButton = new JCommandButton(fixCommandTitle("Check resources"), View.getResizableIcon("update16"));
-        assignListener(checkResourcesCommandButton, ACTION_CHECK_RESOURCES);
+        JCommandButton checkResourcesCommandButton = new JCommandButton(fixCommandTitle("Check resources"), icon);
+        checkResourcesCommandButton.addActionListener(e -> checkResources());
+
+        JCommandButton callGcCommandButton = new JCommandButton(fixCommandTitle("Call System.gc()"), icon);
+        callGcCommandButton.addActionListener(e -> System.gc());
+
+        JCommandButton emptyCacheCommandButton = new JCommandButton(fixCommandTitle("Empty cache"), icon);
+        emptyCacheCommandButton.addActionListener(e -> {
+            SWF swf = mainFrame.getPanel().getCurrentSwf();
+            if (swf != null) {
+                swf.clearAllCache();
+            }
+        });
 
         debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(checkResourcesCommandButton, RibbonElementPriority.MEDIUM);
+        debugBand.addCommandButton(callGcCommandButton, RibbonElementPriority.MEDIUM);
+        debugBand.addCommandButton(emptyCacheCommandButton, RibbonElementPriority.MEDIUM);
         return new RibbonTask("Debug", debugBand);
     }
 
@@ -999,15 +1007,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
             case ACTION_DEOBFUSCATE:
             case ACTION_DEOBFUSCATE_ALL:
                 deobfuscate();
-                break;
-            case ACTION_REMOVE_NON_SCRIPTS:
-                removeNonScripts();
-                break;
-            case ACTION_REFRESH_DECOMPILED:
-                refreshDecompiled();
-                break;
-            case ACTION_CHECK_RESOURCES:
-                checkResources();
                 break;
         }
     }
