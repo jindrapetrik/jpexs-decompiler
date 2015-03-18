@@ -1103,7 +1103,7 @@ public class Helper {
     private static int findRight(int[] imgData, int x, int y, int width) {
         int result = x;
         int idx = width * y + x;
-        while ((imgData[idx] >>> 24) > 0 && result < width) {
+        while (result < width && (imgData[idx] >>> 24) > 0) {
             result++;
             idx++;
         }

@@ -387,9 +387,7 @@ public class TagTreeModel implements TreeModel {
 
     private List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
-        int cnt = getChildCount(parent);
-        for (int i = 0; i < cnt; i++) {
-            TreeItem n = getChild(parent, i);
+        for (TreeItem n : getAllChildren(parent)) {
             List<TreeItem> newPath = new ArrayList<>();
             newPath.addAll(path);
             newPath.add(n);
@@ -455,6 +453,74 @@ public class TagTreeModel implements TreeModel {
         return swfInfo.folders;
     }
 
+    public List<? extends TreeItem> getAllChildren(Object parent) {
+        TreeItem parentNode = (TreeItem) parent;
+        if (parentNode == root) {
+            List<TreeItem> result = new ArrayList<>(swfs.size());
+            for (SWFList swfList : swfs) {
+                if (!swfList.isBundle()) {
+                    result.add(swfList.get(0));
+                }
+                result.add(swfList);
+            }
+            return result;
+        } else if (parentNode instanceof SWFList) {
+            return ((SWFList) parentNode).swfs;
+        } else if (parentNode instanceof SWF) {
+            return getSwfFolders((SWF) parentNode);
+        } else if (parentNode instanceof FolderItem) {
+            return ((FolderItem) parentNode).subItems;
+        } else if (parentNode instanceof Frame) {
+            return ((Frame) parentNode).innerTags;
+        } else if (parentNode instanceof DefineSpriteTag) {
+            return ((DefineSpriteTag) parentNode).getTimeline().getFrames();
+        } else if (parentNode instanceof DefineBinaryDataTag) {
+            List<SWF> result = new ArrayList<>(1);
+            result.add(((DefineBinaryDataTag) parentNode).innerSwf);
+            return result;
+        } else if (parentNode instanceof AS2Package) {
+            return ((AS2Package) parentNode).getAllChildren();
+        } else if (parentNode instanceof FrameScript) {
+            Frame parentFrame = ((FrameScript) parentNode).getFrame();
+            List<TreeItem> result = new ArrayList<>();
+            result.addAll(parentFrame.actionContainers);
+            result.addAll(parentFrame.actions);
+            for (int i = 0; i < result.size(); i++) {
+                TreeItem item = result.get(i);
+                if (item instanceof Tag) {
+                    Tag resultTag = (Tag) item;
+                    Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(item.getSwf()).tagScriptCache;
+                    TagScript tagScript = currentTagScriptCache.get(resultTag);
+                    if (tagScript == null) {
+                        List<TreeItem> subNodes = new ArrayList<>();
+                        if (item instanceof ASMSourceContainer) {
+                            for (ASMSource item2 : ((ASMSourceContainer) item).getSubItems()) {
+                                subNodes.add(item2);
+                            }
+                        }
+                        tagScript = new TagScript(item.getSwf(), resultTag, subNodes);
+                        currentTagScriptCache.put(resultTag, tagScript);
+                    }
+                    result.set(i, tagScript);
+                }
+            }
+            return result;
+        } else if (parentNode instanceof TagScript) {
+            return ((TagScript) parentNode).getFrames();
+        } else if (parentNode instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clt = (ClassesListTreeModel) parentNode;
+            return clt.getAllChildren(clt.getRoot());
+        } else if (parentNode instanceof AS3ClassTreeItem) {
+            if (parentNode instanceof AS3Package) {
+                return ((AS3Package) parentNode).getAllChildren();
+            } else {
+                return new ArrayList<>();
+            }
+        }
+
+        return new ArrayList<>();
+    }
+    
     @Override
     public TreeItem getChild(Object parent, int index) {
         TreeItem parentNode = (TreeItem) parent;

@@ -136,6 +136,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         return root;
     }
 
+    public List<AS3ClassTreeItem> getAllChildren(Object parent) {
+        AS3Package pkg = (AS3Package) parent;
+        return pkg.getAllChildren();
+    }
+    
     @Override
     public AS3ClassTreeItem getChild(Object parent, int index) {
         AS3Package pkg = (AS3Package) parent;

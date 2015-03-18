@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,6 +49,13 @@ public class AS3Package extends AS3ClassTreeItem {
         return swf;
     }
 
+    public List<AS3ClassTreeItem> getAllChildren() {
+        List<AS3ClassTreeItem> result = new ArrayList<>(getChildCount());
+        result.addAll(subPackages.values());
+        result.addAll(scripts.values());
+        return result;
+    }
+    
     public AS3ClassTreeItem getChild(int index) {
         if (index < subPackages.size()) {
             for (AS3Package subPackage : subPackages.values()) {

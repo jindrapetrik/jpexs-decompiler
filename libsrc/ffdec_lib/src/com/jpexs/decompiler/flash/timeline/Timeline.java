@@ -96,7 +96,7 @@ public class Timeline {
         }
     }
 
-    public Iterable<Frame> getFrames() {
+    public List<Frame> getFrames() {
         ensureInitialized();
         return frames;
     }

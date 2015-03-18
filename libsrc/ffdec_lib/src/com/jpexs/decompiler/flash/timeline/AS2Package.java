@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,6 +51,13 @@ public class AS2Package implements TreeItem {
         return swf;
     }
 
+    public List<TreeItem> getAllChildren() {
+        List<TreeItem> result = new ArrayList<>(getChildCount());
+        result.addAll(subPackages.values());
+        result.addAll(scripts.values());
+        return result;
+    }
+    
     public TreeItem getChild(int index) {
         if (index < subPackages.size()) {
             for (AS2Package subPackage : subPackages.values()) {
