@@ -871,8 +871,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (n instanceof ClassesListTreeModel) {
                 ((ClassesListTreeModel) n).setFilter(filterField.getText());
                 TagTreeModel tm = tagTree.getModel();
-                tm.updateNode(n);
-                View.expandTreeNodes(tagTree, tm.getTreePath(n), true);
+                TreePath path = tm.getTreePath(n);
+                tm.updateNode(path);
+                View.expandTreeNodes(tagTree, path, true);
             }
         }
     }

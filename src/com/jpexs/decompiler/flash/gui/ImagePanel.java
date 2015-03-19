@@ -669,6 +669,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom;
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
+            Timeline timeline = drawable.getTimeline();
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
                 RECT rect = bounded.getRect();
@@ -686,7 +687,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 RenderContext renderContext = new RenderContext();
                 renderContext.stateUnderCursor = stateUnderCursor;
                 renderContext.mouseButton = mouseButton;
-                drawable.getTimeline().toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
+                timeline.toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
 
                 Graphics2D gg = (Graphics2D) image.getGraphics();
                 gg.setStroke(new BasicStroke(3));
@@ -694,7 +695,11 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
                 List<DepthState> dss = new ArrayList<>();
                 List<Shape> os = new ArrayList<>();
-                DepthState ds = drawable.getTimeline().getFrame(frame).layers.get(selectedDepth);
+                DepthState ds = null;
+                if (timeline.getFrameCount() > frame) {
+                    ds = timeline.getFrame(frame).layers.get(selectedDepth);
+                }
+
                 if (ds != null) {
                     CharacterTag cht = swf.getCharacter(ds.characterId);
                     if (cht != null) {
@@ -724,7 +729,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
                 img = image;
             }
-            if (drawable.getTimeline().isSingleFrame(frame)) {
+
+            if (timeline.isSingleFrame(frame)) {
                 SWF.putToCache(key, img);
             }
         }

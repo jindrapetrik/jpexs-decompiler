@@ -144,6 +144,10 @@ public class TagTreeModel implements TreeModel {
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
     }
 
+    public void updateNode(TreePath changedPath) {
+        fireTreeStructureChanged(new TreeModelEvent(this, changedPath.getParentPath()));
+    }
+
     private void fireTreeNodesRemoved(TreeModelEvent e) {
         for (TreeModelListener listener : listeners) {
             listener.treeNodesRemoved(e);
