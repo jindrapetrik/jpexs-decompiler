@@ -406,15 +406,12 @@ public class TagTree extends JTree {
         return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
 
-    public List<TreeItem> getAllSubs(JTree tree, TreeItem o) {
+    public void getAllSubs(JTree tree, TreeItem o, List<TreeItem> ret) {
         TagTreeModel tm = (TagTreeModel) tree.getModel();
-        List<TreeItem> ret = new ArrayList<>();
-        for (int i = 0; i < tm.getChildCount(o); i++) {
-            TreeItem c = tm.getChild(o, i);
+        for (TreeItem c : tm.getAllChildren(o)) {
             ret.add(c);
-            ret.addAll(getAllSubs(tree, c));
+            getAllSubs(tree, c, ret);
         }
-        return ret;
     }
 
     public List<TreeItem> getAllSelected(TagTree tree) {
@@ -428,7 +425,7 @@ public class TagTree extends JTree {
         for (TreePath tp : tps) {
             TreeItem treeNode = (TreeItem) tp.getLastPathComponent();
             ret.add(treeNode);
-            ret.addAll(getAllSubs(tree, treeNode));
+            getAllSubs(tree, treeNode, ret);
         }
         return ret;
     }
