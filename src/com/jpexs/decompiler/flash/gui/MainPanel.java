@@ -867,21 +867,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void doFilter() {
         List<TreeItem> nodes = getASTreeNodes(tagTree);
-        boolean updateNeeded = false;
         for (TreeItem n : nodes) {
             if (n instanceof ClassesListTreeModel) {
                 ((ClassesListTreeModel) n).setFilter(filterField.getText());
-                updateNeeded = true;
+                TagTreeModel tm = tagTree.getModel();
+                tm.updateNode(n);
+                View.expandTreeNodes(tagTree, tm.getTreePath(n), true);
             }
-        }
-
-        if (updateNeeded) {
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    tagTree.updateUI();
-                }
-            });
         }
     }
 

@@ -1144,11 +1144,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         return exported;
     }
 
-    private List<MyEntry<ClassPath, ScriptPack>> uniqueAS3Packs(List<MyEntry<ClassPath, ScriptPack>> packs) {
-        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
+    private List<ScriptPack> uniqueAS3Packs(List<ScriptPack> packs) {
+        List<ScriptPack> ret = new ArrayList<>();
         Set<ClassPath> classPaths = new HashSet<>();
-        for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            ClassPath key = item.getKey();
+        for (ScriptPack item : packs) {
+            ClassPath key = item.getClassPath();
             if (classPaths.contains(key)) {
                 logger.log(Level.SEVERE, "Duplicate pack path found (" + key + ")!");
             } else {
@@ -1159,8 +1159,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public List<MyEntry<ClassPath, ScriptPack>> getAS3Packs() {
-        List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
+    public List<ScriptPack> getAS3Packs() {
+        List<ScriptPack> packs = new ArrayList<>();
         for (ABCContainerTag abcTag : getAbcList()) {
             packs.addAll(abcTag.getABC().getScriptPacks());
         }
@@ -1256,15 +1256,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         final AtomicInteger cnt = new AtomicInteger(1);
 
         final List<File> ret = new ArrayList<>();
-        final List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
+        final List<ScriptPack> packs = getAS3Packs();
 
         if (!parallel || packs.size() < 2) {
             try {
                 CancellableWorker.call(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, exportMode, parallel, evl);
+                        for (ScriptPack item : packs) {
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportMode, parallel, evl);
                             ret.add(task.call());
                         }
                         return null;
@@ -1278,8 +1278,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
-            for (MyEntry<ClassPath, ScriptPack> item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getKey(), item.getValue(), outdir, exportMode, parallel, evl));
+            for (ScriptPack item : packs) {
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportMode, parallel, evl));
                 futureResults.add(future);
             }
 

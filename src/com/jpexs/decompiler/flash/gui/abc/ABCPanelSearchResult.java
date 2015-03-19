@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 
 /**
@@ -27,10 +26,8 @@ public class ABCPanelSearchResult {
 
     public ScriptPack scriptPack;
 
-    public ClassPath classPath;
-
     @Override
     public String toString() {
-        return classPath.toString();
+        return scriptPack.getClassPath().toString();
     }
 }

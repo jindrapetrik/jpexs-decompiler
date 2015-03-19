@@ -17,12 +17,10 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import java.util.ArrayList;
@@ -37,13 +35,13 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     private SWF swf;
 
-    private List<MyEntry<ClassPath, ScriptPack>> list;
+    private List<ScriptPack> list;
 
     private AS3Package root;
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 
-    public List<MyEntry<ClassPath, ScriptPack>> getList() {
+    public List<ScriptPack> getList() {
         return list;
     }
 
@@ -73,19 +71,18 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     }
 
     public final void setFilter(String filter) {
-        root.scripts.clear();
-        root.subPackages.clear();
+        root.clear();
 
         filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();
-        for (MyEntry<ClassPath, ScriptPack> item : list) {
+        for (ScriptPack item : list) {
             if (filter != null) {
-                if (!item.getKey().toString().toLowerCase().contains(filter)) {
+                if (!item.getClassPath().toString().toLowerCase().contains(filter)) {
                     continue;
                 }
             }
 
-            AS3Package pkg = ensurePackage(item.getKey().packageStr);
-            pkg.scripts.put(item.getKey().className, item.getValue());
+            AS3Package pkg = ensurePackage(item.getClassPath().packageStr);
+            pkg.addScriptPack(item);
         }
     }
 
@@ -94,10 +91,10 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         AS3Package parent = root;
         while (st.hasMoreTokens()) {
             String pathElement = st.nextToken();
-            AS3Package pkg = parent.subPackages.get(pathElement);
+            AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
                 pkg = new AS3Package(pathElement, swf);
-                parent.subPackages.put(pathElement, pkg);
+                parent.addSubPackage(pkg);
             }
 
             parent = pkg;
@@ -111,14 +108,14 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     }
 
     private ScriptPack getElementByClassIndexRecursive(AS3Package item, int classIndex) {
-        for (AS3Package pkg : item.subPackages.values()) {
+        for (AS3Package pkg : item.getSubPackages()) {
             ScriptPack result = getElementByClassIndexRecursive(pkg, classIndex);
             if (result != null) {
                 return result;
             }
         }
 
-        for (ScriptPack sc : item.scripts.values()) {
+        for (ScriptPack sc : item.getScriptPacks()) {
             for (Trait t : sc.abc.script_info.get(sc.scriptIndex).traits.traits) {
                 if (t instanceof TraitClass) {
                     if (((TraitClass) t).class_info == classIndex) {
@@ -140,7 +137,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         AS3Package pkg = (AS3Package) parent;
         return pkg.getAllChildren();
     }
-    
+
     @Override
     public AS3ClassTreeItem getChild(Object parent, int index) {
         AS3Package pkg = (AS3Package) parent;

@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -69,7 +68,6 @@ import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -1438,14 +1436,14 @@ public class CommandLineArgumentParser {
                                 replaceAS2PCode(repText, src);
                             }
                         } else {
-                            List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
-                            for (MyEntry<ClassPath, ScriptPack> entry : packs) {
-                                if (entry.getKey().toString().equals(objectToReplace)) {
+                            List<ScriptPack> packs = swf.getAS3Packs();
+                            for (ScriptPack entry : packs) {
+                                if (entry.getClassPath().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
                                     String repFile = args.pop();
                                     String repText = Helper.readTextFile(repFile);
-                                    ScriptPack pack = entry.getValue();
+                                    ScriptPack pack = entry;
                                     if (Path.getExtension(repFile).equals(".as")) {
                                         replaceAS3(repText, pack);
                                     } else {
@@ -1627,9 +1625,9 @@ public class CommandLineArgumentParser {
         try {
             try (FileInputStream is = new FileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
-                List<MyEntry<ClassPath, ScriptPack>> packs = swf.getAS3Packs();
-                for (MyEntry<ClassPath, ScriptPack> entry : packs) {
-                    System.out.println(entry.getKey().toString() + " " + entry.getValue().scriptIndex);
+                List<ScriptPack> packs = swf.getAS3Packs();
+                for (ScriptPack entry : packs) {
+                    System.out.println(entry.getClassPath().toString() + " " + entry.scriptIndex);
                 }
             }
         } catch (IOException | InterruptedException e) {

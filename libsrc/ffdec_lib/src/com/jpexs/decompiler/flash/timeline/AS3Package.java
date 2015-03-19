@@ -34,9 +34,13 @@ public class AS3Package extends AS3ClassTreeItem {
 
     public String packageName;
 
-    public Map<String, AS3Package> subPackages = new TreeMap<>();
+    private final Map<String, AS3Package> subPackages = new TreeMap<>();
 
-    public Map<String, ScriptPack> scripts = new TreeMap<>();
+    private final Map<String, ScriptPack> scripts = new TreeMap<>();
+
+    private List<AS3Package> sortedPackages;
+
+    private List<ScriptPack> sortedScripts;
 
     public AS3Package(String packageName, SWF swf) {
         super(packageName, null);
@@ -49,35 +53,60 @@ public class AS3Package extends AS3ClassTreeItem {
         return swf;
     }
 
+    public List<AS3Package> getSubPackages() {
+        if (sortedPackages == null) {
+            List<AS3Package> list = new ArrayList<>();
+            for (AS3Package subPackage : subPackages.values()) {
+                list.add(subPackage);
+            }
+
+            sortedPackages = list;
+        }
+
+        return sortedPackages;
+    }
+
+    public List<ScriptPack> getScriptPacks() {
+        if (sortedScripts == null) {
+            List<ScriptPack> list = new ArrayList<>();
+            for (ScriptPack script : scripts.values()) {
+                list.add(script);
+            }
+
+            sortedScripts = list;
+        }
+
+        return sortedScripts;
+    }
+
+    public void addScriptPack(ScriptPack script) {
+        scripts.put(script.getClassPath().className, script);
+        sortedScripts = null;
+    }
+
+    public void addSubPackage(AS3Package subPackage) {
+        subPackages.put(subPackage.getName(), subPackage);
+        sortedPackages = null;
+    }
+
+    public AS3Package getSubPackage(String packageName) {
+        return subPackages.get(packageName);
+    }
+
     public List<AS3ClassTreeItem> getAllChildren() {
         List<AS3ClassTreeItem> result = new ArrayList<>(getChildCount());
         result.addAll(subPackages.values());
         result.addAll(scripts.values());
         return result;
     }
-    
+
     public AS3ClassTreeItem getChild(int index) {
         if (index < subPackages.size()) {
-            for (AS3Package subPackage : subPackages.values()) {
-                if (index == 0) {
-                    return subPackage;
-                }
-
-                index--;
-            }
+            return getSubPackages().get(index);
         }
 
         index -= subPackages.size();
-
-        for (ScriptPack pack : scripts.values()) {
-            if (index == 0) {
-                return pack;
-            }
-
-            index--;
-        }
-
-        return null;
+        return getScriptPacks().get(index);
     }
 
     public int getChildCount() {
@@ -105,6 +134,13 @@ public class AS3Package extends AS3ClassTreeItem {
         }
 
         return res;
+    }
+
+    public void clear() {
+        subPackages.clear();
+        scripts.clear();
+        sortedPackages = null;
+        sortedScripts = null;
     }
 
     @Override

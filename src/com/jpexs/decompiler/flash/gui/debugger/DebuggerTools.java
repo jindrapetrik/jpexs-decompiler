@@ -18,14 +18,12 @@ package com.jpexs.decompiler.flash.gui.debugger;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebugLogDialog;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
@@ -49,9 +47,9 @@ public class DebuggerTools {
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
         for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
-            for (MyEntry<ClassPath, ScriptPack> m : a.getScriptPacks()) {
-                if (isDebuggerClass(m.getKey().packageStr, null)) {
-                    return m.getValue();
+            for (ScriptPack m : a.getScriptPacks()) {
+                if (isDebuggerClass(m.getClassPath().packageStr, null)) {
+                    return m;
                 }
             }
         }

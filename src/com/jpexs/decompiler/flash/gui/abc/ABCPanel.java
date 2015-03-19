@@ -58,7 +58,6 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -177,16 +176,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             final List<ABCPanelSearchResult> found = new ArrayList<>();
             if (scriptsNode instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
-                List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
+                List<ScriptPack> allpacks = clModel.getList();
                 final Pattern pat = regexp
                         ? Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0)
                         : Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
                 int pos = 0;
-                for (final MyEntry<ClassPath, ScriptPack> item : allpacks) {
+                for (final ScriptPack pack : allpacks) {
                     pos++;
                     String workText = AppStrings.translate("work.searching");
                     String decAdd = "";
-                    final ScriptPack pack = item.getValue();
                     if (!SWF.isCached(pack)) {
                         decAdd = ", " + AppStrings.translate("work.decompiling");
                     }
@@ -199,14 +197,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                                 if (pat.matcher(SWF.getCached(pack).text).find()) {
                                     ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
                                     searchResult.scriptPack = pack;
-                                    searchResult.classPath = item.getKey();
                                     found.add(searchResult);
                                 }
                                 return null;
                             }
                         };
                         worker.execute();
-                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.getKey().toString() + "... ", worker);
+                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
                         worker.get();
                     } catch (InterruptedException ex) {
                         break;
@@ -686,12 +683,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         if (scriptsNode instanceof ClassesListTreeModel) {
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
-            for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
-                ClassPath classPath = item.getKey();
-                
+            for (ScriptPack item : clModel.getList()) {
+                ClassPath classPath = item.getClassPath();
+
                 // first check the className to avoid calling unnecessary toString
                 if (name.endsWith(classPath.className) && classPath.toString().equals(name)) {
-                    pack = item.getValue();
+                    pack = item;
                     break;
                 }
             }
@@ -807,9 +804,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                 try {
                     String oldSp = null;
-                    List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
+                    List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
                     if (!packs.isEmpty()) {
-                        oldSp = packs.get(0).getKey().toString();
+                        oldSp = packs.get(0).getClassPath().toString();
                     }
 
                     String as = decompiledTextArea.getText();

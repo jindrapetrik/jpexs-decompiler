@@ -55,7 +55,6 @@ import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -867,8 +866,8 @@ public class ABC {
         }
     }
 
-    public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
-        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
+    public List<ScriptPack> getScriptPacks() {
+        List<ScriptPack> ret = new ArrayList<>();
         for (int i = 0; i < script_info.size(); i++) {
             ret.addAll(script_info.get(i).getPacks(this, i));
         }
@@ -1046,22 +1045,23 @@ public class ABC {
 
     public List<ScriptPack> findScriptPacksByPath(String name) {
         List<ScriptPack> ret = new ArrayList<>();
-        List<MyEntry<ClassPath, ScriptPack>> allPacks = getScriptPacks();
+        List<ScriptPack> allPacks = getScriptPacks();
         if (name.endsWith(".**") || name.equals("**") || name.endsWith(".++") || name.equals("++")) {
             name = name.substring(0, name.length() - 2);
 
-            for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
-                if (en.getKey().toString().startsWith(name)) {
-                    ret.add(en.getValue());
+            for (ScriptPack en : allPacks) {
+                if (en.getClassPath().toString().startsWith(name)) {
+                    ret.add(en);
                 }
             }
         } else if (name.endsWith(".*") || name.equals("*") || name.endsWith(".+") || name.equals("+")) {
             name = name.substring(0, name.length() - 1);
-            for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
-                if (en.getKey().toString().startsWith(name)) {
-                    String rem = name.isEmpty() ? en.getKey().toString() : en.getKey().toString().substring(name.length());
+            for (ScriptPack en : allPacks) {
+                String classPathStr = en.getClassPath().toString();
+                if (classPathStr.startsWith(name)) {
+                    String rem = name.isEmpty() ? classPathStr : classPathStr.substring(name.length());
                     if (!rem.contains(".")) {
-                        ret.add(en.getValue());
+                        ret.add(en);
                     }
                 }
             }
@@ -1076,10 +1076,10 @@ public class ABC {
     }
 
     public ScriptPack findScriptPackByPath(String name) {
-        List<MyEntry<ClassPath, ScriptPack>> packs = getScriptPacks();
-        for (MyEntry<ClassPath, ScriptPack> en : packs) {
-            if (en.getKey().toString().equals(name)) {
-                return en.getValue();
+        List<ScriptPack> packs = getScriptPacks();
+        for (ScriptPack en : packs) {
+            if (en.getClassPath().toString().equals(name)) {
+                return en;
             }
         }
         return null;

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +35,13 @@ public class ScriptInfo {
     public ScriptInfo() {
         traits = new Traits();
     }
-       
+
     public ScriptInfo(Traits traits) {
         this.traits = traits;
     }
-       
-    public List<MyEntry<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
-        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
+
+    public List<ScriptPack> getPacks(ABC abc, int scriptIndex) {
+        List<ScriptPack> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
         for (int j = 0; j < traits.traits.size(); j++) {
@@ -70,7 +69,7 @@ public class ScriptInfo {
                 }
                 otherTraits = new ArrayList<>();
                 ClassPath cp = new ClassPath(packageName, objectName);
-                ret.add(new MyEntry<>(cp, new ScriptPack(cp, abc, scriptIndex, traitIndices)));
+                ret.add(new ScriptPack(cp, abc, scriptIndex, traitIndices));
             }
         }
         return ret;
