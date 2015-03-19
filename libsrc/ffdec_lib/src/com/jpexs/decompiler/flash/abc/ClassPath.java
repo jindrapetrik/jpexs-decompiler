@@ -58,9 +58,6 @@ public class ClassPath {
         if (!Objects.equals(this.packageStr, other.packageStr)) {
             return false;
         }
-        if (!Objects.equals(this.className, other.className)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.className, other.className);
     }
 }

@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.treeitems;
 
+import com.jpexs.decompiler.flash.abc.ClassPath;
+
 /**
  *
  * @author JPEXS
@@ -24,9 +26,9 @@ public abstract class AS3ClassTreeItem implements TreeItem {
 
     private final String name;
 
-    private final String path;
+    private final ClassPath path;
 
-    public AS3ClassTreeItem(String name, String path) {
+    public AS3ClassTreeItem(String name, ClassPath path) {
         this.name = name;
         this.path = path;
     }
@@ -36,7 +38,7 @@ public abstract class AS3ClassTreeItem implements TreeItem {
     }
 
     public String getPath() {
-        return path;
+        return path.toString();
     }
 
     @Override

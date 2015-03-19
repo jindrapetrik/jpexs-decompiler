@@ -65,7 +65,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public ScriptPack(ClassPath path, ABC abc, int scriptIndex, List<Integer> traitIndices) {
-        super(path.className, path.toString());
+        super(path.className, path);
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;

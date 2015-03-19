@@ -687,7 +687,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
-                if (item.getKey().toString().equals(name)) {
+                ClassPath classPath = item.getKey();
+                
+                // first check the className to avoid calling unnecessary toString
+                if (name.endsWith(classPath.className) && classPath.toString().equals(name)) {
                     pack = item.getValue();
                     break;
                 }
