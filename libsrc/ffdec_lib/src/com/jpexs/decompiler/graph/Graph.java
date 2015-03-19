@@ -1471,7 +1471,7 @@ public class Graph {
                             a.firstPart = ((AndItem) second).firstPart;
                         }
                         if (second instanceof OrItem) {
-                            a.firstPart = ((AndItem) second).firstPart;
+                            a.firstPart = ((OrItem) second).firstPart;
                         }
                     } else {
                         OrItem o = new OrItem(null, first, second);
@@ -1480,8 +1480,8 @@ public class Graph {
                         if (second instanceof OrItem) {
                             o.firstPart = ((OrItem) second).firstPart;
                         }
-                        if (second instanceof OrItem) {
-                            o.firstPart = ((OrItem) second).firstPart;
+                        if (second instanceof AndItem) {
+                            o.firstPart = ((AndItem) second).firstPart;
                         }
                     }
 
