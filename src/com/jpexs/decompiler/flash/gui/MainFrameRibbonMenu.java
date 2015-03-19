@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
 import java.awt.BorderLayout;
@@ -721,11 +722,27 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
             }
         });
 
+        JCommandButton memoryInformationCommandButton = new JCommandButton(fixCommandTitle("Memory information"), icon);
+        memoryInformationCommandButton.addActionListener(e -> {
+            String architecture = System.getProperty("sun.arch.data.model");
+            Runtime runtime = Runtime.getRuntime();
+            String info = "Architecture: " + architecture + Helper.newLine +
+                    "Max: " + (runtime.maxMemory() / 1024 / 1024)+ "MB" + Helper.newLine + 
+                    "Used: " + (runtime.totalMemory() / 1024 / 1024)+ "MB" + Helper.newLine + 
+                    "Free: " + (runtime.freeMemory() / 1024 / 1024)+ "MB";
+            View.showMessageDialog(null, info);
+            SWF swf = mainFrame.getPanel().getCurrentSwf();
+            if (swf != null) {
+                swf.clearAllCache();
+            }
+        });
+
         debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(checkResourcesCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(callGcCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(emptyCacheCommandButton, RibbonElementPriority.MEDIUM);
+        debugBand.addCommandButton(memoryInformationCommandButton, RibbonElementPriority.MEDIUM);
         return new RibbonTask("Debug", debugBand);
     }
 
