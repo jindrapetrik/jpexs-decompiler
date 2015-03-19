@@ -31,8 +31,16 @@ public class ScriptInfo {
 
     public int init_index; //MethodInfo
 
-    public Traits traits = new Traits();
+    public Traits traits;
 
+    public ScriptInfo() {
+        traits = new Traits();
+    }
+       
+    public ScriptInfo(Traits traits) {
+        this.traits = traits;
+    }
+       
     public List<MyEntry<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
 
@@ -52,8 +60,8 @@ public class ScriptInfo {
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
-                String packageName = ns.getName(abc.constants, false); //assume not null package
-                String objectName = name.getName(abc.constants, new ArrayList<String>(), false);
+                String packageName = ns.getName(abc.constants, false); // assume not null package
+                String objectName = name.getName(abc.constants, null, false);
                 List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);

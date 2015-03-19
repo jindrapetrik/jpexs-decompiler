@@ -32,13 +32,13 @@ public class NamespaceSet {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < this.namespaces.length; i++) {
             if (i > 0) {
-                s += ", ";
+                sb.append(", ");
             }
-            s += constants.getNamespace(namespaces[i]).getNameWithKind(constants);
+            sb.append(constants.getNamespace(namespaces[i]).getNameWithKind(constants));
         }
-        return s;
+        return sb.toString();
     }
 }

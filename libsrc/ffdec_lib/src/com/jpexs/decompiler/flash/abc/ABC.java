@@ -527,7 +527,7 @@ public class ABC {
         class_info = new ArrayList<>(class_count);
         for (int i = 0; i < class_count; i++) {
             ais.newDumpLevel("class", "class_info");
-            ClassInfo ci = new ClassInfo();
+            ClassInfo ci = new ClassInfo(null); // do not create Traits in constructor
             ci.cinit_index = ais.readU30("cinit_index");
             ci.static_traits = ais.readTraits("static_traits");
             class_info.add(ci);
@@ -537,7 +537,7 @@ public class ABC {
         script_info = new ArrayList<>(script_count);
         for (int i = 0; i < script_count; i++) {
             ais.newDumpLevel("script", "script_info");
-            ScriptInfo si = new ScriptInfo();
+            ScriptInfo si = new ScriptInfo(null); // do not create Traits in constructor
             si.init_index = ais.readU30("init_index");
             si.traits = ais.readTraits("traits");
             script_info.add(si);
@@ -548,7 +548,7 @@ public class ABC {
         bodies = new ArrayList<>(bodies_count);
         for (int i = 0; i < bodies_count; i++) {
             ais.newDumpLevel("method_body", "method_body_info");
-            MethodBody mb = new MethodBody();
+            MethodBody mb = new MethodBody(null, null, null); // do not create Traits in constructor
             mb.method_info = ais.readU30("method_info");
             mb.max_stack = ais.readU30("max_stack");
             mb.max_regs = ais.readU30("max_regs");

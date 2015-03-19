@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -64,18 +65,32 @@ public final class MethodBody implements Cloneable {
     public int max_scope_depth;
 
     @SWFField
-    private byte[] codeBytes = new byte[0];
+    private byte[] codeBytes;
 
     private AVM2Code code;
 
-    public ABCException[] exceptions = new ABCException[0];
+    public ABCException[] exceptions;
 
-    public Traits traits = new Traits();
+    public Traits traits;
 
+    @Internal
     public transient List<GraphTargetItem> convertedItems;
 
+    @Internal
     public transient Throwable convertException;
 
+    public MethodBody() {
+        this.traits = new Traits();
+        this.codeBytes = new byte[0];
+        this.exceptions = new ABCException[0];
+    }
+       
+    public MethodBody(Traits traits, byte[] codeBytes, ABCException[] exceptions) {
+        this.traits = traits;
+        this.codeBytes = codeBytes;
+        this.exceptions = exceptions;
+    }
+       
     public synchronized void setCodeBytes(byte codeBytes[]) {
         this.codeBytes = codeBytes;
         this.code = null;

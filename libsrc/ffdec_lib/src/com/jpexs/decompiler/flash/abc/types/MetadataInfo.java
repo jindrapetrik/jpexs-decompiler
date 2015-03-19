@@ -39,17 +39,18 @@ public class MetadataInfo {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        String s = "name=" + constants.getString(name_index);
+        StringBuilder sb = new StringBuilder();
+        sb.append("name=").append(constants.getString(name_index));
         if (keys.length > 0) {
-            s += "\r\n";
+            sb.append("\r\n");
         }
         for (int i = 0; i < keys.length; i++) {
             if (keys[i] == 0) {
-                s += "\"" + constants.getString(values[i]) + "\"\r\n";
+                sb.append("\"").append(constants.getString(values[i])).append("\"\r\n");
             } else {
-                s += "\"" + constants.getString(keys[i]) + "\"=\"" + constants.getString(values[i]) + "\"\r\n";
+                sb.append("\"").append(constants.getString(keys[i])).append("\"=\"").append(constants.getString(values[i])).append("\"\r\n");
             }
         }
-        return s;
+        return sb.toString();
     }
 }

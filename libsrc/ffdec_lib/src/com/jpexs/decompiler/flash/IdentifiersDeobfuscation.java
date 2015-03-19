@@ -48,7 +48,9 @@ public class IdentifiersDeobfuscation {
 
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}";
 
-    public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*$");
+    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Z_\\$][a-zA-Z0-9_\\$]*$");
+    
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*$");
 
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
 
@@ -88,8 +90,9 @@ public class IdentifiersDeobfuscation {
             return false;
         }
         String[] reservedWords = as3 ? reservedWordsAS3 : reservedWordsAS2;
+        s = s.trim();
         for (String rw : reservedWords) {
-            if (rw.equals(s.trim())) {
+            if (rw.equals(s)) {
                 return true;
             }
         }
@@ -240,7 +243,7 @@ public class IdentifiersDeobfuscation {
         }
 
         // simple fast test
-        if (s.matches("^[a-zA-Z_\\$][a-zA-Z0-9_\\$]*$")) {
+        if (VALID_NAME_PATTERN.matcher(s).matches()) {
             return true;
         }
         // unicode test

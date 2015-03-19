@@ -280,10 +280,10 @@ public class Multiname {
             return "";
         }
         if (name_index == 0) {
-            return (isAttribute() ? "@*" : "*");
+            return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
+            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
                 return getNameWithNamespace(constants, raw);
             }
             return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));

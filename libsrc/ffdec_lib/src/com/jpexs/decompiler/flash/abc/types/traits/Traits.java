@@ -34,8 +34,16 @@ import java.util.logging.Logger;
 
 public class Traits implements Serializable {
 
-    public List<Trait> traits = new ArrayList<>();
+    public List<Trait> traits;
 
+    public Traits() {
+        traits = new ArrayList<>();
+    }
+    
+    public Traits(int initialCapacity) {
+        traits = new ArrayList<>(initialCapacity);
+    }
+    
     public void delete(ABC abc, boolean d) {
         for (Trait t : traits) {
             t.delete(abc, d);

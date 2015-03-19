@@ -1619,7 +1619,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
             MethodBody mbody = new MethodBody();
 
             if (needsActivation) {
-                mbody.traits = new Traits();
                 int slotId = 1;
                 for (int i = 1; i < slotNames.size(); i++) {
                     TraitSlotConst tsc = new TraitSlotConst();

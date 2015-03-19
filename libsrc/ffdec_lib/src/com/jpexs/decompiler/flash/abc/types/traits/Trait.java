@@ -30,13 +30,15 @@ import java.util.List;
 
 public abstract class Trait implements Serializable {
 
+    private static final int[] EMPTY_METADATA_ARRAY = new int[0];
+    
     public int name_index;
 
     public int kindType;
 
     public int kindFlags;
 
-    public int[] metadata = new int[0];
+    public int[] metadata = EMPTY_METADATA_ARRAY;
 
     public long fileOffset;
 

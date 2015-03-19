@@ -50,6 +50,8 @@ public class ABCInputStream implements AutoCloseable {
     public static final boolean DEBUG_READ = false;
 
     public DumpInfo dumpInfo;
+    
+    private byte[] stringDataBuffer = new byte[256];
 
     public void startBuffer() {
         if (bufferOs == null) {
@@ -251,7 +253,8 @@ public class ABCInputStream implements AutoCloseable {
     }
 
     private long readLong() throws IOException {
-        byte[] readBuffer = safeRead(8);
+        safeRead(8, stringDataBuffer);
+        byte[] readBuffer = stringDataBuffer;
         return (((long) readBuffer[7] << 56)
                 + ((long) (readBuffer[6] & 255) << 48)
                 + ((long) (readBuffer[5] & 255) << 40)
@@ -270,12 +273,10 @@ public class ABCInputStream implements AutoCloseable {
         return ret;
     }
 
-    private byte[] safeRead(int count) throws IOException {
-        byte[] ret = new byte[count];
+    private void safeRead(int count, byte[] data) throws IOException {
         for (int i = 0; i < count; i++) {
-            ret[i] = (byte) readInternal();
+            data[i] = (byte) readInternal();
         }
-        return ret;
     }
 
     public Namespace readNamespace(String name) throws IOException {
@@ -423,8 +424,7 @@ public class ABCInputStream implements AutoCloseable {
     public Traits readTraits(String name) throws IOException {
         newDumpLevel(name, "Traits");
         int count = readU30("count");
-        Traits traits = new Traits();
-        traits.traits = new ArrayList<>();
+        Traits traits = new Traits(count);
         for (int i = 0; i < count; i++) {
             traits.traits.add(readTrait("trait"));
         }
@@ -456,7 +456,7 @@ public class ABCInputStream implements AutoCloseable {
 
     public InstanceInfo readInstanceInfo(String name) throws IOException {
         newDumpLevel(name, "instance_info");
-        InstanceInfo ret = new InstanceInfo();
+        InstanceInfo ret = new InstanceInfo(null); // do not create Traits in constructor
         ret.name_index = readU30("name_index");
         ret.super_index = readU30("super_index");
         ret.flags = readInternal();
@@ -477,8 +477,19 @@ public class ABCInputStream implements AutoCloseable {
     public String readString(String name) throws IOException {
         newDumpLevel(name, "String");
         int length = readU30Internal();
-        byte[] b = safeRead(length);
-        String r = new String(b, Utf8Helper.charset);
+        
+        // avoid creating new byte array every time
+        if (stringDataBuffer.length < length) {
+            int newLength = stringDataBuffer.length * 2;
+            while (newLength < length) {
+                newLength *= 2;
+            }
+            
+            stringDataBuffer = new byte[newLength];
+        }
+        
+        safeRead(length, stringDataBuffer);
+        String r = new String(stringDataBuffer, 0, length, Utf8Helper.charset);
         endDumpLevel(r);
         return r;
     }
