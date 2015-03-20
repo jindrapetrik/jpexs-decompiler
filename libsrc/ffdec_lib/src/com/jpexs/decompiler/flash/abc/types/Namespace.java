@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 
 public class Namespace {
 
@@ -46,6 +47,7 @@ public class Namespace {
 
     public int name_index;
 
+    @Internal
     public boolean deleted;
 
     public static String kindToStr(int kind) {

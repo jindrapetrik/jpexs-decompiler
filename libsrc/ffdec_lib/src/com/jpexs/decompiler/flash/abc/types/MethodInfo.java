@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 public class MethodInfo {
 
+    @Internal
     public boolean deleted;
 
     public void delete(ABC abc, boolean d) {

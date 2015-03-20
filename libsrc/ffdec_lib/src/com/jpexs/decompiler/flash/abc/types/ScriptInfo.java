@@ -21,11 +21,13 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScriptInfo {
 
+    @Internal
     public boolean deleted;
 
     public int init_index; //MethodInfo

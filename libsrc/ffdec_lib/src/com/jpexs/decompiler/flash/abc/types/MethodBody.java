@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 
 public final class MethodBody implements Cloneable {
 
+    @Internal
     public boolean deleted;
 
     boolean debugMode = false;

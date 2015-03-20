@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.util.List;
 
 public class ClassInfo {
@@ -26,6 +27,7 @@ public class ClassInfo {
 
     public Traits static_traits;
 
+    @Internal
     public boolean deleted;
 
     public ClassInfo() {

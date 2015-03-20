@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class InstanceInfo {
 
     public static final int CLASS_PROTECTEDNS = 8;
 
+    @Internal
     public boolean deleted;
 
     public InstanceInfo() {

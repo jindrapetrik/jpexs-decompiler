@@ -17,9 +17,11 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 
 public class NamespaceSet {
 
+    @Internal
     public boolean deleted;
 
     public int[] namespaces;
