@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
@@ -366,18 +367,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
         for (ABCContainerTag tag : abc.getAbcTags()) {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
-                    String spath = t.getPath(tag.getABC());
-                    String pkg = "";
-                    String name = spath;
-                    if (spath.contains(".")) {
-                        pkg = spath.substring(0, spath.lastIndexOf('.'));
-                        name = spath.substring(spath.lastIndexOf('.') + 1);
-                    }
+                    ClassPath classPath = t.getPath(tag.getABC());
+                    String pkg = classPath.packageStr == null ? "" : classPath.packageStr;
                     if (pkg.equals(packageName)) {
-                        namesInThisPackage.add(name);
+                        namesInThisPackage.add(classPath.className);
                     }
                 }
-
             }
         }
 

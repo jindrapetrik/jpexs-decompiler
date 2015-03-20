@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -189,11 +190,11 @@ public abstract class Trait implements Serializable {
 
     public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException;
 
-    public String getPath(ABC abc) {
+    public ClassPath getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants, false);
         String objectName = name.getName(abc.constants, new ArrayList<String>(), false);
-        return packageName + "." + objectName; //assume not null name
+        return new ClassPath(packageName, objectName); //assume not null name
     }
 }

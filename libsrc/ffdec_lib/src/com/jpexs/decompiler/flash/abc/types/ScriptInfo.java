@@ -40,7 +40,7 @@ public class ScriptInfo {
         this.traits = traits;
     }
 
-    public List<ScriptPack> getPacks(ABC abc, int scriptIndex) {
+    public List<ScriptPack> getPacks(ABC abc, int scriptIndex, String packagePrefix) {
         List<ScriptPack> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
@@ -66,10 +66,13 @@ public class ScriptInfo {
                 traitIndices.add(j);
                 if (!otherTraits.isEmpty()) {
                     traitIndices.addAll(otherTraits);
+                    otherTraits.clear();
                 }
-                otherTraits = new ArrayList<>();
-                ClassPath cp = new ClassPath(packageName, objectName);
-                ret.add(new ScriptPack(cp, abc, scriptIndex, traitIndices));
+                
+                if (packagePrefix == null || packageName.startsWith(packagePrefix)) {
+                    ClassPath cp = new ClassPath(packageName, objectName);
+                    ret.add(new ScriptPack(cp, abc, scriptIndex, traitIndices));
+                }
             }
         }
         return ret;

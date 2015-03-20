@@ -47,7 +47,7 @@ public class DebuggerTools {
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
         for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
-            for (ScriptPack m : a.getScriptPacks()) {
+            for (ScriptPack m : a.getScriptPacks(DEBUGGER_PACKAGE)) {
                 if (isDebuggerClass(m.getClassPath().packageStr, null)) {
                     return m;
                 }
@@ -64,11 +64,18 @@ public class DebuggerTools {
         if (tested == null) {
             return false;
         }
+        
+        // fast check, because dynamic regex compile and match is expensive
+        if (!tested.startsWith(DEBUGGER_PACKAGE)) {
+            return false;
+        }
+        
         if (cls == null) {
             cls = "";
         } else {
             cls = "\\." + Pattern.quote(cls);
         }
+        
         return tested.matches(Pattern.quote(DEBUGGER_PACKAGE) + "(\\.pkg[a-f0-9]+)?" + cls);
     }
 

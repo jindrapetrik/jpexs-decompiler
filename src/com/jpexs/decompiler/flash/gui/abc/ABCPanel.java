@@ -804,7 +804,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                 try {
                     String oldSp = null;
-                    List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
+                    List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null);
                     if (!packs.isEmpty()) {
                         oldSp = packs.get(0).getClassPath().toString();
                     }

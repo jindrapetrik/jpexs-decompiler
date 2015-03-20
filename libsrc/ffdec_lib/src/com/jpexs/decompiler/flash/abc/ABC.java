@@ -866,10 +866,10 @@ public class ABC {
         }
     }
 
-    public List<ScriptPack> getScriptPacks() {
+    public List<ScriptPack> getScriptPacks(String packagePrefix) {
         List<ScriptPack> ret = new ArrayList<>();
         for (int i = 0; i < script_info.size(); i++) {
-            ret.addAll(script_info.get(i).getPacks(this, i));
+            ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix));
         }
         return ret;
     }
@@ -1045,7 +1045,7 @@ public class ABC {
 
     public List<ScriptPack> findScriptPacksByPath(String name) {
         List<ScriptPack> ret = new ArrayList<>();
-        List<ScriptPack> allPacks = getScriptPacks();
+        List<ScriptPack> allPacks = getScriptPacks(null); // todo: honfika: use filter parameter
         if (name.endsWith(".**") || name.equals("**") || name.endsWith(".++") || name.equals("++")) {
             name = name.substring(0, name.length() - 2);
 
@@ -1076,7 +1076,7 @@ public class ABC {
     }
 
     public ScriptPack findScriptPackByPath(String name) {
-        List<ScriptPack> packs = getScriptPacks();
+        List<ScriptPack> packs = getScriptPacks(null);
         for (ScriptPack en : packs) {
             if (en.getClassPath().toString().equals(name)) {
                 return en;

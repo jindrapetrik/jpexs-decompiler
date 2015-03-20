@@ -1162,7 +1162,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public List<ScriptPack> getAS3Packs() {
         List<ScriptPack> packs = new ArrayList<>();
         for (ABCContainerTag abcTag : getAbcList()) {
-            packs.addAll(abcTag.getABC().getScriptPacks());
+            packs.addAll(abcTag.getABC().getScriptPacks(null));
         }
         return uniqueAS3Packs(packs);
     }

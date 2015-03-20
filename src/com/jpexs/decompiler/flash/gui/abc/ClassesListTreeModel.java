@@ -81,7 +81,8 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 }
             }
 
-            AS3Package pkg = ensurePackage(item.getClassPath().packageStr);
+            String packageStr = item.getClassPath().packageStr;
+            AS3Package pkg = ensurePackage(packageStr);
             pkg.addScriptPack(item);
         }
     }
