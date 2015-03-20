@@ -2347,7 +2347,7 @@ public class ActionScriptParser {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
             initPlayer();
-            ABC abc = new ABC(swf);
+            ABC abc = new ABC(null);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
             parser.addScript(new String(Helper.readFile(src), "UTF-8"), true, src, classPos);
             try (FileOutputStream fos = new FileOutputStream(new File(dst))) {

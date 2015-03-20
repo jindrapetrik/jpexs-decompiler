@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -42,6 +43,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     public int value_kind;
 
+    @Internal
     public GraphTargetItem assignedValue;
 
     @Override

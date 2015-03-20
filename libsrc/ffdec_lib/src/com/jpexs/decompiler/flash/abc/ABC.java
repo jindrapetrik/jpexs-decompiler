@@ -109,7 +109,8 @@ public class ABC {
     /* Map from multiname index of namespace value to namespace name**/
     private Map<String, String> namespaceMap;
 
-    public ABC(SWF swf) {
+    public ABC(ABCContainerTag tag) {
+        this.parentTag = tag;
         this.deobfuscation = null;
         constants.constant_double.add(null);
         constants.constant_int.add(null);

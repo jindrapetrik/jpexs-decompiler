@@ -98,6 +98,7 @@ import com.jpexs.helpers.ReflectionTools;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -134,7 +135,7 @@ public class SwfXmlImporter {
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
-            processElement(doc.getDocumentElement(), swf, swf);
+            processElement(doc.getDocumentElement(), swf, swf, null);
         } catch (ParserConfigurationException | SAXException ex) {
             Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -152,7 +153,7 @@ public class SwfXmlImporter {
         return field;
     }
 
-    private void processElement(Element element, Object obj, SWF swf) {
+    private void processElement(Element element, Object obj, SWF swf, Tag tag) {
         Class cls = obj.getClass();
         for (int i = 0; i < element.getAttributes().getLength(); i++) {
             Attr attr = (Attr) element.getAttributes().item(i);
@@ -182,7 +183,7 @@ public class SwfXmlImporter {
                             Node childChildNode = child.getChildNodes().item(j);
                             if (childChildNode instanceof Element) {
                                 Element childChild = (Element) child.getChildNodes().item(j);
-                                Object childObj = processObject(childChild, ReflectionTools.getFieldSubType(obj, field), swf);
+                                Object childObj = processObject(childChild, ReflectionTools.getFieldSubType(obj, field), swf, tag);
                                 list.add(childObj);
                             }
                         }
@@ -194,7 +195,7 @@ public class SwfXmlImporter {
                             Node childChildNode = child.getChildNodes().item(j);
                             if (childChildNode instanceof Element) {
                                 Element childChild = (Element) child.getChildNodes().item(j);
-                                Object childObj = processObject(childChild, childCls.getComponentType(), swf);
+                                Object childObj = processObject(childChild, childCls.getComponentType(), swf, tag);
                                 list.add(childObj);
                             }
                         }
@@ -206,7 +207,7 @@ public class SwfXmlImporter {
 
                         field.set(obj, array);
                     } else {
-                        Object childObj = processObject(child, null, swf);
+                        Object childObj = processObject(child, null, swf, tag);
                         field.set(obj, childObj);
                     }
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
@@ -216,11 +217,15 @@ public class SwfXmlImporter {
         }
     }
 
-    private Object processObject(Element element, Class requiredType, SWF swf) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+    private Object processObject(Element element, Class requiredType, SWF swf, Tag tag) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         String type = element.getAttribute("type");
         if (type != null && !type.isEmpty()) {
-            Object childObj = createObject(type, swf);
-            processElement(element, childObj, swf);
+            Object childObj = createObject(type, swf, tag);
+            if (childObj instanceof Tag) {
+                tag = (Tag) childObj;
+            }
+
+            processElement(element, childObj, swf, tag);
             return childObj;
         } else {
             String isNullAttr = element.getAttribute("isNull");
@@ -232,7 +237,7 @@ public class SwfXmlImporter {
         }
     }
 
-    private Object createObject(String type, SWF swf) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    private Object createObject(String type, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (swfTags == null) {
             Map<String, Class> tags = new HashMap<>();
             Map<Integer, Class> knownTags = Tag.getKnownClasses();
@@ -300,7 +305,14 @@ public class SwfXmlImporter {
 
         cls = swfObjectsParam.get(type);
         if (cls != null) {
-            return cls.getConstructor(SWF.class).newInstance(swf);
+            for (Constructor<?> constructor : cls.getConstructors()) {
+                if (constructor.getParameterCount() == 1) {
+                    Class<?> parameterType = constructor.getParameterTypes()[0];
+                    if (parameterType.isAssignableFrom(tag.getClass())) {
+                        return constructor.newInstance(tag);
+                    }
+                }
+            }
         }
 
         System.err.println("Type not found: " + type);
@@ -329,6 +341,9 @@ public class SwfXmlImporter {
         } else if (cls == ByteArrayRange.class) {
             ByteArrayRange range = new ByteArrayRange(stringValue);
             return range;
+        } else if (cls == byte[].class) {
+            ByteArrayRange range = new ByteArrayRange(stringValue);
+            return range.getArray();
         } else if (cls.isEnum()) {
             return Enum.valueOf(cls, stringValue);
         } else {

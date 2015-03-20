@@ -95,6 +95,15 @@ public class SwfXmlExporter {
         generateXml(doc, node, "swf", swf, false, 0);
     }
 
+    private static String byteArrayToString(byte[] data) {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        for (int i = 0; i < data.length; i++) {
+            sb.append(String.format("%02x", data[i]));
+        }        
+        
+        return sb.toString();
+    }
+    
     private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
         Class cls = obj != null ? obj.getClass() : null;
 
@@ -124,12 +133,10 @@ public class SwfXmlExporter {
         } else if (obj instanceof ByteArrayRange) {
             ByteArrayRange range = (ByteArrayRange) obj;
             byte[] data = range.getRangeData();
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < data.length; i++) {
-                sb.append(String.format("%02x", data[i]));
-            }
-
-            ((Element) node).setAttribute(name, sb.toString());
+            ((Element) node).setAttribute(name, byteArrayToString(data));
+        } else if (obj instanceof byte[]) {
+            byte[] data = (byte[]) obj;
+            ((Element) node).setAttribute(name, byteArrayToString(data));
         } else if (cls != null && List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
             Element listNode = doc.createElement(name);

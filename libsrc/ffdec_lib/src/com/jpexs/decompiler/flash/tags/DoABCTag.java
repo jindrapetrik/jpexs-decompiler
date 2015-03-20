@@ -62,7 +62,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      */
     public DoABCTag(SWF swf) {
         super(swf, ID, "DoABC", null);
-        abc = new ABC(swf);
+        abc = new ABC(this);
     }
 
     /**
