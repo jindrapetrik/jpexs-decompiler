@@ -948,7 +948,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         new ShowFrameTag(swf).writeTag(sos2);
                     }
 
-                }//not showframe
+                } // not showframe
 
                 new EndTag(swf).writeTag(sos2);
                 data = baos.toByteArray();

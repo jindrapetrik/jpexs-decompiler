@@ -266,7 +266,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         ribbon.addTask(createSettingsRibbonTask(externalFlashPlayerUnavailable));
         ribbon.addTask(createHelpRibbonTask());
 
-        if (Configuration.showDebugMenu.get()) {
+        if (Configuration.showDebugMenu.get() || Configuration.debugMode.get()) {
             ribbon.addTask(createDebugRibbonTask());
         }
 
@@ -726,10 +726,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         memoryInformationCommandButton.addActionListener(e -> {
             String architecture = System.getProperty("sun.arch.data.model");
             Runtime runtime = Runtime.getRuntime();
-            String info = "Architecture: " + architecture + Helper.newLine +
-                    "Max: " + (runtime.maxMemory() / 1024 / 1024)+ "MB" + Helper.newLine + 
-                    "Used: " + (runtime.totalMemory() / 1024 / 1024)+ "MB" + Helper.newLine + 
-                    "Free: " + (runtime.freeMemory() / 1024 / 1024)+ "MB";
+            String info = "Architecture: " + architecture + Helper.newLine
+                    + "Max: " + (runtime.maxMemory() / 1024 / 1024) + "MB" + Helper.newLine
+                    + "Used: " + (runtime.totalMemory() / 1024 / 1024) + "MB" + Helper.newLine
+                    + "Free: " + (runtime.freeMemory() / 1024 / 1024) + "MB";
             View.showMessageDialog(null, info);
             SWF swf = mainFrame.getPanel().getCurrentSwf();
             if (swf != null) {

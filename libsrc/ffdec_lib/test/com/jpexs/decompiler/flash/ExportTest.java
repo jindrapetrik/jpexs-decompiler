@@ -20,34 +20,35 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import static org.testng.Assert.fail;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
  *
  * @author JPEXS
  */
-public class ExportTest {
+public class ExportTest extends FileTestBase {
 
     @BeforeClass
     public void init() {
-        //Main.initLogging(false);
+        Configuration.autoDeobfuscate.set(false);
+        Configuration.debugCopy.set(false);
     }
 
     public static final String TESTDATADIR = "testdata/decompile";
 
+    public static Handler loggerHandler;
+
     @BeforeClass
     public void addLogger() {
-        Configuration.autoDeobfuscate.set(true);
         Logger logger = Logger.getLogger("");
-        logger.addHandler(new Handler() {
+        loggerHandler = new Handler() {
             @Override
             public void publish(LogRecord record) {
                 if (record.getLevel() == Level.SEVERE) {
@@ -62,44 +63,33 @@ public class ExportTest {
             @Override
             public void close() throws SecurityException {
             }
-        });
+        };
+
+        logger.addHandler(loggerHandler);
     }
 
-    @DataProvider(name = "swfFiles")
-    public Object[][] createData() {
-        File dir = new File(TESTDATADIR);
-        File[] files = new File[0];
-        if (dir.exists()) {
-            files = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".swf");
-                }
-            });
+    @AfterClass
+    public void removeLogger() {
+        if (loggerHandler != null) {
+            Logger logger = Logger.getLogger("");
+            logger.removeHandler(loggerHandler);
         }
-        Object[][] ret = new Object[files.length + 2][1];
-        ret[0][0] = new File(TESTDATADIR + File.separator + "../as2/as2.swf");
-        ret[1][0] = new File(TESTDATADIR + File.separator + "../as3/as3.swf");
-        for (int f = 0; f < files.length; f++) {
-            ret[f + 2][0] = files[f];
-        }
-        return ret;
     }
 
-    @Test(dataProvider = "swfFiles")
-    public void testDecompileAS(File f) {
-        testDecompile(f, ScriptExportMode.AS);
+    @Test(dataProvider = "provideFiles")
+    public void testDecompileAS(String fileName) {
+        testDecompile(fileName, ScriptExportMode.AS);
     }
 
-    @Test(dataProvider = "swfFiles")
-    public void testDecompilePcode(File f) {
-        testDecompile(f, ScriptExportMode.PCODE);
+    @Test(dataProvider = "provideFiles")
+    public void testDecompilePcode(String fileName) {
+        testDecompile(fileName, ScriptExportMode.PCODE);
     }
 
-    public void testDecompile(File f, ScriptExportMode exportMode) {
+    public void testDecompile(String fileName, ScriptExportMode exportMode) {
         try {
-            SWF swf = new SWF(new FileInputStream(f), false);
-            Configuration.debugCopy.set(true);
+            File f = new File(fileName);
+            SWF swf = new SWF(new FileInputStream(TESTDATADIR + File.separator + fileName), false);
             String folderName = exportMode == ScriptExportMode.AS ? "output" : "outputp";
             File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
@@ -117,7 +107,12 @@ public class ExportTest {
 
             }, fdir.getAbsolutePath(), exportMode, false, null);
         } catch (Exception ex) {
-            fail();
+            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
         }
+    }
+
+    @Override
+    public String getTestDataDir() {
+        return TESTDATADIR;
     }
 }
