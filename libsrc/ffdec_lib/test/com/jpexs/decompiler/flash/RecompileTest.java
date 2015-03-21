@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.NotSameException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
 import java.io.BufferedInputStream;
@@ -43,6 +47,26 @@ public class RecompileTest extends FileTestBase {
     public static final String TESTDATADIR = "testdata/recompile";
 
     @Test(dataProvider = "provideFiles")
+    public void testAS3InstructionParsing(String fileName) {
+        try {
+            Configuration.debugCopy.set(false);
+            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + fileName)) {
+                SWF swf = new SWF(new BufferedInputStream(fis), false);
+                for (ABCContainerTag abcTag : swf.getAbcList()) {
+                    ABC abc = abcTag.getABC();
+                    for (MethodBody body : abc.bodies) {
+                        AVM2Code code = body.getCode();
+                    }
+
+                    ((Tag) abcTag).setModified(true);
+                }
+            }
+        } catch (Throwable ex) {
+            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
+        }
+    }
+
+    //@Test(dataProvider = "provideFiles")
     public void testRecompile(String fileName) {
         try {
             try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + fileName)) {

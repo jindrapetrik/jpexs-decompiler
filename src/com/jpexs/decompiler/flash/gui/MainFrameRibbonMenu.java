@@ -737,12 +737,21 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
             }
         });
 
+        JCommandButton fixAs3CodeCommandButton = new JCommandButton(fixCommandTitle("Fix AS3 code"), icon);
+        fixAs3CodeCommandButton.addActionListener(e -> {
+            SWF swf = mainFrame.getPanel().getCurrentSwf();
+            if (swf != null) {
+                swf.fixAS3Code();
+            }
+        });
+
         debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(checkResourcesCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(callGcCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(emptyCacheCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(memoryInformationCommandButton, RibbonElementPriority.MEDIUM);
+        debugBand.addCommandButton(fixAs3CodeCommandButton, RibbonElementPriority.MEDIUM);
         return new RibbonTask("Debug", debugBand);
     }
 

@@ -484,9 +484,14 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof DefineSpriteTag) {
             return ((DefineSpriteTag) parentNode).getTimeline().getFrames();
         } else if (parentNode instanceof DefineBinaryDataTag) {
-            List<SWF> result = new ArrayList<>(1);
-            result.add(((DefineBinaryDataTag) parentNode).innerSwf);
-            return result;
+            DefineBinaryDataTag binaryDataTag = (DefineBinaryDataTag) parentNode;
+            if (binaryDataTag.innerSwf != null) {
+                List<SWF> result = new ArrayList<>(1);
+                result.add(((DefineBinaryDataTag) parentNode).innerSwf);
+                return result;
+            } else {
+                return new ArrayList<>(0);
+            }
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getAllChildren();
         } else if (parentNode instanceof FrameScript) {
