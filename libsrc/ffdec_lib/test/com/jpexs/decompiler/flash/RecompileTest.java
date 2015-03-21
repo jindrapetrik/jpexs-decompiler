@@ -66,7 +66,7 @@ public class RecompileTest extends FileTestBase {
         }
     }
 
-    //@Test(dataProvider = "provideFiles")
+    @Test(dataProvider = "provideFiles")
     public void testRecompile(String fileName) {
         try {
             try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + fileName)) {
