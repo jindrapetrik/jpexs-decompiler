@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class FindPropGlobalIns extends InstructionDefinition {
 
     public FindPropGlobalIns() {
-        super(0x5C, "findpropglobal", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+        super(0x5C, "findpropglobal", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }
 
     @Override

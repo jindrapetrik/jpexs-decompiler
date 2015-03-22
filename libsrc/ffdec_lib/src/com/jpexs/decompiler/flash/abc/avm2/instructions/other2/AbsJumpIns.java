@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class AbsJumpIns extends InstructionDefinition {
 
     public AbsJumpIns() {
-        super(0xEE, "abs_jump", new int[]{});
+        super(0xEE, "abs_jump", new int[]{}, false /*?*/);
     }
 
     @Override

@@ -50,10 +50,13 @@ public class InstructionDefinition implements Serializable {
 
     public int instructionCode = 0;
 
-    public InstructionDefinition(int instructionCode, String instructionName, int[] operands) {
+    public boolean canThrow;
+
+    public InstructionDefinition(int instructionCode, String instructionName, int[] operands, boolean canThrow) {
         this.instructionCode = instructionCode;
         this.instructionName = instructionName;
         this.operands = operands;
+        this.canThrow = canThrow;
     }
 
     @Override

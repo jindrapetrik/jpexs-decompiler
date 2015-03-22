@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DoubleToAtomIns extends InstructionDefinition {
 
     public DoubleToAtomIns() {
-        super(0xFB, "doubletoatom", new int[]{});
+        super(0xFB, "doubletoatom", new int[]{}, true /*?*/);
     }
 
     @Override

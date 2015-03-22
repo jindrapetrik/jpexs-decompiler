@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class ConcatIns extends InstructionDefinition {
 
     public ConcatIns() {
-        super(0x9A, "concat", new int[]{});
+        super(0x9A, "concat", new int[]{}, true /*?*/);
     }
 
     @Override

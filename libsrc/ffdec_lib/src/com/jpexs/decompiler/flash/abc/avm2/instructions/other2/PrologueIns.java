@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PrologueIns extends InstructionDefinition {
 
     public PrologueIns() {
-        super(0xF9, "prologue", new int[]{});
+        super(0xF9, "prologue", new int[]{}, false /*?*/);
     }
 
     @Override

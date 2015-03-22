@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class NegatePIns extends InstructionDefinition {
 
     public NegatePIns() {
-        super(0x8F, "negate_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS});
+        super(0x8F, "negate_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
     }
 
     @Override

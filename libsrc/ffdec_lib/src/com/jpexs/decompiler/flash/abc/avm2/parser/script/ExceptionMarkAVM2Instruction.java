@@ -33,7 +33,7 @@ public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
         super(0, null, null);
         this.markType = markType;
         this.exceptionId = exceptionId;
-        this.definition = new InstructionDefinition(0, "--mark", new int[0]);
+        this.definition = new InstructionDefinition(0, "--mark", new int[0], false /*?*/);
     }
 
     @Override

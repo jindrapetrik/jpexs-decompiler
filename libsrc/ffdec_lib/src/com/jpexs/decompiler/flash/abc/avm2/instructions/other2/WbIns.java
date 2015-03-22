@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class WbIns extends InstructionDefinition {
 
     public WbIns() {
-        super(0xF8, "wb", new int[]{});
+        super(0xF8, "wb", new int[]{}, false /*?*/);
     }
 
     @Override

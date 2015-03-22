@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushDNanIns extends InstructionDefinition {
 
     public PushDNanIns() {
-        super(0x34, "pushdnan", new int[]{});
+        super(0x34, "pushdnan", new int[]{}, true);
     }
 
     @Override

@@ -21,6 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class CallSuperIdIns extends InstructionDefinition {
 
     public CallSuperIdIns() {
-        super(0x4B, "callsuperid", new int[]{});
+        super(0x4B, "callsuperid", new int[]{}, true);
     }
 }

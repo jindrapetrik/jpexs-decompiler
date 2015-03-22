@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class MultiplyPIns extends InstructionDefinition {
 
     public MultiplyPIns() {
-        super(0xB7, "multiply_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS});
+        super(0xB7, "multiply_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
     }
 
     @Override

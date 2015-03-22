@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class AllocIns extends InstructionDefinition {
 
     public AllocIns() {
-        super(0xF6, "alloc", new int[]{});
+        super(0xF6, "alloc", new int[]{}, true /*?*/);
     }
 
     @Override

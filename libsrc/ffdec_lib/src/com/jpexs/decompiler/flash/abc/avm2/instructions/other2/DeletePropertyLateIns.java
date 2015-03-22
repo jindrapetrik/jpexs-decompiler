@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DeletePropertyLateIns extends InstructionDefinition {
 
     public DeletePropertyLateIns() {
-        super(0x6B, "deletepropertylate", new int[]{});
+        super(0x6B, "deletepropertylate", new int[]{}, true /*?*/);
     }
 
     @Override

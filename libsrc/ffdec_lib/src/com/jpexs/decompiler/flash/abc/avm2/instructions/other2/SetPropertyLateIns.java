@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class SetPropertyLateIns extends InstructionDefinition {
 
     public SetPropertyLateIns() {
-        super(0x69, "setpropertylate", new int[]{});
+        super(0x69, "setpropertylate", new int[]{}, true /*?*/);
     }
 
     @Override

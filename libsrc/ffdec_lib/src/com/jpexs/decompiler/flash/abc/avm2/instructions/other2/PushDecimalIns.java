@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushDecimalIns extends InstructionDefinition {
 
     public PushDecimalIns() {
-        super(0x33, "pushdecimal", new int[]{AVM2Code.DAT_DECIMAL_INDEX});
+        super(0x33, "pushdecimal", new int[]{AVM2Code.DAT_DECIMAL_INDEX}, true);
     }
 
     @Override

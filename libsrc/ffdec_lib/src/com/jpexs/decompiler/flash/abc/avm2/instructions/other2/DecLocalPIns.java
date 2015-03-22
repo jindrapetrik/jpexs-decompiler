@@ -22,6 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DecLocalPIns extends InstructionDefinition {
 
     public DecLocalPIns() {
-        super(0x9F, "declocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX});
+        super(0x9F, "declocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX}, false /*?*/);
     }
 }

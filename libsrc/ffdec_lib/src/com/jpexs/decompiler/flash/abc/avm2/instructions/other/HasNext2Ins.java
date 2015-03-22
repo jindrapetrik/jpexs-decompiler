@@ -34,7 +34,7 @@ import java.util.List;
 public class HasNext2Ins extends InstructionDefinition {
 
     public HasNext2Ins() {
-        super(0x32, "hasnext2", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX, AVM2Code.DAT_LOCAL_REG_INDEX});
+        super(0x32, "hasnext2", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX, AVM2Code.DAT_LOCAL_REG_INDEX}, true);
     }
 
     @Override

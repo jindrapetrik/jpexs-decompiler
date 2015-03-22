@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class CodeGenOpIns extends InstructionDefinition {
 
     public CodeGenOpIns() {
-        super(0xFD, "codegenop", new int[]{});
+        super(0xFD, "codegenop", new int[]{}, false /*?*/);
     }
 
     @Override

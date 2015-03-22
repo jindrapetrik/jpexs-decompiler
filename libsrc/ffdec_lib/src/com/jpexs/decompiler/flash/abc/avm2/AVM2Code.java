@@ -163,6 +163,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceOIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceUIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConcatIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertF4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
@@ -176,6 +177,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.FindPropGlobalIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncrementPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.InvalidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.Lf32x4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MarkIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ModuloPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MultiplyPIns;
@@ -184,8 +187,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PrologueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushConstantIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDecimalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloat4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SendEnterIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SetPropertyLateIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.Sf32x4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SubtractPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SweepIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.TimestampIns;
@@ -366,8 +371,8 @@ public class AVM2Code implements Cloneable {
         /*0x07*/ new DXNSLateIns(),
         /*0x08*/ new KillIns(),
         /*0x09*/ new LabelIns(),
-        /*0x0A*/ null,
-        /*0x0B*/ null,
+        /*0x0A*/ new Lf32x4Ins(),
+        /*0x0B*/ new Sf32x4Ins(),
         /*0x0C*/ new IfNLtIns(),
         /*0x0D*/ new IfNLeIns(),
         /*0x0E*/ new IfNGtIns(),
@@ -440,7 +445,7 @@ public class AVM2Code implements Cloneable {
         /*0x51*/ new Sxi8Ins(),
         /*0x52*/ new Sxi16Ins(),
         /*0x53*/ new ApplyTypeIns(),
-        /*0x54*/ null,
+        /*0x54*/ new PushFloat4Ins(),
         /*0x55*/ new NewObjectIns(),
         /*0x56*/ new NewArrayIns(),
         /*0x57*/ new NewActivationIns(),
@@ -481,7 +486,7 @@ public class AVM2Code implements Cloneable {
         /*0x78*/ new CheckFilterIns(),
         /*0x79*/ new ConvertMIns(),
         /*0x7A*/ new ConvertMPIns(),
-        /*0x7B*/ null,
+        /*0x7B*/ new ConvertF4Ins(),
         /*0x7C*/ null,
         /*0x7D*/ null,
         /*0x7E*/ null,
@@ -595,7 +600,7 @@ public class AVM2Code implements Cloneable {
         /*0xEA*/ null,
         /*0xEB*/ null,
         /*0xEC*/ null,
-        /*0xED*/ null,
+        /*0xED*/ new InvalidIns(),
         /*0xEE*/ new AbsJumpIns(),
         /*0xEF*/ new DebugIns(),
         /*0xF0*/ new DebugLineIns(),

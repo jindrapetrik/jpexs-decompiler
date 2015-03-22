@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class VerifyPassIns extends InstructionDefinition {
 
     public VerifyPassIns() {
-        super(0xF5, "verifypass", new int[]{});
+        super(0xF5, "verifypass", new int[]{}, false /*?*/);
     }
 
     @Override

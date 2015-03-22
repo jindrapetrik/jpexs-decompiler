@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class SweepIns extends InstructionDefinition {
 
     public SweepIns() {
-        super(0xFC, "sweep", new int[]{});
+        super(0xFC, "sweep", new int[]{}, false /*?*/);
     }
 
     @Override

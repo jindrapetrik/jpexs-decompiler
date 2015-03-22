@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class GetOuterScopeIns extends InstructionDefinition {
 
     public GetOuterScopeIns() {
-        super(0x67, "getouterscope", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+        super(0x67, "getouterscope", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, false);
     }
 
     @Override

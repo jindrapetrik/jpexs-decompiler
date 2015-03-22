@@ -21,6 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class BkptIns extends InstructionDefinition {
 
     public BkptIns() {
-        super(0x01, "bkpt", new int[]{});
+        super(0x01, "bkpt", new int[]{}, false);
     }
 }

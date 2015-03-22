@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushUninitializedIns extends InstructionDefinition {
 
     public PushUninitializedIns() {
-        super(0x22, "pushuninitialized", new int[]{AVM2Code.OPT_U30});
+        super(0x22, "pushuninitialized", new int[]{AVM2Code.OPT_U30}, false /*?*/);
     }
 
     @Override

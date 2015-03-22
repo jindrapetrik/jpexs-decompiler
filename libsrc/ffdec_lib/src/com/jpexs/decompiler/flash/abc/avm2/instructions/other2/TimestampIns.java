@@ -21,6 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class TimestampIns extends InstructionDefinition {
 
     public TimestampIns() {
-        super(0xF3, "timestamp", new int[]{});
+        super(0xF3, "timestamp", new int[]{}, false /*?*/);
     }
 }

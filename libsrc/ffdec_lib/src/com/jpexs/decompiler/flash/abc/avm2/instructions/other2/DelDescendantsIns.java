@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DelDescendantsIns extends InstructionDefinition {
 
     public DelDescendantsIns() {
-        super(0x5B, "deldescendants", new int[]{});
+        super(0x5B, "deldescendants", new int[]{}, true);
     }
 
     @Override

@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class SendEnterIns extends InstructionDefinition {
 
     public SendEnterIns() {
-        super(0xFA, "sendenter", new int[]{});
+        super(0xFA, "sendenter", new int[]{}, false /*?*/);
     }
 
     @Override

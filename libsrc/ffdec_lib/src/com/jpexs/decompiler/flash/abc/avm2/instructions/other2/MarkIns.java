@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class MarkIns extends InstructionDefinition {
 
     public MarkIns() {
-        super(0xF7, "mark", new int[]{});
+        super(0xF7, "mark", new int[]{}, false /*?*/);
     }
 
     @Override

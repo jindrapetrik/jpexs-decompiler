@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class SubtractPIns extends InstructionDefinition {
 
     public SubtractPIns() {
-        super(0xB6, "subtract_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS});
+        super(0xB6, "subtract_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
     }
 
     @Override

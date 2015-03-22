@@ -21,6 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class CoerceBIns extends InstructionDefinition {
 
     public CoerceBIns() {
-        super(0x81, "coerce_b", new int[]{}); // stack: -1+1
+        super(0x81, "coerce_b", new int[]{}, true); // stack: -1+1
     }
 }

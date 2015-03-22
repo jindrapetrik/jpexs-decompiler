@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DecodeIns extends InstructionDefinition {
 
     public DecodeIns() {
-        super(0xFF, "decode", new int[]{});
+        super(0xFF, "decode", new int[]{}, false /*?*/);
     }
 
     @Override

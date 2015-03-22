@@ -21,6 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class ConvertMIns extends InstructionDefinition {
 
     public ConvertMIns() {
-        super(0x79, "convert_m", new int[]{}); // -1 +1
+        super(0x79, "convert_m", new int[]{}, true); // -1 +1
     }
 }
