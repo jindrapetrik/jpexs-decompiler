@@ -148,6 +148,50 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.AbsJumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.AddDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.AddPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.AllocIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.BkptIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.BkptLineIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CallInterfaceIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CallSuperIdIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CodeGenOpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceBIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceOIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceUIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConcatIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecodeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecrementPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DelDescendantsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DeletePropertyLateIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DividePIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DoubleToAtomIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.FindPropGlobalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.GetOuterScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncLocalPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncrementPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MarkIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ModuloPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MultiplyPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.NegatePIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PrologueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushConstantIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDNanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDecimalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SendEnterIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SetPropertyLateIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SubtractPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SweepIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.TimestampIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.VerifyOpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.VerifyPassIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.WbIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
@@ -312,481 +356,267 @@ public class AVM2Code implements Cloneable {
     public static final int DAT_DECIMAL_PARAMS = OPT_U30 + 0x13;
 
     public static InstructionDefinition[] instructionSet = new InstructionDefinition[]{
-        new AddIns(),
-        new InstructionDefinition(0x9b, "add_d", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; // ?
-            }
-        },
-        new AddIIns(),
-        new InstructionDefinition(0xb5, "add_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
-        new ApplyTypeIns(),
-        new AsTypeIns(),
-        new AsTypeLateIns(),
-        new BitAndIns(),
-        new BitNotIns(),
-        new BitOrIns(),
-        new BitXorIns(),
-        new InstructionDefinition(0x01, "bkpt", new int[]{}),
-        new InstructionDefinition(0xf2, "bkptline", new int[]{AVM2Code.OPT_U30}),
-        new CallIns(),
-        new InstructionDefinition(0x4d, "callinterface", new int[]{AVM2Code.OPT_U30}),
-        new CallMethodIns(),
-        new CallPropertyIns(),
-        new CallPropLexIns(),
-        new CallPropVoidIns(),
-        new CallStaticIns(),
-        new CallSuperIns(),
-        new InstructionDefinition(0x4b, "callsuperid", new int[]{}),
-        new CallSuperVoidIns(),
-        new CheckFilterIns(),
-        new CoerceIns(),
-        new CoerceAIns(),
-        new InstructionDefinition(0x81, "coerce_b", new int[]{}), // stack:-1+1
-        new InstructionDefinition(0x84, "coerce_d", new int[]{}), // stack:-1+1
-        new InstructionDefinition(0x83, "coerce_i", new int[]{}), // stack:-1+1
-        new InstructionDefinition(0x89, "coerce_o", new int[]{}), // stack:-1+1
-        new CoerceSIns(),
-        new InstructionDefinition(0x88, "coerce_u", new int[]{}), // stack:-1+1
-        new InstructionDefinition(0x9a, "concat", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; // ?
-            }
-        },
-        new ConstructIns(),
-        new ConstructPropIns(),
-        new ConstructSuperIns(),
-        new ConvertBIns(),
-        new ConvertIIns(),
-        new ConvertDIns(),
-        new ConvertOIns(),
-        new ConvertUIns(),
-        new ConvertSIns(),
-        new InstructionDefinition(0x79, "convert_m", new int[]{}), // -1 +1
-        new InstructionDefinition(0x7a, "convert_m_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new DebugIns(),
-        new DebugFileIns(),
-        new DebugLineIns(),
-        new DecLocalIns(),
-        new DecLocalIIns(),
-        new DecrementIns(),
-        new DecrementIIns(),
-        new InstructionDefinition(0x5b, "deldescendants", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new DeletePropertyIns(),
-        new InstructionDefinition(0x6b, "deletepropertylate", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new DivideIns(),
-        new InstructionDefinition(0xb8, "divide_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; // ?
-            }
-        },
-        new DupIns(),
-        new DXNSIns(),
-        new DXNSLateIns(),
-        new EqualsIns(),
-        new EscXAttrIns(),
-        new EscXElemIns(),
-        new FindDefIns(),
+        /*0x00*/null,
+        /*0x01*/ new BkptIns(),
+        /*0x02*/ new NopIns(),
+        /*0x03*/ new ThrowIns(),
+        /*0x04*/ new GetSuperIns(),
+        /*0x05*/ new SetSuperIns(),
+        /*0x06*/ new DXNSIns(),
+        /*0x07*/ new DXNSLateIns(),
+        /*0x08*/ new KillIns(),
+        /*0x09*/ new LabelIns(),
+        /*0x0A*/ null,
+        /*0x0B*/ null,
+        /*0x0C*/ new IfNLtIns(),
+        /*0x0D*/ new IfNLeIns(),
+        /*0x0E*/ new IfNGtIns(),
+        /*0x0F*/ new IfNGeIns(),
+        /*0x10*/ new JumpIns(),
+        /*0x11*/ new IfTrueIns(),
+        /*0x12*/ new IfFalseIns(),
+        /*0x13*/ new IfEqIns(),
+        /*0x14*/ new IfNeIns(),
+        /*0x15*/ new IfLtIns(),
+        /*0x16*/ new IfLeIns(),
+        /*0x17*/ new IfGtIns(),
+        /*0x18*/ new IfGeIns(),
+        /*0x19*/ new IfStrictEqIns(),
+        /*0x1A*/ new IfStrictNeIns(),
+        /*0x1B*/ new LookupSwitchIns(),
+        /*0x1C*/ new PushWithIns(),
+        /*0x1D*/ new PopScopeIns(),
+        /*0x1E*/ new NextNameIns(),
+        /*0x1F*/ new HasNextIns(),
+        /*0x20*/ new PushNullIns(),
+        /*0x21*/ new PushUndefinedIns(),
+        /*0x22*/ new PushConstantIns(), // new PushUninitializedIns()
+        /*0x23*/ new NextValueIns(),
+        /*0x24*/ new PushByteIns(),
+        /*0x25*/ new PushShortIns(),
+        /*0x26*/ new PushTrueIns(),
+        /*0x27*/ new PushFalseIns(),
+        /*0x28*/ new PushNanIns(),
+        /*0x29*/ new PopIns(),
+        /*0x2A*/ new DupIns(),
+        /*0x2B*/ new SwapIns(),
+        /*0x2C*/ new PushStringIns(),
+        /*0x2D*/ new PushIntIns(),
+        /*0x2E*/ new PushUIntIns(),
+        /*0x2F*/ new PushDoubleIns(),
+        /*0x30*/ new PushScopeIns(),
+        /*0x31*/ new PushNamespaceIns(),
+        /*0x32*/ new HasNext2Ins(),
+        /*0x33*/ new PushDecimalIns(),
+        /*0x34*/ new PushDNanIns(),
+        /*0x35*/ new Li8Ins(),
+        /*0x36*/ new Li16Ins(),
+        /*0x37*/ new Li32Ins(),
+        /*0x38*/ new Lf32Ins(),
+        /*0x39*/ new Lf64Ins(),
+        /*0x3A*/ new Si8Ins(),
+        /*0x3B*/ new Si16Ins(),
+        /*0x3C*/ new Si32Ins(),
+        /*0x3D*/ new Sf32Ins(),
+        /*0x3E*/ new Sf64Ins(),
+        /*0x3F*/ null,
+        /*0x40*/ new NewFunctionIns(),
+        /*0x41*/ new CallIns(),
+        /*0x42*/ new ConstructIns(),
+        /*0x43*/ new CallMethodIns(),
+        /*0x44*/ new CallStaticIns(),
+        /*0x45*/ new CallSuperIns(),
+        /*0x46*/ new CallPropertyIns(),
+        /*0x47*/ new ReturnVoidIns(),
+        /*0x48*/ new ReturnValueIns(),
+        /*0x49*/ new ConstructSuperIns(),
+        /*0x4A*/ new ConstructPropIns(),
+        /*0x4B*/ new CallSuperIdIns(),
+        /*0x4C*/ new CallPropLexIns(),
+        /*0x4D*/ new CallInterfaceIns(),
+        /*0x4E*/ new CallSuperVoidIns(),
+        /*0x4F*/ new CallPropVoidIns(),
+        /*0x50*/ new Sxi1Ins(),
+        /*0x51*/ new Sxi8Ins(),
+        /*0x52*/ new Sxi16Ins(),
+        /*0x53*/ new ApplyTypeIns(),
+        /*0x54*/ null,
+        /*0x55*/ new NewObjectIns(),
+        /*0x56*/ new NewArrayIns(),
+        /*0x57*/ new NewActivationIns(),
+        /*0x58*/ new NewClassIns(),
+        /*0x59*/ new GetDescendantsIns(),
+        /*0x5A*/ new NewCatchIns(),
+        /*0x5B*/ new DelDescendantsIns(),
         /* // Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
-         new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
-
-         @Override
-         public int getStackDelta(AVM2Instruction ins, ABC abc) {
-         throw new UnsupportedOperationException();
-         }
-
-         @Override
-         public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-         throw new UnsupportedOperationException();
-         }
-
-         },*/
-        new InstructionDefinition(0x5c, "findpropglobal", new int[]{AVM2Code.DAT_MULTINAME_INDEX}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new FindPropertyIns(),
-        new FindPropertyStrictIns(),
-        new GetDescendantsIns(),
-        new GetGlobalScopeIns(),
-        new GetGlobalSlotIns(),
-        new GetLexIns(),
-        new GetLocalIns(),
-        new GetLocal0Ins(),
-        new GetLocal1Ins(),
-        new GetLocal2Ins(),
-        new GetLocal3Ins(),
-        new InstructionDefinition(0x67, "getouterscope", new int[]{AVM2Code.DAT_MULTINAME_INDEX}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new GetPropertyIns(),
-        new InstructionDefinition(0x67, "getpropertylate", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new GetScopeObjectIns(),
-        new GetSlotIns(),
-        new GetSuperIns(),
-        new GreaterEqualsIns(),
-        new GreaterThanIns(),
-        new HasNextIns(),
-        new HasNext2Ins(),
-        new IfEqIns(),
-        new IfFalseIns(),
-        new IfGeIns(),
-        new IfGtIns(),
-        new IfLeIns(),
-        new IfLtIns(),
-        new IfNGeIns(),
-        new IfNGtIns(),
-        new IfNLeIns(),
-        new IfNLtIns(),
-        new IfNeIns(),
-        new IfStrictEqIns(),
-        new IfStrictNeIns(),
-        new IfTrueIns(),
-        new InIns(),
-        new IncLocalIns(),
-        new IncLocalIIns(),
-        new IncrementIns(),
-        new IncrementIIns(),
-        new InstructionDefinition(0x9c, "increment_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
-        new InstructionDefinition(0x9d, "inclocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX}),
-        new InstructionDefinition(0x9e, "decrement_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
-        new InstructionDefinition(0x9f, "declocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX}),
-        new InitPropertyIns(),
-        new InstanceOfIns(),
-        new IsTypeIns(),
-        new IsTypeLateIns(),
-        new JumpIns(),
-        new KillIns(),
-        new LabelIns(),
-        new LessEqualsIns(),
-        new LessThanIns(),
-        new LookupSwitchIns(),
-        new LShiftIns(),
-        new ModuloIns(),
-        new InstructionDefinition(0xb9, "modulo_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; // ?
-            }
-        },
-        new MultiplyIns(),
-        new MultiplyIIns(),
-        new InstructionDefinition(0xb7, "multiply_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return -2 + 1; // ?
-            }
-        },
-        new NegateIns(),
-        new NegateIIns(),
-        new InstructionDefinition(0x8f, "negate_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new NewActivationIns(),
-        new NewArrayIns(),
-        new NewCatchIns(),
-        new NewClassIns(),
-        new NewFunctionIns(),
-        new NewObjectIns(),
-        new NextNameIns(),
-        new NextValueIns(),
-        new NopIns(),
-        new NotIns(),
-        new PopIns(),
-        new PopScopeIns(),
-        new PushByteIns(),
-        new InstructionDefinition(0x22, "pushconstant", new int[]{AVM2Code.DAT_STRING_INDEX}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; // ?
-            }
-        },
-        new InstructionDefinition(0x33, "pushdecimal", new int[]{AVM2Code.DAT_DECIMAL_INDEX}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; // ?
-            }
-        },
-        new InstructionDefinition(0x34, "pushdnan", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                return 1; // ?
-            }
-        },
-        new PushDoubleIns(),
-        new PushFalseIns(),
-        new PushIntIns(),
-        new PushNamespaceIns(),
-        new PushNanIns(),
-        new PushNullIns(),
-        new PushScopeIns(),
-        new PushShortIns(),
-        new PushStringIns(),
-        new PushTrueIns(),
-        new PushUIntIns(),
-        new PushUndefinedIns(),
-        new InstructionDefinition(0x22, "pushuninitialized", new int[]{AVM2Code.OPT_U30}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new PushWithIns(),
-        new ReturnValueIns(),
-        new ReturnVoidIns(),
-        new RShiftIns(),
-        new SetLocalIns(),
-        new SetLocal0Ins(),
-        new SetLocal1Ins(),
-        new SetLocal2Ins(),
-        new SetLocal3Ins(),
-        new SetGlobalSlotIns(),
-        new SetPropertyIns(),
-        new InstructionDefinition(0x69, "setpropertylate", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new SetSlotIns(),
-        new SetSuperIns(),
-        new StrictEqualsIns(),
-        new SubtractIns(),
-        new SubtractIIns(),
-        new InstructionDefinition(0xb6, "subtract_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new SwapIns(),
-        new ThrowIns(),
-        new InstructionDefinition(0xf3, "timestamp", new int[]{}),
-        new TypeOfIns(),
-        new URShiftIns(),
-        new Li8Ins(),
-        new Li16Ins(),
-        new Li32Ins(),
-        new Lf32Ins(),
-        new Lf64Ins(),
-        new Si8Ins(),
-        new Si16Ins(),
-        new Si32Ins(),
-        new Sf32Ins(),
-        new Sf64Ins(),
-        new Sxi1Ins(),
-        new Sxi8Ins(),
-        new Sxi16Ins(),
-        new InstructionDefinition(0xf5, "verifypass", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf6, "alloc", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf7, "mark", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf8, "wb", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xf9, "prologue", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfa, "sendenter", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfb, "doubletoatom", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfc, "sweep", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfd, "codegenop", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xfe, "verifyop", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xff, "decode", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0xee, "abs_jump", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        }
-    };
+         new FindPropGlobalStrictIns(),*/
+        /*0x5C*/ new FindPropGlobalIns(),
+        /*0x5D*/ new FindPropertyStrictIns(),
+        /*0x5E*/ new FindPropertyIns(),
+        /*0x5F*/ new FindDefIns(),
+        /*0x60*/ new GetLexIns(),
+        /*0x61*/ new SetPropertyIns(),
+        /*0x62*/ new GetLocalIns(),
+        /*0x63*/ new SetLocalIns(),
+        /*0x64*/ new GetGlobalScopeIns(),
+        /*0x65*/ new GetScopeObjectIns(),
+        /*0x66*/ new GetPropertyIns(),
+        /*0x67*/ new GetOuterScopeIns(), // new GetPropertyLateIns()
+        /*0x68*/ new InitPropertyIns(),
+        /*0x69*/ new SetPropertyLateIns(),
+        /*0x6A*/ new DeletePropertyIns(),
+        /*0x6B*/ new DeletePropertyLateIns(),
+        /*0x6C*/ new GetSlotIns(),
+        /*0x6D*/ new SetSlotIns(),
+        /*0x6E*/ new GetGlobalSlotIns(),
+        /*0x6F*/ new SetGlobalSlotIns(),
+        /*0x70*/ new ConvertSIns(),
+        /*0x71*/ new EscXElemIns(),
+        /*0x72*/ new EscXAttrIns(),
+        /*0x73*/ new ConvertIIns(),
+        /*0x74*/ new ConvertUIns(),
+        /*0x75*/ new ConvertDIns(),
+        /*0x76*/ new ConvertBIns(),
+        /*0x77*/ new ConvertOIns(),
+        /*0x78*/ new CheckFilterIns(),
+        /*0x79*/ new ConvertMIns(),
+        /*0x7A*/ new ConvertMPIns(),
+        /*0x7B*/ null,
+        /*0x7C*/ null,
+        /*0x7D*/ null,
+        /*0x7E*/ null,
+        /*0x7F*/ null,
+        /*0x80*/ new CoerceIns(),
+        /*0x81*/ new CoerceBIns(),
+        /*0x82*/ new CoerceAIns(),
+        /*0x83*/ new CoerceIIns(),
+        /*0x84*/ new CoerceDIns(),
+        /*0x85*/ new CoerceSIns(),
+        /*0x86*/ new AsTypeIns(),
+        /*0x87*/ new AsTypeLateIns(),
+        /*0x88*/ new CoerceUIns(),
+        /*0x89*/ new CoerceOIns(),
+        /*0x8A*/ null,
+        /*0x8B*/ null,
+        /*0x8C*/ null,
+        /*0x8D*/ null,
+        /*0x8E*/ null,
+        /*0x8F*/ new NegatePIns(),
+        /*0x90*/ new NegateIns(),
+        /*0x91*/ new IncrementIns(),
+        /*0x92*/ new IncLocalIns(),
+        /*0x93*/ new DecrementIns(),
+        /*0x94*/ new DecLocalIns(),
+        /*0x95*/ new TypeOfIns(),
+        /*0x96*/ new NotIns(),
+        /*0x97*/ new BitNotIns(),
+        /*0x98*/ null,
+        /*0x99*/ null,
+        /*0x9A*/ new ConcatIns(),
+        /*0x9B*/ new AddDIns(),
+        /*0x9C*/ new IncrementPIns(),
+        /*0x9D*/ new IncLocalPIns(),
+        /*0x9E*/ new DecrementPIns(),
+        /*0x9F*/ new DecLocalPIns(),
+        /*0xA0*/ new AddIns(),
+        /*0xA1*/ new SubtractIns(),
+        /*0xA2*/ new MultiplyIns(),
+        /*0xA3*/ new DivideIns(),
+        /*0xA4*/ new ModuloIns(),
+        /*0xA5*/ new LShiftIns(),
+        /*0xA6*/ new RShiftIns(),
+        /*0xA7*/ new URShiftIns(),
+        /*0xA8*/ new BitAndIns(),
+        /*0xA9*/ new BitOrIns(),
+        /*0xAA*/ new BitXorIns(),
+        /*0xAB*/ new EqualsIns(),
+        /*0xAC*/ new StrictEqualsIns(),
+        /*0xAD*/ new LessThanIns(),
+        /*0xAE*/ new LessEqualsIns(),
+        /*0xAF*/ new GreaterThanIns(),
+        /*0xB0*/ new GreaterEqualsIns(),
+        /*0xB1*/ new InstanceOfIns(),
+        /*0xB2*/ new IsTypeIns(),
+        /*0xB3*/ new IsTypeLateIns(),
+        /*0xB4*/ new InIns(),
+        /*0xB5*/ new AddPIns(),
+        /*0xB6*/ new SubtractPIns(),
+        /*0xB7*/ new MultiplyPIns(),
+        /*0xB8*/ new DividePIns(),
+        /*0xB9*/ new ModuloPIns(),
+        /*0xBA*/ null,
+        /*0xBB*/ null,
+        /*0xBC*/ null,
+        /*0xBD*/ null,
+        /*0xBE*/ null,
+        /*0xBF*/ null,
+        /*0xC0*/ new IncrementIIns(),
+        /*0xC1*/ new DecrementIIns(),
+        /*0xC2*/ new IncLocalIIns(),
+        /*0xC3*/ new DecLocalIIns(),
+        /*0xC4*/ new NegateIIns(),
+        /*0xC5*/ new AddIIns(),
+        /*0xC6*/ new SubtractIIns(),
+        /*0xC7*/ new MultiplyIIns(),
+        /*0xC8*/ null,
+        /*0xC9*/ null,
+        /*0xCA*/ null,
+        /*0xCB*/ null,
+        /*0xCC*/ null,
+        /*0xCD*/ null,
+        /*0xCE*/ null,
+        /*0xCF*/ null,
+        /*0xD0*/ new GetLocal0Ins(),
+        /*0xD1*/ new GetLocal1Ins(),
+        /*0xD2*/ new GetLocal2Ins(),
+        /*0xD3*/ new GetLocal3Ins(),
+        /*0xD4*/ new SetLocal0Ins(),
+        /*0xD5*/ new SetLocal1Ins(),
+        /*0xD6*/ new SetLocal2Ins(),
+        /*0xD7*/ new SetLocal3Ins(),
+        /*0xD8*/ null,
+        /*0xD9*/ null,
+        /*0xDA*/ null,
+        /*0xDB*/ null,
+        /*0xDC*/ null,
+        /*0xDD*/ null,
+        /*0xDE*/ null,
+        /*0xDF*/ null,
+        /*0xE0*/ null,
+        /*0xE1*/ null,
+        /*0xE2*/ null,
+        /*0xE3*/ null,
+        /*0xE4*/ null,
+        /*0xE5*/ null,
+        /*0xE6*/ null,
+        /*0xE7*/ null,
+        /*0xE8*/ null,
+        /*0xE9*/ null,
+        /*0xEA*/ null,
+        /*0xEB*/ null,
+        /*0xEC*/ null,
+        /*0xED*/ null,
+        /*0xEE*/ new AbsJumpIns(),
+        /*0xEF*/ new DebugIns(),
+        /*0xF0*/ new DebugLineIns(),
+        /*0xF1*/ new DebugFileIns(),
+        /*0xF2*/ new BkptLineIns(),
+        /*0xF3*/ new TimestampIns(),
+        /*0xF4*/ null,
+        /*0xF5*/ new VerifyPassIns(),
+        /*0xF6*/ new AllocIns(),
+        /*0xF7*/ new MarkIns(),
+        /*0xF8*/ new WbIns(),
+        /*0xF9*/ new PrologueIns(),
+        /*0xFA*/ new SendEnterIns(),
+        /*0xFB*/ new DoubleToAtomIns(),
+        /*0xFC*/ new SweepIns(),
+        /*0xFD*/ new CodeGenOpIns(),
+        /*0xFE*/ new VerifyOpIns(),
+        /*0xFF*/ new DecodeIns(),};
     // endoflist
 
-    public static InstructionDefinition[] instructionSetByCode = buildInstructionSetByCode();
-
     public boolean hideTemporaryRegisters = true;
-
-    private static InstructionDefinition[] buildInstructionSetByCode() {
-        InstructionDefinition[] result = new InstructionDefinition[256];
-        for (InstructionDefinition id : instructionSet) {
-            if (result[id.instructionCode] != null) {
-                logger.log(Level.WARNING, "Duplicate OPCODE for instruction {0} {1}", new Object[]{result[id.instructionCode], id});
-            }
-            result[id.instructionCode] = id;
-        }
-        return result;
-    }
 
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
 
@@ -860,7 +690,7 @@ public class AVM2Code implements Cloneable {
                     DumpInfo di = ais.newDumpLevel("instruction", "instruction");
                     long startOffset = ais.getPosition();
                     int instructionCode = ais.read("instructionCode");
-                    InstructionDefinition instr = instructionSetByCode[instructionCode];
+                    InstructionDefinition instr = instructionSet[instructionCode];
                     if (di != null) {
                         di.name = instr.instructionName;
                     }
