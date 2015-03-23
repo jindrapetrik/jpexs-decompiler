@@ -85,7 +85,7 @@ public class RecompileTest extends FileTestBase {
     public void testTagEditing(String fileName) throws IOException, InterruptedException {
         try {
             Configuration.debugCopy.set(false);
-            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + fileName)), false);
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + fileName)), false, false);
             for (Tag tag : swf.tags) {
                 if (!(tag instanceof TagStub)) {
                     Tag tag2 = tag.cloneTag();

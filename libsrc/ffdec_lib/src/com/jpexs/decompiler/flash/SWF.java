@@ -745,7 +745,20 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, null, null, null, parallelRead, false);
+        this(is, null, null, null, parallelRead, false, true);
+    }
+
+    /**
+     * Construct SWF from stream
+     *
+     * @param is Stream to read SWF from
+     * @param parallelRead Use parallel threads?
+     * @param lazy
+     * @throws IOException
+     * @throws java.lang.InterruptedException
+     */
+    public SWF(InputStream is, boolean parallelRead, boolean lazy) throws IOException, InterruptedException {
+        this(is, null, null, null, parallelRead, false, lazy);
     }
 
     /**
@@ -759,7 +772,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, String file, String fileTitle, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, file, fileTitle, null, parallelRead, false);
+        this(is, file, fileTitle, null, parallelRead, false, true);
     }
 
     /**
@@ -772,7 +785,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, null, null, listener, parallelRead, false);
+        this(is, null, null, listener, parallelRead, false, true);
     }
 
     /**
@@ -787,7 +800,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, false);
+        this(is, file, fileTitle, listener, parallelRead, false, true);
     }
 
     /**
@@ -809,10 +822,11 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param listener
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
+     * @param lazy
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -839,7 +853,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         sis.readUI8("tmpFirstByetOfFrameRate"); // tmpFirstByetOfFrameRate
         frameRate = sis.readUI8("frameRate");
         frameCount = sis.readUI16("frameCount");
-        List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
+        List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, lazy);
         if (tags.size() > 0 && tags.get(tags.size() - 1).getId() == EndTag.ID) {
             tags.remove(tags.size() - 1);
         } else {

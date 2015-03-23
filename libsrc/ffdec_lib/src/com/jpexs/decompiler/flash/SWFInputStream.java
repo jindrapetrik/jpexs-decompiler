@@ -1017,19 +1017,22 @@ public class SWFInputStream implements AutoCloseable {
 
         private final boolean skipUnusualTags;
 
-        public TagResolutionTask(TagStub tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags) {
+        private final boolean lazy;
+
+        public TagResolutionTask(TagStub tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) {
             this.tag = tag;
             this.dumpInfo = dumpInfo;
             this.level = level;
             this.parallel = parallel;
             this.skipUnusualTags = skipUnusualTags;
+            this.lazy = lazy;
         }
 
         @Override
         public Tag call() throws Exception {
             DumpInfo di = dumpInfo;
             try {
-                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, true);
+                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, lazy);
                 if (dumpInfo != null && t != null) {
                     dumpInfo.name = t.getName();
                 }
@@ -1051,11 +1054,12 @@ public class SWFInputStream implements AutoCloseable {
      * @param parallel
      * @param skipUnusualTags
      * @param parseTags
+     * @param lazy
      * @return List of tags
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException, InterruptedException {
+    public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean lazy) throws IOException, InterruptedException {
         boolean parallel1 = level == 0 && parallel;
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
@@ -1070,7 +1074,7 @@ public class SWFInputStream implements AutoCloseable {
             long pos = getPos();
             newDumpLevel(null, "TAG");
             try {
-                tag = readTag(timelined, level, pos, parseTags && !parallel1, parallel1, skipUnusualTags);
+                tag = readTag(timelined, level, pos, parseTags && !parallel1, parallel1, skipUnusualTags, lazy);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
@@ -1098,7 +1102,7 @@ public class SWFInputStream implements AutoCloseable {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: // FileAttributes
                         if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, true);
+                            tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
                         }
                         FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                         if (fileAttributes.actionScript3) {
@@ -1140,7 +1144,7 @@ public class SWFInputStream implements AutoCloseable {
                 }
             }
             if (parseTags && doParse && parallel1 && tag instanceof TagStub) {
-                Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel1, skipUnusualTags));
+                Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel1, skipUnusualTags, lazy));
                 futureResults.add(future);
             } else {
                 Future<Tag> future = new ImmediateFuture<>(tag);
@@ -1472,11 +1476,12 @@ public class SWFInputStream implements AutoCloseable {
      * @param resolve
      * @param parallel
      * @param skipUnusualTags
+     * @param lazy
      * @return Tag or null when End tag
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public Tag readTag(Timelined timelined, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+    public Tag readTag(Timelined timelined, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16("tagIDTagLength");
         int tagID = (tagIDTagLength) >> 6;
 
@@ -1509,7 +1514,7 @@ public class SWFInputStream implements AutoCloseable {
         if (resolve) {
             DumpInfo di = dumpInfo;
             try {
-                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, true);
+                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, lazy);
             } catch (Exception ex) {
                 tagDataStream.endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);
