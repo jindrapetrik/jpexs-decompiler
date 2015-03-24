@@ -735,7 +735,7 @@ public class ASM3Parser {
                 }
                 boolean insFound = false;
                 for (InstructionDefinition def : AVM2Code.instructionSet) {
-                    if (def.instructionName.equals((String) symb.value)) {
+                    if (def != null && def.instructionName.equals((String) symb.value)) {
                         insFound = true;
                         List<Integer> operandsList = new ArrayList<>();
 
