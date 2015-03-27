@@ -149,8 +149,15 @@ public class FontExporter {
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
         f.setVersion("1.0");
 
-        f.setAscender(Math.round(t.getAscent() / divider));
-        f.setDescender(Math.round(t.getDescent() / divider));
+        int ascent = t.getAscent();
+        if (ascent != -1) {
+            f.setAscender(Math.round(ascent / divider));
+        }
+        
+        int descent = t.getDescent();
+        if (descent != -1) {
+            f.setDescender(Math.round(descent / divider));
+        }
 
         int glyphCount = 0;
         for (int i = 0; i < shapes.size(); i++) {

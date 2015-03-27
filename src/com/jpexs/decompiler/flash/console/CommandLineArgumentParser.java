@@ -886,6 +886,12 @@ public class CommandLineArgumentParser {
             }
 
             for (File inFile : inFiles) {
+                long startTimeSwf = 0;
+                if (!singleFile) {
+                    startTimeSwf = System.currentTimeMillis();
+                    System.out.println("Start exporting " + inFile.getName());
+                }
+                
                 SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
@@ -1037,12 +1043,19 @@ public class CommandLineArgumentParser {
                     }
                     exfile.exportXfl(handler, outDir + (multipleExportTypes ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
                 }
+
+                if (!singleFile) {
+                    long stopTimeSwf = System.currentTimeMillis();
+                    long time = stopTimeSwf - startTimeSwf;
+                    System.out.println("Export finished: " + inFile.getName() + " Export time: " + Helper.formatTimeSec(time));
+                }
             }
         } catch (OutOfMemoryError | Exception ex) {
             System.err.print("FAIL: Exporting Failed on Exception - ");
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
+
         long stopTime = System.currentTimeMillis();
         long time = stopTime - startTime;
         System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
