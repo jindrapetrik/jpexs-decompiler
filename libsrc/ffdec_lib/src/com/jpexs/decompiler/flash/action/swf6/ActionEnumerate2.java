@@ -17,12 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf6;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
-import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
