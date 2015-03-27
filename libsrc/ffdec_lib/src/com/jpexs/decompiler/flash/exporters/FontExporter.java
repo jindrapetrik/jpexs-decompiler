@@ -137,7 +137,7 @@ public class FontExporter {
             ttfFile = File.createTempFile("ffdec_export", ".ttf");
         }
 
-        String fontName = t.getFontNameIntag();
+        String fontName = Helper.makeFileName(t.getFontNameIntag());
         if (fontName.length() == 0) {
             fontName = "noname";
         }
