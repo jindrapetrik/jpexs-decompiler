@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -168,9 +170,9 @@ public class XHead implements java.io.Serializable, Cloneable, IRNode {
     private String title_;
     private String unicode_;
     // List<String>
-    private java.util.List<String> unicodeRange_ = new java.util.ArrayList<>();
+    private List<String> unicodeRange_ = new ArrayList<>();
     // List<String>
-    private java.util.List<String> codePage_ = new java.util.ArrayList<>();
+    private List<String> codePage_ = new ArrayList<>();
     private Double ascender_;
     private Double descender_;
     private Double xHeight_;
@@ -2322,7 +2324,7 @@ public class XHead implements java.io.Serializable, Cloneable, IRNode {
      * @return IRNode[]
      */
     public IRNode[] rGetRNodes() {
-        java.util.List<IRNode> classNodes = new java.util.ArrayList<>();
+        List<IRNode> classNodes = new ArrayList<>();
         if (headGlobal_ != null) {
             classNodes.add(headGlobal_);
         }

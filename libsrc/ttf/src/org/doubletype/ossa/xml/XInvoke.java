@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -79,9 +81,9 @@ import org.xml.sax.*;
 public class XInvoke implements java.io.Serializable, Cloneable, IRNode {
     private XInvokePos invokePos_;
     // List<XInvokeArg>
-    private java.util.List<XInvokeArg> invokeArg_ = new java.util.ArrayList<>();
+    private List<XInvokeArg> invokeArg_ = new ArrayList<>();
     // List<XInvokeVarg>
-    private java.util.List<XInvokeVarg> invokeVarg_ = new java.util.ArrayList<>();
+    private List<XInvokeVarg> invokeVarg_ = new ArrayList<>();
     private IRNode parentRNode_;
 
     /**
@@ -839,7 +841,7 @@ public class XInvoke implements java.io.Serializable, Cloneable, IRNode {
      * @return IRNode[]
      */
     public IRNode[] rGetRNodes() {
-        java.util.List<IRNode> classNodes = new java.util.ArrayList<>();
+        List<IRNode> classNodes = new ArrayList<>();
         if (invokePos_ != null) {
             classNodes.add(invokePos_);
         }

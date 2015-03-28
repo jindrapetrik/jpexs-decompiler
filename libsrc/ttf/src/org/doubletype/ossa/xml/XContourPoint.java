@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -90,7 +92,7 @@ public class XContourPoint implements java.io.Serializable, Cloneable, IRNode {
     private XControlPoint controlPoint1_;
     private XControlPoint controlPoint2_;
     // List<XHint>
-    private java.util.List<XHint> hint_ = new java.util.ArrayList<>();
+    private List<XHint> hint_ = new ArrayList<>();
     private IRNode parentRNode_;
 
     /**
@@ -914,7 +916,7 @@ public class XContourPoint implements java.io.Serializable, Cloneable, IRNode {
      * @return IRNode[]
      */
     public IRNode[] rGetRNodes() {
-        java.util.List<IRNode> classNodes = new java.util.ArrayList<>();
+        List<IRNode> classNodes = new ArrayList<>();
         if (point2d_ != null) {
             classNodes.add(point2d_);
         }

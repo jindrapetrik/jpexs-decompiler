@@ -38,6 +38,7 @@ package org.doubletype.ossa.adapter;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
+import java.util.List;
 import org.doubletype.ossa.xml.*;
 
 /** Emulator emulates font engine.
@@ -116,7 +117,7 @@ public class Emulator {
         return retval;
     }
         
-	private Shape concretePointsToShape(java.util.List a_listOfPoints) {
+	private Shape concretePointsToShape(List a_listOfPoints) {
 		GeneralPath retval = new GeneralPath();
 		EContourPoint p;
 		
@@ -147,8 +148,8 @@ public class Emulator {
 		return retval;
 	}
     
-	private java.util.List<EContourPoint> createConcretePoints(java.util.List a_points) {
-		java.util.List<EContourPoint> retval = new ArrayList<>();
+	private List<EContourPoint> createConcretePoints(List a_points) {
+		List<EContourPoint> retval = new ArrayList<>();
 		
 		if (a_points.size() < 3)
 			return retval;
@@ -181,8 +182,8 @@ public class Emulator {
 		return retval;
 	}
     
-    private java.util.List<EContourPoint> createAdjustedPoints(EContour a_contour, int a_ppem) {
-        java.util.List<EContourPoint> retval = new ArrayList<>();
+    private List<EContourPoint> createAdjustedPoints(EContour a_contour, int a_ppem) {
+        List<EContourPoint> retval = new ArrayList<>();
         
 	    XContourPoint [] points = a_contour.getContourPoint();
 	    if (points.length < 3) {
@@ -217,8 +218,8 @@ public class Emulator {
 	    return promoteAdjustedToMain(retval);  
     }
     
-	private java.util.List<EContourPoint> promoteAdjustedToMain(java.util.List<EContourPoint> a_points) {
-	    java.util.List<EContourPoint> retval = new ArrayList<>();
+	private List<EContourPoint> promoteAdjustedToMain(List<EContourPoint> a_points) {
+	    List<EContourPoint> retval = new ArrayList<>();
 	    for (int i = 0; i < a_points.size(); i++) {
 	        EContourPoint original = (EContourPoint) a_points.get(i);
 	        EContourPoint adjusted = new EContourPoint(original.getAdjusted().getX(),
@@ -231,7 +232,7 @@ public class Emulator {
 	    return retval;
 	}
 		
-	private void interpolate(java.util.List<EContourPoint> a_points, boolean a_isX) {
+	private void interpolate(List<EContourPoint> a_points, boolean a_isX) {
 	    Collection<EContourPoint> sorted = sortPoints(a_points, a_isX);
 	    
 	    Iterator itr = sorted.iterator();
@@ -265,7 +266,7 @@ public class Emulator {
 	    } // if
 	}
 	
-	private Collection<EContourPoint> sortPoints(java.util.List<EContourPoint> a_points, boolean a_isX) {
+	private Collection<EContourPoint> sortPoints(List<EContourPoint> a_points, boolean a_isX) {
 	    Map<Double,EContourPoint> sorted = new TreeMap<>();
 	    
 	    for (int i = 0; i < a_points.size(); i++) {
@@ -294,7 +295,7 @@ public class Emulator {
 	    setAdjusted(a_second, secondValue, a_isX);
 	}
 	
-	private void shiftPoint(EContourPoint a_point, java.util.List<EContourPoint> a_points, boolean a_isX) {
+	private void shiftPoint(EContourPoint a_point, List<EContourPoint> a_points, boolean a_isX) {
 	    EContourPoint closest = closestTouchedPoint(a_point, a_points);
 	    if (closest == null) {
 	        return;
@@ -334,7 +335,7 @@ public class Emulator {
 	    } // if-else
 	}
 	
-	private EContourPoint closestTouchedPoint(EContourPoint a_point, java.util.List<EContourPoint> a_points) {
+	private EContourPoint closestTouchedPoint(EContourPoint a_point, List<EContourPoint> a_points) {
 	    EContourPoint retval = null;
 	    double min = Double.MAX_VALUE;
 	    for (int i = 0; i < a_points.size(); i++) {

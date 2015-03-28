@@ -26,6 +26,8 @@ package org.doubletype.ossa.xml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import org.w3c.dom.*;
 
 /**
@@ -56,7 +58,7 @@ import org.w3c.dom.*;
  */
 public class XParamList implements java.io.Serializable, Cloneable, IRNode {
     // List<XParamListParam>
-    private java.util.List<XParamListParam> paramListParam_ = new java.util.ArrayList<>();
+    private List<XParamListParam> paramListParam_ = new ArrayList<>();
     private IRNode parentRNode_;
 
     /**
@@ -404,7 +406,7 @@ public class XParamList implements java.io.Serializable, Cloneable, IRNode {
      * @return IRNode[]
      */
     public IRNode[] rGetRNodes() {
-        java.util.List<IRNode> classNodes = new java.util.ArrayList<>();
+        List<IRNode> classNodes = new ArrayList<>();
         classNodes.addAll(paramListParam_);
         IRNode[] nodes = new IRNode[classNodes.size()];
         return ((IRNode[])classNodes.toArray(nodes));

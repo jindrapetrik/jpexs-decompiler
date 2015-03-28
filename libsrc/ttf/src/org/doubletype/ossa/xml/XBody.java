@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
@@ -61,13 +62,13 @@ import org.xml.sax.*;
  */
 public class XBody implements java.io.Serializable, Cloneable, IRNode {
     // List<XGlyphFile>
-    private List<IRNode> glyphFile_ = new java.util.ArrayList<>();
+    private List<IRNode> glyphFile_ = new ArrayList<>();
     // List<XContour>
-    private List<IRNode> contour_ = new java.util.ArrayList<>();
+    private List<IRNode> contour_ = new ArrayList<>();
     // List<XInclude>
-    private List<IRNode> include_ = new java.util.ArrayList<>();
+    private List<IRNode> include_ = new ArrayList<>();
     // List<XModule>
-    private java.util.List<IRNode> module_ = new java.util.ArrayList<>();
+    private List<IRNode> module_ = new ArrayList<>();
     private IRNode parentRNode_;
 
     /**
@@ -1112,7 +1113,7 @@ public class XBody implements java.io.Serializable, Cloneable, IRNode {
      * @return IRNode[]
      */
     public IRNode[] rGetRNodes() {
-        java.util.List<IRNode> classNodes = new java.util.ArrayList<>();
+        List<IRNode> classNodes = new ArrayList<>();
         classNodes.addAll(glyphFile_);
         classNodes.addAll(contour_);
         classNodes.addAll(include_);

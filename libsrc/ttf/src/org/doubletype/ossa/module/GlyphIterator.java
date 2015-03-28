@@ -47,7 +47,7 @@ import org.doubletype.ossa.adapter.*;
 public class GlyphIterator implements Iterator {
 	protected GlyphFile m_file;
 	private int m_index = 0;
-	protected java.util.List<IRNode> m_list = new ArrayList<>();
+	protected List<IRNode> m_list = new ArrayList<>();
 	
 	public GlyphIterator(GlyphFile a_file) {
 		m_file = a_file;
