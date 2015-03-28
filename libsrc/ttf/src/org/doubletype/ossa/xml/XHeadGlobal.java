@@ -44,7 +44,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XHeadGlobal implements java.io.Serializable, Cloneable, IRNode {
     // List<XParamListParam>
     private java.util.List<XParamListParam> paramListParam_ = new java.util.ArrayList<>();

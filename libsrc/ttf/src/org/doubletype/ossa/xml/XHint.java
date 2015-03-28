@@ -54,7 +54,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XHint implements java.io.Serializable, Cloneable, IRNode {
     private long ppem_;
     private XPoint2d point2d_;
@@ -526,7 +525,6 @@ public class XHint implements java.io.Serializable, Cloneable, IRNode {
      *
      * @return IRNode[]
      */
-    
     public IRNode[] rGetRNodes() {
         java.util.List<XPoint2d> classNodes = new java.util.ArrayList<>();
         if (point2d_ != null) {

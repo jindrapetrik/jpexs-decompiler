@@ -33,7 +33,6 @@ import org.w3c.dom.*;
  * @version May. 22, 2003
  * @author  ASAMI, Tomoharu (asami@relaxer.org)
  */
-@SuppressWarnings("all")
 public final class RStack {
     private Element element_;
     private Object[] children_;

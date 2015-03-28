@@ -237,7 +237,7 @@ public class FontFileWriter extends FontFormatWriter {
 			tableOffset += table.size();
 		} // for table
 		
-        @SuppressWarnings("unchecked")
+                @SuppressWarnings("unchecked")
 		ArrayList<FontFormatWriter> tables = (ArrayList<FontFormatWriter>) m_tables.clone();
 		Collections.sort(tables, new Comparator<FontFormatWriter>() {
 			public int compare(FontFormatWriter a_lhs, FontFormatWriter a_rhs) {

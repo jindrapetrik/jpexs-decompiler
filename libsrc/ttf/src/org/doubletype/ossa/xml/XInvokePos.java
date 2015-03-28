@@ -48,7 +48,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XInvokePos implements java.io.Serializable, Cloneable, IRNode {
     private XPoint2d point2d_;
     private IRNode parentRNode_;

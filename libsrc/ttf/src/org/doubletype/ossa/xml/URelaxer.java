@@ -43,16 +43,15 @@ import org.w3c.dom.*;
  * @version Mar. 12, 2004
  * @author  ASAMI, Tomoharu (asami@relaxer.org)
  */
-@SuppressWarnings("unchecked")  //JPEXS: I am too lazy to fix everything in this class
 public final class URelaxer {
     // String type
     public static String getString(String value) {
-        return (value);
+        return value;
     }
 
     public static String getString(String[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -62,12 +61,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(List values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         int size = values.size();
         StringBuffer buffer = new StringBuffer();
@@ -78,26 +77,26 @@ public final class URelaxer {
                 buffer.append(getString(values.get(i)));
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String[] getStringArrayObject(Object value) {
         if (value instanceof String[]) {
-            return ((String[])value);
+            return (String[])value;
         } else if (value instanceof Object[]) {
             Object[] values = (Object[])value;
             String[] result = new String[values.length];
             for (int i = 0;i < values.length;i++) {
                 result[i] = values[i].toString();
             }
-            return (result);
+            return result;
         } else {
-            return (getStringArray(value.toString()));
+            return getStringArray(value.toString());
         }
     }
 
     public static String[] getStringArray(String value) {
-        return (getStringList(value));
+        return getStringList(value);
     }
 
     public static String[] getStringList(String value) { // XXX : Array and List?
@@ -107,7 +106,7 @@ public final class URelaxer {
         while (st.hasMoreTokens()) {
             list[i++] = st.nextToken();
         }
-        return (list);
+        return list;
     }
 
     public static List<String> makeStringList(String string) {
@@ -118,7 +117,7 @@ public final class URelaxer {
                 list.add(st.nextToken());
             }
         }
-        return (list);
+        return list;
     }
 
     public static String escape(String string) {
@@ -129,7 +128,7 @@ public final class URelaxer {
             string.indexOf('\'') == -1 &&
             string.indexOf('\r') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -151,7 +150,7 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeEntityQuot(String string) {
@@ -159,7 +158,7 @@ public final class URelaxer {
             string.indexOf('&') == -1 &&
             string.indexOf('"') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -175,7 +174,7 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeEntityApos(String string) {
@@ -183,7 +182,7 @@ public final class URelaxer {
             string.indexOf('&') == -1 &&
             string.indexOf('\'') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -199,7 +198,7 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeAttrQuot(String string) {
@@ -207,7 +206,7 @@ public final class URelaxer {
             string.indexOf('&') == -1 &&
             string.indexOf('"') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -223,7 +222,7 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeAttrApos(String string) {
@@ -231,7 +230,7 @@ public final class URelaxer {
             string.indexOf('&') == -1 &&
             string.indexOf('\'') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -247,12 +246,12 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeSystemQuot(String string) {
         if (string.indexOf('"') == -1) {
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -264,12 +263,12 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeSystemApos(String string) {
         if (string.indexOf('\'') == -1) {
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -281,19 +280,19 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String escapeCharData(String string) {
         if (string == null) {
-            return ("");
+            return "";
         }
         if (string.indexOf('<') == -1 &&
             string.indexOf('&') == -1 &&
             string.indexOf('>') == -1 &&
             string.indexOf('\r') == -1) {
 
-            return (string);
+            return string;
         }
         StringBuffer buffer = new StringBuffer();
         int size = string.length();
@@ -311,19 +310,19 @@ public final class URelaxer {
                 buffer.append(c);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getElementPropertyAsString(
         Element element
     ) {
-        return (element2Text(element));
+        return element2Text(element);
     }
 
     public static List<String> getElementPropertyAsStringDataList(
         Element element
     ) {
-        return (makeStringList(element2Text(element)));
+        return makeStringList(element2Text(element));
     }
 
     public static String getElementPropertyAsString(
@@ -332,7 +331,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Text(property);
-        return (text);
+        return text;
     }
 
     public static List getElementPropertyAsStringDataList(
@@ -341,7 +340,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Text(property);
-        return (makeStringList(text));
+        return makeStringList(text);
     }
 
     public static List<String> getElementPropertyAsStringList(
@@ -353,7 +352,7 @@ public final class URelaxer {
         for (int i = 0;i < nodes.length;i++) {
             list.add(element2Text(nodes[i]));
         }
-        return (list);
+        return list;
     }
 
     public static List<List<String>> getElementPropertyAsStringListDataList(
@@ -365,7 +364,7 @@ public final class URelaxer {
         for (int i = 0;i < nodes.length;i++) {
             list.add(makeStringList(element2Text(nodes[i])));
         }
-        return (list);
+        return list;
     }
 
     public static String getElementPropertyAsStringByStack(
@@ -373,14 +372,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (element2Text(property));
+        return element2Text(property);
     }
 
     public static List getElementPropertyAsStringDataListByStack(
@@ -388,14 +387,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (makeStringList(element2Text(property)));
+        return makeStringList(element2Text(property));
     }
 
     public static List<String> getElementPropertyAsStringListByStack(
@@ -414,7 +413,7 @@ public final class URelaxer {
             stack.popElement();
             list.add(element2Text(property));
         }
-        return (list);
+        return list;
     }
 
     public static List<List<String>> getElementPropertyAsStringListDataListByStack(
@@ -433,7 +432,7 @@ public final class URelaxer {
             stack.popElement();
             list.add(makeStringList(element2Text(property)));
         }
-        return (list);
+        return list;
     }
 
     public static String getAttributePropertyAsString(
@@ -442,9 +441,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (value);
+            return value;
         }
     }
 
@@ -454,9 +453,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (makeStringList(value));
+        return makeStringList(value);
     }
 
     public static void setElementPropertyByString(
@@ -576,22 +575,22 @@ public final class URelaxer {
     // boolean type
     public static String getString(boolean value) {
         if (value) {
-            return ("true");
+            return "true";
         } else {
-            return ("false");
+            return "false";
         }
     }
 
     public static String getString(Boolean value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(boolean[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -609,12 +608,12 @@ public final class URelaxer {
                 }
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Boolean[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -624,17 +623,17 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static boolean getBooleanValue(Object value) {
         Boolean object;
         if (value instanceof Boolean) {
             object = (Boolean)value;
-            return (object.booleanValue());
+            return object.booleanValue();
         } else {
             String string = value.toString();
-            return ("true".equals(string) || "1".equals(string));
+            return "true".equals(string) || "1".equals(string);
         }
     }
 
@@ -642,12 +641,12 @@ public final class URelaxer {
         switch (text) {
             case "true":
             case "1":
-                return (Boolean.TRUE);
+                return Boolean.TRUE;
             case "false":
             case "0":
-                return (Boolean.FALSE);
+                return Boolean.FALSE;
             default:
-                return (_invalidBooleanObject(text));
+                return _invalidBooleanObject(text);
         }
     }
 
@@ -657,21 +656,21 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getBooleanObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static boolean getElementPropertyAsBoolean(
         Element element
     ) {
         String text = element2Data(element);
-        return ("true".equals(text) || "1".equals(text));
+        return "true".equals(text) || "1".equals(text);
     }
 
     public static Boolean getElementPropertyAsBooleanObject(
         Element element
     ) {
         String text = element2Data(element);
-        return (getBooleanObject(text));
+        return getBooleanObject(text);
     }
 
 // g1u
@@ -682,9 +681,9 @@ public final class URelaxer {
         List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getBooleanObject((String)strings.get(i)));
+            result.add(getBooleanObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static boolean getElementPropertyAsBoolean(
@@ -692,7 +691,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBoolean(property));
+        return getElementPropertyAsBoolean(property);
     }
 
 // g2a
@@ -701,7 +700,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBooleanDataList(property));
+        return getElementPropertyAsBooleanDataList(property);
     }
 
     public static List<Boolean> getElementPropertyAsBooleanList(
@@ -709,14 +708,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List<Boolean> list = new ArrayList();
+        List<Boolean> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             Boolean value = getElementPropertyAsBooleanObject(nodes[i]);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -725,14 +724,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<Boolean>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsBooleanDataList(nodes[i]);
+            List<Boolean> values = getElementPropertyAsBooleanDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Boolean getElementPropertyAsBooleanByStack(
@@ -740,14 +739,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBooleanObject(property));
+        return getElementPropertyAsBooleanObject(property);
     }
 
 // g4a
@@ -756,21 +755,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBooleanDataList(property));
+        return getElementPropertyAsBooleanDataList(property);
     }
 
     public static List<Boolean> getElementPropertyAsBooleanListByStack(
         RStack stack,
         String name
     ) {
-        List<Boolean> list = new ArrayList();
+        List<Boolean> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -785,7 +784,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -808,7 +807,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static boolean getAttributePropertyAsBoolean(
@@ -817,9 +816,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (false);
+            return false;
         }
-        return ("true".equals(value));
+        return "true".equals(value);
     }
 
     public static Boolean getAttributePropertyAsBooleanObject(
@@ -828,9 +827,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (getBooleanObject(value));
+        return getBooleanObject(value);
     }
 
     public static List<Boolean> getAttributePropertyAsBooleanList(
@@ -839,20 +838,20 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
         List<Boolean> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             if ("true".equals(data) || "1".equals(data)) {
                 result.add(Boolean.TRUE);
             } else {
                 result.add(Boolean.FALSE);
             }
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByBoolean(
@@ -1004,19 +1003,19 @@ public final class URelaxer {
 
     // byte type
     public static String getString(byte value) {
-        return (Byte.toString(value));
+        return Byte.toString(value);
     }
 
     public static String getString(Byte value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(byte[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1026,12 +1025,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Byte[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1041,7 +1040,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static byte getByteValue(Object value) {
@@ -1052,17 +1051,17 @@ public final class URelaxer {
             } else {
                 object = new Byte(value.toString());
             }
-            return (object.byteValue());
+            return object.byteValue();
         } catch (Exception e) {
-            return (_invalidByteValue(e));
+            return _invalidByteValue(e);
         }
     }
 
     public static Byte getByteObject(String text) {
         try {
-            return (new Byte(text));
+            return new Byte(text);
         } catch (Exception e) {
-            return (_invalidByteObject(e));
+            return _invalidByteObject(e);
         }
     }
 
@@ -1072,7 +1071,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getByteObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static byte getElementPropertyAsByte(
@@ -1080,9 +1079,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Byte.parseByte(text));
+            return Byte.parseByte(text);
         } catch (Exception e) {
-            return (_invalidByteValue(e));
+            return _invalidByteValue(e);
         }
     }
 
@@ -1090,7 +1089,7 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getByteObject(text));
+        return getByteObject(text);
     }
 
 // g1u
@@ -1101,9 +1100,9 @@ public final class URelaxer {
         List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getByteObject((String)strings.get(i)));
+            result.add(getByteObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static byte getElementPropertyAsByte(
@@ -1113,19 +1112,19 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Byte.parseByte(text));
+            return Byte.parseByte(text);
         } catch (Exception e) {
-            return (_invalidByteValue(e));
+            return _invalidByteValue(e);
         }
     }
 
 // g2a
-    public static List getElementPropertyAsByteDataList(
+    public static List<Byte> getElementPropertyAsByteDataList(
         Element element,
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsByteDataList(property));
+        return getElementPropertyAsByteDataList(property);
     }
 
     public static List getElementPropertyAsByteList(
@@ -1133,14 +1132,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<Byte> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             Byte value = getElementPropertyAsByteObject(nodes[i]);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -1156,7 +1155,7 @@ public final class URelaxer {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Byte getElementPropertyAsByteByStack(
@@ -1164,14 +1163,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsByteObject(property));
+        return getElementPropertyAsByteObject(property);
     }
 
 // g4a
@@ -1180,14 +1179,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsByteDataList(property));
+        return getElementPropertyAsByteDataList(property);
     }
 
     public static List<Byte> getElementPropertyAsByteListByStack(
@@ -1209,7 +1208,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -1232,7 +1231,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static byte getAttributePropertyAsByte(
@@ -1242,12 +1241,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Byte.parseByte(value));
+                return Byte.parseByte(value);
             }
         } catch (Exception e) {
-            return (_invalidByteValue(e));
+            return _invalidByteValue(e);
         }
     }
 
@@ -1257,9 +1256,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getByteObject(value));
+            return getByteObject(value);
         }
     }
 
@@ -1269,16 +1268,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
         List<Byte> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getByteObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByByte(
@@ -1430,19 +1429,19 @@ public final class URelaxer {
 
     // short type
     public static String getString(short value) {
-        return (Short.toString(value));
+        return Short.toString(value);
     }
 
     public static String getString(Short value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(short[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1452,12 +1451,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Short[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1467,7 +1466,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static short getShortValue(Object value) {
@@ -1478,17 +1477,17 @@ public final class URelaxer {
             } else {
                 object = new Short(value.toString());
             }
-            return (object.shortValue());
+            return object.shortValue();
         } catch (Exception e) {
-            return (_invalidShortValue(e));
+            return _invalidShortValue(e);
         }
     }
 
     public static Short getShortObject(String text) {
         try {
-            return (new Short(text));
+            return new Short(text);
         } catch (Exception e) {
-            return (_invalidShortObject(e));
+            return _invalidShortObject(e);
         }
     }
 
@@ -1498,7 +1497,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getShortObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static short getElementPropertyAsShort(
@@ -1506,9 +1505,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Short.parseShort(text));
+            return Short.parseShort(text);
         } catch (Exception e) {
-            return (_invalidShortValue(e));
+            return _invalidShortValue(e);
         }
     }
 
@@ -1516,7 +1515,7 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getShortObject(text));
+        return getShortObject(text);
     }
 
 // g1u
@@ -1527,9 +1526,9 @@ public final class URelaxer {
         List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getShortObject((String)strings.get(i)));
+            result.add(getShortObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static short getElementPropertyAsShort(
@@ -1539,9 +1538,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Short.parseShort(text));
+            return Short.parseShort(text);
         } catch (Exception e) {
-            return (_invalidShortValue(e));
+            return _invalidShortValue(e);
         }
     }
 
@@ -1551,7 +1550,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsShortDataList(property));
+        return getElementPropertyAsShortDataList(property);
     }
 
     public static List<Short> getElementPropertyAsShortList(
@@ -1566,7 +1565,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -1582,7 +1581,7 @@ public final class URelaxer {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Short getElementPropertyAsShortByStack(
@@ -1590,14 +1589,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsShortObject(property));
+        return getElementPropertyAsShortObject(property);
     }
 
 // g4a
@@ -1606,14 +1605,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsShortDataList(property));
+        return getElementPropertyAsShortDataList(property);
     }
 
     public static List<Short> getElementPropertyAsShortListByStack(
@@ -1635,7 +1634,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -1658,7 +1657,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static short getAttributePropertyAsShort(
@@ -1668,12 +1667,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Short.parseShort(value));
+                return Short.parseShort(value);
             }
         } catch (Exception e) {
-            return (_invalidShortValue(e));
+            return _invalidShortValue(e);
         }
     }
 
@@ -1683,9 +1682,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getShortObject(value));
+            return getShortObject(value);
         }
     }
 
@@ -1695,16 +1694,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
         List<Short> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getShortObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByShort(
@@ -1856,19 +1855,19 @@ public final class URelaxer {
 
     // int type
     public static String getString(int value) {
-        return (Integer.toString(value));
+        return Integer.toString(value);
     }
 
     public static String getString(Integer value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(int[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1878,12 +1877,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Integer[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -1893,7 +1892,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static int getIntValue(Object value) {
@@ -1904,17 +1903,17 @@ public final class URelaxer {
             } else {
                 object = new Integer(value.toString());
             }
-            return (object.intValue());
+            return object.intValue();
         } catch (Exception e) {
-            return (_invalidIntValue(e));
+            return _invalidIntValue(e);
         }
     }
 
     public static Integer getIntObject(String text) {
         try {
-            return (new Integer(text));
+            return new Integer(text);
         } catch (Exception e) {
-            return (_invalidIntegerObject(e));
+            return _invalidIntegerObject(e);
         }
     }
 
@@ -1924,7 +1923,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getIntObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static int getElementPropertyAsInt(
@@ -1932,9 +1931,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Integer.parseInt(text));
+            return Integer.parseInt(text);
         } catch (Exception e) {
-            return (_invalidIntValue(e));
+            return _invalidIntValue(e);
         }
     }
 
@@ -1942,7 +1941,7 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getIntObject(text));
+        return getIntObject(text);
     }
 
 // g1u
@@ -1953,9 +1952,9 @@ public final class URelaxer {
         List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getIntObject((String)strings.get(i)));
+            result.add(getIntObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static int getElementPropertyAsInt(
@@ -1965,9 +1964,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Integer.parseInt(text));
+            return Integer.parseInt(text);
         } catch (Exception e) {
-            return (_invalidIntValue(e));
+            return _invalidIntValue(e);
         }
     }
 
@@ -1977,7 +1976,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsIntDataList(property));
+        return getElementPropertyAsIntDataList(property);
     }
 
     public static List<Integer> getElementPropertyAsIntList(
@@ -1992,7 +1991,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -2008,7 +2007,7 @@ public final class URelaxer {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Integer getElementPropertyAsIntByStack(
@@ -2016,14 +2015,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsIntObject(property));
+        return getElementPropertyAsIntObject(property);
     }
 
 // ga4
@@ -2032,14 +2031,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsIntDataList(property));
+        return getElementPropertyAsIntDataList(property);
     }
 
     public static List<Integer> getElementPropertyAsIntListByStack(
@@ -2061,7 +2060,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -2084,7 +2083,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static int getAttributePropertyAsInt(
@@ -2094,12 +2093,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Integer.parseInt(value));
+                return Integer.parseInt(value);
             }
         } catch (Exception e) {
-            return (_invalidIntValue(e));
+            return _invalidIntValue(e);
         }
     }
 
@@ -2109,9 +2108,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getIntObject(value));
+            return getIntObject(value);
         }
     }
 
@@ -2121,16 +2120,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
         List<Integer> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getIntObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByInt(
@@ -2282,19 +2281,19 @@ public final class URelaxer {
 
     // long type
     public static String getString(long value) {
-        return (Long.toString(value));
+        return Long.toString(value);
     }
 
     public static String getString(Long value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(long[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -2304,12 +2303,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Long[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -2319,7 +2318,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static long getLongValue(Object value) {
@@ -2330,17 +2329,17 @@ public final class URelaxer {
             } else {
                 object = new Long(value.toString());
             }
-            return (object.longValue());
+            return object.longValue();
         } catch (Exception e) {
-            return (_invalidLongValue(e));
+            return _invalidLongValue(e);
         }
     }
 
     public static Long getLongObject(String text) {
         try {
-            return (new Long(text));
+            return new Long(text);
         } catch (Exception e) {
-            return (_invalidLongObject(e));
+            return _invalidLongObject(e);
         }
     }
 
@@ -2350,7 +2349,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getLongObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static long getElementPropertyAsLong(
@@ -2358,9 +2357,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Long.parseLong(text));
+            return Long.parseLong(text);
         } catch (Exception e) {
-            return (_invalidLongValue(e));
+            return _invalidLongValue(e);
         }
     }
 
@@ -2368,7 +2367,7 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getLongObject(text));
+        return getLongObject(text);
     }
 
 // g1u
@@ -2379,9 +2378,9 @@ public final class URelaxer {
         List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getLongObject((String)strings.get(i)));
+            result.add(getLongObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static long getElementPropertyAsLong(
@@ -2391,9 +2390,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Long.parseLong(text));
+            return Long.parseLong(text);
         } catch (Exception e) {
-            return (_invalidLongValue(e));
+            return _invalidLongValue(e);
         }
     }
 
@@ -2403,7 +2402,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsLongDataList(property));
+        return getElementPropertyAsLongDataList(property);
     }
 
     public static List<Long> getElementPropertyAsLongList(
@@ -2418,7 +2417,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -2434,7 +2433,7 @@ public final class URelaxer {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Long getElementPropertyAsLongByStack(
@@ -2443,16 +2442,16 @@ public final class URelaxer {
     ) {
         try {
             if (stack.isEmptyElement()) {
-                return (null);
+                return null;
             }
             Element property = stack.peekElement();
             if (!name.equals(property.getTagName())) {
-                return (null);
+                return null;
             }
             stack.popElement();
-            return (new Long(element2Data(property)));
+            return new Long(element2Data(property));
         } catch (Exception e) {
-            return (_invalidLongObject(e));
+            return _invalidLongObject(e);
         }
     }
 
@@ -2462,14 +2461,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsLongDataList(property));
+        return getElementPropertyAsLongDataList(property);
     }
 
     public static List<Long> getElementPropertyAsLongListByStack(
@@ -2491,7 +2490,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -2514,7 +2513,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static long getAttributePropertyAsLong(
@@ -2524,12 +2523,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Long.parseLong(value));
+                return Long.parseLong(value);
             }
         } catch (Exception e) {
-            return (_invalidLongValue(e));
+            return _invalidLongValue(e);
         }
     }
 
@@ -2539,9 +2538,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getLongObject(value));
+            return getLongObject(value);
         }
     }
 
@@ -2551,16 +2550,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<Long> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getLongObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByLong(
@@ -2721,19 +2720,19 @@ public final class URelaxer {
 
     // float type
     public static String getString(float value) {
-        return (Float.toString(value));
+        return Float.toString(value);
     }
 
     public static String getString(Float value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(float[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -2743,12 +2742,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Float[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -2758,7 +2757,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static float getFloatValue(Object value) {
@@ -2769,17 +2768,17 @@ public final class URelaxer {
             } else {
                 object = new Float(value.toString());
             }
-            return (object.floatValue());
+            return object.floatValue();
         } catch (Exception e) {
-            return (_invalidFloatValue(e));
+            return _invalidFloatValue(e);
         }
     }
 
     public static Float getFloatObject(String text) {
         try {
-            return (new Float(text));
+            return new Float(text);
         } catch (Exception e) {
-            return (_invalidFloatObject(e));
+            return _invalidFloatObject(e);
         }
     }
 
@@ -2789,7 +2788,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getFloatObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static float getElementPropertyAsFloat(
@@ -2797,9 +2796,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Float.parseFloat(text));
+            return Float.parseFloat(text);
         } catch (Exception e) {
-            return (_invalidFloatValue(e));
+            return _invalidFloatValue(e);
         }
     }
 
@@ -2807,7 +2806,7 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getFloatObject(text));
+        return getFloatObject(text);
     }
 
 // g1u
@@ -2815,12 +2814,12 @@ public final class URelaxer {
         Element element
     ) {
         List<Float> result = new ArrayList<>();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getFloatObject((String)strings.get(i)));
+            result.add(getFloatObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static float getElementPropertyAsFloat(
@@ -2830,9 +2829,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Float.parseFloat(text));
+            return Float.parseFloat(text);
         } catch (Exception e) {
-            return (_invalidFloatValue(e));
+            return _invalidFloatValue(e);
         }
     }
 
@@ -2842,7 +2841,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsFloatDataList(property));
+        return getElementPropertyAsFloatDataList(property);
     }
 
     public static List<Float> getElementPropertyAsFloatList(
@@ -2857,7 +2856,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -2873,7 +2872,7 @@ public final class URelaxer {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Float getElementPropertyAsFloatByStack(
@@ -2881,14 +2880,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsFloatObject(property));
+        return getElementPropertyAsFloatObject(property);
     }
 
 // g4a
@@ -2897,14 +2896,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsFloatDataList(property));
+        return getElementPropertyAsFloatDataList(property);
     }
 
     public static List<Float> getElementPropertyAsFloatListByStack(
@@ -2926,7 +2925,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -2949,7 +2948,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static float getAttributePropertyAsFloat(
@@ -2959,12 +2958,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Float.parseFloat(value));
+                return Float.parseFloat(value);
             }
         } catch (Exception e) {
-            return (_invalidFloatValue(e));
+            return _invalidFloatValue(e);
         }
     }
 
@@ -2974,9 +2973,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getFloatObject(value));
+            return getFloatObject(value);
         }
     }
 
@@ -2986,16 +2985,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
-        List<Float> result = new ArrayList();
+        List<Float> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getFloatObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByFloat(
@@ -3156,19 +3155,19 @@ public final class URelaxer {
 
     // double type
     public static String getString(double value) {
-        return (Double.toString(value));
+        return Double.toString(value);
     }
 
     public static String getString(Double value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(double[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -3178,12 +3177,12 @@ public final class URelaxer {
                 buffer.append(values[i]);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getString(Double[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -3193,7 +3192,7 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static double getDoubleValue(Object value) {
@@ -3204,17 +3203,17 @@ public final class URelaxer {
             } else {
                 object = new Double(value.toString());
             }
-            return (object.doubleValue());
+            return object.doubleValue();
         } catch (Exception e) {
-            return (_invalidDoubleValue(e));
+            return _invalidDoubleValue(e);
         }
     }
 
     public static Double getDoubleObject(String text) {
         try {
-            return (new Double(text));
+            return new Double(text);
         } catch (Exception e) {
-            return (_invalidDoubleObject(e));
+            return _invalidDoubleObject(e);
         }
     }
 
@@ -3224,7 +3223,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getDoubleObject(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static double getElementPropertyAsDouble(
@@ -3232,9 +3231,9 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (Double.parseDouble(text));
+            return Double.parseDouble(text);
         } catch (Exception e) {
-            return (_invalidDoubleValue(e));
+            return _invalidDoubleValue(e);
         }
     }
 
@@ -3242,20 +3241,20 @@ public final class URelaxer {
         Element element
     ) {
         String text = element2Data(element);
-        return (getDoubleObject(text));
+        return getDoubleObject(text);
     }
 
 // g1u
-    public static List getElementPropertyAsDoubleDataList(
+    public static List<Double> getElementPropertyAsDoubleDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<Double> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getDoubleObject((String)strings.get(i)));
+            result.add(getDoubleObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static double getElementPropertyAsDouble(
@@ -3265,9 +3264,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (Double.parseDouble(text));
+            return Double.parseDouble(text);
         } catch (Exception e) {
-            return (_invalidDoubleValue(e));
+            return _invalidDoubleValue(e);
         }
     }
 
@@ -3277,7 +3276,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsDoubleDataList(property));
+        return getElementPropertyAsDoubleDataList(property);
     }
 
     public static List getElementPropertyAsDoubleList(
@@ -3285,14 +3284,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<Double> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             Double value = getElementPropertyAsDoubleObject(nodes[i]);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -3301,26 +3300,26 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<Double>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsDoubleDataList(nodes[i]);
+            List<Double> values = getElementPropertyAsDoubleDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static List getElementPropertyAsDoubleList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<Double> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getDoubleObject((String)strings.get(i)));
+            result.add(getDoubleObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
 // g4a
@@ -3329,14 +3328,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsDoubleDataList(property));
+        return getElementPropertyAsDoubleDataList(property);
     }
 
     public static Double getElementPropertyAsDoubleByStack(
@@ -3344,14 +3343,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsDoubleObject(property));
+        return getElementPropertyAsDoubleObject(property);
     }
 
 // g5a
@@ -3359,7 +3358,7 @@ public final class URelaxer {
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<Double>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -3369,19 +3368,19 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsDoubleDataList(property);
+            List<Double> value = getElementPropertyAsDoubleDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static List getElementPropertyAsDoubleListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<Double> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -3396,7 +3395,7 @@ public final class URelaxer {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static double getAttributePropertyAsDouble(
@@ -3406,12 +3405,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (0);
+                return 0;
             } else {
-                return (Double.parseDouble(value));
+                return Double.parseDouble(value);
             }
         } catch (Exception e) {
-            return (_invalidDoubleValue(e));
+            return _invalidDoubleValue(e);
         }
     }
 
@@ -3421,9 +3420,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getDoubleObject(value));
+            return getDoubleObject(value);
         }
     }
 
@@ -3433,16 +3432,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<Double> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getDoubleObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByDouble(
@@ -3604,14 +3603,14 @@ public final class URelaxer {
     // BigDecimal type
     public static String getString(BigDecimal value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(BigDecimal[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -3621,26 +3620,26 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static BigDecimal getBigDecimal(String value) {
         try {
-            return (new BigDecimal(value));
+            return new BigDecimal(value);
         } catch (Exception e) {
-            return (_invalidBigDecimal(e));
+            return _invalidBigDecimal(e);
         }
     }
 
     public static BigDecimal getBigDecimalObject(Object value) {
         try {
             if (value instanceof BigDecimal) {
-                return ((BigDecimal)value);
+                return (BigDecimal)value;
             } else {
-                return (new BigDecimal(value.toString()));
+                return new BigDecimal(value.toString());
             }
         } catch (Exception e) {
-            return (_invalidBigDecimal(e));
+            return _invalidBigDecimal(e);
         }
     }
 
@@ -3650,7 +3649,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getBigDecimal(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static BigDecimal getElementPropertyAsBigDecimal(
@@ -3658,23 +3657,23 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (new BigDecimal(text));
+            return new BigDecimal(text);
         } catch (Exception e) {
-            return (_invalidBigDecimal(e));
+            return _invalidBigDecimal(e);
         }
     }
 
 // g1u
-    public static List getElementPropertyAsBigDecimalDataList(
+    public static List<BigDecimal> getElementPropertyAsBigDecimalDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<BigDecimal> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getBigDecimalObject((String)strings.get(i)));
+            result.add(getBigDecimalObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static BigDecimal getElementPropertyAsBigDecimal(
@@ -3684,9 +3683,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (new BigDecimal(text));
+            return new BigDecimal(text);
         } catch (Exception e) {
-            return (_invalidBigDecimal(e));
+            return _invalidBigDecimal(e);
         }
     }
 
@@ -3696,7 +3695,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBigDecimalDataList(property));
+        return getElementPropertyAsBigDecimalDataList(property);
     }
 
     public static List getElementPropertyAsBigDecimalList(
@@ -3704,7 +3703,7 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<BigDecimal> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             try {
                 list.add(new BigDecimal(element2Data(nodes[i])));
@@ -3712,7 +3711,7 @@ public final class URelaxer {
                 _invalidBigDecimal(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -3721,14 +3720,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<BigDecimal>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsBigDecimalDataList(nodes[i]);
+            List<BigDecimal> values = getElementPropertyAsBigDecimalDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static BigDecimal getElementPropertyAsBigDecimalByStack(
@@ -3736,14 +3735,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBigDecimal(property));
+        return getElementPropertyAsBigDecimal(property);
     }
 
 // g4a
@@ -3752,21 +3751,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBigDecimalDataList(property));
+        return getElementPropertyAsBigDecimalDataList(property);
     }
 
     public static List getElementPropertyAsBigDecimalListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<BigDecimal> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -3782,7 +3781,7 @@ public final class URelaxer {
                 _invalidBigDecimal(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -3790,7 +3789,7 @@ public final class URelaxer {
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<BigDecimal>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -3800,12 +3799,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsBigDecimalDataList(property);
+            List<BigDecimal> value = getElementPropertyAsBigDecimalDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static BigDecimal getAttributePropertyAsBigDecimal(
@@ -3815,12 +3814,12 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (null);
+                return null;
             } else {
-                return (new BigDecimal(value));
+                return new BigDecimal(value);
             }
         } catch (Exception e) {
-            return (_invalidBigDecimal(e));
+            return _invalidBigDecimal(e);
         }
     }
 
@@ -3830,16 +3829,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<BigDecimal> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getBigDecimalObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByBigDecimal(
@@ -3962,14 +3961,14 @@ public final class URelaxer {
     // BigInteger type
     public static String getString(BigInteger value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(BigInteger[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -3979,26 +3978,26 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static BigInteger getBigInteger(String value) {
         try {
-            return (new BigInteger(value));
+            return new BigInteger(value);
         } catch (Exception e) {
-            return (_invalidBigInteger(e));
+            return _invalidBigInteger(e);
         }
     }
 
     public static BigInteger getBigIntegerObject(Object value) {
         try {
             if (value instanceof BigInteger) {
-                return ((BigInteger)value);
+                return (BigInteger)value;
             } else {
-                return (new BigInteger(value.toString()));
+                return new BigInteger(value.toString());
             }
         } catch (Exception e) {
-            return (_invalidBigInteger(e));
+            return _invalidBigInteger(e);
         }
     }
 
@@ -4008,7 +4007,7 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getBigInteger(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static BigInteger getElementPropertyAsBigInteger(
@@ -4016,23 +4015,23 @@ public final class URelaxer {
     ) {
         try {
             String text = element2Data(element);
-            return (new BigInteger(text));
+            return new BigInteger(text);
         } catch (Exception e) {
-            return (_invalidBigInteger(e));
+            return _invalidBigInteger(e);
         }
     }
 
 // g1u
-    public static List getElementPropertyAsBigIntegerDataList(
+    public static List<BigInteger> getElementPropertyAsBigIntegerDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<BigInteger> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getBigIntegerObject((String)strings.get(i)));
+            result.add(getBigIntegerObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static BigInteger getElementPropertyAsBigInteger(
@@ -4042,9 +4041,9 @@ public final class URelaxer {
         try {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
-            return (new BigInteger(text));
+            return new BigInteger(text);
         } catch (Exception e) {
-            return (_invalidBigInteger(e));
+            return _invalidBigInteger(e);
         }
     }
 
@@ -4054,7 +4053,7 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBigIntegerDataList(property));
+        return getElementPropertyAsBigIntegerDataList(property);
     }
 
     public static List getElementPropertyAsBigIntegerList(
@@ -4062,7 +4061,7 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<BigInteger> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             try {
                 list.add(new BigInteger(element2Data(nodes[i])));
@@ -4070,7 +4069,7 @@ public final class URelaxer {
                 _invalidBigInteger(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -4079,14 +4078,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<BigInteger>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsBigIntegerDataList(nodes[i]);
+            List<BigInteger> values = getElementPropertyAsBigIntegerDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static BigInteger getElementPropertyAsBigIntegerByStack(
@@ -4094,14 +4093,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBigInteger(property));
+        return getElementPropertyAsBigInteger(property);
     }
 
 // g4a
@@ -4110,21 +4109,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBigIntegerDataList(property));
+        return getElementPropertyAsBigIntegerDataList(property);
     }
 
-    public static List getElementPropertyAsBigIntegerListByStack(
+    public static List<BigInteger> getElementPropertyAsBigIntegerListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<BigInteger> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4140,7 +4139,7 @@ public final class URelaxer {
                 _invalidBigInteger(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
@@ -4148,7 +4147,7 @@ public final class URelaxer {
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<BigInteger>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4158,12 +4157,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsBigIntegerDataList(property);
+            List<BigInteger> value = getElementPropertyAsBigIntegerDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static BigInteger getAttributePropertyAsBigInteger(
@@ -4173,31 +4172,31 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (null);
+                return null;
             } else {
-                return (new BigInteger(value));
+                return new BigInteger(value);
             }
         } catch (Exception e) {
-            return (_invalidBigInteger(e));
+            return _invalidBigInteger(e);
         }
     }
 
-    public static List getAttributePropertyAsBigIntegerList(
+    public static List<BigInteger> getAttributePropertyAsBigIntegerList(
         Element element,
         String name
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<BigInteger> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getBigIntegerObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByBigInteger(
@@ -4317,14 +4316,14 @@ public final class URelaxer {
     // Date type
     public static String getString(Date value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (getString(new java.sql.Timestamp(value.getTime())));
+        return getString(new java.sql.Timestamp(value.getTime()));
     }
 
     public static String getString(Date[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -4334,14 +4333,14 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static Date getDateObject(Object value) {
         if (value instanceof Date) {
-            return ((Date)value);
+            return (Date)value;
         } else {
-            return (getSQLTimestampObject(value));
+            return getSQLTimestampObject(value);
         }
     }
 
@@ -4351,23 +4350,23 @@ public final class URelaxer {
         try {
             String text = element2Data(element);
             DateFormat df = DateFormat.getDateInstance();
-            return (df.parse(text));
+            return df.parse(text);
         } catch (Exception e) {
-            return (_invalidDate(e));
+            return _invalidDate(e);
         }
     }
 
 // g1u
-    public static List getElementPropertyAsDateDataList(
+    public static List<Date> getElementPropertyAsDateDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<Date> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getDateObject((String)strings.get(i)));
+            result.add(getDateObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static Date getElementPropertyAsDate(
@@ -4378,9 +4377,9 @@ public final class URelaxer {
             Element property = getOnlyElement(element, name);
             String text = element2Data(property);
             DateFormat df = DateFormat.getDateInstance();
-            return (df.parse(text));
+            return df.parse(text);
         } catch (IllegalArgumentException | ParseException e) {
-            return (_invalidDate(e));
+            return _invalidDate(e);
         }
     }
 
@@ -4390,16 +4389,16 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsDateDataList(property));
+        return getElementPropertyAsDateDataList(property);
     }
 
-    public static List getElementPropertyAsDateList(
+    public static List<Date> getElementPropertyAsDateList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
         DateFormat df = DateFormat.getDateInstance();
-        List list = new ArrayList();
+        List<Date> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             try {
                 list.add(df.parse(element2Data(nodes[i])));
@@ -4407,7 +4406,7 @@ public final class URelaxer {
                 _invalidDate(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -4416,14 +4415,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<Date>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsDateDataList(nodes[i]);
+            List<Date> values = getElementPropertyAsDateDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Date getElementPropertyAsDateByStack(
@@ -4431,14 +4430,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsDate(property));
+        return getElementPropertyAsDate(property);
     }
 
 // g4a
@@ -4447,21 +4446,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsDateDataList(property));
+        return getElementPropertyAsDateDataList(property);
     }
 
-    public static List getElementPropertyAsDateListByStack(
+    public static List<Date> getElementPropertyAsDateListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<Date> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4479,15 +4478,15 @@ public final class URelaxer {
                 _invalidDate(e);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsDateListDataListByStack(
+    public static List<List<Date>> getElementPropertyAsDateListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<Date>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4497,12 +4496,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsDateDataList(property);
+            List<Date> value = getElementPropertyAsDateDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Date getAttributePropertyAsDate(
@@ -4512,32 +4511,32 @@ public final class URelaxer {
         try {
             String value = getAttribute(element, name);
             if (value == null) {
-                return (null);
+                return null;
             } else {
                 DateFormat df = DateFormat.getDateInstance();
-                return (df.parse(value));
+                return df.parse(value);
             }
         } catch (Exception e) {
-            return (_invalidDate(e));
+            return _invalidDate(e);
         }
     }
 
-    public static List getAttributePropertyAsDateList(
+    public static List<Date> getAttributePropertyAsDateList(
         Element element,
         String name
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<Date> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getDateObject(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByDate(
@@ -4659,12 +4658,12 @@ public final class URelaxer {
 
     // Locale type
     public static String getString(Locale value) {
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(Locale[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -4674,21 +4673,21 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static Locale getLocale(String value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (makeLocale(value));
+        return makeLocale(value);
     }
 
     public static Locale getLocaleObject(Object value) {
         if (value instanceof Locale) {
-            return ((Locale)value);
+            return (Locale)value;
         } else {
-            return (makeLocale(value.toString()));
+            return makeLocale(value.toString());
         }
     }
 
@@ -4698,27 +4697,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getLocale(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static Locale getElementPropertyAsLocale(
         Element element
     ) {
         String text = element2Data(element);
-        return (makeLocale(text));
+        return makeLocale(text);
     }
 
 // g1u
-    public static List getElementPropertyAsLocaleDataList(
+    public static List<Locale> getElementPropertyAsLocaleDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<Locale> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getLocaleObject((String)strings.get(i)));
+            result.add(getLocaleObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static Locale getElementPropertyAsLocale(
@@ -4727,7 +4726,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (makeLocale(text));
+        return makeLocale(text);
     }
 
 // g2a
@@ -4736,22 +4735,22 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsLocaleDataList(property));
+        return getElementPropertyAsLocaleDataList(property);
     }
 
-    public static List getElementPropertyAsLocaleList(
+    public static List<Locale> getElementPropertyAsLocaleList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<Locale> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             Locale locale = makeLocale(element2Data(nodes[i]));
             if (locale != null) {
                 list.add(locale);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
@@ -4760,14 +4759,14 @@ public final class URelaxer {
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<Locale>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsLocaleDataList(nodes[i]);
+            List<Locale> values = getElementPropertyAsLocaleDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Locale getElementPropertyAsLocaleByStack(
@@ -4775,14 +4774,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsLocale(property));
+        return getElementPropertyAsLocale(property);
     }
 
 // g4a
@@ -4791,21 +4790,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsLocaleDataList(property));
+        return getElementPropertyAsLocaleDataList(property);
     }
 
-    public static List getElementPropertyAsLocaleListByStack(
+    public static List<Locale> getElementPropertyAsLocaleListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<Locale> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4820,15 +4819,15 @@ public final class URelaxer {
                 list.add(locale);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsLocaleListDataListByStack(
+    public static List<List<Locale>> getElementPropertyAsLocaleListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<Locale>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -4838,12 +4837,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsLocaleDataList(property);
+            List<Locale> value = getElementPropertyAsLocaleDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static Locale getAttributePropertyAsLocale(
@@ -4852,9 +4851,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (makeLocale(value));
+            return makeLocale(value);
         }
     }
 
@@ -4864,16 +4863,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<Locale> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(makeLocale(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByLocale(
@@ -4993,14 +4992,14 @@ public final class URelaxer {
     // URL type
     public static String getString(URL value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toExternalForm());
+        return value.toExternalForm();
     }
 
     public static String getString(URL[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -5010,18 +5009,18 @@ public final class URelaxer {
                 buffer.append(getString(values[i]));
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static URL getURL(String value) {
-        return (makeURL4Property(value));
+        return makeURL4Property(value);
     }
 
     public static URL getURLObject(Object value) {
         if (value instanceof URL) {
-            return ((URL)value);
+            return (URL)value;
         } else {
-            return (makeURL4Property(value.toString()));
+            return makeURL4Property(value.toString());
         }
     }
 
@@ -5031,27 +5030,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getURL(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static URL getElementPropertyAsURL(
         Element element
     ) {
         String text = element2Data(element);
-        return (makeURL4Property(text));
+        return makeURL4Property(text);
     }
 
 // g1u
-    public static List getElementPropertyAsURLDataList(
+    public static List<URL> getElementPropertyAsURLDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<URL> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getURLObject((String)strings.get(i)));
+            result.add(getURLObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static URL getElementPropertyAsURL(
@@ -5060,7 +5059,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (makeURL4Property(text));
+        return makeURL4Property(text);
     }
 
 // g2a
@@ -5069,38 +5068,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsURLDataList(property));
+        return getElementPropertyAsURLDataList(property);
     }
 
-    public static List getElementPropertyAsURLList(
+    public static List<URL> getElementPropertyAsURLList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<URL> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             URL url = makeURL4Property(element2Data(nodes[i]));
             if (url != null) {
                 list.add(url);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsURLListDataList(
+    public static List<List<URL>> getElementPropertyAsURLListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<URL>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsURLDataList(nodes[i]);
+            List<URL> values = getElementPropertyAsURLDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static URL getElementPropertyAsURLByStack(
@@ -5108,14 +5107,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsURL(property));
+        return getElementPropertyAsURL(property);
     }
 
 // g4a
@@ -5124,21 +5123,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsURLDataList(property));
+        return getElementPropertyAsURLDataList(property);
     }
 
     public static List getElementPropertyAsURLListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<URL> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5153,15 +5152,15 @@ public final class URelaxer {
                 list.add(url);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsURLListDataListByStack(
+    public static List<List<URL>> getElementPropertyAsURLListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<URL>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5171,12 +5170,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsURLDataList(property);
+            List<URL> value = getElementPropertyAsURLDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static URL getAttributePropertyAsURL(
@@ -5185,9 +5184,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (makeURL4Property(value));
+            return makeURL4Property(value);
         }
     }
 
@@ -5197,19 +5196,19 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<URL> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             URL url = makeURL4Property(data);
             if (url != null) {
                 result.add(url);
             }
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByURL(
@@ -5329,14 +5328,14 @@ public final class URelaxer {
     // SQL Timestamp type
     public static String getString(java.sql.Timestamp value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (adjustTime_(value.toString().replace(' ', 'T')));
+        return adjustTime_(value.toString().replace(' ', 'T'));
     }
 
     public static String getString(java.sql.Timestamp[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -5346,22 +5345,22 @@ public final class URelaxer {
                 buffer.append(getString(values[i]));
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static java.sql.Timestamp getSQLTimestamp(String value) {
         try {
-            return (java.sql.Timestamp.valueOf(value.trim().replace('T', ' ')));
+            return java.sql.Timestamp.valueOf(value.trim().replace('T', ' '));
         } catch (Exception e) {
-            return (_invalidSQLTimestamp(e));
+            return _invalidSQLTimestamp(e);
         }
     }
 
     public static java.sql.Timestamp getSQLTimestampObject(Object value) {
         if (value instanceof java.sql.Timestamp) {
-            return ((java.sql.Timestamp)value);
+            return (java.sql.Timestamp)value;
         } else {
-            return (getSQLTimestamp(value.toString()));
+            return getSQLTimestamp(value.toString());
         }
     }
 
@@ -5371,27 +5370,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getSQLTimestamp(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Timestamp getElementPropertyAsSQLTimestamp(
         Element element
     ) {
         String text = element2Data(element);
-        return (getSQLTimestamp(text));
+        return getSQLTimestamp(text);
     }
 
 // g1u
-    public static List getElementPropertyAsSQLTimestampDataList(
+    public static List<java.sql.Timestamp> getElementPropertyAsSQLTimestampDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<java.sql.Timestamp> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getSQLTimestampObject((String)strings.get(i)));
+            result.add(getSQLTimestampObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static java.sql.Timestamp getElementPropertyAsSQLTimestamp(
@@ -5400,7 +5399,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (getSQLTimestamp(text));
+        return getSQLTimestamp(text);
     }
 
 // g2a
@@ -5409,38 +5408,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsSQLTimestampDataList(property));
+        return getElementPropertyAsSQLTimestampDataList(property);
     }
 
-    public static List getElementPropertyAsSQLTimestampList(
+    public static List<java.sql.Timestamp> getElementPropertyAsSQLTimestampList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<java.sql.Timestamp> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             java.sql.Timestamp ts = getSQLTimestamp(element2Data(nodes[i]));
             if (ts != null) {
                 list.add(ts);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsSQLTimestampListDataList(
+    public static List<List<java.sql.Time>> getElementPropertyAsSQLTimestampListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<java.sql.Time>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsSQLTimeDataList(nodes[i]);
+            List<java.sql.Time> values = getElementPropertyAsSQLTimeDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Timestamp getElementPropertyAsSQLTimestampByStack(
@@ -5448,14 +5447,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLTimestamp(property));
+        return getElementPropertyAsSQLTimestamp(property);
     }
 
 // g4a
@@ -5464,21 +5463,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLTimestampDataList(property));
+        return getElementPropertyAsSQLTimestampDataList(property);
     }
 
-    public static List getElementPropertyAsSQLTimestampListByStack(
+    public static List<java.sql.Timestamp> getElementPropertyAsSQLTimestampListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<java.sql.Timestamp> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5493,15 +5492,15 @@ public final class URelaxer {
                 list.add(ts);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsSQLTimestampListDataListByStack(
+    public static List<List<java.sql.Timestamp>> getElementPropertyAsSQLTimestampListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<java.sql.Timestamp>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5511,12 +5510,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsSQLTimestampDataList(property);
+            List<java.sql.Timestamp> value = getElementPropertyAsSQLTimestampDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Timestamp getAttributePropertyAsSQLTimestamp(
@@ -5525,9 +5524,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getSQLTimestamp(value));
+            return getSQLTimestamp(value);
         }
     }
 
@@ -5537,16 +5536,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<java.sql.Timestamp> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getSQLTimestamp(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyBySQLTimestamp(
@@ -5659,21 +5658,21 @@ public final class URelaxer {
     // SQL Time type
     public static String getString(java.sql.Time value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (adjustTime_(value.toString()));
+        return adjustTime_(value.toString());
     }
 
     private static String adjustTime_(String time) {
         if (!time.endsWith(".0")) {
-            return (time);
+            return time;
         }
-        return (time.substring(0, time.length() - 2));
+        return time.substring(0, time.length() - 2);
     }
 
     public static String getString(java.sql.Time[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -5683,21 +5682,21 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
     public static java.sql.Time getSQLTime(String value) {
         try {
-            return (java.sql.Time.valueOf(value));
+            return java.sql.Time.valueOf(value);
         } catch (Exception e) {
-            return (_invalidSQLTime(e));
+            return _invalidSQLTime(e);
         }
     }
 
     public static java.sql.Time getSQLTimeObject(Object value) {
         if (value instanceof java.sql.Time) {
-            return ((java.sql.Time)value);
+            return (java.sql.Time)value;
         } else {
-            return (getSQLTime(value.toString()));
+            return getSQLTime(value.toString());
         }
     }
 
@@ -5707,27 +5706,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getSQLTime(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Time getElementPropertyAsSQLTime(
         Element element
     ) {
         String text = element2Data(element);
-        return (getSQLTime(text));
+        return getSQLTime(text);
     }
 
 // g1u
-    public static List getElementPropertyAsSQLTimeDataList(
+    public static List<java.sql.Time> getElementPropertyAsSQLTimeDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<java.sql.Time> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getSQLTimeObject((String)strings.get(i)));
+            result.add(getSQLTimeObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static java.sql.Time getElementPropertyAsSQLTime(
@@ -5736,7 +5735,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (getSQLTime(text));
+        return getSQLTime(text);
     }
 
 // g2a
@@ -5745,38 +5744,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsSQLTimeDataList(property));
+        return getElementPropertyAsSQLTimeDataList(property);
     }
 
-    public static List getElementPropertyAsSQLTimeList(
+    public static List<java.sql.Time> getElementPropertyAsSQLTimeList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<java.sql.Time> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             java.sql.Time time = getSQLTime(element2Data(nodes[i]));
             if (time != null) {
                 list.add(time);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsSQLTimeListDataList(
+    public static List<List<java.sql.Time>> getElementPropertyAsSQLTimeListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<java.sql.Time>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsSQLTimeDataList(nodes[i]);
+            List<java.sql.Time> values = getElementPropertyAsSQLTimeDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Time getElementPropertyAsSQLTimeByStack(
@@ -5784,14 +5783,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLTime(property));
+        return getElementPropertyAsSQLTime(property);
     }
 
 // g4a
@@ -5800,21 +5799,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLTimeDataList(property));
+        return getElementPropertyAsSQLTimeDataList(property);
     }
 
-    public static List getElementPropertyAsSQLTimeListByStack(
+    public static List<java.sql.Time> getElementPropertyAsSQLTimeListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<java.sql.Time> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5829,15 +5828,15 @@ public final class URelaxer {
                 list.add(time);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsSQLTimeListDataListByStack(
+    public static List<List<java.sql.Time>> getElementPropertyAsSQLTimeListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<java.sql.Time>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -5847,12 +5846,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsSQLTimeDataList(property);
+            List<java.sql.Time> value = getElementPropertyAsSQLTimeDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Time getAttributePropertyAsSQLTime(
@@ -5861,9 +5860,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getSQLTime(value));
+            return getSQLTime(value);
         }
     }
 
@@ -5873,16 +5872,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<java.sql.Time> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getSQLTime(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyBySQLTime(
@@ -5993,14 +5992,14 @@ public final class URelaxer {
     // SQL Date type
     public static String getString(java.sql.Date value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (value.toString());
+        return value.toString();
     }
 
     public static String getString(java.sql.Date[] values) {
         if (values == null) {
-            return (null);
+            return null;
         }
         StringBuffer buffer = new StringBuffer();
         if (values.length > 0) {
@@ -6010,22 +6009,22 @@ public final class URelaxer {
                 buffer.append(values[i].toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static java.sql.Date getSQLDate(String value) {
         try {
-            return (java.sql.Date.valueOf(value));
+            return java.sql.Date.valueOf(value);
         } catch (Exception e) {
-            return (_invalidSQLDate(e));
+            return _invalidSQLDate(e);
         }
     }
 
     public static java.sql.Date getSQLDateObject(Object value) {
         if (value instanceof java.sql.Date) {
-            return ((java.sql.Date)value);
+            return (java.sql.Date)value;
         } else {
-            return (getSQLDate(value.toString()));
+            return getSQLDate(value.toString());
         }
     }
 
@@ -6035,27 +6034,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getSQLDate(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Date getElementPropertyAsSQLDate(
         Element element
     ) {
         String text = element2Data(element);
-        return (getSQLDate(text));
+        return getSQLDate(text);
     }
 
 // g1u
-    public static List getElementPropertyAsSQLDateDataList(
+    public static List<java.sql.Date> getElementPropertyAsSQLDateDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<java.sql.Date> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getSQLDateObject((String)strings.get(i)));
+            result.add(getSQLDateObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static java.sql.Date getElementPropertyAsSQLDate(
@@ -6064,7 +6063,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (getSQLDate(text));
+        return getSQLDate(text);
     }
 
 // g2a
@@ -6073,38 +6072,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsSQLDateDataList(property));
+        return getElementPropertyAsSQLDateDataList(property);
     }
 
-    public static List getElementPropertyAsSQLDateList(
+    public static List<java.sql.Date> getElementPropertyAsSQLDateList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<java.sql.Date> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             java.sql.Date date = getSQLDate(element2Data(nodes[i]));
             if (date != null) {
                 list.add(date);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsSQLDateListDataList(
+    public static List<List<java.sql.Date>> getElementPropertyAsSQLDateListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<java.sql.Date>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsSQLDateDataList(nodes[i]);
+            List<java.sql.Date> values = getElementPropertyAsSQLDateDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Date getElementPropertyAsSQLDateByStack(
@@ -6112,14 +6111,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLDate(property));
+        return getElementPropertyAsSQLDate(property);
     }
 
 // g4a
@@ -6128,21 +6127,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsSQLDateDataList(property));
+        return getElementPropertyAsSQLDateDataList(property);
     }
 
-    public static List getElementPropertyAsSQLDateListByStack(
+    public static List<java.sql.Date> getElementPropertyAsSQLDateListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<java.sql.Date> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6157,15 +6156,15 @@ public final class URelaxer {
                 list.add(date);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsSQLDateListDataListByStack(
+    public static List<List<java.sql.Date>> getElementPropertyAsSQLDateListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<java.sql.Date>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6175,12 +6174,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsSQLDateDataList(property);
+            List<java.sql.Date> value = getElementPropertyAsSQLDateDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static java.sql.Date getAttributePropertyAsSQLDate(
@@ -6189,9 +6188,9 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         } else {
-            return (getSQLDate(value));
+            return getSQLDate(value);
         }
     }
 
@@ -6201,16 +6200,16 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<java.sql.Date> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(getSQLDate(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyBySQLDate(
@@ -6330,17 +6329,17 @@ public final class URelaxer {
     // binary type (BASE64)
     public static String getBinaryString(byte[] value) {
         if (value == null) {
-            return (null);
+            return null;
         }
-        return (makeStringAsBASE64(value));
+        return makeStringAsBASE64(value);
     }
 
     public static String getBinaryString(byte[][] value) {
         if (value == null) {
-            return (null);
+            return null;
         }
         if (value.length == 0) {
-            return ("");
+            return "";
         }
         StringBuffer buffer = new StringBuffer();
         buffer.append(makeStringAsBASE64(value[0]));
@@ -6348,18 +6347,18 @@ public final class URelaxer {
             buffer.append(" ");
             buffer.append(makeStringAsBASE64(value[i]));
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static byte[] getBinary(String value) {
-        return (makeBytesByBASE64(value));
+        return makeBytesByBASE64(value);
     }
 
     public static byte[] getBinaryObject(Object value) {
         if (value instanceof byte[]) {
-            return ((byte[])value);
+            return (byte[])value;
         } else {
-            return (getBinary(value.toString()));
+            return getBinary(value.toString());
         }
     }
 
@@ -6369,27 +6368,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getBinary(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getElementPropertyAsBinaryBASE64(
         Element element
     ) {
         String text = element2Data(element);
-        return (makeBytesByBASE64(text));
+        return makeBytesByBASE64(text);
     }
 
 // g1u
-    public static List getElementPropertyAsBinaryBASE64DataList(
+    public static List<byte[]> getElementPropertyAsBinaryBASE64DataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<byte[]> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getBinaryObject((String)strings.get(i)));
+            result.add(getBinaryObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static byte[] getElementPropertyAsBinaryBASE64(
@@ -6398,7 +6397,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (makeBytesByBASE64(text));
+        return makeBytesByBASE64(text);
     }
 
 // g2a
@@ -6407,38 +6406,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBinaryBASE64DataList(property));
+        return getElementPropertyAsBinaryBASE64DataList(property);
     }
 
-    public static List getElementPropertyAsBinaryListBASE64(
+    public static List<byte[]> getElementPropertyAsBinaryListBASE64(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<byte[]> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             byte[] binary = makeBytesByBASE64(element2Data(nodes[i]));
             if (binary != null) {
                 list.add(binary);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsBinaryBASE64ListDataList(
+    public static List<List<byte[]>> getElementPropertyAsBinaryBASE64ListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<byte[]>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsBinaryBASE64DataList(nodes[i]);
+            List<byte[]> values = getElementPropertyAsBinaryBASE64DataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getElementPropertyAsBinaryBASE64ByStack(
@@ -6446,14 +6445,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBinaryBASE64(property));
+        return getElementPropertyAsBinaryBASE64(property);
     }
 
 // g4a
@@ -6462,21 +6461,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBinaryBASE64DataList(property));
+        return getElementPropertyAsBinaryBASE64DataList(property);
     }
 
-    public static List getElementPropertyAsBinaryListBASE64ByStack(
+    public static List<byte[]> getElementPropertyAsBinaryListBASE64ByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<byte[]> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6491,15 +6490,15 @@ public final class URelaxer {
                 list.add(binary);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsBinaryBASE64ListDataListByStack(
+    public static List<List<byte[]>> getElementPropertyAsBinaryBASE64ListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<byte[]>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6509,12 +6508,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsBinaryBASE64DataList(property);
+            List<byte[]> value = getElementPropertyAsBinaryBASE64DataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getAttributePropertyAsBinaryBASE64(
@@ -6522,25 +6521,25 @@ public final class URelaxer {
         String name
     ) {
         String value = getAttribute(element, name);
-        return (makeBytesByBASE64(value));
+        return makeBytesByBASE64(value);
     }
 
-    public static List getAttributePropertyAsBinaryBASE64List(
+    public static List<byte[]> getAttributePropertyAsBinaryBASE64List(
         Element element,
         String name
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
-        List list = makeStringList(value);
-        List result = new ArrayList();
+        List<String> list = makeStringList(value);
+        List<byte[]> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(makeBytesByBASE64(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByBinaryBASE64(
@@ -6662,17 +6661,17 @@ public final class URelaxer {
     // HEX type
     public static String getStringByBinaryHEX(byte[] bytes) {
         if (bytes == null) {
-            return (null);
+            return null;
         }
-        return (makeStringAsHEX(bytes));
+        return makeStringAsHEX(bytes);
     }
 
     public static String getStringByBinaryHEX(byte[][] value) {
         if (value == null) {
-            return (null);
+            return null;
         }
         if (value.length == 0) {
-            return ("");
+            return "";
         }
         StringBuffer buffer = new StringBuffer();
         buffer.append(makeStringAsHEX(value[0]));
@@ -6680,18 +6679,18 @@ public final class URelaxer {
             buffer.append(" ");
             buffer.append(makeStringAsHEX(value[i]));
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static byte[] getBinaryHEX(String value) {
-        return (makeBytesByHEX(value));
+        return makeBytesByHEX(value);
     }
 
     public static byte[] getBinaryHEXObject(Object value) {
         if (value instanceof byte[]) {
-            return ((byte[])value);
+            return (byte[])value;
         } else {
-            return (makeBytesByHEX(value.toString()));
+            return makeBytesByHEX(value.toString());
         }
     }
 
@@ -6701,27 +6700,27 @@ public final class URelaxer {
         for (int i = 0;i < strings.length;i++) {
             list[i] = getBinaryHEX(strings[i]);
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getElementPropertyAsBinaryHEX(
         Element element
     ) {
         String text = element2Data(element);
-        return (makeBytesByHEX(text));
+        return makeBytesByHEX(text);
     }
 
 // g1u
-    public static List getElementPropertyAsBinaryHEXDataList(
+    public static List<byte[]> getElementPropertyAsBinaryHEXDataList(
         Element element
     ) {
-        List result = new ArrayList();
-        List strings = getElementPropertyAsStringDataList(element);
+        List<byte[]> result = new ArrayList<>();
+        List<String> strings = getElementPropertyAsStringDataList(element);
         int size = strings.size();
         for (int i = 0;i < size;i++) {
-            result.add(getBinaryHEXObject((String)strings.get(i)));
+            result.add(getBinaryHEXObject(strings.get(i)));
         }
-        return (result);
+        return result;
     }
 
     public static byte[] getElementPropertyAsBinaryHEX(
@@ -6730,7 +6729,7 @@ public final class URelaxer {
     ) {
         Element property = getOnlyElement(element, name);
         String text = element2Data(property);
-        return (makeBytesByHEX(text));
+        return makeBytesByHEX(text);
     }
 
 // g2a
@@ -6739,38 +6738,38 @@ public final class URelaxer {
         String name
     ) {
         Element property = getOnlyElement(element, name);
-        return (getElementPropertyAsBinaryHEXDataList(property));
+        return getElementPropertyAsBinaryHEXDataList(property);
     }
 
-    public static List getElementPropertyAsBinaryListHEX(
+    public static List<byte[]> getElementPropertyAsBinaryListHEX(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<byte[]> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
             byte[] binary = makeBytesByHEX(element2Data(nodes[i]));
             if (binary != null) {
                 list.add(binary);
             }
         }
-        return (list);
+        return list;
     }
 
 // g3a
-    public static List getElementPropertyAsBinaryHEXListDataList(
+    public static List<List<byte[]>> getElementPropertyAsBinaryHEXListDataList(
         Element element,
         String name
     ) {
         Element[] nodes = getElements(element, name);
-        List list = new ArrayList();
+        List<List<byte[]>> list = new ArrayList<>();
         for (int i = 0;i < nodes.length;i++) {
-            List values = getElementPropertyAsBinaryHEXDataList(nodes[i]);
+            List<byte[]> values = getElementPropertyAsBinaryHEXDataList(nodes[i]);
             if (values != null) {
                 list.add(values);
             }
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getElementPropertyAsBinaryHEXByStack(
@@ -6778,14 +6777,14 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBinaryHEX(property));
+        return getElementPropertyAsBinaryHEX(property);
     }
 
 // g4a
@@ -6794,21 +6793,21 @@ public final class URelaxer {
         String name
     ) {
         if (stack.isEmptyElement()) {
-            return (null);
+            return null;
         }
         Element property = stack.peekElement();
         if (!name.equals(property.getTagName())) {
-            return (null);
+            return null;
         }
         stack.popElement();
-        return (getElementPropertyAsBinaryHEXDataList(property));
+        return getElementPropertyAsBinaryHEXDataList(property);
     }
 
-    public static List getElementPropertyAsBinaryListHEXByStack(
+    public static List<byte[]> getElementPropertyAsBinaryListHEXByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<byte[]> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6823,15 +6822,15 @@ public final class URelaxer {
                 list.add(binary);
             }
         }
-        return (list);
+        return list;
     }
 
 // g5a
-    public static List getElementPropertyAsBinaryHEXListDataListByStack(
+    public static List<List<byte[]>> getElementPropertyAsBinaryHEXListDataListByStack(
         RStack stack,
         String name
     ) {
-        List list = new ArrayList();
+        List<List<byte[]>> list = new ArrayList<>();
         for (;;) {
             if (stack.isEmptyElement()) {
                 break;
@@ -6841,12 +6840,12 @@ public final class URelaxer {
                 break;
             }
             stack.popElement();
-            List value = getElementPropertyAsBinaryHEXDataList(property);
+            List<byte[]> value = getElementPropertyAsBinaryHEXDataList(property);
             if (value != null) {
                 list.add(value);
             }
         }
-        return (list);
+        return list;
     }
 
     public static byte[] getAttributePropertyAsBinaryHEX(
@@ -6854,7 +6853,7 @@ public final class URelaxer {
         String name
     ) {
         String value = getAttribute(element, name);
-        return (makeBytesByHEX(value));
+        return makeBytesByHEX(value);
     }
 
     public static List<byte[]> getAttributePropertyAsBinaryHEXList(
@@ -6863,7 +6862,7 @@ public final class URelaxer {
     ) {
         String value = getAttribute(element, name);
         if (value == null) {
-            return (null);
+            return null;
         }
         List<String> list = makeStringList(value);
         List<byte[]> result = new ArrayList<>();
@@ -6872,7 +6871,7 @@ public final class URelaxer {
             String data = list.get(i).toString();
             result.add(makeBytesByHEX(data));
         }
-        return (result);
+        return result;
     }
 
     public static void setElementPropertyByBinaryHEX(
@@ -6994,15 +6993,15 @@ public final class URelaxer {
     // Relaxer object
     public static String getString(Object object) {
         if (object instanceof java.sql.Timestamp) {
-            return (getString((java.sql.Timestamp)object));
+            return getString((java.sql.Timestamp)object);
         } else if (object instanceof java.sql.Time) {
-            return (getString((java.sql.Time)object));
+            return getString((java.sql.Time)object);
         } else if (object instanceof java.sql.Date) {
-            return (getString((java.sql.Date)object));
+            return getString((java.sql.Date)object);
         } else if (object instanceof Date) {
-            return (getString((Date)object));
+            return getString((Date)object);
         } else {
-            return (object.toString());
+            return object.toString();
         }
     }
 
@@ -7014,31 +7013,31 @@ public final class URelaxer {
         Element element,
         String localName
     ) {
-        return (localName.equals(element.getTagName()));
+        return localName.equals(element.getTagName());
     }
 
     public static boolean hasAttributeHungry(RStack stack, String name) {
         Attr attr = stack.getContextElement().getAttributeNode(name);
         if (attr == null) {
-            return (false);
+            return false;
         }
         if (stack.isConsumedAttribute(attr)) {
             return(false);
         }
         stack.consumeAttribute(attr);
-        return (true);
+        return true;
     }
 
     public static String getAttributeHungry(RStack stack, String name) {
         Attr attr = stack.getContextElement().getAttributeNode(name);
         if (attr == null) {
-            return (null);
+            return null;
         }
         if (stack.isConsumedAttribute(attr)) {
             throw (new IllegalArgumentException());
         }
         stack.consumeAttribute(attr);
-        return (attr.getValue());
+        return attr.getValue();
     }
 
 /*
@@ -7047,7 +7046,7 @@ public final class URelaxer {
             return(false);
         }
         stack.setConsumedAttribute(name);
-        return (hasAttribute(stack.getContextElement(), name));
+        return hasAttribute(stack.getContextElement(), name);
     }
 
     public static String getAttributeHungry(RStack stack, String name) {
@@ -7055,48 +7054,48 @@ public final class URelaxer {
             throw (new IllegalArgumentException());
         }
         stack.setConsumedAttribute(name);
-        return (getAttribute(stack.getContextElement(), name));
+        return getAttribute(stack.getContextElement(), name);
     }
 */
 
     public static boolean hasAttribute(Element element, String name) {
         String value = getAttribute(element, name);
-        return (value != null);
+        return value != null;
     }
 
     public static String getAttribute(Element element, String name) {
         Attr attr = element.getAttributeNode(name);
         if (attr == null) {
-            return (null);
+            return null;
         }
-        return (attr.getValue());
+        return attr.getValue();
     }
 
     public static boolean isSequence(RStack stack, String name) {
         Element[] elements = stack.peekElements();
         if (elements == null) {
-            return (false);
+            return false;
         }
         if (elements.length != 1) {
-            return (false);
+            return false;
         }
-        return (name.equals(elements[0].getTagName()));
+        return name.equals(elements[0].getTagName());
     }
 
     public static boolean isSequence(RStack stack, String[] names) {
         Element[] elements = stack.peekElements();
         if (elements == null) {
-            return (false);
+            return false;
         }
         if (elements.length != names.length) {
-            return (false);
+            return false;
         }
         for (int i = 0;i < names.length;i++) {
             if (!names[i].equals(elements[i].getTagName())) {
-                return (false);
+                return false;
             }
         }
-        return (true);
+        return true;
     }
 
     public static String getElementPropertyAsValue(
@@ -7104,14 +7103,14 @@ public final class URelaxer {
         String typeName
     ) {
         if ("string".equals(typeName)) {
-            return (getElementPropertyAsString(element));
+            return getElementPropertyAsString(element);
         } else {
-            return (getElementPropertyAsValueData(element));
+            return getElementPropertyAsValueData(element);
         }
     }
 
     public static String getElementPropertyAsValueData(Element element) {
-        return (getElementPropertyAsString(element).trim());
+        return getElementPropertyAsString(element).trim();
     }
 
     public static String getElementPropertyAsValue(
@@ -7120,9 +7119,9 @@ public final class URelaxer {
         String typeName
     ) {
         if ("string".equals(typeName)) {
-            return (getElementPropertyAsString(element, slotName));
+            return getElementPropertyAsString(element, slotName);
         } else {
-            return (getElementPropertyAsValueData(element, slotName));
+            return getElementPropertyAsValueData(element, slotName);
         }
     }
 
@@ -7130,7 +7129,7 @@ public final class URelaxer {
         Element element,
         String slotName
     ) {
-        return (getElementPropertyAsString(element, slotName).trim());
+        return getElementPropertyAsString(element, slotName).trim();
     }
 
     public static String getAttributePropertyAsValue(
@@ -7139,9 +7138,9 @@ public final class URelaxer {
         String typeName
     ) {
         if ("string".equals(typeName)) {
-            return (getAttributePropertyAsString(element, attrName));
+            return getAttributePropertyAsString(element, attrName);
         } else {
-            return (getAttributePropertyAsValueData(element, attrName));
+            return getAttributePropertyAsValueData(element, attrName);
         }
     }
 
@@ -7151,9 +7150,9 @@ public final class URelaxer {
     ) {
         String data = getAttributePropertyAsString(element, attrName);
         if (data == null) {
-            return (null);
+            return null;
         }
-        return (data.trim());
+        return data.trim();
     }
 
     public static boolean isMatchDataValues(
@@ -7162,7 +7161,7 @@ public final class URelaxer {
         String value
     ) {
         String data = getElementPropertyAsValue(element, typeName);
-        return (isMatchDataValues(data, typeName, value));
+        return isMatchDataValues(data, typeName, value);
     }
 
     public static boolean isMatchDataValues(
@@ -7172,7 +7171,7 @@ public final class URelaxer {
         String value2
     ) {
         String data = getElementPropertyAsValue(element, typeName);
-        return (isMatchDataValues(data, typeName, value1, value2));
+        return isMatchDataValues(data, typeName, value1, value2);
     }
 
     public static boolean isMatchDataValues(
@@ -7183,7 +7182,7 @@ public final class URelaxer {
         String value3
     ) {
         String data = getElementPropertyAsValue(element, typeName);
-        return (isMatchDataValues(data, typeName, value1, value2, value3));
+        return isMatchDataValues(data, typeName, value1, value2, value3);
     }
 
     public static boolean isMatchDataValues(
@@ -7192,7 +7191,7 @@ public final class URelaxer {
         String[] values
     ) {
         String data = getElementPropertyAsValue(element, typeName);
-        return (isMatchDataValues(data, typeName, values));
+        return isMatchDataValues(data, typeName, values);
     }
 
     public static boolean isMatchDataComplex(
@@ -7200,7 +7199,7 @@ public final class URelaxer {
         String typeExpr
     ) {
         String data = getElementPropertyAsValue(element, "string");
-        return (isMatchDataComplex(data, typeExpr));
+        return isMatchDataComplex(data, typeExpr);
     }
 
     public static boolean isMatchDataValuesElement(
@@ -7212,9 +7211,9 @@ public final class URelaxer {
         String data
             = getElementPropertyAsValue(element, elementName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value));
+        return isMatchDataValues(data, typeName, value);
     }
 
     public static boolean isMatchDataValuesElement(
@@ -7227,9 +7226,9 @@ public final class URelaxer {
         String data
             = getElementPropertyAsValue(element, elementName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value1, value2));
+        return isMatchDataValues(data, typeName, value1, value2);
     }
 
     public static boolean isMatchDataValuesElement(
@@ -7243,9 +7242,9 @@ public final class URelaxer {
         String data
             = getElementPropertyAsValue(element, elementName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value1, value2, value3));
+        return isMatchDataValues(data, typeName, value1, value2, value3);
     }
 
     public static boolean isMatchDataValuesElement(
@@ -7257,9 +7256,9 @@ public final class URelaxer {
         String data
             = getElementPropertyAsValue(element, elementName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, values));
+        return isMatchDataValues(data, typeName, values);
     }
 
     public static boolean isMatchDataComplexElement(
@@ -7270,9 +7269,9 @@ public final class URelaxer {
         String data
             = getElementPropertyAsValue(element, elementName, "string");
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataComplex(data, typeExpr));
+        return isMatchDataComplex(data, typeExpr);
     }
 
     public static boolean isMatchDataValuesAttr(
@@ -7284,9 +7283,9 @@ public final class URelaxer {
         String data
             = getAttributePropertyAsValue(element, attrName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value));
+        return isMatchDataValues(data, typeName, value);
     }
 
     public static boolean isMatchDataValuesAttr(
@@ -7299,9 +7298,9 @@ public final class URelaxer {
         String data
             = getAttributePropertyAsValue(element, attrName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value1, value2));
+        return isMatchDataValues(data, typeName, value1, value2);
     }
 
     public static boolean isMatchDataValuesAttr(
@@ -7315,9 +7314,9 @@ public final class URelaxer {
         String data
             = getAttributePropertyAsValue(element, attrName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, value1, value2, value3));
+        return isMatchDataValues(data, typeName, value1, value2, value3);
     }
 
     public static boolean isMatchDataValuesAttr(
@@ -7329,9 +7328,9 @@ public final class URelaxer {
         String data
             = getAttributePropertyAsValue(element, attrName, typeName);
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataValues(data, typeName, values));
+        return isMatchDataValues(data, typeName, values);
     }
 
     public static boolean isMatchDataComplexAttr(
@@ -7342,9 +7341,9 @@ public final class URelaxer {
         String data
             = getAttributePropertyAsValue(element, attrName, "string");
         if (data == null) {
-            return (false);
+            return false;
         }
-        return (isMatchDataComplex(data, typeExpr));
+        return isMatchDataComplex(data, typeExpr);
     }
 
     public static boolean isMatchDataValues(
@@ -7352,7 +7351,7 @@ public final class URelaxer {
         String typeName,
         String value
     ) {
-        return (value.equals(data));
+        return value.equals(data);
     }
 
     public static boolean isMatchDataValues(
@@ -7361,8 +7360,8 @@ public final class URelaxer {
         String value1,
         String value2
     ) {
-        return (value1.equals(data) ||
-                value2.equals(data));
+        return value1.equals(data) ||
+                value2.equals(data);
     }
 
     public static boolean isMatchDataValues(
@@ -7372,9 +7371,9 @@ public final class URelaxer {
         String value2,
         String value3
     ) {
-        return (value1.equals(data) ||
+        return value1.equals(data) ||
                 value2.equals(data) ||
-                value3.equals(data));
+                value3.equals(data);
     }
 
     public static boolean isMatchDataValues(
@@ -7384,14 +7383,14 @@ public final class URelaxer {
     ) {
         for (int i = 0;i < values.length;i++) {
             if (values[i].equals(data)) {
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
     }
 
     public static boolean isMatchDataComplex(String data, String typeExpr) {
-        return (true);
+        return true;
     }
 
     //
@@ -7401,7 +7400,7 @@ public final class URelaxer {
     // XXX
     public static boolean hasElement(Element element, String name) {
         Element[] nodes = getElements(element, name);
-        return (nodes.length > 0);
+        return nodes.length > 0;
     }
 
     // XXX
@@ -7410,11 +7409,11 @@ public final class URelaxer {
         for (int i = 0;i < elements.length;i++) {
             for (int j = 0;j < names.length;j++) {
                 if (names[j].equals(elements[i].getTagName())) {
-                    return (true);
+                    return true;
                 }
             }
         }
-        return (false);
+        return false;
     }
 
     public static Element getOnlyElement(Element element, String name)
@@ -7424,32 +7423,32 @@ public final class URelaxer {
         switch (nodes.length) {
 
         case 0:
-            return (null);
+            return null;
         case 1:
             break;
         default:
             throw (new IllegalArgumentException());
         }
-        return (nodes[0]);
+        return nodes[0];
     }
 
     public static Element[] getElements(Element element) {
         NodeList children = element.getChildNodes();
-        List list = new ArrayList();
+        List<Element> list = new ArrayList<>();
         int size = children.getLength();
         for (int i = 0;i < size;i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                list.add(child);
+                list.add((Element)child);
             }
         }
         Element[] array = new Element[list.size()];
-        return ((Element[])list.toArray(array));
+        return (Element[])list.toArray(array);
     }
 
     public static Element[] getElements(Element element, String name) {
         NodeList children = element.getChildNodes();
-        List list = new ArrayList();
+        List<Element> list = new ArrayList<>();
         int size = children.getLength();
         for (int i = 0;i < size;i++) {
             Node child = children.item(i);
@@ -7461,12 +7460,12 @@ public final class URelaxer {
             }
         }
         Element[] array = new Element[list.size()];
-        return ((Element[])list.toArray(array));
+        return (Element[])list.toArray(array);
     }
 
-    public static Stack getElementsAsStack(Element element) {
+    public static Stack<Node> getElementsAsStack(Element element) {
         NodeList children = element.getChildNodes();
-        Stack stack = new Stack();
+        Stack<Node> stack = new Stack<>();
         int size = children.getLength();
         for (int i = size - 1;i >= 0;i--) {
             Node child = children.item(i);
@@ -7474,7 +7473,7 @@ public final class URelaxer {
                 stack.push(children.item(i));
             }
         }
-        return (stack);
+        return stack;
     }        
 
     public static String getStringByMixedList(List list) { // XXX : URString
@@ -7486,16 +7485,16 @@ public final class URelaxer {
                 buffer.append(object.toString());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String getQName(String prefix, String localName) {
         if (prefix == null) {
-            return (localName);
+            return localName;
         } else if ("".equals(prefix)) {
-            return (localName);
+            return localName;
         } else {
-            return (prefix + ":" + localName);
+            return prefix + ":" + localName;
         }
     }
 
@@ -7549,20 +7548,20 @@ public final class URelaxer {
 
     public static String getNSMapping(String prefix, String uri) {
         if (prefix == null) {
-            return ("");
+            return "";
         }
         if ("".equals(prefix)) {
-            return (" xmlns=\"" + uri + "\"");
+            return " xmlns=\"" + uri + "\"";
         }
-        return (" xmlns:" + prefix + "=\"" + uri + "\"");
+        return " xmlns:" + prefix + "=\"" + uri + "\"";
     }
 
     public static String element2Data(Element element) {
-        return (element2Text(element).trim());
+        return element2Text(element).trim();
     }
 
     public static String element2Text(Element element) {
-        return (node2Text(element));
+        return node2Text(element);
     }
 
     public static String nodes2Text(Node[] nodes) {
@@ -7571,13 +7570,13 @@ public final class URelaxer {
         for (int i = 0;i < nNodes;i++) {
             node2Text(nodes[i], buffer);
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String node2Text(Node node) {
         StringBuffer buffer = new StringBuffer();
         node2Text(node, buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static void node2Text(Node node, StringBuffer buffer) {
@@ -7641,78 +7640,78 @@ public final class URelaxer {
             StringTokenizer st = new StringTokenizer(name, "_");
             switch (st.countTokens()) {
             case 1:
-                return (new Locale(st.nextToken(), "", ""));
+                return new Locale(st.nextToken(), "", "");
             case 2:
-                return (new Locale(st.nextToken(), st.nextToken(), ""));
+                return new Locale(st.nextToken(), st.nextToken(), "");
             case 3:
-                return (new Locale(
-                    st.nextToken(), st.nextToken(), st.nextToken()));
+                return new Locale(
+                    st.nextToken(), st.nextToken(), st.nextToken());
             default:
-                return (null);
+                return null;
             }
         } catch (Exception e) {
-            return (_invalidLocale(e));
+            return _invalidLocale(e);
         }
     }
     
     public static URL makeURL4Property(String name) {
         try {
-            return (new URL(name));
+            return new URL(name);
         } catch (Exception e) {
-            return (_invalidURL(e));
+            return _invalidURL(e);
         }
     }
 
     public static URL makeURL(URL base, URL leaf) {
         if (leaf.getProtocol() != null) {
-            return (leaf);
+            return leaf;
         }
         try {
-            return (new URL(base, leaf.toExternalForm()));
+            return new URL(base, leaf.toExternalForm());
         } catch (Exception e) {
-            return (_invalidURL(e));
+            return _invalidURL(e);
         }
     }
 
     public static URL makeURL(String uri) throws MalformedURLException {
         try {
-            return (new URL(uri));
+            return new URL(uri);
         } catch (MalformedURLException e) {
-            return (new File(uri).toURI().toURL());
+            return new File(uri).toURI().toURL();
         }
     }
 
     public static String makeUrlString(String base, String leaf) {
         try {
             URL url = new URL(leaf);
-            return (url.toExternalForm());
+            return url.toExternalForm();
         } catch (MalformedURLException e) {
         }
         if (base == null) {
-            return (leaf);
+            return leaf;
         }
         if (leaf == null) {
-            return (base);
+            return base;
         }
         int index = base.lastIndexOf('/');
         if (index == -1) {
-            return (leaf);
+            return leaf;
         }
-        return (base.substring(0, index + 1) + leaf);
+        return base.substring(0, index + 1) + leaf;
     }
 
     public static String makeUrlString(URL base, String leaf) {
         if (base == null) {
-            return (leaf);
+            return leaf;
         }
-        return (makeUrlString(base.toExternalForm(), leaf));
+        return makeUrlString(base.toExternalForm(), leaf);
     }
 
 /*
     // XXX : locale? schema2 problem:
     public static String makeStringAsDate(Date date) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        return (df.format(date));
+        return df.format(date);
     }
 
     public static String makeStringAsTime(Date date) {
@@ -7738,13 +7737,13 @@ public final class URelaxer {
             }
             offset.append(Integer.toString(minutes));
         }
-        return (text + new String(offset));
+        return text + new String(offset);
     }
 
     public static Date makeDateByDate(String cdata) throws ParseException {
         DateFormat df = new SimpleDateFormat("hh:mm:ss");
         Date date = df.parse(cdata);
-        return (date);
+        return date);
     }
 
     public static Date makeDateByTime(String cdata) throws ParseException {
@@ -7769,18 +7768,18 @@ public final class URelaxer {
         DateFormat df = new SimpleDateFormat("hh:mm:ss");
         Date time = df.parse(timeText);
         // XXX : timezone
-        return (time);
+        return time);
     }
 */
 
     public static String makeStringJava(Date date) {
         DateFormat df = DateFormat.getDateInstance();
-        return (df.format(date));
+        return df.format(date);
     }
 
     public static Date makeDateJava(String cdata) throws ParseException {
         DateFormat df = DateFormat.getDateInstance();
-        return (df.parse(cdata));
+        return df.parse(cdata);
     }
 
     public static String makeStringAsBASE64(byte[] bytes) {
@@ -7827,7 +7826,7 @@ public final class URelaxer {
                 count = 0;
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static byte[] makeBytesByBASE64(String cdata) {
@@ -7866,30 +7865,30 @@ public final class URelaxer {
                     status = 0;
                     break;
                 default:
-                    return (_invalidBinary("char = " + newData));
+                    return _invalidBinary("char = " + newData);
                 }
             }
         }
-        return (buffer.toByteArray());
+        return buffer.toByteArray();
     }
 
     private static int _calcData(int charData) {
         if ('A' <= charData && charData <= 'Z') {
-            return (charData - 'A');
+            return charData - 'A';
         }
         if ('a' <= charData && charData <= 'z') {
-            return (charData - 'a' + 26);
+            return charData - 'a' + 26;
         }
         if ('0' <= charData && charData <= '9') {
-            return (charData - '0' + 26 + 26);
+            return charData - '0' + 26 + 26;
         }
         if (charData == '+') {
-            return (62);
+            return 62;
         }
         if (charData == '/') {
-            return (63);
+            return 63;
         }
-        return (-1);
+        return -1;
     }
 
     private static char[] map__ = {
@@ -8013,7 +8012,7 @@ public final class URelaxer {
                 throw (new IllegalArgumentException());
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static byte[] makeBytesByHEX(String cdata) {
@@ -8088,7 +8087,7 @@ public final class URelaxer {
                     break;
 */
                 default:
-                    return (_invalidBinary("char = " + cdata.charAt(i)));
+                    return _invalidBinary("char = " + cdata.charAt(i));
                 }
                 switch (cdata.charAt(i + 1)) {
 
@@ -8156,14 +8155,14 @@ public final class URelaxer {
                     break;
 */
                 default:
-                    return (_invalidBinary("char = " + cdata.charAt(i)));
+                    return _invalidBinary("char = " + cdata.charAt(i));
                 }
                 buffer.write(byteData);
             }
         } catch (StringIndexOutOfBoundsException e) {
-            return (_invalidBinary(e));
+            return _invalidBinary(e);
         }
-        return (buffer.toByteArray());
+        return buffer.toByteArray();
     }
 
     // Auto
@@ -8182,7 +8181,7 @@ public final class URelaxer {
     }
 
     public static String getAutoIDPrefix() {
-        return (autoIDPrefix__);
+        return autoIDPrefix__;
     }
 
     public static void setAutoIDThreadSingle(Boolean threadSingle) {
@@ -8190,7 +8189,7 @@ public final class URelaxer {
     }
 
     public static Boolean getAutoIDThreadSingle() {
-        return (autoIDThreadSingle__);
+        return autoIDThreadSingle__;
     }
 
     public static void setAutoIDThreadGroupSingle(Boolean threadGroupSingle) {
@@ -8198,14 +8197,14 @@ public final class URelaxer {
     }
 
     public static Boolean getAutoIDThreadGroupSingle() {
-        return (autoIDThreadGroupSingle__);
+        return autoIDThreadGroupSingle__;
     }
 
     public static String makeAutoID() {
         if (autoIDHandler__ != null) {
-            return (autoIDHandler__.toString());
+            return autoIDHandler__.toString();
         } else {
-            return (_makeDefaultAutoID());
+            return _makeDefaultAutoID();
         }
     }
 
@@ -8225,7 +8224,7 @@ public final class URelaxer {
                 _hashAppend(thread.getThreadGroup().getName(), buffer);
             }
         }
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     private static void _hashAppend(String string, StringBuffer buffer) {
@@ -8239,99 +8238,97 @@ public final class URelaxer {
     private static String _getAutoIDPrefix() {
         String prefix = getAutoIDPrefix();
         if (prefix != null) {
-            return (prefix);
+            return prefix;
         }
-        return (_getPropertyPrefix());
+        return _getPropertyPrefix();
     }
 
     private static boolean _isAutoIDSingleThread() {
         Boolean value = getAutoIDThreadSingle();
         if (value != null) {
-            return (value.booleanValue());
+            return value.booleanValue();
         }
-        return (_isPropertySingleThread());
+        return _isPropertySingleThread();
     }
 
     private static boolean _isAutoIDSingleThreadGroup() {
         Boolean value = getAutoIDThreadGroupSingle();
         if (value != null) {
-            return (value.booleanValue());
+            return value.booleanValue();
         }
-        return (_isPropertySingleThreadGroup());
+        return _isPropertySingleThreadGroup();
     }
 
     private static String _getPropertyPrefix() {
-        return (System.getProperty("org.relaxer.autoid.prefix"));
+        return System.getProperty("org.relaxer.autoid.prefix");
     }        
 
     private static boolean _isPropertySingleThread() {
-        return (
+        return 
             "true".equals(
                 System.getProperty("org.relaxer.autoid.thread.single")
-            )
-        );
+            );
     }
 
     private static boolean _isPropertySingleThreadGroup() {
-        return (
+        return 
             "true".equals(
                 System.getProperty("org.relaxer.autoid.threadGroup.single")
-            )
-        );
+            );
     }
 
     public static java.sql.Timestamp makeAutoSQLTimestamp() {
-        return (new java.sql.Timestamp(System.currentTimeMillis()));
+        return new java.sql.Timestamp(System.currentTimeMillis());
     }
 
     public static java.sql.Time makeAutoSQLTime() {
-        return (new java.sql.Time(System.currentTimeMillis()));
+        return new java.sql.Time(System.currentTimeMillis());
     }
 
     public static java.sql.Date makeAutoSQLDate() {
-        return (new java.sql.Date(System.currentTimeMillis()));
+        return new java.sql.Date(System.currentTimeMillis());
     }
 
     // JavaBeans
 
     public static Object getPropertyObject(String value) {
-        return (value);
+        return value;
     }
 
     public static Object getPropertyObject(boolean value) {
-        return (new Boolean(value));
+        return new Boolean(value);
     }
 
     public static Object getPropertyObject(byte value) {
-        return (new Byte(value));
+        return new Byte(value);
     }
 
     public static Object getPropertyObject(short value) {
-        return (new Short(value));
+        return new Short(value);
     }
 
     public static Object getPropertyObject(int value) {
-        return (new Integer(value));
+        return new Integer(value);
     }
 
     public static Object getPropertyObject(long value) {
-        return (new Long(value));
+        return new Long(value);
     }
 
     public static Object getPropertyObject(float value) {
-        return (new Float(value));
+        return new Float(value);
     }
 
     public static Object getPropertyObject(double value) {
-        return (new Double(value));
+        return new Double(value);
     }
 
     public static Object getPropertyObject(Object value) {
-        return (value);
+        return value;
     }
 
     public static Object getPropertyObject(Collection value) {
-        return (value.toArray());
+        return value.toArray();
     }
 
     // XML
@@ -8341,7 +8338,7 @@ public final class URelaxer {
         Element element = doc.getDocumentElement();
         buffer.append("<?xml version='1.0' ?>\n");
         _node2String4Print(element, "", buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String doc2String4Print(Document doc, String encoding) {
@@ -8351,7 +8348,7 @@ public final class URelaxer {
         buffer.append(encoding);
         buffer.append("' ?>\n");
         _node2String4Print(element, "", buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String node2String4Print(Node node, String encoding) {
@@ -8360,17 +8357,17 @@ public final class URelaxer {
         buffer.append(encoding);
         buffer.append("' ?>\n");
         _node2String4Print(node, "", buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String node2String4Print(Node node) {
-        return (_node2String4Print(node, ""));
+        return _node2String4Print(node, "");
     }
 
     protected static String _node2String4Print(Node node, String indent) {
         StringBuffer buffer = new StringBuffer();
         _node2String4Print(node, indent, buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     protected static void _node2String4Print(
@@ -8459,13 +8456,13 @@ public final class URelaxer {
         Element element = doc.getDocumentElement();
         buffer.append("<?xml version='1.0' ?>");
         _node2String4Data(element, buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     public static String node2String4Data(Node node) {
         StringBuffer buffer = new StringBuffer();
         _node2String4Data(node, buffer);
-        return (new String(buffer));
+        return new String(buffer);
     }
 
     private static void _node2String4Data(Node node, StringBuffer buffer) {
@@ -8517,10 +8514,10 @@ public final class URelaxer {
         int nNodes = nodes.getLength();
         for (int i = 0;i < nNodes;i++) {
             if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
     }
 
     public static boolean isBlankText(Text text) {
@@ -8528,10 +8525,10 @@ public final class URelaxer {
         char[] chars = data.toCharArray();
         for (int i = 0;i < chars.length;i++) {
             if (!isSpace(chars[i])) {
-                return (false);
+                return false;
             }
         }
-        return (true);
+        return true;
     }
 
     public static boolean isSpace(char c) {
@@ -8541,9 +8538,9 @@ public final class URelaxer {
         case '\t':
         case '\r':
         case '\n':
-            return (true);
+            return true;
         default:
-            return (false);
+            return false;
         }
     }
 
@@ -8573,7 +8570,7 @@ public final class URelaxer {
         }
 
         protected String toExternalForm(URL u) {
-            return (u.getFile());
+            return u.getFile();
         }
     }
 */
@@ -8585,7 +8582,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (false);
+            return false;
         }
     }
 
@@ -8594,9 +8591,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (-1);
+                return -1;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8606,9 +8603,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (-1);
+                return -1;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8618,9 +8615,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (-1);
+                return -1;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8630,9 +8627,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (-1);
+                return -1;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8642,9 +8639,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (Float.NaN);
+                return Float.NaN;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8654,9 +8651,9 @@ public final class URelaxer {
             throw (new IllegalArgumentException(value.toString()));
         } else {
             if (isBadNumber__) {
-                return (Double.NaN);
+                return Double.NaN;
             } else {
-                return (0);
+                return 0;
             }
         }
     }
@@ -8665,7 +8662,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8673,7 +8670,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8681,7 +8678,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8689,7 +8686,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8697,7 +8694,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8705,7 +8702,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8713,7 +8710,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8721,7 +8718,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8729,7 +8726,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8737,7 +8734,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8745,7 +8742,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8753,7 +8750,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8761,7 +8758,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8769,7 +8766,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8777,7 +8774,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 
@@ -8785,7 +8782,7 @@ public final class URelaxer {
         if (isRigid__) {
             throw (new IllegalArgumentException(value.toString()));
         } else {
-            return (null);
+            return null;
         }
     }
 }

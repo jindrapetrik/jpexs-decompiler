@@ -38,7 +38,6 @@ import org.w3c.dom.*;
  * @version Oct. 22, 2003
  * @author  ASAMI, Tomoharu (asami@relaxer.org)
  */
-@SuppressWarnings("all")
 public final class RInterleave {
     private RStack rstack_;
     private List<Entry> entries_ = new ArrayList<>();
@@ -648,15 +647,14 @@ public final class RInterleave {
     }
 
     static class StateClassEntry extends Entry {
-        public Class stateClass;
+        public Class<?> stateClass;
         public List<RStack> stacks = new ArrayList<>();
 
-        public StateClassEntry(Class stateClass, String occurs) {
+        public StateClassEntry(Class<?> stateClass, String occurs) {
             super(occurs);
             this.stateClass = stateClass;
         }
 
-        @SuppressWarnings("unchecked")
         public boolean isMatchHungry(RStack stack) {
 //System.out.println("enter:isMatchHungry [" + stateClass + "] - " + stack);
             try {
@@ -681,7 +679,6 @@ public final class RInterleave {
             }
         }
 
-        @SuppressWarnings("unchecked")
         public Object getObject() {
             if (stacks.size() == 0) {
                 return (null);
@@ -700,7 +697,6 @@ public final class RInterleave {
             }
         }
 
-        @SuppressWarnings("unchecked")
         public Object[] getObjects() {
             int size = stacks.size();
             Object array = Array.newInstance(stateClass, size);

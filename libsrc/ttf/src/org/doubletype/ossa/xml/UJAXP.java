@@ -39,7 +39,6 @@ import org.w3c.dom.*;
  * @version Jul. 10, 2003
  * @author  ASAMI, Tomoharu (asami@relaxer.org)
  */
-@SuppressWarnings("all")
 public final class UJAXP {
     public final static int FLAG_NONE = 0x00;
     public final static int FLAG_VALIDATION = 0x01;
@@ -996,11 +995,10 @@ public final class UJAXP {
     }
 
     // test driver
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
 	String className = args[0];
 	File file = new File(args[1]);
-	Class clazz = Class.forName(className);
+	Class<?> clazz = Class.forName(className);
 	Method setupMethod = clazz.getMethod(
 	    "setup",
 	    new Class[] { File.class }

@@ -42,7 +42,7 @@ import java.lang.Character.UnicodeBlock;
 /**
  * @author e.e
  */
-public class TTUnicodeRange implements Comparable {
+public class TTUnicodeRange implements Comparable<TTUnicodeRange> {
 	public static final long k_notDef = 0x0001;
 	public static final long k_null = 0x0000;
 	public static final long k_cr = 0x000D;
@@ -348,8 +348,8 @@ public class TTUnicodeRange implements Comparable {
 		return (m_start == object.m_start);
 	}
 	
-	public int compareTo(Object a_object) {
-		TTUnicodeRange object = (TTUnicodeRange) a_object;
+        public int compareTo(TTUnicodeRange a_object) {
+		TTUnicodeRange object = a_object;
 		if (this.m_start < object.m_start) {
 			return -1;
 		} else if (this.m_start == object.m_start) {

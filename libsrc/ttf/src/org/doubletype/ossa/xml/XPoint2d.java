@@ -58,7 +58,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XPoint2d implements java.io.Serializable, Cloneable, IRNode {
     private double x_;
     private double y_;

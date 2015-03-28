@@ -80,7 +80,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XContourPoint implements java.io.Serializable, Cloneable, IRNode {
     public static final String TYPE_ON = "on";
     public static final String TYPE_OFF = "off";

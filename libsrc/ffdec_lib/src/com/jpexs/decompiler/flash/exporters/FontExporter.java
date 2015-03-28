@@ -153,7 +153,7 @@ public class FontExporter {
         if (ascent != -1) {
             f.setAscender(Math.round(ascent / divider));
         }
-        
+
         int descent = t.getDescent();
         if (descent != -1) {
             f.setDescender(Math.round(descent / divider));
@@ -247,7 +247,7 @@ public class FontExporter {
 
         if (mode == FontExportMode.WOFF) {
             FontFactory fontFactory = FontFactory.getInstance();
-            byte[] fontBytes = new byte[0];
+            byte[] fontBytes;
             try (FileInputStream fis = new FileInputStream(ttfFile)) {
                 fontBytes = new byte[(int) ttfFile.length()];
                 fis.read(fontBytes);

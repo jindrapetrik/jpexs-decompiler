@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -58,14 +59,13 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XBody implements java.io.Serializable, Cloneable, IRNode {
     // List<XGlyphFile>
-    private java.util.List<IRNode> glyphFile_ = new java.util.ArrayList<>();
+    private List<IRNode> glyphFile_ = new java.util.ArrayList<>();
     // List<XContour>
-    private java.util.List<IRNode> contour_ = new java.util.ArrayList<>();
+    private List<IRNode> contour_ = new java.util.ArrayList<>();
     // List<XInclude>
-    private java.util.List<IRNode> include_ = new java.util.ArrayList<>();
+    private List<IRNode> include_ = new java.util.ArrayList<>();
     // List<XModule>
     private java.util.List<IRNode> module_ = new java.util.ArrayList<>();
     private IRNode parentRNode_;

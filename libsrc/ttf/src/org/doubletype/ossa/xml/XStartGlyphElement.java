@@ -50,7 +50,6 @@ import org.xml.sax.*;
  * @version glyph.rng (Tue Nov 09 20:22:48 EST 2004)
  * @author  Relaxer 1.1b (http://www.relaxer.org)
  */
-@SuppressWarnings("all")
 public class XStartGlyphElement implements java.io.Serializable, Cloneable, IRNode {
     private XHead head_;
     private XBody body_;

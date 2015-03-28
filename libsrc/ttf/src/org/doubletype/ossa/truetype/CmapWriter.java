@@ -67,7 +67,6 @@ public class CmapWriter extends FontFormatWriter {
 		m_isIncludeVersion0 = false;
 	}
 	
-    @SuppressWarnings("unchecked")
 	private void prepare() {        
 		Collections.sort(m_unicodeRanges);
 		
