@@ -334,7 +334,7 @@ public final class URelaxer {
         return text;
     }
 
-    public static List getElementPropertyAsStringDataList(
+    public static List<String> getElementPropertyAsStringDataList(
         Element element,
         String name
     ) {
@@ -382,7 +382,7 @@ public final class URelaxer {
         return element2Text(property);
     }
 
-    public static List getElementPropertyAsStringDataListByStack(
+    public static List<String> getElementPropertyAsStringDataListByStack(
         RStack stack,
         String name
     ) {
@@ -447,7 +447,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsStringList(
+    public static List<String> getAttributePropertyAsStringList(
         Element element,
         String name
     ) {
@@ -695,7 +695,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsBooleanDataList(
+    public static List<Boolean> getElementPropertyAsBooleanDataList(
         Element element,
         String name
     ) {
@@ -719,7 +719,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsBooleanListDataList(
+    public static List<List<Boolean>> getElementPropertyAsBooleanListDataList(
         Element element,
         String name
     ) {
@@ -750,7 +750,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsBooleanDataListByStack(
+    public static List<Boolean> getElementPropertyAsBooleanDataListByStack(
         RStack stack,
         String name
     ) {
@@ -1127,7 +1127,7 @@ public final class URelaxer {
         return getElementPropertyAsByteDataList(property);
     }
 
-    public static List getElementPropertyAsByteList(
+    public static List<Byte> getElementPropertyAsByteList(
         Element element,
         String name
     ) {
@@ -1174,7 +1174,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsByteDataListByStack(
+    public static List<Byte> getElementPropertyAsByteDataListByStack(
         RStack stack,
         String name
     ) {
@@ -1545,7 +1545,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsShortDataList(
+    public static List<Short> getElementPropertyAsShortDataList(
         Element element,
         String name
     ) {
@@ -1600,7 +1600,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsShortDataListByStack(
+    public static List<Short> getElementPropertyAsShortDataListByStack(
         RStack stack,
         String name
     ) {
@@ -1971,7 +1971,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsIntDataList(
+    public static List<Integer> getElementPropertyAsIntDataList(
         Element element,
         String name
     ) {
@@ -2026,7 +2026,7 @@ public final class URelaxer {
     }
 
 // ga4
-    public static List getElementPropertyAsIntDataListByStack(
+    public static List<Integer> getElementPropertyAsIntDataListByStack(
         RStack stack,
         String name
     ) {
@@ -2397,7 +2397,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsLongDataList(
+    public static List<Long> getElementPropertyAsLongDataList(
         Element element,
         String name
     ) {
@@ -2456,7 +2456,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsLongDataListByStack(
+    public static List<Long> getElementPropertyAsLongDataListByStack(
         RStack stack,
         String name
     ) {
@@ -2544,7 +2544,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsLongList(
+    public static List<Long> getAttributePropertyAsLongList(
         Element element,
         String name
     ) {
@@ -2836,7 +2836,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsFloatDataList(
+    public static List<Float> getElementPropertyAsFloatDataList(
         Element element,
         String name
     ) {
@@ -2891,7 +2891,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsFloatDataListByStack(
+    public static List<Float> getElementPropertyAsFloatDataListByStack(
         RStack stack,
         String name
     ) {
@@ -3271,7 +3271,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsDoubleDataList(
+    public static List<Double> getElementPropertyAsDoubleDataList(
         Element element,
         String name
     ) {
@@ -3279,7 +3279,7 @@ public final class URelaxer {
         return getElementPropertyAsDoubleDataList(property);
     }
 
-    public static List getElementPropertyAsDoubleList(
+    public static List<Double> getElementPropertyAsDoubleList(
         Element element,
         String name
     ) {
@@ -3295,7 +3295,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsDoubleListDataList(
+    public static List<List<Double>> getElementPropertyAsDoubleListDataList(
         Element element,
         String name
     ) {
@@ -3310,7 +3310,7 @@ public final class URelaxer {
         return list;
     }
 
-    public static List getElementPropertyAsDoubleList(
+    public static List<Double> getElementPropertyAsDoubleList(
         Element element
     ) {
         List<Double> result = new ArrayList<>();
@@ -3323,7 +3323,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsDoubleDataListByStack(
+    public static List<Double> getElementPropertyAsDoubleDataListByStack(
         RStack stack,
         String name
     ) {
@@ -3354,7 +3354,7 @@ public final class URelaxer {
     }
 
 // g5a
-    public static List getElementPropertyAsDoubleListDataListByStack(
+    public static List<List<Double>> getElementPropertyAsDoubleListDataListByStack(
         RStack stack,
         String name
     ) {
@@ -3376,7 +3376,7 @@ public final class URelaxer {
         return list;
     }
 
-    public static List getElementPropertyAsDoubleListByStack(
+    public static List<Double> getElementPropertyAsDoubleListByStack(
         RStack stack,
         String name
     ) {
@@ -3426,7 +3426,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsDoubleList(
+    public static List<Double> getAttributePropertyAsDoubleList(
         Element element,
         String name
     ) {
@@ -3690,7 +3690,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsBigDecimalDataList(
+    public static List<BigDecimal> getElementPropertyAsBigDecimalDataList(
         Element element,
         String name
     ) {
@@ -3698,7 +3698,7 @@ public final class URelaxer {
         return getElementPropertyAsBigDecimalDataList(property);
     }
 
-    public static List getElementPropertyAsBigDecimalList(
+    public static List<BigDecimal> getElementPropertyAsBigDecimalList(
         Element element,
         String name
     ) {
@@ -3715,7 +3715,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsBigDecimalListDataList(
+    public static List<List<BigDecimal>> getElementPropertyAsBigDecimalListDataList(
         Element element,
         String name
     ) {
@@ -3746,7 +3746,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsBigDecimalDataListByStack(
+    public static List<BigDecimal> getElementPropertyAsBigDecimalDataListByStack(
         RStack stack,
         String name
     ) {
@@ -3761,7 +3761,7 @@ public final class URelaxer {
         return getElementPropertyAsBigDecimalDataList(property);
     }
 
-    public static List getElementPropertyAsBigDecimalListByStack(
+    public static List<BigDecimal> getElementPropertyAsBigDecimalListByStack(
         RStack stack,
         String name
     ) {
@@ -3785,7 +3785,7 @@ public final class URelaxer {
     }
 
 // g5a
-    public static List getElementPropertyAsBigDecimalListDataListByStack(
+    public static List<List<BigDecimal>> getElementPropertyAsBigDecimalListDataListByStack(
         RStack stack,
         String name
     ) {
@@ -3823,7 +3823,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsBigDecimalList(
+    public static List<BigDecimal> getAttributePropertyAsBigDecimalList(
         Element element,
         String name
     ) {
@@ -4048,7 +4048,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsBigIntegerDataList(
+    public static List<BigInteger> getElementPropertyAsBigIntegerDataList(
         Element element,
         String name
     ) {
@@ -4056,7 +4056,7 @@ public final class URelaxer {
         return getElementPropertyAsBigIntegerDataList(property);
     }
 
-    public static List getElementPropertyAsBigIntegerList(
+    public static List<BigInteger> getElementPropertyAsBigIntegerList(
         Element element,
         String name
     ) {
@@ -4073,7 +4073,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsBigIntegerListDataList(
+    public static List<List<BigInteger>> getElementPropertyAsBigIntegerListDataList(
         Element element,
         String name
     ) {
@@ -4104,7 +4104,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsBigIntegerDataListByStack(
+    public static List<BigInteger> getElementPropertyAsBigIntegerDataListByStack(
         RStack stack,
         String name
     ) {
@@ -4143,7 +4143,7 @@ public final class URelaxer {
     }
 
 // g5a
-    public static List getElementPropertyAsBigIntegerListDataListByStack(
+    public static List<List<BigInteger>> getElementPropertyAsBigIntegerListDataListByStack(
         RStack stack,
         String name
     ) {
@@ -4384,7 +4384,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsDateDataList(
+    public static List<Date> getElementPropertyAsDateDataList(
         Element element,
         String name
     ) {
@@ -4410,7 +4410,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsDateListDataList(
+    public static List<List<Date>> getElementPropertyAsDateListDataList(
         Element element,
         String name
     ) {
@@ -4441,7 +4441,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsDateDataListByStack(
+    public static List<Date> getElementPropertyAsDateDataListByStack(
         RStack stack,
         String name
     ) {
@@ -4730,7 +4730,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsLocaleDataList(
+    public static List<Locale> getElementPropertyAsLocaleDataList(
         Element element,
         String name
     ) {
@@ -4754,7 +4754,7 @@ public final class URelaxer {
     }
 
 // g3a
-    public static List getElementPropertyAsLocaleListDataList(
+    public static List<List<Locale>> getElementPropertyAsLocaleListDataList(
         Element element,
         String name
     ) {
@@ -4785,7 +4785,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsLocaleDataListByStack(
+    public static List<Locale> getElementPropertyAsLocaleDataListByStack(
         RStack stack,
         String name
     ) {
@@ -4857,7 +4857,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsLocaleList(
+    public static List<Locale> getAttributePropertyAsLocaleList(
         Element element,
         String name
     ) {
@@ -5063,7 +5063,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsURLDataList(
+    public static List<URL> getElementPropertyAsURLDataList(
         Element element,
         String name
     ) {
@@ -5118,7 +5118,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsURLDataListByStack(
+    public static List<URL> getElementPropertyAsURLDataListByStack(
         RStack stack,
         String name
     ) {
@@ -5133,7 +5133,7 @@ public final class URelaxer {
         return getElementPropertyAsURLDataList(property);
     }
 
-    public static List getElementPropertyAsURLListByStack(
+    public static List<URL> getElementPropertyAsURLListByStack(
         RStack stack,
         String name
     ) {
@@ -5190,7 +5190,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsURLList(
+    public static List<URL> getAttributePropertyAsURLList(
         Element element,
         String name
     ) {
@@ -5403,7 +5403,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsSQLTimestampDataList(
+    public static List<java.sql.Timestamp> getElementPropertyAsSQLTimestampDataList(
         Element element,
         String name
     ) {
@@ -5458,7 +5458,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsSQLTimestampDataListByStack(
+    public static List<java.sql.Timestamp> getElementPropertyAsSQLTimestampDataListByStack(
         RStack stack,
         String name
     ) {
@@ -5530,7 +5530,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsSQLTimestampList(
+    public static List<java.sql.Timestamp> getAttributePropertyAsSQLTimestampList(
         Element element,
         String name
     ) {
@@ -5739,7 +5739,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsSQLTimeDataList(
+    public static List<java.sql.Time> getElementPropertyAsSQLTimeDataList(
         Element element,
         String name
     ) {
@@ -5794,7 +5794,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsSQLTimeDataListByStack(
+    public static List<java.sql.Time> getElementPropertyAsSQLTimeDataListByStack(
         RStack stack,
         String name
     ) {
@@ -5866,7 +5866,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsSQLTimeList(
+    public static List<java.sql.Time> getAttributePropertyAsSQLTimeList(
         Element element,
         String name
     ) {
@@ -6067,7 +6067,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsSQLDateDataList(
+    public static List<java.sql.Date> getElementPropertyAsSQLDateDataList(
         Element element,
         String name
     ) {
@@ -6122,7 +6122,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsSQLDateDataListByStack(
+    public static List<java.sql.Date> getElementPropertyAsSQLDateDataListByStack(
         RStack stack,
         String name
     ) {
@@ -6194,7 +6194,7 @@ public final class URelaxer {
         }
     }
 
-    public static List getAttributePropertyAsSQLDateList(
+    public static List<java.sql.Date> getAttributePropertyAsSQLDateList(
         Element element,
         String name
     ) {
@@ -6401,7 +6401,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsBinaryBASE64DataList(
+    public static List<byte[]> getElementPropertyAsBinaryBASE64DataList(
         Element element,
         String name
     ) {
@@ -6456,7 +6456,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsBinaryBASE64DataListByStack(
+    public static List<byte[]> getElementPropertyAsBinaryBASE64DataListByStack(
         RStack stack,
         String name
     ) {
@@ -6733,7 +6733,7 @@ public final class URelaxer {
     }
 
 // g2a
-    public static List getElementPropertyAsBinaryHEXDataList(
+    public static List<byte[]> getElementPropertyAsBinaryHEXDataList(
         Element element,
         String name
     ) {
@@ -6788,7 +6788,7 @@ public final class URelaxer {
     }
 
 // g4a
-    public static List getElementPropertyAsBinaryHEXDataListByStack(
+    public static List<byte[]> getElementPropertyAsBinaryHEXDataListByStack(
         RStack stack,
         String name
     ) {
@@ -6868,7 +6868,7 @@ public final class URelaxer {
         List<byte[]> result = new ArrayList<>();
         int size = list.size();
         for (int i = 0;i < size;i++) {
-            String data = list.get(i).toString();
+            String data = list.get(i);
             result.add(makeBytesByHEX(data));
         }
         return result;
