@@ -64,7 +64,7 @@ findpropglobalstrict
 findpropglobal
 findproperty
 findpropstrict
-getdescentants
+getdescendants
 getglobalscope
 getglobalslot
 getlex
