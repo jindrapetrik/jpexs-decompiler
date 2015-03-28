@@ -123,7 +123,6 @@ public class GlyphFile extends GlyphModule {
 	protected File m_fileName;
 	protected long m_modifiedTime = 0;
 	protected long m_savedTime = 0;
-	protected HistoryList m_history;
 	
 	private final int k_halfWidth = 512;
 	private final int k_fullWidth = 1024;	
@@ -137,7 +136,7 @@ public class GlyphFile extends GlyphModule {
 	/**
 	 * creates new file
 	 */
-	public GlyphFile(File a_dir, String a_name, long a_unicode) throws FileNotFoundException {
+	public GlyphFile(File a_dir, String a_name, long a_unicode) {
 		super();
 		
 		m_fileName = createFileName(a_dir, a_name);
@@ -154,8 +153,6 @@ public class GlyphFile extends GlyphModule {
 		if (eastAsianWidth == 5 || eastAsianWidth == 1) {
 			setAdvanceWidth(k_fullWidth);
 		} // if
-		
-		saveGlyphFile();
 	}
 	
 	/**
@@ -168,7 +165,6 @@ public class GlyphFile extends GlyphModule {
 		init(getClass().getResource(s_emptyFileName));
 		setGlyphTitle(a_name);
 		m_fileName = createFileName(a_dir, a_name);
-		saveGlyphFile();
 	}
 	
 	/**
@@ -201,16 +197,14 @@ public class GlyphFile extends GlyphModule {
 		ModuleManager.getSingletonInstance().clear();
 		
 		//m_display = Engine.getSingletonInstance().getDisplay();
-		m_history = new HistoryList(this);
 		
-		m_history.record("loadFile");
 		m_savedTime = m_modifiedTime;
 	}
 	
 	/**
 	 * initialize .notdef
 	 */
-	public void initNotDef(int a_advanceWidth) throws FileNotFoundException {
+	public void initNotDef(int a_advanceWidth) {
 		setAdvanceWidth(a_advanceWidth);
 		
 		EContour contour = new EContour();
@@ -228,30 +222,18 @@ public class GlyphFile extends GlyphModule {
 		contour.addContourPoint(new EContourPoint(73.0, 610.0, true));
 		contour.addContourPoint(new EContourPoint(365.0, 610.0, true));
 		addContour(contour);
-		
-		saveGlyphFile();
 	}
 	
-	public void initNullGlyph() throws FileNotFoundException {
+	public void initNullGlyph() {
 		setAdvanceWidth(0);
-		saveGlyphFile();
 	}
 	
-	public void initSpace(int a_advanceWidth) throws FileNotFoundException {
+	public void initSpace(int a_advanceWidth) {
 		setAdvanceWidth(a_advanceWidth);
-		saveGlyphFile();
 	}
 	
 	public void beforePush() {
 		loadVar();
-	}
-	
-	public void undo() {
-	    m_history.undo();
-	}
-	
-	public void redo() {
-	    m_history.redo();
 	}
 	
 	public void restore(Memento a_memento) {
@@ -266,20 +248,6 @@ public class GlyphFile extends GlyphModule {
 	}
 	
 	// --------------------------------------------------------------
-	
-	public void saveGlyphFile() throws FileNotFoundException {	    
-	        saveGlyphFile(m_fileName);
-	}
-	
-	protected void saveGlyphFile(File a_file) throws FileNotFoundException {
-            FileOutputStream output = new FileOutputStream(a_file);
-		saveGlyphFile(output);     
-            try {
-                output.close(); //JPEXS
-            } catch (IOException ex) {                
-                Logger.getLogger(GlyphFile.class.getName()).log(Level.SEVERE, null, ex);
-            }
-	}
 	
 	public void saveGlyphFile(OutputStream a_output) {
 	    try {
@@ -308,7 +276,6 @@ public class GlyphFile extends GlyphModule {
 	
 	public void setAuthor(String a_value) {
 		m_glyph.getHead().setAuthor(a_value);
-		m_history.record("setAuthor");
 	}
 	
 	public String getAuthor() {
@@ -317,7 +284,6 @@ public class GlyphFile extends GlyphModule {
 	
 	public void setCopyrightYear(String a_value) {
 		m_glyph.getHead().setCopyright(a_value);
-		m_history.record("setCopyrightYear"); 
 	}
 	
 	public String getCopyrightYear() {
@@ -326,7 +292,6 @@ public class GlyphFile extends GlyphModule {
 	
 	public void setAdvanceWidth(int a_width) {
 		m_glyph.getHead().setAdvanceWidth(a_width);
-		m_history.record("setAdvanceWidth");
 	}
 	
 	public int getAdvanceWidth() {
@@ -437,8 +402,6 @@ public class GlyphFile extends GlyphModule {
 		} // if
 		
 		m_isMoving = false;
-		
-		m_history.record("move");
 	}
 	
 	//	--------------------------------------------------------------
@@ -666,7 +629,6 @@ public class GlyphFile extends GlyphModule {
 		m_actives.unselectAll();
 		m_actives.addActive((GlyphObject) a_include);
 		m_glyph.getBody().addInclude(a_include);
-		m_history.record("addInclude");		
 	}
 		
 	// --------------------------------------------------------------
@@ -679,7 +641,6 @@ public class GlyphFile extends GlyphModule {
 		m_actives.unselectAll();
 		m_actives.addActive(a_module);
 		m_glyph.getBody().addModule(a_module);
-		m_history.record("addModule");
 		
 		return a_module;		
 	}
@@ -693,7 +654,6 @@ public class GlyphFile extends GlyphModule {
 		m_actives.unselectAll();
 		m_actives.addActive(a_contour);
 		m_glyph.getBody().addContour(a_contour);
-		m_history.record("addContour");		
 	}
 	
 
@@ -708,8 +668,6 @@ public class GlyphFile extends GlyphModule {
 		EContourPoint contourPoint = m_actives.getActivePoint();
 		m_actives.unselectAll();
 		m_actives.addActive(contourPoint.add());
-		
-		m_history.record("addPoint");		
 	}
 	
 	// --------------------------------------------------------------
@@ -731,9 +689,6 @@ public class GlyphFile extends GlyphModule {
 		    EContourPoint p = (EContourPoint) contourPoint.getControlPoint2().getContourPoint();
 		    m_actives.addActive(p.addHint(a_ppem));
 		} // if
-		
-		
-		m_history.record("addHint");					
 	}
 	
 	public void toggleRounded() {
@@ -742,8 +697,6 @@ public class GlyphFile extends GlyphModule {
 	    
 	   EContourPoint contourPoint = m_actives.getActivePoint();
 	   contourPoint.toggleRounded();
-	   
-	   m_history.record("toggleGridfit");
 	}
 	
 	public void convertControlPoint() {
@@ -753,8 +706,6 @@ public class GlyphFile extends GlyphModule {
 	    
 	    EControlPoint controlPoint = m_actives.getActiveControlPoint();
 	    controlPoint.convert();
-	    
-	    m_history.record("convertControlPoint");
 	}
 	
 	public void convertContour() {
@@ -764,8 +715,6 @@ public class GlyphFile extends GlyphModule {
 	    
 	    EContour contour = m_actives.getActiveContour();
 	    contour.convert();
-	    
-	    m_history.record("convertContour");
 	}
 	
 	// --------------------------------------------------------------
@@ -779,8 +728,6 @@ public class GlyphFile extends GlyphModule {
 			GlyphObject active = m_actives.get(i);
 			active.remove();
 		} // for i
-				
-		m_history.record("remove");
 				
 		m_actives.unselectAll();	
 	}
@@ -801,8 +748,6 @@ public class GlyphFile extends GlyphModule {
 			EContourPoint point = (EContourPoint) active;
 			point.toggleOnCurve();
 		} // for i
-				
-		m_history.record("toggleOnOff");	
 	}
 		
 	private void loadVar() {
@@ -822,14 +767,11 @@ public class GlyphFile extends GlyphModule {
 		XParamListParam param = new XParamListParam();
 		param.setName("New parameter");
 		param.setContent(0.0);
-		m_history.record("addFileVar");
 		
 		m_glyph.getHead().getHeadGlobal().addParamListParam(param);
 	}
 	
 	public void removeFileVar(int a_index) {
-		m_history.record("removeFileVar");
-		
 		m_glyph.getHead().getHeadGlobal().removeParamListParam(a_index);	
 	}
 	
@@ -857,12 +799,10 @@ public class GlyphFile extends GlyphModule {
 			return;
 		
 		m_actives.getActiveInclude().setHref(a_name);
-		m_history.record("setIncludeName");		
 	}
 	
 	public void setGlyphTitle(String a_title) {
 		m_glyph.getHead().setTitle(a_title);
-		m_history.record("setGlyphTitle");
 	}
 	
 	public String getGlyphTitle() {
@@ -914,7 +854,6 @@ public class GlyphFile extends GlyphModule {
 	
 	protected void setUnicode(String a_unicode) {
 		m_glyph.getHead().setUnicode(a_unicode);
-		m_history.record("setUnicode");
 	}
 	
 	public boolean isSimple() {
@@ -943,7 +882,6 @@ public class GlyphFile extends GlyphModule {
 	
 	public void setLicense(String a_value) {
 		m_glyph.getHead().setLicense(a_value);
-		m_history.record("setLicense");
 	}
 	
 	public String getLicense() {

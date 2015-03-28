@@ -221,7 +221,6 @@ public class Engine {
 	    } // if
 	    
 	    m_ui.showPropertyDialog(m_actives.get(0));
-	    fireAction();
 	}
 	
 	public void setUi(UiBridge a_ui) {
@@ -236,7 +235,6 @@ public class Engine {
 	    } // if
 	    
 	    m_root.selectNext();
-	    fireAction();
 	}
 	
 	public void delete() {
@@ -247,8 +245,6 @@ public class Engine {
 		} // if
 		
 		m_root.remove();
-			
-		fireAction();
 	}
 
 	public void cutToClipboard() {
@@ -260,8 +256,6 @@ public class Engine {
 		
 		copyToClipboard();
 		delete();
-		
-		fireAction();
 	}
 
 	public void copyToClipboard() {
@@ -283,8 +277,6 @@ public class Engine {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} // try-catch
-
-		fireAction();
 	}
 
 	public void pasteFromClipboard() {
@@ -311,24 +303,6 @@ public class Engine {
 		} catch (GlyphFile.CircularIncludeException e) {
 			         Logger.getLogger(Engine.class.getName()).log(Level.SEVERE, m_msgCircular, e);
 		}
-
-		fireAction();
-	}
-
-	public void undo() {
-		if (m_root == null)
-			return;
-
-		m_root.undo();
-		fireAction();
-	}
-
-	public void redo() {
-		if (m_root == null)
-			return;
-
-		m_root.redo();
-		fireAction();
 	}
 
 	public void setAdvanceWidth(int a_value) {
@@ -336,7 +310,6 @@ public class Engine {
 			return;
 
 		m_root.setAdvanceWidth(a_value);
-		fireAction();
 	}
 	
 	public void moveLeft() {
@@ -383,8 +356,6 @@ public class Engine {
 	public void addDefaultGlyphs() throws FileNotFoundException {
 		m_typeface.addRequiredGlyphs();
 		m_typeface.addBasicLatinGlyphs();
-
-		fireAction();
 	}
 
 	public void openTypeface() throws FileNotFoundException {
@@ -407,13 +378,11 @@ public class Engine {
 	    setTypeface(new TypefaceFile(a_file));
 	    
 	    if (m_typeface.addRequiredGlyphs()) {
-	    	fireAction();
 	    } // if
 	}
 	
 	public void setTypeface(TypefaceFile a_typeface) {
 		m_typeface = a_typeface;
-		fireAction();
 	}
 
 	public void changeUnicode(long a_unicode) throws FileNotFoundException {
@@ -422,7 +391,6 @@ public class Engine {
 		} // if
 
 		m_typeface.setGlyphUnicode(m_root, a_unicode);
-		fireAction();
 	}
 	
 	public int findFile(long a_unicode) {
@@ -469,7 +437,6 @@ public class Engine {
 
 	private void addGlyphToTypeface(GlyphFile a_file) throws FileNotFoundException {
 		m_typeface.addGlyph(a_file);
-		m_typeface.saveGlyphFile();
 
 		setRoot(a_file);
 	}
@@ -487,7 +454,6 @@ public class Engine {
 			return;
 
 		m_typeface.removeGlyph(a_fileName);
-		fireAction();
 	}
 
 	public Font buildTrueType(boolean a_isDebug) {
@@ -516,9 +482,6 @@ public class Engine {
             Logger.getLogger(Engine.class.getName()).log(Level.SEVERE, m_msgEmptyGlyphTitle);
 			return;
 		} // if
-
-		m_root.saveGlyphFile();
-		fireAction();
 	}
 
 	public TypefaceFile getTypeface() {
@@ -536,19 +499,6 @@ public class Engine {
 
 	public void setRoot(GlyphFile a_file) {
 		m_root = a_file;
-		fireAction();
-	}
-
-	public void addActionListener(ActionListener a_listener) {
-		m_listeners.add(a_listener);
-	}
-
-	public void fireAction() {
-		ActionEvent e = new ActionEvent(this, Event.ACTION_EVENT, "foo");
-		
-		for (ActionListener listener: m_listeners) {
-			listener.actionPerformed(e);
-		} // for listener	
 	}
 
 	public String includeFileName() {
@@ -572,7 +522,6 @@ public class Engine {
 		} // if
 
 		m_typeface.addCodePage(a_codePage);
-		fireAction();
 	}
 
 	public void removeCodePage(String a_codePage) throws FileNotFoundException {
@@ -581,7 +530,6 @@ public class Engine {
 		} // if
 
 		m_typeface.removeCodePage(a_codePage);
-		fireAction();
 	}
 
 	public void setAuthor(String a_value) throws FileNotFoundException {
@@ -590,8 +538,6 @@ public class Engine {
 		} // if
 
 		m_typeface.setAuthor(a_value);
-		m_typeface.saveGlyphFile();
-		fireAction();
 	}
 
 	public void setCopyrightYear(String a_value) throws FileNotFoundException {
@@ -600,8 +546,6 @@ public class Engine {
 		} // if
 
 		m_typeface.setCopyrightYear(a_value);
-		m_typeface.saveGlyphFile();
-		fireAction();
 	}
 
 	public void setFontFamilyName(String a_value) throws FileNotFoundException {
@@ -610,7 +554,6 @@ public class Engine {
 		} // if
 
 		m_typeface.setFontFamilyName(a_value);
-		fireAction();
 	}
 
 	public void setTypefaceLicense(String a_value) throws FileNotFoundException {
@@ -619,8 +562,6 @@ public class Engine {
 		} // if
 
 		m_typeface.setLicense(a_value);
-		m_typeface.saveGlyphFile();
-		fireAction();
 	}
 
 	public void setBaseline(double a_value) throws FileNotFoundException {
@@ -648,8 +589,6 @@ public class Engine {
 		catch (OutOfRangeException e) {
 			e.printStackTrace();	
 		} // try-catch
-		
-		fireAction();
 	}
 	
 	public void setMeanline(double a_value) throws FileNotFoundException {
@@ -675,8 +614,6 @@ public class Engine {
 		catch (OutOfRangeException e) {
 			e.printStackTrace();	
 		} // try-catch
-		
-		fireAction();
 	}
 
 	public void mousePressed(MouseEvent a_event) {
@@ -705,8 +642,6 @@ public class Engine {
 		} else if (a_event.getModifiers() == KeyEvent.SHIFT_MASK) {
 		    
 		} // if
-
-		fireAction();
 	}
 	
 	private JFileChooser createImageChooser() {

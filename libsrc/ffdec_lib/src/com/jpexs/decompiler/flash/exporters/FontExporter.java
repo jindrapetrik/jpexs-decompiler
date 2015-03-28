@@ -263,6 +263,7 @@ public class FontExporter {
                 WritableFontData woffData = w.convert(font);
                 woffData.copyTo(fos);
             }
+            
             ttfFile.delete();
         }
     }

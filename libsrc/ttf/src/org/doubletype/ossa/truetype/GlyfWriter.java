@@ -68,8 +68,9 @@ public class GlyfWriter extends FontFormatWriter {
 		m_loca.m_offsets.clear();
 		
 		for (int i = 0; i < m_glyphs.size(); i++) {
-			writeGlyph(m_glyphs.get(i));
-			m_hdmx.updatePixelWidth(i, m_glyphs.get(i));
+                        TTGlyph glyph = m_glyphs.get(i);
+			writeGlyph(glyph);
+			m_hdmx.updatePixelWidth(i, glyph);
 		} // for i
 		
 		m_loca.m_offsets.add(size());

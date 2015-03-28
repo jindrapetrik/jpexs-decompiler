@@ -165,6 +165,7 @@ public class Fontastic {
         //m_engine.fireAction();
         //m_engine.addDefaultGlyphs();
 
+        List<GlyphFile> glyphFiles = new ArrayList<>(glyphs.size());
         for (FGlyph glyph : glyphs) {
 
             m_engine.checkUnicodeBlock(glyph.getGlyphChar());
@@ -199,8 +200,10 @@ public class Fontastic {
 
                 glyphFile.addContour(econtour);
             }
-            glyphFile.saveGlyphFile();
+            
+            glyphFiles.add(glyphFile);
         }
+
         m_engine.getTypeface().addRequiredGlyphs();        
         m_engine.buildTrueType(false);
 

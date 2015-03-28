@@ -41,6 +41,7 @@ import org.doubletype.ossa.xml.*;
 import org.doubletype.ossa.adapter.*;
 import org.doubletype.ossa.truetype.*;
 import java.awt.*;
+import java.util.List;
 
 /**
  * @author e.e
@@ -61,6 +62,7 @@ public class TypefaceFile extends GlyphFile {
 	private File m_ttfFile;
 	private Font m_font = null;
 	private File m_binFolder;
+        private Map<String, GlyphFile> m_glyphFiles = new HashMap<>();
 	
 	public TypefaceFile(String a_name, File a_dir) throws FileNotFoundException {
 		super(TypefaceFile.class.getResource(s_emptyFileName));
@@ -70,8 +72,6 @@ public class TypefaceFile extends GlyphFile {
 		
 		m_fileName = new File(m_dir, a_name + k_dotDtyp);
 		initFileName();
-		
-		saveGlyphFile();
 	}
 	
 	public TypefaceFile(File a_file) {
@@ -93,7 +93,7 @@ public class TypefaceFile extends GlyphFile {
 		m_ttfFile = new File(m_binFolder, fileName);
 	}
 	
-	public GlyphFile createGlyph(long a_unicode) throws FileNotFoundException {
+	public GlyphFile createGlyph(long a_unicode) {
 		String name = Character.getName((int) a_unicode);
 		if (name == null) {
 			name = "NAC_" + Long.toHexString(a_unicode);
@@ -104,7 +104,7 @@ public class TypefaceFile extends GlyphFile {
 			getGlyphPath(), name, a_unicode);
 	}
 	
-	public boolean addRequiredGlyphs() throws FileNotFoundException {
+	public boolean addRequiredGlyphs() {
 		boolean retval = false;
 		
 		if (unicodeToFileName(TTUnicodeRange.k_notDef) == null) {
@@ -135,14 +135,10 @@ public class TypefaceFile extends GlyphFile {
 			retval = true;
 		} // if
 		
-		if (retval) {
-			saveGlyphFile();
-		} // if
-		
 		return retval;
 	}
 	
-	public void addBasicLatinGlyphs() throws FileNotFoundException {
+	public void addBasicLatinGlyphs() {
 		String basicLatin = Character.UnicodeBlock.BASIC_LATIN.toString();
 		TTUnicodeRange.find(basicLatin);
 		TTUnicodeRange range = TTUnicodeRange.getLastFound();
@@ -152,8 +148,6 @@ public class TypefaceFile extends GlyphFile {
 				addGlyph(createGlyph(i));
 			} // if
 		} // for i
-		
-		saveGlyphFile();
 	}
 	
 	public File getGlyphPath() {
@@ -175,7 +169,7 @@ public class TypefaceFile extends GlyphFile {
 	 * @param a_glyphFile
 	 * @param a_unicode
 	 */
-	public void setGlyphUnicode(GlyphFile a_glyphFile, long a_unicode) throws FileNotFoundException {
+	public void setGlyphUnicode(GlyphFile a_glyphFile, long a_unicode) {
 		int i;
 		XGlyphFile [] glyphFiles = m_glyph.getBody().getGlyphFile();
 		for (i = 0; i < glyphFiles.length; i++) {
@@ -188,23 +182,25 @@ public class TypefaceFile extends GlyphFile {
 			
 			glyphFile.setUnicode(a_unicode);
 			a_glyphFile.setUnicode(Long.toHexString(a_unicode));
-			a_glyphFile.saveGlyphFile();
-			saveGlyphFile();
 			
 			return;
 		} // for i
 	}
 	
 	public void addGlyph(GlyphFile a_file) {		
+                String shortFileName = a_file.getShortFileName();
+                m_glyphFiles.put(shortFileName, a_file);
 		XGlyphFile xglyphFile = new XGlyphFile();
-		xglyphFile.setHref(a_file.getShortFileName());
+		xglyphFile.setHref(shortFileName);
 		xglyphFile.setUnicode(a_file.getUnicodeAsLong());
 		m_glyph.getBody().addGlyphFile(xglyphFile);
 	}
 	
 	public void addGlyph(int a_index, GlyphFile a_file) {
+                String shortFileName = a_file.getShortFileName();
+                m_glyphFiles.put(shortFileName, a_file);
 		XGlyphFile xglyphFile = new XGlyphFile();
-		xglyphFile.setHref(a_file.getShortFileName());
+		xglyphFile.setHref(shortFileName);
 		xglyphFile.setUnicode(a_file.getUnicodeAsLong());
 		m_glyph.getBody().addGlyphFile(a_index, xglyphFile);
 	}
@@ -255,13 +251,12 @@ public class TypefaceFile extends GlyphFile {
 		return false;
 	}
 	
-	public void addUnicodeRange(String a_unicodeRange) throws FileNotFoundException {
+	public void addUnicodeRange(String a_unicodeRange) {
 		if (containsUnicodeRange(a_unicodeRange)) {
 			return;
 		} // if
 		
 		m_glyph.getHead().addUnicodeRange(a_unicodeRange);
-		saveGlyphFile();
 	}
 	
 	public boolean containsCodePage(String a_codePage) {
@@ -277,80 +272,73 @@ public class TypefaceFile extends GlyphFile {
 		return false;
 	}
 	
-	public void addCodePage(String a_codePage) throws FileNotFoundException {
+	public void addCodePage(String a_codePage) {
 		if (containsCodePage(a_codePage)) {
 			return;
 		} // if
 		
 		m_glyph.getHead().addCodePage(a_codePage);
-		saveGlyphFile();
 	}
 	
-	public void removeCodePage(String a_codePage) throws FileNotFoundException {
+	public void removeCodePage(String a_codePage) {
 		if (!containsCodePage(a_codePage)) {
 			return;
 		} // if
 		
 		m_glyph.getHead().removeCodePage(a_codePage);
-		saveGlyphFile();
 	}
 	
-	public void setFontFamilyName(String a_value) throws FileNotFoundException {
+	public void setFontFamilyName(String a_value) {
 		m_glyph.getHead().setFontFamily(a_value);
-		saveGlyphFile();
 	}
 	
 	public String getFontFamilyName() {
 		return m_glyph.getHead().getFontFamily();
 	}
 	
-	public String getVersion() throws FileNotFoundException {
+	public String getVersion() {
 		if (m_glyph.getHead().getVersion() == null) {
 			m_glyph.getHead().setVersion("0.1");
-			saveGlyphFile();
 		} // if
 		
 		return m_glyph.getHead().getVersion();
 	}
 	
-	public void setSubFamily(String a_value) throws FileNotFoundException {
+	public void setSubFamily(String a_value) {
 		m_glyph.getHead().setFontSubFamily(a_value);
-		saveGlyphFile();
 	}
 	
-	public void setDefaultMetrics() throws FileNotFoundException {
+	public void setDefaultMetrics() {
 		XHead head = m_glyph.getHead();
 		head.setTopSideBearing(k_defaultTopSideBearing);
 		head.setAscender(k_defaultAscender);
 		head.setXHeight(k_defaultXHeight);
 		head.setDescender(k_defaultDescender);
 		head.setBottomSideBearing(k_defaultBottomSideBearing);
-		
-		saveGlyphFile();
 	}
 	
 	public double getEm() {
 		return k_em;
 	}
 	
-	public double getBaseline() throws FileNotFoundException {
+	public double getBaseline() {
 		return getBottomSideBearing() + getDescender();
 	}
 	
-	public double getMeanline() throws FileNotFoundException {
+	public double getMeanline() {
 		return getBottomSideBearing() 
 			+ getDescender() + getXHeight();
 	}
 	
-	public double getBodyBottom() throws FileNotFoundException {
+	public double getBodyBottom() {
 		return getBottomSideBearing();
 	}
 	
-	public double getBodyTop() throws FileNotFoundException {
+	public double getBodyTop() {
 		return getEm() - getTopSideBearing();
 	}
 	
-	public double getTopSideBearing() throws FileNotFoundException {
+	public double getTopSideBearing() {
 		if (!m_glyph.getHead().checkTopSideBearing()) {
 			setDefaultMetrics();
 		} // if
@@ -358,7 +346,7 @@ public class TypefaceFile extends GlyphFile {
 		return m_glyph.getHead().getTopSideBearing();
 	}
 	
-	public double getAscender() throws FileNotFoundException {
+	public double getAscender() {
 		if (!m_glyph.getHead().checkAscender()) {
 			setDefaultMetrics();
 		} // if
@@ -366,7 +354,7 @@ public class TypefaceFile extends GlyphFile {
 		return m_glyph.getHead().getAscender();
 	}
 	
-	public double getXHeight() throws FileNotFoundException {
+	public double getXHeight() {
 		if (!m_glyph.getHead().checkXHeight()) {
 			setDefaultMetrics();
 		} // if
@@ -374,7 +362,7 @@ public class TypefaceFile extends GlyphFile {
 		return m_glyph.getHead().getXHeight();
 	}
 	
-	public double getDescender() throws FileNotFoundException {
+	public double getDescender() {
 		if (!m_glyph.getHead().checkDescender()) {
 			setDefaultMetrics();		
 		} // if
@@ -382,7 +370,7 @@ public class TypefaceFile extends GlyphFile {
 		return m_glyph.getHead().getDescender();
 	}
 	
-	public double getBottomSideBearing() throws FileNotFoundException {
+	public double getBottomSideBearing() {
 		if (!m_glyph.getHead().checkBottomSideBearing()) {
 			setDefaultMetrics();
 		} // if
@@ -390,10 +378,9 @@ public class TypefaceFile extends GlyphFile {
 		return m_glyph.getHead().getBottomSideBearing();
 	}
 	
-	public void setTopSideBearing(double a_value) throws OutOfRangeException, FileNotFoundException {
+	public void setTopSideBearing(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
 		m_glyph.getHead().setTopSideBearing(a_value);
-		saveGlyphFile();
 	}
 	
 	private void checkBoundary(double a_value) throws OutOfRangeException  {
@@ -402,37 +389,31 @@ public class TypefaceFile extends GlyphFile {
 		} // if
 	}
 	
-	public void setAscender(double a_value) throws OutOfRangeException, FileNotFoundException {
+	public void setAscender(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
 		m_glyph.getHead().setAscender(a_value);
-		saveGlyphFile();
 	}
 
-	public void setXHeight(double a_value) throws OutOfRangeException, FileNotFoundException {
+	public void setXHeight(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
 		if (a_value > getAscender()) {
 			throw new OutOfRangeException(a_value);
 		} // if
 			
 		m_glyph.getHead().setXHeight(a_value);
-		
-		m_history.record("setXHeight");
-		saveGlyphFile();
 	}
 	
-	public void setDescender(double a_value) throws OutOfRangeException, FileNotFoundException {
+	public void setDescender(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);		
 		m_glyph.getHead().setDescender(a_value);
-		saveGlyphFile();
 	}
 	
-	public void setBottomSideBearing(double a_value) throws OutOfRangeException, FileNotFoundException {
+	public void setBottomSideBearing(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
 		m_glyph.getHead().setBottomSideBearing(a_value);
-		saveGlyphFile();
 	}
 	
-	public double getBodyHeight() throws FileNotFoundException {
+	public double getBodyHeight() {
 		return k_em - getTopSideBearing() - getBottomSideBearing();
 	}
 		
@@ -440,7 +421,6 @@ public class TypefaceFile extends GlyphFile {
 			
 	/**
 	 * Calls FontFileWriter to produce TrueType font file.
-	 * @throws FileNotFoundException
 	 */
 	public void buildTTF(boolean a_isDebug) throws Exception {		
 		String randomString = UUID.randomUUID().toString().substring(0, 4);
@@ -543,13 +523,11 @@ public class TypefaceFile extends GlyphFile {
 	}
 	
 	private GlyphFile nameToGlyphFile(String a_fileName) throws FileNotFoundException {
-		File file = new File(m_dir, a_fileName);
-		
-		if (!file.exists()) {
+		if (!m_glyphFiles.containsKey(a_fileName)) {
 			throw new FileNotFoundException(a_fileName);
 		} // if
 		
-		GlyphFile retval = new GlyphFile(file);
+		GlyphFile retval = m_glyphFiles.get(a_fileName);
 		
 		return retval;
 	}
