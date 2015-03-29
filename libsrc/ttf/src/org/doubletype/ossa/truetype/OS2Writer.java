@@ -176,7 +176,7 @@ public class OS2Writer extends FontFormatWriter {
 	    m_usWinDescent = 0;
 	    if (m_head.getMin().y < 0) {
 	        m_usWinDescent = -m_head.getMin().y;
-	    } // if
+	    }
 	    	    
 	    // table version number
 		writeUInt16(0x02);

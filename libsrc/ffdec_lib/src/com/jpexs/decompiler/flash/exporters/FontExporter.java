@@ -36,7 +36,6 @@ import com.jpexs.helpers.Helper;
 import fontastic.FGlyph;
 import fontastic.FPoint;
 import fontastic.Fontastic;
-import fontastic.PVector;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -187,19 +186,19 @@ public class FontExporter {
                 @Override
                 public void moveTo(double x, double y) {
                     finalizePath();
-                    path.add(new FPoint(new PVector(transformX(x), transformY(y))));
+                    path.add(new FPoint(transformX(x), transformY(y)));
                 }
 
                 @Override
                 public void lineTo(double x, double y) {
-                    path.add(new FPoint(new PVector(transformX(x), transformY(y))));
+                    path.add(new FPoint(transformX(x), transformY(y)));
                 }
 
                 @Override
                 public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
                     path.add(new FPoint(
-                            new PVector(transformX(anchorX), transformY(anchorY)),
-                            new PVector(transformX(controlX), transformY(controlY))
+                            new FPoint(transformX(anchorX), transformY(anchorY)),
+                            new FPoint(transformX(controlX), transformY(controlY))
                     ));
 
                 }

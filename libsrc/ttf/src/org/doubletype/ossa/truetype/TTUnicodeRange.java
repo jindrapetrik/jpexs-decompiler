@@ -65,8 +65,8 @@ public class TTUnicodeRange implements Comparable<TTUnicodeRange> {
 			TTUnicodeRange range = s_list.get(i);
 			if (range.m_block.equals(block)) {
 				return range;	
-			} // if
-		} // for i
+			}
+		}
 		
 		return retval;
 	}
@@ -300,8 +300,8 @@ public class TTUnicodeRange implements Comparable<TTUnicodeRange> {
 				s_selected = range;
 				
 				return true;
-			} // if
-		} // for i
+			}
+		}
 		
 		return false;
 	}

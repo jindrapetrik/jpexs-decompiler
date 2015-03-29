@@ -37,8 +37,6 @@ package org.doubletype.ossa.adapter;
 
 import java.util.*;
 
-import org.doubletype.ossa.xml.XContourPoint;
-
 /**
  * @author e.e
  */
@@ -57,7 +55,7 @@ public class QuadraticSegment {
         ArrayList points = toConcreatePoints(a_contour);
         if (points.size() < 3) {
             return retval;
-        } // if
+        }
         
         for (int i = 0; i < points.size() - 1; i++) {
             EContourPoint startPoint = (EContourPoint) points.get(i);
@@ -71,8 +69,8 @@ public class QuadraticSegment {
                 i++;
                 nextPoint = (EContourPoint) points.get(i + 1);
                 retval.add(new QuadraticSegment(startPoint, offCurvePoint, nextPoint));
-            } // if-else
-        } // for i
+            }
+        }
         
         return retval;
     }
@@ -87,7 +85,8 @@ public class QuadraticSegment {
         retval.setType(EContour.k_quadratic);
         
         for (QuadraticSegment segment: a_segments) {
-            EContourPoint startPoint = (EContourPoint) segment.m_startPoint.clone();
+            EContourPoint p = segment.m_startPoint;
+            EContourPoint startPoint = new EContourPoint(p.getX(), p.getY(), p.isOn());
             startPoint.setControlPoint1(null);
             startPoint.setControlPoint2(null);
             
@@ -98,7 +97,7 @@ public class QuadraticSegment {
                 retval.addContourPoint(startPoint);
                 retval.addContourPoint(segment.m_offCurvePoint);
             }
-        } // for i
+        }
         
         return retval;
     }
@@ -112,22 +111,22 @@ public class QuadraticSegment {
     private static ArrayList<EContourPoint> toConcreatePoints(EContour a_contour) {
         ArrayList<EContourPoint> retval = new ArrayList<>();
         
-        XContourPoint [] points = a_contour.getContourPoint();
-		if (points.length < 3)
+        ArrayList<EContourPoint> points = a_contour.getContourPoints();
+		if (points.size() < 3)
 			return retval;
 		
-		EContourPoint fromPoint = (EContourPoint) points[points.length - 1];
-		for (XContourPoint point: points) {
+		EContourPoint fromPoint = (EContourPoint) points.get(points.size() - 1);
+		for (EContourPoint point: points) {
 			EContourPoint toPoint = (EContourPoint) point;
 			if (!toPoint.isOn() && !fromPoint.isOn()) {
 				double xMidpoint = (toPoint.getX() + fromPoint.getX()) / 2;
 				double yMidpoint = (toPoint.getY() + fromPoint.getY()) / 2;
 				retval.add(new EContourPoint(xMidpoint, yMidpoint, true));
-			} // if
+			}
 			
 			retval.add(toPoint);
 			fromPoint = toPoint;
-		} // for i
+		}
 		
 		// all contours should start with on-curve point
 		// move off-curve point to the end if a contour starts with one.
@@ -135,7 +134,7 @@ public class QuadraticSegment {
 		if (!firstPoint.isOn()) {
 			retval.remove(0);
 			retval.add(firstPoint);
-		} // if
+		}
 		
 		retval.add(retval.get(0));
         
@@ -159,7 +158,7 @@ public class QuadraticSegment {
         
         if (m_offCurvePoint != null) {
             m_type = CURVE;
-        } // if
+        }
     }
     
     /**
@@ -171,7 +170,7 @@ public class QuadraticSegment {
         // if the segment is a line
         if (m_type == LINE) {
             return new CubicSegment(m_startPoint, m_endPoint);
-        } // if
+        }
         
         double x, y;
         x = m_startPoint.getX() + 2.0 / 3.0 * (m_offCurvePoint.getX() - m_startPoint.getX());

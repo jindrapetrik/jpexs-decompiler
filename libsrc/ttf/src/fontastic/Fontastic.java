@@ -32,11 +32,7 @@ import org.doubletype.ossa.adapter.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * Fontastic A font file writer to create TTF and WOFF (Webfonts).
@@ -45,55 +41,30 @@ import java.util.regex.Matcher;
  */
 public class Fontastic {
 
-    private org.doubletype.ossa.module.TypefaceFile typeface;
     private org.doubletype.ossa.Engine m_engine;
 
-    private String fontname;
+    private String fontName;
 
     private List<FGlyph> glyphs;
 
     private int advanceWidth = 512;
 
-    private File ttffile;
-    private File outfile;
+    private File ttfFile;
+    private File outFile;
     private File tempDir;
-
-    public final static String VERSION = "0.4";
-
-    /**
-     * Uppercase alphabet 26 characters *
-     */
-    public final static char alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
-        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-        'U', 'V', 'W', 'X', 'Y', 'Z'};
-    /**
-     * Lowercase alphabet 26 characters *
-     */
-    public final static char alphabetLc[] = {'a', 'b', 'c', 'd', 'e', 'f',
-        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-        't', 'u', 'v', 'w', 'x', 'y', 'z'};
-
-    /**
-     * Return the version of the library.
-     *
-     * @return String
-     */
-    public static String version() {
-        return VERSION;
-    }
 
     /**
      * Constructor
      *
      * @example Fontastic f = new Fontastic(this, "MyFont");
      *
-     * @param theParent Your processing sketch (this).
-     * @param fontname Font name
+     * @param fontName Font name
+     * @param outFile
      *
      */
-    public Fontastic(String fontname, File outfile) throws IOException {
-        this.fontname = fontname;
-        this.outfile = outfile;
+    public Fontastic(String fontName, File outFile) throws IOException {
+        this.fontName = fontName;
+        this.outFile = outFile;
         intitialiseFont();
         this.glyphs = new ArrayList<>();
     }
@@ -104,7 +75,7 @@ public class Fontastic {
      * @return String
      */
     public String getFontname() {
-        return fontname;
+        return fontName;
     }
 
     private static File createTempDirectory()
@@ -132,27 +103,17 @@ public class Fontastic {
     private void intitialiseFont() throws IOException {
 
         tempDir = createTempDirectory();
-        /*if (!tempDir.exists()) {
-            if(!tempDir.mkdirs()){
-                if (!tempDir.exists()) {
-                    throw new IOException("Cannot create temp dir");
-                }
-            }
-        } else {
-            //deleteFolderContents(tempDir, false);
-        }*/
         
-
-        m_engine = Engine.getSingletonInstance();
-        m_engine.buildNewTypeface(fontname, tempDir);
+        m_engine = new Engine();
+        m_engine.buildNewTypeface(fontName, tempDir);
         
-        this.setFontFamilyName(fontname);
+        this.setFontFamilyName(fontName);
         this.setVersion("CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0/"); // default
         // license
 
-        String directoryName = tempDir + File.separator + "bin" + File.separator;
+        String directoryName = tempDir + File.separator;
 
-        ttffile = new File(directoryName + fontname + ".ttf");
+        ttfFile = new File(directoryName + fontName + ".ttf");
     }
 
     /**
@@ -160,12 +121,11 @@ public class Fontastic {
      * template for previewing the WOFF. If debug is set (default is true) then
      * you'll see the .ttf and .woff file name in the console.
      */
-    public void buildFont() throws FileNotFoundException {
+    public void buildFont() {
         // Create TTF file with doubletype
         //m_engine.fireAction();
         //m_engine.addDefaultGlyphs();
 
-        List<GlyphFile> glyphFiles = new ArrayList<>(glyphs.size());
         for (FGlyph glyph : glyphs) {
 
             m_engine.checkUnicodeBlock(glyph.getGlyphChar());
@@ -200,18 +160,16 @@ public class Fontastic {
 
                 glyphFile.addContour(econtour);
             }
-            
-            glyphFiles.add(glyphFile);
         }
 
         m_engine.getTypeface().addRequiredGlyphs();        
-        m_engine.buildTrueType(false);
+        m_engine.buildTrueType();
 
         // End TTF creation
-        if(outfile.exists()){
-            outfile.delete();
+        if(outFile.exists()){
+            outFile.delete();
         }
-        ttffile.renameTo(outfile);
+        ttfFile.renameTo(outFile);
         cleanup();
     }
 
@@ -229,14 +187,14 @@ public class Fontastic {
     /**
      * Sets the author of the font.
      */
-    public void setAuthor(String author) throws FileNotFoundException {
+    public void setAuthor(String author) {
         m_engine.setAuthor(author);
     }
 
     /**
      * Sets the copyright year of the font.
      */
-    public void setCopyrightYear(String copyrightYear) throws FileNotFoundException {
+    public void setCopyrightYear(String copyrightYear) {
         m_engine.setCopyrightYear(copyrightYear);
     }
 
@@ -244,7 +202,7 @@ public class Fontastic {
      * Sets the version of the font (default is "0.1").
      */
     public void setVersion(String version) {
-        m_engine.getTypeface().getGlyph().getHead().setVersion(version);
+        m_engine.getTypeface().setVersion(version);
     }
 
     /**
@@ -252,14 +210,14 @@ public class Fontastic {
      * changed with setFontFamilyName() it won't affect folder the font is
      * stored in.
      */
-    public void setFontFamilyName(String fontFamilyName) throws FileNotFoundException {
+    public void setFontFamilyName(String fontFamilyName) {
         m_engine.setFontFamilyName(fontFamilyName);
     }
 
     /**
      * Sets the sub family of the font.
      */
-    public void setSubFamily(String subFamily) throws FileNotFoundException {
+    public void setSubFamily(String subFamily) {
         m_engine.getTypeface().setSubFamily(subFamily);
     }
 
@@ -267,21 +225,21 @@ public class Fontastic {
      * Sets the license of the font (default is "CC BY-SA 3.0
      * http://creativecommons.org/licenses/by-sa/3.0/")
      */
-    public void setTypefaceLicense(String typefaceLicense) throws FileNotFoundException {
+    public void setTypefaceLicense(String typefaceLicense) {
         m_engine.setTypefaceLicense(typefaceLicense);
     }
 
     /**
      * Sets the baseline of the font.
      */
-    public void setBaseline(float baseline) throws FileNotFoundException {
+    public void setBaseline(float baseline) {
         m_engine.setBaseline(baseline);
     }
 
     /**
      * Sets the meanline of the font.
      */
-    public void setMeanline(float meanline) throws FileNotFoundException {
+    public void setMeanline(float meanline) {
         m_engine.setMeanline(meanline);
     }
 
@@ -294,7 +252,7 @@ public class Fontastic {
         this.advanceWidth = advanceWidth;
     }
 
-    public void setTopSideBearing(float topSideBearing) throws FileNotFoundException {
+    public void setTopSideBearing(float topSideBearing) {
         try {
             m_engine.getTypeface().setTopSideBearing(topSideBearing);
         } catch (OutOfRangeException e) {
@@ -305,7 +263,7 @@ public class Fontastic {
         }
     }
 
-    public void setBottomSideBearing(float bottomSideBearing) throws FileNotFoundException {
+    public void setBottomSideBearing(float bottomSideBearing) {
         try {
             m_engine.getTypeface().setBottomSideBearing(bottomSideBearing);
         } catch (OutOfRangeException e) {
@@ -316,7 +274,7 @@ public class Fontastic {
         }
     }
 
-    public void setAscender(float ascender) throws FileNotFoundException {
+    public void setAscender(float ascender) {
         try {
             m_engine.getTypeface().setAscender(ascender);
         } catch (OutOfRangeException e) {
@@ -327,7 +285,7 @@ public class Fontastic {
         }
     }
 
-    public void setDescender(float descender) throws FileNotFoundException {
+    public void setDescender(float descender) {
         try {
             m_engine.getTypeface().setDescender(descender);
         } catch (OutOfRangeException e) {
@@ -338,7 +296,7 @@ public class Fontastic {
         }
     }
 
-    public void setXHeight(float xHeight) throws FileNotFoundException {
+    public void setXHeight(float xHeight) {
         try {
             m_engine.getTypeface().setXHeight(xHeight);
         } catch (OutOfRangeException e) {
@@ -357,7 +315,7 @@ public class Fontastic {
      * // 2 px setBottomSideBearing(0); // 0px
      *
      */
-    public void setDefaultMetrics() throws FileNotFoundException {
+    public void setDefaultMetrics() {
         m_engine.getTypeface().setDefaultMetrics();
     }
 
@@ -383,7 +341,7 @@ public class Fontastic {
      *
      * @param c Character of the glyph.
      *
-     * @param FContour Shape of the glyph as FContour.
+     * @param contour Shape of the glyph as FContour.
      *
      * @return The glyph FGlyph that has been created. You can use this to store
      * the glyph and add contours afterwards. Alternatively, you can call
@@ -405,7 +363,7 @@ public class Fontastic {
      *
      * @param c Character of the glyph.
      *
-     * @param FContour [] Shape of the glyph in an array of FContour.
+     * @param contours Shape of the glyph in an array of FContour.
      *
      * @return The FGlyph that has been created. You can use this to store the
      * glyph and add contours afterwards. Alternatively, you can call
@@ -417,7 +375,6 @@ public class Fontastic {
         glyphs.add(glyph);
 
         for (FContour contour : contours) {
-            // if (debug) System.out.println(p.x + " - " + p.y);
             glyph.addContour(contour);
         }
         glyph.setAdvanceWidth(advanceWidth);
@@ -471,7 +428,7 @@ public class Fontastic {
      * @return The .ttf file name, which is being created when you call build()
      */
     public String getTTFfilename() {
-        return ttffile.toString();
+        return ttfFile.toString();
     }
 
     private static void deleteFolderContents(File folder,

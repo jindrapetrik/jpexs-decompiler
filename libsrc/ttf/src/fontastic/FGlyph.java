@@ -52,15 +52,11 @@ public class FGlyph {
 		contours.add(new FContour());
 	}
 	
-	public void addContour(PVector[] points) {
-		contours.add(new FContour(points));
-	}
-	
 	public void addContour(FPoint[] points) {
 		contours.add(new FContour(points));
 	}
 
-	public void addContour(PVector[] points, PVector[] controlPoints) {
+	public void addContour(FPoint[] points, FPoint[] controlPoints) {
 		contours.add(new FContour(points, controlPoints));
 	}
 	
@@ -97,10 +93,6 @@ public class FGlyph {
 		return contours.size();
 	}
 	
-	public void setContour(int index, PVector[] points) {
-		contours.set(index, new FContour(points));		
-	}
-
 	public void setContour(int index, FPoint[] points) {
 		contours.set(index, new FContour(points));		
 	}

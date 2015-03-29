@@ -269,7 +269,7 @@ public class FontFileWriter extends FontFormatWriter {
 		// padding is always 4 zeros
 		for (int i = 0; i < 4; i++) {
 			writeUInt8(0);
-		} // for i
+		}
 	}
 	
 	private int getSearchRange(int a_value) {

@@ -35,42 +35,45 @@ package fontastic;
  * Stores a point with x and y coordinates and optional PVector controlPoint1 and controlPoint2.
  * 
  */
-public class FPoint extends PVector {
+public class FPoint {
 
-	public PVector controlPoint;
+        public double x;
+        public double y;
+
+        public FPoint controlPoint;
 	
 	private boolean hasControlPoint;
 
 	public FPoint() {	
 	}
 	
-	public FPoint(PVector point) {
+	public FPoint(FPoint point) {
 		this.x = point.x;
 		this.y = point.y;
 		this.hasControlPoint = false;
 	}
 	
-	public FPoint(float x, float y) {
+	public FPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
 		this.hasControlPoint = false;
 	}
 	
         
-	public FPoint(PVector point, PVector controlPoint) {
+	public FPoint(FPoint point, FPoint controlPoint) {
 		this.x = point.x;
 		this.y = point.y;
 		this.controlPoint = controlPoint;
 		this.hasControlPoint = true;
 	}
 	
-	public void setControlPoint(PVector controlPoint1) {
+	public void setControlPoint(FPoint controlPoint1) {
 		this.controlPoint = controlPoint1;
 		this.hasControlPoint = true;
 	}
 
 	public void setControlPoint(float x, float y) {
-		this.controlPoint = new PVector(x,y);
+		this.controlPoint = new FPoint(x, y);
 		this.hasControlPoint = true;
 	}
 

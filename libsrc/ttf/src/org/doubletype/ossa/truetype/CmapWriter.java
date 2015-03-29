@@ -93,7 +93,7 @@ public class CmapWriter extends FontFormatWriter {
 			{
 				m_unicodes.add(unicode);
 			} // for unicode
-		} // for i
+		}
 		
 		m_startCodes.add(k_tableEnd);
 		m_endCodes.add(k_tableEnd);
@@ -106,7 +106,7 @@ public class CmapWriter extends FontFormatWriter {
 		
 		if (m_isIncludeVersion0) {
 			storeVersion0();
-		} // if
+		}
 		storeVersion4();
 		
 		reset();
@@ -118,19 +118,19 @@ public class CmapWriter extends FontFormatWriter {
 			writeUInt16(TTName.k_macintosh);
 			writeUInt16(TTName.k_macRomanEncode);
 			writeUInt32(size() + 4 + 8);
-		} // if
+		}
 		
 		writeUInt16(TTName.k_microsoft);
 		writeUInt16(TTName.k_winUnicodeEncode);
 		int version4Offset = size() + 4;
 		if (m_isIncludeVersion0) {
 			version4Offset += m_version0.length;
-		} // if
+		}
 		writeUInt32(version4Offset);
 		
 		if (m_isIncludeVersion0) {
 			m_buffer.write(m_version0);
-		} // if
+		}
 		
 		m_buffer.write(m_version4);		
 		pad();
@@ -139,7 +139,7 @@ public class CmapWriter extends FontFormatWriter {
 	private int getNumOfEncoding() {
 		if (m_isIncludeVersion0) {
 			return 2;
-		} // if
+		}
 		
 		return 1;
 	}
@@ -164,7 +164,7 @@ public class CmapWriter extends FontFormatWriter {
 		
 		if (m_unicode2glyph.containsKey(a_key)) {
 			retval = m_unicode2glyph.get(a_key);
-		} // if
+		}
 				
 		return retval;
 	}
@@ -208,8 +208,8 @@ public class CmapWriter extends FontFormatWriter {
 			}
 			else {
 				writeUInt8((int) getGlyfIndex((long) i));
-			} // if
-		} // for i
+			}
+		}
 	}
 	
 	private void writeVersion4() throws IOException {
@@ -220,7 +220,7 @@ public class CmapWriter extends FontFormatWriter {
 		for (i = 0; i < segCount; i++) {
 			Long n = (Long) m_endCodes.get(i);
 			writeUInt16(n.intValue());
-		} // for i
+		}
 		
 		// reserverdPad
 		writeUInt16(0);
@@ -229,13 +229,13 @@ public class CmapWriter extends FontFormatWriter {
 		for (i = 0; i < segCount; i++) {
 			Long n = m_startCodes.get(i);
 			writeUInt16(n.intValue());
-		} // for i
+		}
   		
 		// idDelta
 		for (i = 0; i < segCount; i++) {
 			Long n = m_idDeltas.get(i);
 			writeInt16(n.intValue());
-		} // for i
+		}
 				
 		// idRangeOffset
 		for (i = 0; i < segCount; i++) {
@@ -247,7 +247,7 @@ public class CmapWriter extends FontFormatWriter {
 		for (i = 0; i < m_unicodes.size(); i++) {
 			Long unicode = m_unicodes.get(i);
 			writeUInt16((int) getGlyfIndex(unicode));
-		} // for i
+		}
 		
 		byte [] bytes = m_bytes.toByteArray();
 		
@@ -287,7 +287,7 @@ public class CmapWriter extends FontFormatWriter {
 			writeUInt32(startCharCode.get(i));
 			writeUInt32(endCharCode.get(i));
 			writeUInt32(startGlyphCode.get(i));
-		} // for i
+		}
 	}
 	
 	/**

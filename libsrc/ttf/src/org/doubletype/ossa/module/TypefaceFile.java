@@ -37,8 +37,6 @@ import java.io.*;
 import java.util.*;
 
 import org.doubletype.ossa.*;
-import org.doubletype.ossa.xml.*;
-import org.doubletype.ossa.adapter.*;
 import org.doubletype.ossa.truetype.*;
 import java.awt.*;
 import java.util.List;
@@ -54,23 +52,29 @@ public class TypefaceFile extends GlyphFile {
 	private final double k_defaultBottomSideBearing = 0; // 0 px
 	private final double k_em = 1024;
 	private final int k_defaultAdvanceWidth = 512;
-	private final String k_dotDtyp = ".dtyp";
 	private final String k_dotTtf = ".ttf";
 	
 	private File m_dir;
-	private Hashtable<String, Integer> m_nameToIndeces = new Hashtable<>();
 	private File m_ttfFile;
 	private Font m_font = null;
-	private File m_binFolder;
-        private Map<String, GlyphFile> m_glyphFiles = new HashMap<>();
-	
+        private List<GlyphFile> m_glyphFiles = new ArrayList<>();
+        private List<String> m_unicodeRanges = new ArrayList<>();
+        private List<String> m_codePages = new ArrayList<>();
+        private String m_fontFamilyName;
+        private String m_subFamily;
+        private String m_version;
+        private Double m_topSideBearing = null;
+	private Double m_ascender = null;
+	private Double m_xHeight = null;
+	private Double m_descender = null;
+	private Double m_bottomSideBearing = null;
+        private String m_name;
+        
 	public TypefaceFile(String a_name, File a_dir) throws FileNotFoundException {
-		super(TypefaceFile.class.getResource(s_emptyFileName));
+		super(a_dir);
 		
 		m_dir = a_dir;
-		setGlyphTitle(a_name);
-		
-		m_fileName = new File(m_dir, a_name + k_dotDtyp);
+		m_name = a_name;
 		initFileName();
 	}
 	
@@ -78,62 +82,61 @@ public class TypefaceFile extends GlyphFile {
 		super(a_file);
 		
 		m_dir = a_file.getParentFile();
-		m_fileName = a_file;
+		m_name = a_file.getName();
 		
 		initFileName();
 	}
 	
 	private void initFileName() {
-		m_binFolder = new File(m_dir, "bin");
-		if (!m_binFolder.exists()) {
-		    m_binFolder.mkdir();
-		} // if
 	    
-	    String fileName = getGlyphTitle() + k_dotTtf;
-		m_ttfFile = new File(m_binFolder, fileName);
+	    String fileName = m_name + k_dotTtf;
+		m_ttfFile = new File(m_dir, fileName);
 	}
 	
 	public GlyphFile createGlyph(long a_unicode) {
-		String name = Character.getName((int) a_unicode);
-		if (name == null) {
-			name = "NAC_" + Long.toHexString(a_unicode);
-		} // if
-		
-		name = name.replace(' ', '_');
-		return new GlyphFile(
-			getGlyphPath(), name, a_unicode);
+		return new GlyphFile(getGlyphPath(), a_unicode);
 	}
 	
+        private GlyphFile getGlyphFileByUnicode(long code) {
+            for (GlyphFile glyphFile : m_glyphFiles) {
+                if (glyphFile.getUnicode() == code) {
+                    return glyphFile;
+                }
+            }
+            
+            return null;
+        }
+        
 	public boolean addRequiredGlyphs() {
 		boolean retval = false;
 		
-		if (unicodeToFileName(TTUnicodeRange.k_notDef) == null) {
-			GlyphFile glyph = new GlyphFile(getGlyphPath(), "NOTDEF", TTUnicodeRange.k_notDef);
+		if (getGlyphFileByUnicode(TTUnicodeRange.k_notDef) == null) {
+			GlyphFile glyph = new GlyphFile(getGlyphPath(), TTUnicodeRange.k_notDef);
 			glyph.initNotDef(k_defaultAdvanceWidth);
 			addGlyph(0, glyph);
 			retval = true;
-		} // if
+		}
 		
-		if (unicodeToFileName(TTUnicodeRange.k_null) == null) {
-			GlyphFile glyph = new GlyphFile(getGlyphPath(), "NULL", TTUnicodeRange.k_null);
+		if (getGlyphFileByUnicode(TTUnicodeRange.k_null) == null) {
+			GlyphFile glyph = new GlyphFile(getGlyphPath(), TTUnicodeRange.k_null);
 			glyph.initNullGlyph();
 			addGlyph(1, glyph);
 			retval = true;
-		} // if
+		}
 		
-		if (unicodeToFileName(TTUnicodeRange.k_cr) == null) {
-			GlyphFile glyph = new GlyphFile(getGlyphPath(), "CR", TTUnicodeRange.k_cr);
+		if (getGlyphFileByUnicode(TTUnicodeRange.k_cr) == null) {
+			GlyphFile glyph = new GlyphFile(getGlyphPath(), TTUnicodeRange.k_cr);
 			glyph.initSpace(k_defaultAdvanceWidth);
 			addGlyph(2, glyph);
 			retval = true;
-		} // if
+		}
 		
-		if (unicodeToFileName(TTUnicodeRange.k_space) == null) {
-			GlyphFile glyph = new GlyphFile(getGlyphPath(), "SPACE", TTUnicodeRange.k_space);
+		if (getGlyphFileByUnicode(TTUnicodeRange.k_space) == null) {
+			GlyphFile glyph = new GlyphFile(getGlyphPath(), TTUnicodeRange.k_space);
 			glyph.initSpace(k_defaultAdvanceWidth);
 			addGlyph(3, glyph);
 			retval = true;
-		} // if
+		}
 		
 		return retval;
 	}
@@ -146,22 +149,12 @@ public class TypefaceFile extends GlyphFile {
 		for (long i = range.getStartCode(); i <= range.getEndCode(); i++) {
 			if (i != 0x0020) {
 				addGlyph(createGlyph(i));
-			} // if
-		} // for i
+			}
+		}
 	}
 	
 	public File getGlyphPath() {
 		return m_dir;
-	}
-	
-	public String unicodeToFileName(long a_unicode) {		
-		for (XGlyphFile glyphFile: m_glyph.getBody().getGlyphFile()) {	
-			if (glyphFile.getUnicode() == a_unicode) {
-				return glyphFile.getHref();
-			} // if
-		} // for i
-		
-		return null;
 	}
 	
 	/**
@@ -170,151 +163,83 @@ public class TypefaceFile extends GlyphFile {
 	 * @param a_unicode
 	 */
 	public void setGlyphUnicode(GlyphFile a_glyphFile, long a_unicode) {
-		int i;
-		XGlyphFile [] glyphFiles = m_glyph.getBody().getGlyphFile();
-		for (i = 0; i < glyphFiles.length; i++) {
-			XGlyphFile glyphFile = glyphFiles[i];
-						
-			if (glyphFile.getHref().equals(
-				a_glyphFile.getShortFileName())) {
-				continue;
-			} // if
-			
-			glyphFile.setUnicode(a_unicode);
-			a_glyphFile.setUnicode(Long.toHexString(a_unicode));
-			
-			return;
-		} // for i
+                a_glyphFile.setUnicode(a_unicode);
 	}
 	
 	public void addGlyph(GlyphFile a_file) {		
-                String shortFileName = a_file.getShortFileName();
-                m_glyphFiles.put(shortFileName, a_file);
-		XGlyphFile xglyphFile = new XGlyphFile();
-		xglyphFile.setHref(shortFileName);
-		xglyphFile.setUnicode(a_file.getUnicodeAsLong());
-		m_glyph.getBody().addGlyphFile(xglyphFile);
+                m_glyphFiles.add(a_file);
 	}
 	
 	public void addGlyph(int a_index, GlyphFile a_file) {
-                String shortFileName = a_file.getShortFileName();
-                m_glyphFiles.put(shortFileName, a_file);
-		XGlyphFile xglyphFile = new XGlyphFile();
-		xglyphFile.setHref(shortFileName);
-		xglyphFile.setUnicode(a_file.getUnicodeAsLong());
-		m_glyph.getBody().addGlyphFile(a_index, xglyphFile);
-	}
-	
-	public void removeGlyph(String a_fileName) {		
-		for (XGlyphFile file: m_glyph.getBody().getGlyphFile()) {
-			if (file.getHref().equals(a_fileName)) {
-				m_glyph.getBody().removeGlyphFile(file);
-				return;
-			} // if
-		}
-	}
-	
-	public ArrayList<String> getChildFileNames() {
-		ArrayList<String> retval = new ArrayList<>();
-		XGlyphFile [] files = m_glyph.getBody().getGlyphFile();
-		
-		for (int i = 0; i < files.length; i++) {
-			XGlyphFile file = files[i];
-			retval.add(file.getHref());
-		} // for i
-		
-		return retval;
+                m_glyphFiles.add(a_index, a_file);
 	}
 	
 	public Object [] getCodePages() {
 		int i;
 		Object [] retval;
-		String [] codePages = m_glyph.getHead().getCodePage();
-		retval = new Object[codePages.length];
-		for (i = 0; i < codePages.length; i++) {
-			retval[i] = codePages[i];
-		} // for i
+		retval = new Object[0];
 		
 		return retval;
 	}
 	
 	public boolean containsUnicodeRange(String a_unicodeRange) {
-		int i;
-		String [] unicodeRanges = m_glyph.getHead().getUnicodeRange();
-		
-		for (i = 0; i < unicodeRanges.length; i++) {
-			if (unicodeRanges[i].equals(a_unicodeRange)) {
-				return true;
-			} // if
-		} // for i
-		
-		return false;
+                return m_unicodeRanges.contains(a_unicodeRange);
 	}
 	
 	public void addUnicodeRange(String a_unicodeRange) {
 		if (containsUnicodeRange(a_unicodeRange)) {
 			return;
-		} // if
+		}
 		
-		m_glyph.getHead().addUnicodeRange(a_unicodeRange);
+		m_unicodeRanges.add(a_unicodeRange);
 	}
 	
 	public boolean containsCodePage(String a_codePage) {
-		int i;
-		String [] codePages = m_glyph.getHead().getCodePage();
-		
-		for (i = 0; i < codePages.length; i++) {
-			if (codePages[i].equals(a_codePage)) {
-				return true;
-			} // if
-		} // for i
-		
-		return false;
+                return m_codePages.contains(a_codePage);
 	}
 	
 	public void addCodePage(String a_codePage) {
 		if (containsCodePage(a_codePage)) {
 			return;
-		} // if
+		}
 		
-		m_glyph.getHead().addCodePage(a_codePage);
+		m_codePages.add(a_codePage);
 	}
 	
 	public void removeCodePage(String a_codePage) {
 		if (!containsCodePage(a_codePage)) {
 			return;
-		} // if
+		}
 		
-		m_glyph.getHead().removeCodePage(a_codePage);
+		m_codePages.remove(a_codePage);
 	}
 	
 	public void setFontFamilyName(String a_value) {
-		m_glyph.getHead().setFontFamily(a_value);
+		m_fontFamilyName = a_value;
 	}
 	
 	public String getFontFamilyName() {
-		return m_glyph.getHead().getFontFamily();
+		return m_fontFamilyName;
 	}
 	
 	public String getVersion() {
-		if (m_glyph.getHead().getVersion() == null) {
-			m_glyph.getHead().setVersion("0.1");
-		} // if
-		
-		return m_glyph.getHead().getVersion();
+                return m_version == null ? "0.1" : m_version;
+	}
+	
+	public void setVersion(String a_value) {
+                m_version = a_value;
 	}
 	
 	public void setSubFamily(String a_value) {
-		m_glyph.getHead().setFontSubFamily(a_value);
+		m_subFamily = a_value;
 	}
 	
 	public void setDefaultMetrics() {
-		XHead head = m_glyph.getHead();
-		head.setTopSideBearing(k_defaultTopSideBearing);
-		head.setAscender(k_defaultAscender);
-		head.setXHeight(k_defaultXHeight);
-		head.setDescender(k_defaultDescender);
-		head.setBottomSideBearing(k_defaultBottomSideBearing);
+		m_topSideBearing = k_defaultTopSideBearing;
+		m_ascender = k_defaultAscender;
+		m_xHeight = k_defaultXHeight;
+		m_descender = k_defaultDescender;
+		m_bottomSideBearing = k_defaultBottomSideBearing;
 	}
 	
 	public double getEm() {
@@ -339,78 +264,78 @@ public class TypefaceFile extends GlyphFile {
 	}
 	
 	public double getTopSideBearing() {
-		if (!m_glyph.getHead().checkTopSideBearing()) {
+		if (m_topSideBearing == null) {
 			setDefaultMetrics();
-		} // if
+		}
 		
-		return m_glyph.getHead().getTopSideBearing();
+		return m_topSideBearing;
 	}
 	
 	public double getAscender() {
-		if (!m_glyph.getHead().checkAscender()) {
+		if (m_ascender == null) {
 			setDefaultMetrics();
-		} // if
+		}
 		
-		return m_glyph.getHead().getAscender();
+		return m_ascender;
 	}
 	
 	public double getXHeight() {
-		if (!m_glyph.getHead().checkXHeight()) {
+		if (m_xHeight == null) {
 			setDefaultMetrics();
-		} // if
+		}
 		
-		return m_glyph.getHead().getXHeight();
+		return m_xHeight;
 	}
 	
 	public double getDescender() {
-		if (!m_glyph.getHead().checkDescender()) {
+		if (m_descender == null) {
 			setDefaultMetrics();		
-		} // if
+		}
 		
-		return m_glyph.getHead().getDescender();
+		return m_descender;
 	}
 	
 	public double getBottomSideBearing() {
-		if (!m_glyph.getHead().checkBottomSideBearing()) {
+		if (m_bottomSideBearing == null) {
 			setDefaultMetrics();
-		} // if
+		}
 		
-		return m_glyph.getHead().getBottomSideBearing();
+		return m_bottomSideBearing;
 	}
 	
 	public void setTopSideBearing(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
-		m_glyph.getHead().setTopSideBearing(a_value);
+		m_topSideBearing = a_value;
 	}
 	
 	private void checkBoundary(double a_value) throws OutOfRangeException  {
 		if (a_value > k_em || a_value < 0) {
 			throw new OutOfRangeException(a_value);
-		} // if
+		}
 	}
 	
 	public void setAscender(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
-		m_glyph.getHead().setAscender(a_value);
+		m_ascender = a_value;
 	}
 
 	public void setXHeight(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
 		if (a_value > getAscender()) {
 			throw new OutOfRangeException(a_value);
-		} // if
+		}
 			
-		m_glyph.getHead().setXHeight(a_value);
+		m_xHeight = a_value;
 	}
 	
 	public void setDescender(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);		
-		m_glyph.getHead().setDescender(a_value);
+		m_descender = a_value;
 	}
 	
 	public void setBottomSideBearing(double a_value) throws OutOfRangeException {
 		checkBoundary(a_value);
-		m_glyph.getHead().setBottomSideBearing(a_value);
+		m_bottomSideBearing = a_value;
 	}
 	
 	public double getBodyHeight() {
@@ -422,27 +347,19 @@ public class TypefaceFile extends GlyphFile {
 	/**
 	 * Calls FontFileWriter to produce TrueType font file.
 	 */
-	public void buildTTF(boolean a_isDebug) throws Exception {		
+	public void buildTTF() throws Exception {		
 		String randomString = UUID.randomUUID().toString().substring(0, 4);
 		
-		File tempFile = new File(m_binFolder, 
-			getGlyphTitle() + "_" + randomString + k_dotTtf);
+		File tempFile = new File(m_dir, 
+			m_name + "_" + randomString + k_dotTtf);
 		File target;
 		String fontFamilyName;
 		
-		if (a_isDebug) {
-			target = tempFile;
-			fontFamilyName = getGlyphTitle() + " " + randomString;
-		} else {
-			target = m_ttfFile;
-			fontFamilyName = getFontFamilyName();
-		} // if-else
+                target = m_ttfFile;
+                fontFamilyName = getFontFamilyName();
 		
 		target.delete();
 		FontFileWriter writer;
-		ModuleManager.getSingletonInstance().clear();
-		m_stack.clear();
-		m_stack.push(this);
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(target, "rw")) {
             writer = new FontFileWriter(randomAccessFile);
             
@@ -460,17 +377,14 @@ public class TypefaceFile extends GlyphFile {
             loadGlyphs(writer);
             writer.write();
         }
-		if (!a_isDebug && target.exists()) {
+		if (target.exists()) {
 			copyFile(target, tempFile);
-		} // if
+		}
 		
 		FileInputStream in = new FileInputStream(tempFile);
 		m_font = Font.createFont(Font.TRUETYPE_FONT,
 				(InputStream) in);
 		in.close();
-		
-		ModuleManager.getSingletonInstance().clear();
-		m_stack.pop(); // pop this
 	}
 	
 	private void copyFile(File a_in, File a_out) throws Exception {
@@ -491,45 +405,30 @@ public class TypefaceFile extends GlyphFile {
 	}
 	
 	private void loadCodePages(FontFileWriter a_writer) {		
-		for (String codePageName: m_glyph.getHead().getCodePage()) {
+		for (String codePageName: m_codePages) {
 			TTCodePage codePage = TTCodePage.forName(codePageName);
 			if (codePage == null) {
 				continue;
-			} // if
+			}
 			
 			a_writer.setCodeRangeFlag(codePage.getOsTwoFlag());	
 		} // for codePageName
 	}
 	
 	private void loadUnicodeRanges(FontFileWriter a_writer) {
-		String [] unicodeRanges = m_glyph.getHead().getUnicodeRange();
-		int i;
-		for (i = 0; i < unicodeRanges.length; i++) {
-			if (!TTUnicodeRange.find(unicodeRanges[i])) {
+                for (String unicodeRange : m_unicodeRanges) {
+			if (!TTUnicodeRange.find(unicodeRange)) {
 				continue;
-			} // if
+			}
 			
 			a_writer.addUnicodeRange(TTUnicodeRange.getLastFound());
-		} // for i
+                }
 	}
 	
 	private void loadGlyphs(FontFileWriter a_writer) throws Exception {
-		m_nameToIndeces.clear();
-		
-		for (String fileName: getChildFileNames()) {
-			GlyphFile glyphFile = nameToGlyphFile(fileName);
-			loadGlyph(glyphFile, glyphFile, a_writer);
-		} // for
-	}
-	
-	private GlyphFile nameToGlyphFile(String a_fileName) throws FileNotFoundException {
-		if (!m_glyphFiles.containsKey(a_fileName)) {
-			throw new FileNotFoundException(a_fileName);
-		} // if
-		
-		GlyphFile retval = m_glyphFiles.get(a_fileName);
-		
-		return retval;
+                for (GlyphFile glyphFile : m_glyphFiles) {
+			loadGlyph(glyphFile, a_writer);
+                }
 	}
 	
 	/**
@@ -538,49 +437,35 @@ public class TypefaceFile extends GlyphFile {
 	 * @param a_writer
 	 * @throws Exception
 	 */
-	private void loadGlyph(GlyphFile a_glyphFile, VarStackFrame a_frame, FontFileWriter a_writer) throws Exception {
-		if (m_nameToIndeces.containsKey(a_glyphFile.getShortFileName())) {
-			return;
-		} // if
-		
-		/*
-		if (a_glyphFile.getUnicodeAsLong() == TTUnicodeRange.k_null) {
-			return;
-		} // if
-		*/
-		
+	private void loadGlyph(GlyphFile a_glyphFile, FontFileWriter a_writer) throws Exception {
 		TTGlyph glyph = null;
-		m_stack.push(a_frame);
 		
 		if (a_glyphFile.isSimple()) {
 			// glyph will be null if it is empty
 			glyph = a_glyphFile.toSimpleGlyph();	
 		} else {
 			glyph = createCompoundGlyph(a_glyphFile, a_writer);
-		} // if
-		
-		m_stack.pop();
+		}
 		
 		if (glyph == null && a_glyphFile.isWhiteSpace()) {
 			glyph = new TTGlyph();
-		} // if
+		}
 		
 		if (glyph == null) {
 			return;
-		} // if
+		}
 		
 		int glyphIndex = a_writer.addGlyph(glyph);
-		m_nameToIndeces.put(a_glyphFile.getShortFileName(), glyphIndex);
-		long unicode = a_glyphFile.getUnicodeAsLong();
+		long unicode = a_glyphFile.getUnicode();
 		
-		if (unicode != -1 && glyph != null) {
+		if (unicode != -1) {
 			long existingIndex = a_writer.getCharacterMapping(unicode);
 			if (existingIndex != 0) {
 				throw new Exception(Long.toHexString(unicode) + " is mapped already.");
-			} // if
+			}
 			
 			a_writer.addCharacterMapping(unicode, glyphIndex);
-		} // if
+		}
 	}
 	
 	private TTGlyph createCompoundGlyph(GlyphFile a_glyphFile, 
@@ -599,25 +484,9 @@ public class TypefaceFile extends GlyphFile {
 			
 			locs.add(new Point(0, 0));
 			indeces.add(glyphIndex);	
-		} // if
+		}
 		
-		XInclude [] includes = a_glyphFile.m_glyph.getBody().getInclude();
-		int i;
-		for (i = 0; i < includes.length; i++) {
-			EIncludeInvoke include = (EIncludeInvoke) includes[i];
-			GlyphFile glyphFile = nameToGlyphFile(include.getHref());
-			
-			// load the glyph included in this one
-			loadGlyph(glyphFile, include, a_writer);
-			Integer n = m_nameToIndeces.get(glyphFile.getShortFileName());
-			if (n == null) {
-				continue;
-			} // if
-			
-			indeces.add(n);
-			XPoint2d pos = include.getInvoke().getInvokePos().getPoint2d();
-			locs.add(new Point((int) pos.getX(), (int) pos.getY()));
-		} // for i
+		int i = 0;
 		
 		int flag = TTGlyph.ARG_1_AND_2_ARE_WORDS
 				| TTGlyph.ARGS_ARE_XY_VALUES
@@ -632,14 +501,14 @@ public class TypefaceFile extends GlyphFile {
 			numOfCompositeContours += glyph.getNumOfCompositeContours();
 			if (glyph.getComponentDepth() > componentDepth) {
 				componentDepth = glyph.getComponentDepth();
-			} // if
+			}
 			
 			retval.addGlyfIndex(glyfIndex);
 			if (i < indeces.size() - 1) {
 				retval.addFlag(flag | TTGlyph.MORE_COMPONENTS);
 			} else {
 				retval.addFlag(flag);
-			} // if-else
+			}
 			
 			Point loc = locs.get(i);
 			retval.addArg1(loc.x);

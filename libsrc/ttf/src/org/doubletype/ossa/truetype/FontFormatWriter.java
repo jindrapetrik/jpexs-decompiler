@@ -83,7 +83,7 @@ public class FontFormatWriter {
 		if (fraction > k_denom) {
 			fraction = 0;
 			mantissa++;
-		} // if
+		}
 		
 		m_buffer.writeShort(mantissa);
 		m_buffer.writeShort(fraction);
@@ -123,7 +123,7 @@ public class FontFormatWriter {
 		int i;
 		for (i = 0; i < 4; i++) {
 			writeUInt8(s.charAt(i));
-		} // for i
+		}
 	}
 	
 	protected void writeLongDateTime(Date a_date) throws IOException {
@@ -146,21 +146,21 @@ public class FontFormatWriter {
 				n += bytes[4 * i + j] << ((4 - j) * 8);	
 			} // for j
 			retval += n;
-		} // for i
+		}
 	
 		return retval;
 	}
 	
 	protected void pad() throws IOException {
 		int align = 4;
-		int numOfPad = align - toByteArray().length % align;
+		int numOfPad = align - m_bytes.size() % align;
 		if (numOfPad == align)
 			return;
 		
 		int i;
 		for (i = 0; i < numOfPad; i++) {
 			writeUInt8(0);
-		} // for i
+		}
 	}
 	
 	public int getOffset() {

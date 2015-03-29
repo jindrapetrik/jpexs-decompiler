@@ -46,24 +46,17 @@ public class FContour {
 		this.points = new ArrayList<>();	
 	}
 	
-	FContour(PVector[] points) {
+	FContour(FPoint[] points) {
 		this.points = new ArrayList<>();
-		for (PVector p : points) {
-			this.points.add(new FPoint(p));
+		for (FPoint p : points) {
+			this.points.add(p);
 		}
 	}
 	
-	FContour(PVector[] points, PVector[] controlpoints) {
+	FContour(FPoint[] points, FPoint[] controlpoints) {
 		this.points = new ArrayList<>();
 		for (int i=0; i<points.length; i++) {
 			this.points.add(new FPoint(points[i], controlpoints[i] ));
-		}
-	}
-	
-	FContour(FPoint[] points) {
-		this.points = new ArrayList<>();
-		for (int i=0; i<points.length; i++) {
-			this.points.add(points[i]);
 		}
 	}
 	
@@ -76,10 +69,10 @@ public class FContour {
 		return pointsArray;
 	}
 	
-	public void setPoints(PVector[] points) {
+	public void setPoints(FPoint[] points) {
 		this.points = new ArrayList<>();
-		for (PVector p : points) {
-			this.points.add(new FPoint(p));
+		for (FPoint p : points) {
+			this.points.add(p);
 		}
 	}
 

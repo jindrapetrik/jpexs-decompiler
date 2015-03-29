@@ -90,7 +90,7 @@ public class TTPixelSize {
 		m_pixelWidths[a_glyphIndex] = a_value;
 		if (a_value > m_maxPixelWidth) {
 			m_maxPixelWidth = a_value;
-		} // if
+		}
 	}
 	
 	public int [] getPixelWidths() {

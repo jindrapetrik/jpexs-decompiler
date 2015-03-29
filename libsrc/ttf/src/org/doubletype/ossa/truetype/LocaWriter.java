@@ -56,7 +56,7 @@ public class LocaWriter extends FontFormatWriter {
 		int i;
 		for (i = 0; i < m_offsets.size(); i++) {
 			writeUInt32(m_offsets.get(i));
-		} // for i
+		}
 		
 		pad();
 	}

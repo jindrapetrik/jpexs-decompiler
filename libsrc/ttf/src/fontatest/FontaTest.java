@@ -2,7 +2,6 @@ package fontatest;
 
 import fontastic.FPoint;
 import fontastic.Fontastic;
-import fontastic.PVector;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,11 +16,11 @@ public class FontaTest {
         file.delete();
         Fontastic f = new Fontastic("ExampleFont",file);
         f.setAuthor("Nobody");
-        FPoint[] points = new FPoint[]{              // Define a PVector array containing the points of the shape
+        FPoint[] points = new FPoint[]{              // Define a FPoint array containing the points of the shape
         new FPoint(0, 0),
         new FPoint(512,0),
         //new FPoint(256, 1024),
-        new FPoint(new PVector(256,1024), new PVector(512,512)),
+        new FPoint(new FPoint(256,1024), new FPoint(512,512)),
         new FPoint(0, 0) 
     };        
         f.addGlyph('P').addContour(points);             // Assign contour to character A

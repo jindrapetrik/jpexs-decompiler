@@ -65,15 +65,15 @@ public class HmtxWriter extends FontFormatWriter {
 			
 			if (glyph.getAdvanceWidth() > maxWidth) {
 			    maxWidth = glyph.getAdvanceWidth();
-			} // if
+			}
 			
 			if (glyph.getRightSideBearing() < minRightSideBearing) {
 				minRightSideBearing = glyph.getRightSideBearing(); 
-			} // if
+			}
 			
 			writeUFWord(glyph.getAdvanceWidth());
 			writeFWord(glyph.getLeftSideBearing());
-		} // for i
+		}
 		
 		writeFWord(0);
 		

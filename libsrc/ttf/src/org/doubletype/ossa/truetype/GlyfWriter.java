@@ -71,7 +71,7 @@ public class GlyfWriter extends FontFormatWriter {
                         TTGlyph glyph = m_glyphs.get(i);
 			writeGlyph(glyph);
 			m_hdmx.updatePixelWidth(i, glyph);
-		} // for i
+		}
 		
 		m_loca.m_offsets.add(size());
 	}
@@ -97,13 +97,13 @@ public class GlyfWriter extends FontFormatWriter {
 		
 		if (a_glyph == null) {
 			return;
-		} // if
+		}
 		
 		if (a_glyph.isSimple()) {
 			writeSimpleGlyph(a_glyph);			
 		} else {
 			writeCompoundGlyph(a_glyph);			
-		} // if-else
+		}
 		
 		pad();
 	}
@@ -115,7 +115,7 @@ public class GlyfWriter extends FontFormatWriter {
 	private void writeSimpleGlyph(TTGlyph a_glyph) throws IOException {
 		if (a_glyph.getNumOfContours() == 0) {
 			return;
-		} // if
+		}
 		
 		m_maxp.updateNumOfContours(a_glyph.getNumOfContours());
 		writeInt16(a_glyph.getNumOfContours());
@@ -124,7 +124,7 @@ public class GlyfWriter extends FontFormatWriter {
 		int i;
 		for (i = 0; i < a_glyph.getNumOfContours(); i++) {
 			writeUInt16(a_glyph.getEndPoint(i));
-		} // for i
+		}
 		
 		int numOfInst = a_glyph.getNumOfInstructions();
 		m_maxp.updateSizeOfInstructions(numOfInst);
@@ -132,12 +132,12 @@ public class GlyfWriter extends FontFormatWriter {
 		writeUInt16(numOfInst);
 		for (i = 0; i < numOfInst; i++) {
 			writeUInt8(a_glyph.getInstruction(i));
-		} // for i
+		}
 		
 		for (i = 0; i < a_glyph.getNumOfFlags(); i++) {
 			int flag = a_glyph.getFlag(i);
 			writeUInt8(flag);
-		} // for i
+		}
 		
 		// update num of points		
 		m_maxp.updateNumOfPoints(a_glyph.getNumOfPoints());
@@ -148,7 +148,7 @@ public class GlyfWriter extends FontFormatWriter {
 			
 			writeInt16(point.x - lastX);
 			lastX = point.x;
-		} // for i
+		}
 		
 		int lastY = 0;
 		for (i = 0; i < a_glyph.getNumOfPoints(); i++) {
@@ -156,7 +156,7 @@ public class GlyfWriter extends FontFormatWriter {
 			
 			writeInt16(point.y - lastY);
 			lastY = point.y;
-		} // for i
+		}
 	}
 	
 	/**
@@ -181,7 +181,7 @@ public class GlyfWriter extends FontFormatWriter {
 			writeUInt16(a_glyph.getGlyfIndex(i));
 			writeInt16(a_glyph.getArg1(i));
 			writeInt16(a_glyph.getArg2(i));
-		} // for i
+		}
 	}
 
 	/**

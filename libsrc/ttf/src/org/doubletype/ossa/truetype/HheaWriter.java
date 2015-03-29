@@ -92,7 +92,7 @@ public class HheaWriter extends FontFormatWriter {
 		// reserved
 		for (int i = 0; i < 5; i++) {
 			writeInt16(0);
-		} // for i
+		}
 		
 		writeInt16(0);
 		

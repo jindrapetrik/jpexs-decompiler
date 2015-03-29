@@ -93,45 +93,45 @@ public class MaxpWriter extends FontFormatWriter {
 	public void updateNumOfPoints(int a_value) {
 		if (a_value > m_maxPoints) {
 			m_maxPoints = a_value;
-		} // if
+		}
 	}
 	
 	/** update points in non-compound glyph */
 	public void updateNumOfContours(int a_value) {
 		if (a_value > m_maxContours) {
 			m_maxContours = a_value;
-		} // if
+		}
 	}
 	
 	public void updateNumOfCompositePoints(int a_value) { 
 		if (a_value > m_maxCompositePoints) {
 			m_maxCompositePoints = a_value;
-		} // if
+		}
 	}
 	
 	public void updateNumOfCompositeContours(int a_value) {
 		if (a_value > m_maxCompositeContours) {
 			m_maxCompositeContours = a_value;
-		} // if
+		}
 	}
 	
 	/** update byte count for glyph instructions */
 	public void updateSizeOfInstructions(int a_value) {
 		if (a_value > m_maxSizeOfInstructions) {
 			m_maxSizeOfInstructions = a_value;
-		} // if
+		}
 	}
 	
 	public void updateNumOfComponentElements(int a_value) { 
 		if (a_value > m_maxComponentElements) {
 			m_maxComponentElements = a_value;
-		} // if
+		}
 	}
 	
 	public void updateComponentDepth(int a_value) {
 		if (a_value > m_maxComponentDepth) {
 			m_maxComponentDepth = a_value;
-		} // if
+		}
 	}
 
 }

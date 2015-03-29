@@ -108,7 +108,7 @@ public class TTGlyph {
 		
 		if (a_value >= 2.0 || a_value < -2.0) {
 			throw new RuntimeException(Double.toString(a_value) + " out of range");
-		} // if
+		}
 		
 		int mantissa = (int) Math.floor(a_value);
 		int fraction = (int) Math.floor((a_value - mantissa) * 16384);
@@ -116,7 +116,7 @@ public class TTGlyph {
 		int twoBitPart = mantissa;
 		if (mantissa < 0) {
 			twoBitPart = 4 + mantissa;
-		} // if
+		}
 		
 		retval = (twoBitPart << 14) | fraction;
 		
@@ -128,14 +128,14 @@ public class TTGlyph {
 		
 		if (a_step < -8 || a_step > 8 || a_step == 0) {
 			throw new RuntimeException("Out of range");
-		} // if
+		}
 		
 		int selector = 0;
 		if (a_step > 0) {
 			selector = a_step + 7;
 		} else {
 			selector = a_step + 8;
-		} // if
+		}
 		
 		retval = (a_relativePpem << 4) | (selector);
 		
@@ -215,7 +215,7 @@ public class TTGlyph {
 			return m_endPtsOfContours.size();
 		} else {
 			return -1;
-		} // if-else
+		}
 	}
 	
 	public int getEndPoint(int a_index) {
@@ -233,7 +233,7 @@ public class TTGlyph {
 	public Point getMax() {
 	    if (m_max == null) {
 		    m_max = new Point(0, 0);
-		} // if
+		}
 	    
 	    return m_max;
 	}
@@ -241,7 +241,7 @@ public class TTGlyph {
 	public Point getMin() {	    
 	    if (m_min == null) {
 	        m_min = new Point(0, 0);
-	    } // if
+	    }
 	    
 	    return m_min;
 	}
@@ -286,27 +286,27 @@ public class TTGlyph {
 	private void updateMinMax(Point a_value) {
 		if (m_max == null) {
 		    m_max = new Point(a_value);
-		} // if
+		}
 		
 		if (m_min == null) {
 		    m_min = new Point(a_value);
-		} // if
+		}
 		
 		if (a_value.x > m_max.x) {
 		    m_max.x = a_value.x;
-		} // if
+		}
 		
 		if (a_value.x < m_min.x) {
 		    m_min.x = a_value.x;
-		} // if
+		}
 		
 		if (a_value.y > m_max.y) {
 		    m_max.y = a_value.y;
-		} // if 
+		} 
 		
 		if (a_value.y < m_min.y) {
 		    m_min.y = a_value.y;
-		} // if	    
+		}	    
 	}
 	
 	public Point getPoint(int a_index) {
@@ -362,7 +362,7 @@ public class TTGlyph {
 			return getNumOfContours();
 		} else {
 			return m_numOfCompositeContours;
-		} // if-else
+		}
 	}
 	
 	public void setNumOfCompositeContours(int a_value) {
@@ -374,7 +374,7 @@ public class TTGlyph {
 			return 0;
 		} else {
 			return m_componentDepth;
-		} // if-else
+		}
 	}
 	
 	public void setComponentDepth(int a_value) {

@@ -84,7 +84,7 @@ public class HdmxWriter extends FontFormatWriter {
 		int numOfPads = 4 - ((m_numGlyphs + 2) % 4);
 		if (numOfPads == 4) {
 		    numOfPads = 0;
-		} // if
+		}
 		int size = m_numGlyphs + 2 + numOfPads; // 2 comes from the ppem and max
 		
 		// format version number

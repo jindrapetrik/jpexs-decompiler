@@ -58,7 +58,7 @@ public class TTCodePage {
 		for (i = 0; i < s_list.size(); i++) {
 			TTCodePage codePage = (TTCodePage) s_list.get(i);
 			retval[i] = codePage.getName();
-		} // for i
+		}
 		
 		return retval;
 	}
@@ -76,7 +76,7 @@ public class TTCodePage {
 		for (TTCodePage codePage: s_list) {
 			if (codePage.getCharset() == null) {
 				continue;
-			} // if
+			}
 			
 			if (codePage.getCharset().name().equals(a_name)) {
 				return codePage;
@@ -157,7 +157,7 @@ public class TTCodePage {
 	{
 		if (Charset.isSupported(a_charsetName)) {
 			m_charset = Charset.forName(a_charsetName);
-		} // if
+		}
 		
 		m_name = a_name;
 		m_osTwoFlag = a_osTwoFlag;

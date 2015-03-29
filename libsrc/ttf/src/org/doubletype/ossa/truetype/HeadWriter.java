@@ -86,21 +86,21 @@ public class HeadWriter extends FontFormatWriter {
 	public void updateMin(Point a_value) {
 	    if (a_value.x < m_min.x) {
 	        m_min.x = a_value.x;
-	    } // if
+	    }
 	    
 	    if (a_value.y < m_min.y) {
 	        m_min.y = a_value.y;
-	    } // if
+	    }
 	}
 	
 	public void updateMax(Point a_value) {
 	    if (a_value.x > m_max.x) {
 	        m_max.x = a_value.x;
-	    } // if
+	    }
 	    
 	    if (a_value.y > m_max.y) {
 	        m_max.y = a_value.y;
-	    } // if
+	    }
 	}
 	
 	public void write() throws IOException {

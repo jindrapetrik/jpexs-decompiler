@@ -59,7 +59,7 @@ public class PostWriter extends FontFormatWriter {
 			writeUInt32(1); // fixed pitch
 		} else {
 			writeUInt32(0);
-		} // if
+		}
 		
 		// vm memory stuff
 		writeUInt32(0);

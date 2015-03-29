@@ -82,7 +82,7 @@ public class NameWriter extends FontFormatWriter {
 		
 		if (m_tradeMark.length() == 0) {
 			m_tradeMark = "n/a";
-		} // if
+		}
 		
 		m_names.clear();
 		addNames();
@@ -168,11 +168,11 @@ public class NameWriter extends FontFormatWriter {
 			writeUInt16(name.getStringLength());
 			writeUInt16(offset);
 			offset += name.getStringLength();
-		} // for i
+		}
 		
 		for (TTName name: m_names) {
 			m_buffer.write(name.getBytes());
-		} // for i
+		}
 				
 		pad();
 	}
