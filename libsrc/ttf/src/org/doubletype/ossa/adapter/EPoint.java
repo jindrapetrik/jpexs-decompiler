@@ -1,8 +1,8 @@
 /*
  * $Id: EPoint.java,v 1.1 2004/12/27 04:56:02 eed3si9n Exp $
- * 
+ *
  * $Copyright: copyright (c) 2004, e.e d3si9n $
- * $License: 
+ * $License:
  * This source code is part of DoubleType.
  * DoubleType is a graphical typeface designer.
  *
@@ -25,20 +25,21 @@
  * to public with free of charge, including but not limited to
  * Sun Microsystem's JAVA(TM) 2 RUNTIME ENVIRONMENT (J2RE),
  * and distribute linked combinations including the two.
- * You must obey the GNU General Public License in all respects for all 
- * of the code used other than Java Platform. If you modify this file, 
+ * You must obey the GNU General Public License in all respects for all
+ * of the code used other than Java Platform. If you modify this file,
  * you may extend this exception to your version of the file, but you are not
  * obligated to do so. If you do not wish to do so, delete this exception
  * statement from your version.
  * $
  */
-
 package org.doubletype.ossa.adapter;
 
 /**
  * @author e.e
  */
 public interface EPoint {
+
     double getX();
+
     double getY();
 }

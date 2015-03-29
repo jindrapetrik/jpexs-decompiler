@@ -1,6 +1,6 @@
 package fontastic;
 
-/**
+/*
  * Fontastic
  * A font file writer to create TTF and WOFF (Webfonts).
  * http://code.andreaskoller.com/libraries/fontastic
@@ -11,98 +11,97 @@ package fontastic;
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA  02111-1307  USA
- * 
- * @author      Andreas Koller http://andreaskoller.com
- * @modified    06/19/2013
- * @version     0.4 (4)
+ * Boston, MA 02111-1307 USA
+ *
+ * @author Andreas Koller http://andreaskoller.com
+ * @modified 06/19/2013
+ * @version 0.4 (4)
  */
-
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Class FGlyph
- * 
+ *
  * Stores a glyph with all its properties.
- * 
+ *
  */
 public class FGlyph {
 
-	private char glyphChar;
-	private List<FContour> contours;
-	private int advanceWidth = 512;
+    private final char glyphChar;
 
-	FGlyph(char c) {
-		glyphChar = c;
-		this.contours = new ArrayList<>();
-	}
+    private final List<FContour> contours;
 
-	public void addContour() {
-		contours.add(new FContour());
-	}
-	
-	public void addContour(FPoint[] points) {
-		contours.add(new FContour(points));
-	}
+    private int advanceWidth = 512;
 
-	public void addContour(FPoint[] points, FPoint[] controlPoints) {
-		contours.add(new FContour(points, controlPoints));
-	}
-	
-	public void addContour(FContour contour) {
-		contours.add(contour);
-	}
+    FGlyph(char c) {
+        glyphChar = c;
+        this.contours = new ArrayList<>();
+    }
 
-	public void setAdvanceWidth(int advanceWidth) {
-		this.advanceWidth = advanceWidth;
-	}
-	
-	public char getGlyphChar() {
-		return glyphChar;
-	}
-	
-	public int getAdvanceWidth() {
-		return advanceWidth;
-	}
-	
-	public List<FContour> getContours() {
-		return contours;
-	}
+    public void addContour() {
+        contours.add(new FContour());
+    }
 
-	public FContour[] getContoursArray() {
-		FContour[] contoursArray = contours.toArray(new FContour[contours.size()]);
-		return contoursArray;
-	}
-	
-	public FContour getContour(int index) {
-		return contours.get(index);
-	}
-	
-	public int getContourCount() {
-		return contours.size();
-	}
-	
-	public void setContour(int index, FPoint[] points) {
-		contours.set(index, new FContour(points));		
-	}
+    public void addContour(FPoint[] points) {
+        contours.add(new FContour(points));
+    }
 
-	public void setContour(int index, FContour contour) {
-		contours.set(index, contour);
-	}
-	
-	public void clearContours() {
-		this.contours.clear();
-	}
-	
+    public void addContour(FPoint[] points, FPoint[] controlPoints) {
+        contours.add(new FContour(points, controlPoints));
+    }
+
+    public void addContour(FContour contour) {
+        contours.add(contour);
+    }
+
+    public void setAdvanceWidth(int advanceWidth) {
+        this.advanceWidth = advanceWidth;
+    }
+
+    public char getGlyphChar() {
+        return glyphChar;
+    }
+
+    public int getAdvanceWidth() {
+        return advanceWidth;
+    }
+
+    public List<FContour> getContours() {
+        return contours;
+    }
+
+    public FContour[] getContoursArray() {
+        FContour[] contoursArray = contours.toArray(new FContour[contours.size()]);
+        return contoursArray;
+    }
+
+    public FContour getContour(int index) {
+        return contours.get(index);
+    }
+
+    public int getContourCount() {
+        return contours.size();
+    }
+
+    public void setContour(int index, FPoint[] points) {
+        contours.set(index, new FContour(points));
+    }
+
+    public void setContour(int index, FContour contour) {
+        contours.set(index, contour);
+    }
+
+    public void clearContours() {
+        this.contours.clear();
+    }
 }

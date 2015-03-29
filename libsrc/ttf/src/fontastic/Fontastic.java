@@ -1,4 +1,4 @@
-/**
+/*
  * Fontastic A font file writer to create TTF
  * http://code.andreaskoller.com/libraries/fontastic
  *
@@ -21,18 +21,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  * @author Andreas Koller http://andreaskoller.com
- * @modified 03/16/2014  JPEXS - removed Woff
+ * @modified 03/16/2014 JPEXS - removed Woff
  * @version 0.4 (4)
  */
 package fontastic;
 
-import org.doubletype.ossa.*;
-import org.doubletype.ossa.module.*;
-import org.doubletype.ossa.adapter.*;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.doubletype.ossa.Engine;
+import org.doubletype.ossa.OutOfRangeException;
+import org.doubletype.ossa.adapter.EContour;
+import org.doubletype.ossa.adapter.EContourPoint;
+import org.doubletype.ossa.module.GlyphFile;
+import org.doubletype.ossa.module.TypefaceFile;
 
 /**
  * Fontastic A font file writer to create TTF and WOFF (Webfonts).
@@ -50,7 +53,9 @@ public class Fontastic {
     private int advanceWidth = 512;
 
     private File ttfFile;
+
     private File outFile;
+
     private File tempDir;
 
     /**
@@ -83,12 +88,10 @@ public class Fontastic {
         File temp;
         temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
 
-       
-        
         if (!(temp.delete())) {
             throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
         }
-   
+
         if (!(temp.mkdirs())) {
             throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
         }
@@ -103,10 +106,10 @@ public class Fontastic {
     private void intitialiseFont() throws IOException {
 
         tempDir = createTempDirectory();
-        
+
         m_engine = new Engine();
         m_engine.buildNewTypeface(fontName, tempDir);
-        
+
         this.setFontFamilyName(fontName);
         this.setVersion("CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0/"); // default
         // license
@@ -139,21 +142,21 @@ public class Fontastic {
 
                 for (FPoint point : contour.points) {
 
-                    EContourPoint e = new EContourPoint(point.x, point.y, true);                    
+                    EContourPoint e = new EContourPoint(point.x, point.y, true);
                     if (point.hasControlPoint1()) {
-                        
+
                         econtour.addContourPoint(new EContourPoint(point.controlPoint.x, point.controlPoint.y, false));
                         /*EControlPoint cp1 = new EControlPoint(true,
-                                point.controlPoint1.x, point.controlPoint1.y);
-                        e.setControlPoint1(cp1);   
-                        */
+                         point.controlPoint1.x, point.controlPoint1.y);
+                         e.setControlPoint1(cp1);
+                         */
                     }
-/*
-                    if (point.hasControlPoint2()) {
-                        EControlPoint cp2 = new EControlPoint(false,
-                                point.controlPoint2.x, point.controlPoint2.y);    
-                        e.setControlPoint2(cp2);  
-                    }                      */
+                    /*
+                     if (point.hasControlPoint2()) {
+                     EControlPoint cp2 = new EControlPoint(false,
+                     point.controlPoint2.x, point.controlPoint2.y);
+                     e.setControlPoint2(cp2);
+                     }                      */
 
                     econtour.addContourPoint(e);
                 }
@@ -162,11 +165,11 @@ public class Fontastic {
             }
         }
 
-        m_engine.getTypeface().addRequiredGlyphs();        
+        m_engine.getTypeface().addRequiredGlyphs();
         m_engine.buildTrueType();
 
         // End TTF creation
-        if(outFile.exists()){
+        if (outFile.exists()) {
             outFile.delete();
         }
         ttfFile.renameTo(outFile);
@@ -212,13 +215,6 @@ public class Fontastic {
      */
     public void setFontFamilyName(String fontFamilyName) {
         m_engine.setFontFamilyName(fontFamilyName);
-    }
-
-    /**
-     * Sets the sub family of the font.
-     */
-    public void setSubFamily(String subFamily) {
-        m_engine.getTypeface().setSubFamily(subFamily);
     }
 
     /**
@@ -329,7 +325,7 @@ public class Fontastic {
      */
     public FGlyph addGlyph(char c) {
 
-        FGlyph glyph = new FGlyph(c);       
+        FGlyph glyph = new FGlyph(c);
         glyph.setAdvanceWidth(advanceWidth);
         glyphs.add(glyph);
         return glyph;

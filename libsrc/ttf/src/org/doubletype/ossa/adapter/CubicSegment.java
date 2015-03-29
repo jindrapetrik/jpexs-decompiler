@@ -1,8 +1,8 @@
 /*
  * $Id: CubicSegment.java,v 1.2 2004/12/27 04:56:02 eed3si9n Exp $
- * 
+ *
  * $Copyright: copyright (c) 2004, e.e d3si9n $
- * $License: 
+ * $License:
  * This source code is part of DoubleType.
  * DoubleType is a graphical typeface designer.
  *
@@ -13,95 +13,99 @@
  *
  * This Program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  * In addition, as a special exception, e.e d3si9n gives permission to
  * link the code of this program with any Java Platform that is available
  * to public with free of charge, including but not limited to
  * Sun Microsystem's JAVA(TM) 2 RUNTIME ENVIRONMENT (J2RE),
  * and distribute linked combinations including the two.
- * You must obey the GNU General Public License in all respects for all 
- * of the code used other than Java Platform. If you modify this file, 
+ * You must obey the GNU General Public License in all respects for all
+ * of the code used other than Java Platform. If you modify this file,
  * you may extend this exception to your version of the file, but you are not
  * obligated to do so. If you do not wish to do so, delete this exception
  * statement from your version.
  * $
  */
-
 package org.doubletype.ossa.adapter;
 
-import java.util.*;
-import java.awt.geom.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 /**
  * @author e.e
  */
 public class CubicSegment {
+
     public static final int LINE = 0;
+
     public static final int CURVE = 1;
-    
+
     /**
      * converts cubic contour into cubic segments.
+     *
      * @param a_contour
      * @return
      */
     public static ArrayList<CubicSegment> toSegments(EContour a_contour) {
         ArrayList<CubicSegment> retval = new ArrayList<>();
         ArrayList<EContourPoint> points = a_contour.getContourPoints();
-		if (points.size() < 2) {
-			return retval;
-		}
-		
-		EContourPoint startPoint = (EContourPoint) points.get(points.size() - 1);
-		for (int i = 0; i < points.size(); i++) {
-		    EContourPoint endPoint = (EContourPoint) points.get(i);
-		    retval.add(new CubicSegment(startPoint, endPoint));		    
-	        startPoint = endPoint;
-		} // for
-		
+        if (points.size() < 2) {
+            return retval;
+        }
+
+        EContourPoint startPoint = (EContourPoint) points.get(points.size() - 1);
+        for (int i = 0; i < points.size(); i++) {
+            EContourPoint endPoint = (EContourPoint) points.get(i);
+            retval.add(new CubicSegment(startPoint, endPoint));
+            startPoint = endPoint;
+        } // for
+
         return retval;
     }
-    
+
     private EContourPoint m_startPoint = null;
+
     private EContourPoint m_controlPoint1 = null;
+
     private EContourPoint m_controlPoint2 = null;
+
     private EContourPoint m_endPoint = null;
-    
+
     private int m_type = LINE;
-    
-    
+
     public CubicSegment(EContourPoint a_startPoint, EContourPoint a_endPoint) {
         m_startPoint = a_startPoint;
         m_endPoint = a_endPoint;
-        
+
         if ((!a_startPoint.hasControlPoint2()) && (!a_endPoint.hasControlPoint1())) {
             m_type = LINE;
             return;
         }
-        
+
         if (a_startPoint.hasControlPoint2() || a_endPoint.hasControlPoint1()) {
             m_type = CURVE;
-            
+
             if (a_startPoint.hasControlPoint2()) {
                 m_controlPoint1 = a_startPoint.getControlPoint2().getContourPoint();
             } else {
                 m_controlPoint1 = a_startPoint;
             }
-            
+
             if (a_endPoint.hasControlPoint1()) {
                 m_controlPoint2 = a_endPoint.getControlPoint1().getContourPoint();
             } else {
                 m_controlPoint1 = a_endPoint;
-            } 
+            }
         }
     }
-    
-    public CubicSegment(EContourPoint a_startPoint, EContourPoint a_controlPoint1, 
+
+    public CubicSegment(EContourPoint a_startPoint, EContourPoint a_controlPoint1,
             EContourPoint a_controlPoint2, EContourPoint a_endPoint) {
         m_startPoint = a_startPoint;
         m_controlPoint1 = a_controlPoint1;
@@ -109,18 +113,18 @@ public class CubicSegment {
         m_endPoint = a_endPoint;
         m_type = CURVE;
     }
-    
-    public ArrayList<QuadraticSegment> toQuadraticSegments() {        
+
+    public ArrayList<QuadraticSegment> toQuadraticSegments() {
         ArrayList<QuadraticSegment> retval = new ArrayList<>();
-        
+
         if (m_type == LINE) {
             retval.add(new QuadraticSegment(m_startPoint, null, m_endPoint));
             return retval;
         }
-        
+
         return toQuadraticSegments(0);
     }
-    
+
     //JPEXS start
     private static Point2D.Double movePoint(Point2D point, double dx, double dy) {
         return new Point2D.Double(point.getX() + dx, point.getY() + dy);
@@ -135,6 +139,7 @@ public class CubicSegment {
         double y = p0.getY() + ((p1.getY() - p0.getY()) * ratio);
         return new Point2D.Double(x, y);
     }
+
     private static double[][] approximateCubic(double[] cubicControlPointCoords) {
         if (cubicControlPointCoords.length < 8) {
             throw new IllegalArgumentException("Must have at least 8 coordinates");
@@ -180,21 +185,20 @@ public class CubicSegment {
             {pc3.getX(), pc3.getY(), pa3.getX(), pa3.getY()},
             {pc4.getX(), pc4.getY(), p3.getX(), p3.getY()}};
     }
-    
+
     //JPEXS end
-    
     private ArrayList<QuadraticSegment> toQuadraticSegments(int a_trial) {
         ArrayList<QuadraticSegment> retval = new ArrayList<>();
-              
-        double[][] quadCoords =approximateCubic(new double[]{m_startPoint.getX(),m_startPoint.getY(),m_controlPoint1.getX(),m_controlPoint1.getY(),m_controlPoint2.getX(),m_controlPoint2.getY(),m_endPoint.getX(),m_endPoint.getY()});
-        EContourPoint lastPoint=m_startPoint;
-        for (int i = 0; i < quadCoords.length; i++) {            
-                        retval.add(new QuadraticSegment(
-                                lastPoint,
-                                new EContourPoint(quadCoords[i][0], quadCoords[i][1], true),                                 
-                                new EContourPoint(quadCoords[i][2], quadCoords[i][3], false)));
-                        lastPoint =  new EContourPoint(quadCoords[i][2],quadCoords[i][3],true);
-                    }
+
+        double[][] quadCoords = approximateCubic(new double[]{m_startPoint.getX(), m_startPoint.getY(), m_controlPoint1.getX(), m_controlPoint1.getY(), m_controlPoint2.getX(), m_controlPoint2.getY(), m_endPoint.getX(), m_endPoint.getY()});
+        EContourPoint lastPoint = m_startPoint;
+        for (int i = 0; i < quadCoords.length; i++) {
+            retval.add(new QuadraticSegment(
+                    lastPoint,
+                    new EContourPoint(quadCoords[i][0], quadCoords[i][1], true),
+                    new EContourPoint(quadCoords[i][2], quadCoords[i][3], false)));
+            lastPoint = new EContourPoint(quadCoords[i][2], quadCoords[i][3], true);
+        }
         return retval;
     }
 }
