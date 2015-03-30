@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -50,6 +52,7 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
             return result;
         }
         Scanner sc = new Scanner(System.in);
+        Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Error occured", thrown);
         System.out.println("Error occured: " + thrown.getLocalizedMessage());
         do {
             System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
