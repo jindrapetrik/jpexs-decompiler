@@ -29,6 +29,7 @@ package fontastic;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.doubletype.ossa.Engine;
 import org.doubletype.ossa.OutOfRangeException;
@@ -199,6 +200,14 @@ public class Fontastic {
      */
     public void setCopyrightYear(String copyrightYear) {
         m_engine.setCopyrightYear(copyrightYear);
+    }
+
+    public void setCreationDate(Date date) {
+        m_engine.setCreationDate(date);
+    }
+
+    public void setModificationDate(Date date) {
+        m_engine.setModificationDate(date);
     }
 
     /**

@@ -389,6 +389,8 @@ public class TypefaceFile extends GlyphFile {
 
             writer.setFontFamilyName(fontFamilyName);
             writer.setCopyrightYear(getCopyrightYear());
+            writer.setCreationDate(getCreationDate());
+            writer.setModificationDate(getModificationDate());
             writer.setFontVersion(getVersion());
             writer.setManufacturer(getAuthor());
             writer.setAscent((int) getAscender());

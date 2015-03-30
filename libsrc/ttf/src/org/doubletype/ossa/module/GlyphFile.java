@@ -35,6 +35,7 @@ package org.doubletype.ossa.module;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.doubletype.ossa.adapter.EContour;
 import org.doubletype.ossa.adapter.EContourPoint;
@@ -51,6 +52,10 @@ public class GlyphFile {
     private String m_author;
 
     private String m_copyrightYear;
+
+    private Date m_creationDate;
+
+    private Date m_modificationDate;
 
     private String m_license;
 
@@ -147,6 +152,22 @@ public class GlyphFile {
 
     public String getCopyrightYear() {
         return m_copyrightYear;
+    }
+
+    public void setCreationDate(Date a_value) {
+        m_creationDate = a_value;
+    }
+
+    public Date getCreationDate() {
+        return m_creationDate;
+    }
+
+    public void setModificationDate(Date a_value) {
+        m_modificationDate = a_value;
+    }
+
+    public Date getModificationDate() {
+        return m_modificationDate;
     }
 
     public void setAdvanceWidth(int a_width) {

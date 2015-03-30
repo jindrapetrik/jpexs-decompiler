@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -41,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,6 +149,16 @@ public class FontExporter {
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
         f.setVersion("1.0");
+        
+        SWF swf = t.getSwf();
+        if (swf != null && swf.swfList != null && swf.swfList.sourceInfo != null) {
+            String fileName = swf.swfList.sourceInfo.getFile();
+            if (fileName != null) {
+                Date date = new Date(new File(fileName).lastModified());
+                f.setCreationDate(date);
+                f.setModificationDate(date);
+            }
+        }
 
         int ascent = t.getAscent();
         if (ascent != -1) {

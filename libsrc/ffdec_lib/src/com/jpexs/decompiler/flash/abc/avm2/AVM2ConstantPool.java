@@ -131,7 +131,7 @@ public class AVM2ConstantPool {
         try {
             return constant_int.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "Int not found. Index: " + index, ex);
         }
         return 0;
     }
@@ -140,7 +140,7 @@ public class AVM2ConstantPool {
         try {
             return constant_namespace.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "Namespace not found. Index: " + index, ex);
         }
         return null;
     }
@@ -149,7 +149,7 @@ public class AVM2ConstantPool {
         try {
             return constant_namespace_set.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "NamespaceSet not found. Index: " + index, ex);
         }
         return null;
     }
@@ -167,7 +167,7 @@ public class AVM2ConstantPool {
         try {
             return constant_uint.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "UInt not found. Index: " + index, ex);
         }
         return 0;
     }
@@ -176,7 +176,7 @@ public class AVM2ConstantPool {
         try {
             return constant_double.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "Double not found. Index: " + index, ex);
         }
         return 0;
     }
@@ -185,7 +185,7 @@ public class AVM2ConstantPool {
         try {
             return constant_decimal.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "Decimal not found. Index: " + index, ex);
         }
         return null;
     }
@@ -194,7 +194,7 @@ public class AVM2ConstantPool {
         try {
             return constant_string.get(index);
         } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
+            logger.log(Level.SEVERE, "String not found. Index: " + index, ex);
         }
         return null;
     }

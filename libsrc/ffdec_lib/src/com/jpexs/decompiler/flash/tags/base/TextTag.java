@@ -248,7 +248,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         double descent = 0;
         double lineDistance = 0;
 
-        List<SHAPE> glyphs = new ArrayList<>();
+        List<SHAPE> glyphs = null;
         boolean firstLine = true;
         double top = 0;
         List<Integer> allLeftMargins = new ArrayList<>();
@@ -403,7 +403,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         int textHeight = 12;
         int x = 0;
         int y = 0;
-        List<SHAPE> glyphs = new ArrayList<>();
+        List<SHAPE> glyphs = null;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
@@ -458,7 +458,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         int textHeight = 12;
         int x = 0;
         int y = 0;
-        List<SHAPE> glyphs = new ArrayList<>();
+        List<SHAPE> glyphs = null;
         ExportRectangle result = null;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {

@@ -187,6 +187,22 @@ public class Engine {
         m_typeface.setCopyrightYear(a_value);
     }
 
+    public void setCreationDate(Date a_value) {
+        if (m_typeface == null) {
+            return;
+        }
+
+        m_typeface.setCreationDate(a_value);
+    }
+
+    public void setModificationDate(Date a_value) {
+        if (m_typeface == null) {
+            return;
+        }
+
+        m_typeface.setModificationDate(a_value);
+    }
+
     public void setFontFamilyName(String a_value) {
         if (m_typeface == null) {
             return;

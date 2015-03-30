@@ -25,6 +25,8 @@ hs_err_pid*.log
 *.~*
 /revision.txt
 /lib/ffdec_lib.jar
+/lib/README.TXT
+/libsrc/avi/nbproject/private/
 /libsrc/gnujpdf/dist/
 /libsrc/jsyntaxpane/jsyntaxpane/target/
 /libsrc/ffdec_lib/build/
@@ -53,4 +55,3 @@ hs_err_pid*.log
 /version.properties
 /tools.properties
 /nbproject/private/
-/libsrc/avi/nbproject/private/

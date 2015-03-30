@@ -126,6 +126,10 @@ public class CommandLineArgumentParser {
 
     private static boolean commandLineMode = false;
 
+    private static String stdOut = null;
+
+    private static String stdErr = null;
+
     @SuppressWarnings("unchecked")
     private static final ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
         Configuration.decompile,
@@ -367,6 +371,12 @@ public class CommandLineArgumentParser {
                     break;
                 case "-exportfiletimeout":
                     parseExportFileTimeout(args);
+                    break;
+                case "-stdout":
+                    parseStdOut(args);
+                    break;
+                case "-stderr":
+                    parseStdErr(args);
                     break;
                 case "-affinity":
                     parseAffinity(args);
@@ -717,6 +727,24 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseStdOut(Stack<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("stdOut parameter expected");
+            badArguments();
+        }
+        
+        stdOut = args.pop();
+    }
+        
+    private static void parseStdErr(Stack<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("stdErr parameter expected");
+            badArguments();
+        }
+        
+        stdErr = args.pop();
+    }
+        
     private static void parseAffinity(Stack<String> args) {
         if (Platform.isWindows()) {
             if (args.isEmpty()) {
@@ -886,6 +914,15 @@ public class CommandLineArgumentParser {
             }
 
             for (File inFile : inFiles) {
+                String inFileName = Path.getFileNameWithoutExtension(inFile);
+                if (stdOut != null) {
+                    System.setOut(new PrintStream(new FileOutputStream(stdOut.replace("{swfFile}", inFileName), true)));
+                }
+                    
+                if (stdErr != null) {
+                    System.setErr(new PrintStream(new FileOutputStream(stdErr.replace("{swfFile}", inFileName), true)));
+                }
+                
                 long startTimeSwf = 0;
                 if (!singleFile) {
                     startTimeSwf = System.currentTimeMillis();

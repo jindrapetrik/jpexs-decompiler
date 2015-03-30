@@ -39,6 +39,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * @author e.e
@@ -224,6 +225,14 @@ public class FontFileWriter extends FontFormatWriter {
 
     public TTGlyph getGlyph(int a_index) {
         return m_glyf.getGlyph(a_index);
+    }
+    
+    public void setCreationDate(Date a_date) {
+        m_head.setCreationDate(a_date);
+    }
+
+    public void setModificationDate(Date a_date) {
+        m_head.setModificationDate(a_date);
     }
 
     /**

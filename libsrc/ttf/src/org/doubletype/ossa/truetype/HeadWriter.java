@@ -73,6 +73,10 @@ public class HeadWriter extends FontFormatWriter {
     private Point m_min = new Point(0, 0);
 
     private Point m_max = new Point(0, 0);
+    
+    private Date m_creationDate = new Date();
+
+    private Date m_modificationDate = m_creationDate;
 
     public HeadWriter() {
         super();
@@ -109,6 +113,14 @@ public class HeadWriter extends FontFormatWriter {
             m_max.y = a_value.y;
         }
     }
+    
+    public void setCreationDate(Date a_date) {
+        m_creationDate = a_date;
+    }
+
+    public void setModificationDate(Date a_date) {
+        m_modificationDate = a_date;
+    }
 
     public void write() throws IOException {
         // table version number
@@ -130,8 +142,8 @@ public class HeadWriter extends FontFormatWriter {
         writeUInt16(1024);
 
         // created, modified
-        writeLongDateTime(new Date());
-        writeLongDateTime(new Date());
+        writeLongDateTime(m_creationDate);
+        writeLongDateTime(m_modificationDate);
 
         writeFWord(m_min.x);
         writeFWord(m_min.y);
