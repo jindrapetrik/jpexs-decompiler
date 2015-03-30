@@ -79,6 +79,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
@@ -930,6 +931,8 @@ public class CommandLineArgumentParser {
                 }
                 
                 SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
+                exfile.swfList = new SWFList();
+                exfile.swfList.sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
                     outDir = Path.combine(outDir, inFile.getName());

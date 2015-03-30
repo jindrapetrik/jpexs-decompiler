@@ -53,9 +53,9 @@ public class GlyphFile {
 
     private String m_copyrightYear;
 
-    private Date m_creationDate;
+    private Date m_creationDate = new Date();
 
-    private Date m_modificationDate;
+    private Date m_modificationDate = m_creationDate;
 
     private String m_license;
 
