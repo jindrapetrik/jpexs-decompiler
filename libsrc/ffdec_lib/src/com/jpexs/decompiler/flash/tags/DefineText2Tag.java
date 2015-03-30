@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -113,7 +114,12 @@ public class DefineText2Tag extends TextTag {
                  ret += "\r\n";
                  }*/
             }
-            ret.add(rec.getText(fnt));
+
+            if (fnt == null) {
+                ret.add(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
+            } else {
+                ret.add(rec.getText(fnt));
+            }
         }
         return ret;
     }
@@ -179,7 +185,12 @@ public class DefineText2Tag extends TextTag {
                 }
                 writer.append("]");
             }
-            writer.hilightSpecial(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
+
+            if (fnt == null) {
+                writer.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
+            } else {
+                writer.hilightSpecial(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
+            }
         }
         return new HighlightedText(writer);
     }

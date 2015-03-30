@@ -78,6 +78,7 @@ import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -1372,10 +1373,11 @@ public class Main {
             Logger logger = Logger.getLogger("");
             logger.setLevel(Configuration.logLevel);
 
-            int handlerCount = logger.getHandlers().length;
-            for (int i = handlerCount - 1; i >= 0; i--) {
-                logger.removeHandler(logger.getHandlers()[i]);
+            Handler[] handlers = logger.getHandlers();
+            for (int i = handlers.length - 1; i >= 0; i--) {
+                logger.removeHandler(handlers[i]);
             }
+            
             ConsoleHandler conHan = new ConsoleHandler();
             conHan.setLevel(debug ? Level.CONFIG : Level.WARNING);
             SimpleFormatter formatterTxt = new SimpleFormatter();

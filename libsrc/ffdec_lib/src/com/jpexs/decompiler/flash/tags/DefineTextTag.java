@@ -114,7 +114,12 @@ public class DefineTextTag extends TextTag {
                  ret += "\r\n";
                  }*/
             }
-            ret.add(rec.getText(fnt));
+            
+            if (fnt == null) {
+                ret.add(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
+            } else {
+                ret.add(rec.getText(fnt));
+            }
         }
         return ret;
     }

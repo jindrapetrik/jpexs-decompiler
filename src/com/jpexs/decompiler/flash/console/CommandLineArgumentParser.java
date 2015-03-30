@@ -922,6 +922,7 @@ public class CommandLineArgumentParser {
                     
                 if (stdErr != null) {
                     System.setErr(new PrintStream(new FileOutputStream(stdErr.replace("{swfFile}", inFileName), true)));
+                    Main.initLogging(Configuration.debugMode.get());
                 }
                 
                 long startTimeSwf = 0;
