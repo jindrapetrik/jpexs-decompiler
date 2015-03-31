@@ -192,8 +192,8 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         if (fontFlagsHasLayout) {
-            fontAscent = sis.readSI16("fontAscent");
-            fontDescent = sis.readSI16("fontDescent");
+            fontAscent = sis.readUI16("fontAscent");
+            fontDescent = sis.readUI16("fontDescent");
             fontLeading = sis.readSI16("fontLeading");
             fontAdvanceTable = new ArrayList<>();
             for (int i = 0; i < numGlyphs; i++) {
