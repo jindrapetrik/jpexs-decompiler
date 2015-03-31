@@ -155,7 +155,6 @@ import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -173,11 +172,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
-import net.kroo.elliot.GifSequenceWriter;
-import org.monte.media.VideoFormatKeys;
-import org.monte.media.avi.AVIWriter;
 
 /**
  * Class representing SWF file
@@ -1583,41 +1577,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         writeLE(fos, 4 + chunkBytes.length, 4);
         fos.write(Utf8Helper.getBytes("WAVE"));
         fos.write(chunkBytes);
-    }
-
-    public static void makeAVI(Iterator<BufferedImage> images, int frameRate, File file) throws IOException {
-        if (!images.hasNext()) {
-            return;
-        }
-        AVIWriter out = new AVIWriter(file);
-        BufferedImage img0 = images.next();
-        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
-        try {
-            out.write(0, img0, 1);
-            while (images.hasNext()) {
-                out.write(0, images.next(), 1);
-            }
-        } finally {
-            out.close();
-        }
-
-    }
-
-    public static void makeGIF(Iterator<BufferedImage> images, int frameRate, File file) throws IOException {
-        if (!images.hasNext()) {
-            return;
-        }
-        try (ImageOutputStream output = new FileImageOutputStream(file)) {
-            BufferedImage img0 = images.next();
-            GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
-            writer.writeToSequence(img0);
-
-            while (images.hasNext()) {
-                writer.writeToSequence(images.next());
-            }
-
-            writer.close();
-        }
     }
 
     public static String getTypePrefix(CharacterTag c) {

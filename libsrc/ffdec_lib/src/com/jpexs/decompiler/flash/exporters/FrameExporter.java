@@ -71,6 +71,11 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import net.kroo.elliot.GifSequenceWriter;
+import org.monte.media.VideoFormatKeys;
+import org.monte.media.avi.AVIWriter;
 
 /**
  *
@@ -128,7 +133,7 @@ public class FrameExporter {
         if (settings.mode == FramesExportMode.SVG) {
             for (int i = 0; i < frames.size(); i++) {
                 if (evl != null) {
-                    evl.handleExportingEvent("frame", i, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    evl.handleExportingEvent("frame", i + 1, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
 
                 final int fi = i;
@@ -156,7 +161,7 @@ public class FrameExporter {
                 }, handler).run();
 
                 if (evl != null) {
-                    evl.handleExportedEvent("frame", i, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    evl.handleExportedEvent("frame", i + 1, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
             }
 
@@ -303,7 +308,14 @@ public class FrameExporter {
                 if (evl != null) {
                     evl.handleExportingEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
-                return SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
+                
+                BufferedImage result = SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
+
+                if (evl != null) {
+                    evl.handleExportedEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                }
+                
+                return result;
             }
         };
 
@@ -313,7 +325,7 @@ public class FrameExporter {
                     @Override
                     public void run() throws IOException {
                         File f = new File(foutdir + File.separator + "frames.gif");
-                        SWF.makeGIF(frameImages, swf.frameRate, f);
+                        makeGIF(frameImages, swf.frameRate, f, evl);
                         ret.add(f);
                     }
                 }, handler).run();
@@ -376,7 +388,7 @@ public class FrameExporter {
                     @Override
                     public void run() throws IOException {
                         File f = new File(foutdir + File.separator + "frames.avi");
-                        SWF.makeAVI(frameImages, swf.frameRate, f);
+                        makeAVI(frameImages, swf.frameRate, f, evl);
                         ret.add(f);
                     }
                 }, handler).run();
@@ -391,6 +403,41 @@ public class FrameExporter {
 
     private static String jsArrColor(RGB rgb) {
         return "[" + rgb.red + "," + rgb.green + "," + rgb.blue + "," + ((rgb instanceof RGBA) ? ((RGBA) rgb).getAlphaFloat() : 1) + "]";
+    }
+
+    public static void makeAVI(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+        if (!images.hasNext()) {
+            return;
+        }
+        AVIWriter out = new AVIWriter(file);
+        BufferedImage img0 = images.next();
+        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
+        try {
+            out.write(0, img0, 1);
+            while (images.hasNext()) {
+                out.write(0, images.next(), 1);
+            }
+        } finally {
+            out.close();
+        }
+
+    }
+
+    public static void makeGIF(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+        if (!images.hasNext()) {
+            return;
+        }
+        try (ImageOutputStream output = new FileImageOutputStream(file)) {
+            BufferedImage img0 = images.next();
+            GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
+            writer.writeToSequence(img0);
+
+            while (images.hasNext()) {
+                writer.writeToSequence(images.next());
+            }
+
+            writer.close();
+        }
     }
 
     public static String framesToHtmlCanvas(double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {

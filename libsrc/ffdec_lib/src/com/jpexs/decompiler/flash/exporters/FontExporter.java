@@ -162,12 +162,16 @@ public class FontExporter {
 
         int ascent = t.getAscent();
         if (ascent != -1) {
-            f.setAscender(Math.round(ascent / divider));
+            float value = Math.round(ascent / divider);
+            value = Math.min(value, 1024);
+            f.setAscender(value);
         }
 
         int descent = t.getDescent();
         if (descent != -1) {
-            f.setDescender(Math.round(descent / divider));
+            float value = Math.round(descent / divider);
+            value = Math.min(value, 1024);
+            f.setDescender(value);
         }
 
         int glyphCount = 0;
