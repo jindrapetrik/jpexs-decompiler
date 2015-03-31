@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -205,7 +206,10 @@ public class ScriptPack extends AS3ClassTreeItem {
             } catch (InterruptedException ex) {
                 Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "The file path is probably too long", ex);
         }
+        
         return file;
     }
 
