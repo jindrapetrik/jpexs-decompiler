@@ -312,7 +312,7 @@ public class FrameExporter {
                 BufferedImage result = SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
-                    evl.handleExportedEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    evl.handleExportedEvent("frame", pos, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
                 
                 return result;
@@ -395,9 +395,6 @@ public class FrameExporter {
                 break;
         }
 
-        if (evl != null) {
-            evl.handleExportedEvent("frame", fframes.size(), fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
-        }
         return ret;
     }
 
