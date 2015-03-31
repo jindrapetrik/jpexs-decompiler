@@ -980,7 +980,7 @@ public class CommandLineArgumentParser {
                     }
                 });
 
-                // First check all the specified eport formats
+                // First check all the specified export formats
                 for (String exportFormat : exportFormats) {
                     if (Arrays.asList(removedExportFormats).contains(exportFormat)) {
                         System.err.println("Error: Export format : " + exportFormat + " was REMOVED. Run application with --help parameter to see available formats.");
