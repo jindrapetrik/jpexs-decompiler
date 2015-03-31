@@ -1792,7 +1792,9 @@ public class SWFInputStream implements AutoCloseable {
                     Action r = new ActionNop();
                     r.actionCode = actionCode;
                     r.actionLength = actionLength;
-                    logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
+                    if (Configuration.useDetailedLogging.get()) {
+                        logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
+                    }
                     return r;
             }
         } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
