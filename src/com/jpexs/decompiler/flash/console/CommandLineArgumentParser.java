@@ -1090,6 +1090,8 @@ public class CommandLineArgumentParser {
                     long time = stopTimeSwf - startTimeSwf;
                     System.out.println("Export finished: " + inFile.getName() + " Export time: " + Helper.formatTimeSec(time));
                 }
+                
+                exfile.clearAllCache();
             }
         } catch (OutOfMemoryError | Exception ex) {
             System.err.print("FAIL: Exporting Failed on Exception - ");
