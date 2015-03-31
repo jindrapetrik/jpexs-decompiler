@@ -171,8 +171,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         thickness *= zoom / SWF.unitDivisor;
         thicknessEnd *= zoom / SWF.unitDivisor;
         path.setAttribute("fill", "none");
-        path.setAttribute("stroke", color.toHexRGB());
-        path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
+        if (color != null) {
+            path.setAttribute("stroke", color.toHexRGB());
+            path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
+        }
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
         path.appendChild(createAnimateElement("stroke-width", thickness, thicknessEnd));
 
