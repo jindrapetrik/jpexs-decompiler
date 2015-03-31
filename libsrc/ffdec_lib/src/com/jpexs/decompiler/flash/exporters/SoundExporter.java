@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -97,7 +98,7 @@ public class SoundExporter {
                     ext = "flv";
                 }
 
-                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + "." + ext);
+                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + "." + ext);
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
