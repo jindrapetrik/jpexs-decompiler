@@ -56,11 +56,11 @@ public class InstanceInfo {
     public InstanceInfo() {
         instance_traits = new Traits();
     }
-       
+
     public InstanceInfo(Traits traits) {
         instance_traits = traits;
     }
-       
+
     @Override
     public String toString() {
         return "name_index=" + name_index + " super_index=" + super_index + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString();

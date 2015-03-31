@@ -57,7 +57,7 @@ public class AS2Package implements TreeItem {
         result.addAll(scripts.values());
         return result;
     }
-    
+
     public TreeItem getChild(int index) {
         if (index < subPackages.size()) {
             for (AS2Package subPackage : subPackages.values()) {

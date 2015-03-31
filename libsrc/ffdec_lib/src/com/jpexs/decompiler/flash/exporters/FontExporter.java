@@ -149,7 +149,7 @@ public class FontExporter {
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
         f.setVersion("1.0");
-        
+
         SWF swf = t.getSwf();
         if (swf != null && swf.swfList != null && swf.swfList.sourceInfo != null) {
             String fileName = swf.swfList.sourceInfo.getFile();
@@ -278,7 +278,7 @@ public class FontExporter {
                 WritableFontData woffData = w.convert(font);
                 woffData.copyTo(fos);
             }
-            
+
             ttfFile.delete();
         }
     }

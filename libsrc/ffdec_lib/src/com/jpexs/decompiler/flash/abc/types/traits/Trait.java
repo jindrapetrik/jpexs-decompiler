@@ -32,7 +32,7 @@ import java.util.List;
 public abstract class Trait implements Serializable {
 
     private static final int[] EMPTY_METADATA_ARRAY = new int[0];
-    
+
     public int name_index;
 
     public int kindType;

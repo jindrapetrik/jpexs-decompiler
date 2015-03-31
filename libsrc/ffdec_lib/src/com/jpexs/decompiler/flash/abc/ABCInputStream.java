@@ -50,7 +50,7 @@ public class ABCInputStream implements AutoCloseable {
     public static final boolean DEBUG_READ = false;
 
     public DumpInfo dumpInfo;
-    
+
     private byte[] stringDataBuffer = new byte[256];
 
     public void startBuffer() {
@@ -477,17 +477,17 @@ public class ABCInputStream implements AutoCloseable {
     public String readString(String name) throws IOException {
         newDumpLevel(name, "String");
         int length = readU30Internal();
-        
+
         // avoid creating new byte array every time
         if (stringDataBuffer.length < length) {
             int newLength = stringDataBuffer.length * 2;
             while (newLength < length) {
                 newLength *= 2;
             }
-            
+
             stringDataBuffer = new byte[newLength];
         }
-        
+
         safeRead(length, stringDataBuffer);
         String r = new String(stringDataBuffer, 0, length, Utf8Helper.charset);
         endDumpLevel(r);

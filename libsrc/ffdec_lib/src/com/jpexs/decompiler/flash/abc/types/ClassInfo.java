@@ -33,11 +33,11 @@ public class ClassInfo {
     public ClassInfo() {
         static_traits = new Traits();
     }
-       
+
     public ClassInfo(Traits traits) {
         static_traits = traits;
     }
-       
+
     @Override
     public String toString() {
         return "method_index=" + cinit_index + "\r\n" + static_traits.toString();

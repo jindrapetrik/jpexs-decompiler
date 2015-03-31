@@ -308,13 +308,13 @@ public class FrameExporter {
                 if (evl != null) {
                     evl.handleExportingEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
-                
+
                 BufferedImage result = SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
                 }
-                
+
                 return result;
             }
         };

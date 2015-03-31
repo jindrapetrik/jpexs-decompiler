@@ -70,7 +70,7 @@ public class ScriptInfo {
                     traitIndices.addAll(otherTraits);
                     otherTraits.clear();
                 }
-                
+
                 if (packagePrefix == null || packageName.startsWith(packagePrefix)) {
                     ClassPath cp = new ClassPath(packageName, objectName);
                     ret.add(new ScriptPack(cp, abc, scriptIndex, traitIndices));
