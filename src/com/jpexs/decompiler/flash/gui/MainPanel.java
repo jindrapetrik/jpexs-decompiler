@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
@@ -1091,7 +1092,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             EventListener evl = swf.getExportEventListener();
 
-            final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
             ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
                     new ImageExportSettings(export.getValue(ImageExportMode.class)), evl));
             ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
@@ -1118,15 +1118,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
             }
 
+            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), Configuration.textExportSingleFile.get());
             if (swf.isAS3()) {
                 for (int i = 0; i < as3scripts.size(); i++) {
                     ScriptPack tls = as3scripts.get(i);
                     Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
-                    ret.add(tls.export(selFile, scriptMode, Configuration.parallelSpeedUp.get()));
+                    ret.add(tls.export(selFile, scriptExportSettings, Configuration.parallelSpeedUp.get()));
                 }
             } else {
                 Map<String, ASMSource> asmsToExport = swf.getASMs(true, as12scripts, false);
-                ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, selFile + File.separator + "scripts", asmsToExport, scriptMode, evl));
+                ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, selFile + File.separator + "scripts", asmsToExport, scriptExportSettings, evl));
             }
         }
         return ret;
@@ -1161,8 +1162,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        ScriptExportMode exportMode = export.getValue(ScriptExportMode.class);
-        swf.exportActionScript(handler, selFile, exportMode, Configuration.parallelSpeedUp.get(), evl);
+        ScriptExportSettings exportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), Configuration.textExportSingleFile.get());
+        swf.exportActionScript(handler, selFile, exportSettings, Configuration.parallelSpeedUp.get(), evl);
     }
 
     public List<SWFList> getSwfs() {

@@ -65,6 +65,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -1131,7 +1132,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws Exception {
+    public boolean exportAS3Class(String className, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws Exception {
         boolean exported = false;
 
         List<ABCContainerTag> abcList = getAbcList();
@@ -1146,7 +1147,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 String eventData = cnt + scr.getPath() + " ...";
                 evl.handleExportingEvent("tag", i + 1, abcList.size(), eventData);
-                scr.export(outdir, exportMode, parallel);
+                scr.export(outdir, exportSettings, parallel);
                 evl.handleExportedEvent("tag", i + 1, abcList.size(), eventData);
                 exported = true;
             }
@@ -1193,7 +1194,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         String directory;
 
-        ScriptExportMode exportMode;
+        ScriptExportSettings exportSettings;
 
         ClassPath path;
 
@@ -1211,10 +1212,10 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         EventListener eventListener;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportMode exportMode, boolean parallel, EventListener evl) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
             this.pack = pack;
             this.directory = directory;
-            this.exportMode = exportMode;
+            this.exportSettings = exportSettings;
             this.path = path;
             this.index = index;
             this.count = count;
@@ -1229,7 +1230,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 @Override
                 public void run() throws IOException {
                     startTime = System.currentTimeMillis();
-                    this.result = pack.export(directory, exportMode, parallel);
+                    this.result = pack.export(directory, exportSettings, parallel);
                     stopTime = System.currentTimeMillis();
                 }
             };
@@ -1250,7 +1251,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
+    private List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
 
         if (!outdir.endsWith(File.separator)) {
@@ -1258,11 +1259,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         outdir += "scripts" + File.separator;
 
-        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportMode, evl));
+        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportSettings, evl));
         return ret;
     }
 
-    private List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportMode exportMode, final boolean parallel, final EventListener evl) {
+    private List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportSettings exportSettings, final boolean parallel, final EventListener evl) {
         final AtomicInteger cnt = new AtomicInteger(1);
 
         final List<File> ret = new ArrayList<>();
@@ -1274,7 +1275,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     @Override
                     public Void call() throws Exception {
                         for (ScriptPack item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportMode, parallel, evl);
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl);
                             ret.add(task.call());
                         }
                         return null;
@@ -1289,7 +1290,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
             for (ScriptPack item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportMode, parallel, evl));
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
                 futureResults.add(future);
             }
 
@@ -1343,13 +1344,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         return evl;
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
 
         if (isAS3()) {
-            ret.addAll(exportActionScript3(handler, outdir, exportMode, parallel, evl));
+            ret.addAll(exportActionScript3(handler, outdir, exportSettings, parallel, evl));
         } else {
-            ret.addAll(exportActionScript2(handler, outdir, exportMode, parallel, evl));
+            ret.addAll(exportActionScript2(handler, outdir, exportSettings, parallel, evl));
         }
         return ret;
     }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.TranslateException;
@@ -49,13 +50,13 @@ public class AS2ScriptExporter {
 
     private static final Logger logger = Logger.getLogger(AS2ScriptExporter.class.getName());
 
-    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportMode exportMode, final EventListener evl) throws IOException {
+    public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportSettings exportSettings, final EventListener evl) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
                 @Override
                 public List<File> call() throws Exception {
-                    return exportAS2Scripts(handler, outdir, asms, exportMode, evl);
+                    return exportAS2Scripts(handler, outdir, asms, exportSettings, evl);
                 }
             }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
@@ -67,7 +68,7 @@ public class AS2ScriptExporter {
         return new ArrayList<>();
     }
 
-    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportMode exportMode, EventListener evl) throws IOException {
+    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportSettings exportSettings, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
@@ -95,7 +96,7 @@ public class AS2ScriptExporter {
             }
             existingNames.add(name);
 
-            File f = exportAS2Script(handler, currentOutDir, asm, exportMode, evl, cnt, asms.size(), name);
+            File f = exportAS2Script(handler, currentOutDir, asm, exportSettings, evl, cnt, asms.size(), name);
             if (f != null) {
                 ret.add(f);
             }
@@ -104,7 +105,7 @@ public class AS2ScriptExporter {
         return ret;
     }
 
-    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportMode exportMode, EventListener evl, AtomicInteger index, int count, String name) throws IOException {
+    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportSettings exportSettings, EventListener evl, AtomicInteger index, int count, String name) throws IOException {
         boolean retry;
         do {
             retry = false;
@@ -129,6 +130,7 @@ public class AS2ScriptExporter {
 
                 File file = new File(f);
                 try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
+                    ScriptExportMode exportMode = exportSettings.mode;
                     if (exportMode == ScriptExportMode.HEX) {
                         asm.getActionSourcePrefix(writer);
                         asm.getActionBytesAsHex(writer);
