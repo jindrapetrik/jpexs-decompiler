@@ -85,13 +85,13 @@ public final class MethodBody implements Cloneable {
         this.codeBytes = new byte[0];
         this.exceptions = new ABCException[0];
     }
-       
+
     public MethodBody(Traits traits, byte[] codeBytes, ABCException[] exceptions) {
         this.traits = traits;
         this.codeBytes = codeBytes;
         this.exceptions = exceptions;
     }
-       
+
     public synchronized void setCodeBytes(byte codeBytes[]) {
         this.codeBytes = codeBytes;
         this.code = null;

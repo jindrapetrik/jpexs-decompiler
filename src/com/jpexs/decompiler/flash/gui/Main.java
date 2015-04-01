@@ -1377,7 +1377,7 @@ public class Main {
             for (int i = handlers.length - 1; i >= 0; i--) {
                 logger.removeHandler(handlers[i]);
             }
-            
+
             ConsoleHandler conHan = new ConsoleHandler();
             conHan.setLevel(debug ? Level.CONFIG : Level.WARNING);
             SimpleFormatter formatterTxt = new SimpleFormatter();

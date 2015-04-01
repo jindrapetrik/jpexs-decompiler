@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
@@ -733,19 +734,19 @@ public class CommandLineArgumentParser {
             System.err.println("stdOut parameter expected");
             badArguments();
         }
-        
+
         stdOut = args.pop();
     }
-        
+
     private static void parseStdErr(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("stdErr parameter expected");
             badArguments();
         }
-        
+
         stdErr = args.pop();
     }
-        
+
     private static void parseAffinity(Stack<String> args) {
         if (Platform.isWindows()) {
             if (args.isEmpty()) {
@@ -919,18 +920,18 @@ public class CommandLineArgumentParser {
                 if (stdOut != null) {
                     System.setOut(new PrintStream(new FileOutputStream(stdOut.replace("{swfFile}", inFileName), true)));
                 }
-                    
+
                 if (stdErr != null) {
                     System.setErr(new PrintStream(new FileOutputStream(stdErr.replace("{swfFile}", inFileName), true)));
                     Main.initLogging(Configuration.debugMode.get());
                 }
-                
+
                 long startTimeSwf = 0;
                 if (!singleFile) {
                     startTimeSwf = System.currentTimeMillis();
                     System.out.println("Start exporting " + inFile.getName());
                 }
-                
+
                 SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
                 exfile.swfList = new SWFList();
                 exfile.swfList.sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
@@ -1052,6 +1053,7 @@ public class CommandLineArgumentParser {
                     new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + "frames" : ""), exfile, 0, frames, new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom), evl);
                 }
 
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), Configuration.textExportSingleFile.get());
                 if (exportAll || exportFormats.contains("script")) {
                     System.out.println("Exporting scripts...");
                     boolean parallel = Configuration.parallelSpeedUp.get();
@@ -1060,10 +1062,10 @@ public class CommandLineArgumentParser {
                     }
                     if (!as3classes.isEmpty()) {
                         for (String as3class : as3classes) {
-                            exportOK = exportOK && exfile.exportAS3Class(as3class, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel, evl);
+                            exportOK = exportOK && exfile.exportAS3Class(as3class, outDir, scriptExportSettings, parallel, evl);
                         }
                     } else {
-                        exportOK = exportOK && exfile.exportActionScript(handler, outDir, enumFromStr(formats.get("script"), ScriptExportMode.class), parallel, evl) != null;
+                        exportOK = exportOK && exfile.exportActionScript(handler, outDir, scriptExportSettings, parallel, evl) != null;
                     }
                 }
 
@@ -1090,7 +1092,7 @@ public class CommandLineArgumentParser {
                     long time = stopTimeSwf - startTimeSwf;
                     System.out.println("Export finished: " + inFile.getName() + " Export time: " + Helper.formatTimeSec(time));
                 }
-                
+
                 exfile.clearAllCache();
             }
         } catch (OutOfMemoryError | Exception ex) {

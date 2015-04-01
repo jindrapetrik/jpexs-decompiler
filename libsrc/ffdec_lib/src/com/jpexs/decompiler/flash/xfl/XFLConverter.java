@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
@@ -3041,7 +3042,8 @@ public class XFLConverter {
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), ScriptExportMode.AS, parallel, null);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

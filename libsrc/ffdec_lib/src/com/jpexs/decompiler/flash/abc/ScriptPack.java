@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -186,7 +187,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         appendTo(writer, traits, exportMode, parallel);
     }
 
-    public File export(String directory, ScriptExportMode exportMode, boolean parallel) throws IOException {
+    public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
         File outDir = new File(directory + File.separatorChar + "scripts" + File.separatorChar + makeDirPath(packageName));
@@ -202,14 +203,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             try {
-                toSource(writer, abc.script_info.get(scriptIndex).traits.traits, exportMode, parallel);
+                toSource(writer, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "The file path is probably too long", ex);
         }
-        
+
         return file;
     }
 

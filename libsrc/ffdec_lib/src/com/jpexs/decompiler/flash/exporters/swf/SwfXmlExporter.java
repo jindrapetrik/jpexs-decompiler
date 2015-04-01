@@ -99,11 +99,11 @@ public class SwfXmlExporter {
         StringBuilder sb = new StringBuilder(data.length * 2);
         for (int i = 0; i < data.length; i++) {
             sb.append(String.format("%02x", data[i]));
-        }        
-        
+        }
+
         return sb.toString();
     }
-    
+
     private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
         Class cls = obj != null ? obj.getClass() : null;
 

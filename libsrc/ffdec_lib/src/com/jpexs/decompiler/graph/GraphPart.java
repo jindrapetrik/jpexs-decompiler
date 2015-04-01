@@ -58,6 +58,7 @@ public class GraphPart implements Serializable {
     public List<GraphPart> throwParts = new ArrayList<>();
 
     public enum StopPartType {
+
         NONE, AND_OR, COMMONPART
     }
 
@@ -66,24 +67,27 @@ public class GraphPart implements Serializable {
     public TranslateStack andOrStack; // Stores stack when AND_OR stopPart has been reached
 
     public class CommonPartStack { // Stores stack when COMMONPART stopPart has been reached
-      boolean isTrueStack;
-      TranslateStack trueStack;
-      TranslateStack falseStack;
+
+        boolean isTrueStack;
+
+        TranslateStack trueStack;
+
+        TranslateStack falseStack;
     }
 
     public ArrayList<CommonPartStack> commonPartStacks;
-    
+
     public void setAndOrStack(TranslateStack stack) {
-      andOrStack = stack;
+        andOrStack = stack;
     }
 
     public void setCommonPartStack(TranslateStack stack) {
-       CommonPartStack currentStack = commonPartStacks.get(commonPartStacks.size()-1);
-       if (currentStack.isTrueStack) {
-           currentStack.trueStack = stack;
-       } else {
-           currentStack.falseStack = stack;
-       }
+        CommonPartStack currentStack = commonPartStacks.get(commonPartStacks.size() - 1);
+        if (currentStack.isTrueStack) {
+            currentStack.trueStack = stack;
+        } else {
+            currentStack.falseStack = stack;
+        }
     }
 
     public int setTime(int time, List<GraphPart> ordered, List<GraphPart> visited) {
