@@ -56,9 +56,15 @@ PROGRAM="$0"
 while [ -L "$PROGRAM" ]; do
 	PROGRAM=`readlink -f "$PROGRAM"`
 done
-cd "`dirname \"$PROGRAM\"`"
+pushd "`dirname \"$PROGRAM\"`" > /dev/null
 
 search_jar_file || exit 1
+
+if [ ${JAR_FILE:0:1} != '/' ] ; then
+    JAR_FILE=`pwd`/$JAR_FILE
+fi
+
+popd > /dev/null
 
 # Check default java
 if [ -x "`which java`" ]; then
