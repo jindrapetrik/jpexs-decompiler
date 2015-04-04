@@ -1,11 +1,12 @@
 #!/bin/bash
-# FFDec requires Oracle Java 7
+# Based on Freerapid Downloader startup script - created by Petris 2009
+
+# FFDec requires Oracle Java 8
 # Look for java in these directories
 LOOKUP_JRE_DIRS="/usr/lib/jvm/* /opt/java* /opt/jre*"
-#Created by Petris 2009 -> Many thanks!
 # Required version
 REQ_JVER1=1
-REQ_JVER2=7
+REQ_JVER2=8
 REQ_JVER3=0
 REQ_JVER4=0
 MEMORY=1024m
