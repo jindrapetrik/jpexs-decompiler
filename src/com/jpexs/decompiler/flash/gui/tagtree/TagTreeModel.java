@@ -569,8 +569,15 @@ public class TagTreeModel implements TreeModel {
             }
             if (result instanceof Tag) {
                 Tag resultTag = (Tag) result;
-                Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(result.getSwf()).tagScriptCache;
-                TagScript tagScript = currentTagScriptCache.get(resultTag);
+                TagScript tagScript = null;
+                Map<Tag, TagScript> currentTagScriptCache = null;
+                if (swfInfos != null && result.getSwf() != null) {
+                    TagTreeSwfInfo ttsi = swfInfos.get(result.getSwf());
+                    if (ttsi != null) {
+                        currentTagScriptCache = ttsi.tagScriptCache;
+                        tagScript = currentTagScriptCache.get(resultTag);
+                    }
+                }
                 if (tagScript == null) {
                     List<TreeItem> subNodes = new ArrayList<>();
                     if (result instanceof ASMSourceContainer) {
@@ -579,7 +586,9 @@ public class TagTreeModel implements TreeModel {
                         }
                     }
                     tagScript = new TagScript(result.getSwf(), resultTag, subNodes);
-                    currentTagScriptCache.put(resultTag, tagScript);
+                    if (currentTagScriptCache != null) {
+                        currentTagScriptCache.put(resultTag, tagScript);
+                    }
                 }
                 result = tagScript;
             }
