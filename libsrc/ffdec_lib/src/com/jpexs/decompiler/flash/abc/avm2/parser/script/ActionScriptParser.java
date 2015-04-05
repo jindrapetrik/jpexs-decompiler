@@ -176,6 +176,9 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem memberOrCall(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
+        if(debugMode){
+            System.out.println("memberOrCall:");
+        }
         ParsedSymbol s = lex();
         GraphTargetItem ret = newcmds;
         while (s.isType(SymbolType.DOT, SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME, SymbolType.FILTER)) {
@@ -214,6 +217,10 @@ public class ActionScriptParser {
         }
 
         lexer.pushback(s);
+        
+        if(debugMode){
+            System.out.println("/memberOrCall");
+        }
         return ret;
     }
 
@@ -245,6 +252,9 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem member(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
+        if(debugMode){
+            System.out.println("member:");
+        }
         GraphTargetItem ret = obj;
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
@@ -301,7 +311,15 @@ public class ActionScriptParser {
                 s = lex();
             }
         }
-        lexer.pushback(s);
+        if(s.type.getPrecedence() == GraphTargetItem.PRECEDENCE_ASSIGMENT){
+            ret = expression1(ret, s.type.getPrecedence(), thisType, pkg, needsActivation, importedClasses, openedNamespaces, inMethod, registerVars, inFunction, inMethod, false, variables);
+        }else{
+            lexer.pushback(s);
+        }
+        
+        if(debugMode){
+            System.out.println("/member");
+        }
         return ret;
     }
 
@@ -1376,7 +1394,7 @@ public class ActionScriptParser {
                     if (firstCommand instanceof NameAVM2Item) {
                         NameAVM2Item nai = (NameAVM2Item) firstCommand;
                         if (nai.isDefinition() && nai.getAssignedValue() == null) { //??? WUT
-                            //firstCommand = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
+                            firstCommand = expression1(firstCommand,firstCommand.getPrecedence(),thisType, pkg, needsActivation, importedClasses,openedNamespaces,true, registerVars, inFunction, inMethod, true, variables);                            
                         }
                     }
                     InAVM2Item inexpr = null;
@@ -1773,6 +1791,9 @@ public class ActionScriptParser {
 
     private GraphTargetItem expression(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
         GraphTargetItem prim = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+        if(prim==null){
+            return null;
+        }
         return expression1(prim, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
     }
 
@@ -2133,6 +2154,7 @@ public class ActionScriptParser {
                 }
                 needsActivation.setVal(true);
                 ret = function(pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, fname, false, variables);
+                ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
                 break;
             case NAN:
                 ret = new NanAVM2Item(null);

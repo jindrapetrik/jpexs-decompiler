@@ -146,6 +146,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -253,6 +254,13 @@ public class ActionScriptParser {
             s = lex();
         }
         lexer.pushback(s);
+        if (s.type.getPrecedence() == GraphTargetItem.PRECEDENCE_ASSIGMENT) {
+            ret = expression1(ret, s.type.getPrecedence(), registerVars, inFunction, inMethod, inMethod, variables);
+        }
+
+        if (debugMode) {
+            System.out.println("/member");
+        }
         return ret;
     }
 
@@ -469,6 +477,9 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<VariableActionItem> variables) throws IOException, ActionParseException {
+        if (debugMode) {
+            System.out.println("expressionCommands:");
+        }
         GraphTargetItem ret = null;
         switch (s.type) {
             case GETVERSION:
@@ -580,6 +591,9 @@ public class ActionScriptParser {
                 break;
             default:
                 return null;
+        }
+        if (debugMode) {
+            System.out.println("/expressionCommands");
         }
         return ret;
     }
@@ -1153,7 +1167,7 @@ public class ActionScriptParser {
                 ret = new ContinueItem(null, 0); //? There is no more than 1 level continue/break in AS1/2
                 break;
             case RETURN:
-                GraphTargetItem retexpr = expression(true, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem retexpr = expression(registerVars, inFunction, inMethod, true, variables);
                 if (retexpr == null) {
                     retexpr = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
                 }
@@ -1195,20 +1209,19 @@ public class ActionScriptParser {
             case THROW:
                 ret = new ThrowActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
                 break;
+            case SEMICOLON: //empty command
+                if (debugMode) {
+                    System.out.println("/command");
+                }
+                return null;
             default:
                 GraphTargetItem valcmd = expressionCommands(s, registerVars, inFunction, inMethod, forinlevel, variables);
                 if (valcmd != null) {
                     ret = valcmd;
                     break;
                 }
-                if (s.type == SymbolType.SEMICOLON) {
-                    return null;
-                }
                 lexer.pushback(s);
                 ret = expression(registerVars, inFunction, inMethod, true, variables);
-                if (debugMode) {
-                    System.out.println("/command");
-                }
         }
         if (debugMode) {
             System.out.println("/command");
@@ -1228,239 +1241,299 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem expression(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
-        return expression(false, registerVars, inFunction, inMethod, allowRemainder, variables);
-    }
-
-    private GraphTargetItem fixPrecedence(GraphTargetItem expr) {
-        GraphTargetItem ret = expr;
-        if (expr instanceof BinaryOp) {
-            BinaryOp bo = (BinaryOp) expr;
-            GraphTargetItem left = bo.getLeftSide();
-            //GraphTargetItem right=bo.getRightSide();
-            if (left.getPrecedence() > bo.getPrecedence()) {
-                if (left instanceof BinaryOp) {
-                    BinaryOp leftBo = (BinaryOp) left;
-                    bo.setLeftSide(leftBo.getRightSide());
-                    leftBo.setRightSide(expr);
-                    return left;
-                }
-            }
+        if (debugMode) {
+            System.out.println("expression:");
+        }
+        GraphTargetItem prim = expressionPrimary(false, registerVars, inFunction, inMethod, allowRemainder, variables);
+        if (prim == null) {
+            return null;
+        }
+        GraphTargetItem ret = expression1(prim, GraphTargetItem.NOPRECEDENCE, registerVars, inFunction, inMethod, allowRemainder, variables);
+        if (debugMode) {
+            System.out.println("/expression");
         }
         return ret;
     }
 
-    private GraphTargetItem expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
-        GraphTargetItem ret = null;
-        ParsedSymbol s = lex();
-        switch (s.type) {
-            case TERNAR:
-                GraphTargetItem terOnTrue = expression(registerVars, inFunction, inMethod, true, variables);
+    private ParsedSymbol peekLex() throws IOException, ActionParseException {
+        ParsedSymbol lookahead = lex();
+        lexer.pushback(lookahead);
+        return lookahead;
+    }
+
+    private static final String[] operatorIdentifiers = new String[]{"add", "eq", "ne", "lt", "ge", "gt", "le"};
+
+    private boolean isBinaryOperator(ParsedSymbol s) {
+        if (s.type == SymbolType.IDENTIFIER && Arrays.asList(operatorIdentifiers).contains(s.value.toString())) {
+            return true;
+        }
+        return s.type.isBinary();
+    }
+
+    private int getSymbPrecedence(ParsedSymbol s) {
+        if (s.type == SymbolType.IDENTIFIER && Arrays.asList(operatorIdentifiers).contains(s.value.toString())) {
+            switch (s.value.toString()) {
+                case "add":
+                    return GraphTargetItem.PRECEDENCE_ADDITIVE;
+                case "eq":
+                case "ne":
+                    return GraphTargetItem.PRECEDENCE_EQUALITY;
+                case "lt":
+                case "ge":
+                case "gt":
+                case "le":
+                    return GraphTargetItem.PRECEDENCE_RELATIONAL;
+            }
+        }
+        return s.type.getPrecedence();
+    }
+
+    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
+        ParsedSymbol op;
+        GraphTargetItem rhs;
+        GraphTargetItem mhs = null;
+        ParsedSymbol lookahead = peekLex();
+        if (debugMode) {
+            System.out.println("expression1:");
+        }
+        //Note: algorithm from http://en.wikipedia.org/wiki/Operator-precedence_parser
+        //with relation operators reversed as we have precedence in reverse order
+        while (isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) <= /* >= on wiki */ min_precedence) {
+            op = lookahead;
+            lex();
+
+            //Note: Handle ternar operator as Binary
+            //http://stackoverflow.com/questions/13681293/how-can-i-incorporate-ternary-operators-into-a-precedence-climbing-algorithm
+            if (op.type == SymbolType.TERNAR) {
+                if (debugMode) {
+                    System.out.println("ternar-middle:");
+                }
+                mhs = expression(registerVars, inFunction, inMethod, allowRemainder, variables);
                 expectedType(SymbolType.COLON);
-                GraphTargetItem terOnFalse = expression(registerVars, inFunction, inMethod, true, variables);
-                ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
-                break;
-            case SHIFT_LEFT:
-                ret = new LShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case SHIFT_RIGHT:
-                ret = new RShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case USHIFT_RIGHT:
-                ret = new URShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case BITAND:
-                ret = new BitAndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case BITOR:
-                ret = new BitOrActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case DIVIDE:
-                ret = new DivideActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case MODULO:
-                ret = new ModuloActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case EQUALS:
-                ret = new EqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables), true/*FIXME SWF version?*/);
-                break;
-            case STRICT_EQUALS:
-                ret = new StrictEqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case NOT_EQUAL:
-                ret = new NeqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables), true/*FIXME SWF version?*/);
-                break;
-            case STRICT_NOT_EQUAL:
-                ret = new StrictNeqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case LOWER_THAN:
-                ret = new LtActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables), true/*FIXME SWF version?*/);
-                break;
-            case LOWER_EQUAL:
-                ret = new LeActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case GREATER_THAN:
-                ret = new GtActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case GREATER_EQUAL:
-                ret = new GeActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables), true/*FIXME SWF version?*/);
-                break;
-            case AND:
-                ret = new AndItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case OR:
-                ret = new OrItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case FULLAND:
-                ret = new AndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case FULLOR:
-                ret = new OrActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case MINUS:
-                ret = new SubtractActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case MULTIPLY:
-                ret = new MultiplyActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case PLUS:
-                ret = new AddActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables), true);
-                break;
-            case XOR:
-                ret = new BitXorActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case AS:
-
-                break;
-            case INSTANCEOF:
-                ret = new InstanceOfActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
-                break;
-            case IS:
-
-                break;
-
-            case ASSIGN:
-            case ASSIGN_BITAND:
-            case ASSIGN_BITOR:
-            case ASSIGN_DIVIDE:
-            case ASSIGN_MINUS:
-            case ASSIGN_MODULO:
-            case ASSIGN_MULTIPLY:
-            case ASSIGN_PLUS:
-            case ASSIGN_SHIFT_LEFT:
-            case ASSIGN_SHIFT_RIGHT:
-            case ASSIGN_USHIFT_RIGHT:
-            case ASSIGN_XOR:
-                GraphTargetItem assigned = expression(registerVars, inFunction, inMethod, true, variables);
-                switch (s.type) {
-                    case ASSIGN:
-                        //assigned = assigned;
-                        break;
-                    case ASSIGN_BITAND:
-                        assigned = new BitAndActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_BITOR:
-                        assigned = new BitOrActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_DIVIDE:
-                        assigned = new DivideActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_MINUS:
-                        assigned = new SubtractActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_MODULO:
-                        assigned = new ModuloActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_MULTIPLY:
-                        assigned = new MultiplyActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_PLUS:
-                        assigned = new AddActionItem(null, expr, assigned, true/*TODO:SWF version?*/);
-                        break;
-                    case ASSIGN_SHIFT_LEFT:
-                        assigned = new LShiftActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_SHIFT_RIGHT:
-                        assigned = new RShiftActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_USHIFT_RIGHT:
-                        assigned = new URShiftActionItem(null, expr, assigned);
-                        break;
-                    case ASSIGN_XOR:
-                        assigned = new BitXorActionItem(null, expr, assigned);
-                        break;
+                if (debugMode) {
+                    System.out.println("/ternar-middle");
                 }
-                if (expr instanceof VariableActionItem) {
-                    ((VariableActionItem) expr).setStoreValue(assigned);
-                    ((VariableActionItem) expr).setDefinition(false);
-                    ret = expr;
-                } else if (expr instanceof GetMemberActionItem) {
-                    ret = new SetMemberActionItem(null, ((GetMemberActionItem) expr).object, ((GetMemberActionItem) expr).memberName, assigned);
-                } else {
-                    throw new ActionParseException("Invalid assignment", lexer.yyline());
-                }
+            }
+
+            rhs = expressionPrimary(allowRemainder, registerVars, inFunction, inMethod, allowRemainder, variables);
+            if (rhs == null) {
+                lexer.pushback(op);
                 break;
+            }
+
+            lookahead = peekLex();
+            while ((isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) < /* > on wiki */ getSymbPrecedence(op))
+                    || (lookahead.type.isRightAssociative() && getSymbPrecedence(lookahead) == getSymbPrecedence(op))) {
+                rhs = expression1(rhs, getSymbPrecedence(lookahead), registerVars, inFunction, inMethod, allowRemainder, variables);
+                lookahead = peekLex();
+            }
+
+            switch (op.type) {
+                case TERNAR:
+                    lhs = new TernarOpItem(null, lhs, mhs, rhs);
+                    break;
+                case SHIFT_LEFT:
+                    lhs = new LShiftActionItem(null, lhs, rhs);
+                    break;
+                case SHIFT_RIGHT:
+                    lhs = new RShiftActionItem(null, lhs, rhs);
+                    break;
+                case USHIFT_RIGHT:
+                    lhs = new URShiftActionItem(null, lhs, rhs);
+                    break;
+                case BITAND:
+                    lhs = new BitAndActionItem(null, lhs, rhs);
+                    break;
+                case BITOR:
+                    lhs = new BitOrActionItem(null, lhs, rhs);
+                    break;
+                case DIVIDE:
+                    lhs = new DivideActionItem(null, lhs, rhs);
+                    break;
+                case MODULO:
+                    lhs = new ModuloActionItem(null, lhs, rhs);
+                    break;
+                case EQUALS:
+                    lhs = new EqActionItem(null, lhs, rhs, true/*FIXME SWF version?*/);
+                    break;
+                case STRICT_EQUALS:
+                    lhs = new StrictEqActionItem(null, lhs, rhs);
+                    break;
+                case NOT_EQUAL:
+                    lhs = new NeqActionItem(null, lhs, rhs, true/*FIXME SWF version?*/);
+                    break;
+                case STRICT_NOT_EQUAL:
+                    lhs = new StrictNeqActionItem(null, lhs, rhs);
+                    break;
+                case LOWER_THAN:
+                    lhs = new LtActionItem(null, lhs, rhs, true/*FIXME SWF version?*/);
+                    break;
+                case LOWER_EQUAL:
+                    lhs = new LeActionItem(null, lhs, rhs);
+                    break;
+                case GREATER_THAN:
+                    lhs = new GtActionItem(null, lhs, rhs);
+                    break;
+                case GREATER_EQUAL:
+                    lhs = new GeActionItem(null, lhs, rhs, true/*FIXME SWF version?*/);
+                    break;
+                case AND:
+                    lhs = new AndItem(null, lhs, rhs);
+                    break;
+                case OR:
+                    lhs = new OrItem(null, lhs, rhs);
+                    break;
+                case FULLAND:
+                    lhs = new AndActionItem(null, lhs, rhs);
+                    break;
+                case FULLOR:
+                    lhs = new OrActionItem(null, lhs, rhs);
+                    break;
+                case MINUS:
+                    lhs = new SubtractActionItem(null, lhs, rhs);
+                    break;
+                case MULTIPLY:
+                    lhs = new MultiplyActionItem(null, lhs, rhs);
+                    break;
+                case PLUS:
+                    lhs = new AddActionItem(null, lhs, rhs, true);
+                    break;
+                case XOR:
+                    lhs = new BitXorActionItem(null, lhs, rhs);
+                    break;
+                case AS:
+
+                    break;
+                case INSTANCEOF:
+                    lhs = new InstanceOfActionItem(null, lhs, rhs);
+                    break;
+                case IS:
+
+                    break;
+
+                case ASSIGN:
+                case ASSIGN_BITAND:
+                case ASSIGN_BITOR:
+                case ASSIGN_DIVIDE:
+                case ASSIGN_MINUS:
+                case ASSIGN_MODULO:
+                case ASSIGN_MULTIPLY:
+                case ASSIGN_PLUS:
+                case ASSIGN_SHIFT_LEFT:
+                case ASSIGN_SHIFT_RIGHT:
+                case ASSIGN_USHIFT_RIGHT:
+                case ASSIGN_XOR:
+                    GraphTargetItem assigned = rhs;
+                    switch (lookahead.type) {
+                        case ASSIGN:
+                            //assigned = assigned;
+                            break;
+                        case ASSIGN_BITAND:
+                            assigned = new BitAndActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_BITOR:
+                            assigned = new BitOrActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_DIVIDE:
+                            assigned = new DivideActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MINUS:
+                            assigned = new SubtractActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MODULO:
+                            assigned = new ModuloActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MULTIPLY:
+                            assigned = new MultiplyActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_PLUS:
+                            assigned = new AddActionItem(null, lhs, assigned, true/*TODO:SWF version?*/);
+                            break;
+                        case ASSIGN_SHIFT_LEFT:
+                            assigned = new LShiftActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_SHIFT_RIGHT:
+                            assigned = new RShiftActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_USHIFT_RIGHT:
+                            assigned = new URShiftActionItem(null, lhs, assigned);
+                            break;
+                        case ASSIGN_XOR:
+                            assigned = new BitXorActionItem(null, lhs, assigned);
+                            break;
+                    }
+                    if (lhs instanceof VariableActionItem) {
+                        ((VariableActionItem) lhs).setStoreValue(assigned);
+                        ((VariableActionItem) lhs).setDefinition(false);
+                        lhs = lhs;
+                    } else if (lhs instanceof GetMemberActionItem) {
+                        lhs = new SetMemberActionItem(null, ((GetMemberActionItem) lhs).object, ((GetMemberActionItem) lhs).memberName, assigned);
+                    } else {
+                        throw new ActionParseException("Invalid assignment", lexer.yyline());
+                    }
+                    break;
+                case IDENTIFIER:
+                    switch (lookahead.value.toString()) {
+                        case "add":
+                            lhs = new StringAddActionItem(null, lhs, rhs);
+                            break;
+                        case "eq":
+                            lhs = new StringEqActionItem(null, lhs, rhs);
+                            break;
+                        case "ne":
+                            lhs = new StringNeActionItem(null, lhs, rhs);
+                            break;
+                        case "lt":
+                            lhs = new StringLtActionItem(null, lhs, rhs);
+                            break;
+                        case "ge":
+                            lhs = new StringGeActionItem(null, lhs, rhs);
+                            break;
+                        case "gt":
+                            lhs = new StringGtActionItem(null, lhs, rhs);
+                            break;
+                        case "le":
+                            lhs = new StringLeActionItem(null, lhs, rhs);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        switch (lookahead.type) {
             case INCREMENT: //postincrement
-                if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
+                lex();
+                if (!(lhs instanceof VariableActionItem) && !(lhs instanceof GetMemberActionItem)) {
                     throw new ActionParseException("Invalid assignment", lexer.yyline());
                 }
-                ret = new PostIncrementActionItem(null, expr);
+                lhs = new PostIncrementActionItem(null, lhs);
                 break;
             case DECREMENT: //postdecrement
-                if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
+                lex();
+                if (!(lhs instanceof VariableActionItem) && !(lhs instanceof GetMemberActionItem)) {
                     throw new ActionParseException("Invalid assignment", lexer.yyline());
                 }
-                ret = new PostDecrementActionItem(null, expr);
+                lhs = new PostDecrementActionItem(null, lhs);
                 break;
             case DOT: //member
             case BRACKET_OPEN: //member
             case PARENT_OPEN: //function call
-                lexer.pushback(s);
-                ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
-                break;
-            case IDENTIFIER:
-                switch (s.value.toString()) {
-                    case "add":
-                        ret = new StringAddActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "eq":
-                        ret = new StringEqActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "ne":
-                        ret = new StringNeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "lt":
-                        ret = new StringLtActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "ge":
-                        ret = new StringGeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "gt":
-                        ret = new StringGtActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    case "le":
-                        ret = new StringLeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
-                        break;
-                    default:
-                        lexer.pushback(s);
-                }
+                lhs = memberOrCall(lhs, registerVars, inFunction, inMethod, variables);
                 break;
             default:
-                lexer.pushback(s);
-        }
-
-        if (ret == null) {
-            if (expr instanceof ParenthesisItem) {
-                if (isType(((ParenthesisItem) expr).value)) {
-                    GraphTargetItem expr2 = expression(false, registerVars, inFunction, inMethod, true, variables);
-                    if (expr2 != null) {
-                        ret = new CastOpActionItem(null, ((ParenthesisItem) expr).value, expr2);
+                if (lhs instanceof ParenthesisItem) {
+                    if (isType(((ParenthesisItem) lhs).value)) {
+                        GraphTargetItem expr2 = expression(registerVars, inFunction, inMethod, true, variables);
+                        if (expr2 != null) {
+                            lhs = new CastOpActionItem(null, ((ParenthesisItem) lhs).value, expr2);
+                        }
                     }
                 }
-            }
         }
-
-        ret = fixPrecedence(ret);
-        return ret;
+        if (debugMode) {
+            System.out.println("/expression1");
+        }
+        return lhs;
     }
 
     private boolean isType(GraphTargetItem item) {
@@ -1522,29 +1595,28 @@ public class ActionScriptParser {
         return new CommaExpressionItem(null, expr);
     }
 
-    private GraphTargetItem expression(boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
+    private GraphTargetItem expressionPrimary(boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ActionParseException {
         if (debugMode) {
-            System.out.println("expression:");
+            System.out.println("primary:");
         }
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
-        boolean existsRemainder = false;
-        boolean assocRight = false;
+
         switch (s.type) {
             case NEGATE:
                 versionRequired(s, 5);
                 ret = expression(registerVars, inFunction, inMethod, false, variables);
                 ret = new BitXorActionItem(null, ret, new DirectValueActionItem(4.294967295E9));
-                existsRemainder = true;
+
                 break;
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
                     ret = new DirectValueActionItem(null, 0, -(double) (Double) s.value, new ArrayList<String>());
-                    existsRemainder = true;
+
                 } else if (s.isType(SymbolType.INTEGER)) {
                     ret = new DirectValueActionItem(null, 0, -(long) (Long) s.value, new ArrayList<String>());
-                    existsRemainder = true;
+
                 } else {
                     lexer.pushback(s);
                     GraphTargetItem num = expression(registerVars, inFunction, inMethod, true, variables);
@@ -1572,22 +1644,22 @@ public class ActionScriptParser {
                 break;
             case TYPEOF:
                 ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, false, variables));
-                existsRemainder = true;
+
                 break;
             case TRUE:
                 ret = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case NULL:
                 ret = new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case UNDEFINED:
                 ret = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
                 break;
             case FALSE:
                 ret = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case CURLY_OPEN: //Object literal
                 s = lex();
@@ -1628,24 +1700,24 @@ public class ActionScriptParser {
             case STRING:
                 ret = pushConst(s.value.toString());
                 ret = memberOrCall(ret, registerVars, inFunction, inMethod, variables);
-                existsRemainder = true;
+
                 break;
             case NEWLINE:
                 ret = new DirectValueActionItem(null, 0, "\r", new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case NAN:
                 ret = new DirectValueActionItem(null, 0, Double.NaN, new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case INFINITY:
                 ret = new DirectValueActionItem(null, 0, Double.POSITIVE_INFINITY, new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case INTEGER:
             case DOUBLE:
                 ret = new DirectValueActionItem(null, 0, s.value, new ArrayList<String>());
-                existsRemainder = true;
+
                 break;
             case DELETE:
                 GraphTargetItem varDel = variable(registerVars, inFunction, inMethod, variables);
@@ -1665,17 +1737,17 @@ public class ActionScriptParser {
                 if (s.type == SymbolType.DECREMENT) {
                     ret = new PreDecrementActionItem(null, prevar);
                 }
-                existsRemainder = true;
+
                 break;
             case NOT:
                 ret = new NotItem(null, expression(registerVars, inFunction, inMethod, false, variables));
-                existsRemainder = true;
+
                 break;
             case PARENT_OPEN:
                 ret = new ParenthesisItem(null, expression(registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = memberOrCall(ret, registerVars, inFunction, inMethod, variables);
-                existsRemainder = true;
+
                 break;
             case NEW:
                 GraphTargetItem newvar = variable(registerVars, inFunction, inMethod, variables);
@@ -1688,7 +1760,7 @@ public class ActionScriptParser {
                 } else {
                     throw new ActionParseException("Invalid new item", lexer.yyline());
                 }
-                existsRemainder = true;
+
                 break;
             case EVAL:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1696,7 +1768,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 evar = memberOrCall(evar, registerVars, inFunction, inMethod, variables);
                 ret = evar;
-                existsRemainder = true;
+
                 break;
             case IDENTIFIER:
             case THIS:
@@ -1709,28 +1781,20 @@ public class ActionScriptParser {
                     var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
                     ret = var;
                 }
-                existsRemainder = true;
+
                 break;
             default:
                 GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);
                 if (excmd != null) {
-                    existsRemainder = true; //?
+                    //?
                     ret = excmd;
                     break;
                 }
                 lexer.pushback(s);
         }
-        if (allowRemainder && existsRemainder) {
-            GraphTargetItem rem = ret;
-            do {
-                rem = expressionRemainder(rem, registerVars, inFunction, inMethod, assocRight, variables);
-                if (rem != null) {
-                    ret = rem;
-                }
-            } while ((!assocRight) && (rem != null));
-        }
+
         if (debugMode) {
-            System.out.println("/expression");
+            System.out.println("/primary");
         }
         return ret;
     }
