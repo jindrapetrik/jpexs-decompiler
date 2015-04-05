@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
@@ -111,4 +112,16 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     public int compareTo(ABCContainerTag o) {
         return 0;
     }
+
+    @Override
+    public void setModified(boolean value) {
+        super.setModified(value);
+        if (value == false && !isModified()) {
+            ABC abc = getABC();
+            for (ScriptInfo si : abc.script_info) {
+                si.setModified(false);
+            }
+        }
+    }
+
 }

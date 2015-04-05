@@ -192,6 +192,13 @@ public class TagTree extends JTree {
             }
 
             boolean isModified = val instanceof Tag && ((Tag) val).isModified();
+            if(val instanceof ScriptPack){
+                ScriptPack sp=(ScriptPack)val;
+                if(sp.abc.script_info.get(sp.scriptIndex).isModified()){
+                    isModified = true;
+                }
+            }
+            
             if (isModified) {
                 if (boldFont == null) {
                     Font font = getFont();

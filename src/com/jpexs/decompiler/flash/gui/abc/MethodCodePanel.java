@@ -58,6 +58,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.requestFocusInWindow();
     }
 
+    public int getScriptIndex(){
+        return sourceTextArea.getScriptIndex();
+    }
+    
     public String getTraitName() {
         return sourceTextArea.getName();
     }
@@ -74,13 +78,15 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.hilighSpecial(type, specialValue);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, Trait trait) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName(), trait);
+    public void setBodyIndex(int bodyIndex, ABC abc, Trait trait, int scriptIndex) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName(), trait,scriptIndex);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, name, trait);
+    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait,int scriptIndex) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, name, trait,scriptIndex);
     }
+    
+    
 
     public int getBodyIndex() {
         return sourceTextArea.bodyIndex;

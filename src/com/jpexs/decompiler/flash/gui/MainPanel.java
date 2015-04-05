@@ -1839,7 +1839,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (bi != -1) {
                             getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                         }
-                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait());
+                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait(),getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                     }
                     return true;
                 }
@@ -1942,7 +1942,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                                 }
                             }
-                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t);
+                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t,getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);

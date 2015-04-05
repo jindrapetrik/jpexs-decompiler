@@ -28,6 +28,19 @@ import java.util.List;
 public class ScriptInfo {
 
     @Internal
+    private boolean modified = true;
+
+    public void setModified(boolean modified) {
+        this.modified = modified;        
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+    
+    
+    
+    @Internal
     public boolean deleted;
 
     public int init_index; //MethodInfo
@@ -35,7 +48,7 @@ public class ScriptInfo {
     public Traits traits;
 
     public ScriptInfo() {
-        traits = new Traits();
+        traits = new Traits();        
     }
 
     public ScriptInfo(Traits traits) {

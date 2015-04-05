@@ -542,6 +542,7 @@ public class ABC {
             si.traits = ais.readTraits("traits");
             script_info.add(si);
             ais.endDumpLevel();
+            si.setModified(false);
         }
 
         int bodies_count = ais.readU30("bodies_count");
@@ -1228,7 +1229,7 @@ public class ABC {
         method_info.remove(index);
     }
 
-    public void replaceSciptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
+    public void replaceScriptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = script_info.size();
@@ -1248,6 +1249,7 @@ public class ABC {
         // Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);
+        script_info.get(oldIndex).setModified(true);
         pack(); // removes old classes/methods
         ((Tag) parentTag).setModified(true);
     }
