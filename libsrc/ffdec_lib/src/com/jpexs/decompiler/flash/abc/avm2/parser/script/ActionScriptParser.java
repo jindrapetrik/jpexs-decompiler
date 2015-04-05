@@ -83,14 +83,17 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BlockItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -98,6 +101,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
@@ -174,13 +178,18 @@ public class ActionScriptParser {
     private GraphTargetItem memberOrCall(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
         ParsedSymbol s = lex();
         GraphTargetItem ret = newcmds;
-        while (s.isType(SymbolType.DOT, SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
+        while (s.isType(SymbolType.DOT, SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME, SymbolType.FILTER)) {
             switch (s.type) {
                 case BRACKET_OPEN:
                 case DOT:
                 case TYPENAME:
                     lexer.pushback(s);
                     ret = member(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+                    break;
+                case FILTER:
+                    needsActivation.setVal(true);
+                    ret = new XMLFilterAVM2Item(ret, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, inMethod, variables), openedNamespaces);
+                    expectedType(SymbolType.PARENT_CLOSE);
                     break;
                 case PARENT_OPEN:
                     ret = new CallAVM2Item(lexer.yyline(), ret, call(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
@@ -214,7 +223,8 @@ public class ActionScriptParser {
         if (s.type == SymbolType.TYPENAME) {
             List<GraphTargetItem> params = new ArrayList<>();
             do {
-                params.add(expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                params.add(expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables)
+                );
                 s = lex();
             } while (s.type == SymbolType.COMMA);
             if (s.type == SymbolType.USHIFT_RIGHT) {
@@ -1365,8 +1375,8 @@ public class ActionScriptParser {
                     GraphTargetItem firstCommand = command(thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, false, variables);
                     if (firstCommand instanceof NameAVM2Item) {
                         NameAVM2Item nai = (NameAVM2Item) firstCommand;
-                        if (nai.isDefinition() && nai.getAssignedValue() == null) {
-                            firstCommand = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
+                        if (nai.isDefinition() && nai.getAssignedValue() == null) { //??? WUT
+                            //firstCommand = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
                         }
                     }
                     InAVM2Item inexpr = null;
@@ -1652,16 +1662,26 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem fixPrecedence(GraphTargetItem expr) {
+        System.out.println("Fixing " + expr);
         GraphTargetItem ret = expr;
+
+        /*
+         fix > :
+         a || b > c   =>   a || (b > c)
+        
+         a < 0 || (b > c) + 1
+        
+         */
         if (expr instanceof BinaryOp) {
             BinaryOp bo = (BinaryOp) expr;
             GraphTargetItem left = bo.getLeftSide();
-            //GraphTargetItem right=bo.getRightSide();
+            GraphTargetItem right = bo.getRightSide();
             if (left.getPrecedence() > bo.getPrecedence()) {
                 if (left instanceof BinaryOp) {
                     BinaryOp leftBo = (BinaryOp) left;
                     bo.setLeftSide(leftBo.getRightSide());
                     leftBo.setRightSide(expr);
+                    System.out.println("fixed");
                     return left;
                 }
             }
@@ -1669,224 +1689,13 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem expressionRemainder(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<Integer> openedNamespaces, GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables, List<String> importedClasses) throws IOException, AVM2ParseException {
-        GraphTargetItem ret = null;
-        ParsedSymbol s = lex();
+    /*private GraphTargetItem expressionRemainder(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<Integer> openedNamespaces, GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables, List<String> importedClasses) throws IOException, AVM2ParseException {
+     GraphTargetItem ret = null;
+     ParsedSymbol s = lex();
 
-        if (ret == null) {
-            switch (s.type) {
-                case AS:
-                    GraphTargetItem type = type(thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
-                    ret = new AsTypeAVM2Item(null, expr, type);
-                    allowRemainder = false;
-                    break;
-                case DESCENDANTS:
-                    ParsedSymbol d = lex();
-                    expected(d, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.MULTIPLY);
-                    ret = new GetDescendantsAVM2Item(expr, d.type == SymbolType.MULTIPLY ? null : d.value.toString(), openedNamespaces);
-                    allowRemainder = true;
-                    break;
-                case FILTER:
-                    needsActivation.setVal(true);
-                    ret = new XMLFilterAVM2Item(expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables), openedNamespaces);
-                    expectedType(SymbolType.PARENT_CLOSE);
-                    allowRemainder = true;
-                    break;
-                /*case NAMESPACE_OP:
-                 s = lex();
-                 if (s.type == SymbolType.BRACKET_OPEN) {
-                 GraphTargetItem index = expression(thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                 NameAVM2Item name = new NameAVM2Item(new UnboundedTypeItem(), lexer.yyline(), null, null, false, openedNamespaces);
-                 name.setIndex(index);
-                 name.setNs(expr);
-                 ret = name;
-                 expectedType(SymbolType.BRACKET_CLOSE);
-                 } else {
-                 lexer.pushback(s);
-                 GraphTargetItem name = name(thisType,pkg,needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
-                 if (name instanceof UnresolvedAVM2Item) {
-                 ((UnresolvedAVM2Item) name).setNs(expr);
-                 //((UnresolvedAVM2Item) name).unresolved = false;
-                 //TODO
-                 } else {
-                 throw new ParseException("Not a property name", lexer.yyline());
-                 }
-                 ret = name;
-                 }
-                 break;*/
-                case IN:
-                    ret = new InAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
-                    break;
-                case TERNAR:
-                    GraphTargetItem terOnTrue = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                    expectedType(SymbolType.COLON);
-                    GraphTargetItem terOnFalse = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                    ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
-                    break;
-                case SHIFT_LEFT:
-                    ret = new LShiftAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case SHIFT_RIGHT:
-                    ret = new RShiftAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case USHIFT_RIGHT:
-                    ret = new URShiftAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case BITAND:
-                    ret = new BitAndAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case BITOR:
-                    ret = new BitOrAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case DIVIDE:
-                    ret = new DivideAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case MODULO:
-                    ret = new ModuloAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case EQUALS:
-                    ret = new EqAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case STRICT_EQUALS:
-                    ret = new StrictEqAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case NOT_EQUAL:
-                    ret = new NeqAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case STRICT_NOT_EQUAL:
-                    ret = new StrictNeqAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case LOWER_THAN:
-                    ret = new LtAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case LOWER_EQUAL:
-                    ret = new LeAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case GREATER_THAN:
-                case XML_STARTVARTAG_BEGIN:
-                case XML_STARTTAG_BEGIN:
-                    if (s.type != SymbolType.GREATER_THAN) {
-                        lexer.yypushbackstr(s.value.toString().substring(1)); //parse again as GREATER_THAN
-                    }
-                    ret = new GtAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case GREATER_EQUAL:
-                    ret = new GeAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case AND:
-                    ret = new AndItem(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case OR:
-                    ret = new OrItem(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case MINUS:
-                    ret = new SubtractAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case MULTIPLY:
-                    ret = new MultiplyAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case PLUS:
-                    ret = new AddAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case XOR:
-                    ret = new BitXorAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case INSTANCEOF:
-                    ret = new InstanceOfAVM2Item(null, expr, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                    break;
-                case IS:
-                    GraphTargetItem istype = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables);//type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
-                    ret = new IsTypeAVM2Item(null, expr, istype);
-                    allowRemainder = false;
-                    break;
-                case ASSIGN:
-                case ASSIGN_BITAND:
-                case ASSIGN_BITOR:
-                case ASSIGN_DIVIDE:
-                case ASSIGN_MINUS:
-                case ASSIGN_MODULO:
-                case ASSIGN_MULTIPLY:
-                case ASSIGN_PLUS:
-                case ASSIGN_SHIFT_LEFT:
-                case ASSIGN_SHIFT_RIGHT:
-                case ASSIGN_USHIFT_RIGHT:
-                case ASSIGN_XOR:
-                    GraphTargetItem assigned = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                    switch (s.type) {
-                        case ASSIGN:
-                            //assigned = assigned;
-                            break;
-                        case ASSIGN_BITAND:
-                            assigned = new BitAndAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_BITOR:
-                            assigned = new BitOrAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_DIVIDE:
-                            assigned = new DivideAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_MINUS:
-                            assigned = new SubtractAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_MODULO:
-                            assigned = new ModuloAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_MULTIPLY:
-                            assigned = new MultiplyAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_PLUS:
-                            assigned = new AddAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_SHIFT_LEFT:
-                            assigned = new LShiftAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_SHIFT_RIGHT:
-                            assigned = new RShiftAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_USHIFT_RIGHT:
-                            assigned = new URShiftAVM2Item(null, expr, assigned);
-                            break;
-                        case ASSIGN_XOR:
-                            assigned = new BitXorAVM2Item(null, expr, assigned);
-                            break;
-                    }
-
-                    if (!(expr instanceof AssignableAVM2Item)) {
-                        throw new AVM2ParseException("Invalid assignment", lexer.yyline());
-                    }
-                    AssignableAVM2Item as = ((AssignableAVM2Item) expr).copy();
-                    if ((as instanceof UnresolvedAVM2Item) || (as instanceof NameAVM2Item)) {
-                        variables.add(as);
-                    }
-                    as.setAssignedValue(assigned);
-                    if (expr instanceof NameAVM2Item) {
-                        ((NameAVM2Item) expr).setDefinition(false);
-                    }
-                    ret = as;
-                    break;
-                case DOT: //member
-                case BRACKET_OPEN: //member
-                case PARENT_OPEN: //function call
-                    lexer.pushback(s);
-                    ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, expr, registerVars, inFunction, inMethod, variables);
-                    break;
-
-                default:
-                    lexer.pushback(s);
-                    if (expr instanceof ParenthesisItem) {
-                        if (isType(((ParenthesisItem) expr).value)) {
-                            GraphTargetItem expr2 = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
-                            if (expr2 != null) {
-                                ret = new CoerceAVM2Item(null, ((ParenthesisItem) expr).value, expr2);
-                            }
-                        }
-                    }
-            }
-        }
-        ret = fixPrecedence(ret);
-        return ret;
-    }
-
+     ret = fixPrecedence(ret);
+     return ret;
+     }*/
     private boolean isNameOrProp(GraphTargetItem item) {
         if (item instanceof UnresolvedAVM2Item) {
             return true; //we don't know yet
@@ -1963,36 +1772,285 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem expression(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
+        GraphTargetItem prim = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+        return expression1(prim, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+    }
+
+    /**
+     * Lexer can return XML opentags instead of greater. In expression, we need
+     * greater sign only
+     *
+     * @param symb
+     */
+    private void xmlToGreaterFix(ParsedSymbol symb) {
+        if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {
+            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as GREATER_THAN  
+            symb.type = SymbolType.GREATER_THAN;
+            symb.group = SymbolGroup.OPERATOR;
+        }
+    }
+
+    private ParsedSymbol peekExprToken() throws IOException, AVM2ParseException {
+        ParsedSymbol lookahead = lex();
+        xmlToGreaterFix(lookahead);
+
+        lexer.pushback(lookahead);
+        return lookahead;
+    }
+
+    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
         if (debugMode) {
-            System.out.println("expression:");
+            System.out.println("expression1:");
+        }
+        ParsedSymbol lookahead = peekExprToken();
+
+        ParsedSymbol op;
+        GraphTargetItem rhs;
+        GraphTargetItem mhs = null;
+
+        //Note: algorithm from http://en.wikipedia.org/wiki/Operator-precedence_parser
+        //with relation operators reversed as we have precedence in reverse order
+        while (lookahead.type.isBinary() && lookahead.type.getPrecedence() <= /* >= on wiki */ min_precedence) {
+            op = lookahead;
+            lex();
+
+            //Note: Handle ternar operator as Binary
+            //http://stackoverflow.com/questions/13681293/how-can-i-incorporate-ternary-operators-into-a-precedence-climbing-algorithm
+            if (op.type == SymbolType.TERNAR) {
+                if (debugMode) {
+                    System.out.println("ternar-middle:");
+                }
+                mhs = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+                expectedType(SymbolType.COLON);
+                if (debugMode) {
+                    System.out.println("/ternar-middle");
+                }
+            }
+
+            rhs = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+            if (rhs == null) {
+                lexer.pushback(op);
+                break;
+            }
+
+            lookahead = peekExprToken();
+            while ((lookahead.type.isBinary() && lookahead.type.getPrecedence() < /* > on wiki */ op.type.getPrecedence())
+                    || (lookahead.type.isRightAssociative() && lookahead.type.getPrecedence() == op.type.getPrecedence())) {
+                rhs = expression1(rhs, lookahead.type.getPrecedence(), thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+                lookahead = peekExprToken();
+            }
+
+            switch (op.type) {
+                case AS:
+                    //GraphTargetItem type = type(thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
+
+                    lhs = new AsTypeAVM2Item(null, lhs, rhs); //???
+                    allowRemainder = false;
+                    break;
+
+                case IN:
+                    lhs = new InAVM2Item(null, lhs, rhs);
+                    break;
+
+                case TERNAR: //???
+                    lhs = new TernarOpItem(null, lhs, mhs, rhs);
+                    break;
+                case SHIFT_LEFT:
+                    lhs = new LShiftAVM2Item(null, lhs, rhs);
+                    break;
+                case SHIFT_RIGHT:
+                    lhs = new RShiftAVM2Item(null, lhs, rhs);
+                    break;
+                case USHIFT_RIGHT:
+                    lhs = new URShiftAVM2Item(null, lhs, rhs);
+                    break;
+                case BITAND:
+                    lhs = new BitAndAVM2Item(null, lhs, rhs);
+                    break;
+                case BITOR:
+                    lhs = new BitOrAVM2Item(null, lhs, rhs);
+                    break;
+                case DIVIDE:
+                    lhs = new DivideAVM2Item(null, lhs, rhs);
+                    break;
+                case MODULO:
+                    lhs = new ModuloAVM2Item(null, lhs, rhs);
+                    break;
+                case EQUALS:
+                    lhs = new EqAVM2Item(null, lhs, rhs);
+                    break;
+                case STRICT_EQUALS:
+                    lhs = new StrictEqAVM2Item(null, lhs, rhs);
+                    break;
+                case NOT_EQUAL:
+                    lhs = new NeqAVM2Item(null, lhs, rhs);
+                    break;
+                case STRICT_NOT_EQUAL:
+                    lhs = new StrictNeqAVM2Item(null, lhs, rhs);
+                    break;
+                case LOWER_THAN:
+                    lhs = new LtAVM2Item(null, lhs, rhs);
+                    break;
+                case LOWER_EQUAL:
+                    lhs = new LeAVM2Item(null, lhs, rhs);
+                    break;
+                case GREATER_THAN:
+                    lhs = new GtAVM2Item(null, lhs, rhs);
+                    break;
+                case GREATER_EQUAL:
+                    lhs = new GeAVM2Item(null, lhs, rhs);
+                    break;
+                case AND:
+                    lhs = new AndItem(null, lhs, rhs);
+                    break;
+                case OR:
+                    lhs = new OrItem(null, lhs, rhs);
+                    break;
+                case MINUS:
+                    lhs = new SubtractAVM2Item(null, lhs, rhs);
+                    break;
+                case MULTIPLY:
+                    lhs = new MultiplyAVM2Item(null, lhs, rhs);
+                    break;
+                case PLUS:
+                    lhs = new AddAVM2Item(null, lhs, rhs);
+                    break;
+                case XOR:
+                    lhs = new BitXorAVM2Item(null, lhs, rhs);
+                    break;
+                case INSTANCEOF:
+                    lhs = new InstanceOfAVM2Item(null, lhs, rhs);
+                    break;
+                case IS:
+                    GraphTargetItem istype = rhs;//type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
+                    lhs = new IsTypeAVM2Item(null, lhs, istype);
+                    break;
+                case ASSIGN:
+                case ASSIGN_BITAND:
+                case ASSIGN_BITOR:
+                case ASSIGN_DIVIDE:
+                case ASSIGN_MINUS:
+                case ASSIGN_MODULO:
+                case ASSIGN_MULTIPLY:
+                case ASSIGN_PLUS:
+                case ASSIGN_SHIFT_LEFT:
+                case ASSIGN_SHIFT_RIGHT:
+                case ASSIGN_USHIFT_RIGHT:
+                case ASSIGN_XOR:
+                    GraphTargetItem assigned = rhs;
+                    switch (op.type) {
+                        case ASSIGN:
+                            //assigned = assigned;
+                            break;
+                        case ASSIGN_BITAND:
+                            assigned = new BitAndAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_BITOR:
+                            assigned = new BitOrAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_DIVIDE:
+                            assigned = new DivideAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MINUS:
+                            assigned = new SubtractAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MODULO:
+                            assigned = new ModuloAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_MULTIPLY:
+                            assigned = new MultiplyAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_PLUS:
+                            assigned = new AddAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_SHIFT_LEFT:
+                            assigned = new LShiftAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_SHIFT_RIGHT:
+                            assigned = new RShiftAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_USHIFT_RIGHT:
+                            assigned = new URShiftAVM2Item(null, lhs, assigned);
+                            break;
+                        case ASSIGN_XOR:
+                            assigned = new BitXorAVM2Item(null, lhs, assigned);
+                            break;
+                    }
+
+                    if (!(lhs instanceof AssignableAVM2Item)) {
+                        throw new AVM2ParseException("Invalid assignment", lexer.yyline());
+                    }
+                    AssignableAVM2Item as = ((AssignableAVM2Item) lhs).copy();
+                    if ((as instanceof UnresolvedAVM2Item) || (as instanceof NameAVM2Item)) {
+                        variables.add(as);
+                    }
+                    as.setAssignedValue(assigned);
+                    if (lhs instanceof NameAVM2Item) {
+                        ((NameAVM2Item) lhs).setDefinition(false);
+                    }
+                    lhs = as;
+                    break;
+                case DESCENDANTS:
+                    expected(lookahead, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.MULTIPLY);
+                    lookahead = lex();
+                    lhs = new GetDescendantsAVM2Item(lhs, lookahead.type == SymbolType.MULTIPLY ? null : lookahead.value.toString(), openedNamespaces);
+                    allowRemainder = true;
+                    break;
+            }
+        }
+
+        switch (lookahead.type) {
+            case DOT: //member
+            case BRACKET_OPEN: //member
+            case PARENT_OPEN: //function call
+            case FILTER:
+                lhs = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, lhs, registerVars, inFunction, inMethod, variables);
+                break;
+
+            default:
+                if (lhs instanceof ParenthesisItem) {
+                    GraphTargetItem coerced = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+                    if (coerced!=null && isType(((ParenthesisItem) lhs).value)) {
+                        lhs = new CoerceAVM2Item(null, ((ParenthesisItem) lhs).value, coerced);
+                    }
+                }
+        }
+
+        if (debugMode) {
+            System.out.println("/expression1");
+        }
+        return lhs;
+    }
+
+    private GraphTargetItem expressionPrimary(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
+        if (debugMode) {
+            System.out.println("primary:");
         }
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
-        boolean existsRemainder = false;
-        boolean assocRight = false;
         switch (s.type) {
             case XML_STARTTAG_BEGIN:
                 lexer.pushback(s);
                 ret = xml(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
-                existsRemainder = true;
+
                 break;
             case STRING:
                 ret = new StringAVM2Item(null, s.value.toString());
-                existsRemainder = true;
+
                 break;
             case NEGATE:
                 ret = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables);
                 ret = new NegAVM2Item(null, ret);
-                existsRemainder = true;
+
                 break;
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
                     ret = new FloatValueAVM2Item(null, -(Double) s.value);
-                    existsRemainder = true;
+
                 } else if (s.isType(SymbolType.INTEGER)) {
                     ret = new IntegerValueAVM2Item(null, -(Long) s.value);
-                    existsRemainder = true;
+
                 } else {
                     lexer.pushback(s);
                     GraphTargetItem num = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
@@ -2014,22 +2072,22 @@ public class ActionScriptParser {
                 break;
             case TYPEOF:
                 ret = new TypeOfAVM2Item(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                existsRemainder = true;
+
                 break;
             case TRUE:
                 ret = new BooleanAVM2Item(null, true);
-                existsRemainder = true;
+
                 break;
             case NULL:
                 ret = new NullAVM2Item(null);
-                existsRemainder = true;
+
                 break;
             case UNDEFINED:
                 ret = new UndefinedAVM2Item(null);
                 break;
             case FALSE:
                 ret = new BooleanAVM2Item(null, false);
-                existsRemainder = true;
+
                 break;
             case CURLY_OPEN: //Object literal
                 s = lex();
@@ -2078,19 +2136,19 @@ public class ActionScriptParser {
                 break;
             case NAN:
                 ret = new NanAVM2Item(null);
-                existsRemainder = true;
+
                 break;
             case INFINITY:
                 ret = new FloatValueAVM2Item(null, Double.POSITIVE_INFINITY);
-                existsRemainder = true;
+
                 break;
             case INTEGER:
                 ret = new IntegerValueAVM2Item(null, (Long) s.value);
-                existsRemainder = true;
+
                 break;
             case DOUBLE:
                 ret = new FloatValueAVM2Item(null, (Double) s.value);
-                existsRemainder = true;
+
                 break;
             case DELETE:
                 GraphTargetItem varDel = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(thisType,false, openedNamespaces, registerVars, inFunction, inMethod, variables);
@@ -2111,17 +2169,17 @@ public class ActionScriptParser {
                 if (s.type == SymbolType.DECREMENT) {
                     ret = new PreDecrementAVM2Item(null, varincdec);
                 }
-                existsRemainder = true;
+
                 break;
             case NOT:
                 ret = new NotItem(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-                existsRemainder = true;
+
                 break;
             case PARENT_OPEN:
                 ret = new ParenthesisItem(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
-                existsRemainder = true;
+
                 break;
             case NEW:
                 s = lex();
@@ -2162,7 +2220,7 @@ public class ActionScriptParser {
                     expectedType(SymbolType.PARENT_OPEN);
                     ret = new ConstructSomethingAVM2Item(lexer.yyline(), openedNamespaces, newvar, call(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 }
-                existsRemainder = true;
+
                 break;
             case IDENTIFIER:
             case THIS:
@@ -2172,28 +2230,29 @@ public class ActionScriptParser {
                 GraphTargetItem var = name(thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 var = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
                 ret = var;
-                existsRemainder = true;
+
                 break;
             default:
                 GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);
                 if (excmd != null) {
-                    existsRemainder = true; //?
+                    //?
                     ret = excmd;
                     break;
                 }
                 lexer.pushback(s);
         }
-        if (allowRemainder && existsRemainder) {
-            GraphTargetItem rem = ret;
-            do {
-                rem = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);
-                if (rem != null) {
-                    ret = rem;
-                }
-            } while ((!assocRight) && (rem != null));
-        }
+        /*if (allowRemainder && existsRemainder) {
+         GraphTargetItem rem = ret;
+         do {
+         rem = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);                
+         if (rem != null) {
+         ret = rem;
+         }
+         } while ((!assocRight) && (rem != null));
+         ret = fixPrecedence(ret);
+         }*/
         if (debugMode) {
-            System.out.println("/expression");
+            System.out.println("/primary");
         }
         return ret;
     }

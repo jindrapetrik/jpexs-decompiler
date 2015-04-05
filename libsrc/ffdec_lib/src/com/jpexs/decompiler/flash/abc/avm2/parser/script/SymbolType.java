@@ -12,8 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
+
+import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
  *
@@ -22,116 +25,116 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 public enum SymbolType {
     //Keywords
 
-    BREAK,
-    CASE,
-    CONTINUE,
-    DEFAULT,
-    DO,
-    WHILE,
-    ELSE,
-    FOR,
-    EACH,
-    IN,
-    IF,
-    RETURN,
-    SUPER,
-    SWITCH,
-    THROW,
-    TRY,
-    CATCH,
-    FINALLY,
-    WITH,
-    DYNAMIC,
-    INTERNAL,
-    OVERRIDE,
-    PRIVATE,
-    PROTECTED,
-    PUBLIC,
-    STATIC,
-    CLASS,
-    CONST,
-    EXTENDS,
-    FUNCTION,
-    GET,
-    IMPLEMENTS,
-    INTERFACE,
-    NAMESPACE,
-    PACKAGE,
-    SET,
-    VAR,
-    IMPORT,
-    USE,
-    FALSE,
-    NULL,
-    THIS,
-    TRUE,
+    BREAK ,
+    CASE ,
+    CONTINUE ,
+    DEFAULT ,
+    DO ,
+    WHILE ,
+    ELSE ,
+    FOR ,
+    EACH ,
+    IN (GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    IF ,
+    RETURN ,
+    SUPER (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    SWITCH ,
+    THROW ,
+    TRY ,
+    CATCH ,
+    FINALLY ,
+    WITH ,
+    DYNAMIC ,
+    INTERNAL ,
+    OVERRIDE ,
+    PRIVATE ,
+    PROTECTED ,
+    PUBLIC ,
+    STATIC ,
+    CLASS ,
+    CONST ,
+    EXTENDS ,
+    FUNCTION (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    GET  ,
+    IMPLEMENTS  ,
+    INTERFACE  ,
+    NAMESPACE  ,
+    PACKAGE  ,
+    SET  ,
+    VAR  ,
+    IMPORT  ,
+    USE  ,
+    FALSE  (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    NULL (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    THIS (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    TRUE (GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //Operators
-    PARENT_OPEN,
-    PARENT_CLOSE,
-    CURLY_OPEN,
-    CURLY_CLOSE,
-    BRACKET_OPEN,
-    BRACKET_CLOSE,
-    SEMICOLON,
-    COMMA,
-    REST,
-    DOT,
-    ASSIGN,
-    GREATER_THAN,
-    LOWER_THAN,
-    NOT,
-    NEGATE,
-    TERNAR,
-    COLON,
-    EQUALS,
-    STRICT_EQUALS,
-    LOWER_EQUAL,
-    GREATER_EQUAL,
-    NOT_EQUAL,
-    STRICT_NOT_EQUAL,
-    AND,
-    OR,
-    INCREMENT,
-    DECREMENT,
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    BITAND,
-    BITOR,
-    XOR,
-    MODULO,
-    SHIFT_LEFT,
-    SHIFT_RIGHT,
-    USHIFT_RIGHT,
-    ASSIGN_PLUS,
-    ASSIGN_MINUS,
-    ASSIGN_MULTIPLY,
-    ASSIGN_DIVIDE,
-    ASSIGN_BITAND,
-    ASSIGN_BITOR,
-    ASSIGN_XOR,
-    ASSIGN_MODULO,
-    ASSIGN_SHIFT_LEFT,
-    ASSIGN_SHIFT_RIGHT,
-    ASSIGN_USHIFT_RIGHT,
-    AS,
-    DELETE,
-    INSTANCEOF,
-    IS,
-    NAMESPACE_OP,
-    NEW,
-    TYPEOF,
-    VOID,
+    PARENT_OPEN (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    PARENT_CLOSE (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    CURLY_OPEN (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    CURLY_CLOSE (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    BRACKET_OPEN (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    BRACKET_CLOSE (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    SEMICOLON ,
+    COMMA (GraphTargetItem.PRECEDENCE_COMMA,false),
+    REST ,
+    DOT (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    ASSIGN (GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    GREATER_THAN (GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    LOWER_THAN (GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    NOT(GraphTargetItem.PRECEDENCE_UNARY,false),
+    NEGATE (GraphTargetItem.PRECEDENCE_UNARY,false),
+    TERNAR (GraphTargetItem.PRECEDENCE_CONDITIONAL,true,true), /*!! ternar !!!*/
+    COLON(GraphTargetItem.PRECEDENCE_CONDITIONAL,false),/*!! ternar !!!*/
+    EQUALS (GraphTargetItem.PRECEDENCE_EQUALITY,true),
+    STRICT_EQUALS (GraphTargetItem.PRECEDENCE_EQUALITY,true),
+    LOWER_EQUAL (GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    GREATER_EQUAL (GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    NOT_EQUAL (GraphTargetItem.PRECEDENCE_EQUALITY,true),
+    STRICT_NOT_EQUAL (GraphTargetItem.PRECEDENCE_EQUALITY,true),
+    AND(GraphTargetItem.PRECEDENCE_LOGICALAND,true),
+    OR(GraphTargetItem.PRECEDENCE_LOGICALOR,true),
+    INCREMENT(GraphTargetItem.PRECEDENCE_POSTFIX,false),//OR Unary
+    DECREMENT(GraphTargetItem.PRECEDENCE_POSTFIX,false), //OR Unary
+    PLUS(GraphTargetItem.PRECEDENCE_ADDITIVE,true),
+    MINUS(GraphTargetItem.PRECEDENCE_ADDITIVE,true), //OR Unary
+    MULTIPLY(GraphTargetItem.PRECEDENCE_MULTIPLICATIVE,true),
+    DIVIDE(GraphTargetItem.PRECEDENCE_MULTIPLICATIVE,true),
+    BITAND(GraphTargetItem.PRECEDENCE_BITWISEAND,true),
+    BITOR(GraphTargetItem.PRECEDENCE_BITWISEOR,true),
+    XOR(GraphTargetItem.PRECEDENCE_BITWISEXOR,true),
+    MODULO(GraphTargetItem.PRECEDENCE_BITWISESHIFT,true),
+    SHIFT_LEFT(GraphTargetItem.PRECEDENCE_BITWISESHIFT,true),
+    SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_BITWISESHIFT,true),
+    USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_BITWISESHIFT,true),
+    ASSIGN_PLUS(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_MINUS(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_MULTIPLY(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_DIVIDE(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_BITAND(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_BITOR(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_XOR(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_MODULO(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_SHIFT_LEFT(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    ASSIGN_USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT,true,true),
+    AS(GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    DELETE(GraphTargetItem.PRECEDENCE_UNARY,false),
+    INSTANCEOF(GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    IS(GraphTargetItem.PRECEDENCE_RELATIONAL,true),
+    NAMESPACE_OP (GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    NEW(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    TYPEOF (GraphTargetItem.PRECEDENCE_UNARY,false),
+    VOID ,
     ATTRIBUTE,
     //Other
-    STRING,
+    STRING(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     COMMENT,
     //XML,
-    IDENTIFIER,
-    INTEGER,
-    DOUBLE,
-    TYPENAME,
+    IDENTIFIER(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    INTEGER(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    DOUBLE(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    TYPENAME(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     EOF,
     //TRACE,
     //GETURL,
@@ -160,16 +163,16 @@ public enum SymbolType {
     //STARTDRAG,
     //SUBSTR,
     //LENGTH, //string.length
-    INT,
+    INT(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //TARGETPATH,
-    NUMBER_OP,
-    STRING_OP,
+    NUMBER_OP(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    STRING_OP(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //IFFRAMELOADED,
-    INFINITY,
+    INFINITY(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //EVAL,
-    UNDEFINED,
+    UNDEFINED(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //NEWLINE,
-    NAN,
+    NAN(GraphTargetItem.PRECEDENCE_PRIMARY,false),
     //GETVERSION,
     //CALL,
     //LOADMOVIENUM,
@@ -181,26 +184,58 @@ public enum SymbolType {
     //UNLOADMOVIE,
     //UNLOADMOVIENUM,
     FINAL,
-    XML_STARTTAG_BEGIN, // <xxx
-    XML_STARTVARTAG_BEGIN, // <{
-    XML_STARTTAG_END, // >
-    XML_FINISHVARTAG_BEGIN, // </{
-    XML_FINISHTAG, //  </xxx>
-    XML_STARTFINISHTAG_END, // /> 
-    XML_COMMENT, // <!-- ... -->
-    XML_CDATA, //<![CDATA[ ... ]]>
-    XML_INSTR_BEGIN, // <?xxx
-    XML_INSTR_END, // ?>
-    XML_VAR_BEGIN, // {
-    XML_ATTRIBUTENAME, // aaa=
-    XML_ATTRIBUTEVALUE, // "vvv"
-    XML_TEXT,
-    XML_ATTRNAMEVAR_BEGIN, // {...}=
-    XML_ATTRVALVAR_BEGIN, // aaa={
-    XML_INSTRATTRNAMEVAR_BEGIN, // {...}=
-    XML_INSTRATTRVALVAR_BEGIN, // aaa={
-    XML_INSTRVARTAG_BEGIN, // <?{
-    FILTER,
-    DESCENDANTS,
-    NATIVE
+    XML_STARTTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // <xxx
+    XML_STARTVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // <{
+    XML_STARTTAG_END(GraphTargetItem.PRECEDENCE_PRIMARY,false), // >
+    XML_FINISHVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // </{
+    XML_FINISHTAG(GraphTargetItem.PRECEDENCE_PRIMARY,false), //  </xxx>
+    XML_STARTFINISHTAG_END(GraphTargetItem.PRECEDENCE_PRIMARY,false), // /> 
+    XML_COMMENT(GraphTargetItem.PRECEDENCE_PRIMARY,false), // <!-- ... -->
+    XML_CDATA(GraphTargetItem.PRECEDENCE_PRIMARY,false), //<![CDATA[ ... ]]>
+    XML_INSTR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // <?xxx
+    XML_INSTR_END(GraphTargetItem.PRECEDENCE_PRIMARY,false), // ?>
+    XML_VAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // {
+    XML_ATTRIBUTENAME(GraphTargetItem.PRECEDENCE_PRIMARY,false), // aaa=
+    XML_ATTRIBUTEVALUE(GraphTargetItem.PRECEDENCE_PRIMARY,false), // "vvv"
+    XML_TEXT(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    XML_ATTRNAMEVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // {...}=
+    XML_ATTRVALVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // aaa={
+    XML_INSTRATTRNAMEVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // {...}=
+    XML_INSTRATTRVALVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // aaa={
+    XML_INSTRVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY,false), // <?{
+    FILTER(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    DESCENDANTS(GraphTargetItem.PRECEDENCE_PRIMARY,false),
+    NATIVE;
+    
+    private int precedence = GraphTargetItem.NOPRECEDENCE;
+    private boolean binary = false;
+    private boolean rightAssociative = false;
+
+    public boolean isBinary() {
+        return binary;
+    }
+
+    public boolean isRightAssociative() {
+        return rightAssociative;
+    }      
+        
+    public int getPrecedence() {
+        return precedence;
+    }
+    
+        
+    private SymbolType(int precedence,boolean binary){
+        this.precedence = precedence;
+        this.binary = binary;
+    }
+    
+    private SymbolType(int precedence,boolean binary, boolean rightAssociative){
+        this.precedence = precedence;
+        this.binary = binary;
+        this.rightAssociative = rightAssociative;
+    }
+    
+    private SymbolType(){
+        
+    }
 }
