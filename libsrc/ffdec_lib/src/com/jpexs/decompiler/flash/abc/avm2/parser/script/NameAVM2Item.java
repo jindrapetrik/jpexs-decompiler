@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
@@ -333,7 +335,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber));
+                        (decrement?  ins(isInteger ? new DecLocalIIns() : new DecLocalIns(), regNumber):ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber)));
             }
         }
         return toSourceMerge(localData, generator,
