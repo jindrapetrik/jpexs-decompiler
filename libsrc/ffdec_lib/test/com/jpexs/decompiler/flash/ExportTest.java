@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Handler;
@@ -105,7 +106,7 @@ public class ExportTest extends FileTestBase {
                     return this;
                 }
 
-            }, fdir.getAbsolutePath(), exportMode, false, null);
+            }, fdir.getAbsolutePath(), new ScriptExportSettings(exportMode, false), false, null);
         } catch (Exception ex) {
             fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
         }
