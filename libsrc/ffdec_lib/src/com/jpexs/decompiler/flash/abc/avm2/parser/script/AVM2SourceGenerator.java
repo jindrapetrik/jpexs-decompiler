@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -134,6 +135,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -1478,15 +1481,43 @@ public class AVM2SourceGenerator implements SourceGenerator {
             registerTypes.add("Object");
             localData.scopeStack.add(new LocalRegAVM2Item(null, localData.activationReg, null));
         }
-        for (AssignableAVM2Item an : subvariables) {
-            if (an instanceof NameAVM2Item) {
-                NameAVM2Item n = (NameAVM2Item) an;
-                if (n.isDefinition()) {
-                    if (!needsActivation || (n.getSlotScope() <= 0)) {
-                        registerNames.add(n.getVariableName());
-                        registerTypes.add(n.type.toString());
-                        slotNames.add(n.getVariableName());
-                        slotTypes.add(n.type.toString());
+
+        String mask = Configuration.registerNameFormat.get();
+        mask = mask.replace("%d", "([0-9]+)");
+        Pattern pat = Pattern.compile(mask);
+
+        //Two rounds
+        for (int round = 1; round <= 2; round++) {
+            for (AssignableAVM2Item an : subvariables) {
+                if (an instanceof NameAVM2Item) {
+                    NameAVM2Item n = (NameAVM2Item) an;
+                    if (n.isDefinition()) {
+                        if (!needsActivation || (n.getSlotScope() <= 0)) {
+                            String varName = n.getVariableName();
+                            Matcher m = pat.matcher(varName);
+                            //In first round, make all register that match standard loc_xx register
+                            if ((round == 1) && (m.matches())) {
+                                String regIndexStr = m.group(1);
+                                int regIndex = Integer.parseInt(regIndexStr);
+                                while (registerNames.size() <= regIndex) {
+                                    String standardName = String.format(mask, registerNames.size() - 1);
+                                    registerNames.add(standardName);
+                                    registerTypes.add("*");
+                                    slotNames.add(standardName);
+                                    slotTypes.add("*");
+                                }
+                                registerNames.set(regIndex, varName);
+                                registerTypes.set(regIndex, varName);
+                                slotNames.set(regIndex, varName);
+                                slotTypes.set(regIndex, varName);
+                            } //in second round the rest
+                            else if (round == 2 && !m.matches()) {
+                                registerNames.add(n.getVariableName());
+                                registerTypes.add(n.type.toString());
+                                slotNames.add(n.getVariableName());
+                                slotTypes.add(n.type.toString());
+                            }
+                        }
                     }
                 }
             }
