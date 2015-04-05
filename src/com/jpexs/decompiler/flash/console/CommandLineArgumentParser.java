@@ -1630,7 +1630,7 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            pack.abc.replaceSciptPack(pack, as);
+            pack.abc.replaceScriptPack(pack, as);
         } catch (AVM2ParseException ex) {
             System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
