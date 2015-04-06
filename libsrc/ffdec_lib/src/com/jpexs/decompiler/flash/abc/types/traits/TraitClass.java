@@ -449,6 +449,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
         writer.startBlock();
 
+        //static variables & constants
+        abc.class_info.get(class_info).static_traits.toString(new Class[]{TraitSlotConst.class},this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        
+                
+        //static initializer
         int bodyIndex = abc.findBodyIndex(abc.class_info.get(class_info).cinit_index);
         if (bodyIndex != -1) {
             if (!classInitializerIsEmpty) {
@@ -465,7 +470,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
             //"/*classInitializer*/";
         }
 
-        //constructor
+        //instance variables
+        abc.instance_info.get(class_info).instance_traits.toString(new Class[]{TraitSlotConst.class},this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+
+        
+        //instance initializer - constructor
         if (!abc.instance_info.get(class_info).isInterface()) {
             String modifier = "";
             Multiname m = abc.constants.getMultiname(abc.instance_info.get(class_info).name_index);
@@ -503,12 +512,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.endMethod();
             writer.endTrait();
         }
+                        
+        //static methods
+        abc.class_info.get(class_info).static_traits.toString(new Class[]{TraitClass.class,TraitFunction.class,TraitMethodGetterSetter.class},this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        
+        //instance methods
+        abc.instance_info.get(class_info).instance_traits.toString(new Class[]{TraitClass.class,TraitFunction.class,TraitMethodGetterSetter.class},this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        //static variables,constants & methods
-        abc.class_info.get(class_info).static_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
-
-        abc.instance_info.get(class_info).instance_traits.toString(this, path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false), abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
-
+        
         writer.endBlock(); // class
         writer.endClass();
         writer.newLine();

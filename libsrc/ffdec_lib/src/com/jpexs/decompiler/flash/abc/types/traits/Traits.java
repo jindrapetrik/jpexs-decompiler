@@ -141,10 +141,22 @@ public class Traits implements Serializable {
         }
     }
 
-    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        for (int t = 0; t < traits.size(); t++) {
-            writer.newLine();
+    public GraphTextWriter toString(Class[] traitTypes,Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        for (int t = 0; t < traits.size(); t++) {            
             Trait trait = traits.get(t);
+            if(traitTypes!=null){
+                boolean found = false;
+                for(Class c:traitTypes){
+                    if(c.isInstance(trait)){
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    continue;
+                }
+            }
+            writer.newLine();
             int h = t;
             if (classIndex != -1) {
                 if (!isStatic) {

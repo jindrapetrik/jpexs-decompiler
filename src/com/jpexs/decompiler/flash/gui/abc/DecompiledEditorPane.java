@@ -212,7 +212,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
         if (reset || (methodCodePanel.getBodyIndex() != bi)) {
-            methodCodePanel.setBodyIndex(bi, abc, name, trait,script.scriptIndex);
+            methodCodePanel.setBodyIndex(bi, abc, name, trait, script.scriptIndex);
             abcPanel.detailPanel.setEditMode(false);
             this.isStatic = isStatic;
         }
@@ -608,12 +608,14 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, tc.startPos, tc.startPos + tc.len);
             int pos;
             if (th != null) {
-                ignoreCarret = true;
-                int startPos = th.startPos + th.len - 1;
-                if (startPos <= getDocument().getLength()) {
-                    setCaretPosition(startPos);
+                if (th.len > 1) {
+                    ignoreCarret = true;
+                    int startPos = th.startPos + th.len - 1;
+                    if (startPos <= getDocument().getLength()) {
+                        setCaretPosition(startPos);
+                    }
+                    ignoreCarret = false;
                 }
-                ignoreCarret = false;
                 pos = th.startPos;
             } else {
                 pos = tc.startPos;
