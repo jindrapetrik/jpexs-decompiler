@@ -446,15 +446,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("importtext32"));
         assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
 
-        importSymbolClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.symbolClass")), View.getResizableIcon("importtext32"));
+        importSymbolClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.symbolClass")), View.getResizableIcon("importsymbolclass32"));
         assignListener(importSymbolClassCommandButton, ACTION_IMPORT_SYMBOL_CLASS);
 
         importXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.xml")), View.getResizableIcon("importxml32"));
         assignListener(importXmlCommandButton, ACTION_IMPORT_SWF_XML);
 
         importBand.addCommandButton(importXmlCommandButton, RibbonElementPriority.TOP);
-        importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);
-        importBand.addCommandButton(importSymbolClassCommandButton, RibbonElementPriority.TOP);
+        importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.MEDIUM);
+        importBand.addCommandButton(importSymbolClassCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
         viewBand.setResizePolicies(getResizePolicies(viewBand));
