@@ -338,13 +338,13 @@
             <arg value="set_password" />            
             <arg value="${website.password}" />  
             
-            <arg value="-textarea" />
+            <arg value="-${upload.form.new.type}" />
             <arg value="new" />            
-            <arg value="New:" />
+            <arg value="${upload.form.new.value}" />
             
-            <arg value="-textarea" />
+            <arg value="-${upload.form.fixed.type}" />
             <arg value="fixed" />            
-            <arg value="Fixed:" />
+            <arg value="${upload.form.fixed.value}" />
 
             <arg value="-file" />
             <arg value="fileExe" />
@@ -365,7 +365,25 @@
         <available file="jpexs_website.properties" property="upload.config.exists"/>
     </target>
     
-    <target name="-upload" depends="-upload-check-config,-upload-do,-upload-fail">        
+    <!-- Prepare upload dialog to not show (no changes in nightly) -->
+    <target name="-upload-check-nightly" if="NIGHTLY">
+        <property name="upload.form.new.type" value="field" />
+        <property name="upload.form.new.value" value="" />
+        
+        <property name="upload.form.fixed.type" value="field" />
+        <property name="upload.form.fixed.value" value="" />
+    </target>
+    
+    <!-- Prepare upload dialog to show -->
+    <target name="-upload-check-stable" unless="NIGHTLY">
+        <property name="upload.form.new.type" value="textarea" />
+        <property name="upload.form.new.value" value="New:" />
+        
+        <property name="upload.form.fixed.type" value="textarea" />
+        <property name="upload.form.fixed.value" value="Fixed:" />
+    </target>
+    
+    <target name="-upload" depends="-upload-check-nightly,-upload-check-stable,-upload-check-config,-upload-do,-upload-fail">        
                
     </target>    
     
