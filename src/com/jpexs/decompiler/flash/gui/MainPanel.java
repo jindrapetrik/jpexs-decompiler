@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -2612,6 +2613,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     previewPanel.showSwf(swf);
                 }
             }
+        } else if (treeItem instanceof MetadataTag) {
+            MetadataTag metadataTag = (MetadataTag) treeItem;
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.showMetaDataPanel(metadataTag);           
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             showCard(CARDPREVIEWPANEL);

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -39,6 +40,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -69,6 +71,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,6 +83,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,8 +97,19 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
@@ -108,6 +124,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private static final String GENERIC_TAG_CARD = "GENERICTAG";
 
     private static final String BINARY_TAG_CARD = "BINARYTAG";
+    
+    private static final String METADATA_TAG_CARD = "METADATATAG";
 
     private static final String CARDTEXTPANEL = "Text card";
 
@@ -122,6 +140,12 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private static final String ACTION_PREV_FONTS = "PREVFONTS";
 
     private static final String ACTION_NEXT_FONTS = "NEXTFONTS";
+    
+    private static final String ACTION_EDIT_METADATA_TAG = "EDITMETADATATAG";
+
+    private static final String ACTION_SAVE_METADATA_TAG = "SAVEMETADATATAG";
+
+    private static final String ACTION_CANCEL_METADATA_TAG = "CANCELMETADATATAG";
 
     private final MainPanel mainPanel;
 
@@ -138,6 +162,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private MediaDisplay media;
 
     private BinaryPanel binaryPanel;
+    
+    private LineMarkedEditorPane metadataEditor;
 
     private GenericTagPanel genericTagPanel;
 
@@ -153,12 +179,19 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     // Binary tag buttons
     private JButton replaceBinaryButton;
 
+    // Metadata editor buttons
+    private JButton metadataEditButton;
+
+    private JButton metadataSaveButton;
+
+    private JButton metadataCancelButton;
+    
     // Generic tag buttons
-    private JButton editButton;
+    private JButton genericEditButton;
 
-    private JButton saveButton;
+    private JButton genericSaveButton;
 
-    private JButton cancelButton;
+    private JButton genericCancelButton;
 
     private JPanel parametersPanel;
 
@@ -169,6 +202,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private TextPanel textPanel;
 
     private boolean splitsInited;
+    
+    private MetadataTag metadataTag;
 
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
         super(JSplitPane.HORIZONTAL_SPLIT);
@@ -205,6 +240,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
+        viewerCards.add(createMetadataCard(),METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
         setLeftComponent(viewerCards);
 
@@ -270,26 +306,49 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     }
 
     private JPanel createGenericTagButtonsPanel() {
-        editButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
-        editButton.setMargin(new Insets(3, 3, 3, 10));
-        editButton.setActionCommand(ACTION_EDIT_GENERIC_TAG);
-        editButton.addActionListener(this);
-        saveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
-        saveButton.setMargin(new Insets(3, 3, 3, 10));
-        saveButton.setActionCommand(ACTION_SAVE_GENERIC_TAG);
-        saveButton.addActionListener(this);
-        saveButton.setVisible(false);
-        cancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
-        cancelButton.setMargin(new Insets(3, 3, 3, 10));
-        cancelButton.setActionCommand(ACTION_CANCEL_GENERIC_TAG);
-        cancelButton.addActionListener(this);
-        cancelButton.setVisible(false);
+        genericEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
+        genericEditButton.setMargin(new Insets(3, 3, 3, 10));
+        genericEditButton.setActionCommand(ACTION_EDIT_GENERIC_TAG);
+        genericEditButton.addActionListener(this);
+        genericSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        genericSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        genericSaveButton.setActionCommand(ACTION_SAVE_GENERIC_TAG);
+        genericSaveButton.addActionListener(this);
+        genericSaveButton.setVisible(false);
+        genericCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        genericCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        genericCancelButton.setActionCommand(ACTION_CANCEL_GENERIC_TAG);
+        genericCancelButton.addActionListener(this);
+        genericCancelButton.setVisible(false);
 
         ButtonsPanel genericTagButtonsPanel = new ButtonsPanel();
-        genericTagButtonsPanel.add(editButton);
-        genericTagButtonsPanel.add(saveButton);
-        genericTagButtonsPanel.add(cancelButton);
+        genericTagButtonsPanel.add(genericEditButton);
+        genericTagButtonsPanel.add(genericSaveButton);
+        genericTagButtonsPanel.add(genericCancelButton);
         return genericTagButtonsPanel;
+    }
+    
+    private JPanel createMetadataButtonsPanel() {
+        metadataEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
+        metadataEditButton.setMargin(new Insets(3, 3, 3, 10));
+        metadataEditButton.setActionCommand(ACTION_EDIT_METADATA_TAG);
+        metadataEditButton.addActionListener(this);
+        metadataSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        metadataSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        metadataSaveButton.setActionCommand(ACTION_SAVE_METADATA_TAG);
+        metadataSaveButton.addActionListener(this);
+        metadataSaveButton.setVisible(false);
+        metadataCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        metadataCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        metadataCancelButton.setActionCommand(ACTION_CANCEL_METADATA_TAG);
+        metadataCancelButton.addActionListener(this);
+        metadataCancelButton.setVisible(false);
+
+        ButtonsPanel metadataTagButtonsPanel = new ButtonsPanel();
+        metadataTagButtonsPanel.add(metadataEditButton);
+        metadataTagButtonsPanel.add(metadataSaveButton);
+        metadataTagButtonsPanel.add(metadataCancelButton);
+        return metadataTagButtonsPanel;
     }
 
     private JPanel createFlashPlayerPanel(FlashPlayerPanel flashPanel) {
@@ -351,6 +410,55 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         return shapesCard;
     }
 
+    private JPanel createMetadataCard() {        
+        DefaultSyntaxKit.initKit();        
+        JPanel metadataCard = new JPanel(new BorderLayout());
+        metadataEditor = new LineMarkedEditorPane();        
+        metadataCard.add(new JScrollPane(metadataEditor),BorderLayout.CENTER);
+        //metadataEditor.setContentType("text/xml");  
+        metadataEditor.setEditable(false);
+        
+        metadataEditor.setFont(new Font("Monospaced", Font.PLAIN, metadataEditor.getFont().getSize()));
+        metadataEditor.setContentType("text/xml");
+        metadataEditor.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                metadataTextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                metadataTextChanged();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                metadataTextChanged();
+            }
+        });
+        
+        metadataCard.add(createMetadataButtonsPanel(), BorderLayout.SOUTH);
+        return metadataCard;
+    }
+    
+    private boolean metadataModified = false;
+    
+    private void metadataTextChanged() {
+        metadataModified = true;
+        updateMetadataButtonsVisibility();
+    }
+    
+    private void updateMetadataButtonsVisibility(){
+        boolean edit = metadataEditor.isEditable();
+        boolean editorMode = Configuration.editorMode.get();
+        metadataEditButton.setVisible(!edit);
+        metadataSaveButton.setVisible(edit);
+        metadataSaveButton.setEnabled(metadataModified);
+        metadataCancelButton.setVisible(edit);
+        metadataCancelButton.setEnabled(metadataModified || !editorMode);
+    }
+    
     private JPanel createBinaryCard() {
         JPanel binaryCard = new JPanel(new BorderLayout());
         binaryPanel = new BinaryPanel(mainPanel);
@@ -477,6 +585,40 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         textPanel.closeTag();
     }
 
+    
+    
+    public static String formatMetadata(String input, int indent) {
+        input = input.replace("> <", "><");
+        try {
+            Source xmlInput = new StreamSource(new StringReader(input));
+            StringWriter stringWriter = new StringWriter();
+            StreamResult xmlOutput = new StreamResult(stringWriter);
+            StringWriter sw = new StringWriter();
+            xmlOutput.setWriter(sw);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", indent);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", ""+indent);
+            transformer.transform(xmlInput, xmlOutput);           
+
+            return xmlOutput.getWriter().toString();
+        } catch (IllegalArgumentException | TransformerException e) {
+            return input;
+        }
+    }
+    
+    public void showMetaDataPanel(MetadataTag metadataTag){
+        showCardLeft(METADATA_TAG_CARD);           
+        this.metadataTag = metadataTag;
+        metadataEditor.setEditable(Configuration.editorMode.get());
+        metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata,4));                      
+        metadataModified = false;
+        updateMetadataButtonsVisibility();
+        parametersPanel.setVisible(false);               
+    }
+    
     public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
         binaryPanel.setBinaryData(binaryDataTag);
@@ -485,9 +627,9 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     public void showGenericTagPanel(Tag tag) {
         showCardLeft(GENERIC_TAG_CARD);
-        editButton.setVisible(true);
-        saveButton.setVisible(false);
-        cancelButton.setVisible(false);
+        genericEditButton.setVisible(true);
+        genericSaveButton.setVisible(false);
+        genericCancelButton.setVisible(false);
         genericTagPanel.setEditMode(false, tag);
         parametersPanel.setVisible(false);
     }
@@ -997,6 +1139,37 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case ACTION_EDIT_METADATA_TAG: {
+                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+                if (item == null) {
+                    return;
+                }
+
+                if (item instanceof MetadataTag) {
+                    metadataEditor.setEditable(true);                    
+                    updateMetadataButtonsVisibility();
+                }
+            }
+            break;
+            case ACTION_SAVE_METADATA_TAG: {                
+                metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
+                metadataTag.setModified(true);
+                metadataEditor.setEditable(Configuration.editorMode.get());
+                metadataModified = false;
+                updateMetadataButtonsVisibility();
+                mainPanel.repaintTree();
+            }
+            break;
+                
+            case ACTION_CANCEL_METADATA_TAG: {
+                metadataEditor.setEditable(false);                    
+                metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata,4));
+                metadataEditor.setEditable(Configuration.editorMode.get());
+                metadataModified = false;               
+                updateMetadataButtonsVisibility();
+            }
+            break;    
+                
             case ACTION_EDIT_GENERIC_TAG: {
                 TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
                 if (item == null) {
@@ -1004,14 +1177,15 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 }
 
                 if (item instanceof Tag) {
-                    editButton.setVisible(false);
-                    saveButton.setVisible(true);
-                    cancelButton.setVisible(true);
-                    //genericTagPanel.generateEditControls((Tag) item, false);
+                    genericEditButton.setVisible(false);
+                    genericSaveButton.setVisible(true);
+                    genericCancelButton.setVisible(true);
                     genericTagPanel.setEditMode(true, (Tag) item);
                 }
             }
             break;
+                
+                
             case ACTION_SAVE_GENERIC_TAG: {
                 genericTagPanel.save();
                 Tag tag = genericTagPanel.getTag();
@@ -1021,16 +1195,16 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 tag.getTimelined().getTimeline().reset();
                 mainPanel.repaintTree();
                 mainPanel.setTagTreeSelectedNode(tag);
-                editButton.setVisible(true);
-                saveButton.setVisible(false);
-                cancelButton.setVisible(false);
+                genericEditButton.setVisible(true);
+                genericSaveButton.setVisible(false);
+                genericCancelButton.setVisible(false);
                 genericTagPanel.setEditMode(false, null);
             }
             break;
             case ACTION_CANCEL_GENERIC_TAG: {
-                editButton.setVisible(true);
-                saveButton.setVisible(false);
-                cancelButton.setVisible(false);
+                genericEditButton.setVisible(true);
+                genericSaveButton.setVisible(false);
+                genericCancelButton.setVisible(false);
                 genericTagPanel.setEditMode(false, null);
             }
             break;
