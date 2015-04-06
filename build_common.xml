@@ -367,10 +367,10 @@
     
     <!-- Prepare upload dialog to not show (no changes in nightly) -->
     <target name="-upload-check-nightly" if="NIGHTLY">
-        <property name="upload.form.new.type" value="field" />
+        <property name="upload.form.new.type" value="emptyfield" />
         <property name="upload.form.new.value" value="" />
         
-        <property name="upload.form.fixed.type" value="field" />
+        <property name="upload.form.fixed.type" value="emptyfield" />
         <property name="upload.form.fixed.value" value="" />
     </target>
     

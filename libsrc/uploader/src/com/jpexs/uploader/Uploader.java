@@ -183,7 +183,14 @@ public class Uploader {
                     values.add(args[i+2]);
                     labels.add("");
                     i+=2;
-                }       
+                }    
+                if(args[i].equals("-emptyfield")){
+                    types.add("field");
+                    names.add(args[i+1]);
+                    values.add("");
+                    labels.add("");
+                    i+=2;
+                }  
                 if(args[i].equals("-textarea")){
                     types.add("textarea");
                     names.add(args[i+1]);                    
