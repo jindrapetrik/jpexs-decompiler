@@ -1645,10 +1645,12 @@ public class AVM2Code implements Cloneable {
                         if (t.name_index == multinameIndex) {
                             if ((t instanceof TraitSlotConst)) {
                                 if (((TraitSlotConst) t).isConst() || isStaticInitializer) {
-                                    ((TraitSlotConst) t).assignedValue = value;
-                                    list.remove(i);
-                                    i--;
-                                    continue;
+                                    if ((((TraitSlotConst) t).assignedValue) == null) {
+                                        ((TraitSlotConst) t).assignedValue = value;
+                                        list.remove(i);
+                                        i--;
+                                        continue;
+                                    }
                                 }
                                 break;
                             }
@@ -1665,9 +1667,7 @@ public class AVM2Code implements Cloneable {
             for (GraphTargetItem ti : list) {
                 if (!(ti instanceof ReturnVoidAVM2Item)) {
                     if (!(ti instanceof InitPropertyAVM2Item)) {
-                        if (!(ti instanceof SetPropertyAVM2Item)) {
-                            newList.add(ti);
-                        }
+                        newList.add(ti);
                     }
                 }
             }
