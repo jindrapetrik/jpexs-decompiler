@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -32,7 +33,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineButtonCxformTag extends Tag {
+public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int buttonId;
@@ -86,5 +87,10 @@ public class DefineButtonCxformTag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         buttonColorTransform = sis.readCXFORM("buttonColorTransform");
+    }
+    
+    @Override
+    public int getCharacterId() {
+        return buttonId;
     }
 }

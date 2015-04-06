@@ -45,4 +45,9 @@ public enum TreeNodeType {
     BUNDLE_SWC,
     BUNDLE_BINARY,
     HEADER,
+    SET_BACKGROUNDCOLOR,
+    FILE_ATTRIBUTES,
+    METADATA,
+    PLACE_OBJECT,
+    REMOVE_OBJECT
 }

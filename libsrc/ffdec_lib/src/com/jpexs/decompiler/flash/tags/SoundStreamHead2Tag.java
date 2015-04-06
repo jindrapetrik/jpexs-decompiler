@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -40,7 +41,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHeadTypeTag {
+public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHeadTypeTag {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 4)

@@ -352,7 +352,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         di.getChildInfos().clear();
     }
-
+       
     public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
             synchronized (this) {
@@ -857,9 +857,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         this.tags = tags;
         if (!checkOnly) {
             checkInvalidSprites();
+            Map<Integer, CharacterTag> chars = new HashMap<>();
+            parseCharacters(tags, chars);
+            characters = chars;
             assignExportNamesToSymbols();
             assignClassesToSymbols();
-
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
             boolean hasNonUnknownTag = false;
@@ -950,8 +952,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
         for (Tag t : tags) {
-            if (t instanceof CharacterIdTag) {
-                CharacterIdTag ct = (CharacterIdTag) t;
+            if (t instanceof CharacterTag) {
+                CharacterTag ct = (CharacterTag) t;
                 if (exportNames.containsKey(ct.getCharacterId())) {
                     ct.setExportName(exportNames.get(ct.getCharacterId()));
                 }
@@ -1939,7 +1941,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 cnt++;
                 informListeners("rename", "class " + cnt + "/" + classCount);
                 DoInitActionTag dia = (DoInitActionTag) t;
-                String exportName = dia.getExportName();
+                String exportName =  characters.containsKey(dia.spriteId)?characters.get(dia.spriteId).getExportName():"_unk_";
                 final String pkgPrefix = "__Packages.";
                 String[] classNameParts = null;
                 if ((exportName != null) && exportName.startsWith(pkgPrefix)) {

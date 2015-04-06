@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineFontInfoTag extends Tag {
+public class DefineFontInfoTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int fontId;
@@ -145,5 +146,10 @@ public class DefineFontInfoTag extends Tag {
                 codeTable.add(sis.readUI8("code"));
             }
         }
+    }
+    
+    @Override
+    public int getCharacterId() {
+        return fontId;
     }
 }

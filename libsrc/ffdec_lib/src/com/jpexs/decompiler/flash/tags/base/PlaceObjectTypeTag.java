@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -31,7 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class PlaceObjectTypeTag extends CharacterIdTag {
+public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
 
     public PlaceObjectTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);

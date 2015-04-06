@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -31,7 +32,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefineFontAlignZonesTag extends Tag {
+public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int fontID;
@@ -96,5 +97,10 @@ public class DefineFontAlignZonesTag extends Tag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+    
+    @Override
+    public int getCharacterId() {
+        return fontID;
     }
 }

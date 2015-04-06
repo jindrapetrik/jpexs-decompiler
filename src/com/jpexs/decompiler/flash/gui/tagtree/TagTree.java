@@ -96,6 +96,8 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -336,6 +338,21 @@ public class TagTree extends JTree {
             }
         }
 
+        if(t instanceof SetBackgroundColorTag){
+            return TreeNodeType.SET_BACKGROUNDCOLOR;
+        }
+        if(t instanceof FileAttributesTag){
+            return TreeNodeType.FILE_ATTRIBUTES;
+        }
+        if(t instanceof MetadataTag){
+            return TreeNodeType.METADATA;
+        }
+        if(t instanceof PlaceObjectTypeTag){
+            return TreeNodeType.PLACE_OBJECT;
+        }
+        if(t instanceof RemoveTag){
+            return TreeNodeType.REMOVE_OBJECT;
+        }
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
         }

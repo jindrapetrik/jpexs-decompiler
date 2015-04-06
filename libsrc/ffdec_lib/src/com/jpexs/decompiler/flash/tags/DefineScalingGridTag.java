@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -30,7 +31,7 @@ import java.io.OutputStream;
 /**
  * @author JPEXS
  */
-public class DefineScalingGridTag extends Tag {
+public class DefineScalingGridTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int characterId;
@@ -77,5 +78,10 @@ public class DefineScalingGridTag extends Tag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+    
+    @Override
+    public int getCharacterId() {
+        return characterId;
     }
 }

@@ -2733,7 +2733,10 @@ public class XFLConverter {
                         DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
                         if (sprite.subTags.isEmpty()) {
                             String data = convertActionScript(dia);
-                            String expPath = dia.getExportName();
+                            CharacterTag spr=dia.getSwf().getCharacter(dia.spriteId);
+                            String expName = spr!=null?spr.getExportName():"_unk_";
+                            
+                            String expPath = spr.getExportName();
                             final String prefix = "__Packages.";
                             if (expPath.startsWith(prefix)) {
                                 expPath = expPath.substring(prefix.length());

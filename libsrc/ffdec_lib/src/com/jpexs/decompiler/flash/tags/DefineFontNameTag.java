@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -26,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineFontNameTag extends Tag {
+public class DefineFontNameTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int fontId;
@@ -78,5 +79,10 @@ public class DefineFontNameTag extends Tag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+    
+    @Override
+    public int getCharacterId() {
+        return fontId;
     }
 }

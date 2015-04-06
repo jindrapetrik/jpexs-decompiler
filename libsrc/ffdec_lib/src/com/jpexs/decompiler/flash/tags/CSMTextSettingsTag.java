@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -32,7 +33,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class CSMTextSettingsTag extends Tag {
+public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int textID;
@@ -113,5 +114,10 @@ public class CSMTextSettingsTag extends Tag {
         thickness = sis.readFLOAT("thickness"); //F32 = FLOAT
         sharpness = sis.readFLOAT("sharpness"); //F32 = FLOAT
         reserved2 = sis.readUI8("reserved2"); //reserved
+    }
+
+    @Override
+    public int getCharacterId() {
+        return textID;
     }
 }

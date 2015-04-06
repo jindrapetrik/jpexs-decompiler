@@ -360,7 +360,8 @@ public class Timeline {
         for (ASMSource asm : asmSources) {
             if (asm instanceof DoInitActionTag) {
                 DoInitActionTag initAction = (DoInitActionTag) asm;
-                String path = initAction.getExportName();
+                CharacterTag cht=swf.getCharacter(initAction.spriteId);
+                String path = cht!=null?cht.getExportName():"_unk_";
                 if (path == null || path.isEmpty()) {
                     path = initAction.getExportFileName();
                 }

@@ -24,49 +24,10 @@ import com.jpexs.helpers.ByteArrayRange;
  *
  * @author JPEXS
  */
-public abstract class CharacterIdTag extends Tag {
+public interface CharacterIdTag {
 
-    public CharacterIdTag(SWF swf, int id, String name, ByteArrayRange data) {
-        super(swf, id, name, data);
-    }
+    
 
-    public abstract int getCharacterId();
-
-    protected String exportName;
-
-    public void setExportName(String exportName) {
-        if ("".equals(exportName)) {
-            exportName = null;
-        }
-        this.exportName = exportName;
-    }
-
-    @Override
-    public String getName() {
-        String nameAppend = "";
-        if (exportName != null) {
-            nameAppend = ": " + exportName;
-        }
-        if (getCharacterId() != -1) {
-            return super.getName() + " (" + getCharacterId() + nameAppend + ")";
-        }
-        if (!nameAppend.isEmpty()) {
-            return super.getName() + " (" + nameAppend + ")";
-        }
-        return super.getName();
-    }
-
-    @Override
-    public String getExportFileName() {
-        String result = super.getExportFileName() + "_" + getCharacterId();
-        return result + (exportName != null ? "_" + exportName : "");
-    }
-
-    public String getCharacterExportFileName() {
-        return getCharacterId() + (exportName != null ? "_" + exportName : "");
-    }
-
-    public String getExportName() {
-        return exportName;
-    }
+    public int getCharacterId();
+      
 }

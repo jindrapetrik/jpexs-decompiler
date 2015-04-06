@@ -28,6 +28,8 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -190,7 +192,7 @@ public class TagTreeModel implements TreeModel {
         List<TreeItem> sounds = new ArrayList<>();
         List<TreeItem> binaryData = new ArrayList<>();
         List<TreeItem> others = new ArrayList<>();
-
+        Map<Integer, List<TreeItem>> mappedTags = new HashMap<>();
         for (Tag t : swf.tags) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
@@ -229,7 +231,20 @@ public class TagTreeModel implements TreeModel {
                     break;
                 default:
                     if (t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {
-                        others.add(t);
+                        boolean parentFound = false;
+                        if ((t instanceof CharacterIdTag) && !(t instanceof CharacterTag)) {
+                            CharacterIdTag chit = (CharacterIdTag) t;
+                            if (swf.getCharacter(chit.getCharacterId()) != null) {
+                                parentFound = true;
+                                if (!mappedTags.containsKey(chit.getCharacterId())) {
+                                    mappedTags.put(chit.getCharacterId(), new ArrayList<>());
+                                }
+                                mappedTags.get(chit.getCharacterId()).add(t);                                
+                            }
+                        }
+                        if (!parentFound) {
+                            others.add(t);
+                        }
                     }
                     break;
             }
@@ -318,6 +333,7 @@ public class TagTreeModel implements TreeModel {
 
         TagTreeSwfInfo swfInfo = new TagTreeSwfInfo();
         swfInfo.folders = nodeList;
+        swfInfo.mappedTags = mappedTags;
         swfInfo.tagScriptCache = currentTagScriptCache;
         swfInfos.put(swf, swfInfo);
     }
@@ -461,6 +477,20 @@ public class TagTreeModel implements TreeModel {
 
         return swfInfo.folders;
     }
+    
+    private List<TreeItem> getMappedCharacters(SWF swf,CharacterTag tag) {
+        TagTreeSwfInfo swfInfo = swfInfos.get(swf);
+        if (swfInfo == null) {
+            createTagList(swf);
+            swfInfo = swfInfos.get(swf);
+        }
+
+        List<TreeItem> mapped = swfInfo.mappedTags.get(tag.getCharacterId());
+        if(mapped == null){
+            mapped = new ArrayList<>();
+        }
+        return mapped;
+    }
 
     public List<? extends TreeItem> getAllChildren(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
@@ -530,6 +560,8 @@ public class TagTreeModel implements TreeModel {
             } else {
                 return new ArrayList<>();
             }
+        } else if (parentNode instanceof CharacterTag){
+            return getMappedCharacters(((CharacterTag)parentNode).getSwf(),(CharacterTag)parentNode);
         }
 
         return new ArrayList<>();
@@ -600,6 +632,8 @@ public class TagTreeModel implements TreeModel {
             return clt.getChild(clt.getRoot(), index);
         } else if (parentNode instanceof AS3ClassTreeItem) {
             return ((AS3Package) parentNode).getChild(index);
+        } else if (parentNode instanceof CharacterTag){
+            return getMappedCharacters(((CharacterTag)parentNode).getSwf(),(CharacterTag)parentNode).get(index);
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
@@ -636,6 +670,8 @@ public class TagTreeModel implements TreeModel {
             return clt.getChildCount(clt.getRoot());
         } else if (parentNode instanceof AS3Package) {
             return ((AS3Package) parentNode).getChildCount();
+        } else if (parentNode instanceof CharacterTag){
+            return getMappedCharacters(((CharacterTag)parentNode).getSwf(),(CharacterTag)parentNode).size();
         }
 
         return 0;
@@ -690,6 +726,8 @@ public class TagTreeModel implements TreeModel {
             return clt.getIndexOfChild(clt.getRoot(), childNode);
         } else if (parentNode instanceof AS3ClassTreeItem) {
             return ((AS3Package) parentNode).getIndexOfChild((AS3ClassTreeItem) childNode);
+        } else if (parentNode instanceof CharacterTag){
+            return getMappedCharacters(((CharacterTag)parentNode).getSwf(),(CharacterTag)parentNode).indexOf(childNode);
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());

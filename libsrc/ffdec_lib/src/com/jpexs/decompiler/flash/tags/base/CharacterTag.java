@@ -17,13 +17,14 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class CharacterTag extends CharacterIdTag {
+public abstract class CharacterTag extends Tag implements CharacterIdTag {
 
     protected String className;
 
@@ -57,8 +58,20 @@ public abstract class CharacterTag extends CharacterIdTag {
         return result + (className != null ? "_" + className : "");
     }
 
-    @Override
     public String getCharacterExportFileName() {
         return getCharacterId() + (exportName != null ? "_" + exportName : "") + (className != null ? "_" + className : "");
+    }
+
+    protected String exportName;
+
+    public void setExportName(String exportName) {
+        if ("".equals(exportName)) {
+            exportName = null;
+        }
+        this.exportName = exportName;
+    }
+
+    public String getExportName() {
+        return exportName;
     }
 }
