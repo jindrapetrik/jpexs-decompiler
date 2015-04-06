@@ -338,4 +338,11 @@ public interface Kernel32 extends WinNT {
     public static final int LOCALE_SISO639LANGNAME = 89;
 
     int GetLocaleInfo(int Locale, int LCType, char[] lpLCData, int cchData);
+    
+    public HANDLE CreateMutex(WinBase.SECURITY_ATTRIBUTES sa, boolean initialOwner, String name);    
+    
+    HANDLE CreateFile(String lpFileName, int dwDesiredAccess, int dwShareMode, 
+    		WinBase.SECURITY_ATTRIBUTES lpSecurityAttributes, int dwCreationDisposition, 
+    		int dwFlagsAndAttributes, HANDLE hTemplateFile);
+
 }

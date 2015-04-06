@@ -420,6 +420,11 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
+    
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> allowOnlyOneInstance = null;
 
     private enum OSId {
 
@@ -755,4 +760,6 @@ public class Configuration {
 
         return null;
     }
+    
+    
 }

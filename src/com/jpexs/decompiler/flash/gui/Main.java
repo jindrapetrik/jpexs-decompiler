@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -1005,7 +1006,7 @@ public class Main {
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
-
+               
         clearTemp();
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
@@ -1028,14 +1029,23 @@ public class Main {
 
         if (args.length == 0) {
             initGui();
-            showModeFrame();
+            if(Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()){ //Try to focus first instance                
+                Main.exit();
+            }else{
+                showModeFrame();
+            }
+            
         } else {
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
                 initGui();
                 shouldCloseWhenClosingLoadingDialog = true;
-                for (String fileToOpen : filesToOpen) {
-                    openFile(fileToOpen, null);
+                if(Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))){ //Try to open in first instance
+                    Main.exit();
+                }else{
+                    for (String fileToOpen : filesToOpen) {
+                        openFile(fileToOpen, null);
+                    }                
                 }
             }
         }
