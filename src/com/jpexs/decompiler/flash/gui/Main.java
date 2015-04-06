@@ -1002,7 +1002,7 @@ public class Main {
 
     /**
      * @param args the command line arguments
-     * @throws IOException
+     * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
 

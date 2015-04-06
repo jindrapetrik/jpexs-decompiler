@@ -38,9 +38,9 @@ public class FontPreviewDialog extends AppDialog {
     /**
      * Creates new form FontPreviewDialog
      *
-     * @param parent
-     * @param font
-     * @param modal
+     * @param parent Parent frame
+     * @param font Font
+     * @param modal Will show as modal?
      */
     public FontPreviewDialog(java.awt.Frame parent, boolean modal, Font font) {
         super();

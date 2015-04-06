@@ -62,7 +62,7 @@ public class FontPanel extends javax.swing.JPanel {
     /**
      * Creates new form FontPanel
      *
-     * @param mainPanel
+     * @param mainPanel Main panel
      */
     public FontPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;

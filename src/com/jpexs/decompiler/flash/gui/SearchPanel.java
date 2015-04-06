@@ -31,7 +31,7 @@ import jsyntaxpane.actions.DocumentSearchData;
 /**
  *
  * @author JPEXS
- * @param <E>
+ * @param <E> Element to search
  */
 public class SearchPanel<E> extends JPanel implements ActionListener {
 

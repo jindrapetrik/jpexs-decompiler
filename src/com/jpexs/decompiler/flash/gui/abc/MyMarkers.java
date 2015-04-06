@@ -54,7 +54,7 @@ public class MyMarkers {
     /**
      * Remove all the markers from an JEditorPane
      *
-     * @param editorPane
+     * @param editorPane Editor
      */
     public static void removeMarkers(JTextComponent editorPane) {
         removeMarkers(editorPane, null);
@@ -63,9 +63,9 @@ public class MyMarkers {
     /**
      * add highlights for the given Token on the given pane
      *
-     * @param pane
-     * @param token
-     * @param marker
+     * @param pane Editor
+     * @param token Token
+     * @param marker Marker
      */
     public static void markToken(JTextComponent pane, Token token, Highlighter.HighlightPainter marker) {
         markText(pane, token.start, token.end(), marker);
@@ -74,10 +74,10 @@ public class MyMarkers {
     /**
      * add highlights for the given region on the given pane
      *
-     * @param pane
-     * @param start
-     * @param end
-     * @param marker
+     * @param pane Editor
+     * @param start Start index
+     * @param end End index
+     * @param marker Marker
      */
     public static void markText(JTextComponent pane, int start, int end, Highlighter.HighlightPainter marker) {
         try {

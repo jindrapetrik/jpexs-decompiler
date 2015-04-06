@@ -952,7 +952,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      */
     DWORD SendInput(DWORD nInputs, WinUser.INPUT[] pInputs, int cbSize);
 
-    /**
+    /* *
      * Waits until the specified process has finished processing its initial
      * input and is waiting for user input with no input pending, or until the
      * time-out interval has elapsed.
@@ -1099,7 +1099,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      */
     boolean CloseWindow(HWND hWnd);
 
-    /**
+    /* *
      * Defines a system-wide hot key.
      *
      * @param hWnd A handle to the window that will receive
@@ -1199,7 +1199,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      */
     public boolean UnregisterClass(WString lpClassName, HINSTANCE hInstance);
 
-    /**
+    /* *
      * Creates an overlapped, pop-up, or child window with an extended window
      * style; otherwise, this function is identical to the CreateWindow
      * function. For more information about creating a window and for full

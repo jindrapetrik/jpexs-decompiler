@@ -46,7 +46,7 @@ public class LicenseUpdater {
      * Script for updating license header in java files :-)
      *
      * @param dir Star directory (e.g. "src/")
-     * @param lgpl
+     * @param lgpl Is LGPL?
      */
     public static void updateLicenseInDir(File dir, boolean lgpl) {
 

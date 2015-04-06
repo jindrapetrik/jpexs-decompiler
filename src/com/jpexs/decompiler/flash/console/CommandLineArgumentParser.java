@@ -311,9 +311,9 @@ public class CommandLineArgumentParser {
     /**
      * Parses the console arguments
      *
-     * @param arguments
+     * @param arguments Arguments
      * @return paths to the file which should be opened or null
-     * @throws java.io.IOException
+     * @throws java.io.IOException On error
      */
     public static String[] parseArguments(String[] arguments) throws IOException {
         Level traceLevel = Level.WARNING;

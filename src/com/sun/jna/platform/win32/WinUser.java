@@ -265,7 +265,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
     public interface WNDENUMPROC extends StdCallCallback {
 
-        /**
+        /* *
          * Return whether to continue enumeration.
          *
          * @param hWnd

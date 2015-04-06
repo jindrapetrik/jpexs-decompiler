@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 /**
  *
  * @author JPEXS
- * @param <E>
+ * @param <E> Element to search
  */
 public interface SearchListener<E> {
 

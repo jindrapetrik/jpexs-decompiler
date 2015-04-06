@@ -66,7 +66,7 @@ public class SWFListModel implements ListModel<Replacement> {
     /**
      * Called when data in a replacement changed
      *
-     * @param index
+     * @param index Index of which SWF changed
      */
     public void dataChanged(int index) {
         if (index == -1) {

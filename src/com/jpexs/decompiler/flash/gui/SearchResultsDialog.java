@@ -35,7 +35,7 @@ import javax.swing.JScrollPane;
 /**
  *
  * @author JPEXS
- * @param <E>
+ * @param <E> Element to search
  */
 public class SearchResultsDialog<E> extends AppDialog implements ActionListener {
 
