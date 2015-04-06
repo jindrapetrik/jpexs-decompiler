@@ -243,4 +243,11 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         return true;
     }
+
+    @Override
+    public boolean isModified() {
+        return abc.script_info.get(scriptIndex).isModified();
+    }
+    
+    
 }

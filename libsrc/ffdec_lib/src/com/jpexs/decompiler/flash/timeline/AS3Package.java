@@ -147,4 +147,23 @@ public class AS3Package extends AS3ClassTreeItem {
     public String toString() {
         return packageName;
     }
+
+    @Override
+    public boolean isModified() {
+        List<ScriptPack> sps=getScriptPacks();
+        for(ScriptPack sp:sps){
+            if(sp.isModified()){
+                return true;
+            }
+        }
+        List<AS3Package> ps=getSubPackages();
+        for(AS3Package p:ps){
+            if(p.isModified()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
 }

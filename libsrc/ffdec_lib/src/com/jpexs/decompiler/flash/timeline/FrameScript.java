@@ -53,4 +53,11 @@ public class FrameScript implements TreeItem, Exportable {
     public String getExportFileName() {
         return frame.getExportFileName();
     }
+
+    @Override
+    public boolean isModified() {
+        return frame.isModified();
+    }
+    
+    
 }

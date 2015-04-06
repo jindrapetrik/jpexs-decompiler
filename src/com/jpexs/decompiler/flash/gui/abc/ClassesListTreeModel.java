@@ -186,4 +186,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public String toString() {
         return AppStrings.translate("node.scripts");
     }
+
+    @Override
+    public boolean isModified() {
+        return root.isModified();
+    }
+    
+    
 }

@@ -42,4 +42,11 @@ public class HeaderItem implements TreeItem {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean isModified() {
+        return false; //??
+    }
+    
+    
 }

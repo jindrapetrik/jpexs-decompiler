@@ -87,4 +87,29 @@ public class Frame implements TreeItem, Exportable {
     public String getExportFileName() {
         return "frame_" + (frame + 1);
     }
+
+    @Override
+    public boolean isModified() {
+        for(Tag t:innerTags){
+            if(t.isModified()){
+                return true;
+            }
+        }
+        for(Tag t:actions){
+            if(t.isModified()){
+                return true;
+            }
+        }
+        for(ASMSourceContainer t:actionContainers){
+            if(t.isModified()){
+                return true;
+            }
+        }
+        if(showFrameTag!=null && showFrameTag.isModified()){
+            return true;
+        }
+        return false;
+    }
+    
+    
 }

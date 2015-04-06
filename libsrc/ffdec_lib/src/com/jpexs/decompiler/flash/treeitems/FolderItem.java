@@ -53,4 +53,15 @@ public class FolderItem implements TreeItem {
     public String toString() {
         return str;
     }
+
+    @Override
+    public boolean isModified() {
+        for(TreeItem ti:subItems){
+            if(ti.isModified()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }

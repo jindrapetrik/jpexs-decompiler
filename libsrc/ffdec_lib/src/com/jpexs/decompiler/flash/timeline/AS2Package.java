@@ -113,4 +113,21 @@ public class AS2Package implements TreeItem {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean isModified() {
+        for(ASMSource s:scripts.values()){
+            if(s.isModified()){
+                return true;
+            }
+        }
+        for(AS2Package p:subPackages.values()){
+            if(p.isModified()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
 }

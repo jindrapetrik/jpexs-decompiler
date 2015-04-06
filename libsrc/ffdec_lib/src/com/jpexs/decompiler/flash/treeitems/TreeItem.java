@@ -25,4 +25,6 @@ import com.jpexs.decompiler.flash.SWF;
 public interface TreeItem {
 
     public SWF getSwf();
+    
+    public boolean isModified();
 }

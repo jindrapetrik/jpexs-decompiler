@@ -172,4 +172,16 @@ public class SWFList implements List<SWF>, SWFContainerItem {
     public List<SWF> subList(int i, int i1) {
         return swfs.subList(i, i1);
     }
+
+    @Override
+    public boolean isModified() {
+        for(SWF s:swfs){
+            if(s.isModified()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
 }
