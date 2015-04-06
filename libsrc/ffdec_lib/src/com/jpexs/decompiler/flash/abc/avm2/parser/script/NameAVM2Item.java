@@ -343,11 +343,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 //Start get original
                 generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
                 //End get original
-                !isInteger ? ins(new ConvertDIns()) : null,
+                //!isInteger ? ins(new ConvertDIns()) : null,
                 //End get original
                 (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                 needsReturn ? ins(new DupIns()) : null,
                 (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                generateCoerce(localData, generator, returnType()),
                 generateSetLoc(regNumber),
                 slotNumber > -1 ? ins(new SetSlotIns(), slotNumber) : null
         );

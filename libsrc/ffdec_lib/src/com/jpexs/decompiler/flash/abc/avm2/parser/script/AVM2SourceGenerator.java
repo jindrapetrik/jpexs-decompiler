@@ -1499,7 +1499,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if ((round == 1) && (m.matches())) {
                                 String regIndexStr = m.group(1);
                                 int regIndex = Integer.parseInt(regIndexStr);
-                                while (registerNames.size() <= regIndex) {
+                                while (registerNames.size() <= regIndex + 1) {
                                     String standardName = String.format(mask, registerNames.size() - 1);
                                     registerNames.add(standardName);
                                     registerTypes.add("*");
