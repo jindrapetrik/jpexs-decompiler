@@ -73,7 +73,7 @@
         </copy>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="build_lib">
         <!--<delete dir="${COMPILEDIR}"/>-->        
         <mkdir dir="${COMPILEDIR}"/>
         <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true"
@@ -89,6 +89,10 @@
                 <type type="file"/>
             </fileset>
         </copy>
+    </target>
+    
+    <target name="compile_lib">
+        <ant antfile="${CORELIBSCRIPT}" target="compile" inheritAll="false" usenativebasedir="true" />
     </target>
     
     <target name="compile-tests">
@@ -559,6 +563,7 @@
         <delete dir="${COVERAGEDIR}"/>
         <delete dir="${TESTRESULTSDIR}"/>
         <delete dir="${LOCALESTARGETDIR}"/>
+        <delete dir="${INSTRDIR}"/>
     </target>
     
     <!-- Debug one test method (Netbeans IDE) -->

@@ -185,6 +185,7 @@
         <delete dir="${COVERAGEDIR}"/>
         <delete dir="${TESTRESULTSDIR}"/>
         <delete dir="${LOCALESTARGETDIR}"/>
+        <delete dir="${INSTRDIR}"/>
     </target>
     
     <!-- Debug one test method (Netbeans IDE) -->
