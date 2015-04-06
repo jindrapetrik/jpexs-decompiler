@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import gnu.jpdf.PDFJob;
 import java.awt.Color;
@@ -110,13 +111,7 @@ public class FrameExporter {
         }
 
         final File foutdir = new File(outdir + path);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         final List<Integer> fframes = frames;
 

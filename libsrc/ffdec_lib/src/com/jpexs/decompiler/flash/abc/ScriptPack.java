@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -188,22 +189,21 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException {
-        String scriptName = getPathScriptName();
-        String packageName = getPathPackage();
-        File outDir = new File(directory + File.separatorChar + "scripts" + File.separatorChar + makeDirPath(packageName));
-        if (!outDir.exists()) {
-            if (!outDir.mkdirs()) {
-                if (!outDir.exists()) {
-                    throw new IOException("cannot create directory " + outDir);
-                }
-            }
-        }
-        String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
+        File file = null;
 
-        File file = new File(fileName);
-        try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
+        if (!exportSettings.singleFile) {
+            String scriptName = getPathScriptName();
+            String packageName = getPathPackage();
+            File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
+            Path.createDirectorySafe(outDir);
+            String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
+            file = new File(fileName);
+        }
+
+        try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             try {
-                toSource(writer, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
+                FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
+                toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -248,6 +248,4 @@ public class ScriptPack extends AS3ClassTreeItem {
     public boolean isModified() {
         return abc.script_info.get(scriptIndex).isModified();
     }
-    
-    
 }

@@ -329,6 +329,10 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> textExportSingleFile = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<Boolean> scriptExportSingleFile = null;
+
     @ConfigurationDefaultString("--- SEPARATOR ---")
     @ConfigurationCategory("export")
     public static final ConfigurationItem<String> textExportSingleFileSeparator = null;
@@ -420,8 +424,7 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
-    
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> allowOnlyOneInstance = null;
@@ -760,6 +763,4 @@ public class Configuration {
 
         return null;
     }
-    
-    
 }

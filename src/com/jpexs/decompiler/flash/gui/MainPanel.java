@@ -74,6 +74,7 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
+import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
@@ -156,6 +157,7 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -453,13 +455,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             Random rnd = new Random();
                             tempDir += "ffdec" + File.separator + "export" + File.separator + System.currentTimeMillis() + "_" + rnd.nextInt(1000);
                             File fTempDir = new File(tempDir);
-                            if (!fTempDir.exists()) {
-                                if (!fTempDir.mkdirs()) {
-                                    if (!fTempDir.exists()) {
-                                        throw new IOException("cannot create directory " + fTempDir);
-                                    }
-                                }
-                            }
+                            Path.createDirectorySafe(fTempDir);
 
                             File ftemp = new File(tempDir);
                             ExportDialog exd = new ExportDialog(null);
@@ -1119,16 +1115,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
             }
 
-            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), Configuration.textExportSingleFile.get());
+            boolean parallel = Configuration.parallelSpeedUp.get();
+            String scriptsFolder = Path.combine(selFile, "scripts");
+            Path.createDirectorySafe(new File(scriptsFolder));
+            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
+            String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
             if (swf.isAS3()) {
-                for (int i = 0; i < as3scripts.size(); i++) {
-                    ScriptPack tls = as3scripts.get(i);
-                    Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
-                    ret.add(tls.export(selFile, scriptExportSettings, Configuration.parallelSpeedUp.get()));
+                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    scriptExportSettings.singleFileWriter = writer;
+                    for (int i = 0; i < as3scripts.size(); i++) {
+                        ScriptPack tls = as3scripts.get(i);
+                        Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
+                        ret.add(tls.export(scriptsFolder, scriptExportSettings, parallel));
+                    }
                 }
             } else {
                 Map<String, ASMSource> asmsToExport = swf.getASMs(true, as12scripts, false);
-                ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, selFile + File.separator + "scripts", asmsToExport, scriptExportSettings, evl));
+                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    scriptExportSettings.singleFileWriter = writer;
+                    ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, scriptsFolder, asmsToExport, scriptExportSettings, evl));
+                }
             }
         }
         return ret;
@@ -1163,8 +1169,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        ScriptExportSettings exportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), Configuration.textExportSingleFile.get());
-        swf.exportActionScript(handler, selFile, exportSettings, Configuration.parallelSpeedUp.get(), evl);
+        boolean parallel = Configuration.parallelSpeedUp.get();
+        String scriptsFolder = Path.combine(selFile, "scripts");
+        Path.createDirectorySafe(new File(scriptsFolder));
+        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
+        String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
+        try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+            scriptExportSettings.singleFileWriter = writer;
+            swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
+        }
     }
 
     public List<SWFList> getSwfs() {
@@ -1840,7 +1853,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (bi != -1) {
                             getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                         }
-                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait(),getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                     }
                     return true;
                 }
@@ -1943,7 +1956,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
                                 }
                             }
-                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t,getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t, getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
@@ -2616,7 +2629,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             showCard(CARDPREVIEWPANEL);
-            previewPanel.showMetaDataPanel(metadataTag);           
+            previewPanel.showMetaDataPanel(metadataTag);
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             showCard(CARDPREVIEWPANEL);

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,14 +45,9 @@ public class ImageExporter {
         if (tags.isEmpty()) {
             return ret;
         }
+
         File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         int count = 0;
         for (Tag t : tags) {

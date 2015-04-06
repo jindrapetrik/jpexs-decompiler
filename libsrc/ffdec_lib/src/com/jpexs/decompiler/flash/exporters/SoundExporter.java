@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,14 +56,9 @@ public class SoundExporter {
         if (tags.isEmpty()) {
             return ret;
         }
+
         File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         int count = 0;
         for (Tag t : tags) {

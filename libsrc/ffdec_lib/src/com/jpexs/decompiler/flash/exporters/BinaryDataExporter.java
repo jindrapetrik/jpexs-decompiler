@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,14 +41,9 @@ public class BinaryDataExporter {
         if (tags.isEmpty()) {
             return ret;
         }
+
         File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         int count = 0;
         for (Tag t : tags) {

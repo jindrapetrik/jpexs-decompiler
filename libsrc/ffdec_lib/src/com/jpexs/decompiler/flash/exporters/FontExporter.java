@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import fontastic.FGlyph;
 import fontastic.FPoint;
 import fontastic.Fontastic;
@@ -58,14 +59,9 @@ public class FontExporter {
         if (tags.isEmpty()) {
             return ret;
         }
+
         File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         int count = 0;
         for (Tag t : tags) {

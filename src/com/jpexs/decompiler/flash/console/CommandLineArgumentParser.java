@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -932,16 +933,16 @@ public class CommandLineArgumentParser {
                     System.out.println("Start exporting " + inFile.getName());
                 }
 
-                SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
-                exfile.swfList = new SWFList();
-                exfile.swfList.sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
+                SWF swf = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
+                swf.swfList = new SWFList();
+                swf.swfList.sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
                     outDir = Path.combine(outDir, inFile.getName());
                 }
 
                 List<Tag> extags = new ArrayList<>();
-                for (Tag t : exfile.tags) {
+                for (Tag t : swf.tags) {
                     if (t instanceof CharacterIdTag) {
                         CharacterIdTag c = (CharacterIdTag) t;
                         if (selectionIds.contains(c.getCharacterId())) {
@@ -955,7 +956,7 @@ public class CommandLineArgumentParser {
                 }
 
                 final Level level = traceLevel;
-                exfile.addEventListener(new EventListener() {
+                swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
                         if (level.intValue() <= Level.FINE.intValue()) {
@@ -996,7 +997,7 @@ public class CommandLineArgumentParser {
                 commandLineMode = true;
                 boolean exportAll = exportFormats.contains("all");
                 boolean multipleExportTypes = exportAll || exportFormats.size() > 1;
-                EventListener evl = exfile.getExportEventListener();
+                EventListener evl = swf.getExportEventListener();
 
                 if (exportAll || exportFormats.contains("image")) {
                     System.out.println("Exporting images...");
@@ -1045,27 +1046,34 @@ public class CommandLineArgumentParser {
                 if (exportAll || exportFormats.contains("frame")) {
                     System.out.println("Exporting frames...");
                     List<Integer> frames = new ArrayList<>();
-                    for (int i = 0; i < exfile.frameCount; i++) {
+                    for (int i = 0; i < swf.frameCount; i++) {
                         if (selection.contains(i + 1)) {
                             frames.add(i);
                         }
                     }
-                    new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + "frames" : ""), exfile, 0, frames, new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom), evl);
+                    new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + "frames" : ""), swf, 0, frames, new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom), evl);
                 }
 
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), Configuration.textExportSingleFile.get());
+                boolean parallel = Configuration.parallelSpeedUp.get();
+                String scriptsFolder = Path.combine(outDir, "scripts");
+                Path.createDirectorySafe(new File(scriptsFolder));
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
                 if (exportAll || exportFormats.contains("script")) {
                     System.out.println("Exporting scripts...");
-                    boolean parallel = Configuration.parallelSpeedUp.get();
                     if (as3classes.isEmpty()) {
                         as3classes = parseSelectClassOld(args);
                     }
-                    if (!as3classes.isEmpty()) {
-                        for (String as3class : as3classes) {
-                            exportOK = exportOK && exfile.exportAS3Class(as3class, outDir, scriptExportSettings, parallel, evl);
+
+                    String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
+                    try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                        scriptExportSettings.singleFileWriter = writer;
+                        if (!as3classes.isEmpty()) {
+                            for (String as3class : as3classes) {
+                                exportOK = exportOK && swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl);
+                            }
+                        } else {
+                            exportOK = exportOK && swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl) != null;
                         }
-                    } else {
-                        exportOK = exportOK && exfile.exportActionScript(handler, outDir, scriptExportSettings, parallel, evl) != null;
                     }
                 }
 
@@ -1075,7 +1083,7 @@ public class CommandLineArgumentParser {
                     if (flaVersion == null) {
                         flaVersion = FLAVersion.CS6; //Defaults to CS6
                     }
-                    exfile.exportFla(handler, outDir + (multipleExportTypes ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
+                    swf.exportFla(handler, outDir + (multipleExportTypes ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
                 }
 
                 if (exportFormats.contains("xfl")) {
@@ -1084,7 +1092,7 @@ public class CommandLineArgumentParser {
                     if (xflVersion == null) {
                         xflVersion = FLAVersion.CS6; //Defaults to CS6
                     }
-                    exfile.exportXfl(handler, outDir + (multipleExportTypes ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
+                    swf.exportXfl(handler, outDir + (multipleExportTypes ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
                 }
 
                 if (!singleFile) {
@@ -1093,7 +1101,7 @@ public class CommandLineArgumentParser {
                     System.out.println("Export finished: " + inFile.getName() + " Export time: " + Helper.formatTimeSec(time));
                 }
 
-                exfile.clearAllCache();
+                swf.clearAllCache();
             }
         } catch (OutOfMemoryError | Exception ex) {
             System.err.print("FAIL: Exporting Failed on Exception - ");

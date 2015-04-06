@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 
 /**
  *
@@ -27,6 +28,8 @@ public class ScriptExportSettings {
     public ScriptExportMode mode;
 
     public boolean singleFile;
+
+    public FileTextWriter singleFileWriter;
 
     public ScriptExportSettings(ScriptExportMode mode, boolean singleFile) {
         this.mode = mode;

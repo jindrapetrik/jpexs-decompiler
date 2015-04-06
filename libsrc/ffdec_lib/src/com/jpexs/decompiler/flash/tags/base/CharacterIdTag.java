@@ -16,18 +16,11 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.helpers.ByteArrayRange;
-
 /**
  *
  * @author JPEXS
  */
 public interface CharacterIdTag {
 
-    
-
     public int getCharacterId();
-      
 }

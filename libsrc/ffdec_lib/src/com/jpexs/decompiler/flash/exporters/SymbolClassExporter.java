@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -52,13 +53,7 @@ public class SymbolClassExporter {
         }
 
         File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
+        Path.createDirectorySafe(foutdir);
 
         final File file = new File(outdir + File.separator + SYMBOL_CLASS_EXPORT_FILENAME);
         try (Writer writer = new BufferedWriter(new Utf8OutputStreamWriter(new FileOutputStream(file)))) {

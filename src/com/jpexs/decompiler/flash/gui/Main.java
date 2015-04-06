@@ -1006,7 +1006,7 @@ public class Main {
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
-               
+
         clearTemp();
         String pluginPath = Configuration.pluginPath.get();
         if (pluginPath != null && !pluginPath.isEmpty()) {
@@ -1029,23 +1029,23 @@ public class Main {
 
         if (args.length == 0) {
             initGui();
-            if(Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()){ //Try to focus first instance                
+            if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
                 Main.exit();
-            }else{
+            } else {
                 showModeFrame();
             }
-            
+
         } else {
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
                 initGui();
                 shouldCloseWhenClosingLoadingDialog = true;
-                if(Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))){ //Try to open in first instance
+                if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
                     Main.exit();
-                }else{
+                } else {
                     for (String fileToOpen : filesToOpen) {
                         openFile(fileToOpen, null);
-                    }                
+                    }
                 }
             }
         }
@@ -1053,15 +1053,8 @@ public class Main {
 
     public static String tempFile(String url) throws IOException {
         File f = new File(Configuration.getFFDecHome() + "saved" + File.separator);
-        if (!f.exists()) {
-            if (!f.mkdirs()) {
-                if (!f.exists()) {
-                    throw new IOException("cannot create directory " + f);
-                }
-            }
-        }
+        Path.createDirectorySafe(f);
         return Configuration.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
-
     }
 
     public static void removeTrayIcon() {

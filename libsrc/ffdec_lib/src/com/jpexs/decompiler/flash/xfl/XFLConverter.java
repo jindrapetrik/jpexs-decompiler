@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
@@ -2675,13 +2676,7 @@ public class XFLConverter {
         }
         File file = new File(outfile);
         File outDir = file.getParentFile();
-        if (!outDir.exists()) {
-            if (!outDir.mkdirs()) {
-                if (!outDir.exists()) {
-                    throw new IOException("cannot create directory " + outDir);
-                }
-            }
-        }
+        Path.createDirectorySafe(outDir);
         StringBuilder domDocument = new StringBuilder();
         String baseName = swfFileName;
         File f = new File(baseName);
@@ -2733,9 +2728,9 @@ public class XFLConverter {
                         DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
                         if (sprite.subTags.isEmpty()) {
                             String data = convertActionScript(dia);
-                            CharacterTag spr=dia.getSwf().getCharacter(dia.spriteId);
-                            String expName = spr!=null?spr.getExportName():"_unk_";
-                            
+                            CharacterTag spr = dia.getSwf().getCharacter(dia.spriteId);
+                            String expName = spr != null ? spr.getExportName() : "_unk_";
+
                             String expPath = spr.getExportName();
                             final String prefix = "__Packages.";
                             if (expPath.startsWith(prefix)) {
@@ -2748,13 +2743,7 @@ public class XFLConverter {
                             }
                             expPath = expPath.replace(".", File.separator);
                             File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
-                            if (!cdir.exists()) {
-                                if (!cdir.mkdirs()) {
-                                    if (!cdir.exists()) {
-                                        throw new IOException("cannot create directory " + cdir);
-                                    }
-                                }
-                            }
+                            Path.createDirectorySafe(cdir);
                             writeFile(handler, Utf8Helper.getBytes(data), outDir.getAbsolutePath() + File.separator + expPath + ".as");
                         }
                     }
@@ -3021,14 +3010,7 @@ public class XFLConverter {
             }, handler).run();
 
         } else {
-
-            if (!outDir.exists()) {
-                if (!outDir.mkdirs()) {
-                    if (!outDir.exists()) {
-                        throw new IOException("cannot create directory " + outDir);
-                    }
-                }
-            }
+            Path.createDirectorySafe(outDir);
             writeFile(handler, Utf8Helper.getBytes(domDocumentStr), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
             writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
             File libraryDir = new File(outDir.getAbsolutePath() + File.separator + "LIBRARY");
@@ -3046,7 +3028,7 @@ public class XFLConverter {
         if (useAS3) {
             try {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), scriptExportSettings, parallel, null);
+                swf.exportActionScript(handler, Path.combine(outDir.getAbsolutePath(), "scripts"), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

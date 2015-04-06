@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -112,13 +113,8 @@ public class AS2ScriptExporter {
             try {
                 int currentIndex = index.getAndIncrement();
 
-                File dir = new File(outdir);
-                if (!dir.exists()) {
-                    if (!dir.mkdirs()) {
-                        if (!dir.exists()) {
-                            throw new IOException("Cannot create directory " + outdir);
-                        }
-                    }
+                if (!exportSettings.singleFile) {
+                    Path.createDirectorySafe(new File(outdir));
                 }
 
                 String f = outdir + name + ".as";
@@ -129,20 +125,21 @@ public class AS2ScriptExporter {
                 long startTime = System.currentTimeMillis();
 
                 File file = new File(f);
-                try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
+                try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
+                    FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
                     ScriptExportMode exportMode = exportSettings.mode;
                     if (exportMode == ScriptExportMode.HEX) {
-                        asm.getActionSourcePrefix(writer);
-                        asm.getActionBytesAsHex(writer);
-                        asm.getActionSourceSuffix(writer);
+                        asm.getActionSourcePrefix(writer2);
+                        asm.getActionBytesAsHex(writer2);
+                        asm.getActionSourceSuffix(writer2);
                     } else if (exportMode != ScriptExportMode.AS) {
-                        asm.getActionSourcePrefix(writer);
-                        asm.getASMSource(exportMode, writer, null);
-                        asm.getActionSourceSuffix(writer);
+                        asm.getActionSourcePrefix(writer2);
+                        asm.getASMSource(exportMode, writer2, null);
+                        asm.getActionSourceSuffix(writer2);
                     } else {
                         List<Action> as = asm.getActions();
                         Action.setActionsAddresses(as, 0);
-                        Action.actionsToSource(asm, as, ""/*FIXME*/, writer);
+                        Action.actionsToSource(asm, as, ""/*FIXME*/, writer2);
                     }
                 }
 

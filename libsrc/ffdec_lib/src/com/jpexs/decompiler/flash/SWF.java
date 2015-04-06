@@ -352,7 +352,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         di.getChildInfos().clear();
     }
-       
+
     public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
             synchronized (this) {
@@ -1259,7 +1259,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
         }
-        outdir += "scripts" + File.separator;
 
         ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportSettings, evl));
         return ret;
@@ -1941,7 +1940,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 cnt++;
                 informListeners("rename", "class " + cnt + "/" + classCount);
                 DoInitActionTag dia = (DoInitActionTag) t;
-                String exportName =  characters.containsKey(dia.spriteId)?characters.get(dia.spriteId).getExportName():"_unk_";
+                String exportName = characters.containsKey(dia.spriteId) ? characters.get(dia.spriteId).getExportName() : "_unk_";
                 final String pkgPrefix = "__Packages.";
                 String[] classNameParts = null;
                 if ((exportName != null) && exportName.startsWith(pkgPrefix)) {
