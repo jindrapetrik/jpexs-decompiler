@@ -396,15 +396,15 @@ public interface Advapi32 extends StdCallLibrary {
 
     /**
      *
-     * @param hKey
-     * @param lpSubKey
-     * @param Reserved
-     * @param lpClass
-     * @param dwOptions
-     * @param samDesired
-     * @param lpSecurityAttributes
-     * @param phkResult
-     * @param lpdwDisposition
+     * @param hKey hKey
+     * @param lpSubKey lpSubKey
+     * @param Reserved Reserved
+     * @param lpClass lpClass
+     * @param dwOptions dwOptions
+     * @param samDesired samDesired
+     * @param lpSecurityAttributes lpSecurityAttributes
+     * @param phkResult phkResult
+     * @param lpdwDisposition lpdwDisposition
      * @return If the function succeeds, the return value is ERROR_SUCCESS. If
      * the function fails, the return value is a nonzero error code defined in
      * Winerror.h.
@@ -415,8 +415,8 @@ public interface Advapi32 extends StdCallLibrary {
 
     /**
      *
-     * @param hKey
-     * @param name
+     * @param hKey hKey
+     * @param name name
      * @return If the function succeeds, the return value is ERROR_SUCCESS. If
      * the function fails, the return value is a nonzero error code defined in
      * Winerror.h.

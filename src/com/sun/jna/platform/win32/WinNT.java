@@ -349,7 +349,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
         /**
          * Initialize a TOKEN_PRIVILEGES instance from initialized memory.
          *
-         * @param p
+         * @param p p
          */
         public TOKEN_PRIVILEGES(Pointer p) {
             super(p);
@@ -675,7 +675,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          * WARNING: this filename may be either the short or long form of the
          * filename.
          *
-         * @return
+         * @return result
          */
         public String getFilename() {
             return new String(FileName, 0, FileNameLength / 2);
@@ -1033,9 +1033,9 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
         /**
          * Override to the appropriate object for INVALID_HANDLE_VALUE.
          *
-         * @param nativeValue
-         * @param context
-         * @return
+         * @param nativeValue nativeValue
+         * @param context context
+         * @return result
          */
         @Override
         public Object fromNative(Object nativeValue, FromNativeContext context) {

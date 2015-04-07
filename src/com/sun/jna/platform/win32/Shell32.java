@@ -28,7 +28,7 @@ public interface Shell32 extends StdCallLibrary {
             W32APIOptions.UNICODE_OPTIONS);
 
     /**
-     * @param lpExecInfo
+     * @param lpExecInfo lpExecInfo
      * @return true if successful. Otherwise false.
      */
     boolean ShellExecuteEx(SHELLEXECUTEINFO lpExecInfo);

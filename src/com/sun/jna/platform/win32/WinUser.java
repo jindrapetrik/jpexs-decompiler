@@ -268,9 +268,9 @@ public interface WinUser extends StdCallLibrary, WinDef {
         /**
          * Return whether to continue enumeration.
          *
-         * @param hWnd
-         * @param data
-         * @return
+         * @param hWnd hWnd
+         * @param data data
+         * @return result
          */
         boolean callback(HWND hWnd, Pointer data);
     }
