@@ -644,5 +644,5 @@ public class View {
         });
 
         return table;
-    }   
+    }
 }

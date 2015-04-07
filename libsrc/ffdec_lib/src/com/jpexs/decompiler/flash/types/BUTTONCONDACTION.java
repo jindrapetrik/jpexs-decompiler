@@ -145,7 +145,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
      */
     @Internal
     public ByteArrayRange actionBytes;
-    
+
     /**
      * Sets actions associated with this object
      *
@@ -246,8 +246,6 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
         }
         return false;
     }
-    
-    
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {

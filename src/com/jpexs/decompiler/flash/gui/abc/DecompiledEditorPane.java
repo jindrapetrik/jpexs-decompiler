@@ -450,7 +450,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (ch != null) {
             Highlighting th = Highlighting.searchPos(traitHighlights, pos);
             if (th != null) {
-                 currentTrait = abc.findTraitByTraitId((int) ch.getProperties().index, (int) th.getProperties().index);
+                currentTrait = abc.findTraitByTraitId((int) ch.getProperties().index, (int) th.getProperties().index);
             }
         }
 

@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DoInitActionTag extends Tag implements CharacterIdTag,ASMSource {
+public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     /**
      * Identifier of Sprite

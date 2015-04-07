@@ -79,13 +79,11 @@ public class TagScript implements TreeItem, Exportable {
 
     @Override
     public boolean isModified() {
-        for(TreeItem f:frames){
-            if(f.isModified()){
+        for (TreeItem f : frames) {
+            if (f.isModified()) {
                 return true;
             }
         }
         return tag.isModified();
     }
-    
-    
 }

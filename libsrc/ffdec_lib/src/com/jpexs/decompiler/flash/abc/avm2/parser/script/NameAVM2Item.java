@@ -334,7 +334,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        (decrement?  ins(isInteger ? new DecLocalIIns() : new DecLocalIns(), regNumber):ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber)));
+                        (decrement ? ins(isInteger ? new DecLocalIIns() : new DecLocalIns(), regNumber) : ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber)));
             }
         }
         return toSourceMerge(localData, generator,

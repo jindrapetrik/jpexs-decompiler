@@ -267,7 +267,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         if (timeline != null) {
             return timeline;
         }
-        
+
         timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
 
         int maxDepth = 0;
@@ -301,25 +301,25 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             }
 
         }
-        
+
         timeline.addFrame(frameUp);
-        
+
         if (frameOver.layers.isEmpty()) {
             frameOver = frameUp;
         }
-        
+
         timeline.addFrame(frameOver);
-        
+
         if (frameDown.layers.isEmpty()) {
             frameDown = frameOver;
         }
-        
+
         timeline.addFrame(frameDown);
-        
+
         if (frameHit.layers.isEmpty()) {
             frameHit = frameUp;
         }
-        
+
         timeline.addFrame(frameHit);
         return timeline;
     }

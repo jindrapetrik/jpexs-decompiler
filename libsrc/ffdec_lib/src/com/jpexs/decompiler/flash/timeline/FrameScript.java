@@ -58,6 +58,4 @@ public class FrameScript implements TreeItem, Exportable {
     public boolean isModified() {
         return frame.isModified();
     }
-    
-    
 }

@@ -148,7 +148,7 @@ public class FontExporter {
         String cop = t.getCopyright();
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
-        if (Configuration.setFFDecVersionInExportedFont.get()){
+        if (Configuration.setFFDecVersionInExportedFont.get()) {
             f.setAuthor(ApplicationInfo.shortApplicationVerName);
         } else {
             f.setAuthor(ApplicationInfo.SHORT_APPLICATION_NAME);

@@ -969,7 +969,8 @@ public interface User32 extends StdCallLibrary, WinUser {
      * function.
      * Return code: Description
      * 0: The wait was satisfied successfully.
-     * WAIT_TIMEOUT: The wait was terminated because the time-out interval elapsed.
+     * WAIT_TIMEOUT: The wait was terminated because the time-out interval
+     * elapsed.
      * WAIT_FAILED: An error occurred.
      */
     DWORD WaitForInputIdle(HANDLE hProcess, DWORD dwMilliseconds);
@@ -1315,7 +1316,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      * information, call GetLastError.
      *
      * This function typically fails for one of the following reasons:
-     * 
+     *
      * - an invalid parameter value
      * - the system class was registered by a different module
      * - The WH_CBT hook is installed and returns a failure code

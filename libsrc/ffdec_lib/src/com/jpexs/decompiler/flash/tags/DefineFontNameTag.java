@@ -80,7 +80,7 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
         }
         return baos.toByteArray();
     }
-    
+
     @Override
     public int getCharacterId() {
         return fontId;

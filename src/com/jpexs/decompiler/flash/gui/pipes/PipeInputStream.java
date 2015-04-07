@@ -30,24 +30,25 @@ import java.io.InputStream;
 public class PipeInputStream extends InputStream {
 
     protected HANDLE pipe;
+
     private boolean closed = false;
 
-    public PipeInputStream(String pipeName,boolean newpipe) throws IOException {
+    public PipeInputStream(String pipeName, boolean newpipe) throws IOException {
         if (!Platform.isWindows()) {
             throw new IOException("Cannot create Pipe on nonWindows OS");
         }
         String fullPipePath = "\\\\.\\pipe\\" + pipeName;
-        if(newpipe){
-            pipe = Kernel32.INSTANCE.CreateNamedPipe(fullPipePath, Kernel32.PIPE_ACCESS_INBOUND, Kernel32.PIPE_TYPE_BYTE, 1, 4096, 4096, 0, null);        
+        if (newpipe) {
+            pipe = Kernel32.INSTANCE.CreateNamedPipe(fullPipePath, Kernel32.PIPE_ACCESS_INBOUND, Kernel32.PIPE_TYPE_BYTE, 1, 4096, 4096, 0, null);
             if (pipe == null || !Kernel32.INSTANCE.ConnectNamedPipe(pipe, null)) {
                 throw new IOException("Cannot connect to the pipe");
-            } 
-        }else{
-            pipe = Kernel32.INSTANCE.CreateFile(fullPipePath, Kernel32.GENERIC_READ,Kernel32.FILE_SHARE_READ,null,Kernel32.OPEN_EXISTING,Kernel32.FILE_ATTRIBUTE_NORMAL,null);
+            }
+        } else {
+            pipe = Kernel32.INSTANCE.CreateFile(fullPipePath, Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_READ, null, Kernel32.OPEN_EXISTING, Kernel32.FILE_ATTRIBUTE_NORMAL, null);
         }
         if (pipe == null) {
             throw new IOException("Cannot connect to the pipe");
-        }        
+        }
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -58,7 +59,7 @@ public class PipeInputStream extends InputStream {
                 }
             }
 
-        });                
+        });
     }
 
     @Override

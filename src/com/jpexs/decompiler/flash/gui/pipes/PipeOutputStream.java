@@ -30,24 +30,25 @@ import java.io.OutputStream;
 public class PipeOutputStream extends OutputStream {
 
     protected HANDLE pipe;
+
     private boolean closed = false;
 
-    public PipeOutputStream(String pipeName,boolean newPipe) throws IOException {
+    public PipeOutputStream(String pipeName, boolean newPipe) throws IOException {
         if (!Platform.isWindows()) {
             throw new IOException("Cannot create Pipe on nonWindows OS");
         }
         String fullPipePath = "\\\\.\\pipe\\" + pipeName;
-        if(newPipe){
+        if (newPipe) {
             pipe = Kernel32.INSTANCE.CreateNamedPipe(fullPipePath, Kernel32.PIPE_ACCESS_OUTBOUND, Kernel32.PIPE_TYPE_BYTE, 1, 4096, 4096, 0, null);
             if (pipe == null || !Kernel32.INSTANCE.ConnectNamedPipe(pipe, null)) {
                 throw new IOException("Cannot connect to the pipe. Error " + Kernel32.INSTANCE.GetLastError());
             }
-        }else{
-            pipe = Kernel32.INSTANCE.CreateFile(fullPipePath, Kernel32.GENERIC_WRITE,Kernel32.FILE_SHARE_WRITE,null,Kernel32.OPEN_EXISTING,Kernel32.FILE_ATTRIBUTE_NORMAL,null);
+        } else {
+            pipe = Kernel32.INSTANCE.CreateFile(fullPipePath, Kernel32.GENERIC_WRITE, Kernel32.FILE_SHARE_WRITE, null, Kernel32.OPEN_EXISTING, Kernel32.FILE_ATTRIBUTE_NORMAL, null);
             if (pipe == null) {
                 throw new IOException("Cannot connect to the pipe. Error " + Kernel32.INSTANCE.GetLastError());
             }
-        }        
+        }
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

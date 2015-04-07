@@ -50,14 +50,13 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public ABC abc;
 
     public int bodyIndex = -1;
+
     private int scriptIndex = -1;
 
     public int getScriptIndex() {
         return scriptIndex;
     }
 
-    
-    
     private List<Highlighting> disassembledHilights = new ArrayList<>();
 
     private List<Highlighting> specialHilights = new ArrayList<>();
@@ -233,7 +232,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                     }
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
-                abc.bodies.get(bodyIndex).setCode(acode);               
+                abc.bodies.get(bodyIndex).setCode(acode);
             }
             ((Tag) abc.parentTag).setModified(true);
             abc.script_info.get(scriptIndex).setModified(true);

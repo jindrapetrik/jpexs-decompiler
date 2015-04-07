@@ -172,7 +172,7 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem memberOrCall(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
-        if(debugMode){
+        if (debugMode) {
             System.out.println("memberOrCall:");
         }
         ParsedSymbol s = lex();
@@ -213,8 +213,8 @@ public class ActionScriptParser {
         }
 
         lexer.pushback(s);
-        
-        if(debugMode){
+
+        if (debugMode) {
             System.out.println("/memberOrCall");
         }
         return ret;
@@ -248,7 +248,7 @@ public class ActionScriptParser {
     }
 
     private GraphTargetItem member(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
-        if(debugMode){
+        if (debugMode) {
             System.out.println("member:");
         }
         GraphTargetItem ret = obj;
@@ -307,13 +307,13 @@ public class ActionScriptParser {
                 s = lex();
             }
         }
-        if(s.type.getPrecedence() == GraphTargetItem.PRECEDENCE_ASSIGMENT){
+        if (s.type.getPrecedence() == GraphTargetItem.PRECEDENCE_ASSIGMENT) {
             ret = expression1(ret, s.type.getPrecedence(), thisType, pkg, needsActivation, importedClasses, openedNamespaces, inMethod, registerVars, inFunction, inMethod, false, variables);
-        }else{
+        } else {
             lexer.pushback(s);
         }
-        
-        if(debugMode){
+
+        if (debugMode) {
             System.out.println("/member");
         }
         return ret;
@@ -1390,7 +1390,7 @@ public class ActionScriptParser {
                     if (firstCommand instanceof NameAVM2Item) {
                         NameAVM2Item nai = (NameAVM2Item) firstCommand;
                         if (nai.isDefinition() && nai.getAssignedValue() == null) { //??? WUT
-                            firstCommand = expression1(firstCommand,firstCommand.getPrecedence(),thisType, pkg, needsActivation, importedClasses,openedNamespaces,true, registerVars, inFunction, inMethod, true, variables);                            
+                            firstCommand = expression1(firstCommand, firstCommand.getPrecedence(), thisType, pkg, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables);
                         }
                     }
                     InAVM2Item inexpr = null;
@@ -1682,9 +1682,9 @@ public class ActionScriptParser {
         /*
          fix > :
          a || b > c   =>   a || (b > c)
-        
+
          a < 0 || (b > c) + 1
-        
+
          */
         if (expr instanceof BinaryOp) {
             BinaryOp bo = (BinaryOp) expr;
@@ -1787,7 +1787,7 @@ public class ActionScriptParser {
 
     private GraphTargetItem expression(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
         GraphTargetItem prim = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
-        if(prim==null){
+        if (prim == null) {
             return null;
         }
         return expression1(prim, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
@@ -1801,7 +1801,7 @@ public class ActionScriptParser {
      */
     private void xmlToGreaterFix(ParsedSymbol symb) {
         if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {
-            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as GREATER_THAN  
+            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as GREATER_THAN
             symb.type = SymbolType.GREATER_THAN;
             symb.group = SymbolGroup.OPERATOR;
         }
@@ -2027,7 +2027,7 @@ public class ActionScriptParser {
             default:
                 if (lhs instanceof ParenthesisItem) {
                     GraphTargetItem coerced = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
-                    if (coerced!=null && isType(((ParenthesisItem) lhs).value)) {
+                    if (coerced != null && isType(((ParenthesisItem) lhs).value)) {
                         lhs = new CoerceAVM2Item(null, ((ParenthesisItem) lhs).value, coerced);
                     }
                 }
@@ -2262,7 +2262,7 @@ public class ActionScriptParser {
         /*if (allowRemainder && existsRemainder) {
          GraphTargetItem rem = ret;
          do {
-         rem = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);                
+         rem = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);
          if (rem != null) {
          ret = rem;
          }

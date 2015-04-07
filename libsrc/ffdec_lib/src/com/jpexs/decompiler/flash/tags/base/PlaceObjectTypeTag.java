@@ -80,14 +80,14 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
         if (exportName != null) {
             nameAppend = ": " + exportName;
         }
-        
+
         if (getCharacterId() != -1) {
             result += " (" + getCharacterId() + nameAppend + ")";
         }
         if (!nameAppend.isEmpty()) {
             result += " (" + nameAppend + ")";
         }
-        
+
         return result + " Depth: " + getDepth();
     }
 
@@ -98,7 +98,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
         if (exportName != null) {
             result += "_" + exportName;
         }
-        
+
         result += "_" + getDepth();
         return result;
     }

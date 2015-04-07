@@ -522,7 +522,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (characters.containsKey(characterId)) {
                     logger.log(Level.SEVERE, "SWF already contains characterId={0}", characterId);
                 }
-                
+
                 if (characterId != 0) {
                     characters.put(characterId, (CharacterTag) t);
                 }

@@ -116,18 +116,16 @@ public class AS2Package implements TreeItem {
 
     @Override
     public boolean isModified() {
-        for(ASMSource s:scripts.values()){
-            if(s.isModified()){
+        for (ASMSource s : scripts.values()) {
+            if (s.isModified()) {
                 return true;
             }
         }
-        for(AS2Package p:subPackages.values()){
-            if(p.isModified()){
+        for (AS2Package p : subPackages.values()) {
+            if (p.isModified()) {
                 return true;
             }
         }
         return false;
     }
-    
-    
 }

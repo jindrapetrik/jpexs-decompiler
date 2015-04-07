@@ -124,7 +124,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private static final String GENERIC_TAG_CARD = "GENERICTAG";
 
     private static final String BINARY_TAG_CARD = "BINARYTAG";
-    
+
     private static final String METADATA_TAG_CARD = "METADATATAG";
 
     private static final String CARDTEXTPANEL = "Text card";
@@ -140,7 +140,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private static final String ACTION_PREV_FONTS = "PREVFONTS";
 
     private static final String ACTION_NEXT_FONTS = "NEXTFONTS";
-    
+
     private static final String ACTION_EDIT_METADATA_TAG = "EDITMETADATATAG";
 
     private static final String ACTION_SAVE_METADATA_TAG = "SAVEMETADATATAG";
@@ -162,7 +162,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private MediaDisplay media;
 
     private BinaryPanel binaryPanel;
-    
+
     private LineMarkedEditorPane metadataEditor;
 
     private GenericTagPanel genericTagPanel;
@@ -185,7 +185,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private JButton metadataSaveButton;
 
     private JButton metadataCancelButton;
-    
+
     // Generic tag buttons
     private JButton genericEditButton;
 
@@ -202,7 +202,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private TextPanel textPanel;
 
     private boolean splitsInited;
-    
+
     private MetadataTag metadataTag;
 
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
@@ -240,7 +240,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
-        viewerCards.add(createMetadataCard(),METADATA_TAG_CARD);
+        viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
         setLeftComponent(viewerCards);
 
@@ -327,7 +327,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         genericTagButtonsPanel.add(genericCancelButton);
         return genericTagButtonsPanel;
     }
-    
+
     private JPanel createMetadataButtonsPanel() {
         metadataEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
         metadataEditButton.setMargin(new Insets(3, 3, 3, 10));
@@ -410,14 +410,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         return shapesCard;
     }
 
-    private JPanel createMetadataCard() {        
-        DefaultSyntaxKit.initKit();        
+    private JPanel createMetadataCard() {
+        DefaultSyntaxKit.initKit();
         JPanel metadataCard = new JPanel(new BorderLayout());
-        metadataEditor = new LineMarkedEditorPane();        
-        metadataCard.add(new JScrollPane(metadataEditor),BorderLayout.CENTER);
-        //metadataEditor.setContentType("text/xml");  
+        metadataEditor = new LineMarkedEditorPane();
+        metadataCard.add(new JScrollPane(metadataEditor), BorderLayout.CENTER);
+        //metadataEditor.setContentType("text/xml");
         metadataEditor.setEditable(false);
-        
+
         metadataEditor.setFont(new Font("Monospaced", Font.PLAIN, metadataEditor.getFont().getSize()));
         metadataEditor.setContentType("text/xml");
         metadataEditor.getDocument().addDocumentListener(new DocumentListener() {
@@ -437,19 +437,19 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 metadataTextChanged();
             }
         });
-        
+
         metadataCard.add(createMetadataButtonsPanel(), BorderLayout.SOUTH);
         return metadataCard;
     }
-    
+
     private boolean metadataModified = false;
-    
+
     private void metadataTextChanged() {
         metadataModified = true;
         updateMetadataButtonsVisibility();
     }
-    
-    private void updateMetadataButtonsVisibility(){
+
+    private void updateMetadataButtonsVisibility() {
         boolean edit = metadataEditor.isEditable();
         boolean editorMode = Configuration.editorMode.get();
         metadataEditButton.setVisible(!edit);
@@ -458,7 +458,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         metadataCancelButton.setVisible(edit);
         metadataCancelButton.setEnabled(metadataModified || !editorMode);
     }
-    
+
     private JPanel createBinaryCard() {
         JPanel binaryCard = new JPanel(new BorderLayout());
         binaryPanel = new BinaryPanel(mainPanel);
@@ -585,8 +585,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         textPanel.closeTag();
     }
 
-    
-    
     public static String formatMetadata(String input, int indent) {
         input = input.replace("> <", "><");
         try {
@@ -600,25 +598,25 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", ""+indent);
-            transformer.transform(xmlInput, xmlOutput);           
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "" + indent);
+            transformer.transform(xmlInput, xmlOutput);
 
             return xmlOutput.getWriter().toString();
         } catch (IllegalArgumentException | TransformerException e) {
             return input;
         }
     }
-    
-    public void showMetaDataPanel(MetadataTag metadataTag){
-        showCardLeft(METADATA_TAG_CARD);           
+
+    public void showMetaDataPanel(MetadataTag metadataTag) {
+        showCardLeft(METADATA_TAG_CARD);
         this.metadataTag = metadataTag;
         metadataEditor.setEditable(Configuration.editorMode.get());
-        metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata,4));                      
+        metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
         metadataModified = false;
         updateMetadataButtonsVisibility();
-        parametersPanel.setVisible(false);               
+        parametersPanel.setVisible(false);
     }
-    
+
     public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
         binaryPanel.setBinaryData(binaryDataTag);
@@ -1146,12 +1144,12 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 }
 
                 if (item instanceof MetadataTag) {
-                    metadataEditor.setEditable(true);                    
+                    metadataEditor.setEditable(true);
                     updateMetadataButtonsVisibility();
                 }
             }
             break;
-            case ACTION_SAVE_METADATA_TAG: {                
+            case ACTION_SAVE_METADATA_TAG: {
                 metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
                 metadataTag.setModified(true);
                 metadataEditor.setEditable(Configuration.editorMode.get());
@@ -1160,16 +1158,16 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 mainPanel.repaintTree();
             }
             break;
-                
+
             case ACTION_CANCEL_METADATA_TAG: {
-                metadataEditor.setEditable(false);                    
-                metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata,4));
+                metadataEditor.setEditable(false);
+                metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
                 metadataEditor.setEditable(Configuration.editorMode.get());
-                metadataModified = false;               
+                metadataModified = false;
                 updateMetadataButtonsVisibility();
             }
-            break;    
-                
+            break;
+
             case ACTION_EDIT_GENERIC_TAG: {
                 TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
                 if (item == null) {
@@ -1184,8 +1182,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 }
             }
             break;
-                
-                
+
             case ACTION_SAVE_GENERIC_TAG: {
                 genericTagPanel.save();
                 Tag tag = genericTagPanel.getTag();

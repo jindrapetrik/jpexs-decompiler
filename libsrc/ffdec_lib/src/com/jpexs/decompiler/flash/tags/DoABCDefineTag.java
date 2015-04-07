@@ -140,7 +140,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         }
         return 0;
     }
-    
+
     @Override
     public void setModified(boolean value) {
         super.setModified(value);

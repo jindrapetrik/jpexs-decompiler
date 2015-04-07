@@ -29,7 +29,8 @@ import java.util.Map;
 public class TagTreeSwfInfo {
 
     public List<TreeItem> folders;
-    public Map<Integer,List<TreeItem>> mappedTags;
+
+    public Map<Integer, List<TreeItem>> mappedTags;
 
     public Map<Tag, TagScript> tagScriptCache;
 }

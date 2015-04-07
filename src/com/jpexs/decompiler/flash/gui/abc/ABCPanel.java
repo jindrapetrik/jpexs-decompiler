@@ -163,7 +163,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     private static final String ACTION_ADD_TRAIT = "ADDTRAIT";
-    
+
     private static List<Long> modifiedPacks = new ArrayList<>();
 
     public MainPanel getMainPanel() {
@@ -812,7 +812,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     }
 
                     String as = decompiledTextArea.getText();
-                    abc.replaceScriptPack(pack, as);                                        
+                    abc.replaceScriptPack(pack, as);
                     lastDecompiled = as;
                     mainPanel.updateClassesList();
 

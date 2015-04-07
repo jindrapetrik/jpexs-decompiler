@@ -150,20 +150,18 @@ public class AS3Package extends AS3ClassTreeItem {
 
     @Override
     public boolean isModified() {
-        List<ScriptPack> sps=getScriptPacks();
-        for(ScriptPack sp:sps){
-            if(sp.isModified()){
+        List<ScriptPack> sps = getScriptPacks();
+        for (ScriptPack sp : sps) {
+            if (sp.isModified()) {
                 return true;
             }
         }
-        List<AS3Package> ps=getSubPackages();
-        for(AS3Package p:ps){
-            if(p.isModified()){
+        List<AS3Package> ps = getSubPackages();
+        for (AS3Package p : ps) {
+            if (p.isModified()) {
                 return true;
             }
         }
         return false;
     }
-    
-    
 }

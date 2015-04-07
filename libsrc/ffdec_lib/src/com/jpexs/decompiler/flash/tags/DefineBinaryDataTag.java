@@ -131,12 +131,12 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     @Override
     public boolean isModified() {
-        if(super.isModified()){
+        if (super.isModified()) {
             return true;
         }
-        if(innerSwf!=null){
+        if (innerSwf != null) {
             return innerSwf.isModified();
         }
         return false;
-    }        
+    }
 }

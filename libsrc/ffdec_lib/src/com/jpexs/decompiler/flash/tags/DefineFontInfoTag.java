@@ -147,7 +147,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
             }
         }
     }
-    
+
     @Override
     public int getCharacterId() {
         return fontId;

@@ -175,13 +175,11 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     @Override
     public boolean isModified() {
-        for(SWF s:swfs){
-            if(s.isModified()){
+        for (SWF s : swfs) {
+            if (s.isModified()) {
                 return true;
             }
         }
         return false;
     }
-    
-    
 }

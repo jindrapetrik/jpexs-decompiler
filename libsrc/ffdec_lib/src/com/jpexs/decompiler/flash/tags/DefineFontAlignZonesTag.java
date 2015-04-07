@@ -98,7 +98,7 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
         }
         return baos.toByteArray();
     }
-    
+
     @Override
     public int getCharacterId() {
         return fontID;

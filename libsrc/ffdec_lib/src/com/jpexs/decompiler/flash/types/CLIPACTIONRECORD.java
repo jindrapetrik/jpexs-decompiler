@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class CLIPACTIONRECORD implements ASMSource, Serializable {
-    
+
     public static String keyToString(int key) {
         if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {
             return CLIPACTIONRECORD.KEYNAMES[key];
@@ -229,19 +229,17 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     public void setModified() {
         if (tag != null) {
             tag.setModified(true);
-        }       
+        }
     }
 
     @Override
     public boolean isModified() {
         if (tag != null) {
             return tag.isModified();
-        }  
+        }
         return false;
     }
 
-    
-    
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());

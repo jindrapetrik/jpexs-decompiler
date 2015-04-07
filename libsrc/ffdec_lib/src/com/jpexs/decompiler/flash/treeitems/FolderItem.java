@@ -56,12 +56,11 @@ public class FolderItem implements TreeItem {
 
     @Override
     public boolean isModified() {
-        for(TreeItem ti:subItems){
-            if(ti.isModified()){
+        for (TreeItem ti : subItems) {
+            if (ti.isModified()) {
                 return true;
             }
         }
         return false;
     }
-    
 }

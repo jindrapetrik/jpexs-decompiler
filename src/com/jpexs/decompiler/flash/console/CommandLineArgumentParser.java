@@ -1062,12 +1062,12 @@ public class CommandLineArgumentParser {
                 if (singleScriptFile == null) {
                     singleScriptFile = Configuration.scriptExportSingleFile.get();
                 }
-                
+
                 if (parallel && singleScriptFile) {
                     System.out.println("Single file script export is not supported with enabled parallel speedup");
                     singleScriptFile = false;
                 }
-                
+
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile);
                 if (exportAll || exportFormats.contains("script")) {
                     System.out.println("Exporting scripts...");

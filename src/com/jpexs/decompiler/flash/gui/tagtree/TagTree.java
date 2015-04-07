@@ -193,13 +193,13 @@ public class TagTree extends JTree {
                 setIcon(icons.get(type));
             }
 
-           /* boolean isModified = val instanceof Tag && ((Tag) val).isModified();
-            if(val instanceof ScriptPack){
-                ScriptPack sp=(ScriptPack)val;
-                if(sp.abc.script_info.get(sp.scriptIndex).isModified()){
-                    isModified = true;
-                }
-            }*/
+            /* boolean isModified = val instanceof Tag && ((Tag) val).isModified();
+             if(val instanceof ScriptPack){
+             ScriptPack sp=(ScriptPack)val;
+             if(sp.abc.script_info.get(sp.scriptIndex).isModified()){
+             isModified = true;
+             }
+             }*/
             boolean isModified = val.isModified();
             if (isModified) {
                 if (boldFont == null) {
@@ -338,19 +338,19 @@ public class TagTree extends JTree {
             }
         }
 
-        if(t instanceof SetBackgroundColorTag){
+        if (t instanceof SetBackgroundColorTag) {
             return TreeNodeType.SET_BACKGROUNDCOLOR;
         }
-        if(t instanceof FileAttributesTag){
+        if (t instanceof FileAttributesTag) {
             return TreeNodeType.FILE_ATTRIBUTES;
         }
-        if(t instanceof MetadataTag){
+        if (t instanceof MetadataTag) {
             return TreeNodeType.METADATA;
         }
-        if(t instanceof PlaceObjectTypeTag){
+        if (t instanceof PlaceObjectTypeTag) {
             return TreeNodeType.PLACE_OBJECT;
         }
-        if(t instanceof RemoveTag){
+        if (t instanceof RemoveTag) {
             return TreeNodeType.REMOVE_OBJECT;
         }
         if (t instanceof Tag) {

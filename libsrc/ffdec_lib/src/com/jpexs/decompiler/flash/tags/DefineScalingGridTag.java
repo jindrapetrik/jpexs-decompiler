@@ -79,7 +79,7 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         }
         return baos.toByteArray();
     }
-    
+
     @Override
     public int getCharacterId() {
         return characterId;

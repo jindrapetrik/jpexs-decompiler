@@ -35,11 +35,15 @@ import java.util.List;
 public class FirstInstance {
 
     private static final String MUTEX_NAME = "FFDEC_MUTEX";
+
     private static WinNT.HANDLE mutex;
 
     public static final int PIPE_MAJOR = 1;
+
     public static final int PIPE_MINOR = 0;
+
     public static final String PIPE_NAME = "ffdec";
+
     public static final String PIPE_APP_CODE = "ffdec";
 
     private static boolean isRunning() {

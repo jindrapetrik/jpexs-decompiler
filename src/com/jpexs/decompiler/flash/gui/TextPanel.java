@@ -44,6 +44,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
@@ -79,6 +80,8 @@ public class TextPanel extends JPanel {
     private final JButton decreaseTranslateXButton;
 
     private final JButton increaseTranslateXButton;
+
+    private final JButton changeCaseButton;
 
     private final JButton undoChangesButton;
 
@@ -129,6 +132,7 @@ public class TextPanel extends JPanel {
         textAlignJustifyButton = createButton(null, "textalignjustify16", "text.align.justify", e -> textAlign(TextAlign.JUSTIFY));
         decreaseTranslateXButton = createButton(null, "textunindent16", "text.align.translatex.decrease", e -> translateX(-(int) SWF.unitDivisor, ((JRepeatButton) e.getSource()).getRepeatCount()), true);
         increaseTranslateXButton = createButton(null, "textindent16", "text.align.translatex.increase", e -> translateX((int) SWF.unitDivisor, ((JRepeatButton) e.getSource()).getRepeatCount()), true);
+        changeCaseButton = createButton(null, "textuppercase16", "text.toggleCase", e -> changeCase(0));
         undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
         textButtonsPanel.add(selectPrevousTagButton);
@@ -139,6 +143,7 @@ public class TextPanel extends JPanel {
         textButtonsPanel.add(textAlignJustifyButton);
         textButtonsPanel.add(decreaseTranslateXButton);
         textButtonsPanel.add(increaseTranslateXButton);
+        textButtonsPanel.add(changeCaseButton);
         textButtonsPanel.add(undoChangesButton);
 
         textButtonsPanel.setAlignmentX(0);
@@ -197,11 +202,82 @@ public class TextPanel extends JPanel {
         }
     }
 
+    private void changeCase(int caseMode) {
+        // todo: use case mode: first letter, capitalize each word, toggle, etc
+        int selStart = textValue.getSelectionStart();
+        int selEnd = textValue.getSelectionEnd();
+        if (selEnd > selStart) {
+            StringBuilder selected = new StringBuilder(textValue.getSelectedText());
+
+            HighlightedText text = textTag.getFormattedText();
+            boolean allUpper = true;
+            for (Highlighting highlight : text.specialHilights) {
+                if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
+                    int hStart = highlight.startPos;
+                    int hEnd = highlight.startPos + highlight.len;
+                    int start = Math.max(selStart, hStart);
+                    int end = Math.min(selEnd, hEnd);
+
+                    if (start < end) {
+                        try {
+                            String str = textValue.getDocument().getText(start, end - start);
+                            if (!str.equals(str.toUpperCase())) {
+                                allUpper = false;
+                                break;
+                            }
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+
+            for (Highlighting highlight : text.specialHilights) {
+                if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
+                    int hStart = highlight.startPos;
+                    int hEnd = highlight.startPos + highlight.len;
+                    int start = Math.max(selStart, hStart);
+                    int end = Math.min(selEnd, hEnd);
+
+                    if (start < end) {
+                        try {
+                            String str = textValue.getDocument().getText(start, end - start);
+                            if (allUpper) {
+                                str = str.toLowerCase();
+                            } else {
+                                str = str.toUpperCase();
+                            }
+
+                            selected.replace(start - selStart, end - selStart, str);
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+
+            textValue.replaceSelection(selected.toString());
+            saveText(true);
+
+            updateButtonsVisibility();
+            textTag.getSwf().clearImageCache();
+            mainPanel.repaintTree();
+
+            textValue.requestFocusInWindow();
+            textValue.select(selStart, selEnd);
+        }
+    }
+
     public void closeTag() {
         if (modified && Configuration.autoSaveTagModifications.get()) {
-            saveText(false);
+            try {
+                saveText(false);
+            } catch (Exception ex) {
+                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, "Cannot auto-save text tag.", ex);
+            }
         }
 
+        modified = false;
         textTag = null;
     }
 
@@ -218,6 +294,7 @@ public class TextPanel extends JPanel {
         textSaveButton.setEnabled(modified);
         textCancelButton.setVisible(edit);
         textCancelButton.setEnabled(modified || !editorMode);
+        changeCaseButton.setEnabled(!modified);
 
         boolean alignable = false;
         if (textTag != null && !(textTag instanceof DefineEditTextTag)) {

@@ -47,6 +47,4 @@ public class HeaderItem implements TreeItem {
     public boolean isModified() {
         return false; //??
     }
-    
-    
 }

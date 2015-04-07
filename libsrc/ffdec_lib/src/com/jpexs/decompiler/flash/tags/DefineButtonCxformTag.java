@@ -88,7 +88,7 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
         buttonId = sis.readUI16("buttonId");
         buttonColorTransform = sis.readCXFORM("buttonColorTransform");
     }
-    
+
     @Override
     public int getCharacterId() {
         return buttonId;

@@ -146,7 +146,7 @@ public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
             codeTable.add(sis.readUI16("code"));
         }
     }
-    
+
     @Override
     public int getCharacterId() {
         return fontID;

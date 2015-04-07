@@ -51,7 +51,7 @@ public class BinaryDataExporter {
                 count++;
             }
         }
-        
+
         if (count == 0) {
             return ret;
         }

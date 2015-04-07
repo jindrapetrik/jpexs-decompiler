@@ -191,6 +191,4 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public boolean isModified() {
         return root.isModified();
     }
-    
-    
 }
