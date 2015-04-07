@@ -933,9 +933,10 @@ public class CommandLineArgumentParser {
                     System.out.println("Start exporting " + inFile.getName());
                 }
 
-                SWF swf = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
+                SWFSourceInfo sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
+                SWF swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
                 swf.swfList = new SWFList();
-                swf.swfList.sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
+                swf.swfList.sourceInfo = sourceInfo;
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
                     outDir = Path.combine(outDir, inFile.getName());
