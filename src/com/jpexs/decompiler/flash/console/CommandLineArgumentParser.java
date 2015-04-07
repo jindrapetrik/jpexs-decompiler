@@ -1057,7 +1057,17 @@ public class CommandLineArgumentParser {
                 boolean parallel = Configuration.parallelSpeedUp.get();
                 String scriptsFolder = Path.combine(outDir, "scripts");
                 Path.createDirectorySafe(new File(scriptsFolder));
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
+                Boolean singleScriptFile = parseBooleanConfigValue(formats.get("singlescript"));
+                if (singleScriptFile == null) {
+                    singleScriptFile = Configuration.scriptExportSingleFile.get();
+                }
+                
+                if (parallel && singleScriptFile) {
+                    System.out.println("Single file script export is not supported with enabled parallel speedup");
+                    singleScriptFile = false;
+                }
+                
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile);
                 if (exportAll || exportFormats.contains("script")) {
                     System.out.println("Exporting scripts...");
                     if (as3classes.isEmpty()) {
