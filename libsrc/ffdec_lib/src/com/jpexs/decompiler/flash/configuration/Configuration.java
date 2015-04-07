@@ -198,6 +198,10 @@ public class Configuration {
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> dumpTags = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("debug")
+    public static final ConfigurationItem<Boolean> setFFDecVersionInExportedFont = null;
+
     @ConfigurationDefaultInt(60)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;

@@ -154,6 +154,7 @@ public class ExportDialog extends AppDialog {
 
     public ExportDialog(List<TreeItem> exportables) {
         setTitle(translate("dialog.title"));
+        setResizable(false);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -167,7 +168,7 @@ public class ExportDialog extends AppDialog {
         combos = new JComboBox[optionNames.length];
         int labWidth = 0;
         for (int i = 0; i < optionNames.length; i++) {
-            JLabel label = new JLabel(optionNames[i]);
+            JLabel label = new JLabel(translate(optionNames[i]));
             if (label.getPreferredSize().width > labWidth) {
                 labWidth = label.getPreferredSize().width;
             }

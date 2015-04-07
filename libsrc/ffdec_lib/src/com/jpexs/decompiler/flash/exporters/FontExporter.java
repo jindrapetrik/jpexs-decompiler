@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -143,7 +144,12 @@ public class FontExporter {
         String cop = t.getCopyright();
 
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
-        f.setAuthor(ApplicationInfo.shortApplicationVerName);
+        if (Configuration.setFFDecVersionInExportedFont.get()){
+            f.setAuthor(ApplicationInfo.shortApplicationVerName);
+        } else {
+            f.setAuthor(ApplicationInfo.SHORT_APPLICATION_NAME);
+        }
+
         f.setVersion("1.0");
 
         SWF swf = t.getSwf();
