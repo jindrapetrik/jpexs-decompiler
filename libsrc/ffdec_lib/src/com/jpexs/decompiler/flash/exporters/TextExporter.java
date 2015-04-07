@@ -65,6 +65,10 @@ public class TextExporter {
             }
         }
 
+        if (count == 0) {
+            return ret;
+        }
+
         int currentIndex = 1;
         if (settings.mode == TextExportMode.SVG) {
             for (Tag t : tags) {

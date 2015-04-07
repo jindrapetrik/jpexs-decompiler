@@ -71,6 +71,10 @@ public class ShapeExporter {
             }
         }
 
+        if (count == 0) {
+            return ret;
+        }
+
         int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof ShapeTag) {

@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class RemoveObject2Tag extends Tag implements RemoveTag {
+public class RemoveObject2Tag extends RemoveTag {
 
     @SWFType(BasicType.UI16)
     public int depth;

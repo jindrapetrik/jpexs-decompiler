@@ -33,7 +33,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class RemoveObjectTag extends Tag implements CharacterIdTag,RemoveTag {
+public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
 
     /**
      * ID of character to place

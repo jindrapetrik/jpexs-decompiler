@@ -371,6 +371,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         return getCharacters().get(characterId);
     }
 
+    public String getExportName(int characterId) {
+        CharacterTag characterTag = getCharacters().get(characterId);
+        String exportName = characterTag != null ? characterTag.getExportName() : null;
+        return exportName;
+    }
+
     public FontTag getFont(int fontId) {
         CharacterTag characterTag = getCharacters().get(fontId);
         if (characterTag instanceof FontTag) {
@@ -512,7 +518,14 @@ public final class SWF implements SWFContainerItem, Timelined {
     private void parseCharacters(List<Tag> list, Map<Integer, CharacterTag> characters) {
         for (Tag t : list) {
             if (t instanceof CharacterTag) {
-                characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
+                int characterId = ((CharacterTag) t).getCharacterId();
+                if (characters.containsKey(characterId)) {
+                    logger.log(Level.SEVERE, "SWF already contains characterId={0}", characterId);
+                }
+                
+                if (characterId != 0) {
+                    characters.put(characterId, (CharacterTag) t);
+                }
             }
             if (t instanceof DefineSpriteTag) {
                 parseCharacters(((DefineSpriteTag) t).getSubTags(), characters);
@@ -1940,10 +1953,11 @@ public final class SWF implements SWFContainerItem, Timelined {
                 cnt++;
                 informListeners("rename", "class " + cnt + "/" + classCount);
                 DoInitActionTag dia = (DoInitActionTag) t;
-                String exportName = characters.containsKey(dia.spriteId) ? characters.get(dia.spriteId).getExportName() : "_unk_";
+                String exportName = getExportName(dia.spriteId);
+                exportName = exportName != null ? exportName : "_unk_";
                 final String pkgPrefix = "__Packages.";
                 String[] classNameParts = null;
-                if ((exportName != null) && exportName.startsWith(pkgPrefix)) {
+                if (exportName.startsWith(pkgPrefix)) {
                     String className = exportName.substring(pkgPrefix.length());
                     if (className.contains(".")) {
                         classNameParts = className.split("\\.");

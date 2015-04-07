@@ -22,7 +22,6 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
 
 /**
  *

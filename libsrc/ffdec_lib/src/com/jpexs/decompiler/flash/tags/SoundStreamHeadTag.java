@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -41,7 +39,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadTypeTag {
+public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 4)
@@ -263,5 +261,9 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
         return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
     }
 
-   
+    @Override
+    public String getCharacterExportFileName() {
+        String exportName = swf.getExportName(getCharacterId());
+        return getCharacterId() + (exportName != null ? "_" + exportName : "");
+    }
 }

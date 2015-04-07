@@ -346,7 +346,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
             Privileges = new LUID_AND_ATTRIBUTES[nbOfPrivileges];
         }
 
-        /* *
+        /**
          * Initialize a TOKEN_PRIVILEGES instance from initialized memory.
          *
          * @param p
@@ -671,7 +671,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
             allocateMemory(size);
         }
 
-        /* *
+        /**
          * WARNING: this filename may be either the short or long form of the
          * filename.
          *
@@ -1030,7 +1030,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
             immutable = true;
         }
 
-        /* *
+        /**
          * Override to the appropriate object for INVALID_HANDLE_VALUE.
          *
          * @param nativeValue

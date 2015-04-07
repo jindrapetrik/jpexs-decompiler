@@ -166,7 +166,7 @@ public abstract class W32Errors implements WinError {
                 | 0x80000000);
     }
 
-    /* *
+    /**
      * FACILITY_USERMODE_FILTER_MANAGER
      *
      * Translation macro for converting: NTSTATUS --> HRESULT.

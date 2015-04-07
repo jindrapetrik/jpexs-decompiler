@@ -67,6 +67,10 @@ public class SoundExporter {
             }
         }
 
+        if (count == 0) {
+            return ret;
+        }
+
         int currentIndex = 1;
         for (Tag t : tags) {
             if (t instanceof SoundTag) {

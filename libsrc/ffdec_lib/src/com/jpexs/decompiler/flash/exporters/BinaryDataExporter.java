@@ -51,6 +51,10 @@ public class BinaryDataExporter {
                 count++;
             }
         }
+        
+        if (count == 0) {
+            return ret;
+        }
 
         int currentIndex = 1;
         for (final Tag t : tags) {

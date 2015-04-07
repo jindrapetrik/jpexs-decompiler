@@ -478,7 +478,7 @@ public class TagTreeModel implements TreeModel {
         return swfInfo.folders;
     }
     
-    private List<TreeItem> getMappedCharacters(SWF swf,CharacterTag tag) {
+    private List<TreeItem> getMappedCharacters(SWF swf, CharacterTag tag) {
         TagTreeSwfInfo swfInfo = swfInfos.get(swf);
         if (swfInfo == null) {
             createTagList(swf);
@@ -489,6 +489,7 @@ public class TagTreeModel implements TreeModel {
         if(mapped == null){
             mapped = new ArrayList<>();
         }
+        
         return mapped;
     }
 
@@ -671,7 +672,8 @@ public class TagTreeModel implements TreeModel {
         } else if (parentNode instanceof AS3Package) {
             return ((AS3Package) parentNode).getChildCount();
         } else if (parentNode instanceof CharacterTag){
-            return getMappedCharacters(((CharacterTag)parentNode).getSwf(),(CharacterTag)parentNode).size();
+            SWF swf = ((CharacterTag) parentNode).getSwf();
+            return swf == null ? 0 : getMappedCharacters(swf,(CharacterTag)parentNode).size();
         }
 
         return 0;

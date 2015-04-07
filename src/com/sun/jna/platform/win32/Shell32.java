@@ -27,7 +27,7 @@ public interface Shell32 extends StdCallLibrary {
     Shell32 INSTANCE = (Shell32) Native.loadLibrary("shell32", Shell32.class,
             W32APIOptions.UNICODE_OPTIONS);
 
-    /* *
+    /**
      * @param lpExecInfo
      * @return true if successful. Otherwise false.
      */

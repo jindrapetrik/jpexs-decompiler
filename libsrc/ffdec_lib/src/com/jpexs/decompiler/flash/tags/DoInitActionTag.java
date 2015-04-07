@@ -194,8 +194,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag,ASMSource {
 
     @Override
     public String getExportFileName() {
-        CharacterTag sprite=swf.getCharacter(spriteId);
-        String expName = sprite!=null?sprite.getExportName():null;
+        String expName = swf.getExportName(spriteId);
         if ((expName == null) || expName.isEmpty()) {
             return super.getExportFileName();
         }
@@ -210,8 +209,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag,ASMSource {
 
     @Override
     public String getName() {
-        CharacterTag sprite=swf.getCharacter(spriteId);
-        String expName = sprite!=null?sprite.getExportName():null;
+        String expName = swf.getExportName(spriteId);
         if ((expName == null) || expName.isEmpty()) {
             return super.getName();
         }

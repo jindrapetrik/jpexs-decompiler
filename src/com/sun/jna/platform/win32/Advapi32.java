@@ -394,7 +394,7 @@ public interface Advapi32 extends StdCallLibrary {
     public int RegSetValueEx(HKEY hKey, String lpValueName, int Reserved, int dwType,
             byte[] lpData, int cbData);
 
-    /* *
+    /**
      *
      * @param hKey
      * @param lpSubKey
@@ -413,7 +413,7 @@ public interface Advapi32 extends StdCallLibrary {
             int dwOptions, int samDesired, SECURITY_ATTRIBUTES lpSecurityAttributes,
             HKEYByReference phkResult, IntByReference lpdwDisposition);
 
-    /*
+    /**
      *
      * @param hKey
      * @param name

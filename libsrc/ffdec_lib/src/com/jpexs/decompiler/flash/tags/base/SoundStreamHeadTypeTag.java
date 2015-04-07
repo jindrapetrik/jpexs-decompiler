@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -22,7 +23,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface SoundStreamHeadTypeTag extends SoundTag {
+public interface SoundStreamHeadTypeTag extends CharacterIdTag, SoundTag {
 
     @Override
     public boolean getSoundSize();
