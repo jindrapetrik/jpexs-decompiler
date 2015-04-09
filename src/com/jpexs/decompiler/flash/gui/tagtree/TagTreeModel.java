@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -102,25 +103,7 @@ public class TagTreeModel implements TreeModel {
     }
 
     public void updateSwfs(CollectionChangedEvent e) {
-        boolean cleanMap = false;
-        switch (e.getAction()) {
-            case ADD: {
-                TreePath rootPath = new TreePath(new Object[]{root});
-                fireTreeNodesInserted(new TreeModelEvent(this, rootPath, new int[]{e.getNewIndex()}, new Object[]{e.getNewItem()}));
-                break;
-            }
-            case REMOVE: {
-                TreePath rootPath = new TreePath(new Object[]{root});
-                fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
-                cleanMap = true;
-                break;
-            }
-            default:
-                cleanMap = true;
-                fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
-        }
-
-        if (cleanMap) {
+        if (e.getAction() != CollectionChangedAction.ADD) {
             List<SWF> toRemove = new ArrayList<>();
             for (SWF swf : swfInfos.keySet()) {
                 SWF swf2 = swf.getRootSwf();
@@ -132,6 +115,21 @@ public class TagTreeModel implements TreeModel {
             for (SWF swf : toRemove) {
                 swfInfos.remove(swf);
             }
+        }
+
+        switch (e.getAction()) {
+            case ADD: {
+                TreePath rootPath = new TreePath(new Object[]{root});
+                fireTreeNodesInserted(new TreeModelEvent(this, rootPath, new int[]{e.getNewIndex()}, new Object[]{e.getNewItem()}));
+                break;
+            }
+            case REMOVE: {
+                TreePath rootPath = new TreePath(new Object[]{root});
+                fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
+                break;
+            }
+            default:
+                fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
         }
     }
 
@@ -602,15 +600,8 @@ public class TagTreeModel implements TreeModel {
             }
             if (result instanceof Tag) {
                 Tag resultTag = (Tag) result;
-                TagScript tagScript = null;
-                Map<Tag, TagScript> currentTagScriptCache = null;
-                if (swfInfos != null && result.getSwf() != null) {
-                    TagTreeSwfInfo ttsi = swfInfos.get(result.getSwf());
-                    if (ttsi != null) {
-                        currentTagScriptCache = ttsi.tagScriptCache;
-                        tagScript = currentTagScriptCache.get(resultTag);
-                    }
-                }
+                Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(result.getSwf()).tagScriptCache;
+                TagScript tagScript = currentTagScriptCache.get(resultTag);
                 if (tagScript == null) {
                     List<TreeItem> subNodes = new ArrayList<>();
                     if (result instanceof ASMSourceContainer) {
@@ -619,9 +610,7 @@ public class TagTreeModel implements TreeModel {
                         }
                     }
                     tagScript = new TagScript(result.getSwf(), resultTag, subNodes);
-                    if (currentTagScriptCache != null) {
-                        currentTagScriptCache.put(resultTag, tagScript);
-                    }
+                    currentTagScriptCache.put(resultTag, tagScript);
                 }
                 result = tagScript;
             }

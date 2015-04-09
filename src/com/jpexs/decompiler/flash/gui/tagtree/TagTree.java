@@ -172,11 +172,16 @@ public class TagTree extends JTree {
                 int row,
                 boolean hasFocus) {
 
+            TreeItem val = (TreeItem) value;
+            if (val.getSwf() == null) {
+                // SWF was closed
+                value = null;
+            }
+            
             super.getTreeCellRendererComponent(
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
-            TreeItem val = (TreeItem) value;
             TreeNodeType type = getTreeNodeType(val);
 
             if (type == TreeNodeType.FOLDER && expanded) {
@@ -560,6 +565,7 @@ public class TagTree extends JTree {
         if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
             return mainPanel.folderPreviewPanel.selectedItems.entrySet().iterator().next().getValue();
         }
+        
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;
     }

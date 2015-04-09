@@ -181,6 +181,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         }
         textWithHex = null;
         textNoHex = null;
+        textHexOnly = null;
         setHex(exportMode, true);
     }
 
@@ -236,6 +237,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             }
             ((Tag) abc.parentTag).setModified(true);
             abc.script_info.get(scriptIndex).setModified(true);
+            textWithHex = null;
+            textNoHex = null;
+            textHexOnly = null;
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         } catch (AVM2ParseException ex) {

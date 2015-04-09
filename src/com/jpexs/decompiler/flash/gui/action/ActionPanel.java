@@ -681,9 +681,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
         if (val) {
             if (rawEdit) {
-                setText(srcHexOnly, "text/plain");
+                setHex(ScriptExportMode.HEX);
             } else {
-                setText(srcNoHex, "text/flasm");
+                setHex(ScriptExportMode.PCODE);
             }
             editor.setEditable(true);
             saveButton.setVisible(true);

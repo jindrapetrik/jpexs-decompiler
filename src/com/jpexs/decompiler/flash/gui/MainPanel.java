@@ -617,6 +617,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         this.swfs.addCollectionChangedListener((e) -> {
             TagTreeModel ttm = tagTree.getModel();
             if (ttm != null) {
+                if (getCurrentSwf() == null) {
+                    tagTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
+                }
                 ttm.updateSwfs(e);
                 TreeItem root = ttm.getRoot();
                 int childCount = ttm.getChildCount(root);
