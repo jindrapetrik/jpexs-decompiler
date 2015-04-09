@@ -290,16 +290,20 @@ public class DumpTree extends JTree implements ActionListener {
     public DumpTreeModel getModel() {
         return (DumpTreeModel) super.getModel();
     }
-
-    @Override
-    public void setModel(TreeModel tm) {
-        super.setModel(tm);
-
-        if (tm != null) {
-            int rowCount = tm.getChildCount(tm.getRoot());
-            for (int i = rowCount - 1; i >= 0; i--) {
-                expandRow(i);
-            }
+    
+    public void expandRoot() {
+        DumpTreeModel dtm = getModel();
+        DumpInfo root = dtm.getRoot();
+        expandPath(new TreePath(new Object[]{root}));
+    }
+    
+    public void expandFirstLevelNodes() {
+        DumpTreeModel dtm = getModel();
+        DumpInfo root = dtm.getRoot();
+        int childCount = dtm.getChildCount(root);
+        expandPath(new TreePath(new Object[]{root}));
+        for (int i = 0; i < childCount; i++) {
+            expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
         }
     }
 }

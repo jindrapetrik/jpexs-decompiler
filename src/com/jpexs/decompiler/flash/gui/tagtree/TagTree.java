@@ -574,4 +574,19 @@ public class TagTree extends JTree {
     public TagTreeModel getModel() {
         return (TagTreeModel) super.getModel();
     }
+
+    public void expandRoot() {
+        TagTreeModel ttm = getModel();
+        TreeItem root = ttm.getRoot();
+        expandPath(new TreePath(new Object[]{root}));
+    }
+    
+    public void expandFirstLevelNodes() {
+        TagTreeModel ttm = getModel();
+        TreeItem root = ttm.getRoot();
+        int childCount = ttm.getChildCount(root);
+        for (int i = 0; i < childCount; i++) {
+            expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
+        }
+    }
 }

@@ -621,11 +621,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     tagTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
                 }
                 ttm.updateSwfs(e);
-                TreeItem root = ttm.getRoot();
-                int childCount = ttm.getChildCount(root);
-                for (int i = 0; i < childCount; i++) {
-                    tagTree.expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
-                }
+                tagTree.expandRoot();
+                tagTree.expandFirstLevelNodes();
             }
 
             DumpTreeModel dtm = dumpTree.getModel();
@@ -633,12 +630,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 List<List<String>> expandedNodes = View.getExpandedNodes(dumpTree);
                 dtm.updateSwfs();
                 View.expandTreeNodes(dumpTree, expandedNodes);
-                DumpInfo root = dtm.getRoot();
-                int childCount = dtm.getChildCount(root);
-                for (int i = 0; i < childCount; i++) {
-                    dumpTree.expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
-                    dumpTree.expandRow(i);
-                }
+                dumpTree.expandRoot();
+                dumpTree.expandFirstLevelNodes();
             }
 
             if (swfs.isEmpty()) {
@@ -2360,6 +2353,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 // show welcome panel after closing swfs
                 updateUi();
             } else {
+                if (swf == null) {
+                    swf = swfs.get(0).get(0);
+                }
+                
                 updateUi(swf);
             }
         } else {
@@ -2405,12 +2402,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         switch (view) {
             case VIEW_DUMP:
                 if (dumpTree.getModel() == null) {
-                    dumpTree.setModel(new DumpTreeModel(swfs));
+                    DumpTreeModel dtm = new DumpTreeModel(swfs);
+                    dumpTree.setModel(dtm);
+                    dumpTree.expandFirstLevelNodes();
                 }
                 break;
             case VIEW_RESOURCES:
                 if (tagTree.getModel() == null) {
-                    tagTree.setModel(new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get()));
+                    TagTreeModel ttm = new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get());
+                    tagTree.setModel(ttm);
+                    tagTree.expandFirstLevelNodes();
                 }
                 break;
         }
