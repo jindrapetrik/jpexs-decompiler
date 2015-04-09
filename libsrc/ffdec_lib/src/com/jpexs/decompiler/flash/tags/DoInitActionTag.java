@@ -208,7 +208,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Override
     public String getName() {
-        String expName = swf.getExportName(spriteId);
+        String expName = swf==null?"":swf.getExportName(spriteId);
         if ((expName == null) || expName.isEmpty()) {
             return super.getName();
         }

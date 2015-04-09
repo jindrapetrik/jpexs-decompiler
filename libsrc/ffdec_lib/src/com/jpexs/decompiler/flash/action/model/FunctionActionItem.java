@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -256,6 +257,7 @@ public class FunctionActionItem extends ActionItem {
             }
         }
 
+        int regCount = 0;
         if (actions != null && !actions.isEmpty()) {
             localDataCopy.inFunction++;
 
@@ -287,7 +289,28 @@ public class FunctionActionItem extends ActionItem {
                 }
 
             }
+            for (int i = 1 /* zero is not preloaded*/; i < registerNames.size(); i++) {
+                localDataCopy.registerVars.put(registerNames.get(i), i);
+            }
+
             ret.addAll(asGenerator.toActionList(asGenerator.generate(localDataCopy, actions)));
+
+            regCount = registerNames.size();
+
+            //some temporary registers can exceed variable+param count
+            for (GraphSourceItem a : ret) {
+                if (a instanceof ActionPush) {
+                    ActionPush apu = (ActionPush) a;
+                    for (Object o : apu.values) {
+                        if (o instanceof RegisterNumber) {
+                            RegisterNumber rn = (RegisterNumber) o;
+                            if (rn.number >= regCount) {
+                                regCount++;
+                            }
+                        }
+                    }
+                }
+            }
         }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
         if (!needsFun2 && paramNames.isEmpty()) {
@@ -303,7 +326,7 @@ public class FunctionActionItem extends ActionItem {
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    registerNames.size(), len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
+                    regCount, len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
         }
 
         return ret;

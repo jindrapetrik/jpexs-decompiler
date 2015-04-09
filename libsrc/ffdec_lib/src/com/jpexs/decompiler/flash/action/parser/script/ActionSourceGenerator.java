@@ -485,14 +485,18 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     public int getTempRegister(SourceGeneratorLocalData localData) {
         HashMap<String, Integer> registerVars = getRegisterVars(localData);
-        int tmpReg = 0;
-        for (int i = 0; i < 256; i++) {
-            if (!registerVars.containsValue(i)) {
-                tmpReg = i;
-                break;
+        for (int tmpReg = 0; tmpReg < 256; tmpReg++) {
+            if (!registerVars.containsValue(tmpReg)) {
+                registerVars.put("__temp" + tmpReg, tmpReg);
+                return tmpReg;
             }
         }
-        return tmpReg;
+        return 0; //?
+    }
+
+    public void releaseTempRegister(SourceGeneratorLocalData localData, int tmp) {
+        HashMap<String, Integer> registerVars = getRegisterVars(localData);
+        registerVars.remove("__temp" + tmp);
     }
 
     private String getName(GraphTargetItem item) {

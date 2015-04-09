@@ -123,7 +123,11 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         int tmpReg = asGenerator.getTempRegister(localData);
-        return toSourceMerge(localData, generator, object, objectName, value, new ActionStoreRegister(tmpReg), new ActionSetMember(), new ActionPush(new RegisterNumber(tmpReg)));
+        try {
+            return toSourceMerge(localData, generator, object, objectName, value, new ActionStoreRegister(tmpReg), new ActionSetMember(), new ActionPush(new RegisterNumber(tmpReg)));
+        } finally {
+            asGenerator.releaseTempRegister(localData, tmpReg);
+        }
     }
 
     @Override

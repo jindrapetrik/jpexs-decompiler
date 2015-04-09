@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -131,15 +133,8 @@ public class ForInActionItem extends LoopActionItem implements Block {
         ret.add(new ActionEnumerate2());
 
         List<Action> loopExpr = new ArrayList<>();
-        int exprReg = 0;
-        for (int i = 0; i < 256; i++) {
-            if (!registerVars.containsValue(i)) {
-                registerVars.put("__forin" + asGenerator.uniqId(), i);
-                exprReg = i;
-                break;
-            }
-        }
-        int innerExprReg = asGenerator.getTempRegister(localData);
+        int exprReg = asGenerator.getTempRegister(localData);
+        
         loopExpr.add(new ActionStoreRegister(exprReg));
         loopExpr.add(new ActionPush(new Null()));
         loopExpr.add(new ActionEquals2());
@@ -147,13 +142,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
         loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        if (asGenerator.isInFunction(localData) == 2) {
-            loopBody.add(new ActionStoreRegister(innerExprReg));
-            loopBody.add(new ActionPop());
-        } else {
-            loopBody.addAll(0, asGenerator.toActionList(variableName.toSource(localData, generator)));
-            loopBody.add(new ActionSetVariable());
-        }
+        loopBody.addAll(asGenerator.toActionList(variableName.toSourceIgnoreReturnValue(localData, generator)));        
         int oldForIn = asGenerator.getForInLevel(localData);
         asGenerator.setForInLevel(localData, oldForIn + 1);
         loopBody.addAll(asGenerator.toActionList(asGenerator.generate(localData, commands)));
@@ -166,6 +155,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         forInEndIf.setJumpOffset(bodyLen);
         ret.addAll(loopExpr);
         ret.addAll(loopBody);
+        asGenerator.releaseTempRegister(localData, exprReg);
         return ret;
     }
 

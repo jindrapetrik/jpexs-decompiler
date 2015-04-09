@@ -123,7 +123,11 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         int tmpReg = asGenerator.getTempRegister(localData);
-        return toSourceMerge(localData, generator, name, value, new ActionStoreRegister(tmpReg), new ActionSetVariable(), new ActionPush(new RegisterNumber(tmpReg)));
+        try {
+            return toSourceMerge(localData, generator, name, value, new ActionStoreRegister(tmpReg), new ActionSetVariable(), new ActionPush(new RegisterNumber(tmpReg)));
+        } finally {
+            asGenerator.releaseTempRegister(localData, tmpReg);
+        }
     }
 
     @Override

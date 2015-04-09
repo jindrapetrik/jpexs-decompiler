@@ -106,8 +106,12 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        int tmpReg = asGenerator.getTempRegister(localData);
-        return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex), value, new ActionStoreRegister(tmpReg), new ActionSetProperty(), new ActionPush(new RegisterNumber(tmpReg)));
+        int tmpReg=asGenerator.getTempRegister(localData);
+        try{            
+            return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex), value, new ActionStoreRegister(tmpReg), new ActionSetProperty(), new ActionPush(new RegisterNumber(tmpReg)));
+        } finally {
+            asGenerator.releaseTempRegister(localData, tmpReg);
+        }
     }
 
     @Override

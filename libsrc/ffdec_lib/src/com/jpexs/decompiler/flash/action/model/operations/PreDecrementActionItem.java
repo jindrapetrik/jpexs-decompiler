@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -67,6 +68,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.add(new ActionStoreRegister(tmpReg));
             ret.add(new ActionSetVariable());
             ret.add(new ActionPush(new RegisterNumber(tmpReg)));
+            asGenerator.releaseTempRegister(localData, tmpReg);
         } else if (val instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) val;
             ret.addAll(mem.toSource(localData, generator));
@@ -77,6 +79,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.add(new ActionStoreRegister(tmpReg));
             ret.add(new ActionSetMember());
             ret.add(new ActionPush(new RegisterNumber(tmpReg)));
+            asGenerator.releaseTempRegister(localData, tmpReg);
         } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
             RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
             ret.add(new ActionPush(new RegisterNumber(rn.number)));
