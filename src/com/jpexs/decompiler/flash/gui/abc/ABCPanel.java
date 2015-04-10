@@ -180,8 +180,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
                 List<ScriptPack> allpacks = clModel.getList();
                 final Pattern pat = regexp
-                        ? Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0)
-                        : Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                        ? Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0)
+                        : Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
                 int pos = 0;
                 for (final ScriptPack pack : allpacks) {
                     pos++;

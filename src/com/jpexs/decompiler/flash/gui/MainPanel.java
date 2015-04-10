@@ -1352,9 +1352,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                         Pattern pat;
                         if (regexp) {
-                            pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                            pat = Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
                         } else {
-                            pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                            pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
                         }
                         List<TextTag> textTags = new ArrayList<>();
                         for (Tag tag : swf.tags) {
@@ -2356,7 +2356,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (swf == null) {
                     swf = swfs.get(0).get(0);
                 }
-                
+
                 updateUi(swf);
             }
         } else {

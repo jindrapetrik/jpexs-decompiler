@@ -474,7 +474,7 @@
     </target>
     
     <target name="git-tag">
-       <exec executable="git" outputproperty="GITTAG" failonerror="true">
+        <exec executable="git" outputproperty="GITTAG" failonerror="true">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  

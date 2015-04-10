@@ -252,9 +252,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             final List<ActionSearchResult> found = new ArrayList<>();
             Pattern pat;
             if (regexp) {
-                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                pat = Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             } else {
-                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             }
             int pos = 0;
             for (Entry<String, ASMSource> item : asms.entrySet()) {
