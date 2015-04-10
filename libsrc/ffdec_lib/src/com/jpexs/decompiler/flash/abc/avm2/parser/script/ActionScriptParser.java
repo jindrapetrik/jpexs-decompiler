@@ -259,7 +259,6 @@ public class ActionScriptParser {
             if (s.type == SymbolType.DOT) {
                 if (s2.type == SymbolType.ATTRIBUTE) {
                     attr = true;
-                    s = lex();
                 } else {
                     lexer.pushback(s2);
                 }
