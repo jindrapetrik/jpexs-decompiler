@@ -182,6 +182,19 @@
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
         </zip>
     </target>
+    
+    <target name="osxapp" depends="-loadversion,dist">
+        <mkdir dir="${RELEASESDIR}"/>
+        <property  name="app.file.zip" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />
+        <tempfile property="app.desc.temp" />
+        <echo file="${app.desc.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./ffdec.sh</echo>
+        <zip destfile="${app.file.zip}">
+            <zipfileset file="${app.desc.temp}" fullpath="FFDec.app/Contents/MacOS/FFDec" filemode="755" />
+            <zipfileset dir="${DISTRIBUTIONDIR}" excludes="ffdec.sh" prefix="FFDec.app/Contents/Resources/" />
+            <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="FFDec.app/Contents/Resources/ffdec.sh" filemode="755" />           
+        </zip>
+    </target>
+    
     <target name="-set-gui-type">
         <property name="EXETYPE" value="gui" />
     </target>
