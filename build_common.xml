@@ -183,16 +183,45 @@
         </zip>
     </target>
     
-    <target name="osxapp" depends="-loadversion,dist">
+    <target name="osx-app-archive" depends="-loadversion,dist">
         <mkdir dir="${RELEASESDIR}"/>
-        <property  name="app.file.zip" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />
-        <tempfile property="app.desc.temp" />
-        <echo file="${app.desc.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./ffdec.sh</echo>
-        <zip destfile="${app.file.zip}">
-            <zipfileset file="${app.desc.temp}" fullpath="FFDec.app/Contents/MacOS/FFDec" filemode="755" />
+        <property  name="osx.zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />
+        <tempfile property="app.script.temp" deleteonexit="true" />
+        <echo file="${app.script.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./ffdec.sh</echo>
+        <tempfile property="app.info.temp" deleteonexit="true" />        
+        <echo file="${app.info.temp}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>${PRODUCTNAME}</string>
+	<key>CFBundleExecutable</key>
+	<string>FFDec</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>${MACBUNDLE}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>FFDec</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${VERSION}${VERSIONSUFFIX}</string>
+	<key>CFBundleVersion</key>
+	<string>${VERSION}${VERSIONSUFFIX}</string>
+	<key>LSApplicationCategoryType</key>
+	<string>${MACCATEGORYTYPE}</string>
+</dict>
+</plist>]]></echo>        
+        
+        <zip destfile="${osx.zip.file}">
+            <zipfileset file="${app.script.temp}" fullpath="FFDec.app/Contents/MacOS/FFDec" filemode="755" />
+            <zipfileset file="${app.info.temp}" fullpath="FFDec.app/Contents/Info.plist" />            
             <zipfileset dir="${DISTRIBUTIONDIR}" excludes="ffdec.sh" prefix="FFDec.app/Contents/Resources/" />
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="FFDec.app/Contents/Resources/ffdec.sh" filemode="755" />           
-        </zip>
+        </zip>      
     </target>
     
     <target name="-set-gui-type">
@@ -290,7 +319,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,installer,locales">        
+    <target name="release" depends="library,archive,osx-app-archive,installer,locales">        
 
     </target>
          
@@ -370,6 +399,10 @@
             <arg value="-file" />
             <arg value="fileZip" />
             <arg value="${zip.file}" />
+            
+            <arg value="-file" />
+            <arg value="fileOSXZip" />
+            <arg value="${osx.zip.file}" />
 
             <arg value="-file" />
             <arg value="fileLang" />

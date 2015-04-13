@@ -688,6 +688,7 @@ Section "FFDec" SecDummy
   File "dist\${APP_EXENAME}"
   File "dist\ffdec.bat"
   File "dist\ffdec.jar"
+  File "dist\icon.ico"
   File "dist\license.txt"
   
   SetOutPath "$INSTDIR"  
