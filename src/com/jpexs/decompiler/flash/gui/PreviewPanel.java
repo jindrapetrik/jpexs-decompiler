@@ -381,7 +381,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>" + mainPanel.translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
-            swtPanel.setBackground(View.DEFAULT_BACKGROUND_COLOR);
+            swtPanel.setBackground(View.getDefaultBackgroundColor());
             leftComponent = swtPanel;
         }
 
@@ -654,10 +654,10 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
             tempFile.deleteOnExit();
 
-            Color backgroundColor = View.swfBackgroundColor;
+            Color backgroundColor = View.getSwfBackgroundColor();
 
             if (tagObj instanceof FontTag) { //Fonts are always black on white
-                backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
+                backgroundColor = View.getDefaultBackgroundColor();
             }
 
             if (tagObj instanceof Frame) {
@@ -1112,7 +1112,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     }
 
     public void showSwf(SWF swf) {
-        Color backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
+        Color backgroundColor = View.getDefaultBackgroundColor();
         for (Tag t : swf.tags) {
             if (t instanceof SetBackgroundColorTag) {
                 backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();

@@ -791,6 +791,14 @@ public class Main {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
+        View.execInEventDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+                ErrorLogFrame.createNewInstance();
+            }
+        });
+        
         autoCheckForUpdates();
         offerAssociation();
         View.execInEventDispatch(new Runnable() {
@@ -867,8 +875,7 @@ public class Main {
             }
         }
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
-        AppStrings.updateLanguage();
-        ErrorLogFrame.createNewInstance();
+        AppStrings.updateLanguage();        
 
         try {
             Class<?> cl = Class.forName("org.pushingpixels.substance.api.SubstanceLookAndFeel");
@@ -1357,7 +1364,7 @@ public class Main {
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
-        if (!GraphicsEnvironment.isHeadless()) {
+        if (!GraphicsEnvironment.isHeadless() && ErrorLogFrame.hasInstance()) {
             ErrorLogFrame.getInstance().clearErrorState();
         }
 

@@ -508,9 +508,9 @@ public class PlayerControls extends JPanel implements ActionListener {
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
+                        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
                         if (newColor != null) {
-                            View.swfBackgroundColor = newColor;
+                            View.setSwfBackgroundColor(newColor);
                             display.setBackground(newColor);
                         }
                     }

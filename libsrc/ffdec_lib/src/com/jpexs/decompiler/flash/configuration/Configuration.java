@@ -266,6 +266,11 @@ public class Configuration {
     @ConfigurationName("gui.splitPane2.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
 
+    @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
+    @ConfigurationName("gui.skin")
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<String> guiSkin = null;
+    
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;

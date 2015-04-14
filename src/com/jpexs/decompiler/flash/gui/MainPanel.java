@@ -2147,9 +2147,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_SELECT_BKCOLOR:
-                Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
+                Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
                 if (newColor != null) {
-                    View.swfBackgroundColor = newColor;
+                    View.setSwfBackgroundColor(newColor);
                     reload(true);
                 }
                 break;
