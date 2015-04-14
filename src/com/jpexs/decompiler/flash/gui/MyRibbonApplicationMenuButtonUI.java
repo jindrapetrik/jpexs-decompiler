@@ -16,10 +16,19 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
@@ -27,6 +36,10 @@ import org.pushingpixels.flamingo.api.common.model.PopupButtonModel;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.BasicRibbonApplicationMenuButtonUI;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 import org.pushingpixels.lafwidget.animation.effects.GhostingListener;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.flamingo.common.ui.ActionPopupTransitionAwareUI;
 import org.pushingpixels.substance.flamingo.utils.CommandButtonVisualStateTracker;
 import org.pushingpixels.substance.internal.animation.StateTransitionTracker;
@@ -49,6 +62,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
     private MyResizableIcon clickIcon = null;
 
     private MyResizableIcon normalIcon = null;
+    private MyResizableIcon clearIcon = null;
 
     private final boolean buttonResized = false;
 
@@ -56,11 +70,89 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         return clickIcon;
     }
 
+    
+    public static MyResizableIcon[] getIcons(){
+        MyResizableIcon clearIcon = View.getMyResizableIcon("buttonicon_clear_256");
+        return new MyResizableIcon[]{
+            clearIcon,
+            //normal
+            new MyResizableIcon(clearIcon.originalImage) {
+
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5).getUltraLightColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getMidColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED).getUltraDarkColor()
+                }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+                Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
+                g2.fill(s);
+                g2.setPaint(SubstanceLookAndFeel.getCurrentSkin().getEnabledColorScheme(DecorationAreaType.PRIMARY_TITLE_PANE).getMidColor());
+                super.paintIcon(c, g, x, y);
+            }
+        },
+            //hover
+            new MyResizableIcon(clearIcon.originalImage) {
+
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(Color.white, 0.8)*/.getUltraLightColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_UNSELECTED).getMidColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(new Color(0x7c, 0x7c, 0x7c), 0.8)*/.getUltraDarkColor()
+                }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+                Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
+                g2.fill(s);
+                super.paintIcon(c, g, x, y);
+            }
+        },
+        //click
+        new MyResizableIcon(clearIcon.originalImage) {
+
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.2f, 0.5f, 0.8f}, new Color[]{
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getUltraLightColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getMidColor(),
+                    SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).shiftBackground(Color.black, 0.7).getUltraDarkColor()
+                }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+                Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
+                g2.fill(s);
+                AffineTransform origt = g2.getTransform();
+                AffineTransform t = (AffineTransform) origt.clone();
+                t.translate(-getIconWidth() / 2, -getIconHeight() / 2);
+                t.scale(0.8, 0.8);
+                t.translate(getIconWidth() / 2 + getIconWidth() / 4, getIconHeight() / 2 + getIconHeight() / 4);
+                g2.setTransform(t);
+                g2.setPaint(Color.BLACK);
+                super.paintIcon(c, g, x, y);
+                g2.setTransform(origt);
+            }
+        }
+            
+        };
+    }
+    
     public MyRibbonApplicationMenuButtonUI() {
         super();
-        hoverIcon = View.getMyResizableIcon("buttonicon_hover_256");
-        normalIcon = View.getMyResizableIcon("buttonicon_256");
-        clickIcon = View.getMyResizableIcon("buttonicon_down_256");
+        MyResizableIcon[] icons=getIcons();
+        clearIcon = icons[0];
+        normalIcon = icons[1];
+        hoverIcon = icons[2];
+        clickIcon = icons[3];
+        
     }
 
     /**
@@ -177,6 +269,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         if (regular == null) {
             return;
         }
+        //SubstanceLookAndFeel.getCurrentSkin().getActiveColorScheme(DecorationAreaType.GENERAL);
 
         Graphics2D g2d = (Graphics2D) g.create();
         regular.paintIcon(this.applicationMenuButton, g2d, 0, 0);

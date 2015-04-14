@@ -22,8 +22,12 @@ import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.swing.JLabel;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.painter.border.StandardBorderPainter;
 import org.pushingpixels.substance.api.skin.OfficeBlue2007Skin;
 import org.pushingpixels.substance.internal.utils.SubstanceOutlineUtilities;
@@ -65,7 +69,7 @@ public class HeaderLabel extends JLabel {
 
     @Override
     public void paint(Graphics g) {
-        g.setColor(new Color(217, 232, 251));
+        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL,ComponentState.ENABLED).getBackgroundFillColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         StandardBorderPainter borderPainter = new StandardBorderPainter();
 
@@ -80,12 +84,12 @@ public class HeaderLabel extends JLabel {
 
         GeneralPath contour = SubstanceOutlineUtilities.getBaseOutline(getWidth(),
                 getHeight() + dy, cornerRadius, straightSides, borderInsets);
+        
         borderPainter.paintBorder(g, this, getWidth(), getHeight() + dy,
-                contour, contourInner, new OfficeBlue2007Skin().getActiveColorScheme(DecorationAreaType.HEADER));
-        g.setColor(Color.black);
+                contour, contourInner,SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER,ComponentState.ENABLED));
+        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL,ComponentState.ENABLED).getForegroundColor());
         JLabel lab = new JLabel(getText(), JLabel.CENTER);
         lab.setSize(getSize());
-        lab.paint(g);
-        //g.drawString(getText(), getWidth()/2-getFontMetrics(getFont()).stringWidth(getText())/2, getFont().getSize());
+        lab.paint(g);        
     }
 }

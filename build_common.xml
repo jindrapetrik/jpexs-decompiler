@@ -6,7 +6,8 @@
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
-        <include name="**/?*.properties"/>        
+        <include name="**/?*.properties"/>  
+        <include name="**/?*.colorschemes"/>                
         <include name="**/?*.bin"/>
         <include name="**/?*.xml"/>
         <include name="**/?*.txt"/>

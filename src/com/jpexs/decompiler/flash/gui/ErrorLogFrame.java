@@ -78,6 +78,10 @@ public class ErrorLogFrame extends AppFrame {
         return handler;
     }
 
+    public static boolean hasInstance() {
+        return instance != null;
+    }
+    
     public static ErrorLogFrame getInstance() {
         if (instance == null) {
             instance = new ErrorLogFrame();

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -81,7 +82,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -96,10 +99,25 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
  * @author JPEXS
  */
 public class View {
+    
+    public static Color getDefaultBackgroundColor() {
+        return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+    }
+        
+    private static Color swfBackgroundColor = null;
 
-    public static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
+    public static void setSwfBackgroundColor(Color swfBackgroundColor) {
+        View.swfBackgroundColor = swfBackgroundColor;
+    }
 
-    public static Color swfBackgroundColor = DEFAULT_BACKGROUND_COLOR;
+    public static Color getSwfBackgroundColor() {
+        if(swfBackgroundColor == null){
+            return getDefaultBackgroundColor();
+        }
+        return swfBackgroundColor;
+    }
+    
+    
 
     private static final BufferedImage transparentTexture;
 
@@ -140,6 +158,7 @@ public class View {
 
                 try {
                     UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
+                    SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
                     UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
                     UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                     UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
@@ -267,10 +286,15 @@ public class View {
      */
     public static void setWindowIcon(Window f) {
         List<Image> images = new ArrayList<>();
-        images.add(loadImage("icon16"));
-        images.add(loadImage("icon32"));
-        images.add(loadImage("icon48"));
-        images.add(loadImage("icon256"));
+        MyResizableIcon[] icons=MyRibbonApplicationMenuButtonUI.getIcons();
+        MyResizableIcon icon=icons[1];
+        int sizes[] = new int[] {16,32,48,256};
+        for(int size:sizes){
+            icon.setIconSize(size,size);
+            BufferedImage bi=new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
+            icon.paintIcon(f, bi.getGraphics(), 0, 0);
+            images.add(bi);
+        }                
         f.setIconImages(images);
     }
 

@@ -1,0 +1,210 @@
+Oceanic Watermark {
+    kind=Light
+    colorUltraLight=#DEE8F5
+    colorExtraLight=#D2DFF0
+    colorLight=#D0E0F0
+    colorMid=#CAD9ED
+    colorDark=#BACAD9
+    colorUltraDark=#AEC2D5
+    colorForeground=#15428B
+}
+
+Oceanic Header Watermark {
+    kind=Light
+    colorUltraLight=#ceebfd
+    colorExtraLight=#b2e0fd
+    colorLight=#95d4fd
+    colorMid=#6ec4fb
+    colorDark=#59beff
+    colorUltraDark=#42b4fc
+    colorForeground=#000000
+}
+
+Oceanic Active {
+    kind=Light
+    colorUltraLight=#9DBDE7
+    colorExtraLight=#BBD5F8
+    colorLight=#ABCCF6
+    colorMid=#AACBF6
+    colorDark=#8CB8F3
+    colorUltraDark=#79ADF1
+    colorForeground=#15428B
+}
+
+Oceanic Title Watermark {
+    kind=Light
+    colorUltraLight=#ceebfd
+    colorExtraLight=#b2e0fd
+    colorLight=#95d4fd
+    colorMid=#6ec4fb
+    colorDark=#59beff
+    colorUltraDark=#42b4fc
+    colorForeground=#005e8e
+}
+
+Oceanic Border Active {
+    kind=Light
+    colorUltraLight=#7F96BA
+    colorExtraLight=#63779E
+    colorLight=#576890
+    colorMid=#596991
+    colorDark=#576890
+    colorUltraDark=#566890
+    colorForeground=#15428B
+}
+
+Oceanic Enabled {
+    kind=Light
+    colorUltraLight=#C2E1F9
+    colorExtraLight=#B1DDFF
+    colorLight=#72c2ff
+    colorMid=#49adfa
+    colorDark=#3ba8fb
+    colorUltraDark=#2ba3ff
+    colorForeground=#053E6A
+}
+
+
+Oceanic Border Enabled {
+    kind=Light
+    colorUltraLight=#9EBAE1
+    colorExtraLight=#8AADDB
+    colorLight=#84A8D7
+    colorMid=#81A3D0
+    colorDark=#6E90B8
+    colorUltraDark=#537BAE
+    colorForeground=#15428B
+}
+
+Oceanic Pressed {
+    kind=Light
+    colorUltraLight=#FDA661
+    colorExtraLight=#FC963C
+    colorLight=#FD9D3E
+    colorMid=#FC923C
+    colorDark=#FC8F3C
+    colorUltraDark=#FC923D
+    colorForeground=#15428B
+}
+
+Oceanic Pressed Selected {
+    kind=Light
+    colorUltraLight=#FEB96C
+    colorExtraLight=#FC963C
+    colorLight=#FDA962
+    colorMid=#FD953C
+    colorDark=#FC923D
+    colorUltraDark=#FC8F3D
+    colorForeground=#15428B
+}
+
+Oceanic Rollover {
+    kind=Light
+    colorUltraLight=#fef512 
+    colorExtraLight=#feee0d
+    colorLight=#fcdf0a
+    colorMid=#fad008
+    colorDark=#f9c006
+    colorUltraDark=#f7b203
+    colorForeground=#000000
+}
+
+Oceanic Rollover Selected {
+    kind=Light
+    colorUltraLight=#febd12
+    colorExtraLight=#feb60d
+    colorLight=#fca60a
+    colorMid=#fa9808
+    colorDark=#f98706
+    colorUltraDark=#f77903
+    colorForeground=#15428B
+}
+
+Oceanic Selected {
+    kind=Light
+    colorUltraLight=#FBDBB5
+    colorExtraLight=#FDEB9F
+    colorLight=#FEC778
+    colorMid=#FDD07C
+    colorDark=#FDB759
+    colorUltraDark=#FEB456
+    colorForeground=#15428B
+}
+
+Oceanic Separator {
+    kind=Light
+    colorUltraLight=#D5E3F1
+    colorExtraLight=#D0E1F7
+    colorLight=#C2D5ED
+    colorMid=#C1D3EC
+    colorDark=#8DACD3
+    colorUltraDark=#7797C1
+    colorForeground=#F8FAFC
+}
+
+Oceanic Tab Rollover {
+    kind=Light
+    colorUltraLight=#E0E3DC
+    colorExtraLight=#E4E6E0
+    colorLight=#D8DBD0
+    colorMid=#E0D4A8
+    colorDark=#E2D19E
+    colorUltraDark=#E3D198
+    colorForeground=#15428B
+}
+
+Oceanic Tab Selected {
+    kind=Light
+    colorUltraLight=#F5FAFF
+    colorExtraLight=#EBF3FE
+    colorLight=#EAF2FD
+    colorMid=#E9F1FA
+    colorDark=#E8F0F9
+    colorUltraDark=#E1EAF6
+    colorForeground=#15428B
+}
+
+
+Oceanic Border Selected {
+    kind=Light
+    colorUltraLight=#C6C0B1
+    colorExtraLight=#AEA590
+    colorLight=#8E8165
+    colorMid=#8E8064
+    colorDark=#9A7057
+    colorUltraDark=#9F7559
+    colorForeground=#FCE59C
+}
+
+Oceanic Border Pressed {
+    kind=Light
+    colorUltraLight=#C8BAA4
+    colorExtraLight=#BDB19E
+    colorLight=#A6957B
+    colorMid=#8B7654
+    colorDark=#8B7654
+    colorUltraDark=#8B7654
+    colorForeground=#FEBE64
+}
+
+Oceanic Border Rollover {
+    kind=Light
+    colorUltraLight=#DAC378
+    colorExtraLight=#D9C176
+    colorLight=#D8BB6D
+    colorMid=#D6B664
+    colorDark=#D7B867
+    colorUltraDark=#CFBA73
+    colorForeground=#FFE798
+}
+
+Oceanic Border Rollover Selected {
+    kind=Light
+    colorUltraLight=#B1A389
+    colorExtraLight=#AE9F7D
+    colorLight=#A19476
+    colorMid=#9C8F73
+    colorDark=#9C8864
+    colorUltraDark=#8E8165
+    colorForeground=#F7C05B
+}

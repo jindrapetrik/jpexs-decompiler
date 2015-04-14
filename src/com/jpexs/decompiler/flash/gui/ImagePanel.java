@@ -207,7 +207,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             g2d.setPaint(View.transparentPaint);
             g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
             g2d.setComposite(AlphaComposite.SrcOver);
-            g2d.setPaint(View.swfBackgroundColor);
+            g2d.setPaint(View.getSwfBackgroundColor());
             g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
             if (img != null) {
                 calcRect();
@@ -342,7 +342,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         super(new BorderLayout());
         //iconPanel.setHorizontalAlignment(JLabel.CENTER);
         setOpaque(true);
-        setBackground(View.DEFAULT_BACKGROUND_COLOR);
+        setBackground(View.getDefaultBackgroundColor());
 
         iconPanel = new IconPanel();
         //labelPan.add(label, new GridBagConstraints());
@@ -554,7 +554,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     public synchronized void setImage(SerializableImage image) {
-        setBackground(View.swfBackgroundColor);
+        setBackground(View.getSwfBackgroundColor());
         clear();
 
         timelined = null;
@@ -567,7 +567,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     public synchronized void setText(TextTag textTag, TextTag newTextTag) {
-        setBackground(View.swfBackgroundColor);
+        setBackground(View.getSwfBackgroundColor());
         clear();
 
         timelined = null;
