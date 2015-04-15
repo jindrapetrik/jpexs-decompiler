@@ -887,5 +887,27 @@
 			var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
          	var b:Vector.<int> = new <int>[10,20,30];
 		}
+		
+		public function testFinallyOnly(){
+			var a = 5;
+			try{
+				a = 9;
+				trace("intry");
+			}finally {
+				trace("infinally");
+			}
+		}
+		
+		public function testCatchFinally(){
+			var a = 5;
+			try{
+				a = 9;
+				trace("intry");
+			}catch(e){
+				trace("incatch");
+			}finally {
+				trace("infinally");
+			}
+		}
 	}
 }

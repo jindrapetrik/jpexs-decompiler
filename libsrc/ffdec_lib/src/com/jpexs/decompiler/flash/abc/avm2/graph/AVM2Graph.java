@@ -192,21 +192,24 @@ public class AVM2Graph extends Graph {
         List<ABCException> catchedExceptions = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
             if (addr == this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                if (!body.exceptions[e].isFinally()) {
-                    if (((body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
-                        catchedExceptions.clear();
-                        maxend = this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end);
-                        catchedExceptions.add(body.exceptions[e]);
-                    } else if (this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
-                        catchedExceptions.add(body.exceptions[e]);
+                //Add finally only when the list is empty
+                if (!body.exceptions[e].isFinally() || catchedExceptions.isEmpty()) {
+                    if (!parsedExceptions.contains(body.exceptions[e])) {
+                        if (((body.exceptions[e].end) > maxend)) {
+                            catchedExceptions.clear();
+                            maxend = this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end);
+                            catchedExceptions.add(body.exceptions[e]);
+                        } else if (this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
+                            catchedExceptions.add(body.exceptions[e]);
+                        }
+
                     }
+                } else if (body.exceptions[e].isFinally()) {
+                    parsedExceptions.add(body.exceptions[e]);
                 }
             }
         }
         if (catchedExceptions.size() > 0) {
-            /*if (currentLoop != null) {
-             //currentLoop.phase=0;
-             }*/
             parsedExceptions.addAll(catchedExceptions);
             int endpos = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
@@ -328,6 +331,11 @@ public class AVM2Graph extends Graph {
                         stopPart2.add(retPart);
                     }
                     catchedCommands.add(printGraph(localData2, stack, allParts, parent, npart, stopPart2, loops, staticOperation, path));
+                    if (catchedExceptions.get(e).isFinally()) {
+                        catchedCommands.remove(catchedCommands.size() - 1);
+                        catchedExceptions.remove(e);
+                        e--;
+                    }
                 }
 
                 GraphPart nepart = null;

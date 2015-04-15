@@ -897,6 +897,37 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var b:Vector.<int> = new <int>[10,20,30];\r\n", false);
     }
 
+    public void testFinallyOnly() {
+        decompileMethod("testFinallyOnly", "var a:* = 5;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "a = 9;\r\n"
+                + "trace(\"intry\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"infinally\");\r\n"
+                + "}\r\n", false);
+    }
+
+    @Test
+    public void testCatchFinally() {
+        decompileMethod("testCatchFinally", "var a:* = 5;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "a = 9;\r\n"
+                + "trace(\"intry\");\r\n"
+                + "}\r\n"
+                + "catch(e:*)\r\n"
+                + "{\r\n"
+                + "trace(\"incatch\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"infinally\");\r\n"
+                + "}\r\n", false);
+    }
+
     @Test
     public void testOptionalParameters() {
         String methodName = "testOptionalParameters";
