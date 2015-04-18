@@ -49,7 +49,7 @@ check_java_version () {
 		return 1
 	fi
 
-	return 0	
+	return 0
 }
 
 # Handle symlinks
@@ -67,11 +67,17 @@ fi
 
 popd > /dev/null
 
+args=(-Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@")
+
+if [ "`uname`" = "Darwin" ]; then
+	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
+fi
+
 # Check default java
 if [ -x "`which java`" ]; then
 	JAVA_VERSION_OUTPUT=`java -version 2>&1`
 	JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
-	check_java_version && exec java -Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@"
+	check_java_version && exec java "${args[@]}"
 fi
 
 # Test other possible Java locations
@@ -81,14 +87,14 @@ for JRE_PATH in $LOOKUP_JRE_DIRS; do
 		JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
 		check_java_version && {
 			export JRE_PATH
-			exec $JRE_PATH/bin/java -Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@"
+			exec $JRE_PATH/bin/java "${args[@]}"
 		}
 	fi
 done
 
 # Failed
 if [ -x "`which xmessage`" ]; then
-	xmessage -nearmouse -file - <<EOF 
+	xmessage -nearmouse -file - <<EOF
 Failed to find a suitable java version.
 Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3_$REQ_JVER4 or newer.
 EOF
