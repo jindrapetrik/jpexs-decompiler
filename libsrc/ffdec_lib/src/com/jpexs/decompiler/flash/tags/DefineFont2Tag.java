@@ -500,4 +500,9 @@ public class DefineFont2Tag extends FontTag {
         }
         return kerningAdjustment;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
 }

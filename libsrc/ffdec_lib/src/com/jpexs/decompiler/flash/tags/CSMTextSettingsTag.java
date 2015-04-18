@@ -120,4 +120,9 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     public int getCharacterId() {
         return textID;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.textID = characterId;
+    }
 }

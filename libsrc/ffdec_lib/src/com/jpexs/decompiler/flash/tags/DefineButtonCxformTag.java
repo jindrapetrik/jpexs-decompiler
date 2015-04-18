@@ -93,4 +93,9 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     public int getCharacterId() {
         return buttonId;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
 }

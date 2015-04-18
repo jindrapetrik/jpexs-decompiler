@@ -323,4 +323,9 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         timeline.addFrame(frameHit);
         return timeline;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
 }

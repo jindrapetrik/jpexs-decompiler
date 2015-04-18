@@ -237,4 +237,9 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
         setModified(mod);
         matrix = old;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
 }

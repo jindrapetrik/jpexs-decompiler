@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -31,7 +32,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class VideoFrameTag extends Tag {
+public class VideoFrameTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public int streamID;
@@ -90,5 +91,15 @@ public class VideoFrameTag extends Tag {
         streamID = sis.readUI16("streamID");
         frameNum = sis.readUI16("frameNum");
         videoData = sis.readByteRangeEx(sis.available(), "videoData"); //TODO: Parse video packets
+    }
+
+    @Override
+    public int getCharacterId() {
+        return streamID;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.streamID = characterId;
     }
 }

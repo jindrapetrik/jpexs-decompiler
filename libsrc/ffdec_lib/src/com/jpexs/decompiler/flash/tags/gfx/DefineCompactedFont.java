@@ -423,4 +423,9 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public boolean hasLayout() {
         return true;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
 }

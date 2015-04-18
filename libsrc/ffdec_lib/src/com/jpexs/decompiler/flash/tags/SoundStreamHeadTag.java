@@ -99,6 +99,11 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.virtualCharacterId = characterId;
+    }
+
+    @Override
     public void setVirtualCharacterId(int ch) {
         virtualCharacterId = ch;
     }

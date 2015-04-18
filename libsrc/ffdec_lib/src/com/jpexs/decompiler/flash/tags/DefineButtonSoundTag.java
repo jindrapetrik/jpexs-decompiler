@@ -140,4 +140,9 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
             buttonSoundInfo3 = sis.readSOUNDINFO("buttonSoundInfo3");
         }
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
 }

@@ -171,4 +171,9 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
         bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

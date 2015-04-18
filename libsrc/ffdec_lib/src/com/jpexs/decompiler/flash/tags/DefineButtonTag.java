@@ -413,4 +413,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     public Tag getSourceTag() {
         return this;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
 }

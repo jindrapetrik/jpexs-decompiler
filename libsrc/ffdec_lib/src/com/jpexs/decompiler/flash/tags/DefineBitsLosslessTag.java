@@ -279,4 +279,9 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     public String getImageFormat() {
         return "png";
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

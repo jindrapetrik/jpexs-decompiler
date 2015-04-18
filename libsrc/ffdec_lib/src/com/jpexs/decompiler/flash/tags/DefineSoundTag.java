@@ -355,4 +355,9 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         final int[] rateMap = {5512, 11025, 22050, 44100};
         return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.soundId = characterId;
+    }
 }

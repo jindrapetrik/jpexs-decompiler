@@ -172,4 +172,9 @@ public class DefineShape4Tag extends ShapeTag {
     public boolean isSingleFrame() {
         return true;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.shapeId = characterId;
+    }
 }

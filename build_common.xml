@@ -222,7 +222,9 @@
             <zipfileset file="${app.info.temp}" fullpath="FFDec.app/Contents/Info.plist" />            
             <zipfileset dir="${DISTRIBUTIONDIR}" excludes="ffdec.sh" prefix="FFDec.app/Contents/Resources/" />
             <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="FFDec.app/Contents/Resources/ffdec.sh" filemode="755" />           
-        </zip>      
+        </zip>   
+        <delete file="${app.script.temp}" />
+        <delete file="${app.info.temp}" />
     </target>
     
     <target name="-set-gui-type">

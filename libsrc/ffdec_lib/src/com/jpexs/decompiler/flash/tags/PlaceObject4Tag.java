@@ -574,4 +574,9 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         setModified(mod);
         matrix = old;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
 }

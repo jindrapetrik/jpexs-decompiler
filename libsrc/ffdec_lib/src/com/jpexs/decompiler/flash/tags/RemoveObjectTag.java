@@ -105,4 +105,9 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
     public int getCharacterId() {
         return characterId;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
 }

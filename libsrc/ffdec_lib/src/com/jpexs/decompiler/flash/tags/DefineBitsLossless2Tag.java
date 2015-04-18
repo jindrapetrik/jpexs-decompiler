@@ -277,4 +277,9 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         cachedImage = bi;
         return bi;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

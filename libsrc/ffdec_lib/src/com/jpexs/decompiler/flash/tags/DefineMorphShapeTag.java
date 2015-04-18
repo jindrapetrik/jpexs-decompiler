@@ -388,4 +388,9 @@ public class DefineMorphShapeTag extends MorphShapeTag {
 
         return cmse.getShapeData();
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
 }

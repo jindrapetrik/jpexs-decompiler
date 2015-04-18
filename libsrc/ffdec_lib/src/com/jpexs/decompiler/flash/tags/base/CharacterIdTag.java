@@ -23,4 +23,6 @@ package com.jpexs.decompiler.flash.tags.base;
 public interface CharacterIdTag {
 
     public int getCharacterId();
+
+    public void setCharacterId(int characterId);
 }

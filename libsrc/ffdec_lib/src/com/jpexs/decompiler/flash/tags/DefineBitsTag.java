@@ -137,4 +137,9 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     public void handleEvent(Tag tag) {
         clearCache();
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

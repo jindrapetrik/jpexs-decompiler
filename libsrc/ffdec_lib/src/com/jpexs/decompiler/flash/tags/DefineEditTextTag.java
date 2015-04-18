@@ -1124,4 +1124,9 @@ public class DefineEditTextTag extends TextTag {
     public String toHtmlCanvas(double unitDivisor) {
         return render(true, null, new Matrix(), new ColorTransform());
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

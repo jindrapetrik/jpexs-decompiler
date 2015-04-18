@@ -103,4 +103,9 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
     public int getCharacterId() {
         return fontID;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontID = characterId;
+    }
 }

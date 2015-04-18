@@ -324,8 +324,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             List<Integer> allowedTagTypes = null;
             if (firstItem instanceof FolderItem) {
                 allowedTagTypes = tagTree.getSwfFolderItemNestedTagIds(((FolderItem) firstItem).getName(), firstItem.getSwf().gfx);
-            } else if (firstItem instanceof DefineSpriteTag) {
-                allowedTagTypes = tagTree.getSpriteNestedTagIds();
+            } else if (firstItem instanceof Tag) {
+                allowedTagTypes = tagTree.getNestedTagIds((Tag) firstItem);
             }
 
             addTagMenu.removeAll();
@@ -347,7 +347,19 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                 if (isDefineSprite) {
                                     ((DefineSpriteTag) firstItem).subTags.add(t);
                                 } else {
-                                    swf.tags.add(t);
+                                    if (firstItem instanceof Tag) {
+                                        if ((t instanceof CharacterIdTag) && (firstItem instanceof CharacterTag)) {
+                                            ((CharacterIdTag) t).setCharacterId(((CharacterTag) firstItem).getCharacterId());
+                                        }
+                                        int index = swf.tags.indexOf(firstItem);
+                                        if (index > -1) {
+                                            swf.tags.add(index, t);
+                                        } else {
+                                            swf.tags.add(t);
+                                        }
+                                    } else {
+                                        swf.tags.add(t);
+                                    }
                                 }
                                 timelined.getTimeline().reset();
                                 swf.updateCharacters();

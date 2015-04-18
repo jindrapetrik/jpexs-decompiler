@@ -85,4 +85,9 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
     public int getCharacterId() {
         return fontId;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
 }

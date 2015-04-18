@@ -124,4 +124,9 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         }
         return baos.toByteArray();
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

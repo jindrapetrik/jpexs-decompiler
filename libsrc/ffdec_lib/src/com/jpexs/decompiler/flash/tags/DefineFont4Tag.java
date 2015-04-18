@@ -105,4 +105,9 @@ public class DefineFont4Tag extends CharacterTag {
         }
         return baos.toByteArray();
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontID = characterId;
+    }
 }

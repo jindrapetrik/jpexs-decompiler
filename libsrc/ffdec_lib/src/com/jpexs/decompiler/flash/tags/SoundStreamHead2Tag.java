@@ -243,4 +243,9 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
         String exportName = swf.getExportName(getCharacterId());
         return getCharacterId() + (exportName != null ? "_" + exportName : "");
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.virtualCharacterId = characterId;
+    }
 }

@@ -633,4 +633,9 @@ public class DefineText2Tag extends TextTag {
     public String toHtmlCanvas(double unitDivisor) {
         return staticTextToHtmlCanvas(unitDivisor, swf, textRecords, 2, textBounds, textMatrix, new ColorTransform());
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
 }

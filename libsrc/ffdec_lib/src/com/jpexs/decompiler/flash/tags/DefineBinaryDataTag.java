@@ -139,4 +139,9 @@ public class DefineBinaryDataTag extends CharacterTag {
         }
         return false;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.tag = characterId;
+    }
 }
