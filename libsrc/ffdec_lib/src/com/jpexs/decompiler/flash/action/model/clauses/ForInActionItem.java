@@ -21,12 +21,9 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
-import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
-import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
@@ -41,7 +38,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -134,7 +130,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
 
         List<Action> loopExpr = new ArrayList<>();
         int exprReg = asGenerator.getTempRegister(localData);
-        
+
         loopExpr.add(new ActionStoreRegister(exprReg));
         loopExpr.add(new ActionPush(new Null()));
         loopExpr.add(new ActionEquals2());
@@ -142,7 +138,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
         loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        loopBody.addAll(asGenerator.toActionList(variableName.toSourceIgnoreReturnValue(localData, generator)));        
+        loopBody.addAll(asGenerator.toActionList(variableName.toSourceIgnoreReturnValue(localData, generator)));
         int oldForIn = asGenerator.getForInLevel(localData);
         asGenerator.setForInLevel(localData, oldForIn + 1);
         loopBody.addAll(asGenerator.toActionList(asGenerator.generate(localData, commands)));

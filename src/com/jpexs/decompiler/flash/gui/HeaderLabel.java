@@ -1,22 +1,21 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
@@ -25,11 +24,9 @@ import javax.swing.JLabel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
-import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.painter.border.StandardBorderPainter;
-import org.pushingpixels.substance.api.skin.OfficeBlue2007Skin;
 import org.pushingpixels.substance.internal.utils.SubstanceOutlineUtilities;
 
 /**
@@ -69,7 +66,7 @@ public class HeaderLabel extends JLabel {
 
     @Override
     public void paint(Graphics g) {
-        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL,ComponentState.ENABLED).getBackgroundFillColor());
+        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         StandardBorderPainter borderPainter = new StandardBorderPainter();
 
@@ -84,12 +81,12 @@ public class HeaderLabel extends JLabel {
 
         GeneralPath contour = SubstanceOutlineUtilities.getBaseOutline(getWidth(),
                 getHeight() + dy, cornerRadius, straightSides, borderInsets);
-        
+
         borderPainter.paintBorder(g, this, getWidth(), getHeight() + dy,
-                contour, contourInner,SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER,ComponentState.ENABLED));
-        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL,ComponentState.ENABLED).getForegroundColor());
+                contour, contourInner, SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
+        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
         JLabel lab = new JLabel(getText(), JLabel.CENTER);
         lab.setSize(getSize());
-        lab.paint(g);        
+        lab.paint(g);
     }
 }

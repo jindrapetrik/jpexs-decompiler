@@ -250,5 +250,4 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public void setCharacterId(int characterId) {
         this.spriteId = characterId;
     }
-
 }

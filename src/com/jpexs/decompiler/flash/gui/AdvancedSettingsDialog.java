@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -56,7 +55,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -114,9 +112,11 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
             }
         };
     }
-    
+
     private static class SkinSelect {
+
         private String name;
+
         private String className;
 
         public SkinSelect(String name, String className) {
@@ -132,8 +132,6 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         public String toString() {
             return name;
         }
-                
-        
     }
 
     private void initComponents() {
@@ -195,65 +193,65 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
 
         JTabbedPane tabPane = new JTabbedPane();
         Map<String, Component> tabs = new HashMap<>();
-        
-         JComboBox<SkinSelect> skinComboBox=new JComboBox<>();
-                      skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer(){
 
-                          @Override
-                          public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                              SubstanceDefaultListCellRenderer cmp= (SubstanceDefaultListCellRenderer)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
-                              final SkinSelect ss=(SkinSelect)value;
-                              cmp.setIcon(new Icon() {
+        JComboBox<SkinSelect> skinComboBox = new JComboBox<>();
+        skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer() {
 
-                                  @Override
-                                  public void paintIcon(Component c, Graphics g, int x, int y) {
-                                      Graphics2D g2 = (Graphics2D) g;
-                                      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                                      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                                      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                                      try {
-                                          Class<?> act = Class.forName(ss.getClassName());                                          
-                                          SubstanceSkin skin = (SubstanceSkin)act.newInstance();
-                                          Color fill = skin.getColorScheme(DecorationAreaType.GENERAL,ColorSchemeAssociationKind.FILL,ComponentState.ENABLED).getBackgroundFillColor();
-                                          Color hilight=skin.getColorScheme(DecorationAreaType.GENERAL,ColorSchemeAssociationKind.FILL,ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
-                                          Color border = skin.getColorScheme(DecorationAreaType.GENERAL,ColorSchemeAssociationKind.BORDER,ComponentState.ENABLED).getDarkColor();
-                                          g2.setColor(fill);
-                                          g2.fillOval(0, 0, 16, 16);
-                                          g2.setColor(hilight);
-                                          g2.fillArc(0, 0, 16, 16, -45, 90);                                          
-                                          g2.setColor(border);
-                                          g2.drawOval(0, 0, 16, 16);
-                                          
-                                      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-                                          //no icon
-                                      }
-                                      
-                                  }
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                SubstanceDefaultListCellRenderer cmp = (SubstanceDefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
+                final SkinSelect ss = (SkinSelect) value;
+                cmp.setIcon(new Icon() {
 
-                                  @Override
-                                  public int getIconWidth() {
-                                      return 16;
-                                  }
+                    @Override
+                    public void paintIcon(Component c, Graphics g, int x, int y) {
+                        Graphics2D g2 = (Graphics2D) g;
+                        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        try {
+                            Class<?> act = Class.forName(ss.getClassName());
+                            SubstanceSkin skin = (SubstanceSkin) act.newInstance();
+                            Color fill = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+                            Color hilight = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
+                            Color border = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED).getDarkColor();
+                            g2.setColor(fill);
+                            g2.fillOval(0, 0, 16, 16);
+                            g2.setColor(hilight);
+                            g2.fillArc(0, 0, 16, 16, -45, 90);
+                            g2.setColor(border);
+                            g2.drawOval(0, 0, 16, 16);
 
-                                  @Override
-                                  public int getIconHeight() {
-                                      return 16;
-                                  }
-                              });
-                              return cmp;
-                          }
-                      
-                      });
-                      skinComboBox.addItem(new SkinSelect(OceanicSkin.NAME, OceanicSkin.class.getName()));
-                        Map<String,SkinInfo> skins = SubstanceLookAndFeel.getAllSkins();
-                        for(String skinKey:skins.keySet()){
-                           SkinInfo skin=skins.get(skinKey);
-                           skinComboBox.addItem(new SkinSelect(skin.getDisplayName(), skin.getClassName()));
-                           if(skin.getClassName().equals(Configuration.guiSkin.get())){
-                               skinComboBox.setSelectedIndex(skinComboBox.getItemCount()-1);
-                           }
+                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+                            //no icon
                         }
-        
+
+                    }
+
+                    @Override
+                    public int getIconWidth() {
+                        return 16;
+                    }
+
+                    @Override
+                    public int getIconHeight() {
+                        return 16;
+                    }
+                });
+                return cmp;
+            }
+
+        });
+        skinComboBox.addItem(new SkinSelect(OceanicSkin.NAME, OceanicSkin.class.getName()));
+        Map<String, SkinInfo> skins = SubstanceLookAndFeel.getAllSkins();
+        for (String skinKey : skins.keySet()) {
+            SkinInfo skin = skins.get(skinKey);
+            skinComboBox.addItem(new SkinSelect(skin.getDisplayName(), skin.getClassName()));
+            if (skin.getClassName().equals(Configuration.guiSkin.get())) {
+                skinComboBox.setSelectedIndex(skinComboBox.getItemCount() - 1);
+            }
+        }
+
         for (String cat : categorized.keySet()) {
             JPanel configPanel = new JPanel(new SpringLayout());
             for (String name : categorized.get(cat).keySet()) {
@@ -267,33 +265,33 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
 
                     ParameterizedType listType = (ParameterizedType) field.getGenericType();
                     Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
-                    
+
                     String description = translate("config.description." + name);
 
                     Object defaultValue = Configuration.getDefaultValue(field);
-                    if(name.equals("gui.skin")){
+                    if (name.equals("gui.skin")) {
                         Class c;
                         try {
-                            c = Class.forName((String)defaultValue);
+                            c = Class.forName((String) defaultValue);
                             defaultValue = c.getField("NAME").get(c);
                         } catch (ClassNotFoundException | NoSuchFieldException | SecurityException ex) {
                             Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        
+
                     }
                     if (defaultValue != null) {
                         description += " (" + translate("default") + ": " + defaultValue + ")";
                     }
-                    
+
                     JLabel l = new JLabel(locName, JLabel.TRAILING);
                     l.setToolTipText(description);
                     configPanel.add(l);
                     Component c = null;
-                    if(name.equals("gui.skin")){                         
+                    if (name.equals("gui.skin")) {
                         skinComboBox.setToolTipText(description);
                         skinComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, skinComboBox.getPreferredSize().height));
                         c = skinComboBox;
-                    } else if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {                        
+                    } else if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {
                         JTextField tf = new JTextField();
                         Object val = item.get();
                         if (val == null) {
@@ -403,10 +401,9 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
 
                     ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
                     Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
-                    if(name.equals("gui.skin")){
-                        value = ((SkinSelect)((JComboBox<SkinSelect>)c).getSelectedItem()).className;
-                    }
-                    else if (itemType == String.class) {
+                    if (name.equals("gui.skin")) {
+                        value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
+                    } else if (itemType == String.class) {
                         value = ((JTextField) c).getText();
                     }
                     if (itemType == Boolean.class) {

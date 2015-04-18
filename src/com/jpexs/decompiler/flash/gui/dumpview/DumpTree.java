@@ -290,13 +290,13 @@ public class DumpTree extends JTree implements ActionListener {
     public DumpTreeModel getModel() {
         return (DumpTreeModel) super.getModel();
     }
-    
+
     public void expandRoot() {
         DumpTreeModel dtm = getModel();
         DumpInfo root = dtm.getRoot();
         expandPath(new TreePath(new Object[]{root}));
     }
-    
+
     public void expandFirstLevelNodes() {
         DumpTreeModel dtm = getModel();
         DumpInfo root = dtm.getRoot();
