@@ -23,26 +23,15 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.Version;
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
-import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -74,7 +63,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -417,12 +405,24 @@ public class Main {
 
         private final SWFSourceInfo[] sourceInfos;
 
+        private final Runnable executeAfterOpen;
+
         public OpenFileWorker(SWFSourceInfo sourceInfo) {
+            this(sourceInfo, null);
+        }
+
+        public OpenFileWorker(SWFSourceInfo sourceInfo, Runnable executeAfterOpen) {
             this.sourceInfos = new SWFSourceInfo[]{sourceInfo};
+            this.executeAfterOpen = executeAfterOpen;
         }
 
         public OpenFileWorker(SWFSourceInfo[] sourceInfos) {
+            this(sourceInfos, null);
+        }
+
+        public OpenFileWorker(SWFSourceInfo[] sourceInfos, Runnable executeAfterOpen) {
             this.sourceInfos = sourceInfos;
+            this.executeAfterOpen = executeAfterOpen;
         }
 
         @Override
@@ -467,16 +467,17 @@ public class Main {
             shouldCloseWhenClosingLoadingDialog = false;
 
             final SWF fswf = firstSWF;
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    if (mainFrame != null) {
-                        mainFrame.setVisible(true);
-                    }
-                    Main.stopWork();
-                    if (mainFrame != null && Configuration.gotoMainClassOnStartup.get()) {
-                        mainFrame.getPanel().gotoDocumentClass(fswf);
-                    }
+            View.execInEventDispatch(() -> {
+                if (executeAfterOpen != null) {
+                    executeAfterOpen.run();
+                }
+
+                if (mainFrame != null) {
+                    mainFrame.setVisible(true);
+                }
+                Main.stopWork();
+                if (mainFrame != null && Configuration.gotoMainClassOnStartup.get()) {
+                    mainFrame.getPanel().gotoDocumentClass(fswf);
                 }
             });
 
@@ -536,6 +537,10 @@ public class Main {
     }
 
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
+        return openFile(swfFile, fileTitle, null);
+    }
+
+    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
         try {
             File file = new File(swfFile);
             if (!file.exists()) {
@@ -557,7 +562,15 @@ public class Main {
         return openFile(new SWFSourceInfo[]{sourceInfo});
     }
 
+    public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen) {
+        return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen);
+    }
+
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
+        return openFile(newSourceInfos, null);
+    }
+
+    public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
             mainFrame.getPanel().closeAll();
@@ -566,7 +579,7 @@ public class Main {
         }
 
         loadingDialog.setVisible(true);
-        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos);
+        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen);
         wrk.execute();
         sourceInfos.addAll(Arrays.asList(newSourceInfos));
         return OpenFileResult.OK;
@@ -1052,6 +1065,7 @@ public class Main {
                 Main.exit();
             } else {
                 showModeFrame();
+                reloadLastSession();
             }
 
         } else {
@@ -1066,6 +1080,30 @@ public class Main {
                         openFile(fileToOpen, null);
                     }
                 }
+            }
+        }
+    }
+
+    private static void reloadLastSession() {
+        if (Configuration.saveSessionOnExit.get()) {
+            String lastSession = Configuration.lastSessionData.get();
+            if (lastSession != null && lastSession.length() > 0) {
+                String[] filesToOpen = lastSession.split(File.pathSeparator, -1);
+                int cnt = filesToOpen.length - 1;
+                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[cnt];
+                for (int i = 0; i < cnt; i++) {
+                    String fileToOpen = filesToOpen[i];
+                    sourceInfos[i] = new SWFSourceInfo(null, fileToOpen, null);
+                }
+
+                openFile(sourceInfos, () -> {
+                    // last part contains the selected node in the tagtree
+                    String pathStr = filesToOpen[filesToOpen.length - 1];
+                    if (pathStr.length() > 0) {
+                        String[] path = pathStr.split("\\|");
+                        View.selectTreeNode(mainFrame.getPanel().tagTree, Arrays.asList(path));
+                    }
+                });
             }
         }
     }

@@ -99,11 +99,11 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
  * @author JPEXS
  */
 public class View {
-    
+
     public static Color getDefaultBackgroundColor() {
         return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
     }
-        
+
     private static Color swfBackgroundColor = null;
 
     public static void setSwfBackgroundColor(Color swfBackgroundColor) {
@@ -111,13 +111,11 @@ public class View {
     }
 
     public static Color getSwfBackgroundColor() {
-        if(swfBackgroundColor == null){
+        if (swfBackgroundColor == null) {
             return getDefaultBackgroundColor();
         }
         return swfBackgroundColor;
     }
-    
-    
 
     private static final BufferedImage transparentTexture;
 
@@ -286,15 +284,15 @@ public class View {
      */
     public static void setWindowIcon(Window f) {
         List<Image> images = new ArrayList<>();
-        MyResizableIcon[] icons=MyRibbonApplicationMenuButtonUI.getIcons();
-        MyResizableIcon icon=icons[1];
-        int sizes[] = new int[] {16,32,48,256};
-        for(int size:sizes){
-            icon.setIconSize(size,size);
-            BufferedImage bi=new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
+        MyResizableIcon[] icons = MyRibbonApplicationMenuButtonUI.getIcons();
+        MyResizableIcon icon = icons[1];
+        int sizes[] = new int[]{16, 32, 48, 256};
+        for (int size : sizes) {
+            icon.setIconSize(size, size);
+            BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
             icon.paintIcon(f, bi.getGraphics(), 0, 0);
             images.add(bi);
-        }                
+        }
         f.setIconImages(images);
     }
 
@@ -532,15 +530,15 @@ public class View {
         }
     }
 
-    private static void expandTreeNode(JTree tree, List<String> pathAsStringList) {
+    private static TreePath expandTreeNode(JTree tree, List<String> pathAsStringList) {
         TreeModel model = tree.getModel();
         Object node = model.getRoot();
 
         if (pathAsStringList.isEmpty()) {
-            return;
+            return null;
         }
         if (!pathAsStringList.get(0).equals(node.toString())) {
-            return;
+            return null;
         }
 
         List<Object> path = new ArrayList<>();
@@ -561,6 +559,14 @@ public class View {
 
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         tree.expandPath(tp);
+        return tp;
+    }
+
+    public static void selectTreeNode(JTree tree, List<String> pathAsStringList) {
+        TreePath tp = expandTreeNode(tree, pathAsStringList);
+        if (tp != null) {
+            tree.setSelectionPath(tp);
+        }
     }
 
     public static void expandTreeNodes(JTree tree, TreePath parent, boolean expand) {

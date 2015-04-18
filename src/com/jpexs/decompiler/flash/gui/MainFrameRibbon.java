@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
+import com.jpexs.decompiler.flash.treeitems.SWFList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -29,8 +30,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.io.File;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 
@@ -114,6 +117,32 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                if (Configuration.saveSessionOnExit.get()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (SWFList swf : panel.getSwfs()) {
+                        String file = swf.sourceInfo.getFile();
+                        if (file != null) {
+                            sb.append(file);
+                            sb.append(File.pathSeparator);
+                        }
+                    }
+
+                    TreePath path = panel.tagTree.getLeadSelectionPath();
+                    if (path != null) {
+                        boolean first = true;
+                        for (Object p : path.getPath()) {
+                            if (!first) {
+                                sb.append("|");
+                            }
+
+                            first = false;
+                            sb.append(p.toString());
+                        }
+                    }
+
+                    Configuration.lastSessionData.set(sb.toString());
+                }
+
                 boolean closeResult = panel.closeAll();
                 if (closeResult) {
                     Main.exit();

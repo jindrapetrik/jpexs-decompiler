@@ -270,7 +270,7 @@ public class Configuration {
     @ConfigurationName("gui.skin")
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<String> guiSkin = null;
-    
+
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
@@ -430,9 +430,11 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> autoSaveTagModifications = null;
 
-    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
+
+    public static final ConfigurationItem<String> lastSessionData = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
