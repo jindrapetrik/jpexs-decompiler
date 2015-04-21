@@ -169,4 +169,8 @@ public class InstructionDefinition implements Serializable {
         }
         return true;
     }
+
+    public boolean isExitInstruction() {
+        return false;
+    }
 }
