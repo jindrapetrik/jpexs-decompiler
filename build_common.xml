@@ -525,8 +525,16 @@
     </target>
     
     
-    <target name="test_lib">
-        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />
+    <target name="-test_lib-newver" if="NEWVER">
+        <ant antfile="${CORELIBSCRIPT}" target="testhalt" inheritAll="false" usenativebasedir="true" />    
+    </target>
+    
+    <target name="-test_lib-nonewver" unless="NEWVER">
+        <ant antfile="${CORELIBSCRIPT}" target="test" inheritAll="false" usenativebasedir="true" />    
+    </target>
+    
+    
+    <target name="test_lib" depends="-test_lib-newver,-test_lib-nonewver">
     </target>
     
     <target name="git-tag">
