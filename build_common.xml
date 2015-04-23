@@ -108,7 +108,14 @@
         </javac>
     </target>
 
-    <target name="test" depends="test_lib,compile,compile-tests">
+    <target name="-test-halt-newver" if="NEWVER">
+        <property name="TESTHALTFAILURE" value="true" />
+    </target>
+    <target name="-test-halt-nonewver" unless="NEWVER">
+        <property name="TESTHALTFAILURE" value="false" />
+    </target>
+
+    <target name="test" depends="-test-halt-newver,-test-halt-nonewver,test_lib,compile,compile-tests">
         <delete dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
@@ -120,7 +127,7 @@
         
         <testng 
             outputDir="${TESTRESULTSDIR}"
-            haltOnFailure="false" verbose="2" workingDir="${basedir}" >
+            haltOnFailure="${TESTHALTFAILURE}" verbose="2" workingDir="${basedir}">
         
             <classpath>
                 <pathelement path="${COMPILETESTSDIR}"/>
@@ -708,20 +715,24 @@
         
     </target>
     
-    <target name="new-version-major" depends="git-pull,-inc-major,-check-version-online,all,-upload,git-push">
+    <target name="-new-version-set">
+        <property name="NEWVER" value="1" />
+    </target>
+    
+    <target name="new-version-major" depends="git-pull,-new-version-set,-inc-major,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-minor" depends="git-pull,-inc-minor,-check-version-online,all,-upload,git-push">
+    <target name="new-version-minor" depends="git-pull,-new-version-set,-inc-minor,-check-version-online,all,-upload,git-push">
         
     </target>
     
-    <target name="new-version-release" depends="git-pull,-inc-release,-check-version-online,all,-upload,git-push">
+    <target name="new-version-release" depends="git-pull,-new-version-set,-inc-release,-check-version-online,all,-upload,git-push">
        
     </target>
        
         
-    <target name="new-version-nightlybuild" depends="git-pull,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
+    <target name="new-version-nightlybuild" depends="git-pull,-new-version-set,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
 
     </target>
     
