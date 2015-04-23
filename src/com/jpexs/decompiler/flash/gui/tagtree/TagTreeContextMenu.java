@@ -223,7 +223,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         });
     }
 
-    public void update(List<TreeItem> items) {
+    public void update(final List<TreeItem> items) {
 
         if (items.isEmpty()) {
             return;
@@ -283,6 +283,23 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             }
         }
 
+        boolean allSelectedIsInTheSameSwf = true;
+        SWF singleSwf = null;
+        for (TreeItem item : items) {
+            if (item instanceof SWFList) {
+                allSelectedIsInTheSameSwf = false;
+                break;
+            }
+            if (singleSwf == null) {
+                singleSwf = item.getSwf();
+            } else {
+                if (singleSwf != item.getSwf()) {
+                    allSelectedIsInTheSameSwf = false;
+                    break;
+                }
+            }
+        }
+
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(allSelectedIsTagOrFrame);
         removeWithDependenciesMenuItem.setVisible(allSelectedIsTagOrFrame);
@@ -300,10 +317,11 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         copyTagMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
 
-        final TreeItem firstItem = items.get(0);
         boolean singleSelect = items.size() == 1;
 
         if (singleSelect) {
+            final TreeItem firstItem = items.get(0);
+
             // replace
             if (firstItem instanceof ImageTag && ((ImageTag) firstItem).importSupported()) {
                 replaceMenuItem.setVisible(true);
@@ -374,61 +392,6 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 addTagMenu.setVisible(true);
             }
 
-            if (firstItem instanceof Tag && swfs.size() > 1) {
-                final Tag tag = (Tag) firstItem;
-                moveTagMenu.removeAll();
-                copyTagMenu.removeAll();
-                for (SWFList targetSwfList : swfs) {
-                    for (final SWF targetSwf : targetSwfList) {
-                        if (targetSwf != tag.getSwf()) {
-                            JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
-                            swfItem.addActionListener(new ActionListener() {
-
-                                @Override
-                                public void actionPerformed(ActionEvent ae) {
-                                    SWF sourceSwf = tag.getSwf();
-                                    sourceSwf.tags.remove(tag);
-                                    tag.setSwf(targetSwf);
-                                    targetSwf.tags.add(tag);
-                                    tag.setModified(true);
-                                    sourceSwf.assignExportNamesToSymbols();
-                                    targetSwf.assignExportNamesToSymbols();
-                                    sourceSwf.assignClassesToSymbols();
-                                    targetSwf.assignClassesToSymbols();
-                                    sourceSwf.clearImageCache();
-                                    targetSwf.clearImageCache();
-                                    mainPanel.refreshTree(null); // refresh all opened swfs
-                                }
-                            });
-                            moveTagMenu.add(swfItem);
-
-                            swfItem = new JMenuItem(targetSwf.getShortFileName());
-                            swfItem.addActionListener(new ActionListener() {
-
-                                @Override
-                                public void actionPerformed(ActionEvent ae) {
-                                    try {
-                                        Tag copyTag = tag.cloneTag();
-                                        copyTag.setSwf(targetSwf);
-                                        targetSwf.tags.add(copyTag);
-                                        copyTag.setModified(true);
-                                        targetSwf.assignExportNamesToSymbols();
-                                        targetSwf.assignClassesToSymbols();
-                                        targetSwf.clearImageCache();
-                                        mainPanel.refreshTree(targetSwf);
-                                    } catch (IOException | InterruptedException ex) {
-                                        Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                            });
-                            copyTagMenu.add(swfItem);
-                        }
-                    }
-                }
-                moveTagMenu.setVisible(true);
-                copyTagMenu.setVisible(true);
-            }
-
             if (tagTree.getModel().getChildCount(firstItem) > 0) {
                 expandRecursiveMenuItem.setVisible(true);
             }
@@ -440,6 +403,71 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
             if (firstItem instanceof Tag) {
                 rawEditMenuItem.setVisible(firstItem instanceof Tag);
             }
+        }
+        
+        if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
+            moveTagMenu.removeAll();
+            copyTagMenu.removeAll();
+            for (SWFList targetSwfList : swfs) {
+                for (final SWF targetSwf : targetSwfList) {
+                    if (targetSwf != singleSwf) {
+                        JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
+                        swfItem.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                SWF sourceSwf = items.get(0).getSwf();
+                                for (TreeItem item : items) {
+                                    Tag tag = (Tag) item;
+                                    sourceSwf.tags.remove(tag);
+                                    tag.setSwf(targetSwf);
+                                    targetSwf.tags.add(tag);
+                                    tag.setModified(true);
+                                }
+                                
+                                sourceSwf.assignExportNamesToSymbols();
+                                targetSwf.assignExportNamesToSymbols();
+                                sourceSwf.assignClassesToSymbols();
+                                targetSwf.assignClassesToSymbols();
+                                sourceSwf.clearImageCache();
+                                targetSwf.clearImageCache();
+                                sourceSwf.updateCharacters();
+                                targetSwf.updateCharacters();
+                                mainPanel.refreshTree(null); // refresh all opened swfs
+                            }
+                        });
+                        moveTagMenu.add(swfItem);
+
+                        swfItem = new JMenuItem(targetSwf.getShortFileName());
+                        swfItem.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                try {
+                                    for (TreeItem item : items) {
+                                        Tag tag = (Tag) item;
+                                        Tag copyTag = tag.cloneTag();
+                                        copyTag.setSwf(targetSwf);
+                                        targetSwf.tags.add(copyTag);
+                                        copyTag.setModified(true);
+                                    }
+                                    
+                                    targetSwf.assignExportNamesToSymbols();
+                                    targetSwf.assignClassesToSymbols();
+                                    targetSwf.clearImageCache();
+                                    targetSwf.updateCharacters();
+                                    mainPanel.refreshTree(targetSwf);
+                                } catch (IOException | InterruptedException ex) {
+                                    Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        });
+                        copyTagMenu.add(swfItem);
+                    }
+                }
+            }
+            moveTagMenu.setVisible(true);
+            copyTagMenu.setVisible(true);
         }
 
         if (allSelectedIsBinaryData) {
