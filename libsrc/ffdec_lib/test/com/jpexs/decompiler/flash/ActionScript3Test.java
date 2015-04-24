@@ -314,7 +314,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForBreak() {
-        decompileMethod("testForBreak", "var a:* = 0;\r\n"
+        /*decompileMethod("testForBreak", "var a:* = 0;\r\n"
                 + "while(a < 10)\r\n"
                 + "{\r\n"
                 + "if(a == 5)\r\n"
@@ -323,6 +323,15 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello:\" + a);\r\n"
                 + "a++;\r\n"
+                + "}\r\n", false);*/
+        // Issue 842, recover for loops
+        decompileMethod("testForBreak", "for (var a:* = 0; a < 10; a++)\r\n"
+                + "{\r\n"
+                + "if(a == 5)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"hello:\" + a);\r\n"
                 + "}\r\n", false);
     }
 
@@ -350,11 +359,16 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testFor() {
-        decompileMethod("testFor", "var a:* = 0;\r\n"
+        /*decompileMethod("testFor", "var a:* = 0;\r\n"
                 + "while(a < 10)\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "a++;\r\n"
+                + "}\r\n", false);*/
+        // Issue 842, recover for loops
+        decompileMethod("testFor", "for (var a:* = 0; a < 10; a++)\r\n"
+                + "{\r\n"
+                + "trace(\"a=\" + a);\r\n"
                 + "}\r\n", false);
     }
 
