@@ -50,5 +50,4 @@ public class ReturnValueIns extends InstructionDefinition {
     public boolean isExitInstruction() {
         return true;
     }
-
 }

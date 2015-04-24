@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -51,6 +52,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
@@ -995,6 +997,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             List<Tag> images = new ArrayList<>();
             List<Tag> shapes = new ArrayList<>();
             List<Tag> morphshapes = new ArrayList<>();
+            List<Tag> buttons = new ArrayList<>();
             List<Tag> movies = new ArrayList<>();
             List<Tag> sounds = new ArrayList<>();
             List<Tag> texts = new ArrayList<>();
@@ -1029,6 +1032,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                     if (nodeType == TreeNodeType.SHAPE) {
                         shapes.add((Tag) d);
+                    }
+                    if (nodeType == TreeNodeType.BUTTON) {
+                        buttons.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.MORPH_SHAPE) {
                         morphshapes.add((Tag) d);
@@ -1109,6 +1115,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 int containerId = entry.getKey();
                 String subFolder = containerId == 0 ? "frames" : "sprites";
                 ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
+            }
+
+            ButtonExportSettings bes = new ButtonExportSettings(export.getValue(ButtonExportMode.class), export.getZoom());
+            for (Tag tag : buttons) {
+                ButtonTag button = (ButtonTag) tag;
+                String subFolder = "buttons";
+                List<Integer> frameNums = new ArrayList<>();
+                frameNums.add(0); // todo: export all frames
+                ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, button.getCharacterId(), frameNums, bes, evl));
             }
 
             boolean parallel = Configuration.parallelSpeedUp.get();

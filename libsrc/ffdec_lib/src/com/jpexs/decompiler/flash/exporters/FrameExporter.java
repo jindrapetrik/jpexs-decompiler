@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
@@ -85,6 +86,26 @@ import org.monte.media.avi.AVIWriter;
 public class FrameExporter {
 
     private static final Logger logger = Logger.getLogger(FrameExporter.class.getName());
+
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException {
+        FramesExportMode fem;
+        switch (settings.mode) {
+            case BMP:
+                fem = FramesExportMode.BMP;
+                break;
+            case PNG:
+                fem = FramesExportMode.PNG;
+                break;
+            case SVG:
+                fem = FramesExportMode.SVG;
+                break;
+            default:
+                throw new Error("Unsupported button export mode");
+        }
+
+        FramesExportSettings fes = new FramesExportSettings(fem, settings.zoom);
+        return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
+    }
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FramesExportSettings settings, final EventListener evl) throws IOException {
         final List<File> ret = new ArrayList<>();

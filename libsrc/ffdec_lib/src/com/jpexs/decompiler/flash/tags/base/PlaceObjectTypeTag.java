@@ -93,7 +93,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
 
     @Override
     public String getExportFileName() {
-        String result = super.getExportFileName() + "_" + getCharacterId() + "_" + getDepth();
+        String result = super.getExportFileName() + "_" + getCharacterId();
         String exportName = swf.getExportName(getCharacterId());
         if (exportName != null) {
             result += "_" + exportName;

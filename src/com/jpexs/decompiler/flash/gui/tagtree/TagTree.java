@@ -535,6 +535,9 @@ public class TagTree extends JTree {
                 if (nodeType == TreeNodeType.MORPH_SHAPE) {
                     ret.add(d);
                 }
+                if (nodeType == TreeNodeType.BUTTON) {
+                    ret.add(d);
+                }
                 if (nodeType == TreeNodeType.AS) {
                     ret.add(d);
                 }
