@@ -388,17 +388,19 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private List<RibbonBandResizePolicy> getIconBandResizePolicies(JRibbonBand ribbonBand) {
         List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
+        IconRibbonBandResizePolicy iconBandResizePolicy = new IconRibbonBandResizePolicy(ribbonBand.getControlPanel());
+        final int width = Math.max(105, iconBandResizePolicy.getPreferredWidth(0, 0));
         resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
             @Override
             public int getPreferredWidth(int i, int i1) {
-                return 105;
+                return width;
             }
 
             @Override
             public void install(int i, int i1) {
             }
         });
-        resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
+        resizePolicies.add(iconBandResizePolicy);
         return resizePolicies;
     }
 

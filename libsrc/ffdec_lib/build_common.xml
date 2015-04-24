@@ -71,7 +71,16 @@
         </javac>
     </target>
 
-    <target name="test" depends="compile,compile-tests">
+    <target name="-test-sethalt" depends="">
+        <property name="TESTHALT" value="true" />
+    </target>
+    <target name="-test-setnohalt" unless="TESTHALT">
+        <property name="TESTHALT" value="false" />
+    </target>
+    <target name="testhalt" depends="-test-sethalt,test">
+    </target>
+
+    <target name="test" depends="-test-setnohalt,compile,compile-tests">
         <delete dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
@@ -83,7 +92,7 @@
         
         <testng 
             outputDir="${TESTRESULTSDIR}"
-            haltOnFailure="false" verbose="2" workingDir="${basedir}" >
+            haltOnFailure="${TESTHALT}" verbose="2" workingDir="${basedir}" >
         
             <classpath>
                 <pathelement path="${COMPILETESTSDIR}"/>
