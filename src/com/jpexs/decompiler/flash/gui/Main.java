@@ -439,9 +439,11 @@ public class Main {
                 } catch (OutOfMemoryError ex) {
                     logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
+                    continue;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file.");
+                    continue;
                 }
 
                 final SWFList swfs1 = swfs;
@@ -1106,7 +1108,10 @@ public class Main {
 
                         MainPanel mainPanel = mainFrame.getPanel();
                         TreePath tp = View.getTreePathByPathStrings(mainPanel.tagTree, Arrays.asList(path));
-                        mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
+                        if (tp != null) {
+                            // the current view is the Resources view, otherwise tp is null
+                            mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
+                        }
                     }
                 });
             }

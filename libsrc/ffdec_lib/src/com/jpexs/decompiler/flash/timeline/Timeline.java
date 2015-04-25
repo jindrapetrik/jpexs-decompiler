@@ -159,6 +159,19 @@ public class Timeline {
         return frames.size();
     }
 
+    public int getRealFrameCount() {
+        ensureInitialized();
+
+        int cnt = 1;
+        for (int i = 1; i < frames.size(); i++) {
+            if (frames.get(i).layersChanged) {
+                cnt++;
+            }
+        }
+
+        return cnt;
+    }
+
     public int getFrameForAction(ASMSource asm) {
         Integer frame = actionFrames.get(asm);
         if (frame == null) {

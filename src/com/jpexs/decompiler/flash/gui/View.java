@@ -538,6 +538,10 @@ public class View {
 
     public static TreePath getTreePathByPathStrings(JTree tree, List<String> pathAsStringList) {
         TreeModel model = tree.getModel();
+        if (model == null) {
+            return null;
+        }
+
         Object node = model.getRoot();
 
         if (pathAsStringList.isEmpty()) {

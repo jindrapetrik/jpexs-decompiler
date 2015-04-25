@@ -139,4 +139,16 @@ public class LoadingPanel extends JPanel {
         g2.setTransform(t);
         g2.drawImage(lastImage, 0, 0, this);
     }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if (!visible) {
+            if (drawTimer != null) {
+                drawTimer.cancel();
+                drawTimer = null;
+            }
+        }
+
+        super.setVisible(visible);
+    }
 }

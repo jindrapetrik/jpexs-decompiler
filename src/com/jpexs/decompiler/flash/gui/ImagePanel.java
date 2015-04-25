@@ -916,7 +916,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
 
             final int cnt = counter;
-            final boolean singleFrame = timeline.getFrameCount() <= 1 && timeline.isSingleFrame();
+            final boolean singleFrame = timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame();
             shouldDraw.set(true);
             startTimer(cnt, singleFrame, msPerFrame);
         }

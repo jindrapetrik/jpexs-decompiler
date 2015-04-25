@@ -184,21 +184,30 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
             @Override
             public void run() {
 
-                boolean changed = false;
+                try {
+                    ShockwaveFlash flash1 = flash;
+                    if (flash1 == null) {
+                        return;
+                    }
 
-                boolean isPlaying = flash.IsPlaying();
-                if (this.isPlaying != isPlaying) {
-                    this.isPlaying = isPlaying;
-                }
+                    boolean changed = false;
 
-                int currentFrame = flash.CurrentFrame();
-                if (this.currentFrame != currentFrame) {
-                    this.currentFrame = currentFrame;
-                    changed = true;
-                }
+                    boolean isPlaying = flash1.IsPlaying();
+                    if (this.isPlaying != isPlaying) {
+                        this.isPlaying = isPlaying;
+                    }
 
-                if (changed) {
-                    fireMediaDisplayStateChanged();
+                    int currentFrame = flash1.CurrentFrame();
+                    if (this.currentFrame != currentFrame) {
+                        this.currentFrame = currentFrame;
+                        changed = true;
+                    }
+
+                    if (changed) {
+                        fireMediaDisplayStateChanged();
+                    }
+                } catch (Exception ex) {
+                    // ignore
                 }
             }
         }, 100, 100);

@@ -313,18 +313,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         return getTimeline().getFrameCount(); // frameCount
     }
 
-    private int getRealFrameCount() {
-        int cnt = 1;
-        Timeline timeline = getTimeline();
-        for (int i = 1; i < timeline.getFrameCount(); i++) {
-            if (timeline.getFrame(i).layersChanged) {
-                cnt++;
-            }
-        }
-
-        return cnt;
-    }
-
     @Override
     public boolean isSingleFrame() {
         if (!isSingleFrameInitialized) {
@@ -335,7 +323,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     private synchronized void initialiteIsSingleFrame() {
         if (!isSingleFrameInitialized) {
-            if (getRealFrameCount() > 1) {
+            if (getTimeline().getRealFrameCount() > 1) {
                 isSingleFrameInitialized = true;
                 return;
             }

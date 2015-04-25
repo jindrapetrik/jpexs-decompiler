@@ -194,7 +194,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public List<Tag> tags = new ArrayList<>();
 
     @Internal
-    public boolean hasEndTag;
+    public boolean hasEndTag = true;
 
     /**
      * ExportRectangle for the display
