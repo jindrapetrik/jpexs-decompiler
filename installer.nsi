@@ -753,23 +753,23 @@ var pos
 var pgfound
 var f
 var pgname
+var pghtml
 
 Section "Download PlayerGlobal.swc" SecPlayerGlobal
 checkadobe:
 DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
-!tempfile PGHTML
-MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "XXX tempfile: ${PGHTML})" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "${PGHTML}"
+GetTempFileName $pghtml
+inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "$pghtml"
 Pop $0
 StrCmp $0 "OK" dlok
 MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-;MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually. (Error returned was: $0, tempfile: ${PGHTML})" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
+;MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually. (Error returned was: $0, tempfile: $pghtml)" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
 Abort
 dlok:
 
 StrCpy $pgfound 0
 
-FileOpen $f "${PGHTML}" r
+FileOpen $f "$pghtml" r
 loop:
   FileRead $f $txt
   IfErrors done      
