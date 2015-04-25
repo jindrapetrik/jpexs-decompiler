@@ -27,6 +27,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -41,11 +46,18 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileFilter;
 import layout.TableLayout;
 
@@ -53,7 +65,7 @@ import layout.TableLayout;
  *
  * @author JPEXS
  */
-public class FontPanel extends javax.swing.JPanel {
+public class FontPanel extends JPanel {
 
     private final MainPanel mainPanel;
 
@@ -197,6 +209,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : Integer.toString(ft.getLeading()));
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
+        fontCharactersScrollPane.getVerticalScrollBar().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
         setAllowSave(false);
         String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontNameIntag();
 
@@ -238,43 +251,43 @@ public class FontPanel extends javax.swing.JPanel {
 
     private void initComponents() {
 
-        addCharsPanel = new javax.swing.JPanel();
-        fontParamsPanel = new javax.swing.JPanel();
-        fontNameIntagLabel = new javax.swing.JLabel();
-        javax.swing.JScrollPane fontDisplayNameScrollPane = new javax.swing.JScrollPane();
-        fontNameTextArea = new javax.swing.JTextArea();
-        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
-        javax.swing.JScrollPane fontCopyrightScrollPane = new javax.swing.JScrollPane();
-        fontCopyrightTextArea = new javax.swing.JTextArea();
-        javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
-        fontIsBoldCheckBox = new javax.swing.JCheckBox();
-        javax.swing.JLabel jLabel5 = new javax.swing.JLabel();
-        fontIsItalicCheckBox = new javax.swing.JCheckBox();
-        javax.swing.JLabel jLabel6 = new javax.swing.JLabel();
-        fontAscentLabel = new javax.swing.JLabel();
-        javax.swing.JLabel jLabel7 = new javax.swing.JLabel();
-        fontDescentLabel = new javax.swing.JLabel();
-        javax.swing.JLabel jLabel8 = new javax.swing.JLabel();
-        fontLeadingLabel = new javax.swing.JLabel();
-        javax.swing.JLabel jLabel9 = new javax.swing.JLabel();
-        fontCharactersScrollPane = new javax.swing.JScrollPane();
-        fontCharactersTextArea = new javax.swing.JTextArea();
-        javax.swing.JLabel fontCharsAddLabel = new javax.swing.JLabel();
-        fontAddCharactersField = new javax.swing.JTextField();
-        fontAddCharsButton = new javax.swing.JButton();
-        updateTextsCheckBox = new javax.swing.JCheckBox();
-        fontSourceLabel = new javax.swing.JLabel();
-        fontFamilyNameSelection = new javax.swing.JComboBox<>();
-        fontFaceSelection = new javax.swing.JComboBox<>();
-        fontEmbedButton = new javax.swing.JButton();
-        buttonEdit = new javax.swing.JButton();
-        buttonSave = new javax.swing.JButton();
-        buttonCancel = new javax.swing.JButton();
-        buttonPreviewFont = new javax.swing.JButton();
-        buttonSetAdvanceValues = new javax.swing.JButton();
-        addComponentListener(new java.awt.event.ComponentAdapter() {
+        addCharsPanel = new JPanel();
+        fontParamsPanel = new JPanel();
+        fontNameIntagLabel = new JLabel();
+        JScrollPane fontDisplayNameScrollPane = new JScrollPane();
+        fontNameTextArea = new JTextArea();
+        JLabel jLabel3 = new JLabel();
+        JScrollPane fontCopyrightScrollPane = new JScrollPane();
+        fontCopyrightTextArea = new JTextArea();
+        JLabel jLabel4 = new JLabel();
+        fontIsBoldCheckBox = new JCheckBox();
+        JLabel jLabel5 = new JLabel();
+        fontIsItalicCheckBox = new JCheckBox();
+        JLabel jLabel6 = new JLabel();
+        fontAscentLabel = new JLabel();
+        JLabel jLabel7 = new JLabel();
+        fontDescentLabel = new JLabel();
+        JLabel jLabel8 = new JLabel();
+        fontLeadingLabel = new JLabel();
+        JLabel jLabel9 = new JLabel();
+        fontCharactersScrollPane = new JScrollPane();
+        fontCharactersTextArea = new JTextArea();
+        JLabel fontCharsAddLabel = new JLabel();
+        fontAddCharactersField = new JTextField();
+        fontAddCharsButton = new JButton();
+        updateTextsCheckBox = new JCheckBox();
+        fontSourceLabel = new JLabel();
+        fontFamilyNameSelection = new JComboBox<>();
+        fontFaceSelection = new JComboBox<>();
+        fontEmbedButton = new JButton();
+        buttonEdit = new JButton();
+        buttonSave = new JButton();
+        buttonCancel = new JButton();
+        buttonPreviewFont = new JButton();
+        buttonSetAdvanceValues = new JButton();
+        addComponentListener(new ComponentAdapter() {
             @Override
-            public void componentResized(java.awt.event.ComponentEvent evt) {
+            public void componentResized(ComponentEvent evt) {
                 formComponentResized(evt);
             }
         });
@@ -282,7 +295,7 @@ public class FontPanel extends javax.swing.JPanel {
         TableLayout tlFontParamsPanel;
         fontParamsPanel.setLayout(tlFontParamsPanel = new TableLayout(new double[][]{
             {TableLayout.PREFERRED, TableLayout.FILL},
-            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,}
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL,}
         }));
 
         JLabel fontNameIntagLabLabel = new JLabel();
@@ -290,9 +303,9 @@ public class FontPanel extends javax.swing.JPanel {
         fontParamsPanel.add(fontNameIntagLabLabel, "0,0,R");
 
         fontNameIntagLabel.setText(AppStrings.translate("value.unknown"));
-        fontNameIntagLabel.setMaximumSize(new java.awt.Dimension(250, 14));
-        fontNameIntagLabel.setMinimumSize(new java.awt.Dimension(250, 14));
-        fontNameIntagLabel.setPreferredSize(new java.awt.Dimension(250, 14));
+        fontNameIntagLabel.setMaximumSize(new Dimension(250, 14));
+        fontNameIntagLabel.setMinimumSize(new Dimension(250, 14));
+        fontNameIntagLabel.setPreferredSize(new Dimension(250, 14));
         fontParamsPanel.add(fontNameIntagLabel, "1,0");
 
         JLabel fontNameNameLabLabel = new JLabel();
@@ -300,7 +313,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontParamsPanel.add(fontNameNameLabLabel, "0,1,R");
 
         fontDisplayNameScrollPane.setBorder(null);
-        fontDisplayNameScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontDisplayNameScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         fontDisplayNameScrollPane.setHorizontalScrollBar(null);
 
         fontNameTextArea.setEditable(false);
@@ -309,7 +322,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontNameTextArea.setLineWrap(true);
         fontNameTextArea.setText(AppStrings.translate("value.unknown"));
         fontNameTextArea.setWrapStyleWord(true);
-        fontNameTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
+        fontNameTextArea.setMinimumSize(new Dimension(250, 16));
         fontNameTextArea.setOpaque(false);
         fontDisplayNameScrollPane.setViewportView(fontNameTextArea);
 
@@ -319,7 +332,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontParamsPanel.add(jLabel3, "0,2,R");
 
         fontCopyrightScrollPane.setBorder(null);
-        fontCopyrightScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontCopyrightScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         fontCopyrightScrollPane.setHorizontalScrollBar(null);
 
         fontCopyrightTextArea.setEditable(false);
@@ -328,7 +341,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontCopyrightTextArea.setLineWrap(true);
         fontCopyrightTextArea.setText(AppStrings.translate("value.unknown"));
         fontCopyrightTextArea.setWrapStyleWord(true);
-        fontCopyrightTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
+        fontCopyrightTextArea.setMinimumSize(new Dimension(250, 16));
         fontCopyrightTextArea.setOpaque(false);
         fontCopyrightScrollPane.setViewportView(fontCopyrightTextArea);
 
@@ -367,18 +380,19 @@ public class FontPanel extends javax.swing.JPanel {
         fontParamsPanel.add(fontLeadingLabel, "1,7");
 
         jLabel9.setText(AppStrings.translate("font.characters"));
-        fontParamsPanel.add(jLabel9, "0,8,R");
+        fontParamsPanel.add(jLabel9, "0,8,R,T");
 
         fontCharactersScrollPane.setBorder(null);
-        fontCharactersScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontCharactersScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         fontCharactersScrollPane.setHorizontalScrollBar(null);
+        fontCharactersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         fontCharactersTextArea.setEditable(false);
         fontCharactersTextArea.setColumns(20);
         fontCharactersTextArea.setFont(new JLabel().getFont());
         fontCharactersTextArea.setLineWrap(true);
         fontCharactersTextArea.setWrapStyleWord(true);
-        fontCharactersTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
+        fontCharactersTextArea.setMinimumSize(new Dimension(250, 16));
         fontCharactersTextArea.setOpaque(false);
         fontCharactersScrollPane.setViewportView(fontCharactersTextArea);
         fontParamsPanel.add(fontCharactersScrollPane, "1,8");
@@ -386,9 +400,9 @@ public class FontPanel extends javax.swing.JPanel {
         fontCharsAddLabel.setText(AppStrings.translate("font.characters.add"));
 
         fontAddCharsButton.setText(AppStrings.translate("button.ok"));
-        fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
+        fontAddCharsButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 fontAddCharsButtonActionPerformed(evt);
             }
         });
@@ -400,9 +414,9 @@ public class FontPanel extends javax.swing.JPanel {
         fontFamilyNameSelection.setModel(getFamilyModel());
         fontFamilyNameSelection.setSelectedItem(FontTag.defaultFontName);
         fontFaceSelection.setModel(getFaceModel((FontFamily) fontFamilyNameSelection.getSelectedItem()));
-        fontFamilyNameSelection.addItemListener(new java.awt.event.ItemListener() {
+        fontFamilyNameSelection.addItemListener(new ItemListener() {
             @Override
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+            public void itemStateChanged(ItemEvent evt) {
                 fontFamilySelectionItemStateChanged();
             }
         });
@@ -416,52 +430,52 @@ public class FontPanel extends javax.swing.JPanel {
         });
 
         fontEmbedButton.setText(AppStrings.translate("button.font.embed"));
-        fontEmbedButton.addActionListener(new java.awt.event.ActionListener() {
+        fontEmbedButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 fontEmbedButtonActionPerformed(evt);
             }
         });
 
         buttonEdit.setIcon(View.getIcon("edit16"));
         buttonEdit.setText(AppStrings.translate("button.edit"));
-        buttonEdit.addActionListener(new java.awt.event.ActionListener() {
+        buttonEdit.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 buttonEditActionPerformed(evt);
             }
         });
 
         buttonSave.setIcon(View.getIcon("save16"));
         buttonSave.setText(AppStrings.translate("button.save"));
-        buttonSave.addActionListener(new java.awt.event.ActionListener() {
+        buttonSave.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 buttonSaveActionPerformed(evt);
             }
         });
 
         buttonCancel.setIcon(View.getIcon("cancel16"));
         buttonCancel.setText(AppStrings.translate("button.cancel"));
-        buttonCancel.addActionListener(new java.awt.event.ActionListener() {
+        buttonCancel.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 buttonCancelActionPerformed(evt);
             }
         });
 
         buttonPreviewFont.setText(AppStrings.translate("button.preview"));
-        buttonPreviewFont.addActionListener(new java.awt.event.ActionListener() {
+        buttonPreviewFont.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 buttonPreviewFontActionPerformed(evt);
             }
         });
 
         buttonSetAdvanceValues.setText(AppStrings.translate("button.setAdvanceValues"));
-        buttonSetAdvanceValues.addActionListener(new java.awt.event.ActionListener() {
+        buttonSetAdvanceValues.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 buttonSetAdvanceValuesActionPerformed(evt);
             }
         });
@@ -494,7 +508,7 @@ public class FontPanel extends javax.swing.JPanel {
         TableLayout tlAll;
         setLayout(tlAll = new TableLayout(new double[][]{
             {TableLayout.FILL},
-            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
+            {TableLayout.FILL, TableLayout.PREFERRED, TableLayout.PREFERRED}
         }));
 
         add(fontParamsPanel, "0,0");
@@ -512,7 +526,7 @@ public class FontPanel extends javax.swing.JPanel {
         lab.setMinimumSize(lab.getPreferredSize());
     }
 
-    private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void fontAddCharsButtonActionPerformed(ActionEvent evt) {
         String newchars = fontAddCharactersField.getText();
 
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
@@ -527,7 +541,7 @@ public class FontPanel extends javax.swing.JPanel {
         }
     }
 
-    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void fontEmbedButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
@@ -577,11 +591,11 @@ public class FontPanel extends javax.swing.JPanel {
         savePair();
     }
 
-    private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {
+    private void buttonEditActionPerformed(ActionEvent evt) {
         setEditable(true);
     }
 
-    private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {
+    private void buttonSaveActionPerformed(ActionEvent evt) {
         if (fontTag.isBoldEditable()) {
             fontTag.setBold(fontIsBoldCheckBox.isSelected());
         }
@@ -591,24 +605,24 @@ public class FontPanel extends javax.swing.JPanel {
         setEditable(false);
     }
 
-    private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {
+    private void buttonCancelActionPerformed(ActionEvent evt) {
         showFontTag(fontTag);
         setEditable(false);
     }
 
-    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {
+    private void buttonPreviewFontActionPerformed(ActionEvent evt) {
         new FontPreviewDialog(null, true, ((FontFace) fontFaceSelection.getSelectedItem()).font).setVisible(true);
     }
 
-    private void buttonSetAdvanceValuesActionPerformed(java.awt.event.ActionEvent evt) {
+    private void buttonSetAdvanceValuesActionPerformed(ActionEvent evt) {
         fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
     }
 
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {
+    private void formComponentResized(ComponentEvent evt) {
         fontParamsPanel.updateUI();
     }
 
-    private void importTTFButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void importTTFButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
@@ -661,53 +675,53 @@ public class FontPanel extends javax.swing.JPanel {
         }
     }
 
-    private javax.swing.JButton buttonCancel;
+    private JButton buttonCancel;
 
-    private javax.swing.JButton buttonEdit;
+    private JButton buttonEdit;
 
-    private javax.swing.JButton buttonPreviewFont;
+    private JButton buttonPreviewFont;
 
-    private javax.swing.JButton buttonSetAdvanceValues;
+    private JButton buttonSetAdvanceValues;
 
-    private javax.swing.JButton buttonSave;
+    private JButton buttonSave;
 
-    private javax.swing.JTextField fontAddCharactersField;
+    private JTextField fontAddCharactersField;
 
-    private javax.swing.JButton fontAddCharsButton;
+    private JButton fontAddCharsButton;
 
-    private javax.swing.JLabel fontAscentLabel;
+    private JLabel fontAscentLabel;
 
-    private javax.swing.JScrollPane fontCharactersScrollPane;
+    private JScrollPane fontCharactersScrollPane;
 
-    private javax.swing.JTextArea fontCharactersTextArea;
+    private JTextArea fontCharactersTextArea;
 
-    private javax.swing.JTextArea fontCopyrightTextArea;
+    private JTextArea fontCopyrightTextArea;
 
-    private javax.swing.JLabel fontDescentLabel;
+    private JLabel fontDescentLabel;
 
-    private javax.swing.JTextArea fontNameTextArea;
+    private JTextArea fontNameTextArea;
 
-    private javax.swing.JButton fontEmbedButton;
+    private JButton fontEmbedButton;
 
-    private javax.swing.JCheckBox fontIsBoldCheckBox;
+    private JCheckBox fontIsBoldCheckBox;
 
-    private javax.swing.JCheckBox fontIsItalicCheckBox;
+    private JCheckBox fontIsItalicCheckBox;
 
-    private javax.swing.JLabel fontLeadingLabel;
+    private JLabel fontLeadingLabel;
 
-    private javax.swing.JLabel fontNameIntagLabel;
+    private JLabel fontNameIntagLabel;
 
-    private javax.swing.JComboBox<FontFamily> fontFamilyNameSelection;
+    private JComboBox<FontFamily> fontFamilyNameSelection;
 
-    private javax.swing.JComboBox<FontFace> fontFaceSelection;
+    private JComboBox<FontFace> fontFaceSelection;
 
-    private javax.swing.JLabel fontSourceLabel;
+    private JLabel fontSourceLabel;
 
-    private javax.swing.JPanel fontParamsPanel;
+    private JPanel fontParamsPanel;
 
-    private javax.swing.JPanel addCharsPanel;
+    private JPanel addCharsPanel;
 
-    private javax.swing.JScrollPane jScrollPane1;
+    private JScrollPane jScrollPane1;
 
-    private javax.swing.JCheckBox updateTextsCheckBox;
+    private JCheckBox updateTextsCheckBox;
 }
