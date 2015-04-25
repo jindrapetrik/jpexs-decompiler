@@ -230,7 +230,7 @@ public class TagTree extends JTree {
         setCellRenderer(new TagTreeCellRenderer());
         setRootVisible(false);
         setBackground(Color.white);
-        setRowHeight(16);
+        setRowHeight(Math.max(getFont().getSize() + 5, 16));
         setLargeModel(true);
         setUI(new BasicTreeUI() {
             {
