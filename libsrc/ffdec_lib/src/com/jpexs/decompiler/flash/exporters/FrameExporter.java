@@ -76,6 +76,7 @@ import java.util.logging.Logger;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import net.kroo.elliot.GifSequenceWriter;
+import net.weiner.kevin.AnimatedGifEncoder;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
 
@@ -422,6 +423,7 @@ public class FrameExporter {
         if (!images.hasNext()) {
             return;
         }
+
         AVIWriter out = new AVIWriter(file);
         BufferedImage img0 = images.next();
         out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
@@ -433,13 +435,30 @@ public class FrameExporter {
         } finally {
             out.close();
         }
-
     }
 
     public static void makeGIF(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
         if (!images.hasNext()) {
             return;
         }
+
+        AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+        encoder.setRepeat(0); // repeat forever
+        encoder.setTransparent(new Color(0, 0, 0, 0));
+        encoder.start(file.getAbsolutePath());
+        encoder.setDelay(1000 / frameRate);
+        while (images.hasNext()) {
+            encoder.addFrame(images.next());
+        }
+
+        encoder.finish();
+    }
+
+    public static void makeGIFOld(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+        if (!images.hasNext()) {
+            return;
+        }
+
         try (ImageOutputStream output = new FileImageOutputStream(file)) {
             BufferedImage img0 = images.next();
             GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
@@ -461,6 +480,7 @@ public class FrameExporter {
                 frames.add(i);
             }
         }
+
         sb.append("\tvar clips = [];\r\n");
         sb.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
         sb.append("\tframe = frame % frame_cnt;\r\n");
