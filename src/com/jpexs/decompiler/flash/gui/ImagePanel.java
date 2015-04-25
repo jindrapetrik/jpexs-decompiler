@@ -875,42 +875,52 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     public synchronized void play() {
         pause();
         if (timelined != null) {
-            timer = new Timer();
-            int frameRate = timelined.getTimeline().frameRate;
+            Timeline timeline = timelined.getTimeline();
+            int frameRate = timeline.frameRate;
             int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
 
             final int cnt = counter;
+            final boolean singleFrame = timeline.getFrameCount() <= 1 && timeline.isSingleFrame();
             shouldDraw.set(true);
-            TimerTask task = new TimerTask() {
-                public int counter = cnt;
+            startTimer(cnt, singleFrame, msPerFrame);
+        }
+    }
 
-                private final AtomicBoolean first = shouldDraw;
+    private void startTimer(int cnt, boolean singleFrame, int msPerFrame) {
 
-                @Override
-                public void run() {
-                    try {
-                        Timeline timeline;
-                        synchronized (ImagePanel.class) {
-                            if (timer == null) {
-                                return;
-                            }
+        TimerTask task = new TimerTask() {
+            public final int counter = cnt;
 
-                            timeline = timelined.getTimeline();
+            public final boolean isSingleFrame = singleFrame;
+
+            private final AtomicBoolean first = shouldDraw;
+
+            @Override
+            public void run() {
+                try {
+                    synchronized (ImagePanel.class) {
+                        if (timer == null) {
+                            return;
                         }
-
-                        if (timeline.getFrameCount() <= 1 && timeline.isSingleFrame()) {
-                            if (first.getAndSet(false)) {
-                                drawFrame(counter);
-                            }
-                        } else {
-                            nextFrame(counter);
-                        }
-                    } catch (Exception ex) {
-                        Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
-            };
 
+                    if (isSingleFrame) {
+                        if (first.getAndSet(false)) {
+                            drawFrame(counter);
+                        }
+                    } else {
+                        nextFrame(counter);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+
+        timer = new Timer();
+        if (singleFrame) {
+            timer.schedule(task, 0);
+        } else {
             timer.schedule(task, 0, msPerFrame);
         }
     }
@@ -943,7 +953,11 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (frame < 0) {
             return;
         }
+
         this.frame = frame;
+        stop();
+        shouldDraw.set(true);
+        startTimer(counter, true, 0);
     }
 
     @Override
