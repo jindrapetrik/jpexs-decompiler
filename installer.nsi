@@ -758,6 +758,7 @@ Section "Download PlayerGlobal.swc" SecPlayerGlobal
 checkadobe:
 DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
 !tempfile PGHTML
+MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "XXX tempfile: ${PGHTML})" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
 inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "${PGHTML}"
 Pop $0
 StrCmp $0 "OK" dlok
