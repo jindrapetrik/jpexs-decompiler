@@ -761,8 +761,8 @@ DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
 inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "${PGHTML}"
 Pop $0
 StrCmp $0 "OK" dlok
-;MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually. (Error returned was: $0)" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
+MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
+;MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually. (Error returned was: $0, tempfile: ${PGHTML})" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
 Abort
 dlok:
 
