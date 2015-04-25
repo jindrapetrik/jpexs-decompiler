@@ -531,6 +531,12 @@ public class View {
     }
 
     private static TreePath expandTreeNode(JTree tree, List<String> pathAsStringList) {
+        TreePath tp = getTreePathByPathStrings(tree, pathAsStringList);
+        tree.expandPath(tp);
+        return tp;
+    }
+
+    public static TreePath getTreePathByPathStrings(JTree tree, List<String> pathAsStringList) {
         TreeModel model = tree.getModel();
         Object node = model.getRoot();
 
@@ -558,15 +564,7 @@ public class View {
         }
 
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
-        tree.expandPath(tp);
         return tp;
-    }
-
-    public static void selectTreeNode(JTree tree, List<String> pathAsStringList) {
-        TreePath tp = expandTreeNode(tree, pathAsStringList);
-        if (tp != null) {
-            tree.setSelectionPath(tp);
-        }
     }
 
     public static void expandTreeNodes(JTree tree, TreePath parent, boolean expand) {

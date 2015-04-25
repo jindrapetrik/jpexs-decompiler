@@ -120,7 +120,7 @@ public class NeuQuant {
     /*
      * Types and Global Variables --------------------------
      */
-    protected byte[] thepicture; /* the input image itself */
+    protected int[] thepicture; /* the input image itself */
 
 
     protected int lengthcount; /* lengthcount = H*W*3 */
@@ -130,7 +130,6 @@ public class NeuQuant {
 
 
     // typedef int pixel[4]; /* BGRc */
-
     protected int[][] network; /* the network itself - [netsize][4] */
 
 
@@ -150,7 +149,7 @@ public class NeuQuant {
      * Initialise network in range (0,0,0) to (255,255,255) and set parameters
      * -----------------------------------------------------------------------
      */
-    public NeuQuant(byte[] thepic, int len, int sample) {
+    public NeuQuant(int[] thepic, int len, int sample) {
 
         int i;
         int[] p;
@@ -179,9 +178,11 @@ public class NeuQuant {
         int k = 0;
         for (int i = 0; i < netsize; i++) {
             int j = index[i];
-            map[k++] = (byte) (network[j][0]);
-            map[k++] = (byte) (network[j][1]);
+
+            // convert map from BGR to RGB
             map[k++] = (byte) (network[j][2]);
+            map[k++] = (byte) (network[j][1]);
+            map[k++] = (byte) (network[j][0]);
         }
         return map;
     }
@@ -244,6 +245,7 @@ public class NeuQuant {
         netindex[previouscol] = (startpos + maxnetpos) >> 1;
         for (j = previouscol + 1; j < 256; j++) {
             netindex[j] = maxnetpos; /* really 256 */
+
         }
     }
 
@@ -254,7 +256,7 @@ public class NeuQuant {
 
         int i, j, b, g, r;
         int radius, rad, alpha, step, delta, samplepixels;
-        byte[] p;
+        int[] p;
         int pix, lim;
 
         if (lengthcount < minpicturebytes) {
@@ -277,7 +279,7 @@ public class NeuQuant {
             radpower[i] = alpha * (((rad * rad - i * i) * radbias) / (rad * rad));
         }
 
-    // fprintf(stderr,"beginning 1D learning: initial radius=%d\n", rad);
+        // fprintf(stderr,"beginning 1D learning: initial radius=%d\n", rad);
         if (lengthcount < minpicturebytes) {
             step = 3;
         } else if ((lengthcount % prime1) != 0) {
@@ -296,14 +298,16 @@ public class NeuQuant {
 
         i = 0;
         while (i < samplepixels) {
-            b = (p[pix + 0] & 0xff) << netbiasshift;
-            g = (p[pix + 1] & 0xff) << netbiasshift;
-            r = (p[pix + 2] & 0xff) << netbiasshift;
+            int pixel = p[pix / 3];
+            b = (pixel & 0xff) << netbiasshift;
+            g = ((pixel >> 8) & 0xff) << netbiasshift;
+            r = ((pixel >> 16) & 0xff) << netbiasshift;
             j = contest(b, g, r);
 
             altersingle(alpha, j, b, g, r);
             if (rad != 0) {
                 alterneigh(rad, j, b, g, r); /* alter neighbours */
+
             }
 
             pix += step;
@@ -327,7 +331,7 @@ public class NeuQuant {
                 }
             }
         }
-    // fprintf(stderr,"finished 1D learning: final alpha=%f
+        // fprintf(stderr,"finished 1D learning: final alpha=%f
         // !\n",((float)alpha)/initalpha);
     }
 
@@ -356,6 +360,7 @@ public class NeuQuant {
 
                 if (dist >= bestd) {
                     i = netsize; /* stop iter */
+
                 } else {
                     i++;
                     if (dist < 0) {
@@ -385,6 +390,7 @@ public class NeuQuant {
 
                 if (dist >= bestd) {
                     j = -1; /* stop iter */
+
                 } else {
                     j--;
                     if (dist < 0) {

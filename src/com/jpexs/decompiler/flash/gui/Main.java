@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -92,6 +93,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.TreePath;
 
 /**
  * Main executable class
@@ -1101,7 +1103,10 @@ public class Main {
                     String pathStr = filesToOpen[filesToOpen.length - 1];
                     if (pathStr.length() > 0) {
                         String[] path = pathStr.split("\\|");
-                        View.selectTreeNode(mainFrame.getPanel().tagTree, Arrays.asList(path));
+
+                        MainPanel mainPanel = mainFrame.getPanel();
+                        TreePath tp = View.getTreePathByPathStrings(mainPanel.tagTree, Arrays.asList(path));
+                        mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
                     }
                 });
             }

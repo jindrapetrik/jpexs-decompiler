@@ -3,7 +3,7 @@ package net.weiner.kevin;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class AnimatedGifEncoder {
 
     protected Color transparent = null; // transparent color if given
 
-    protected int transIndex; // transparent index in color table
+    protected int transIndex = -1; // transparent index in color table
 
     protected int repeat = -1; // no repeat
 
@@ -49,10 +49,6 @@ public class AnimatedGifEncoder {
     protected boolean started = false; // ready to output frames
 
     protected OutputStream out;
-
-    protected BufferedImage image; // current frame
-
-    protected byte[] pixels; // BGR byte array from frame
 
     protected byte[] indexedPixels; // converted frame indexed to palette
 
@@ -153,9 +149,9 @@ public class AnimatedGifEncoder {
                 // use first frame's size
                 setSize(im.getWidth(), im.getHeight());
             }
-            image = im;
-            getImagePixels(); // convert to correct format if necessary
-            analyzePixels(); // build color table & map pixels
+
+            int[] pixels = getImagePixels(im); // convert to correct format if necessary
+            analyzePixels(pixels); // build color table & map pixels
             if (firstFrame) {
                 writeLSD(); // logical screen descriptior
                 writePalette(); // global color table
@@ -199,10 +195,8 @@ public class AnimatedGifEncoder {
         }
 
         // reset for subsequent use
-        transIndex = 0;
+        transIndex = -1;
         out = null;
-        image = null;
-        pixels = null;
         indexedPixels = null;
         colorTab = null;
         closeStream = false;
@@ -312,33 +306,62 @@ public class AnimatedGifEncoder {
     /**
      * Analyzes image colors and creates color map.
      */
-    protected void analyzePixels() {
-        int len = pixels.length;
-        int nPix = len / 3;
+    protected void analyzePixels(int[] pixels) {
+        int nPix = pixels.length;
+        int len = nPix * 3;
         indexedPixels = new byte[nPix];
         NeuQuant nq = new NeuQuant(pixels, len, sample);
+
         // initialize quantizer
         colorTab = nq.process(); // create reduced palette
-        // convert map from BGR to RGB
-        for (int i = 0; i < colorTab.length; i += 3) {
-            byte temp = colorTab[i];
-            colorTab[i] = colorTab[i + 2];
-            colorTab[i + 2] = temp;
-            usedEntry[i / 3] = false;
+
+        for (int i = 0; i < usedEntry.length; i++) {
+            usedEntry[i] = false;
         }
+
         // map image pixels to new palette
-        int k = 0;
         for (int i = 0; i < nPix; i++) {
-            int index = nq.map(pixels[k++] & 0xff, pixels[k++] & 0xff, pixels[k++] & 0xff);
+            int pixel = pixels[i];
+            int index = nq.map(pixel & 0xff, (pixel >> 8) & 0xff, (pixel >> 16) & 0xff);
             usedEntry[index] = true;
             indexedPixels[i] = (byte) index;
         }
-        pixels = null;
         colorDepth = 8;
         palSize = 7;
+
+        int unusedIndex = -1;
+        for (int i = 0; i < usedEntry.length; i++) {
+            if (!usedEntry[i]) {
+                unusedIndex = i;
+                break;
+            }
+        }
+
+        int transIdx;
+
         // get closest match to transparent color if specified
         if (transparent != null) {
             transIndex = findClosest(transparent);
+            transIdx = transIndex;
+        } else {
+            if (unusedIndex != -1) {
+                transIdx = (byte) unusedIndex;
+            } else {
+                transIdx = findClosest(Color.black);
+            }
+
+            boolean transp = false;
+            for (int i = 0; i < nPix; i++) {
+                int pixel = pixels[i];
+                if (((pixel >> 24) & 0xff) < 0x80) {
+                    transp = true;
+                    indexedPixels[i] = (byte) transIdx;
+                }
+            }
+
+            if (transp) {
+                transIndex = transIdx;
+            }
         }
     }
 
@@ -373,19 +396,24 @@ public class AnimatedGifEncoder {
 
     /**
      * Extracts image pixels into byte array "pixels"
+     *
+     * @param image current frame
+     * @return ARGB int array from frame
      */
-    protected void getImagePixels() {
+    protected int[] getImagePixels(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
         int type = image.getType();
-        if ((w != width) || (h != height) || (type != BufferedImage.TYPE_3BYTE_BGR)) {
+        if ((w != width) || (h != height) || (type != BufferedImage.TYPE_INT_ARGB)) {
             // create new image with right size/format
-            BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+            BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = temp.createGraphics();
             g.drawImage(image, 0, 0, null);
             image = temp;
         }
-        pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        return pixels;
     }
 
     /**
@@ -396,7 +424,7 @@ public class AnimatedGifEncoder {
         out.write(0xf9); // GCE label
         out.write(4); // data block size
         int transp, disp;
-        if (transparent == null) {
+        if (transIndex == -1) {
             transp = 0;
             disp = 0; // dispose = no action
         } else {
@@ -415,7 +443,7 @@ public class AnimatedGifEncoder {
                 transp); // 8 transparency flag
 
         writeShort(delay); // delay x 1/100 sec
-        out.write(transIndex); // transparent color index
+        out.write(transIndex == -1 ? 0 : transIndex); // transparent color index
         out.write(0); // block terminator
     }
 

@@ -444,7 +444,6 @@ public class FrameExporter {
 
         AnimatedGifEncoder encoder = new AnimatedGifEncoder();
         encoder.setRepeat(0); // repeat forever
-        encoder.setTransparent(new Color(0, 0, 0, 0));
         encoder.start(file.getAbsolutePath());
         encoder.setDelay(1000 / frameRate);
         while (images.hasNext()) {
