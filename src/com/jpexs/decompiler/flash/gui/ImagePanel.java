@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -72,6 +73,8 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
+    private final List<MediaDisplayListener> listeners = new ArrayList<>();
+
     private Timelined timelined;
 
     private boolean stillFrame = false;
@@ -123,6 +126,22 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             this.selectedDepth = depth;
         }
         hideMouseSelection();
+    }
+
+    public void fireMediaDisplayStateChanged() {
+        for (MediaDisplayListener l : listeners) {
+            l.mediaDisplayStateChanged(this);
+        }
+    }
+
+    @Override
+    public void addEventListener(MediaDisplayListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeEventListener(MediaDisplayListener listener) {
+        listeners.remove(listener);
     }
 
     private class IconPanel extends JPanel {
@@ -451,6 +470,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             if (textTag != null) {
                 setText(textTag, newTextTag);
             }
+
+            fireMediaDisplayStateChanged();
         }
     }
 
@@ -551,6 +572,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 clearImagePanel();
             }
         }
+
+        fireMediaDisplayStateChanged();
     }
 
     public synchronized void setImage(SerializableImage image) {
@@ -564,6 +587,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
+
+        fireMediaDisplayStateChanged();
     }
 
     public synchronized void setText(TextTag textTag, TextTag newTextTag) {
@@ -598,6 +623,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
+
+        fireMediaDisplayStateChanged();
     }
 
     private synchronized void clearImagePanel() {
@@ -638,6 +665,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timer != null) {
             timer.cancel();
             timer = null;
+            fireMediaDisplayStateChanged();
         }
 
         textTag = null;
@@ -663,6 +691,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 }
             }
         }
+
+        fireMediaDisplayStateChanged();
     }
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
@@ -815,10 +845,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         final SoundTagPlayer sp;
         try {
             sp = new SoundTagPlayer(st, 1, false);
-            sp.addListener(new PlayerListener() {
+            sp.addEventListener(new MediaDisplayListener() {
 
                 @Override
-                public void playingFinished() {
+                public void mediaDisplayStateChanged(MediaDisplay source) {
+                }
+
+                @Override
+                public void playingFinished(MediaDisplay source) {
                     synchronized (ImagePanel.class) {
                         soundPlayers.remove(sp);
                     }
@@ -864,6 +898,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         clearImagePanel();
         timelined = null;
         swf = null;
+
+        fireMediaDisplayStateChanged();
     }
 
     public synchronized void stop() {
@@ -889,7 +925,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private void startTimer(int cnt, boolean singleFrame, int msPerFrame) {
 
         TimerTask task = new TimerTask() {
-            public final int counter = cnt;
+            public final int taskCounter = cnt;
 
             public final boolean isSingleFrame = singleFrame;
 
@@ -905,11 +941,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     }
 
                     if (isSingleFrame) {
-                        if (first.getAndSet(false)) {
-                            drawFrame(counter);
+                        drawFrame(taskCounter);
+                        synchronized (ImagePanel.class) {
+                            if (taskCounter == counter) {
+                                timer = null;
+                            }
                         }
+                        fireMediaDisplayStateChanged();
                     } else {
-                        nextFrame(counter);
+                        nextFrame(taskCounter);
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -928,6 +968,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     @Override
     public synchronized void rewind() {
         frame = 0;
+        fireMediaDisplayStateChanged();
     }
 
     @Override
@@ -958,6 +999,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stop();
         shouldDraw.set(true);
         startTimer(counter, true, 0);
+        fireMediaDisplayStateChanged();
     }
 
     @Override

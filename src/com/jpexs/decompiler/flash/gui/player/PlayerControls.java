@@ -44,8 +44,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -63,7 +61,7 @@ import javax.swing.event.AncestorListener;
  *
  * @author JPEXS
  */
-public class PlayerControls extends JPanel implements ActionListener {
+public class PlayerControls extends JPanel implements ActionListener, MediaDisplayListener {
 
     private static final String ACTION_PAUSE = "PAUSE";
 
@@ -94,8 +92,6 @@ public class PlayerControls extends JPanel implements ActionListener {
     private MediaDisplay display;
 
     private JProgressBar progress;
-
-    private final Timer timer;
 
     private final JLabel timeLabel;
 
@@ -313,14 +309,9 @@ public class PlayerControls extends JPanel implements ActionListener {
         });
         playbackControls.add(progress);
         playbackControls.add(controlPanel);
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                update();
-            }
-        }, 100, 100);
+
         add(playbackControls);
+        this.display.addEventListener(this);
     }
 
     private String formatMs(long ms) {
@@ -342,7 +333,12 @@ public class PlayerControls extends JPanel implements ActionListener {
     }
 
     public void setMedia(MediaDisplay media) {
+        if (this.display != null) {
+            this.display.removeEventListener(this);
+        }
+
         this.display = media;
+        this.display.addEventListener(this);
     }
 
     private void update() {
@@ -358,10 +354,11 @@ public class PlayerControls extends JPanel implements ActionListener {
                 zoomFitButton.setVisible(zoom != null);
                 percentLabel.setVisible(zoom != null);
                 zoomPanel.setVisible(display.zoomAvailable());
-                graphicControls.setVisible(display.screenAvailable());
-                totalFrameLabel.setVisible(display.screenAvailable());
-                frameLabel.setVisible(display.screenAvailable());
-                frameControls.setVisible(display.screenAvailable());
+                boolean screenAvailable = display.screenAvailable();
+                graphicControls.setVisible(screenAvailable);
+                totalFrameLabel.setVisible(screenAvailable);
+                frameLabel.setVisible(screenAvailable);
+                frameControls.setVisible(screenAvailable);
                 int totalFrames = display.getTotalFrames();
                 int currentFrame = display.getCurrentFrame();
                 if (currentFrame >= totalFrames) {
@@ -388,16 +385,13 @@ public class PlayerControls extends JPanel implements ActionListener {
                 if (totalFrames > 1 && !playbackControls.isVisible()) {
                     playbackControls.setVisible(true);
                 }
-                if (display.isPlaying() == paused) {
-                    paused = !paused;
-
-                    if (paused) {
-                        pauseButton.setToolTipText(AppStrings.translate("preview.play"));
-                        pauseButton.setIcon(playIcon);
-                    } else {
-                        pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
-                        pauseButton.setIcon(pauseIcon);
-                    }
+                boolean paused = !display.isPlaying();
+                if (paused) {
+                    pauseButton.setToolTipText(AppStrings.translate("preview.play"));
+                    pauseButton.setIcon(playIcon);
+                } else {
+                    pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
+                    pauseButton.setIcon(pauseIcon);
                 }
             }
         });
@@ -440,10 +434,10 @@ public class PlayerControls extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_PAUSE:
-                if (paused) {
-                    display.play();
-                } else {
+                if (display.isPlaying()) {
                     display.pause();
+                } else {
+                    display.play();
                 }
                 break;
 
@@ -548,6 +542,19 @@ public class PlayerControls extends JPanel implements ActionListener {
         }
 
         return realZoom;
+    }
+
+    @Override
+    public void mediaDisplayStateChanged(MediaDisplay source) {
+        if (display != source) {
+            return;
+        }
+
+        update();
+    }
+
+    @Override
+    public void playingFinished(MediaDisplay source) {
     }
 
     private class TransferableImage implements Transferable {

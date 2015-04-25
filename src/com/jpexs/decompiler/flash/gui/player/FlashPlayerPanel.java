@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.javactivex.ActiveX;
 import com.jpexs.javactivex.ActiveXEvent;
-import com.jpexs.javactivex.ActiveXEventListener;
 import com.jpexs.javactivex.ActiveXException;
 import com.jpexs.javactivex.example.controls.flash.ShockwaveFlash;
 import com.sun.jna.Platform;
@@ -34,6 +33,10 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,9 +44,13 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
+public final class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
-    private ShockwaveFlash flash;
+    private final List<MediaDisplayListener> listeners = new ArrayList<>();
+
+    private final ShockwaveFlash flash;
+
+    private final Timer timer;
 
     private boolean stopped = true;
 
@@ -149,28 +156,58 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
         flash.setAllowScriptAccess("always");
         flash.setAllowNetworking("all");
-        flash.addFlashCallListener(new ActiveXEventListener() {
+        flash.addOnReadyStateChangeListener((ActiveXEvent axe) -> {
+            fireMediaDisplayStateChanged();
+        });
 
-            @Override
-            public void onEvent(ActiveXEvent axe) {
-                String req = (String) axe.args.get("request");
-                Matcher m = Pattern.compile("<invoke name=\"([^\"]+)\" returntype=\"xml\"><arguments><string>(.*)</string></arguments></invoke>").matcher(req);
-                if (m.matches()) {
-                    String funname = m.group(1);
-                    String msg = m.group(2);
-                    if (funname.equals("alert") || funname.equals("console.log")) {
-                        if (Main.debugDialog != null) {
-                            Main.debugDialog.log(funname + ":" + msg);
-                        }
+        flash.addFlashCallListener((ActiveXEvent axe) -> {
+            String req = (String) axe.args.get("request");
+            Matcher m = Pattern.compile("<invoke name=\"([^\"]+)\" returntype=\"xml\"><arguments><string>(.*)</string></arguments></invoke>").matcher(req);
+            if (m.matches()) {
+                String funname = m.group(1);
+                String msg = m.group(2);
+                if (funname.equals("alert") || funname.equals("console.log")) {
+                    if (Main.debugDialog != null) {
+                        Main.debugDialog.log(funname + ":" + msg);
                     }
                 }
             }
         });
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            private boolean isPlaying = false;
+
+            private int currentFrame = 0;
+
+            @Override
+            public void run() {
+
+                boolean changed = false;
+
+                boolean isPlaying = flash.IsPlaying();
+                if (this.isPlaying != isPlaying) {
+                    this.isPlaying = isPlaying;
+                }
+
+                int currentFrame = flash.CurrentFrame();
+                if (this.currentFrame != currentFrame) {
+                    this.currentFrame = currentFrame;
+                    changed = true;
+                }
+
+                if (changed) {
+                    fireMediaDisplayStateChanged();
+                }
+            }
+        }, 100, 100);
     }
 
     public synchronized void stopSWF() {
         displaySWF("-", null, 1);
         stopped = true;
+        fireMediaDisplayStateChanged();
     }
 
     public synchronized boolean isStopped() {
@@ -197,12 +234,16 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         flash.setMovie(flashName);
         //play
         stopped = false;
-
+        fireMediaDisplayStateChanged();
     }
 
     @Override
     public void close() throws IOException {
 
+    }
+
+    public void unload() {
+        timer.cancel();
     }
 
     @Override
@@ -260,5 +301,21 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     @Override
     public boolean isLoaded() {
         return !isStopped();
+    }
+
+    public void fireMediaDisplayStateChanged() {
+        for (MediaDisplayListener l : listeners) {
+            l.mediaDisplayStateChanged(this);
+        }
+    }
+
+    @Override
+    public void addEventListener(MediaDisplayListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeEventListener(MediaDisplayListener listener) {
+        listeners.remove(listener);
     }
 }

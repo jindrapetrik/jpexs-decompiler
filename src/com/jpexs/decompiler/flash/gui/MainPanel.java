@@ -2385,6 +2385,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (flashPanel != null) {
             try {
                 flashPanel.close();
+                flashPanel.unload();
             } catch (IOException ex) {
                 // ignore
             }

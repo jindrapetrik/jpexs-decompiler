@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -55,19 +56,21 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private final SoundTag tag;
 
-    private final List<PlayerListener> listeners = new ArrayList<>();
+    private final List<MediaDisplayListener> listeners = new ArrayList<>();
 
-    public void addListener(PlayerListener l) {
-        listeners.add(l);
+    @Override
+    public void addEventListener(MediaDisplayListener listener) {
+        listeners.add(listener);
     }
 
-    public void removeListener(PlayerListener l) {
-        listeners.remove(l);
+    @Override
+    public void removeEventListener(MediaDisplayListener listener) {
+        listeners.remove(listener);
     }
 
-    public void fireFinished() {
-        for (PlayerListener l : listeners) {
-            l.playingFinished();
+    private void firePlayingFinished() {
+        for (MediaDisplayListener l : listeners) {
+            l.playingFinished(this);
         }
     }
 
@@ -91,7 +94,7 @@ public class SoundTagPlayer implements MediaDisplay {
                                 clip.setFramePosition(0);
                                 clip.start();
                             } else {
-                                fireFinished();
+                                firePlayingFinished();
                             }
                         }
                     }
