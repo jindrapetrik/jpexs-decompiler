@@ -29,6 +29,13 @@
         <pathelement location="${TESTLIBDIR}/emma_ant.jar"/>
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
+    
+    <path id="ant-deb.classpath">
+        <pathelement location="${basedir}/ant-deb-0.0.1.jar"/>
+    </path>
+    
+    <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant-deb.classpath"/>
+    <taskdef name="desktopentry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant-deb.classpath"/>
 
     <target name="-loadversion" depends="-loadversion-prop,-loadversion-private">
         
@@ -186,17 +193,48 @@
     <target name="archive" depends="-loadversion,dist">
         <mkdir dir="${RELEASESDIR}"/>
         <property  name="zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.zip" />
-        <zip destfile="${zip.file}" basedir="${DISTRIBUTIONDIR}" excludes="ffdec.sh">
-            <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="ffdec.sh" filemode="755"/>
+        <zip destfile="${zip.file}" basedir="${DISTRIBUTIONDIR}" excludes="${app.script}">
+            <zipfileset dir="${DISTRIBUTIONDIR}" includes="${app.script}" fullpath="${app.script}" filemode="755"/>
         </zip>
     </target>
+    
+    
+    
+    <target name="deb" depends="-loadversion,dist">
+        <mkdir dir="${RELEASESDIR}"/>
+        <tempfile property="app.deb.desktop.temp" deleteonexit="true" prefix="desktop"/>
+        <desktopentry
+            toFile="${app.deb.desktop.temp}"
+            name="${PRODUCTNAME}"
+            comment="${app.description.short}"
+            exec="/usr/bin/${app.package}"
+            icon="/usr/share/java/${app.package}/icon.png"
+            categories="Development;Network;Utility;WebDevelopment;Java"
+        />
+        <deb 
+            package="${app.package}"
+            todir="${RELEASESDIR}"
+            debFilenameProperty="deb.file"
+            section="editors"
+            depends="${app.package.depends}">
+        <version upstream="${VERSION}" />
+        <maintainer name="${VENDOR}" email="${app.vendor.mail}"/>
+        <description synopsis="${app.description.short}">${app.description}</description>
+        <tarfileset dir="${DISTRIBUTIONDIR}" prefix="usr/share/java/${app.package}">
+            <include name="**"/>
+        </tarfileset>
+        <tarfileset file="${DISTRIBUTIONDIR}/${app.script}" fullpath="usr/bin/${app.package}" filemode="755" />
+        <tarfileset file="${app.deb.desktop.temp}" fullpath="usr/share/applications/${app.deb.desktop.file}.desktop"/>
+        </deb>
+        <delete file="${app.deb.desktop.temp}" />
+    </target>   
     
     <target name="osx-app-archive" depends="-loadversion,dist">
         <mkdir dir="${RELEASESDIR}"/>
         <property  name="osx.zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />
-        <tempfile property="app.script.temp" deleteonexit="true" />
-        <echo file="${app.script.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./ffdec.sh</echo>
-        <tempfile property="app.info.temp" deleteonexit="true" />        
+        <tempfile property="app.script.temp" deleteonexit="true" prefix="appscript" />
+        <echo file="${app.script.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./${app.script}</echo>
+        <tempfile property="app.info.temp" deleteonexit="true" prefix="appinfo" />        
         <echo file="${app.info.temp}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -225,10 +263,10 @@
 </plist>]]></echo>        
         
         <zip destfile="${osx.zip.file}">
-            <zipfileset file="${app.script.temp}" fullpath="FFDec.app/Contents/MacOS/FFDec" filemode="755" />
-            <zipfileset file="${app.info.temp}" fullpath="FFDec.app/Contents/Info.plist" />            
-            <zipfileset dir="${DISTRIBUTIONDIR}" excludes="ffdec.sh" prefix="FFDec.app/Contents/Resources/" />
-            <zipfileset dir="${DISTRIBUTIONDIR}" includes="ffdec.sh" fullpath="FFDec.app/Contents/Resources/ffdec.sh" filemode="755" />           
+            <zipfileset file="${app.script.temp}" fullpath="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" filemode="755" />
+            <zipfileset file="${app.info.temp}" fullpath="${app.osx.dir}.app/Contents/Info.plist" />            
+            <zipfileset dir="${DISTRIBUTIONDIR}" excludes="${app.script}" prefix="${app.osx.dir}.app/Contents/Resources/" />
+            <zipfileset dir="${DISTRIBUTIONDIR}" includes="${app.script}" fullpath="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />           
         </zip>   
         <delete file="${app.script.temp}" />
         <delete file="${app.info.temp}" />
@@ -329,7 +367,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,osx-app-archive,installer,locales">        
+    <target name="release" depends="library,archive,deb,osx-app-archive,installer,locales">        
 
     </target>
          
@@ -413,6 +451,10 @@
             <arg value="-file" />
             <arg value="fileOSXZip" />
             <arg value="${osx.zip.file}" />
+            
+            <arg value="-file" />
+            <arg value="fileDeb" />
+            <arg value="${deb.file}" />
 
             <arg value="-file" />
             <arg value="fileLang" />
@@ -747,5 +789,5 @@
     
     <target name="upload-last" depends="all,-upload">
         
-    </target>        
+    </target>                        
 </project>

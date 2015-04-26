@@ -61,8 +61,37 @@
     
     <property name="RUNPARAMS" value=""/>
     
-    <property name="website.upload.url" value="https://www.free-decompiler.com/flash/release.html?action=release" />
-    <property name="website.version.url" value="https://www.free-decompiler.com/flash/release.html?action=versionid" />        
+    <property name="website.upload.url" value="https://www.free-decompiler.com/flash/release/release" />
+    <property name="website.version.url" value="https://www.free-decompiler.com/flash/release/versionid" />        
+    
+    <property name="app.vendor.mail" value="flash@free-decompiler.com" />
+    
+    <property name="app.osx.dir" value="FFDec" />
+    <property name="app.deb.desktop.file" value="FFDec" />
+    <property name="app.script" value="ffdec.sh" />
+    <property name="app.package" value="ffdec" />
+    <property name="app.package.depends" value="oracle-java8-jre" />
+    
+    <property name="app.description.short" value="Decompiler and editor of Flash SWF files" />
+    <property name="app.description">JPEXS Free Flash Decompiler (FFDec) is opensource flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Windows, Linux or MacOS.
+
+Key Features:
+- Exporting scripts, images, shapes, movies, sounds, fonts...
+- SWF to FLA conversion
+- SWF to XML export and import again
+- Various output formats like SVG or HTML5 Canvas
+- Displaying ActionScript source code.
+- Experimental direct editing of ActionScript source
+- Editing via assembler source
+- Both ActionScript 1/2 and AS3 support
+- Clicking decompiled source highlights P-code associated instruction and vice-versa
+- Replacing images, editing texts, fonts and other tags
+- Displaying SWF resources (shapes, sprites, fonts, buttons...)
+- Hexadecimal dump view with color hilighting also available
+- Built-in proxy server for editing SWF files which come through it
+- Java based code which supports multiple platforms
+- Multilanguage support (see language list)
+- Can decompile some kinds of obfuscated code too</property>
     
     <import file="${basedir}/build_common.xml"/>
 </project>
