@@ -499,11 +499,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     @Override
     public void caretUpdate(final CaretEvent e) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    caretUpdate(e);
-                }
+            View.execInEventDispatch(() -> {
+                caretUpdate(e);
             });
             return;
         }

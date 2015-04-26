@@ -219,14 +219,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
             searchPanel.setSearchText(txt);
 
-            View.execInEventDispatch(new Runnable() {
-
-                @Override
-                public void run() {
-                    SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(), txt, ABCPanel.this);
-                    sr.setResults(found);
-                    sr.setVisible(true);
-                }
+            View.execInEventDispatch(() -> {
+                SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(), txt, ABCPanel.this);
+                sr.setResults(found);
+                sr.setVisible(true);
             });
 
             return true;
@@ -703,12 +699,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         final TreePath tp = ttm.getTreePath(pack);
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                mainPanel.tagTree.setSelectionPath(tp);
-                mainPanel.tagTree.scrollPathToVisible(tp);
-            }
+        View.execInEventDispatchLater(() -> {
+            mainPanel.tagTree.setSelectionPath(tp);
+            mainPanel.tagTree.scrollPathToVisible(tp);
         });
 
     }
@@ -721,12 +714,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         hilightScript(pack);
         decompiledTextArea.setCaretPosition(0);
 
-        View.execInEventDispatchLater(new Runnable() {
-
-            @Override
-            public void run() {
-                searchPanel.showQuickFindDialog(decompiledTextArea);
-            }
+        View.execInEventDispatchLater(() -> {
+            searchPanel.showQuickFindDialog(decompiledTextArea);
         });
 
     }

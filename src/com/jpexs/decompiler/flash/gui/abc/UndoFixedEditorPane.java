@@ -42,12 +42,8 @@ public class UndoFixedEditorPane extends JEditorPane {
 
     @Override
     public void setText(final String t) {
-        View.execInEventDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-                setText(t, getContentType());
-            }
+        View.execInEventDispatch(() -> {
+            setText(t, getContentType());
         });
     }
 

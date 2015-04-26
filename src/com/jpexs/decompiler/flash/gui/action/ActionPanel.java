@@ -277,14 +277,10 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
             Main.stopWork();
             searchPanel.setSearchText(txt);
-            View.execInEventDispatch(new Runnable() {
-
-                @Override
-                public void run() {
-                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(), txt, ActionPanel.this);
-                    sr.setResults(found);
-                    sr.setVisible(true);
-                }
+            View.execInEventDispatch(() -> {
+                SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(), txt, ActionPanel.this);
+                sr.setResults(found);
+                sr.setVisible(true);
             });
             return true;
             //return searchPanel.setResults(found);
@@ -293,52 +289,40 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     }
 
     private void setDecompiledText(final String text) {
-        View.execInEventDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-                ignoreCarret = true;
-                decompiledEditor.setText(text);
-                ignoreCarret = false;
-            }
+        View.execInEventDispatch(() -> {
+            ignoreCarret = true;
+            decompiledEditor.setText(text);
+            ignoreCarret = false;
         });
     }
 
     private void setEditorText(final String text, final String contentType) {
-        View.execInEventDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-                ignoreCarret = true;
-                editor.setContentType(contentType);
-                editor.setText(text);
-                ignoreCarret = false;
-            }
+        View.execInEventDispatch(() -> {
+            ignoreCarret = true;
+            editor.setContentType(contentType);
+            editor.setText(text);
+            ignoreCarret = false;
         });
     }
 
     private void setText(final HighlightedText text, final String contentType) {
-        View.execInEventDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-                int pos = editor.getCaretPosition();
-                Highlighting lastH = null;
-                for (Highlighting h : disassembledHilights) {
-                    if (pos < h.startPos) {
-                        break;
-                    }
-                    lastH = h;
+        View.execInEventDispatch(() -> {
+            int pos = editor.getCaretPosition();
+            Highlighting lastH = null;
+            for (Highlighting h : disassembledHilights) {
+                if (pos < h.startPos) {
+                    break;
                 }
-                Long offset = lastH == null ? 0 : lastH.getProperties().offset;
-                disassembledHilights = text.instructionHilights;
-                String stripped = text.text;
-                setEditorText(stripped, contentType);
-                Highlighting h = Highlighting.searchOffset(disassembledHilights, offset);
-                if (h != null) {
-                    if (h.startPos <= editor.getDocument().getLength()) {
-                        editor.setCaretPosition(h.startPos);
-                    }
+                lastH = h;
+            }
+            Long offset = lastH == null ? 0 : lastH.getProperties().offset;
+            disassembledHilights = text.instructionHilights;
+            String stripped = text.text;
+            setEditorText(stripped, contentType);
+            Highlighting h = Highlighting.searchOffset(disassembledHilights, offset);
+            if (h != null) {
+                if (h.startPos <= editor.getDocument().getLength()) {
+                    editor.setCaretPosition(h.startPos);
                 }
             }
         });
@@ -468,17 +452,13 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 setSourceWorker = null;
                 Main.stopWork();
 
-                View.execInEventDispatch(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            get();
-                        } catch (CancellationException ex) {
-                            setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
-                        } catch (Exception ex) {
-                            setDecompiledText("// " + AppStrings.translate("decompilationError") + ": " + ex);
-                        }
+                View.execInEventDispatch(() -> {
+                    try {
+                        get();
+                    } catch (CancellationException ex) {
+                        setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
+                    } catch (Exception ex) {
+                        setDecompiledText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                     }
                 });
             }
@@ -839,12 +819,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         mainPanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
 
-        View.execInEventDispatchLater(new Runnable() {
-
-            @Override
-            public void run() {
-                searchPanel.showQuickFindDialog(decompiledEditor);
-            }
+        View.execInEventDispatchLater(() -> {
+            searchPanel.showQuickFindDialog(decompiledEditor);
         });
     }
 }

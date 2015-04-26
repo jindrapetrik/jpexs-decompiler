@@ -33,11 +33,15 @@ public interface MediaDisplay {
 
     public void pause();
 
+    public void stop();
+
     public void play();
 
     public void rewind();
 
     public boolean isPlaying();
+
+    public void setLoop(boolean loop);
 
     public void gotoFrame(int frame);
 
@@ -48,6 +52,8 @@ public interface MediaDisplay {
     public boolean isLoaded();
 
     public BufferedImage printScreen();
+
+    public boolean loopAvailable();
 
     public boolean screenAvailable();
 

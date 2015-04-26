@@ -30,6 +30,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
@@ -56,7 +58,11 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private final SoundTag tag;
 
+    private final Timer timer;
+
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
+
+    private boolean rewindAfterStop = false;
 
     @Override
     public void addEventListener(MediaDisplayListener listener) {
@@ -66,6 +72,12 @@ public class SoundTagPlayer implements MediaDisplay {
     @Override
     public void removeEventListener(MediaDisplayListener listener) {
         listeners.remove(listener);
+    }
+
+    public void fireMediaDisplayStateChanged() {
+        for (MediaDisplayListener l : listeners) {
+            l.mediaDisplayStateChanged(this);
+        }
     }
 
     private void firePlayingFinished() {
@@ -85,7 +97,6 @@ public class SoundTagPlayer implements MediaDisplay {
             @Override
             public void update(LineEvent event) {
                 if (event.getType() == LineEvent.Type.STOP) {
-                    //clip.close();
                     synchronized (playLock) {
                         if (!paused) {
                             decreaseLoopCount();
@@ -98,9 +109,31 @@ public class SoundTagPlayer implements MediaDisplay {
                             }
                         }
                     }
+
+                    if (rewindAfterStop) {
+                        rewind();
+                        rewindAfterStop = false;
+                    }
                 }
+
+                fireMediaDisplayStateChanged();
             }
         });
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+
+                try {
+                    fireMediaDisplayStateChanged();
+                } catch (Exception ex) {
+                    // ignore
+                    cancel();
+                }
+            }
+        }, 100, 100);
 
         if (!async) {
             paused = true;
@@ -169,6 +202,13 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
+    public void stop() {
+        rewindAfterStop = true;
+        pause();
+        rewind();
+    }
+
+    @Override
     public void play() {
         synchronized (playLock) {
             paused = false;
@@ -181,6 +221,8 @@ public class SoundTagPlayer implements MediaDisplay {
                 clip.start();
             }
         }
+
+        fireMediaDisplayStateChanged();
     }
 
     @Override
@@ -193,6 +235,11 @@ public class SoundTagPlayer implements MediaDisplay {
         synchronized (playLock) {
             return clip.isActive();
         }
+    }
+
+    @Override
+    public boolean loopAvailable() {
+        return true;
     }
 
     @Override
@@ -220,18 +267,17 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
+    public void setLoop(boolean loop) {
+        loopCount = loop ? Integer.MAX_VALUE : 1;
+    }
+
+    @Override
     public void gotoFrame(int frame) {
         synchronized (playLock) {
-            boolean active = clip.isActive();
-            if (active) {
-                clip.stop();
-            }
             clip.setMicrosecondPosition((long) frame * FRAME_DIVISOR);
-
-            if (active) {
-                clip.start();
-            }
         }
+
+        fireMediaDisplayStateChanged();
     }
 
     @Override
@@ -257,6 +303,8 @@ public class SoundTagPlayer implements MediaDisplay {
     @Override
     protected void finalize() throws Throwable {
         try {
+            timer.cancel();
+
             if (clip != null) {
                 clip.close();
             }

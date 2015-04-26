@@ -1041,7 +1041,7 @@ public class CommandLineArgumentParser {
                     if (singleTextFile == null) {
                         singleTextFile = Configuration.textExportSingleFile.get();
                     }
-                    new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + "texts" : ""), extags, new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom), evl);
+                    new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + TextExportSettings.EXPORT_FOLDER_NAME : ""), extags, new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("frame")) {
@@ -1056,7 +1056,7 @@ public class CommandLineArgumentParser {
                 }
 
                 boolean parallel = Configuration.parallelSpeedUp.get();
-                String scriptsFolder = Path.combine(outDir, "scripts");
+                String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
                 Path.createDirectorySafe(new File(scriptsFolder));
                 Boolean singleScriptFile = parseBooleanConfigValue(formats.get("singlescript"));
                 if (singleScriptFile == null) {

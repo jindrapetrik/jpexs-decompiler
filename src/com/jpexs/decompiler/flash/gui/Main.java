@@ -179,12 +179,9 @@ public class Main {
     }
 
     public static void startProxy(int port) {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                if (proxyFrame == null) {
-                    proxyFrame = new ProxyFrame(mainFrame);
-                }
+        View.execInEventDispatch(() -> {
+            if (proxyFrame == null) {
+                proxyFrame = new ProxyFrame(mainFrame);
             }
         });
         proxyFrame.setPort(port);
@@ -235,15 +232,12 @@ public class Main {
 
     public static void stopWork() {
         working = false;
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                if (mainFrame != null) {
-                    mainFrame.getPanel().setWorkStatus("", null);
-                }
-                if (loadingDialog != null) {
-                    loadingDialog.setDetail("");
-                }
+        View.execInEventDispatchLater(() -> {
+            if (mainFrame != null) {
+                mainFrame.getPanel().setWorkStatus("", null);
+            }
+            if (loadingDialog != null) {
+                loadingDialog.setDetail("");
             }
         });
     }
@@ -478,12 +472,9 @@ public class Main {
                 }
                 try {
                     Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
-                    View.execInEventDispatch(new Runnable() {
-                        @Override
-                        public void run() {
-                            ensureMainFrame();
-                            mainFrame.getPanel().load(swfs1, first1);
-                        }
+                    View.execInEventDispatch(() -> {
+                        ensureMainFrame();
+                        mainFrame.getPanel().load(swfs1, first1);
                     });
 
                 } catch (Exception ex) {
@@ -846,31 +837,21 @@ public class Main {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        View.execInEventDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-                ErrorLogFrame.createNewInstance();
-            }
+        View.execInEventDispatch(() -> {
+            ErrorLogFrame.createNewInstance();
         });
 
         autoCheckForUpdates();
         offerAssociation();
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog = new LoadingDialog();
-            }
+        View.execInEventDispatch(() -> {
+            loadingDialog = new LoadingDialog();
         });
     }
 
     public static void showModeFrame() {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                ensureMainFrame();
-                mainFrame.setVisible(true);
-            }
+        View.execInEventDispatch(() -> {
+            ensureMainFrame();
+            mainFrame.setVisible(true);
         });
     }
 

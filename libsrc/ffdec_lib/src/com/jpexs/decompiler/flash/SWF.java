@@ -65,6 +65,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
+import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -130,7 +131,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.NulStream;
 import com.jpexs.helpers.ProgressListener;
@@ -161,14 +161,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
@@ -1204,136 +1196,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         return displayRect;
     }
 
-    private class ExportPackTask implements Callable<File> {
-
-        ScriptPack pack;
-
-        String directory;
-
-        ScriptExportSettings exportSettings;
-
-        ClassPath path;
-
-        AtomicInteger index;
-
-        int count;
-
-        boolean parallel;
-
-        AbortRetryIgnoreHandler handler;
-
-        long startTime;
-
-        long stopTime;
-
-        EventListener eventListener;
-
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
-            this.pack = pack;
-            this.directory = directory;
-            this.exportSettings = exportSettings;
-            this.path = path;
-            this.index = index;
-            this.count = count;
-            this.parallel = parallel;
-            this.handler = handler;
-            this.eventListener = evl;
-        }
-
-        @Override
-        public File call() throws Exception {
-            RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
-                @Override
-                public void run() throws IOException {
-                    startTime = System.currentTimeMillis();
-                    this.result = pack.export(directory, exportSettings, parallel);
-                    stopTime = System.currentTimeMillis();
-                }
-            };
-            int currentIndex = index.getAndIncrement();
-            if (eventListener != null) {
-                synchronized (ABC.class) {
-                    eventListener.handleExportingEvent("script", currentIndex, count, path);
-                }
-            }
-            new RetryTask(rio, handler).run();
-            if (eventListener != null) {
-                synchronized (ABC.class) {
-                    long time = stopTime - startTime;
-                    eventListener.handleExportedEvent("script", currentIndex, count, path + ", " + Helper.formatTimeSec(time));
-                }
-            }
-            return rio.result;
-        }
-    }
-
-    private List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
-        List<File> ret = new ArrayList<>();
-
-        if (!outdir.endsWith(File.separator)) {
-            outdir += File.separator;
-        }
-
-        ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportSettings, evl));
-        return ret;
-    }
-
-    private List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportSettings exportSettings, final boolean parallel, final EventListener evl) {
-        final AtomicInteger cnt = new AtomicInteger(1);
-
-        final List<File> ret = new ArrayList<>();
-        final List<ScriptPack> packs = getAS3Packs();
-
-        if (!parallel || packs.size() < 2) {
-            try {
-                CancellableWorker.call(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        for (ScriptPack item : packs) {
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl);
-                            ret.add(task.call());
-                        }
-                        return null;
-                    }
-                }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
-            } catch (TimeoutException ex) {
-                logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, "Error during ABC export", ex);
-            }
-        } else {
-            ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
-            List<Future<File>> futureResults = new ArrayList<>();
-            for (ScriptPack item : packs) {
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
-                futureResults.add(future);
-            }
-
-            try {
-                executor.shutdown();
-                if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
-                    logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
-                }
-            } catch (InterruptedException ex) {
-            } finally {
-                executor.shutdownNow();
-            }
-
-            for (int f = 0; f < futureResults.size(); f++) {
-                try {
-                    if (futureResults.get(f).isDone()) {
-                        ret.add(futureResults.get(f).get());
-                    }
-                } catch (InterruptedException ex) {
-                } catch (ExecutionException ex) {
-                    logger.log(Level.SEVERE, "Error during ABC export", ex);
-                }
-            }
-        }
-
-        return ret;
-    }
-
     public EventListener getExportEventListener() {
         EventListener evl = new EventListener() {
             @Override
@@ -1363,9 +1225,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         List<File> ret = new ArrayList<>();
 
         if (isAS3()) {
-            ret.addAll(exportActionScript3(handler, outdir, exportSettings, parallel, evl));
+            ret.addAll(new AS3ScriptExporter().exportActionScript3(this, handler, outdir, exportSettings, parallel, evl));
         } else {
-            ret.addAll(exportActionScript2(handler, outdir, exportSettings, parallel, evl));
+            ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportSettings, evl));
         }
         return ret;
     }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -50,6 +51,10 @@ import java.util.logging.Logger;
 public class AS2ScriptExporter {
 
     private static final Logger logger = Logger.getLogger(AS2ScriptExporter.class.getName());
+
+    public List<File> exportActionScript2(SWF swf, AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
+        return exportAS2ScriptsTimeout(handler, outdir, swf.getASMs(true), exportSettings, evl);
+    }
 
     public List<File> exportAS2ScriptsTimeout(final AbortRetryIgnoreHandler handler, final String outdir, final Map<String, ASMSource> asms, final ScriptExportSettings exportSettings, final EventListener evl) throws IOException {
         try {

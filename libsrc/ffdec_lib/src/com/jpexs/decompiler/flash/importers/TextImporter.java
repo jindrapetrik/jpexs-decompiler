@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.TextExporter;
+import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
@@ -111,7 +111,7 @@ public class TextImporter {
     }
 
     public void importTextsMultipleFiles(String folder, SWF swf) {
-        File textsFolder = new File(Path.combine(folder, TextExporter.TEXT_EXPORT_FOLDER));
+        File textsFolder = new File(Path.combine(folder, TextExportSettings.EXPORT_FOLDER_NAME));
         String[] files = textsFolder.list(new FilenameFilter() {
 
             private final Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);

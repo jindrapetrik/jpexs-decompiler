@@ -139,6 +139,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
 
+    private static final String ACTION_IMPORT_SCRIPT = "IMPORTSCRIPT";
+
     private static final String ACTION_IMPORT_SYMBOL_CLASS = "IMPORTSYMBOLCLASS";
 
     private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
@@ -198,6 +200,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
     private JCommandButton exportSelectionCommandButton;
 
     private JCommandButton importTextCommandButton;
+
+    private JCommandButton importScriptCommandButton;
 
     private JCommandButton importSymbolClassCommandButton;
 
@@ -448,6 +452,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("importtext32"));
         assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
 
+        // todo: icon
+        importScriptCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.script")), View.getResizableIcon("importtext32"));
+        assignListener(importScriptCommandButton, ACTION_IMPORT_SCRIPT);
+
         importSymbolClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.symbolClass")), View.getResizableIcon("importsymbolclass32"));
         assignListener(importSymbolClassCommandButton, ACTION_IMPORT_SYMBOL_CLASS);
 
@@ -456,6 +464,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
         importBand.addCommandButton(importXmlCommandButton, RibbonElementPriority.TOP);
         importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.MEDIUM);
+        importBand.addCommandButton(importScriptCommandButton, RibbonElementPriority.MEDIUM);
         importBand.addCommandButton(importSymbolClassCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand viewBand = new JRibbonBand(translate("menu.view"), null);
@@ -782,6 +791,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         exportXmlCommandButton.setEnabled(swfLoaded);
         exportSelectionCommandButton.setEnabled(swfLoaded);
         importTextCommandButton.setEnabled(swfLoaded);
+        importScriptCommandButton.setEnabled(swfLoaded);
         importSymbolClassCommandButton.setEnabled(swfLoaded);
         importXmlCommandButton.setEnabled(swfLoaded);
         reloadCommandButton.setEnabled(swfLoaded);
@@ -993,6 +1003,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 break;
             case ACTION_IMPORT_TEXT:
                 importText();
+                break;
+            case ACTION_IMPORT_SCRIPT:
+                importScript();
                 break;
             case ACTION_IMPORT_SYMBOL_CLASS:
                 importSymbolClass();

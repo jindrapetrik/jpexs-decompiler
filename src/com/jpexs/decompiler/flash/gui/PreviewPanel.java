@@ -395,6 +395,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
+        imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(imagePanel, BorderLayout.CENTER);
         previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
@@ -942,7 +943,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
                         doa = new DoActionTag(swf, null);
                         actions = ASMParser.parse(0, false,
-                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
                                 + "Push \"my_sound\" 0.0 \"Sound\"\n"
@@ -961,7 +962,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         new ShowFrameTag(swf).writeTag(sos2);
 
                         actions = ASMParser.parse(0, false,
-                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"
@@ -988,7 +989,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         new ShowFrameTag(swf).writeTag(sos2);
 
                         actions = ASMParser.parse(0, false,
-                                "ActionConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
                                 + "StopSounds\n"
                                 + "Push \"_root\"\n"
                                 + "GetVariable\n"

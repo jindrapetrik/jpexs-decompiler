@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.ScriptImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
@@ -695,12 +696,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void ensureActionPanel() {
         if (actionPanel == null) {
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    actionPanel = new ActionPanel(MainPanel.this);
-                    displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
-                }
+            View.execInEventDispatch(() -> {
+                actionPanel = new ActionPanel(MainPanel.this);
+                displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
             });
         }
     }
@@ -854,11 +852,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         refreshTree(null);
 
         if (updateNeeded) {
-            View.execInEventDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    tagTree.updateUI();
-                }
+            View.execInEventDispatch(() -> {
+                tagTree.updateUI();
             });
         }
     }
@@ -887,21 +882,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 actionPanel.initSplits();
             }
 
-            View.execInEventDispatchLater(new Runnable() {
-                @Override
-                public void run() {
-                    splitPane1.setDividerLocation(Configuration.guiSplitPane1DividerLocation.get(getWidth() / 3));
-                    int confDivLoc = Configuration.guiSplitPane2DividerLocation.get(splitPane2.getHeight() * 3 / 5);
-                    if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
-                        confDivLoc = splitPane2.getHeight() * 3 / 5;
-                    }
-                    splitPane2.setDividerLocation(confDivLoc);
-                    previewPanel.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewPanel.getWidth() / 2));
-
-                    splitPos = splitPane2.getDividerLocation();
-                    splitsInited = true;
-                    previewPanel.setSplitsInited();
+            View.execInEventDispatchLater(() -> {
+                splitPane1.setDividerLocation(Configuration.guiSplitPane1DividerLocation.get(getWidth() / 3));
+                int confDivLoc = Configuration.guiSplitPane2DividerLocation.get(splitPane2.getHeight() * 3 / 5);
+                if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
+                    confDivLoc = splitPane2.getHeight() * 3 / 5;
                 }
+                splitPane2.setDividerLocation(confDivLoc);
+                previewPanel.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewPanel.getWidth() / 2));
+
+                splitPos = splitPane2.getDividerLocation();
+                splitsInited = true;
+                previewPanel.setSplitsInited();
             });
 
         }
@@ -1099,7 +1091,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl));
             ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
                     new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl));
-            ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
+            ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, texts,
                     new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl));
             ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
                     new MovieExportSettings(export.getValue(MovieExportMode.class)), evl));
@@ -1129,7 +1121,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             boolean parallel = Configuration.parallelSpeedUp.get();
-            String scriptsFolder = Path.combine(selFile, "scripts");
+            String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
             Path.createDirectorySafe(new File(scriptsFolder));
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -1161,7 +1153,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl);
         new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", swf.tags,
                 new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl);
-        new TextExporter().exportTexts(handler, selFile + File.separator + "texts", swf.tags,
+        new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, swf.tags,
                 new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl);
         new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", swf.tags,
                 new MovieExportSettings(export.getValue(MovieExportMode.class)), evl);
@@ -1183,7 +1175,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         boolean parallel = Configuration.parallelSpeedUp.get();
-        String scriptsFolder = Path.combine(selFile, "scripts");
+        String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
         Path.createDirectorySafe(new File(scriptsFolder));
         ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
         String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -1310,22 +1302,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             if (swf.isAS3()) {
                                 if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
-                                    View.execInEventDispatch(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showDetail(DETAILCARDAS3NAVIGATOR);
-                                            showCard(CARDACTIONSCRIPT3PANEL);
-                                        }
+                                    View.execInEventDispatch(() -> {
+                                        showDetail(DETAILCARDAS3NAVIGATOR);
+                                        showCard(CARDACTIONSCRIPT3PANEL);
                                     });
                                 }
                             } else {
                                 if (getActionPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
-                                    View.execInEventDispatch(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showCard(CARDACTIONSCRIPTPANEL);
-                                        }
+                                    View.execInEventDispatch(() -> {
+                                        showCard(CARDACTIONSCRIPTPANEL);
                                     });
                                 }
                             }
@@ -1644,7 +1630,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-            File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
 
                 // "configuration items" for the current replace only
@@ -1680,7 +1666,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (textsFile.exists()) {
                 textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
-                textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
                 // try to import plain texts
                 if (textsFile.exists()) {
                     textImporter.importTextsSingleFile(textsFile, swf);
@@ -1690,6 +1676,22 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             swf.clearImageCache();
+            reload(true);
+        }
+    }
+
+    public void importScript(final SWF swf) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
+
+            new ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
+
             reload(true);
         }
     }
@@ -1970,14 +1972,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     Main.stopWork();
                     View.showMessageDialog(null, translate("work.deobfuscating.complete"));
 
-                    View.execInEventDispatch(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            clearAllScriptCache();
-                            getABCPanel().reload();
-                            updateClassesList();
-                        }
+                    View.execInEventDispatch(() -> {
+                        clearAllScriptCache();
+                        getABCPanel().reload();
+                        updateClassesList();
                     });
                 }
             }.execute();
@@ -2077,12 +2075,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
                     return false;
                 }
-                View.execInEventDispatch(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        font.addCharacter(character, f);
-                    }
+                View.execInEventDispatch(() -> {
+                    font.addCharacter(character, f);
                 });
 
                 return true;
@@ -2533,9 +2527,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
 
-        TreeItem treeItem = (TreeItem) tagTree.getLastSelectedPathComponent();
-        if (treeItem == null) {
-            return;
+        TreeItem treeItem = null;
+        TreePath treePath = tagTree.getSelectionPath();
+        if (treePath != null && tagTree.getModel().treePathExists(treePath)) {
+            treeItem = (TreeItem) treePath.getLastPathComponent();
         }
 
         if (!forceReload && (treeItem == oldItem)) {
@@ -2693,7 +2688,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag);
             try {
-                SoundTagPlayer soundThread = new SoundTagPlayer((SoundTag) treeItem, Integer.MAX_VALUE, true);
+                SoundTagPlayer soundThread = new SoundTagPlayer((SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 previewPanel.setMedia(soundThread);
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -2847,6 +2842,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         ds.matrix = new MATRIX();
                         ds.ratio = i * 65535 / framesCnt;
                         f.layers.put(1, ds);
+                        f.layersChanged = true;
                         tim.addFrame(f);
                     }
                 } else if (tag instanceof FontTag) {
@@ -2858,6 +2854,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         ds.matrix = new MATRIX();
                         ds.time = i;
                         f.layers.put(1, ds);
+                        f.layersChanged = true;
                         tim.addFrame(f);
                     }
                 } else {

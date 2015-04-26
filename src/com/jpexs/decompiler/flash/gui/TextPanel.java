@@ -313,12 +313,8 @@ public class TextPanel extends JPanel {
 
     public void updateSearchPos() {
         textValue.setCaretPosition(0);
-        View.execInEventDispatchLater(new Runnable() {
-
-            @Override
-            public void run() {
-                textSearchPanel.showQuickFindDialog(textValue);
-            }
+        View.execInEventDispatchLater(() -> {
+            textSearchPanel.showQuickFindDialog(textValue);
         });
     }
 

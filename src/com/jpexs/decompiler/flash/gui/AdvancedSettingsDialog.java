@@ -364,17 +364,13 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
 
     private void showRestartConfirmDialod() {
         if (View.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            View.execInEventDispatchLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    SelectLanguageDialog.reloadUi();
+            View.execInEventDispatchLater(() -> {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                SelectLanguageDialog.reloadUi();
             });
 
         }

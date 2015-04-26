@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
  */
 public class ScriptExportSettings {
 
+    public static final String EXPORT_FOLDER_NAME = "scripts";
+
     public ScriptExportMode mode;
 
     public boolean singleFile;
