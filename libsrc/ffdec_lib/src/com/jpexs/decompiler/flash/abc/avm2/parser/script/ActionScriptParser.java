@@ -2401,7 +2401,7 @@ public class ActionScriptParser {
     private static void initPlayer() throws IOException, InterruptedException {
         if (playerABCs.isEmpty()) {
             if (Configuration.getPlayerSWC() == null) {
-                throw new IOException("Player SWC library not found, please place it to " + Configuration.getPlayerSWC());
+                throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
             }
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
             SWF swf = new SWF(swc.getSWF("library.swf"), true);

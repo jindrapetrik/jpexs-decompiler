@@ -59,7 +59,7 @@ public class DirectEditingTest extends FileTestBase {
     public void testDirectEditing(String filePath) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
         File playerSWC = Configuration.getPlayerSWC();
         if (playerSWC == null) {
-            throw new IOException("Player SWC library not found, please place it to " + Configuration.getPlayerSWC());
+            throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
         }
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false);
