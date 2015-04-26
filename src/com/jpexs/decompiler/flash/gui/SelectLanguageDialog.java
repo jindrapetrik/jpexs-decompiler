@@ -128,15 +128,11 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
     }
 
     public static void reloadUi() {
-        View.execInEventDispatchLater(new Runnable() {
-
-            @Override
-            public void run() {
-                Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
-                DefaultSyntaxKit.reloadConfigs();
-                Main.initLang();
-                Main.reloadApp();
-            }
+        View.execInEventDispatchLater(() -> {
+            Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
+            DefaultSyntaxKit.reloadConfigs();
+            Main.initLang();
+            Main.reloadApp();
         });
     }
 

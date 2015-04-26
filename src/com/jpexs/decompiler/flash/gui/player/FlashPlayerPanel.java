@@ -57,6 +57,11 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     private int frameRate;
 
     @Override
+    public boolean loopAvailable() {
+        return false;
+    }
+
+    @Override
     public boolean screenAvailable() {
         return true;
     }
@@ -262,6 +267,15 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     }
 
     @Override
+    public void stop() {
+        try {
+            flash.Stop();
+            flash.Rewind();
+        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        }
+    }
+
+    @Override
     public void rewind() {
         try {
             flash.Rewind();
@@ -284,6 +298,10 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         } catch (ActiveXException ex) { // Can be "Data not available yet exception"
             return false;
         }
+    }
+
+    @Override
+    public void setLoop(boolean loop) {
     }
 
     @Override

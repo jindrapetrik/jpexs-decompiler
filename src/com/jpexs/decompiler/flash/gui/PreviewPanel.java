@@ -395,6 +395,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
+        imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(imagePanel, BorderLayout.CENTER);
         previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);

@@ -112,13 +112,8 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
 
     private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
-            View.execInEventDispatchLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    listener.updateSearchPos(resultsList.getSelectedValue());
-                }
-
+            View.execInEventDispatchLater(() -> {
+                listener.updateSearchPos(resultsList.getSelectedValue());
             });
         }
     }

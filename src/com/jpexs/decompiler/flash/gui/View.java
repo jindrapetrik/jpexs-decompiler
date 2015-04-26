@@ -150,109 +150,105 @@ public class View {
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
         }
 
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
+        execInEventDispatch(() -> {
+            try {
+                UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
+                SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
+                UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
+                UIManager.put("Tree.expandedIcon", getIcon("expand16"));
+                UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
+                UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
+                UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
+                UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
+                UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
+                UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
+                UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
+                UIManager.put("TextField.background", Color.white);
+                UIManager.put("FormattedTextField.background", Color.white);
+                UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
 
-                try {
-                    UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
-                    SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
-                    UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
-                    UIManager.put("Tree.expandedIcon", getIcon("expand16"));
-                    UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
-                    UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
-                    UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
-                    UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
-                    UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
-                    UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
-                    UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
-                    UIManager.put("TextField.background", Color.white);
-                    UIManager.put("FormattedTextField.background", Color.white);
-                    UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
+                FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
+                final FontSet fs = pol.getFontSet("Substance", null);
 
-                    FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
-                    final FontSet fs = pol.getFontSet("Substance", null);
+                //Restore default font for chinese characters
+                SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
 
-                    //Restore default font for chinese characters
-                    SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
+                    private final FontSet fontSet = new FontSet() {
 
-                        private final FontSet fontSet = new FontSet() {
+                        private FontUIResource controlFont;
 
-                            private FontUIResource controlFont;
+                        private FontUIResource menuFont;
 
-                            private FontUIResource menuFont;
+                        private FontUIResource titleFont;
 
-                            private FontUIResource titleFont;
+                        private FontUIResource windowTitleFont;
 
-                            private FontUIResource windowTitleFont;
+                        private FontUIResource smallFont;
 
-                            private FontUIResource smallFont;
-
-                            private FontUIResource messageFont;
-
-                            @Override
-                            public FontUIResource getControlFont() {
-                                if (controlFont == null) {
-                                    FontUIResource f = fs.getControlFont();
-                                    controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return controlFont;
-                            }
-
-                            @Override
-                            public FontUIResource getMenuFont() {
-                                if (menuFont == null) {
-                                    FontUIResource f = fs.getMenuFont();
-                                    menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return menuFont;
-                            }
-
-                            @Override
-                            public FontUIResource getTitleFont() {
-                                if (titleFont == null) {
-                                    FontUIResource f = fs.getTitleFont();
-                                    titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return titleFont;
-                            }
-
-                            @Override
-                            public FontUIResource getWindowTitleFont() {
-                                if (windowTitleFont == null) {
-                                    FontUIResource f = fs.getWindowTitleFont();
-                                    windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return windowTitleFont;
-                            }
-
-                            @Override
-                            public FontUIResource getSmallFont() {
-                                if (smallFont == null) {
-                                    FontUIResource f = fs.getSmallFont();
-                                    smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return smallFont;
-                            }
-
-                            @Override
-                            public FontUIResource getMessageFont() {
-                                if (messageFont == null) {
-                                    FontUIResource f = fs.getMessageFont();
-                                    messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                                return messageFont;
-                            }
-                        };
+                        private FontUIResource messageFont;
 
                         @Override
-                        public FontSet getFontSet(String string, UIDefaults uid) {
-                            return fontSet;
+                        public FontUIResource getControlFont() {
+                            if (controlFont == null) {
+                                FontUIResource f = fs.getControlFont();
+                                controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return controlFont;
                         }
-                    });
-                } catch (UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-                }
+
+                        @Override
+                        public FontUIResource getMenuFont() {
+                            if (menuFont == null) {
+                                FontUIResource f = fs.getMenuFont();
+                                menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return menuFont;
+                        }
+
+                        @Override
+                        public FontUIResource getTitleFont() {
+                            if (titleFont == null) {
+                                FontUIResource f = fs.getTitleFont();
+                                titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return titleFont;
+                        }
+
+                        @Override
+                        public FontUIResource getWindowTitleFont() {
+                            if (windowTitleFont == null) {
+                                FontUIResource f = fs.getWindowTitleFont();
+                                windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return windowTitleFont;
+                        }
+
+                        @Override
+                        public FontUIResource getSmallFont() {
+                            if (smallFont == null) {
+                                FontUIResource f = fs.getSmallFont();
+                                smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return smallFont;
+                        }
+
+                        @Override
+                        public FontUIResource getMessageFont() {
+                            if (messageFont == null) {
+                                FontUIResource f = fs.getMessageFont();
+                                messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            }
+                            return messageFont;
+                        }
+                    };
+
+                    @Override
+                    public FontSet getFontSet(String string, UIDefaults uid) {
+                        return fontSet;
+                    }
+                });
+            } catch (UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
 
@@ -389,11 +385,8 @@ public class View {
 
     public static int showOptionDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageType, final Icon icon, final Object[] options, final Object initialValue) {
         final int[] ret = new int[1];
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                ret[0] = JOptionPane.showOptionDialog(parentComponent, message, title, optionType, messageType, icon, options, initialValue);
-            }
+        execInEventDispatch(() -> {
+            ret[0] = JOptionPane.showOptionDialog(parentComponent, message, title, optionType, messageType, icon, options, initialValue);
         });
         return ret[0];
     }
@@ -404,11 +397,8 @@ public class View {
 
     public static int showConfirmDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageTyp) {
         final int ret[] = new int[1];
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                ret[0] = JOptionPane.showConfirmDialog(parentComponent, message, title, optionType, messageTyp);
-            }
+        execInEventDispatch(() -> {
+            ret[0] = JOptionPane.showConfirmDialog(parentComponent, message, title, optionType, messageTyp);
         });
         return ret[0];
     }
@@ -431,11 +421,8 @@ public class View {
         }
 
         final int ret[] = new int[1];
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageTyp);
-            }
+        execInEventDispatch(() -> {
+            ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageTyp);
         });
         showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
         return ret[0];
@@ -471,21 +458,15 @@ public class View {
     }
 
     public static void showMessageDialog(final Component parentComponent, final Object message) {
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(parentComponent, message);
-            }
+        execInEventDispatch(() -> {
+            JOptionPane.showMessageDialog(parentComponent, message);
         });
     }
 
     public static String showInputDialog(final Object message, final Object initialSelection) {
         final String[] ret = new String[1];
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                ret[0] = JOptionPane.showInputDialog(message, initialSelection);
-            }
+        execInEventDispatch(() -> {
+            ret[0] = JOptionPane.showInputDialog(message, initialSelection);
         });
         return ret[0];
     }
@@ -623,52 +604,49 @@ public class View {
     }
 
     public static JTable autoResizeColWidth(final JTable table, final TableModel model) {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                table.setModel(model);
+        View.execInEventDispatch(() -> {
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            table.setModel(model);
 
-                int margin = 5;
+            int margin = 5;
 
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    int vColIndex = i;
-                    DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
-                    TableColumn col = colModel.getColumn(vColIndex);
-                    int width;
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                int vColIndex = i;
+                DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
+                TableColumn col = colModel.getColumn(vColIndex);
+                int width;
 
-                    // Get width of column header
-                    TableCellRenderer renderer = col.getHeaderRenderer();
+                // Get width of column header
+                TableCellRenderer renderer = col.getHeaderRenderer();
 
-                    if (renderer == null) {
-                        renderer = table.getTableHeader().getDefaultRenderer();
-                    }
-
-                    Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
-
-                    width = comp.getPreferredSize().width;
-
-                    // Get maximum width of column data
-                    for (int r = 0; r < table.getRowCount(); r++) {
-                        renderer = table.getCellRenderer(r, vColIndex);
-                        comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
-                                r, vColIndex);
-                        width = Math.max(width, comp.getPreferredSize().width);
-                    }
-
-                    // Add margin
-                    width += 2 * margin;
-
-                    // Set the width
-                    col.setPreferredWidth(width);
+                if (renderer == null) {
+                    renderer = table.getTableHeader().getDefaultRenderer();
                 }
 
-                ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
-                        SwingConstants.LEFT);
+                Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
 
-                // table.setAutoCreateRowSorter(true);
-                table.getTableHeader().setReorderingAllowed(false);
+                width = comp.getPreferredSize().width;
+
+                // Get maximum width of column data
+                for (int r = 0; r < table.getRowCount(); r++) {
+                    renderer = table.getCellRenderer(r, vColIndex);
+                    comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
+                            r, vColIndex);
+                    width = Math.max(width, comp.getPreferredSize().width);
+                }
+
+                // Add margin
+                width += 2 * margin;
+
+                // Set the width
+                col.setPreferredWidth(width);
             }
+
+            ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
+                    SwingConstants.LEFT);
+
+            // table.setAutoCreateRowSorter(true);
+            table.getTableHeader().setReorderingAllowed(false);
         });
 
         return table;

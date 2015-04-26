@@ -124,12 +124,9 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
     }
 
     private void doUpdate() {
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                searchPos.setText((foundPos + 1) + "/" + found.size());
-                listener.updateSearchPos(found.get(foundPos));
-            }
+        View.execInEventDispatchLater(() -> {
+            searchPos.setText((foundPos + 1) + "/" + found.size());
+            listener.updateSearchPos(found.get(foundPos));
         });
     }
 

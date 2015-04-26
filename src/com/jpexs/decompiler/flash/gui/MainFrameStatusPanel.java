@@ -169,16 +169,13 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
             blinkTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    View.execInEventDispatch(new Runnable() {
-                        @Override
-                        public void run() {
-                            blinkPos++;
-                            if ((blinkPos % 2) == 0 || (blinkPos >= 4)) {
-                                errorNotificationButton.setIcon(currentIcon);
-                            } else {
-                                errorNotificationButton.setIcon(null);
-                                errorNotificationButton.setSize(16, 16);
-                            }
+                    View.execInEventDispatch(() -> {
+                        blinkPos++;
+                        if ((blinkPos % 2) == 0 || (blinkPos >= 4)) {
+                            errorNotificationButton.setIcon(currentIcon);
+                        } else {
+                            errorNotificationButton.setIcon(null);
+                            errorNotificationButton.setSize(16, 16);
                         }
                     });
 

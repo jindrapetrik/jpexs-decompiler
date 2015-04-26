@@ -724,6 +724,29 @@ public class TagTreeModel implements TreeModel {
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
     }
 
+    public boolean treePathExists(TreePath treePath) {
+        TreeItem current = null;
+        for (Object o : treePath.getPath()) {
+            TreeItem item = (TreeItem) o;
+            if (current == null) {
+                if (item != getRoot()) {
+                    return false;
+                }
+
+                current = item;
+            } else {
+                int idx = getIndexOfChild(current, item);
+                if (idx == -1) {
+                    return false;
+                }
+
+                current = item;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void addTreeModelListener(TreeModelListener l) {
         listeners.add(l);
