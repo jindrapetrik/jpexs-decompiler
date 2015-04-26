@@ -2825,6 +2825,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         ds.matrix = new MATRIX();
                         ds.ratio = i * 65535 / framesCnt;
                         f.layers.put(1, ds);
+                        f.layersChanged = true;
                         tim.addFrame(f);
                     }
                 } else if (tag instanceof FontTag) {
@@ -2836,6 +2837,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         ds.matrix = new MATRIX();
                         ds.time = i;
                         f.layers.put(1, ds);
+                        f.layersChanged = true;
                         tim.addFrame(f);
                     }
                 } else {

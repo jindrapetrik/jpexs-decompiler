@@ -688,10 +688,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 int frameCount = timelined.getTimeline().getFrameCount();
                 int newframe;
                 if (frameCount > 0) {
-                    if (frame + 1 >= frameCount && !loop) {
-                        newframe = frame;
-                    } else {
-                        newframe = (frame + 1) % frameCount;
+                    newframe = (frame + 1) % frameCount;
+                    if (newframe == 0 && !loop) {
+                        stop();
                     }
                 } else {
                     newframe = frame;

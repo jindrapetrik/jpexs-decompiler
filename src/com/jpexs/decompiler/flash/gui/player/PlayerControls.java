@@ -397,7 +397,7 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
             totalFrameLabel.setText("" + totalFrames);
             if (frameRate != 0) {
                 timeLabel.setText("(" + formatMs((currentFrame * 1000) / frameRate) + ")");
-                totalTimeLabel.setText("(" + formatMs(((totalFrames - 1) * 1000) / frameRate) + ")");
+                totalTimeLabel.setText("(" + formatMs((totalFrames * 1000) / frameRate) + ")");
             }
             if (totalFrames <= 1 && playbackControls.isVisible()) {
                 playbackControls.setVisible(false);
