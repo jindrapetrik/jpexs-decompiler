@@ -41,10 +41,10 @@ public abstract class FileTestBase {
             });
         }
         Object[][] ret = new Object[files.length + 2][1];
-        ret[0][0] = "../as2/as2.swf";
-        ret[1][0] = "../as3/as3.swf";
+        ret[0][0] = "testdata/as2/as2.swf";
+        ret[1][0] = "testdata/as3/as3.swf";
         for (int f = 0; f < files.length; f++) {
-            ret[f + 2][0] = files[f].getName();
+            ret[f + 2][0] = dir.getAbsolutePath() + File.pathSeparator + files[f].getName();
         }
         return ret;
     }

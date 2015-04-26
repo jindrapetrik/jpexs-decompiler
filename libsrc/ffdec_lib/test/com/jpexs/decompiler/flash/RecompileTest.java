@@ -47,10 +47,10 @@ public class RecompileTest extends FileTestBase {
     public static final String TESTDATADIR = "testdata/recompile";
 
     @Test(dataProvider = "provideFiles")
-    public void testAS3InstructionParsing(String fileName) {
+    public void testAS3InstructionParsing(String filePath) {
         try {
             Configuration.debugCopy.set(false);
-            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + fileName)) {
+            try (FileInputStream fis = new FileInputStream(filePath)) {
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 for (ABCContainerTag abcTag : swf.getAbcList()) {
                     ABC abc = abcTag.getABC();
@@ -62,30 +62,30 @@ public class RecompileTest extends FileTestBase {
                 }
             }
         } catch (Throwable ex) {
-            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
+            fail("Exception during decompilation: " + filePath, ex);
         }
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testRecompile(String fileName) {
+    public void testRecompile(String filePath) {
         try {
-            try (FileInputStream fis = new FileInputStream(TESTDATADIR + File.separator + fileName)) {
+            try (FileInputStream fis = new FileInputStream(filePath)) {
                 Configuration.debugCopy.set(true);
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 swf.saveTo(new ByteArrayOutputStream());
             }
         } catch (NotSameException ex) {
-            fail("File is different after recompiling: " + fileName);
+            fail("File is different after recompiling: " + filePath);
         } catch (IOException | InterruptedException ex) {
-            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
+            fail("Exception during decompilation: " + filePath, ex);
         }
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testTagEditing(String fileName) throws IOException, InterruptedException {
+    public void testTagEditing(String filePath) throws IOException, InterruptedException {
         try {
             Configuration.debugCopy.set(false);
-            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + fileName)), false, false);
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false, false);
             for (Tag tag : swf.tags) {
                 if (!(tag instanceof TagStub)) {
                     Tag tag2 = tag.cloneTag();
@@ -95,7 +95,7 @@ public class RecompileTest extends FileTestBase {
                 }
             }
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
+            fail("Exception during decompilation: " + filePath, ex);
         }
     }
 

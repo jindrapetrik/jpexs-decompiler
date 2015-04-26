@@ -78,19 +78,19 @@ public class ExportTest extends FileTestBase {
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testDecompileAS(String fileName) {
-        testDecompile(fileName, ScriptExportMode.AS);
+    public void testDecompileAS(String filePath) {
+        testDecompile(filePath, ScriptExportMode.AS);
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testDecompilePcode(String fileName) {
-        testDecompile(fileName, ScriptExportMode.PCODE);
+    public void testDecompilePcode(String filePath) {
+        testDecompile(filePath, ScriptExportMode.PCODE);
     }
 
-    public void testDecompile(String fileName, ScriptExportMode exportMode) {
+    public void testDecompile(String filePath, ScriptExportMode exportMode) {
         try {
-            File f = new File(fileName);
-            SWF swf = new SWF(new FileInputStream(TESTDATADIR + File.separator + fileName), false);
+            File f = new File(filePath);
+            SWF swf = new SWF(new FileInputStream(filePath), false);
             String folderName = exportMode == ScriptExportMode.AS ? "output" : "outputp";
             File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
@@ -108,7 +108,7 @@ public class ExportTest extends FileTestBase {
 
             }, fdir.getAbsolutePath(), new ScriptExportSettings(exportMode, false), false, null);
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + fileName + " " + ex.getMessage());
+            fail("Exception during decompilation: " + filePath + " " + ex.getMessage());
         }
     }
 

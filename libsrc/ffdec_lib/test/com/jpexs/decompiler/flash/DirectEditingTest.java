@@ -56,13 +56,13 @@ public class DirectEditingTest extends FileTestBase {
     public static final String TESTDATADIR = "testdata/directediting";
 
     @Test(dataProvider = "provideFiles")
-    public void testDirectEditing(String fileName) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
+    public void testDirectEditing(String filePath) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
         File playerSWC = Configuration.getPlayerSWC();
         if (playerSWC == null) {
             throw new IOException("Player SWC library not found, please place it to " + Configuration.getPlayerSWC());
         }
         try {
-            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + fileName)), false);
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false);
             if (swf.isAS3()) {
                 boolean dotest = false;
                 List<ABC> allAbcs = new ArrayList<>();
@@ -128,7 +128,7 @@ public class DirectEditingTest extends FileTestBase {
                 }
             }
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + fileName, ex);
+            fail("Exception during decompilation: " + filePath, ex);
         }
     }
 
