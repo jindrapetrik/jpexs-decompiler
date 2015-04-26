@@ -214,7 +214,7 @@
         <deb 
             package="${app.package}"
             todir="${RELEASESDIR}"
-            debFilenameProperty="deb.filename"
+            debFilenameProperty="deb.file"
             section="editors"
             depends="${app.package.depends}">
         <version upstream="${VERSION}" />
@@ -226,7 +226,6 @@
         <tarfileset file="${DISTRIBUTIONDIR}/${app.script}" fullpath="usr/bin/${app.package}" filemode="755" />
         <tarfileset file="${app.deb.desktop.temp}" fullpath="usr/share/applications/${app.deb.desktop.file}.desktop"/>
         </deb>
-        <property name="deb.file" value="${RELEASESDIR}/${deb.filename}"/>
         <delete file="${app.deb.desktop.temp}" />
     </target>   
     
