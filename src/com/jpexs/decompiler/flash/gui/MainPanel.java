@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.ScriptImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
@@ -1090,7 +1091,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl));
             ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
                     new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl));
-            ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
+            ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, texts,
                     new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl));
             ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
                     new MovieExportSettings(export.getValue(MovieExportMode.class)), evl));
@@ -1120,7 +1121,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             boolean parallel = Configuration.parallelSpeedUp.get();
-            String scriptsFolder = Path.combine(selFile, "scripts");
+            String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
             Path.createDirectorySafe(new File(scriptsFolder));
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -1152,7 +1153,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl);
         new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", swf.tags,
                 new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl);
-        new TextExporter().exportTexts(handler, selFile + File.separator + "texts", swf.tags,
+        new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, swf.tags,
                 new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl);
         new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", swf.tags,
                 new MovieExportSettings(export.getValue(MovieExportMode.class)), evl);
@@ -1174,7 +1175,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         boolean parallel = Configuration.parallelSpeedUp.get();
-        String scriptsFolder = Path.combine(selFile, "scripts");
+        String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
         Path.createDirectorySafe(new File(scriptsFolder));
         ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
         String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -1629,7 +1630,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-            File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
 
                 // "configuration items" for the current replace only
@@ -1665,7 +1666,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (textsFile.exists()) {
                 textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
-                textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
                 // try to import plain texts
                 if (textsFile.exists()) {
                     textImporter.importTextsSingleFile(textsFile, swf);
@@ -1675,6 +1676,22 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             swf.clearImageCache();
+            reload(true);
+        }
+    }
+
+    public void importScript(final SWF swf) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
+
+            new ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
+
             reload(true);
         }
     }

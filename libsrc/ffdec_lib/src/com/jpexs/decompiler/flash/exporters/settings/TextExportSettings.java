@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
  */
 public class TextExportSettings {
 
+    public static final String EXPORT_FOLDER_NAME = "texts";
+
     public TextExportMode mode;
 
     public boolean singleFile;

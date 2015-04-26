@@ -43,8 +43,6 @@ import java.util.List;
  */
 public class TextExporter {
 
-    public static final String TEXT_EXPORT_FOLDER = "texts";
-
     public static final String TEXT_EXPORT_FILENAME_FORMATTED = "textsformatted.txt";
 
     public static final String TEXT_EXPORT_FILENAME_PLAIN = "textsplain.txt";
