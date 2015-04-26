@@ -674,6 +674,75 @@ public class AVM2Code implements Cloneable {
         return null;
     }
 
+    public void calculateDebugFileLine(ABC abc) {
+        calculateDebugFileLine(null, 0, 0, abc, new HashSet<Integer>());
+    }
+
+    private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen) {
+        while (pos < code.size()) {
+            AVM2Instruction ins = code.get(pos);
+            if (seen.contains(pos)) {
+                return true;
+            }
+
+            seen.add(pos);
+
+            if (ins.definition instanceof DebugFileIns) {
+                debugFile = abc.constants.getString(ins.operands[0]);
+            }
+
+            if (ins.definition instanceof DebugLineIns) {
+                debugLine = ins.operands[0];
+            }
+
+            ins.setFileLine(debugFile, debugLine);
+
+            if (ins.definition instanceof NewFunctionIns) {
+                MethodBody innerBody = abc.findBody(ins.operands[0]);
+                innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<Integer>());
+            }
+
+            if (ins.definition instanceof ReturnValueIns) {
+                return true;
+            }
+            if (ins.definition instanceof ReturnVoidIns) {
+                return true;
+            }
+            if (ins.definition instanceof JumpIns) {
+                try {
+                    pos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    continue;
+                } catch (ConvertException ex) {
+                    return false;
+                }
+            } else if (ins.definition instanceof IfTypeIns) {
+                try {
+                    int newpos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen);
+                } catch (ConvertException ex) {
+                    return false;
+                }
+            }
+            if (ins.definition instanceof LookupSwitchIns) {
+                for (int i = 0; i < ins.operands.length; i++) {
+                    if (i == 1) {
+                        continue;
+                    }
+                    try {
+                        int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
+                        if (!calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen)) {
+                            return false;
+                        }
+                    } catch (ConvertException ex) {
+                        return false;
+                    }
+                }
+            }
+            pos++;
+        }
+        return true;
+    }
+
     public AVM2Code(ABCInputStream ais) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
         Map<Long, Long> endOffsets = new HashMap<>();

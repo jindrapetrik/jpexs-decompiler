@@ -1287,4 +1287,15 @@ public abstract class Action implements GraphSourceItem {
     public boolean isDeobfuscatePop() {
         return false;
     }
+
+    @Override
+    public int getLine() {
+        return 0;
+    }
+
+    @Override
+    public String getFile() {
+        return null;
+    }
+
 }

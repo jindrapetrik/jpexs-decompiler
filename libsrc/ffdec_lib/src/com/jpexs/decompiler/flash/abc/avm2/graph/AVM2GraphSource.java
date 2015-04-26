@@ -79,6 +79,7 @@ public class AVM2GraphSource extends GraphSource {
         this.scriptIndex = scriptIndex;
         this.localRegAssigmentIps = localRegAssigmentIp;
         this.refs = refs;
+        code.calculateDebugFileLine(abc);
     }
 
     @Override

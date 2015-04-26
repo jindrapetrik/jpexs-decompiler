@@ -90,9 +90,9 @@ public class ForItem extends LoopItem implements Block {
             firstCommands.get(i).toString(writer, localData);
             p++;
         }
-        writer.append(";");
+        writer.append("; ");
         expression.toString(writer, localData);
-        writer.append(";");
+        writer.append("; ");
         p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {
             if (finalCommands.get(i).isEmpty()) {

@@ -138,7 +138,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     public void frame28_forWithContinueTest() {
         compareSrc(28, "trace(\"forWithContinueTest\");\r\n"
                 + "var i = 0;\r\n"
-                + "for(;i < 10;i++)\r\n"
+                + "for(; i < 10; i++)\r\n"
                 + "{\r\n"
                 + "trace(\"hello:\" + i);\r\n"
                 + "if(i == 5)\r\n"
@@ -213,7 +213,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     public void frame32_switchForTest() {
         compareSrc(32, "trace(\"switchForTest\");\r\n"
                 + "var i = 0;\r\n"
-                + "for(;i < 10;i++)\r\n"
+                + "for(; i < 10; i++)\r\n"
                 + "{\r\n"
                 + "switch(i)\r\n"
                 + "{\r\n"

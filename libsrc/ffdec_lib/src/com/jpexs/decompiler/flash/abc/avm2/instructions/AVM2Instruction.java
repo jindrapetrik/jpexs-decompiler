@@ -56,6 +56,15 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public int changeJumpTo = -1;
 
+    private int line;
+
+    private String file;
+
+    public void setFileLine(String file, int line) {
+        this.file = file;
+        this.line = line;
+    }
+
     public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands) {
         this.definition = definition;
         this.operands = operands != null && operands.length > 0 ? operands : null;
@@ -382,4 +391,15 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         }
         return ret;
     }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
+    public String getFile() {
+        return file;
+    }
+
 }

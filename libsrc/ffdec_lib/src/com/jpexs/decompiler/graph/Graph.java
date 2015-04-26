@@ -461,6 +461,64 @@ public class Graph {
     }
 
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+
+        //For detection based on debug line information
+        Set<Integer> removeFromList = new HashSet<>();
+        for (int i = 0; i < list.size(); i++) {
+
+            if (list.get(i) instanceof ForItem) {
+                ForItem fori = (ForItem) list.get(i);
+                int exprLine = fori.getLine();
+                if (exprLine > 0) {
+                    List<GraphTargetItem> forFirstCommands = new ArrayList<>();
+                    for (int j = i - 1; j >= 0; j--) {
+                        if (list.get(j).getLine() == exprLine) {
+                            forFirstCommands.add(0, list.get(j));
+                            removeFromList.add(j);
+                        } else {
+                            break;
+                        }
+                    }
+                    fori.firstCommands.addAll(0, forFirstCommands);
+                }
+            }
+
+            if (list.get(i) instanceof WhileItem) {
+                WhileItem whi = (WhileItem) list.get(i);
+                int whileExprLine = whi.getLine();
+                if (whileExprLine > 0) {
+                    List<GraphTargetItem> forFirstCommands = new ArrayList<>();
+                    List<GraphTargetItem> forFinalCommands = new ArrayList<>();
+
+                    for (int j = i - 1; j >= 0; j--) {
+                        if (list.get(j).getLine() == whileExprLine) {
+                            forFirstCommands.add(0, list.get(j));
+                            removeFromList.add(j);
+                        } else {
+                            break;
+                        }
+                    }
+                    for (int j = whi.commands.size() - 1; j >= 0; j--) {
+                        if (whi.commands.get(j).getLine() == whileExprLine) {
+                            forFinalCommands.add(0, whi.commands.remove(j));
+                        } else {
+                            break;
+                        }
+                    }
+                    if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
+                        GraphTargetItem lastExpr = whi.expression.remove(whi.expression.size() - 1);
+                        forFirstCommands.addAll(whi.expression);
+                        list.set(i, new ForItem(whi.src, whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
+                    }
+                }
+            }
+        }
+
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (removeFromList.contains(i)) {
+                list.remove(i);
+            }
+        }
     }
 
     private void processIfs(List<GraphTargetItem> list) {
@@ -1752,9 +1810,9 @@ public class Graph {
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
                         if (!finalComm.isEmpty()) {
-                            ret.add(index, li = new ForItem(null, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
-                            ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));
+                            ret.add(index, li = new WhileItem(expr.src, currentLoop, exprList, commands));
                         }
 
                         loopTypeFound = true;

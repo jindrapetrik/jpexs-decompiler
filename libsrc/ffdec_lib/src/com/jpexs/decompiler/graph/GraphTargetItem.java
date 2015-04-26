@@ -83,6 +83,20 @@ public abstract class GraphTargetItem implements Serializable {
 
     protected HighlightData srcData = new HighlightData();
 
+    public int getLine() {
+        if (src != null) {
+            return src.getLine();
+        }
+        return 0;
+    }
+
+    public String getFile() {
+        if (src != null) {
+            return src.getFile();
+        }
+        return null;
+    }
+
     public GraphPart getFirstPart() {
         if (value == null) {
             return firstPart;

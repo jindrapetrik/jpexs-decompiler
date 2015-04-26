@@ -247,12 +247,10 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n"
-                + "c = 0;\r\n"
                 + "loop1:\r\n"
-                + "for(;c < 8;c = c + 1)\r\n"
+                + "for(c = 0; c < 8; c = c + 1)\r\n"
                 + "{\r\n"
-                + "d = 0;\r\n"
-                + "while(d < 25)\r\n"
+                + "for(d = 0; d < 25; d++)\r\n"
                 + "{\r\n"
                 + "e = 0;\r\n"
                 + "if(e < 50)\r\n"
@@ -270,7 +268,6 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "break loop1;\r\n"
                 + "}\r\n"
                 + "}\r\n"
-                + "d++;\r\n"
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
                 + "}\r\n", false);
@@ -315,17 +312,17 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @Test
     public void testForBreak() {
         /*decompileMethod("testForBreak", "var a:* = 0;\r\n"
-                + "while(a < 10)\r\n"
-                + "{\r\n"
-                + "if(a == 5)\r\n"
-                + "{\r\n"
-                + "break;\r\n"
-                + "}\r\n"
-                + "trace(\"hello:\" + a);\r\n"
-                + "a++;\r\n"
-                + "}\r\n", false);*/
+         + "while(a < 10)\r\n"
+         + "{\r\n"
+         + "if(a == 5)\r\n"
+         + "{\r\n"
+         + "break;\r\n"
+         + "}\r\n"
+         + "trace(\"hello:\" + a);\r\n"
+         + "a++;\r\n"
+         + "}\r\n", false);*/
         // Issue 842, recover for loops
-        decompileMethod("testForBreak", "for (var a:* = 0; a < 10; a++)\r\n"
+        decompileMethod("testForBreak", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
@@ -359,14 +356,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testFor() {
-        /*decompileMethod("testFor", "var a:* = 0;\r\n"
-                + "while(a < 10)\r\n"
-                + "{\r\n"
-                + "trace(\"a=\" + a);\r\n"
-                + "a++;\r\n"
-                + "}\r\n", false);*/
-        // Issue 842, recover for loops
-        decompileMethod("testFor", "for (var a:* = 0; a < 10; a++)\r\n"
+        decompileMethod("testFor", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n", false);
@@ -374,8 +364,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForContinue() {
-        decompileMethod("testForContinue", "var a:* = 0;\r\n"
-                + "for(;a < 10;a = a + 1)\r\n"
+        decompileMethod("testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
                 + "{\r\n"
@@ -853,16 +842,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @Test
     public void testWhileTry2() {
         decompileMethod("testWhileTry2", "var j:* = undefined;\r\n"
-                + "var i:* = 0;\r\n"
-                + "for(;i < 100;i++)\r\n"
+                + "for(var i:* = 0; i < 100; i++)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "j = 0;\r\n"
-                + "while(j < 20)\r\n"
+                + "for(j = 0; j < 20; j++)\r\n"
                 + "{\r\n"
                 + "trace(\"a\");\r\n"
-                + "j++;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "catch(e:EOFError)\r\n"
