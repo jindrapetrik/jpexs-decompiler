@@ -146,7 +146,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                     try {
                         PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
                         ReReadableInputStream is = new ReReadableInputStream(pmi);
-                        SWF swf = new SWF(is, null, null, null, false, true, true);
+                        SWF swf = new SWF(is, null, null, null, false, true, false);
                         long limit = pmi.getPos();
                         is.seek(0);
                         is = new ReReadableInputStream(new LimitedInputStream(is, limit));

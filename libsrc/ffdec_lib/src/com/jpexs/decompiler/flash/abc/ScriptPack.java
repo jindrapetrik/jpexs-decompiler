@@ -196,7 +196,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             String packageName = getPathPackage();
             File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
             Path.createDirectorySafe(outDir);
-            String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
+            String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
             file = new File(fileName);
         }
 

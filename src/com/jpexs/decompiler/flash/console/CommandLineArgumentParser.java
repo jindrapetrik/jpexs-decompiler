@@ -1075,7 +1075,7 @@ public class CommandLineArgumentParser {
                         as3classes = parseSelectClassOld(args);
                     }
 
-                    String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
+                    String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                     try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
                         if (!as3classes.isEmpty()) {

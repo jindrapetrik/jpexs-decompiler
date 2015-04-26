@@ -775,17 +775,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        for (SWFList swfList : swfs) {
+        List<SWFList> swfsLists = new ArrayList<>(swfs);
+        swfs.clear();
+        oldItem = null;
+        clear();
+        updateUi();
+
+        for (SWFList swfList : swfsLists) {
             List<SWF> swfs2 = new ArrayList<>(swfList);
             for (SWF swf : swfs2) {
                 swf.clearTagSwfs();
             }
         }
-
-        swfs.clear();
-        oldItem = null;
-        clear();
-        updateUi();
 
         return true;
     }
@@ -805,15 +806,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
+        swfs.remove(swfList);
+        oldItem = null;
+        clear();
+        updateUi();
+
         List<SWF> swfs2 = new ArrayList<>(swfList);
         for (SWF swf : swfs2) {
             swf.clearTagSwfs();
         }
 
-        swfs.remove(swfList);
-        oldItem = null;
-        clear();
-        updateUi();
         return true;
     }
 
@@ -1130,7 +1132,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             String scriptsFolder = Path.combine(selFile, "scripts");
             Path.createDirectorySafe(new File(scriptsFolder));
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
-            String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
+            String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
             if (swf.isAS3()) {
                 try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;
@@ -1184,7 +1186,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         String scriptsFolder = Path.combine(selFile, "scripts");
         Path.createDirectorySafe(new File(scriptsFolder));
         ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
-        String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + ".as");
+        String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
         try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
             scriptExportSettings.singleFileWriter = writer;
             swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
@@ -1766,12 +1768,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         long timeAfter = System.currentTimeMillis();
                         final long timeMs = timeAfter - timeBefore;
 
-                        View.execInEventDispatchLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
-                            }
+                        View.execInEventDispatchLater(() -> {
+                            setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
                         });
                     }
                 }.execute();
@@ -1874,13 +1872,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     Main.stopWork();
                     View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
 
-                    View.execInEventDispatch(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            getABCPanel().reload();
-                            updateClassesList();
-                        }
+                    View.execInEventDispatch(() -> {
+                        getABCPanel().reload();
+                        updateClassesList();
                     });
                 }
             }.execute();
@@ -1904,26 +1898,22 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                     @Override
                     protected void done() {
-                        View.execInEventDispatch(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                try {
-                                    int cnt = get();
-                                    Main.stopWork();
-                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
-                                    swf.assignClassesToSymbols();
-                                    swf.clearScriptCache();
-                                    if (abcPanel != null) {
-                                        abcPanel.reload();
-                                    }
-                                    updateClassesList();
-                                    reload(true);
-                                } catch (Exception ex) {
-                                    logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
-                                    Main.stopWork();
-                                    View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                        View.execInEventDispatch(() -> {
+                            try {
+                                int cnt = get();
+                                Main.stopWork();
+                                View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
+                                swf.assignClassesToSymbols();
+                                swf.clearScriptCache();
+                                if (abcPanel != null) {
+                                    abcPanel.reload();
                                 }
+                                updateClassesList();
+                                reload(true);
+                            } catch (Exception ex) {
+                                logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                Main.stopWork();
+                                View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                             }
                         });
                     }
@@ -2596,18 +2586,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     protected void done() {
                         Main.stopWork();
 
-                        View.execInEventDispatch(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                setSourceWorker = null;
-                                try {
-                                    get();
-                                } catch (CancellationException ex) {
-                                    getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
-                                } catch (Exception ex) {
-                                    getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
-                                }
+                        View.execInEventDispatch(() -> {
+                            setSourceWorker = null;
+                            try {
+                                get();
+                            } catch (CancellationException ex) {
+                                getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
+                            } catch (Exception ex) {
+                                getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                             }
                         });
                     }

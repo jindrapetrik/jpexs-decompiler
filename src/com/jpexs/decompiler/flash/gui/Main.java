@@ -77,6 +77,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.concurrent.CancellationException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -213,27 +214,23 @@ public class Main {
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                if (mainFrame != null) {
-                    mainFrame.getPanel().setWorkStatus(name, worker);
-                    if (percent == -1) {
-                        mainFrame.getPanel().hidePercent();
-                    } else {
-                        mainFrame.getPanel().setPercent(percent);
-                    }
-                }
-                if (loadingDialog != null) {
-                    loadingDialog.setDetail(name);
-                    loadingDialog.setPercent(percent);
-                }
-                if (CommandLineArgumentParser.isCommandLineMode()) {
-                    System.out.println(name);
+        View.execInEventDispatchLater(() -> {
+            if (mainFrame != null) {
+                mainFrame.getPanel().setWorkStatus(name, worker);
+                if (percent == -1) {
+                    mainFrame.getPanel().hidePercent();
+                } else {
+                    mainFrame.getPanel().setPercent(percent);
                 }
             }
+            if (loadingDialog != null) {
+                loadingDialog.setDetail(name);
+                loadingDialog.setPercent(percent);
+            }
+            if (CommandLineArgumentParser.isCommandLineMode()) {
+                System.out.println(name);
+            }
         });
-
     }
 
     public static void stopWork() {
@@ -278,22 +275,49 @@ public class Main {
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
-                SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
+                CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
                     @Override
-                    public void progress(int p) {
-                        startWork(AppStrings.translate("work.reading.swf"), p);
+                    public SWF doInBackground() throws Exception {
+                        SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
+                            @Override
+                            public void progress(int p) {
+                                startWork(AppStrings.translate("work.reading.swf"), p);
+                            }
+                        }, Configuration.parallelSpeedUp.get());
+                        return swf;
                     }
-                }, Configuration.parallelSpeedUp.get());
-                result.add(swf);
+                };
+                loadingDialog.setWroker(worker);
+                worker.execute();
+
+                try {
+                    result.add(worker.get());
+                } catch (CancellationException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
+                }
             }
         } else {
-            SWF swf = new SWF(inputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
+            InputStream fInputStream = inputStream;
+            CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
                 @Override
-                public void progress(int p) {
-                    startWork(AppStrings.translate("work.reading.swf"), p);
+                public SWF doInBackground() throws Exception {
+                    SWF swf = new SWF(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
+                        @Override
+                        public void progress(int p) {
+                            startWork(AppStrings.translate("work.reading.swf"), p);
+                        }
+                    }, Configuration.parallelSpeedUp.get());
+                    return swf;
                 }
-            }, Configuration.parallelSpeedUp.get());
-            result.add(swf);
+            };
+            loadingDialog.setWroker(worker);
+            worker.execute();
+
+            try {
+                result.add(worker.get());
+            } catch (CancellationException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
+            }
         }
 
         if (fis != null) {
@@ -472,16 +496,18 @@ public class Main {
 
             final SWF fswf = firstSWF;
             View.execInEventDispatch(() -> {
-                if (executeAfterOpen != null) {
-                    executeAfterOpen.run();
-                }
-
                 if (mainFrame != null) {
                     mainFrame.setVisible(true);
                 }
+
                 Main.stopWork();
+
                 if (mainFrame != null && Configuration.gotoMainClassOnStartup.get()) {
                     mainFrame.getPanel().gotoDocumentClass(fswf);
+                }
+
+                if (executeAfterOpen != null) {
+                    executeAfterOpen.run();
                 }
             });
 
