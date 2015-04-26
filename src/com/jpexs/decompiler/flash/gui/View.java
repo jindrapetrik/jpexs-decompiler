@@ -447,31 +447,27 @@ public class View {
 
     public static void showMessageDialog(final Component parentComponent, final String message, final String title, final int messageType, ConfigurationItem<Boolean> showAgainConfig) {
 
-        Object msg = message;
-        JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
-
-        if (showAgainConfig != null) {
-            JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
-            final JPanel warPanel = new JPanel(new BorderLayout());
-            warPanel.add(warLabel, BorderLayout.CENTER);
-            donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
-            warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
-            msg = warPanel;
-            if (donotShowAgainCheckBox.isSelected()) {
-                return;
+        execInEventDispatch(() -> {
+            Object msg = message;
+            JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
+            if (showAgainConfig != null) {
+                JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
+                final JPanel warPanel = new JPanel(new BorderLayout());
+                warPanel.add(warLabel, BorderLayout.CENTER);
+                donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
+                warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
+                msg = warPanel;
+                if (donotShowAgainCheckBox.isSelected()) {
+                    return;
+                }
             }
-        }
-        final Object fmsg = msg;
+            final Object fmsg = msg;
 
-        execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(parentComponent, fmsg, title, messageType);
+            JOptionPane.showMessageDialog(parentComponent, fmsg, title, messageType);
+            if (showAgainConfig != null) {
+                showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
             }
         });
-        if (showAgainConfig != null) {
-            showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
-        }
     }
 
     public static void showMessageDialog(final Component parentComponent, final Object message) {
