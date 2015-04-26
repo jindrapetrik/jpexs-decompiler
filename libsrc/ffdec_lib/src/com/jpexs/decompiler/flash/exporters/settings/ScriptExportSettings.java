@@ -35,4 +35,18 @@ public class ScriptExportSettings {
         this.mode = mode;
         this.singleFile = singleFile;
     }
+
+    public String getFileExtension() {
+        switch (mode) {
+            case AS:
+                return ".as";
+            case PCODE:
+            case PCODE_HEX:
+                return ".pcode";
+            case HEX:
+                return ".hex";
+            default:
+                throw new Error("Unsupported script export mode: " + mode);
+        }
+    }
 }

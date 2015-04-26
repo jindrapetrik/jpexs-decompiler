@@ -290,7 +290,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     @Internal
-    private static Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
+    private Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
 
     @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
@@ -337,6 +337,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         as2Cache.clear();
         as3Cache.clear();
+        frameCache.clear();
 
         timeline = null;
         clearDumpInfo(dumpInfo);
@@ -2176,14 +2177,14 @@ public final class SWF implements SWFContainerItem, Timelined {
                 mat.translateX, mat.translateY);
     }
 
-    public static SerializableImage getFromCache(String key) {
+    public SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {
-            return SWF.frameCache.get(key);
+            return frameCache.get(key);
         }
         return null;
     }
 
-    public static void putToCache(String key, SerializableImage img) {
+    public void putToCache(String key, SerializableImage img) {
         if (Configuration.useFrameCache.get()) {
             frameCache.put(key, img);
         }
@@ -2405,10 +2406,11 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
-        String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode() + "_" + zoom;
+        SWF swf = timeline.swf;
+        String key = "frame_" + frame + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
         SerializableImage image;
         if (useCache) {
-            image = getFromCache(key);
+            image = swf.getFromCache(key);
             if (image != null) {
                 return image;
             }
@@ -2429,6 +2431,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             g.setColor(backGroundColor);
             g.fill(new Rectangle(image.getWidth(), image.getHeight()));
         }
+
         Matrix m = transformation.clone();
         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
@@ -2437,8 +2440,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         renderContext.mouseButton = mouseButton;
         frameToImage(timeline, frame, time, renderContext, image, m, colorTransform);
         if (useCache) {
-            putToCache(key, image);
+            swf.putToCache(key, image);
         }
+
         return image;
     }
 

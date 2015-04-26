@@ -404,7 +404,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 rawEditMenuItem.setVisible(firstItem instanceof Tag);
             }
         }
-        
+
         if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
             moveTagMenu.removeAll();
             copyTagMenu.removeAll();
@@ -424,7 +424,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                     targetSwf.tags.add(tag);
                                     tag.setModified(true);
                                 }
-                                
+
                                 sourceSwf.assignExportNamesToSymbols();
                                 targetSwf.assignExportNamesToSymbols();
                                 sourceSwf.assignClassesToSymbols();
@@ -451,7 +451,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                                         targetSwf.tags.add(copyTag);
                                         copyTag.setModified(true);
                                     }
-                                    
+
                                     targetSwf.assignExportNamesToSymbols();
                                     targetSwf.assignClassesToSymbols();
                                     targetSwf.clearImageCache();

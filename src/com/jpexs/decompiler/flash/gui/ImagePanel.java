@@ -676,7 +676,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         drawFrame(counter);
         synchronized (ImagePanel.class) {
             if (timelined != null && counter == this.counter) {
-                int newframe = (frame + 1) % timelined.getTimeline().getFrameCount();
+                int frameCount = timelined.getTimeline().getFrameCount();
+                int newframe = frameCount > 0 ? (frame + 1) % frameCount : frame;
                 if (stillFrame) {
                     newframe = frame;
                 }
@@ -697,9 +698,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
         String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom;
-        SerializableImage img = SWF.getFromCache(key);
+        SerializableImage img = swf.getFromCache(key);
         if (img == null) {
             Timeline timeline = drawable.getTimeline();
+            boolean shouldCache = timeline.isSingleFrame(frame);
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
                 RECT rect = bounded.getRect();
@@ -760,8 +762,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 img = image;
             }
 
-            if (timeline.isSingleFrame(frame)) {
-                SWF.putToCache(key, img);
+            if (shouldCache) {
+                swf.putToCache(key, img);
             }
         }
         return img;
@@ -796,38 +798,46 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined == null) {
             return;
         }
-        Timeline timeline = timelined.getTimeline();
-        if (frame >= timeline.getFrameCount()) {
-            return;
-        }
 
-        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-        getOutlines(timelined, frame, time, zoomDouble, stateUnderCursor, mouseButton, counter);
-        updatePos(timelined, lastMouseEvent, counter);
+        SerializableImage img;
+        try {
+            Timeline timeline = timelined.getTimeline();
+            if (frame >= timeline.getFrameCount()) {
+                return;
+            }
 
-        Matrix mat = new Matrix();
-        mat.translateX = swf.displayRect.Xmin;
-        mat.translateY = swf.displayRect.Ymin;
-        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoomDouble);
+            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+            getOutlines(timelined, frame, time, zoomDouble, stateUnderCursor, mouseButton, counter);
+            updatePos(timelined, lastMouseEvent, counter);
 
-        List<Integer> sounds = new ArrayList<>();
-        List<String> soundClasses = new ArrayList<>();
-        timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
-        for (int cid : swf.getCharacters().keySet()) {
-            CharacterTag c = swf.getCharacter(cid);
-            for (String cls : soundClasses) {
-                if (cls.equals(c.getClassName())) {
-                    sounds.add(cid);
+            Matrix mat = new Matrix();
+            mat.translateX = swf.displayRect.Xmin;
+            mat.translateY = swf.displayRect.Ymin;
+
+            img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoomDouble);
+
+            List<Integer> sounds = new ArrayList<>();
+            List<String> soundClasses = new ArrayList<>();
+            timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
+            for (int cid : swf.getCharacters().keySet()) {
+                CharacterTag c = swf.getCharacter(cid);
+                for (String cls : soundClasses) {
+                    if (cls.equals(c.getClassName())) {
+                        sounds.add(cid);
+                    }
                 }
             }
-        }
 
-        for (int sndId : sounds) {
-            CharacterTag c = swf.getCharacter(sndId);
-            if (c instanceof SoundTag) {
-                SoundTag st = (SoundTag) c;
-                playSound(st, counter);
+            for (int sndId : sounds) {
+                CharacterTag c = swf.getCharacter(sndId);
+                if (c instanceof SoundTag) {
+                    SoundTag st = (SoundTag) c;
+                    playSound(st, counter);
+                }
             }
+        } catch (Throwable ex) {
+            // swf was closed during the rendering probably
+            return;
         }
 
         synchronized (ImagePanel.class) {

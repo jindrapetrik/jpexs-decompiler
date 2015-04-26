@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.ImageObserver;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,11 +34,17 @@ import javax.swing.SwingConstants;
  *
  * @author JPEXS
  */
-public class LoadingDialog extends AppDialog implements ImageObserver {
+public class LoadingDialog extends AppDialog {
 
     private final JLabel detailLabel;
 
-    JProgressBar progressBar = new JProgressBar(0, 100);
+    private CancellableWorker<?> worker;
+
+    private final JProgressBar progressBar = new JProgressBar(0, 100);
+
+    public void setWroker(CancellableWorker<?> worker) {
+        this.worker = worker;
+    }
 
     public void setDetail(String d) {
         detailLabel.setText(d);
@@ -46,17 +52,14 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
     }
 
     public void setPercent(final int percent) {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                if (percent == -1) {
-                    progressBar.setIndeterminate(true);
-                    progressBar.setStringPainted(false);
-                } else {
-                    progressBar.setIndeterminate(false);
-                    progressBar.setValue(percent);
-                    progressBar.setStringPainted(true);
-                }
+        View.execInEventDispatch(() -> {
+            if (percent == -1) {
+                progressBar.setIndeterminate(true);
+                progressBar.setStringPainted(false);
+            } else {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(percent);
+                progressBar.setStringPainted(true);
             }
         });
     }
@@ -95,6 +98,10 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
             public void windowClosing(WindowEvent e) {
                 if (Main.shouldCloseWhenClosingLoadingDialog) {
                     System.exit(0);
+                } else {
+                    if (worker != null) {
+                        worker.cancel(true);
+                    }
                 }
             }
         });

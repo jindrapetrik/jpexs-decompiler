@@ -297,7 +297,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -745,7 +744,6 @@ public class AVM2Code implements Cloneable {
 
     public AVM2Code(ABCInputStream ais) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
-        Map<Long, Long> endOffsets = new HashMap<>();
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
         long startPos = ais.getPosition();
@@ -810,8 +808,6 @@ public class AVM2Code implements Cloneable {
                         }
                         codeMap.put(startOffset, new AVM2Instruction(startOffset, instr, actualOperands));
                         ais.endDumpLevel(instr.instructionCode);
-                        long endOffset = ais.getPosition();
-                        endOffsets.put(startOffset, endOffset);
                         if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
                             afterExit = true;
                         }

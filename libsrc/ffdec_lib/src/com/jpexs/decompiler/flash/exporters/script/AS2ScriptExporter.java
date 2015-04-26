@@ -117,7 +117,7 @@ public class AS2ScriptExporter {
                     Path.createDirectorySafe(new File(outdir));
                 }
 
-                String f = outdir + name + ".as";
+                String f = outdir + name + exportSettings.getFileExtension();
                 if (evl != null) {
                     evl.handleExportingEvent("script", currentIndex, count, f);
                 }
@@ -153,7 +153,7 @@ public class AS2ScriptExporter {
                 return file;
             } catch (InterruptedException ex) {
             } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-                Logger.getLogger(AS2ScriptExporter.class.getName()).log(Level.SEVERE, "Decompilation error in file: " + name + ".as", ex);
+                Logger.getLogger(AS2ScriptExporter.class.getName()).log(Level.SEVERE, "Decompilation error in script: " + name, ex);
                 if (handler != null) {
                     int action = handler.getNewInstance().handle(ex);
                     switch (action) {
