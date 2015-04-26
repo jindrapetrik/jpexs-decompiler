@@ -186,9 +186,6 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
                 try {
                     ShockwaveFlash flash1 = flash;
-                    if (flash1 == null) {
-                        return;
-                    }
 
                     boolean changed = false;
 
@@ -208,6 +205,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
                     }
                 } catch (Exception ex) {
                     // ignore
+                    cancel();
                 }
             }
         }, 100, 100);
