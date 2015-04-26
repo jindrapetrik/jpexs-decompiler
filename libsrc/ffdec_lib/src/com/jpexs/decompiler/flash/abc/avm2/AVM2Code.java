@@ -684,6 +684,7 @@ public class AVM2Code implements Cloneable {
 
         while (!addresses.isEmpty()) {
             long address = addresses.remove(0);
+            boolean afterExit = false;
             if (codeMap.containsKey(address)) {
                 continue;
             }
@@ -734,7 +735,7 @@ public class AVM2Code implements Cloneable {
                             }
                         }
 
-                        if (instr instanceof IfTypeIns) {
+                        if (!afterExit && (instr instanceof IfTypeIns)) {
                             long target = ais.getPosition() + actualOperands[0];
                             addresses.add(target);
                         }
@@ -742,8 +743,8 @@ public class AVM2Code implements Cloneable {
                         ais.endDumpLevel(instr.instructionCode);
                         long endOffset = ais.getPosition();
                         endOffsets.put(startOffset, endOffset);
-                        if (instr.isExitInstruction()) { //do not continue if there is return/throw instruction
-                            break;
+                        if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
+                            afterExit = true;
                         }
                     } else {
                         ais.endDumpLevel();
@@ -756,19 +757,6 @@ public class AVM2Code implements Cloneable {
                 ais.endDumpLevelUntil(diParent);
             }
         }
-
-        //If there are gaps between instructions, fill them with Nops, so the jump offsets are correct
-        List<Long> starts = new ArrayList<>(new TreeSet<>(codeMap.keySet()));
-        for (int s = 0; s < starts.size() - 1/*last does not have next endoffset instruction*/; s++) {
-            long curEnd = endOffsets.get(starts.get(s));
-            if (!codeMap.containsKey(curEnd)) {
-                long nextStart = starts.get(s + 1);
-                for (long off = curEnd; off < nextStart; off++) {
-                    codeMap.put(off, new AVM2Instruction(off, new NopIns(), new int[]{}));
-                }
-            }
-        }
-
         code.addAll(codeMap.values());
     }
 
