@@ -56,13 +56,13 @@ public class HeaderInfoPanel extends JPanel {
     private final JLabel displayRectTwipsLabel = new JLabel();
 
     private final JLabel displayRectPixelsLabel = new JLabel();
-    
+
     private final JComboBox<String> versionComboBox = new JComboBox<>();
-    
+
     private final JCheckBox gfxCheckBox = new JCheckBox();
-    
+
     private final JSpinner frameRateEditor = new JSpinner();
-    
+
     private final JPanel propertiesPanel = new JPanel();
 
     private final JPanel buttonsPanel = new JPanel();
@@ -72,40 +72,41 @@ public class HeaderInfoPanel extends JPanel {
     private final JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
     private final JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
-    
+
     private final JPanel displayRectEditorPanel = new JPanel();
-    
+
     private final JSpinner xMinEditor = new JSpinner();
-    
+
     private final JSpinner xMaxEditor = new JSpinner();
-    
+
     private final JSpinner yMinEditor = new JSpinner();
-    
+
     private final JSpinner yMaxEditor = new JSpinner();
 
     private SWF swf;
 
     public HeaderInfoPanel() {
         setLayout(new BorderLayout());
-        
+
         TableLayout tl;
         propertiesPanel.setLayout(tl = new TableLayout(new double[][]{
             {TableLayout.PREFERRED, TableLayout.FILL},
-            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, 
-                TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, 
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
+                TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
                 TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
         }));
 
         displayRectEditorPanel.setLayout(new FlowLayout(SwingConstants.WEST));
+        displayRectEditorPanel.setMinimumSize(new Dimension(10, displayRectEditorPanel.getMinimumSize().height));
         xMinEditor.setPreferredSize(new Dimension(80, xMinEditor.getPreferredSize().height));
         xMaxEditor.setPreferredSize(new Dimension(80, xMaxEditor.getPreferredSize().height));
         yMinEditor.setPreferredSize(new Dimension(80, yMinEditor.getPreferredSize().height));
         yMaxEditor.setPreferredSize(new Dimension(80, yMaxEditor.getPreferredSize().height));
         displayRectEditorPanel.add(xMinEditor);
-        displayRectEditorPanel.add(xMaxEditor);
         displayRectEditorPanel.add(yMinEditor);
+        displayRectEditorPanel.add(xMaxEditor);
         displayRectEditorPanel.add(yMaxEditor);
-        
+
         propertiesPanel.add(new JLabel(AppStrings.translate("header.signature")), "0,0");
         propertiesPanel.add(signatureLabel, "1,0");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.compression")), "0,1");
@@ -134,23 +135,23 @@ public class HeaderInfoPanel extends JPanel {
         }
 
         add(propertiesPanel, BorderLayout.CENTER);
-        
+
         editButton.setVisible(false);
         editButton.addActionListener(this::editButtonActionPerformed);
-        
+
         saveButton.setVisible(false);
         saveButton.addActionListener(this::saveButtonActionPerformed);
 
         cancelButton.setVisible(false);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        
+
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
         buttonsPanel.add(editButton);
         buttonsPanel.add(saveButton);
         buttonsPanel.add(cancelButton);
         add(buttonsPanel, BorderLayout.SOUTH);
-        
+
         TableLayoutHelper.addTableSpaces(tl, 10);
         setEditMode(false);
     }
@@ -158,7 +159,7 @@ public class HeaderInfoPanel extends JPanel {
     private void editButtonActionPerformed(ActionEvent evt) {
         setEditMode(true);
     }
-    
+
     private void saveButtonActionPerformed(ActionEvent evt) {
         swf.version = Integer.parseInt((String) versionComboBox.getSelectedItem());
         swf.gfx = gfxCheckBox.isSelected();
@@ -167,16 +168,16 @@ public class HeaderInfoPanel extends JPanel {
         swf.displayRect.Xmax = (int) xMaxEditor.getModel().getValue();
         swf.displayRect.Ymin = (int) yMinEditor.getModel().getValue();
         swf.displayRect.Ymax = (int) yMaxEditor.getModel().getValue();
-        
+
         load(swf);
         setEditMode(false);
     }
-    
+
     private void cancelButtonActionPerformed(ActionEvent evt) {
         load(swf);
         setEditMode(false);
     }
-    
+
     public void load(SWF swf) {
         this.swf = swf;
         signatureLabel.setText(swf.getHeaderBytes());
@@ -197,12 +198,12 @@ public class HeaderInfoPanel extends JPanel {
 
         gfxLabel.setText(swf.gfx ? AppStrings.translate("yes") : AppStrings.translate("no"));
         gfxCheckBox.setSelected(swf.gfx);
-        
+
         fileSizeLabel.setText(Long.toString(swf.fileSize));
-        
+
         frameRateLabel.setText(Integer.toString(swf.frameRate));
         frameRateEditor.setModel(new SpinnerNumberModel(swf.frameRate, -0x80000000, 0x7fffffff, 1));
-        
+
         frameCountLabel.setText("" + swf.frameCount);
         displayRectTwipsLabel.setText(AppStrings.translate("header.displayrect.value.twips")
                 .replace("%xmin%", Integer.toString(swf.displayRect.Xmin))
@@ -214,7 +215,7 @@ public class HeaderInfoPanel extends JPanel {
                 .replace("%ymin%", fmtDouble(swf.displayRect.Ymin / SWF.unitDivisor))
                 .replace("%xmax%", fmtDouble(swf.displayRect.Xmax / SWF.unitDivisor))
                 .replace("%ymax%", fmtDouble(swf.displayRect.Ymax / SWF.unitDivisor)));
-        
+
         xMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmin, -0x80000000, 0x7fffffff, 1));
         xMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmax, -0x80000000, 0x7fffffff, 1));
         yMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymin, -0x80000000, 0x7fffffff, 1));
@@ -234,7 +235,7 @@ public class HeaderInfoPanel extends JPanel {
         }
         return r;
     }
-    
+
     private void setEditMode(boolean edit) {
         versionLabel.setVisible(!edit);
         versionComboBox.setVisible(edit);
@@ -242,11 +243,11 @@ public class HeaderInfoPanel extends JPanel {
         gfxCheckBox.setVisible(edit);
         frameRateLabel.setVisible(!edit);
         frameRateEditor.setVisible(edit);
-        
+
         displayRectTwipsLabel.setVisible(!edit);
         displayRectPixelsLabel.setVisible(!edit);
         displayRectEditorPanel.setVisible(edit);
-        
+
         editButton.setVisible(!edit);
         saveButton.setVisible(edit);
         cancelButton.setVisible(edit);
