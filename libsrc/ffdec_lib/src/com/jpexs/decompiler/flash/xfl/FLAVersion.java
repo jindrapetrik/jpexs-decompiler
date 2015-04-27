@@ -46,7 +46,8 @@ public enum FLAVersion {
     private static final Map<Integer, String> versionToPlayerMap = new HashMap<>();
 
     static {
-        versionToPlayerMap.put(10, "FlashPlayer10.0");  //10 & 10.1
+        versionToPlayerMap.put(9, "FlashPlayer9.0"); // 9.0.115.0
+        versionToPlayerMap.put(10, "FlashPlayer10.0"); //10 & 10.1
         versionToPlayerMap.put(11, "FlashPlayer10.2");
         versionToPlayerMap.put(12, "FlashPlayer10.3");
         versionToPlayerMap.put(13, "FlashPlayer11.0");
@@ -64,6 +65,7 @@ public enum FLAVersion {
         versionToPlayerMap.put(25, "FlashPlayer14.0");
         versionToPlayerMap.put(26, "FlashPlayer15.0");
         versionToPlayerMap.put(27, "FlashPlayer16.0");
+        versionToPlayerMap.put(28, "FlashPlayer17.0");
     }
 
     private FLAVersion(String shortName, String applicationName, String xflVersion, int maxSwfVersion) {

@@ -179,6 +179,12 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Default version of SWF file format
      */
     public static final int DEFAULT_VERSION = 10;
+    
+    /**
+     * Maximum SWF file format version
+     * Needs to be fixed when SWF versions reaches this value
+     */
+    public static final int MAX_VERSION = 30;
 
     /**
      * Tags inside of file

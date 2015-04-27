@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -236,17 +237,6 @@ public class FontPanel extends JPanel {
 
         setAllowSave(true);
         setEditable(false);
-    }
-
-    private static void addTableSpaces(TableLayout tl, double size) {
-        int cols = tl.getNumColumn();
-        int rows = tl.getNumRow();
-        for (int x = 0; x <= cols; x++) {
-            tl.insertColumn(x * 2, size);
-        }
-        for (int y = 0; y <= rows; y++) {
-            tl.insertRow(y * 2, size);
-        }
     }
 
     private void initComponents() {
@@ -489,10 +479,9 @@ public class FontPanel extends JPanel {
         setLayout(new BorderLayout());
         add(contentScrollPane, BorderLayout.CENTER);
 
-        addTableSpaces(tlAddCharsPanel, 10);
-        addTableSpaces(tlFontParamsPanel, 10);
-        addTableSpaces(tlAll, 10);
-
+        TableLayoutHelper.addTableSpaces(tlAddCharsPanel, 10);
+        TableLayoutHelper.addTableSpaces(tlFontParamsPanel, 10);
+        TableLayoutHelper.addTableSpaces(tlAll, 10);
     }
 
     private void fontAddCharsButtonActionPerformed(ActionEvent evt) {

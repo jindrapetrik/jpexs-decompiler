@@ -158,6 +158,7 @@ public class TextPanel extends JPanel {
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
         
         // hide the buttonts to aviod panel resize problems on other views
+        textEditButton.setVisible(false);
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
 

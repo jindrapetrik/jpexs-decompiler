@@ -2003,6 +2003,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void clear() {
         dumpViewPanel.clear();
         previewPanel.clear();
+        headerPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
