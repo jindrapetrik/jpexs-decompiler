@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -123,6 +124,7 @@ public class TextPanel extends JPanel {
 
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
+        textButtonsPanel.setMinimumSize(new Dimension(10, textButtonsPanel.getMinimumSize().height));
 
         selectPrevousTagButton = createButton(null, "arrowup16", "selectPreviousTag", e -> mainPanel.previousTag());
         selectNextTagButton = createButton(null, "arrowdown16", "selectNextTag", e -> mainPanel.nextTag());
@@ -154,6 +156,10 @@ public class TextPanel extends JPanel {
         textEditButton = createButton("button.edit", "edit16", null, e -> editText());
         textSaveButton = createButton("button.save", "save16", null, e -> saveText(true));
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
+        
+        // hide the buttonts to aviod panel resize problems on other views
+        textSaveButton.setVisible(false);
+        textCancelButton.setVisible(false);
 
         buttonsPanel.add(textEditButton);
         buttonsPanel.add(textSaveButton);

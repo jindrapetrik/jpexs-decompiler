@@ -308,7 +308,6 @@ public class FontPanel extends JPanel {
         fontParamsPanel.add(fontNameIntagLabLabel, "0,0,R");
 
         fontNameIntagLabel.setText(AppStrings.translate("value.unknown"));
-        fontNameIntagLabel.setMaximumSize(new Dimension(250, fontNameIntagLabel.getMaximumSize().height));
         fontNameIntagLabel.setMinimumSize(new Dimension(100, fontNameIntagLabel.getMinimumSize().height));
         fontNameIntagLabel.setPreferredSize(new Dimension(250, fontNameIntagLabel.getPreferredSize().height));
         fontParamsPanel.add(fontNameIntagLabel, "1,0");
