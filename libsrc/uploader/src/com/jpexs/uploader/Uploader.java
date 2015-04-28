@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jpexs.uploader;
 
 import java.awt.Dimension;
@@ -61,9 +56,9 @@ public class Uploader {
             httpConn.setUseCaches(false);
             httpConn.setDoOutput(true); // indicates POST method
             httpConn.setDoInput(true);
+            httpConn.setRequestProperty("User-Agent", "JPEXS Uploader");
             httpConn.setRequestProperty("Content-Type",
                     "multipart/form-data; boundary=" + boundary);
-            httpConn.setRequestProperty("User-Agent", "JPEXS Uploader");
             outputStream = httpConn.getOutputStream();
             writer = new PrintWriter(new OutputStreamWriter(outputStream, charset),
                     true);
@@ -119,17 +114,6 @@ public class Uploader {
             inputStream.close();
 
             writer.append(LINE_FEED);
-            writer.flush();
-        }
-
-        /**
-         * Adds a header field to the request.
-         *
-         * @param name - name of the header field
-         * @param value - value of the header field
-         */
-        public void addHeaderField(String name, String value) {
-            writer.append(name + ": " + value).append(LINE_FEED);
             writer.flush();
         }
 
@@ -248,9 +232,6 @@ public class Uploader {
 
         try {
             MultipartUtility multipart = new MultipartUtility(requestURL, charset);
-
-            multipart.addHeaderField("User-Agent", "JPEXS Uploader");
-
             for (int i = 0; i < types.size(); i++) {
                 if (types.get(i).equals("field")) {
                     multipart.addFormField(names.get(i), values.get(i));
@@ -272,7 +253,6 @@ public class Uploader {
             }
             System.exit(ok ? 0 : 1);
         } catch (IOException ex) {
-            ex.printStackTrace();
             System.exit(1);
         }
     }
