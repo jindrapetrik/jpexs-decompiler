@@ -226,7 +226,7 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<String> registerNameFormat = null;
 
-    @ConfigurationDefaultInt(10)
+    @ConfigurationDefaultInt(15)
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
 
     public static final ConfigurationItem<String> recentFiles = null;

@@ -35,7 +35,7 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected String currentDrawCommand = "";
 
-    protected String pathData;
+    protected StringBuilder pathData;
 
     protected double zoom;
 
@@ -101,35 +101,37 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     @Override
     public void moveTo(double x, double y) {
         currentDrawCommand = "";
-        pathData += "M"
-                + roundPixels20(x * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
+        pathData.append("M")
+                .append(roundPixels20(x * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y * zoom / SWF.unitDivisor)).append(" ");
     }
 
     @Override
     public void lineTo(double x, double y) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_L)) {
             currentDrawCommand = DRAW_COMMAND_L;
-            pathData += "L";
+            pathData.append("L");
         }
-        pathData += roundPixels20(x * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
+        
+        pathData.append(roundPixels20(x * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y * zoom / SWF.unitDivisor)).append(" ");
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_Q)) {
             currentDrawCommand = DRAW_COMMAND_Q;
-            pathData += "Q";
+            pathData.append("Q");
         }
-        pathData += roundPixels20(controlX * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(controlY * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY * zoom / SWF.unitDivisor) + " ";
+        
+        pathData.append(roundPixels20(controlX * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(controlY * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorX * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorY * zoom / SWF.unitDivisor)).append(" ");
     }
 
     protected void finalizePath() {
-        pathData = "";
+        pathData = new StringBuilder();
         currentDrawCommand = "";
     }
 

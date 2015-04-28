@@ -49,12 +49,12 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -125,6 +125,10 @@ public class ExportDialog extends AppDialog {
 
     private final JComboBox[] combos;
 
+    private final JCheckBox[] checkBoxes;
+    
+    private final JCheckBox selectAllCheckBox;
+
     private JTextField zoomTextField = new JTextField();
 
     public <E> E getValue(Class<E> option) {
@@ -134,7 +138,18 @@ public class ExportDialog extends AppDialog {
                 return values[combos[i].getSelectedIndex()];
             }
         }
+        
         return null;
+    }
+
+    public boolean isOptionEnabled(Class<?> option) {
+        for (int i = 0; i < optionClasses.length; i++) {
+            if (option == optionClasses[i]) {
+                return checkBoxes[i].isSelected();
+            }
+        }
+        
+        return false;
     }
 
     public double getZoom() {
@@ -153,6 +168,7 @@ public class ExportDialog extends AppDialog {
             }
             cfg += key;
         }
+        
         Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
         Configuration.lastSelectedExportFormats.set(cfg);
     }
@@ -170,18 +186,39 @@ public class ExportDialog extends AppDialog {
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         JPanel comboPanel = new JPanel(null);
-        combos = new JComboBox[optionNames.length];
         int labWidth = 0;
+        boolean[] exportableExistsArray = new boolean[optionNames.length];
         for (int i = 0; i < optionNames.length; i++) {
+            boolean exportableExists = false;
+            if (exportables == null) {
+                exportableExists = true;
+            } else {
+                for (TreeItem e : exportables) {
+                    for (int j = 0; j < objClasses[i].length; j++) {
+                        if (objClasses[i][j].isInstance(e)) {
+                            exportableExists = true;
+                        }
+                    }
+                }
+            }
+            
+            if (!exportableExists) {
+                continue;
+            }
+            
+            exportableExistsArray[i] = true;
+            
             JLabel label = new JLabel(translate(optionNames[i]));
             if (label.getPreferredSize().width > labWidth) {
                 labWidth = label.getPreferredSize().width;
             }
         }
+        
         String exportFormatsStr = Configuration.lastSelectedExportFormats.get();
         if ("".equals(exportFormatsStr)) {
             exportFormatsStr = null;
         }
+        
         String exportFormatsArr[] = new String[0];
         if (exportFormatsStr != null) {
             if (exportFormatsStr.contains(",")) {
@@ -191,9 +228,29 @@ public class ExportDialog extends AppDialog {
             }
 
         }
-        List<String> exportFormats = Arrays.asList(exportFormatsArr);
+        
         int comboWidth = 200;
+        int checkBoxWidth;
         int top = 10;
+
+        List<String> exportFormats = Arrays.asList(exportFormatsArr);
+        combos = new JComboBox[optionNames.length];
+        checkBoxes = new JCheckBox[optionNames.length];
+        selectAllCheckBox = new JCheckBox();
+        checkBoxWidth = selectAllCheckBox.getPreferredSize().width;
+        selectAllCheckBox.setBounds(10 + labWidth + 10 + comboWidth + 10, top, checkBoxWidth, selectAllCheckBox.getPreferredSize().height);
+        selectAllCheckBox.setSelected(true);
+        selectAllCheckBox.addActionListener((ActionEvent e) -> {
+            boolean selected = selectAllCheckBox.isSelected();
+            for (JCheckBox checkBox : checkBoxes) {
+                if (checkBox != null){
+                    checkBox.setSelected(selected);
+                }
+            }
+        });
+        comboPanel.add(selectAllCheckBox);
+        top += selectAllCheckBox.getHeight();
+        
         boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
@@ -213,31 +270,29 @@ public class ExportDialog extends AppDialog {
             if (itemIndex > -1) {
                 combos[i].setSelectedIndex(itemIndex);
             }
+            
             combos[i].setBounds(10 + labWidth + 10, top, comboWidth, combos[i].getPreferredSize().height);
-            boolean exportableExists = false;
-            if (exportables == null) {
-                exportableExists = true;
-            } else {
-                for (TreeItem e : exportables) {
-                    for (int j = 0; j < objClasses[i].length; j++) {
-                        if (objClasses[i][j].isInstance(e)) {
-                            exportableExists = true;
-                        }
-                    }
-                }
-            }
-            if (!exportableExists) {
+
+            checkBoxes[i] = new JCheckBox();
+            checkBoxes[i].setBounds(10 + labWidth + 10 + comboWidth + 10, top, checkBoxWidth, checkBoxes[i].getPreferredSize().height);
+            checkBoxes[i].setSelected(true);
+
+            if (!exportableExistsArray[i]) {
                 continue;
             }
+
             if (Arrays.asList(zoomClasses).contains(c)) {
                 zoomable = true;
             }
+            
             JLabel lab = new JLabel(translate(optionNames[i]));
             lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
             comboPanel.add(lab);
+            comboPanel.add(checkBoxes[i]);
             comboPanel.add(combos[i]);
             top += combos[i].getHeight();
         }
+        
         int zoomWidth = 50;
         if (zoomable) {
             top += 2;
@@ -253,34 +308,29 @@ public class ExportDialog extends AppDialog {
             top += zoomTextField.getHeight();
         }
 
-        Dimension dim = new Dimension(10 + labWidth + 10 + comboWidth + 10, top + 10);
+        Dimension dim = new Dimension(10 + labWidth + 10 + checkBoxWidth + 10 + comboWidth + 10, top + 10);
         comboPanel.setMinimumSize(dim);
         comboPanel.setPreferredSize(dim);
         cnt.add(comboPanel, BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    saveConfig();
-                } catch (NumberFormatException nfe) {
-                    JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    zoomTextField.requestFocusInWindow();
-                    return;
-                }
-                setVisible(false);
+        okButton.addActionListener((ActionEvent e) -> {
+            try {
+                saveConfig();
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                zoomTextField.requestFocusInWindow();
+                return;
             }
+            
+            setVisible(false);
         });
 
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelled = true;
-                setVisible(false);
-            }
+        cancelButton.addActionListener((ActionEvent e) -> {
+            cancelled = true;
+            setVisible(false);
         });
 
         buttonsPanel.add(okButton);
@@ -296,6 +346,7 @@ public class ExportDialog extends AppDialog {
         if (pct.endsWith(".0")) {
             pct = pct.substring(0, pct.length() - 2);
         }
+        
         zoomTextField.setText(pct);
     }
 
