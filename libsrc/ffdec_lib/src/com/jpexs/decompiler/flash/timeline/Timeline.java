@@ -71,6 +71,8 @@ public class Timeline {
 
     public int maxDepth;
 
+    public int fontFrameNum = -1;
+    
     public List<Tag> tags;
 
     private final List<Frame> frames = new ArrayList<>();

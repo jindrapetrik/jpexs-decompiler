@@ -1211,7 +1211,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 int pageCount = getFontPageCount(fontTag);
                 fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
                 if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum);
+                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
                 }
             }
             break;
@@ -1220,7 +1220,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 int pageCount = getFontPageCount(fontTag);
                 fontPageNum = (fontPageNum + 1) % pageCount;
                 if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum);
+                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
                 }
             }
             break;

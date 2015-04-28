@@ -2381,7 +2381,14 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (drawableFrameCount == 0) {
                     drawableFrameCount = 1;
                 }
-                int dframe = (time + layer.time) % drawableFrameCount;
+                
+                int dframe;
+                if (timeline.fontFrameNum != -1) {
+                    dframe = timeline.fontFrameNum;
+                } else {
+                    dframe = (time + layer.time) % drawableFrameCount;
+                }
+                
                 if (character instanceof ButtonTag) {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.stateUnderCursor == layer) {

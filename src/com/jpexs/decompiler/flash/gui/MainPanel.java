@@ -2900,6 +2900,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public static Timelined makeTimelined(final Tag tag) {
+        return makeTimelined(tag, -1);
+    }
+    
+    public static Timelined makeTimelined(final Tag tag, final int fontFrameNum) {
 
         return new Timelined() {
 
@@ -2926,16 +2930,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                 } else if (tag instanceof FontTag) {
                     int pageCount = PreviewPanel.getFontPageCount((FontTag) tag);
-                    for (int i = 0; i < pageCount; i++) {
-                        Frame f = new Frame(tim, i);
-                        DepthState ds = new DepthState(tag.getSwf(), f);
-                        ds.characterId = ((CharacterTag) tag).getCharacterId();
-                        ds.matrix = new MATRIX();
-                        ds.time = i;
-                        f.layers.put(1, ds);
-                        f.layersChanged = true;
-                        tim.addFrame(f);
+                    int frame = fontFrameNum;
+                    if (frame < 0 || frame >= pageCount) {
+                        frame = 0;
                     }
+                    
+                    Frame f = new Frame(tim, 0);
+                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    ds.characterId = ((CharacterTag) tag).getCharacterId();
+                    ds.matrix = new MATRIX();
+                    f.layers.put(1, ds);
+                    f.layersChanged = true;
+                    tim.addFrame(f);
+                    tim.fontFrameNum = frame;
                 } else {
                     Frame f = new Frame(tim, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f);

@@ -89,8 +89,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private int counter = 0;
 
-    private AtomicBoolean shouldDraw = new AtomicBoolean();
-
     private SWF swf;
 
     private boolean loaded;
@@ -376,7 +374,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             public void mouseEntered(MouseEvent e) {
                 synchronized (ImagePanel.class) {
                     lastMouseEvent = e;
-                    shouldDraw.set(true);
+                    redraw();
                 }
             }
 
@@ -386,7 +384,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                     stateUnderCursor = null;
                     lastMouseEvent = null;
                     hideMouseSelection();
-                    shouldDraw.set(true);
+                    redraw();
                 }
             }
 
@@ -395,7 +393,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 synchronized (ImagePanel.class) {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
-                    shouldDraw.set(true);
+                    redraw();
                     if (stateUnderCursor != null) {
                         ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
@@ -411,7 +409,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 synchronized (ImagePanel.class) {
                     mouseButton = 0;
                     lastMouseEvent = e;
-                    shouldDraw.set(true);
+                    redraw();
                     if (stateUnderCursor != null) {
                         ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
@@ -428,7 +426,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             public void mouseMoved(MouseEvent e) {
                 synchronized (ImagePanel.class) {
                     lastMouseEvent = e;
-                    shouldDraw.set(true);
+                    redraw();
                     DepthState lastUnderCur = stateUnderCursor;
                     if (stateUnderCursor != null) {
                         if (lastUnderCur == null || lastUnderCur.instanceId != stateUnderCursor.instanceId) {
@@ -457,19 +455,25 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             public void mouseDragged(MouseEvent e) {
                 synchronized (ImagePanel.class) {
                     lastMouseEvent = e;
-                    shouldDraw.set(true);
+                    redraw();
                 }
             }
 
         });
     }
 
+    private void redraw() {
+        if (timer == null) {
+            startTimer(counter, timelined.getTimeline());
+        }
+    }
+    
     @Override
     public synchronized void zoom(Zoom zoom) {
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
         if (modified) {
             this.zoom = zoom;
-            shouldDraw.set(true);
+            redraw();
             if (textTag != null) {
                 setText(textTag, newTextTag);
             }
@@ -558,7 +562,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             time = 0;
             drawReady = false;
-            shouldDraw.set(true);
+            redraw();
             play();
         }
 
@@ -715,10 +719,10 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom;
+        Timeline timeline = drawable.getTimeline();
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
         SerializableImage img = swf.getFromCache(key);
         if (img == null) {
-            Timeline timeline = drawable.getTimeline();
             boolean shouldCache = timeline.isSingleFrame(frame);
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
@@ -940,24 +944,20 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stopInternal();
         if (timelined != null) {
             Timeline timeline = timelined.getTimeline();
-            int frameRate = timeline.frameRate;
-            int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
-
-            final int cnt = counter;
-            final boolean singleFrame = timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame();
-            shouldDraw.set(true);
-            startTimer(cnt, singleFrame, msPerFrame);
+            startTimer(counter, timeline);
         }
     }
 
-    private void startTimer(int cnt, boolean singleFrame, int msPerFrame) {
+    private void startTimer(int cnt, Timeline timeline) {
+
+        int frameRate = timeline.frameRate;
+        int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
+        final boolean singleFrame = (timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
 
         TimerTask task = new TimerTask() {
             public final int taskCounter = cnt;
 
             public final boolean isSingleFrame = singleFrame;
-
-            private final AtomicBoolean first = shouldDraw;
 
             @Override
             public void run() {
@@ -1030,8 +1030,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
         this.frame = frame;
         stopInternal();
-        shouldDraw.set(true);
-        startTimer(counter, true, 0);
+        redraw();
         fireMediaDisplayStateChanged();
     }
 

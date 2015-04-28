@@ -52,7 +52,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public final class DefineCompactedFont extends FontTag implements DrawableTag {
+public final class DefineCompactedFont extends FontTag {
 
     public static final int ID = 1005;
 
