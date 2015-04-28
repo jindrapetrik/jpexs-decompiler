@@ -62,7 +62,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -462,9 +461,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         });
     }
 
-    private void redraw() {
+    private synchronized void redraw() {
+        if (!isPlaying()){
+            counter++;
+        }
+        
         if (timer == null) {
-            startTimer(counter, timelined.getTimeline());
+            startTimer(counter, timelined.getTimeline(), false);
         }
     }
     
@@ -658,12 +661,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     @Override
     public void pause() {
         stopInternal();
+        redraw();
     }
 
     @Override
     public void stop() {
         stopInternal();
         rewind();
+        redraw();
     }
 
     private void stopAllSounds() {
@@ -690,12 +695,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         synchronized (ImagePanel.class) {
             if (timelined != null && counter == this.counter) {
                 int frameCount = timelined.getTimeline().getFrameCount();
+
+                if (!stillFrame && frame == frameCount - 1 && !loop) {
+                    stopInternal();
+                    return;
+                }
+
                 int newframe;
                 if (frameCount > 0) {
                     newframe = (frame + 1) % frameCount;
-                    if (newframe == 0 && !loop) {
-                        stop();
-                    }
                 } else {
                     newframe = frame;
                 }
@@ -944,15 +952,19 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         stopInternal();
         if (timelined != null) {
             Timeline timeline = timelined.getTimeline();
-            startTimer(counter, timeline);
+            if (!stillFrame && frame == timeline.getFrameCount() - 1) {
+                frame = 0;
+            }
+            
+            startTimer(counter, timeline, true);
         }
     }
 
-    private void startTimer(int cnt, Timeline timeline) {
+    private void startTimer(int cnt, Timeline timeline, boolean playing) {
 
         int frameRate = timeline.frameRate;
         int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
-        final boolean singleFrame = (timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
+        final boolean singleFrame = !playing || (timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
 
         TimerTask task = new TimerTask() {
             public final int taskCounter = cnt;
@@ -963,7 +975,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             public void run() {
                 try {
                     synchronized (ImagePanel.class) {
-                        if (timer == null) {
+                        if (timer == null || taskCounter != counter) {
                             return;
                         }
                     }
@@ -975,6 +987,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                                 timer = null;
                             }
                         }
+                        
                         fireMediaDisplayStateChanged();
                     } else {
                         nextFrame(taskCounter);
@@ -1004,9 +1017,11 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined == null) {
             return false;
         }
+        
         if (stillFrame) {
             return false;
         }
+        
         return (timelined.getTimeline().getFrameCount() <= 1) || (timer != null);
     }
 
