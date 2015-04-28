@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 public class Uploader {
 
     private static class MultipartUtility {
+
         private final String boundary;
         private static final String LINE_FEED = "\r\n";
         private HttpURLConnection httpConn;
@@ -53,7 +54,7 @@ public class Uploader {
             this.charset = charset;
 
             // creates a unique boundary based on time stamp
-            boundary = "===" + System.currentTimeMillis() + "===";
+            boundary = Long.toHexString(System.currentTimeMillis());
 
             URL url = new URL(requestURL);
             httpConn = (HttpURLConnection) url.openConnection();
@@ -155,125 +156,121 @@ public class Uploader {
             }
             reader.close();
             httpConn.disconnect();
-            
+
             return status == HttpURLConnection.HTTP_OK;
         }
     }
-    
+
     private static List<String> types = new ArrayList<>();
     private static List<String> names = new ArrayList<>();
     private static List<String> values = new ArrayList<>();
     private static List<String> labels = new ArrayList<>();
 
     public static void main(String[] args) {
-        
-        if(args.length<1){
+
+        if (args.length < 1) {
             System.err.println("1");
             System.exit(1);
         }
-        
+
         String charset = "UTF-8";
         String requestURL = args[0];
-        
-        
-        for(int i=1;i<args.length;i++){
-                if(args[i].equals("-field")){
-                    types.add("field");
-                    names.add(args[i+1]);
-                    values.add(args[i+2]);
-                    labels.add("");
-                    i+=2;
-                }    
-                if(args[i].equals("-emptyfield")){
-                    types.add("field");
-                    names.add(args[i+1]);
-                    values.add("");
-                    labels.add("");
-                    i+=2;
-                }  
-                if(args[i].equals("-textarea")){
-                    types.add("textarea");
-                    names.add(args[i+1]);                    
-                    labels.add(args[i+2]);
-                    values.add("");
-                    i+=2;
-                }        
-                if(args[i].equals("-file")){
-                    types.add("file");
-                    names.add(args[i+1]);
-                    values.add(args[i+2]);
-                    labels.add("");                    
-                    i+=2;
-                }
+
+        for (int i = 1; i < args.length; i++) {
+            if (args[i].equals("-field")) {
+                types.add("field");
+                names.add(args[i + 1]);
+                values.add(args[i + 2]);
+                labels.add("");
+                i += 2;
             }
-        
-        List<JTextArea> texts=new ArrayList<>();
+            if (args[i].equals("-emptyfield")) {
+                types.add("field");
+                names.add(args[i + 1]);
+                values.add("");
+                labels.add("");
+                i += 2;
+            }
+            if (args[i].equals("-textarea")) {
+                types.add("textarea");
+                names.add(args[i + 1]);
+                labels.add(args[i + 2]);
+                values.add("");
+                i += 2;
+            }
+            if (args[i].equals("-file")) {
+                types.add("file");
+                names.add(args[i + 1]);
+                values.add(args[i + 2]);
+                labels.add("");
+                i += 2;
+            }
+        }
+
+        List<JTextArea> texts = new ArrayList<>();
         List<JLabel> textLabels = new ArrayList<>();
-        List<Integer> textIndices=new ArrayList<>();
-        
-        for(int i=0;i<types.size();i++){
-            if(types.get(i).equals("textarea")){
+        List<Integer> textIndices = new ArrayList<>();
+
+        for (int i = 0; i < types.size(); i++) {
+            if (types.get(i).equals("textarea")) {
                 JTextArea t = new JTextArea();
-                t.setPreferredSize(new Dimension(400,100));
+                t.setPreferredSize(new Dimension(400, 100));
                 texts.add(t);
                 textLabels.add(new JLabel(labels.get(i)));
                 textIndices.add(i);
             }
         }
-        if(!texts.isEmpty()){
-            JPanel pan=new JPanel();
+        if (!texts.isEmpty()) {
+            JPanel pan = new JPanel();
             pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-            for(int i=0;i<texts.size();i++){
+            for (int i = 0; i < texts.size(); i++) {
                 textLabels.get(i).setAlignmentX(0f);
-                pan.add(textLabels.get(i));                
+                pan.add(textLabels.get(i));
                 texts.get(i).setAlignmentX(0f);
                 pan.add(texts.get(i));
             }
-            
+
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-               
+
             }
-            
-            if(JOptionPane.showConfirmDialog(null, pan,"Enter values",JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE)!=JOptionPane.OK_OPTION){
+
+            if (JOptionPane.showConfirmDialog(null, pan, "Enter values", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) != JOptionPane.OK_OPTION) {
                 System.exit(1);
             }
-            for(int i=0;i<texts.size();i++){
-                int index=textIndices.get(i);
+            for (int i = 0; i < texts.size(); i++) {
+                int index = textIndices.get(i);
                 types.set(index, "field");
                 values.set(index, texts.get(i).getText());
             }
         }
-        
-         try {
+
+        try {
             MultipartUtility multipart = new MultipartUtility(requestURL, charset);
-             
-            multipart.addHeaderField("User-Agent", "JPEXS Uploader");             
-        
-            for(int i=0;i<types.size();i++){
-                if(types.get(i).equals("field")){
+
+            multipart.addHeaderField("User-Agent", "JPEXS Uploader");
+
+            for (int i = 0; i < types.size(); i++) {
+                if (types.get(i).equals("field")) {
                     multipart.addFormField(names.get(i), values.get(i));
-                }        
-                if(types.get(i).equals("file")){                    
+                }
+                if (types.get(i).equals("file")) {
                     multipart.addFilePart(names.get(i), new File(values.get(i)));
                 }
             }
-             
-            
- 
+
             List<String> response = new ArrayList<>();
             boolean ok = multipart.finish(response);
-             
-             
+
             for (String line : response) {
-                if(ok){
+                if (ok) {
                     System.out.println(line);
-                }else{
+                } else {
                     System.err.println(line);
                 }
             }
-            System.exit(ok?0:1);
+            System.exit(ok ? 0 : 1);
         } catch (IOException ex) {
             ex.printStackTrace();
             System.exit(1);
