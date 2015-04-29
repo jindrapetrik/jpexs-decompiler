@@ -39,15 +39,16 @@ import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Helper;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenu;
@@ -61,23 +62,7 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
-
-    private static final String ACTION_RAW_EDIT = "RAWEDIT";
-
-    private static final String ACTION_JUMP_TO_CHARACTER = "JUMPTOCHARACTER";
-
-    private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
-
-    private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
-
-    private static final String ACTION_UNDO_TAG = "UNDOTAG";
-
-    private static final String ACTION_CLOSE_SWF = "CLOSESWF";
-
-    private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
-
-    private static final String ACTION_OPEN_SWFINSIDE = "OPENSWFINSIDE";
+public class TagTreeContextMenu extends JPopupMenu {
 
     private final MainPanel mainPanel;
 
@@ -113,29 +98,31 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
 
     private JMenu copyTagMenu;
 
+    private JMenu copyTagWithDependenciesMenu;
+
     private JMenuItem openSWFInsideTagMenuItem;
 
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         this.tagTree = tagTree;
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
-        expandRecursiveMenuItem.addActionListener(this);
-        expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
+        expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         add(expandRecursiveMenuItem);
 
         removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
-        removeMenuItem.addActionListener(this);
-        removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
+        removeMenuItem.addActionListener((ActionEvent e) -> {
+            removeItemActionPerformed(e, false);
+        });
         add(removeMenuItem);
 
         removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies"));
-        removeWithDependenciesMenuItem.addActionListener(this);
-        removeWithDependenciesMenuItem.setActionCommand(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
+        removeWithDependenciesMenuItem.addActionListener((ActionEvent e) -> {
+            removeItemActionPerformed(e, true);
+        });
         add(removeWithDependenciesMenuItem);
 
         undoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.undo"));
-        undoTagMenuItem.addActionListener(this);
-        undoTagMenuItem.setActionCommand(ACTION_UNDO_TAG);
+        undoTagMenuItem.addActionListener(this::undoTagActionPerformed);
         add(undoTagMenuItem);
 
         exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
@@ -149,14 +136,12 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         add(replaceMenuItem);
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
-        rawEditMenuItem.setActionCommand(ACTION_RAW_EDIT);
-        rawEditMenuItem.addActionListener(this);
+        rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
         rawEditMenuItem.setVisible(false);
         add(rawEditMenuItem);
 
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
-        jumpToCharacterMenuItem.setActionCommand(ACTION_JUMP_TO_CHARACTER);
-        jumpToCharacterMenuItem.addActionListener(this);
+        jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setVisible(false);
         add(jumpToCharacterMenuItem);
 
@@ -176,8 +161,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         add(importSwfXmlMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
-        closeMenuItem.setActionCommand(ACTION_CLOSE_SWF);
-        closeMenuItem.addActionListener(this);
+        closeMenuItem.addActionListener(this::closeSwfActionPerformed);
         add(closeMenuItem);
 
         addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
@@ -189,10 +173,12 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         copyTagMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
         add(copyTagMenu);
 
+        copyTagWithDependenciesMenu = new JMenu(mainPanel.translate("contextmenu.copyTagWithDependencies"));
+        add(copyTagWithDependenciesMenu);
+
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         add(openSWFInsideTagMenuItem);
-        openSWFInsideTagMenuItem.setActionCommand(ACTION_OPEN_SWFINSIDE);
-        openSWFInsideTagMenuItem.addActionListener(this);
+        openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
 
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -315,6 +301,7 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         addTagMenu.setVisible(false);
         moveTagMenu.setVisible(false);
         copyTagMenu.setVisible(false);
+        copyTagWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
 
         boolean singleSelect = items.size() == 1;
@@ -351,41 +338,8 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
                 for (Integer tagId : allowedTagTypes) {
                     final Class cl = TagIdClassMap.getClassByTagId(tagId);
                     JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
-                    tagItem.addActionListener(new ActionListener() {
-
-                        @Override
-                        @SuppressWarnings("unchecked")
-                        public void actionPerformed(ActionEvent ae) {
-                            try {
-                                SWF swf = firstItem.getSwf();
-                                Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
-                                boolean isDefineSprite = firstItem instanceof DefineSpriteTag;
-                                Timelined timelined = isDefineSprite ? (DefineSpriteTag) firstItem : swf;
-                                t.setTimelined(timelined);
-                                if (isDefineSprite) {
-                                    ((DefineSpriteTag) firstItem).subTags.add(t);
-                                } else {
-                                    if (firstItem instanceof Tag) {
-                                        if ((t instanceof CharacterIdTag) && (firstItem instanceof CharacterTag)) {
-                                            ((CharacterIdTag) t).setCharacterId(((CharacterTag) firstItem).getCharacterId());
-                                        }
-                                        int index = swf.tags.indexOf(firstItem);
-                                        if (index > -1) {
-                                            swf.tags.add(index, t);
-                                        } else {
-                                            swf.tags.add(t);
-                                        }
-                                    } else {
-                                        swf.tags.add(t);
-                                    }
-                                }
-                                timelined.getTimeline().reset();
-                                swf.updateCharacters();
-                                mainPanel.refreshTree(swf);
-                            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-                                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
+                    tagItem.addActionListener((ActionEvent ae) -> {
+                        addTagActionPerformed(ae, firstItem, cl);
                     });
                     addTagMenu.add(tagItem);
                 }
@@ -408,66 +362,33 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
             moveTagMenu.removeAll();
             copyTagMenu.removeAll();
+            copyTagWithDependenciesMenu.removeAll();
             for (SWFList targetSwfList : swfs) {
                 for (final SWF targetSwf : targetSwfList) {
                     if (targetSwf != singleSwf) {
                         JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
-                        swfItem.addActionListener(new ActionListener() {
-
-                            @Override
-                            public void actionPerformed(ActionEvent ae) {
-                                SWF sourceSwf = items.get(0).getSwf();
-                                for (TreeItem item : items) {
-                                    Tag tag = (Tag) item;
-                                    sourceSwf.tags.remove(tag);
-                                    tag.setSwf(targetSwf);
-                                    targetSwf.tags.add(tag);
-                                    tag.setModified(true);
-                                }
-
-                                sourceSwf.assignExportNamesToSymbols();
-                                targetSwf.assignExportNamesToSymbols();
-                                sourceSwf.assignClassesToSymbols();
-                                targetSwf.assignClassesToSymbols();
-                                sourceSwf.clearImageCache();
-                                targetSwf.clearImageCache();
-                                sourceSwf.updateCharacters();
-                                targetSwf.updateCharacters();
-                                mainPanel.refreshTree(null); // refresh all opened swfs
-                            }
+                        swfItem.addActionListener((ActionEvent ae) -> {
+                            copyTagActionPerformed(ae, items, targetSwf);
                         });
                         moveTagMenu.add(swfItem);
 
                         swfItem = new JMenuItem(targetSwf.getShortFileName());
-                        swfItem.addActionListener(new ActionListener() {
-
-                            @Override
-                            public void actionPerformed(ActionEvent ae) {
-                                try {
-                                    for (TreeItem item : items) {
-                                        Tag tag = (Tag) item;
-                                        Tag copyTag = tag.cloneTag();
-                                        copyTag.setSwf(targetSwf);
-                                        targetSwf.tags.add(copyTag);
-                                        copyTag.setModified(true);
-                                    }
-
-                                    targetSwf.assignExportNamesToSymbols();
-                                    targetSwf.assignClassesToSymbols();
-                                    targetSwf.clearImageCache();
-                                    targetSwf.updateCharacters();
-                                    mainPanel.refreshTree(targetSwf);
-                                } catch (IOException | InterruptedException ex) {
-                                    Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
+                        swfItem.addActionListener((ActionEvent ae) -> {
+                            moveTagActionPerformed(ae, items, targetSwf);
                         });
                         copyTagMenu.add(swfItem);
+
+                        swfItem = new JMenuItem(targetSwf.getShortFileName());
+                        swfItem.addActionListener((ActionEvent ae) -> {
+                            copyTagWithDependenciesActionPerformed(ae, items, targetSwf);
+                        });
+                        copyTagWithDependenciesMenu.add(swfItem);
                     }
                 }
             }
             moveTagMenu.setVisible(true);
             copyTagMenu.setVisible(true);
+            copyTagWithDependenciesMenu.setVisible(true);
         }
 
         if (allSelectedIsBinaryData) {
@@ -485,138 +406,239 @@ public class TagTreeContextMenu extends JPopupMenu implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OPEN_SWFINSIDE: {
-                List<TreeItem> sel = tagTree.getSelected(tagTree);
-                List<DefineBinaryDataTag> binaryDatas = new ArrayList<>();
-                for (TreeItem item : sel) {
-                    DefineBinaryDataTag binaryData = (DefineBinaryDataTag) item;
-                    if (binaryData.isSwfData()) {
-                        binaryDatas.add((DefineBinaryDataTag) item);
+    private void addTagActionPerformed(ActionEvent evt, TreeItem firstItem, Class cl) {
+        try {
+            SWF swf = firstItem.getSwf();
+            Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+            boolean isDefineSprite = firstItem instanceof DefineSpriteTag;
+            Timelined timelined = isDefineSprite ? (DefineSpriteTag) firstItem : swf;
+            t.setTimelined(timelined);
+            if (isDefineSprite) {
+                ((DefineSpriteTag) firstItem).subTags.add(t);
+            } else {
+                if (firstItem instanceof Tag) {
+                    if ((t instanceof CharacterIdTag) && (firstItem instanceof CharacterTag)) {
+                        ((CharacterIdTag) t).setCharacterId(((CharacterTag) firstItem).getCharacterId());
                     }
-                }
-
-                mainPanel.loadFromBinaryTag(binaryDatas);
-                break;
-            }
-            case ACTION_RAW_EDIT: {
-                TreeItem itemr = tagTree.getCurrentTreeItem();
-                if (itemr == null) {
-                    return;
-                }
-
-                mainPanel.showGenericTag((Tag) itemr);
-                break;
-            }
-            case ACTION_JUMP_TO_CHARACTER: {
-                TreeItem itemj = tagTree.getCurrentTreeItem();
-                if (itemj == null || !(itemj instanceof CharacterIdTag)) {
-                    return;
-                }
-
-                CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
-                mainPanel.setTagTreeSelectedNode(itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
-                break;
-            }
-            case ACTION_EXPAND_RECURSIVE: {
-                TreePath path = tagTree.getSelectionPath();
-                if (path == null) {
-                    return;
-                }
-                View.expandTreeNodes(tagTree, path, true);
-                break;
-            }
-            case ACTION_REMOVE_ITEM:
-            case ACTION_REMOVE_ITEM_WITH_DEPENDENCIES: {
-                List<TreeItem> sel = tagTree.getSelected(tagTree);
-
-                List<Tag> tagsToRemove = new ArrayList<>();
-                for (TreeItem item : sel) {
-                    if (item instanceof Tag) {
-                        tagsToRemove.add((Tag) item);
-                    } else if (item instanceof TagScript) {
-                        tagsToRemove.add(((TagScript) item).getTag());
-                    } else if (item instanceof Frame) {
-                        Frame frameNode = (Frame) item;
-                        Frame frame = frameNode.timeline.getFrame(frameNode.frame);
-                        if (frame.showFrameTag != null) {
-                            tagsToRemove.add(frame.showFrameTag);
-                        } else {
-                            // this should be the last frame, so remove the inner tags
-                            tagsToRemove.addAll(frame.innerTags);
-                        }
-                    }
-                }
-
-                boolean removeDependencies = e.getActionCommand().equals(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
-                if (tagsToRemove.size() > 0) {
-                    String confirmationMessage;
-                    if (tagsToRemove.size() == 1) {
-                        Tag tag = tagsToRemove.get(0);
-                        confirmationMessage = mainPanel.translate("message.confirm.remove").replace("%item%", tag.toString());
+                    int index = swf.tags.indexOf(firstItem);
+                    if (index > -1) {
+                        swf.tags.add(index, t);
                     } else {
-                        confirmationMessage = mainPanel.translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size()));
+                        swf.tags.add(t);
                     }
-
-                    if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
-                        for (Tag tag : tagsToRemove) {
-                            SWF swf = tag.getSwf();
-                            if (!tagsToRemoveBySwf.containsKey(swf)) {
-                                tagsToRemoveBySwf.put(swf, new ArrayList<>());
-                            }
-
-                            tagsToRemoveBySwf.get(swf).add(tag);
-                        }
-
-                        for (SWF swf : tagsToRemoveBySwf.keySet()) {
-                            swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
-                        }
-
-                        mainPanel.refreshTree(null);
-                    }
+                } else {
+                    swf.tags.add(t);
                 }
-                break;
             }
-            case ACTION_UNDO_TAG: {
-                List<TreeItem> sel = tagTree.getSelected(tagTree);
+            timelined.getTimeline().reset();
+            swf.updateCharacters();
+            mainPanel.refreshTree(swf);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void moveTagActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
+        SWF sourceSwf = items.get(0).getSwf();
+        for (TreeItem item : items) {
+            Tag tag = (Tag) item;
+            sourceSwf.tags.remove(tag);
+            tag.setSwf(targetSwf);
+            targetSwf.tags.add(tag);
+            tag.setModified(true);
+        }
 
-                for (TreeItem item : sel) {
-                    if (item instanceof Tag) {
-                        try {
-                            Tag tag = (Tag) item;
-                            tag.undo();
-                            tag.getSwf().clearAllCache();
-                            tagTree.getModel().updateNode(item);
-                        } catch (InterruptedException | IOException ex) {
-                            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                }
-
-                mainPanel.repaintTree();
-                break;
+        sourceSwf.assignExportNamesToSymbols();
+        targetSwf.assignExportNamesToSymbols();
+        sourceSwf.assignClassesToSymbols();
+        targetSwf.assignClassesToSymbols();
+        sourceSwf.clearImageCache();
+        targetSwf.clearImageCache();
+        sourceSwf.updateCharacters();
+        targetSwf.updateCharacters();
+        mainPanel.refreshTree(null); // refresh all opened swfs
+    }
+    
+    private void copyTagActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
+        try {
+            for (TreeItem item : items) {
+                Tag tag = (Tag) item;
+                Tag copyTag = tag.cloneTag();
+                copyTag.setSwf(targetSwf);
+                targetSwf.tags.add(copyTag);
+                copyTag.setModified(true);
             }
-            case ACTION_CLOSE_SWF: {
-                List<TreeItem> sel = tagTree.getSelected(tagTree);
-                for (TreeItem item : sel) {
-                    if (item instanceof SWF) {
-                        SWF swf = (SWF) item;
-                        if (swf.binaryData != null) {
-                            // embedded swf
-                            swf.binaryData.innerSwf = null;
-                            swf.clearTagSwfs();
-                            mainPanel.refreshTree(null);
-                        } else {
-                            Main.closeFile(swf.swfList);
-                        }
-                    } else if (item instanceof SWFList) {
-                        Main.closeFile((SWFList) item);
-                    }
+
+            targetSwf.assignExportNamesToSymbols();
+            targetSwf.assignClassesToSymbols();
+            targetSwf.clearImageCache();
+            targetSwf.updateCharacters();
+            mainPanel.refreshTree(targetSwf);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void copyTagWithDependenciesActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
+        try {
+            SWF sourceSwf = items.get(0).getSwf();
+            Set<Tag> copiedTags = new HashSet<>();
+            Set<Integer> needed = new HashSet<>();
+            for (TreeItem item : items) {
+                Tag tag = (Tag) item;
+                tag.getNeededCharactersDeep(needed);
+                Tag copyTag = tag.cloneTag();
+                copyTag.setSwf(targetSwf);
+                targetSwf.tags.add(copyTag);
+                copyTag.setModified(true);
+                copiedTags.add(tag);
+            }
+            
+            for (Integer characterId : needed) {
+                Tag tag = (Tag) sourceSwf.getCharacter(characterId);
+                if (!copiedTags.contains(tag)) {
+                    Tag copyTag = tag.cloneTag();
+                    copyTag.setSwf(targetSwf);
+                    targetSwf.tags.add(copyTag);
+                    copyTag.setModified(true);
+                    copiedTags.add(tag);
                 }
-                break;
+            }
+
+            targetSwf.assignExportNamesToSymbols();
+            targetSwf.assignClassesToSymbols();
+            targetSwf.clearImageCache();
+            targetSwf.updateCharacters();
+            mainPanel.refreshTree(targetSwf);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openSwfInsideActionPerformed(ActionEvent evt) {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<DefineBinaryDataTag> binaryDatas = new ArrayList<>();
+        for (TreeItem item : sel) {
+            DefineBinaryDataTag binaryData = (DefineBinaryDataTag) item;
+            if (binaryData.isSwfData()) {
+                binaryDatas.add((DefineBinaryDataTag) item);
+            }
+        }
+
+        mainPanel.loadFromBinaryTag(binaryDatas);
+    }
+    
+    private void rawEditActionPerformed(ActionEvent evt) {
+        TreeItem itemr = tagTree.getCurrentTreeItem();
+        if (itemr == null) {
+            return;
+        }
+
+        mainPanel.showGenericTag((Tag) itemr);
+    }
+    
+    private void jumpToCharacterActionPerformed(ActionEvent evt) {
+        TreeItem itemj = tagTree.getCurrentTreeItem();
+        if (itemj == null || !(itemj instanceof CharacterIdTag)) {
+            return;
+        }
+
+        CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
+        mainPanel.setTagTreeSelectedNode(itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
+    }
+    
+    private void expandRecursiveActionPerformed(ActionEvent evt) {
+        TreePath path = tagTree.getSelectionPath();
+        if (path == null) {
+            return;
+        }
+        View.expandTreeNodes(tagTree, path, true);
+    }
+    
+    private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+
+        List<Tag> tagsToRemove = new ArrayList<>();
+        for (TreeItem item : sel) {
+            if (item instanceof Tag) {
+                tagsToRemove.add((Tag) item);
+            } else if (item instanceof TagScript) {
+                tagsToRemove.add(((TagScript) item).getTag());
+            } else if (item instanceof Frame) {
+                Frame frameNode = (Frame) item;
+                Frame frame = frameNode.timeline.getFrame(frameNode.frame);
+                if (frame.showFrameTag != null) {
+                    tagsToRemove.add(frame.showFrameTag);
+                } else {
+                    // this should be the last frame, so remove the inner tags
+                    tagsToRemove.addAll(frame.innerTags);
+                }
+            }
+        }
+
+        if (tagsToRemove.size() > 0) {
+            String confirmationMessage;
+            if (tagsToRemove.size() == 1) {
+                Tag tag = tagsToRemove.get(0);
+                confirmationMessage = mainPanel.translate("message.confirm.remove").replace("%item%", tag.toString());
+            } else {
+                confirmationMessage = mainPanel.translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size()));
+            }
+
+            if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
+                for (Tag tag : tagsToRemove) {
+                    SWF swf = tag.getSwf();
+                    if (!tagsToRemoveBySwf.containsKey(swf)) {
+                        tagsToRemoveBySwf.put(swf, new ArrayList<>());
+                    }
+
+                    tagsToRemoveBySwf.get(swf).add(tag);
+                }
+
+                for (SWF swf : tagsToRemoveBySwf.keySet()) {
+                    swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
+                }
+
+                mainPanel.refreshTree(null);
+            }
+        }
+    }
+    
+    private void undoTagActionPerformed(ActionEvent evt) {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+
+        for (TreeItem item : sel) {
+            if (item instanceof Tag) {
+                try {
+                    Tag tag = (Tag) item;
+                    tag.undo();
+                    tag.getSwf().clearAllCache();
+                    tagTree.getModel().updateNode(item);
+                } catch (InterruptedException | IOException ex) {
+                    Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        mainPanel.repaintTree();
+    }
+    
+    private void closeSwfActionPerformed(ActionEvent evt) {
+        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        for (TreeItem item : sel) {
+            if (item instanceof SWF) {
+                SWF swf = (SWF) item;
+                if (swf.binaryData != null) {
+                    // embedded swf
+                    swf.binaryData.innerSwf = null;
+                    swf.clearTagSwfs();
+                    mainPanel.refreshTree(null);
+                } else {
+                    Main.closeFile(swf.swfList);
+                }
+            } else if (item instanceof SWFList) {
+                Main.closeFile((SWFList) item);
             }
         }
     }
