@@ -94,6 +94,13 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
+    public void resetTimeline() {
+        if (timeline != null) {
+            timeline.reset(swf, this, subTags, spriteId, getRect());
+        }
+    }
+
+    @Override
     public int getCharacterId() {
         return spriteId;
     }
@@ -286,6 +293,15 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
                 needed.add(((CharacterIdTag) t).getCharacterId());
             }
         }
+    }
+
+    @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = getTimeline().replaceCharacter(oldCharacterId, newCharacterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
     }
 
     @Override

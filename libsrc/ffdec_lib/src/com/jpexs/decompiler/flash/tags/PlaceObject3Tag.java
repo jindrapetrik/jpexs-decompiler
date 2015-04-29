@@ -439,6 +439,11 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        return false;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         // the place object tag will be removed
         return false;

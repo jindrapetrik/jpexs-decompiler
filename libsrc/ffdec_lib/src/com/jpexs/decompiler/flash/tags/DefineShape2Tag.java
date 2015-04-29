@@ -73,6 +73,15 @@ public class DefineShape2Tag extends ShapeTag {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = getShapes().replaceCharacter(oldCharacterId, newCharacterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = getShapes().removeCharacter(characterId);
         if (modified) {

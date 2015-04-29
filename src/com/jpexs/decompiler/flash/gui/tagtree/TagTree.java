@@ -593,6 +593,15 @@ public class TagTree extends JTree {
         return item;
     }
 
+    public void updateSwfs(SWF[] swfs) {
+        TagTreeModel ttm = getModel();
+        if (ttm != null) {
+            List<List<String>> expandedNodes = View.getExpandedNodes(this);
+            ttm.updateSwf(null); // todo: honfika: update only the changed swfs, but there was an exception when i tried it
+            View.expandTreeNodes(this, expandedNodes);
+        }
+    }
+
     @Override
     public TagTreeModel getModel() {
         return (TagTreeModel) super.getModel();

@@ -880,6 +880,16 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        if (fontId == oldCharacterId) {
+            fontId = newCharacterId;
+            setModified(true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         if (fontId == characterId) {
             hasFont = false;

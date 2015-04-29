@@ -574,6 +574,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        return false;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         return false;
     }

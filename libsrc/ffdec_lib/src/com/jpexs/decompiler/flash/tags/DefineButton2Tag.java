@@ -189,6 +189,22 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (int i = 0; i < characters.size(); i++) {
+            BUTTONRECORD character = characters.get(i);
+            if (character.characterId == oldCharacterId) {
+                character.characterId = newCharacterId;
+                modified = true;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         for (int i = 0; i < characters.size(); i++) {
@@ -269,7 +285,19 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
 
         timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+        initTimeline(timeline);
+        return timeline;
+    }
 
+    @Override
+    public void resetTimeline() {
+        if (timeline != null) {
+            timeline.reset(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+            initTimeline(timeline);
+        }
+    }
+
+    private void initTimeline(Timeline timeline) {
         int maxDepth = 0;
         Frame frameUp = new Frame(timeline, 0);
         Frame frameDown = new Frame(timeline, 0);
@@ -321,7 +349,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
 
         timeline.addFrame(frameHit);
-        return timeline;
     }
 
     @Override

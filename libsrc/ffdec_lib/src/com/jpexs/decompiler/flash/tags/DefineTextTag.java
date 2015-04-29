@@ -592,6 +592,21 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (TEXTRECORD tr : textRecords) {
+            if (tr.fontId == oldCharacterId) {
+                tr.fontId = newCharacterId;
+                modified = true;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         for (TEXTRECORD tr : textRecords) {

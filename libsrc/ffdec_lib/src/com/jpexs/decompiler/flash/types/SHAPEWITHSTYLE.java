@@ -43,6 +43,17 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        modified |= fillStyles.replaceCharacter(oldCharacterId, newCharacterId);
+        modified |= lineStyles.replaceCharacter(oldCharacterId, newCharacterId);
+        for (SHAPERECORD r : shapeRecords) {
+            modified |= r.replaceCharacter(oldCharacterId, newCharacterId);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         modified |= fillStyles.removeCharacter(characterId);

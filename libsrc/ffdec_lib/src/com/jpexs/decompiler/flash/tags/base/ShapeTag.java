@@ -134,6 +134,11 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        return getShapes().replaceCharacter(oldCharacterId, newCharacterId);
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         return getShapes().removeCharacter(characterId);
     }

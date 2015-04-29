@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -104,7 +104,7 @@ import java.util.Map;
  */
 public class TagIdClassMap {
 
-    private static final Map<Integer, Class> tagIdClassMap = new HashMap<>();
+    private static final Map<Integer, Class<?>> tagIdClassMap = new HashMap<>();
 
     private static final Map<Class, Integer> classTagIdMap = new HashMap<>();
 
@@ -190,12 +190,12 @@ public class TagIdClassMap {
         addTag(FontTextureInfo.ID, FontTextureInfo.class);
     }
 
-    private static void addTag(int tagId, Class cl) {
+    private static void addTag(int tagId, Class<?> cl) {
         tagIdClassMap.put(tagId, cl);
         classTagIdMap.put(cl, tagId);
     }
 
-    public static Class getClassByTagId(int tagId) {
+    public static Class<?> getClassByTagId(int tagId) {
         return tagIdClassMap.get(tagId);
     }
 

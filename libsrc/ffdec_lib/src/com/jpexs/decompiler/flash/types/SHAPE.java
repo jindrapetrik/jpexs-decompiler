@@ -53,6 +53,15 @@ public class SHAPE implements NeedsCharacters, Serializable {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (SHAPERECORD r : shapeRecords) {
+            modified |= r.replaceCharacter(oldCharacterId, newCharacterId);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         for (SHAPERECORD r : shapeRecords) {

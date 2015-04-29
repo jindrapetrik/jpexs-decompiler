@@ -89,6 +89,18 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        modified |= morphFillStyles.replaceCharacter(oldCharacterId, newCharacterId);
+        modified |= startEdges.replaceCharacter(oldCharacterId, newCharacterId);
+        modified |= endEdges.replaceCharacter(oldCharacterId, newCharacterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         modified |= morphFillStyles.removeCharacter(characterId);

@@ -72,7 +72,7 @@ public class Timeline {
     public int maxDepth;
 
     public int fontFrameNum = -1;
-    
+
     public List<Tag> tags;
 
     private final List<Frame> frames = new ArrayList<>();
@@ -124,7 +124,11 @@ public class Timeline {
         return depthMaxFrame;
     }
 
-    public void reset() {
+    public void reset(SWF swf) {
+        reset(swf, null, swf.tags, 0, swf.displayRect);
+    }
+
+    public void reset(SWF swf, Tag parentTag, List<Tag> tags, int id, RECT displayRect) {
         initialized = false;
         frames.clear();
         depthMaxFrame.clear();
@@ -132,6 +136,13 @@ public class Timeline {
         asmSourceContainers.clear();
         actionFrames.clear();
         otherTags.clear();
+        this.id = id;
+        this.swf = swf;
+        this.displayRect = displayRect;
+        this.frameRate = swf.frameRate;
+        this.timelined = parentTag == null ? swf : (Timelined) parentTag;
+        this.parentTag = parentTag;
+        this.tags = tags;
         as2RootPackage = new AS2Package(null, null, swf);
     }
 
@@ -423,6 +434,18 @@ public class Timeline {
                 swf.getCharacter(layer.characterId).getNeededCharactersDeep(usedCharacters);
             }
         }
+    }
+
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == oldCharacterId) {
+                ((CharacterIdTag) t).setCharacterId(newCharacterId);
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     public boolean removeCharacter(int characterId) {

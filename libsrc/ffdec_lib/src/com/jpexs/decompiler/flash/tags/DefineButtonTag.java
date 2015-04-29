@@ -240,6 +240,22 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (int i = 0; i < characters.size(); i++) {
+            BUTTONRECORD character = characters.get(i);
+            if (character.characterId == oldCharacterId) {
+                character.characterId = newCharacterId;
+                modified = true;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
         for (int i = 0; i < characters.size(); i++) {
@@ -351,8 +367,21 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
 
+        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+        initTimeline(timeline);
+        return timeline;
+    }
+
+    @Override
+    public void resetTimeline() {
+        if (timeline != null) {
+            timeline.reset(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+            initTimeline(timeline);
+        }
+    }
+
+    private void initTimeline(Timeline timeline) {
         ColorTransform clrTrans = null;
         for (Tag t : swf.tags) {
             if (t instanceof DefineButtonCxformTag) {
@@ -405,8 +434,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             frameHit = frameUp;
         }
         timeline.addFrame(frameHit);
-
-        return timeline;
     }
 
     @Override

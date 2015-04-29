@@ -850,7 +850,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        refreshTree(null);
+        refreshTree();
 
         if (updateNeeded) {
             View.execInEventDispatch(() -> {
@@ -1090,42 +1090,42 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
                         new ImageExportSettings(export.getValue(ImageExportMode.class)), evl));
             }
-            
+
             if (export.isOptionEnabled(ShapeExportMode.class)) {
                 ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl));
             }
-            
+
             if (export.isOptionEnabled(MorphShapeExportMode.class)) {
                 ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl));
             }
-            
+
             if (export.isOptionEnabled(TextExportMode.class)) {
                 ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, texts,
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl));
             }
-            
+
             if (export.isOptionEnabled(MovieExportMode.class)) {
                 ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
                         new MovieExportSettings(export.getValue(MovieExportMode.class)), evl));
             }
-            
+
             if (export.isOptionEnabled(SoundExportMode.class)) {
                 ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds,
                         new SoundExportSettings(export.getValue(SoundExportMode.class)), evl));
             }
-            
+
             if (export.isOptionEnabled(BinaryDataExportMode.class)) {
                 ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData,
                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl));
             }
-            
+
             if (export.isOptionEnabled(FontExportMode.class)) {
                 ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts,
                         new FontExportSettings(export.getValue(FontExportMode.class)), evl));
             }
-            
+
             if (export.isOptionEnabled(SymbolClassExportMode.class)) {
                 ret.addAll(new SymbolClassExporter().exportNames(selFile, symbolNames, evl));
             }
@@ -1176,7 +1176,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
         }
-        
+
         return ret;
     }
 
@@ -1187,42 +1187,42 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             new ImageExporter().exportImages(handler, selFile + File.separator + "images", swf.tags,
                     new ImageExportSettings(export.getValue(ImageExportMode.class)), evl);
         }
-        
+
         if (export.isOptionEnabled(ShapeExportMode.class)) {
             new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", swf.tags,
                     new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl);
         }
-        
+
         if (export.isOptionEnabled(MorphShapeExportMode.class)) {
             new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", swf.tags,
                     new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl);
         }
-        
+
         if (export.isOptionEnabled(TextExportMode.class)) {
             new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, swf.tags,
                     new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl);
         }
-        
+
         if (export.isOptionEnabled(MovieExportMode.class)) {
             new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", swf.tags,
                     new MovieExportSettings(export.getValue(MovieExportMode.class)), evl);
         }
-        
+
         if (export.isOptionEnabled(SoundExportMode.class)) {
             new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", swf.tags,
                     new SoundExportSettings(export.getValue(SoundExportMode.class)), evl);
         }
-        
+
         if (export.isOptionEnabled(BinaryDataExportMode.class)) {
             new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", swf.tags,
                     new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl);
         }
-        
+
         if (export.isOptionEnabled(FontExportMode.class)) {
             new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", swf.tags,
                     new FontExportSettings(export.getValue(FontExportMode.class)), evl);
         }
-        
+
         if (export.isOptionEnabled(SymbolClassExportMode.class)) {
             new SymbolClassExporter().exportNames(selFile, swf.tags, evl);
         }
@@ -2091,24 +2091,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void refreshTree() {
-        refreshTree(null);
+        refreshTree(new SWF[0]);
     }
 
     public void refreshTree(SWF swf) {
+        refreshTree(new SWF[]{swf});
+    }
+
+    public void refreshTree(SWF[] swfs) {
         clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
 
-        TagTreeModel ttm = tagTree.getModel();
-        if (ttm != null) {
-            List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
-            ttm.updateSwf(swf);
-            View.expandTreeNodes(tagTree, expandedNodes);
-        }
+        tagTree.updateSwfs(swfs);
 
         if (treeItem != null) {
             SWF treeItemSwf = treeItem.getSwf().getRootSwf();
-            if (swfs.contains(treeItemSwf.swfList)) {
+            if (this.swfs.contains(treeItemSwf.swfList)) {
                 setTagTreeSelectedNode(treeItem);
             }
         }
@@ -2902,7 +2901,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public static Timelined makeTimelined(final Tag tag) {
         return makeTimelined(tag, -1);
     }
-    
+
     public static Timelined makeTimelined(final Tag tag, final int fontFrameNum) {
 
         return new Timelined() {
@@ -2915,6 +2914,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     return tim;
                 }
                 tim = new Timeline(tag.getSwf(), null, new ArrayList<>(), ((CharacterTag) tag).getCharacterId(), getRect());
+                initTimeline(tim);
+                return tim;
+            }
+
+            @Override
+            public void resetTimeline() {
+                if (tim != null) {
+                    tim.reset(tag.getSwf(), null, new ArrayList<>(), ((CharacterTag) tag).getCharacterId(), getRect());
+                    initTimeline(tim);
+                }
+            }
+
+            private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
                     tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
                     int framesCnt = tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH;
@@ -2934,7 +2946,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (frame < 0 || frame >= pageCount) {
                         frame = 0;
                     }
-                    
+
                     Frame f = new Frame(tim, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
@@ -2952,7 +2964,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     tim.addFrame(f);
                 }
                 tim.displayRect = getRect();
-                return tim;
             }
 
             @Override

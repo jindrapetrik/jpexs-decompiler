@@ -82,6 +82,15 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        if (bitmapId == oldCharacterId) {
+            bitmapId = newCharacterId;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         if (bitmapId == characterId) {
             if ((fillStyleType == REPEATING_BITMAP)

@@ -153,6 +153,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,7 +180,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Default version of SWF file format
      */
     public static final int DEFAULT_VERSION = 10;
-    
+
     /**
      * Maximum SWF file format version
      * Needs to be fixed when SWF versions reaches this value
@@ -358,7 +359,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (characters == null) {
                     Map<Integer, CharacterTag> chars = new HashMap<>();
                     parseCharacters(tags, chars);
-                    characters = chars;
+                    characters = Collections.unmodifiableMap(chars);
                 }
             }
         }
@@ -506,10 +507,12 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void resetTimelines(Timelined timelined) {
-        timelined.getTimeline().reset();
-        for (Tag t : timelined.getTimeline().tags) {
-            if (t instanceof Timelined) {
-                resetTimelines((Timelined) t);
+        timelined.resetTimeline();
+        if (timelined instanceof SWF) {
+            for (Tag t : ((SWF) timelined).tags) {
+                if (t instanceof Timelined) {
+                    resetTimelines((Timelined) t);
+                }
             }
         }
     }
@@ -568,6 +571,13 @@ public final class SWF implements SWFContainerItem, Timelined {
             timeline = new Timeline(this);
         }
         return timeline;
+    }
+
+    @Override
+    public void resetTimeline() {
+        if (timeline != null) {
+            timeline.reset(this);
+        }
     }
 
     /**
@@ -869,9 +879,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         this.tags = tags;
         if (!checkOnly) {
             checkInvalidSprites();
-            Map<Integer, CharacterTag> chars = new HashMap<>();
-            parseCharacters(tags, chars);
-            characters = chars;
+            updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             SWFDecompilerPlugin.fireSwfParsed(this);
@@ -2381,14 +2389,14 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (drawableFrameCount == 0) {
                     drawableFrameCount = 1;
                 }
-                
+
                 int dframe;
                 if (timeline.fontFrameNum != -1) {
                     dframe = timeline.fontFrameNum;
                 } else {
                     dframe = (time + layer.time) % drawableFrameCount;
                 }
-                
+
                 if (character instanceof ButtonTag) {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.stateUnderCursor == layer) {
@@ -2731,7 +2739,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 DefineSpriteTag sprite = (DefineSpriteTag) timelined;
                 sprite.setModified(true);
             }
-            timelined.getTimeline().reset();
+            timelined.resetTimeline();
         } else {
             // timeline should be always the swf here
             if (removeDependencies) {

@@ -60,6 +60,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        return false;
+    }
+
+    @Override
     public boolean removeCharacter(int characterId) {
         return false;
     }
