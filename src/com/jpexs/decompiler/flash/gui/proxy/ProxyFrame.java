@@ -55,6 +55,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -720,7 +721,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 String tempFilePath = Main.tempFile(url);
                 data.reset();
                 byte[] dataArray = Helper.readStream(data);
-                try (FileOutputStream fos = new FileOutputStream(new File(tempFilePath))) {
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(tempFilePath)))) {
                     fos.write(dataArray);
                 }
 

@@ -1210,7 +1210,7 @@ public class CommandLineArgumentParser {
             String xml = Helper.readTextFile(args.pop());
             SWF swf = new SWF();
             new SwfXmlImporter().importSwf(swf, xml);
-            try (FileOutputStream fos = new FileOutputStream(new File(args.pop()))) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(args.pop())))) {
                 swf.saveTo(new BufferedOutputStream(fos));
             }
         } catch (IOException ex) {
@@ -1400,7 +1400,7 @@ public class CommandLineArgumentParser {
                     DefineSpriteTag ds = (DefineSpriteTag) t;
                     if ("page1".equals(ds.getExportName())) {
                         page = 1;
-                        job = new PDFJob(new FileOutputStream(outFile));
+                        job = new PDFJob(new BufferedOutputStream(new FileOutputStream(outFile)));
                     } else {
                         if (page > 0) {
                             page++;
@@ -1550,7 +1550,7 @@ public class CommandLineArgumentParser {
                 }
 
                 try {
-                    try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                         swf.saveTo(fos);
                     }
                 } catch (IOException e) {

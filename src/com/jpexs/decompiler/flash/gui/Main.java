@@ -56,6 +56,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,6 +65,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -386,7 +388,7 @@ public class Main {
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tmpFile))) {
             if (mode == SaveFileMode.EXE) {
                 InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
                 byte[] buffer = new byte[4096];

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -80,7 +81,7 @@ public class MovieExporter {
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                             fos.write(exportMovie(videoStream, settings.mode));
                         }
                     }

@@ -31,9 +31,11 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +82,7 @@ public class TextExporter {
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            try (FileOutputStream fos = new FileOutputStream(file)) {
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 ExportRectangle rect = new ExportRectangle(textTag.getRect());
                                 SVGExporter exporter = new SVGExporter(rect);
                                 textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
@@ -109,7 +111,7 @@ public class TextExporter {
                 fileName = settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN;
             }
             final File file = new File(outdir + File.separator + fileName);
-            try (FileOutputStream fos = new FileOutputStream(file)) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                 for (final Tag t : tags) {
                     if (t instanceof TextTag) {
                         final TextTag textTag = (TextTag) t;
@@ -144,7 +146,7 @@ public class TextExporter {
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            try (FileOutputStream fos = new FileOutputStream(file)) {
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 if (settings.mode == TextExportMode.FORMATTED) {
                                     fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
                                 } else {

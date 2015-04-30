@@ -37,9 +37,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -210,7 +212,7 @@ public class DumpTree extends JTree implements ActionListener {
                 View.setWindowIcon(f);
                 if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
                     File sf = Helper.fixDialogFile(fc.getSelectedFile());
-                    try (FileOutputStream fos = new FileOutputStream(sf)) {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
                         byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                         fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
                     } catch (IOException ex) {

@@ -24,8 +24,9 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
+import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,7 +36,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -57,15 +60,21 @@ import org.w3c.dom.Node;
  */
 public class SwfXmlExporter {
 
+    private Map<Class, List<Field>> cachedFields = new HashMap<>();
+
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
+            Stopwatch sw = Stopwatch.startNew();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document xmlDoc = docBuilder.newDocument();
             exportXml(swf, xmlDoc, xmlDoc);
-            try (Writer writer = new BufferedWriter(new Utf8OutputStreamWriter(new FileOutputStream(outFile)))) {
+            System.out.println(sw.getElapsedMilliseconds());
+            try (Writer writer = new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outFile)))) {
                 writer.append(getXml(xmlDoc));
             }
+            sw.stop();
+            System.out.println(sw.getElapsedMilliseconds());
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -104,7 +113,17 @@ public class SwfXmlExporter {
         return sb.toString();
     }
 
-    private static void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
+    public List<Field> getSwfFieldsCached(Class cls) {
+        List<Field> result = cachedFields.get(cls);
+        if (result == null) {
+            result = ReflectionTools.getSwfFields(cls);
+            cachedFields.put(cls, result);
+        }
+
+        return result;
+    }
+
+    private void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
         Class cls = obj != null ? obj.getClass() : null;
 
         if (cls == Byte.class || cls == byte.class
@@ -163,7 +182,7 @@ public class SwfXmlExporter {
             }
 
             String className = clazz.getSimpleName();
-            List<Field> fields = ReflectionTools.getSwfFields(obj.getClass());
+            List<Field> fields = getSwfFieldsCached(obj.getClass());
             Element objNode = doc.createElement(name);
             objNode.setAttribute("type", className);
             node.appendChild(objNode);

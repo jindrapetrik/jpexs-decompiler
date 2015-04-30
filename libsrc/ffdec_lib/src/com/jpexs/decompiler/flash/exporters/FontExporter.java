@@ -39,10 +39,12 @@ import com.jpexs.helpers.Path;
 import fontastic.FGlyph;
 import fontastic.FPoint;
 import fontastic.Fontastic;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -279,7 +281,7 @@ public class FontExporter {
 
             Font font = fontArray[0];
 
-            try (FileOutputStream fos = new FileOutputStream(file)) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                 WoffWriter w = new WoffWriter();
                 WritableFontData woffData = w.convert(font);
                 woffData.copyTo(fos);

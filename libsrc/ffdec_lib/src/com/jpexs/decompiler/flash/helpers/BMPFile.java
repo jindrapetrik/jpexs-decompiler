@@ -19,9 +19,11 @@ package com.jpexs.decompiler.flash.helpers;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.PixelGrabber;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Adapted from
@@ -77,7 +79,7 @@ public class BMPFile extends Component {
     private int[] bitmap;
 
     //--- File section
-    private FileOutputStream fo;
+    private OutputStream fo;
 
     //--- Private constructor
     private BMPFile() {
@@ -85,7 +87,7 @@ public class BMPFile extends Component {
 
     public static void saveBitmap(Image image, File file) throws IOException {
         BMPFile b = new BMPFile();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
             b.fo = fos;
             b.save(image, image.getWidth(null), image.getHeight(null));
         }

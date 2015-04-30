@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.helpers;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
@@ -43,7 +43,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
 
     public FileTextWriter(CodeFormatting formatting, FileOutputStream fos) {
         super(formatting);
-        this.writer = new BufferedWriter(new Utf8OutputStreamWriter(fos));
+        this.writer = new Utf8OutputStreamWriter(new BufferedOutputStream(fos));
     }
 
     @Override

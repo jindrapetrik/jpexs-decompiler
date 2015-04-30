@@ -30,6 +30,7 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -843,9 +844,9 @@ public class Helper {
     }
 
     public static void saveStream(InputStream is, File output) throws IOException {
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[4096];
         int cnt;
-        try (FileOutputStream fos = new FileOutputStream(output)) {
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(output))) {
             while ((cnt = is.read(buf)) > 0) {
                 fos.write(buf, 0, cnt);
                 fos.flush();

@@ -34,10 +34,12 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +92,7 @@ public class MorphShapeExporter {
                         MorphShapeTag mst = (MorphShapeTag) t;
                         switch (settings.mode) {
                             case SVG:
-                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                     ExportRectangle rect = new ExportRectangle(mst.getRect());
                                     rect.xMax *= settings.zoom;
                                     rect.yMax *= settings.zoom;
@@ -102,7 +104,7 @@ public class MorphShapeExporter {
                                 }
                                 break;
                             case CANVAS:
-                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                     int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);
                                     int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
                                     CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);

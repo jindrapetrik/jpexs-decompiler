@@ -24,9 +24,11 @@ import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Path;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +71,7 @@ public class BinaryDataExporter {
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                             fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
                         }
                     }

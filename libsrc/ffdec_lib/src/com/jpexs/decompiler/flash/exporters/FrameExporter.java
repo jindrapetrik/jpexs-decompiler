@@ -61,10 +61,12 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -160,7 +162,7 @@ public class FrameExporter {
                     public void run() throws IOException {
                         int frame = fframes.get(fi);
                         File f = new File(foutdir + File.separator + frame + ".svg");
-                        try (FileOutputStream fos = new FileOutputStream(f)) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             ExportRectangle rect = new ExportRectangle(tim.displayRect);
                             rect.xMax *= settings.zoom;
                             rect.yMax *= settings.zoom;
@@ -204,7 +206,7 @@ public class FrameExporter {
                     File fmin = new File(foutdir + File.separator + "frames.min.js");
                     int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
                     int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
-                    try (FileOutputStream fos = new FileOutputStream(f)) {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                         fos.write(Utf8Helper.getBytes("\r\n"));
                         Set<Integer> library = new HashSet<>();
                         ftim.getNeededCharacters(fframes, library);
@@ -274,7 +276,7 @@ public class FrameExporter {
                     }
 
                     File fh = new File(foutdir + File.separator + "frames.html");
-                    try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis = new FileInputStream(fmin)) {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fh)); FileInputStream fis = new FileInputStream(fmin)) {
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
                         byte[] buf = new byte[1000];
@@ -380,7 +382,7 @@ public class FrameExporter {
                     @Override
                     public void run() throws IOException {
                         File f = new File(foutdir + File.separator + "frames.pdf");
-                        PDFJob job = new PDFJob(new FileOutputStream(f));
+                        PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();
