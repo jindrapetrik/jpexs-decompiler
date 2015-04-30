@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +109,19 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     public void setSwf(SWF swf) {
+        setSwf(swf, false);
+    }
+
+    public void setSwf(SWF swf, boolean deep) {
         this.swf = swf;
+        if (deep) {
+            if (this instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) this;
+                for (Tag subTag : sprite.subTags) {
+                    subTag.setSwf(swf);
+                }
+            }
+        }
     }
 
     public Timelined getTimelined() {
@@ -585,7 +598,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public void getNeededCharactersDeep(Set<Integer> needed) {
         Set<Integer> visited = new HashSet<>();
-        Set<Integer> needed2 = new HashSet<>();
+        Set<Integer> needed2 = new LinkedHashSet<>();
         getNeededCharacters(needed2);
 
         while (visited.size() != needed2.size()) {

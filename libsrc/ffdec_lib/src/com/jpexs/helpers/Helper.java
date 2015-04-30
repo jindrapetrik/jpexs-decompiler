@@ -384,10 +384,10 @@ public class Helper {
         return sb.toString();
     }
 
-    public static String joinStrings(List<String> arr, String glue) {
+    public static String joinStrings(Iterable<?> arr, String glue) {
         StringBuilder ret = new StringBuilder();
         boolean first = true;
-        for (String s : arr) {
+        for (Object s : arr) {
             if (!first) {
                 ret.append(glue);
             } else {

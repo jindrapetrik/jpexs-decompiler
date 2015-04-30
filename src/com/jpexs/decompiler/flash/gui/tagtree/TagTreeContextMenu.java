@@ -46,6 +46,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -440,7 +441,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private void chechUniqueCharacterId(Tag tag) {
+    private int chechUniqueCharacterId(Tag tag) {
         if (tag instanceof CharacterTag) {
             CharacterTag characterTag = (CharacterTag) tag;
             int characterId = characterTag.getCharacterId();
@@ -449,8 +450,13 @@ public class TagTreeContextMenu extends JPopupMenu {
                 int newCharacterId = swf.getNextCharacterId();
                 characterTag.setCharacterId(newCharacterId);
                 logger.log(Level.WARNING, "Target SWF already contained chatacter tag with id = {0} => id changed to {1}", new Object[]{characterId, newCharacterId});
+                return newCharacterId;
             }
+            
+            return characterId;
         }
+        
+        return -1;
     }
 
     private void moveTagActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
@@ -458,7 +464,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         for (TreeItem item : items) {
             Tag tag = (Tag) item;
             sourceSwf.tags.remove(tag);
-            tag.setSwf(targetSwf);
+            tag.setSwf(targetSwf, true);
             targetSwf.tags.add(tag);
             chechUniqueCharacterId(tag);
             targetSwf.updateCharacters();
@@ -483,7 +489,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (TreeItem item : items) {
                 Tag tag = (Tag) item;
                 Tag copyTag = tag.cloneTag();
-                copyTag.setSwf(targetSwf);
+                copyTag.setSwf(targetSwf, true);
                 targetSwf.tags.add(copyTag);
                 chechUniqueCharacterId(copyTag);
                 targetSwf.updateCharacters();
@@ -503,32 +509,66 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void copyTagWithDependenciesActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
         try {
             SWF sourceSwf = items.get(0).getSwf();
-            Set<Tag> copiedTags = new HashSet<>();
-            Set<Integer> needed = new HashSet<>();
             for (TreeItem item : items) {
+                Set<Tag> copiedTags = new HashSet<>();
+                Set<Tag> newTags = new HashSet<>();
+                LinkedHashSet<Integer> needed = new LinkedHashSet<>();
+                Map<Integer, Integer> changedCharacterIds = new HashMap<>();
+
                 Tag tag = (Tag) item;
                 tag.getNeededCharactersDeep(needed);
-                Tag copyTag = tag.cloneTag();
-                copyTag.setSwf(targetSwf);
+                Tag copyTag;
+
+                List<Integer> neededList = new ArrayList<>();
+                for (Integer characterId : needed) {
+                    neededList.add(characterId);
+                }
+                
+                // first add dependencies in reverse order
+                for (int i = neededList.size() - 1; i >= 0; i--) {
+                    int characterId = neededList.get(i);
+                    Tag neededTag = (Tag) sourceSwf.getCharacter(characterId);
+                    if (!copiedTags.contains(neededTag)) {
+                        copyTag = neededTag.cloneTag();
+                        copyTag.setSwf(targetSwf, true);
+                        targetSwf.tags.add(copyTag);
+                        if (neededTag instanceof CharacterTag) {
+                            CharacterTag characterTag = (CharacterTag) copyTag;
+                            int oldCharacterId = characterTag.getCharacterId();
+                            int newCharacterId = chechUniqueCharacterId(copyTag);
+                            changedCharacterIds.put(oldCharacterId, newCharacterId);
+                        }
+
+                        targetSwf.updateCharacters();
+                        targetSwf.getCharacters(); // force rebuild character id cache
+                        copyTag.setModified(true);
+                        copiedTags.add(neededTag);
+                        newTags.add(copyTag);
+                    }
+                }
+
+                copyTag = tag.cloneTag();
+                copyTag.setSwf(targetSwf, true);
                 targetSwf.tags.add(copyTag);
-                chechUniqueCharacterId(copyTag);
+                if (tag instanceof CharacterTag) {
+                    CharacterTag characterTag = (CharacterTag) copyTag;
+                    int oldCharacterId = characterTag.getCharacterId();
+                    int newCharacterId = chechUniqueCharacterId(copyTag);
+                    changedCharacterIds.put(oldCharacterId, newCharacterId);
+                }
+                
                 targetSwf.updateCharacters();
                 targetSwf.getCharacters(); // force rebuild character id cache
                 copyTag.setModified(true);
                 copiedTags.add(tag);
-            }
+                newTags.add(copyTag);
 
-            for (Integer characterId : needed) {
-                Tag tag = (Tag) sourceSwf.getCharacter(characterId);
-                if (!copiedTags.contains(tag)) {
-                    Tag copyTag = tag.cloneTag();
-                    copyTag.setSwf(targetSwf);
-                    targetSwf.tags.add(copyTag);
-                    chechUniqueCharacterId(copyTag);
-                    targetSwf.updateCharacters();
-                    targetSwf.getCharacters(); // force rebuild character id cache
-                    copyTag.setModified(true);
-                    copiedTags.add(tag);
+                for (int oldCharacterId : changedCharacterIds.keySet()) {
+                    int newCharacterId = changedCharacterIds.get(oldCharacterId);
+                    for (Tag newTag : newTags) {
+                        // todo: avoid double replaces
+                        newTag.replaceCharacter(oldCharacterId, newCharacterId);
+                    }
                 }
             }
 
