@@ -60,7 +60,16 @@ import org.w3c.dom.Node;
  */
 public class SwfXmlExporter {
 
-    private Map<Class, List<Field>> cachedFields = new HashMap<>();
+    private final Map<Class, List<Field>> cachedFields = new HashMap<>();
+
+    private static final String[] hexStringCache;
+
+    static {
+        hexStringCache = new String[256];
+        for (int i = 0; i < hexStringCache.length; i++) {
+            hexStringCache[i] = String.format("%02x", i);
+        }
+    }
 
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -107,7 +116,7 @@ public class SwfXmlExporter {
     private static String byteArrayToString(byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
         for (int i = 0; i < data.length; i++) {
-            sb.append(String.format("%02x", data[i]));
+            sb.append(hexStringCache[data[i] & 0xFF]);
         }
 
         return sb.toString();
