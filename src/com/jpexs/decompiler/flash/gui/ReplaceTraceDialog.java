@@ -20,7 +20,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -87,31 +86,9 @@ public class ReplaceTraceDialog extends AppDialog {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
-        okButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (debugAlertRadio.isSelected()) {
-                    value = "debugAlert";
-                }
-                if (debugConsoleRadio.isSelected()) {
-                    value = "debugConsole";
-                }
-                if (debugSocketRadio.isSelected()) {
-                    value = "debugSocket";
-                }
-                setVisible(false);
-            }
-        });
+        okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(AppStrings.translate("button.cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                value = null;
-                setVisible(false);
-            }
-        });
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
         buttonsPanel.setAlignmentX(0);
@@ -121,5 +98,24 @@ public class ReplaceTraceDialog extends AppDialog {
         View.setWindowIcon(this);
         View.centerScreen(this);
         setValue(defaultVal);
+    }
+
+    private void okButtonActionPerformed(ActionEvent evt) {
+        if (debugAlertRadio.isSelected()) {
+            value = "debugAlert";
+        }
+        if (debugConsoleRadio.isSelected()) {
+            value = "debugConsole";
+        }
+        if (debugSocketRadio.isSelected()) {
+            value = "debugSocket";
+        }
+
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        value = null;
+        setVisible(false);
     }
 }

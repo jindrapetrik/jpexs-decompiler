@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
@@ -31,13 +30,7 @@ import javax.swing.JLabel;
  *
  * @author JPEXS
  */
-public class ModeFrame extends AppFrame implements ActionListener {
-
-    private static final String ACTION_OPEN = "OPEN";
-
-    private static final String ACTION_PROXY = "PROXY";
-
-    private static final String ACTION_EXIT = "EXIT";
+public class ModeFrame extends AppFrame {
 
     private final JButton openButton = new JButton(translate("button.open"));
 
@@ -50,14 +43,11 @@ public class ModeFrame extends AppFrame implements ActionListener {
      */
     public ModeFrame() {
         setSize(350, 200);
-        openButton.addActionListener(this);
-        openButton.setActionCommand(ACTION_OPEN);
+        openButton.addActionListener(this::openButtonActionPerformed);
         openButton.setIcon(View.getIcon("open32"));
-        proxyButton.addActionListener(this);
-        proxyButton.setActionCommand(ACTION_PROXY);
+        proxyButton.addActionListener(this::proxyButtonActionPerformed);
         proxyButton.setIcon(View.getIcon("proxy32"));
-        exitButton.addActionListener(this);
-        exitButton.setActionCommand(ACTION_EXIT);
+        exitButton.addActionListener(this::exitButtonActionPerformed);
         exitButton.setIcon(View.getIcon("exit32"));
         setResizable(false);
         Container cont = getContentPane();
@@ -79,28 +69,20 @@ public class ModeFrame extends AppFrame implements ActionListener {
         });
     }
 
-    /**
-     * Method handling actions from buttons
-     *
-     * @param e event
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OPEN:
-                setVisible(false);
-                if (!Main.openFileDialog()) {
-                    setVisible(true);
-                }
-                break;
-            case ACTION_PROXY:
-                setVisible(false);
-                Main.showProxy();
-                break;
-            case ACTION_EXIT:
-                setVisible(false);
-                Main.exit();
-                break;
+    private void openButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
+        if (!Main.openFileDialog()) {
+            setVisible(true);
         }
+    }
+
+    private void proxyButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
+        Main.showProxy();
+    }
+
+    private void exitButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
+        Main.exit();
     }
 }

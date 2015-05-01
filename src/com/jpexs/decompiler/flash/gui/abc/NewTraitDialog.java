@@ -26,7 +26,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -41,11 +40,7 @@ import javax.swing.event.AncestorListener;
  *
  * @author JPEXS
  */
-public class NewTraitDialog extends AppDialog implements ActionListener {
-
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
+public class NewTraitDialog extends AppDialog {
 
     private static final int modifiers[] = new int[]{
         Namespace.KIND_PACKAGE,
@@ -72,6 +67,8 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
     private final JCheckBox staticCheckbox;
 
     private final JTextField nameField;
+
+    private int result = ERROR_OPTION;
 
     public boolean getStatic() {
         return staticCheckbox.isSelected();
@@ -127,11 +124,9 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         cnt.add(optionsPanel, BorderLayout.CENTER);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton buttonOk = new JButton(AppStrings.translate("button.ok"));
-        buttonOk.setActionCommand(ACTION_OK);
-        buttonOk.addActionListener(this);
+        buttonOk.addActionListener(this::okButtonActionPerformed);
         JButton buttonCancel = new JButton(AppStrings.translate("button.cancel"));
-        buttonCancel.setActionCommand(ACTION_CANCEL);
-        buttonCancel.addActionListener(this);
+        buttonCancel.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(buttonOk);
         buttonsPanel.add(buttonCancel);
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
@@ -157,30 +152,33 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         getRootPane().setDefaultButton(buttonOk);
     }
 
-    public boolean display() {
-        nameField.setText("");
-        setVisible(true);
-        return result;
-    }
-
-    private boolean result = false;
-
     @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OK:
-                if (nameField.getText().trim().isEmpty()) {
-                    View.showMessageDialog(null, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                result = true;
-                setVisible(false);
-                break;
-            case ACTION_CANCEL:
-                result = false;
-                setVisible(false);
-                break;
+    public void setVisible(boolean b) {
+        if (b) {
+            result = ERROR_OPTION;
+            nameField.setText("");
         }
 
+        super.setVisible(b);
+    }
+
+    private void okButtonActionPerformed(ActionEvent evt) {
+        result = OK_OPTION;
+        if (nameField.getText().trim().isEmpty()) {
+            View.showMessageDialog(null, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        result = CANCEL_OPTION;
+        setVisible(false);
+    }
+
+    public int showDialog() {
+        setVisible(true);
+        return result;
     }
 }

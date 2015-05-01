@@ -22,7 +22,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -42,11 +41,7 @@ import javax.swing.JTextField;
  *
  * @author JPEXS
  */
-public class SearchDialog extends AppDialog implements ActionListener {
-
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
+public class SearchDialog extends AppDialog {
 
     public JTextField searchField = new MyTextField();
 
@@ -62,7 +57,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
 
     public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
 
-    public boolean result = false;
+    private int result = ERROR_OPTION;
 
     public SearchDialog(Window owner, boolean replace) {
         super(owner);
@@ -73,11 +68,9 @@ public class SearchDialog extends AppDialog implements ActionListener {
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         JPanel panButtons = new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.setActionCommand(ACTION_OK);
-        okButton.addActionListener(this);
+        okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.setActionCommand(ACTION_CANCEL);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         panButtons.add(okButton);
         panButtons.add(cancelButton);
         JPanel panField = new JPanel(new FlowLayout());
@@ -133,27 +126,34 @@ public class SearchDialog extends AppDialog implements ActionListener {
     @Override
     public void setVisible(boolean b) {
         if (b) {
-            result = false;
+            result = ERROR_OPTION;
             searchField.requestFocusInWindow();
         }
+
         super.setVisible(b);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(ACTION_OK)) {
-            if (regexpCheckBox.isSelected()) {
-                try {
-                    Pattern pat = Pattern.compile(searchField.getText());
-                } catch (PatternSyntaxException ex) {
-                    View.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+    private void okButtonActionPerformed(ActionEvent evt) {
+        result = OK_OPTION;
+        if (regexpCheckBox.isSelected()) {
+            try {
+                Pattern pat = Pattern.compile(searchField.getText());
+            } catch (PatternSyntaxException ex) {
+                View.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            result = true;
-        } else {
-            result = false;
         }
+
         setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        result = CANCEL_OPTION;
+        setVisible(false);
+    }
+
+    public int showDialog() {
+        setVisible(true);
+        return result;
     }
 }

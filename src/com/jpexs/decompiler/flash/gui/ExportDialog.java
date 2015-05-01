@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
+import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
+import static com.jpexs.decompiler.flash.gui.AppDialog.OK_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -49,8 +51,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
@@ -67,7 +67,7 @@ import javax.swing.JTextField;
  */
 public class ExportDialog extends AppDialog {
 
-    boolean cancelled = false;
+    private int result = ERROR_OPTION;
 
     String[] optionNames = {
         TagTreeModel.FOLDER_SHAPES,
@@ -126,7 +126,7 @@ public class ExportDialog extends AppDialog {
     private final JComboBox[] combos;
 
     private final JCheckBox[] checkBoxes;
-    
+
     private final JCheckBox selectAllCheckBox;
 
     private JTextField zoomTextField = new JTextField();
@@ -138,7 +138,7 @@ public class ExportDialog extends AppDialog {
                 return values[combos[i].getSelectedIndex()];
             }
         }
-        
+
         return null;
     }
 
@@ -148,7 +148,7 @@ public class ExportDialog extends AppDialog {
                 return checkBoxes[i].isSelected();
             }
         }
-        
+
         return false;
     }
 
@@ -168,7 +168,7 @@ public class ExportDialog extends AppDialog {
             }
             cfg += key;
         }
-        
+
         Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
         Configuration.lastSelectedExportFormats.set(cfg);
     }
@@ -176,12 +176,6 @@ public class ExportDialog extends AppDialog {
     public ExportDialog(List<TreeItem> exportables) {
         setTitle(translate("dialog.title"));
         setResizable(false);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                cancelled = true;
-            }
-        });
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
@@ -201,24 +195,24 @@ public class ExportDialog extends AppDialog {
                     }
                 }
             }
-            
+
             if (!exportableExists) {
                 continue;
             }
-            
+
             exportableExistsArray[i] = true;
-            
+
             JLabel label = new JLabel(translate(optionNames[i]));
             if (label.getPreferredSize().width > labWidth) {
                 labWidth = label.getPreferredSize().width;
             }
         }
-        
+
         String exportFormatsStr = Configuration.lastSelectedExportFormats.get();
         if ("".equals(exportFormatsStr)) {
             exportFormatsStr = null;
         }
-        
+
         String exportFormatsArr[] = new String[0];
         if (exportFormatsStr != null) {
             if (exportFormatsStr.contains(",")) {
@@ -228,7 +222,7 @@ public class ExportDialog extends AppDialog {
             }
 
         }
-        
+
         int comboWidth = 200;
         int checkBoxWidth;
         int top = 10;
@@ -243,14 +237,14 @@ public class ExportDialog extends AppDialog {
         selectAllCheckBox.addActionListener((ActionEvent e) -> {
             boolean selected = selectAllCheckBox.isSelected();
             for (JCheckBox checkBox : checkBoxes) {
-                if (checkBox != null){
+                if (checkBox != null) {
                     checkBox.setSelected(selected);
                 }
             }
         });
         comboPanel.add(selectAllCheckBox);
         top += selectAllCheckBox.getHeight();
-        
+
         boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
@@ -270,7 +264,7 @@ public class ExportDialog extends AppDialog {
             if (itemIndex > -1) {
                 combos[i].setSelectedIndex(itemIndex);
             }
-            
+
             combos[i].setBounds(10 + labWidth + 10, top, comboWidth, combos[i].getPreferredSize().height);
 
             checkBoxes[i] = new JCheckBox();
@@ -284,7 +278,7 @@ public class ExportDialog extends AppDialog {
             if (Arrays.asList(zoomClasses).contains(c)) {
                 zoomable = true;
             }
-            
+
             JLabel lab = new JLabel(translate(optionNames[i]));
             lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
             comboPanel.add(lab);
@@ -292,7 +286,7 @@ public class ExportDialog extends AppDialog {
             comboPanel.add(combos[i]);
             top += combos[i].getHeight();
         }
-        
+
         int zoomWidth = 50;
         if (zoomable) {
             top += 2;
@@ -315,23 +309,10 @@ public class ExportDialog extends AppDialog {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.addActionListener((ActionEvent e) -> {
-            try {
-                saveConfig();
-            } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                zoomTextField.requestFocusInWindow();
-                return;
-            }
-            
-            setVisible(false);
-        });
+        okButton.addActionListener(this::okButtonActionPerformed);
 
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.addActionListener((ActionEvent e) -> {
-            cancelled = true;
-            setVisible(false);
-        });
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
 
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
@@ -346,15 +327,38 @@ public class ExportDialog extends AppDialog {
         if (pct.endsWith(".0")) {
             pct = pct.substring(0, pct.length() - 2);
         }
-        
+
         zoomTextField.setText(pct);
     }
 
     @Override
     public void setVisible(boolean b) {
         if (b) {
-            cancelled = false;
+            result = ERROR_OPTION;
         }
         super.setVisible(b);
+    }
+
+    private void okButtonActionPerformed(ActionEvent evt) {
+        result = OK_OPTION;
+        try {
+            saveConfig();
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            zoomTextField.requestFocusInWindow();
+            return;
+        }
+
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        result = CANCEL_OPTION;
+        setVisible(false);
+    }
+
+    public int showExportDialog() {
+        setVisible(true);
+        return result;
     }
 }

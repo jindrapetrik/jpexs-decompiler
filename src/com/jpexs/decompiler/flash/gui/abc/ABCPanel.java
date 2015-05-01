@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -850,7 +851,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         View.showMessageDialog(null, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                     again = false;
-                    if (!newTraitDialog.display()) {
+                    if (newTraitDialog.showDialog() != AppDialog.OK_OPTION) {
                         return;
                     }
                     kind = newTraitDialog.getTraitType();

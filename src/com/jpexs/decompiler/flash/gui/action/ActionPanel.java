@@ -55,7 +55,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -87,25 +86,7 @@ import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 
-public class ActionPanel extends JPanel implements ActionListener, SearchListener<ActionSearchResult> {
-
-    private static final String ACTION_GRAPH = "GRAPH";
-
-    private static final String ACTION_HEX = "HEX";
-
-    private static final String ACTION_HEX_ONLY = "HEXONLY";
-
-    private static final String ACTION_SAVE_ACTION = "SAVEACTION";
-
-    private static final String ACTION_EDIT_ACTION = "EDITACTION";
-
-    private static final String ACTION_CANCEL_ACTION = "CANCELACTION";
-
-    private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
-
-    private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
-
-    private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
+public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult> {
 
     private MainPanel mainPanel;
 
@@ -482,20 +463,17 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
-        graphButton.setActionCommand(ACTION_GRAPH);
-        graphButton.addActionListener(this);
+        graphButton.addActionListener(this::graphButtonActionPerformed);
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hexas16"));
-        hexButton.setActionCommand(ACTION_HEX);
-        hexButton.addActionListener(this);
+        hexButton.addActionListener(this::hexButtonActionPerformed);
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
-        hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
-        hexOnlyButton.addActionListener(this);
+        hexOnlyButton.addActionListener(this::hexOnlyButtonActionPerformed);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
@@ -539,22 +517,15 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         //buttonsPan.add(loadHexButton);
         panB.add(buttonsPan, BorderLayout.SOUTH);
 
-        saveButton.addActionListener(this);
-        saveButton.setActionCommand(ACTION_SAVE_ACTION);
-        editButton.addActionListener(this);
-        editButton.setActionCommand(ACTION_EDIT_ACTION);
-        cancelButton.addActionListener(this);
-        cancelButton.setActionCommand(ACTION_CANCEL_ACTION);
+        saveButton.addActionListener(this::saveActionButtonActionPerformed);
+        editButton.addActionListener(this::editActionButtonActionPerformed);
+        cancelButton.addActionListener(this::cancelActionButtonActionPerformed);
         saveButton.setVisible(false);
         cancelButton.setVisible(false);
 
-        saveDecompiledButton.addActionListener(this);
-        saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
-        editDecompiledButton.addActionListener(this);
-        editDecompiledButton.setActionCommand(ACTION_EDIT_DECOMPILED);
-
-        cancelDecompiledButton.addActionListener(this);
-        cancelDecompiledButton.setActionCommand(ACTION_CANCEL_DECOMPILED);
+        saveDecompiledButton.addActionListener(this::saveDecompiledButtonActionPerformed);
+        editDecompiledButton.addActionListener(this::editDecompiledButtonActionPerformed);
+        cancelDecompiledButton.addActionListener(this::cancelDecompiledButtonActionPerformed);
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
 
@@ -725,83 +696,85 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         decompiledEditor.requestFocusInWindow();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_GRAPH:
-                if (lastCode != null) {
-                    try {
-                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
-                        gf.setVisible(true);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                break;
-            case ACTION_EDIT_ACTION:
-                setEditMode(true);
-                break;
-            case ACTION_HEX:
-            case ACTION_HEX_ONLY:
-                if (e.getActionCommand().equals(ACTION_HEX)) {
-                    hexOnlyButton.setSelected(false);
-                } else {
-                    hexButton.setSelected(false);
-                }
-                setHex(getExportMode());
-                break;
-            case ACTION_CANCEL_ACTION:
-                setEditMode(false);
-                setHex(getExportMode());
-                break;
-            case ACTION_SAVE_ACTION:
-                try {
-                    String text = editor.getText();
-                    if (text.trim().startsWith("#hexdata")) {
-                        src.setActionBytes(Helper.getBytesFromHexaText(text));
-                    } else {
-                        src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
-                    }
-                    src.setModified();
-                    setSource(this.src, false);
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-                    saveButton.setVisible(false);
-                    cancelButton.setVisible(false);
-                    editButton.setVisible(true);
-                    editor.setEditable(false);
-                    editMode = false;
-                } catch (IOException ex) {
-                } catch (ActionParseException ex) {
-                    editor.gotoLine((int) ex.line);
-                    editor.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case ACTION_EDIT_DECOMPILED:
-                if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-                    setDecompiledEditMode(true);
-                }
-                break;
-            case ACTION_CANCEL_DECOMPILED:
-                setDecompiledEditMode(false);
-                break;
-            case ACTION_SAVE_DECOMPILED:
-                try {
-                    ActionScriptParser par = new ActionScriptParser(mainPanel.getCurrentSwf().version);
-                    src.setActions(par.actionsFromString(decompiledEditor.getText()));
-                    src.setModified();
-                    setSource(src, false);
+    private void graphButtonActionPerformed(ActionEvent evt) {
+        if (lastCode != null) {
+            try {
+                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
+                gf.setVisible(true);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-                    setDecompiledEditMode(false);
-                } catch (IOException ex) {
-                    Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
-                } catch (ActionParseException ex) {
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                } catch (CompilationException ex) {
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                }
-                break;
+    private void editActionButtonActionPerformed(ActionEvent evt) {
+        setEditMode(true);
+    }
+
+    private void hexButtonActionPerformed(ActionEvent evt) {
+        hexOnlyButton.setSelected(false);
+        setHex(getExportMode());
+    }
+
+    private void hexOnlyButtonActionPerformed(ActionEvent evt) {
+        hexButton.setSelected(false);
+        setHex(getExportMode());
+    }
+
+    private void cancelActionButtonActionPerformed(ActionEvent evt) {
+        setEditMode(false);
+        setHex(getExportMode());
+    }
+
+    private void saveActionButtonActionPerformed(ActionEvent evt) {
+        try {
+            String text = editor.getText();
+            if (text.trim().startsWith("#hexdata")) {
+                src.setActionBytes(Helper.getBytesFromHexaText(text));
+            } else {
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
+            }
+            src.setModified();
+            setSource(this.src, false);
+            View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            saveButton.setVisible(false);
+            cancelButton.setVisible(false);
+            editButton.setVisible(true);
+            editor.setEditable(false);
+            editMode = false;
+        } catch (IOException ex) {
+        } catch (ActionParseException ex) {
+            editor.gotoLine((int) ex.line);
+            editor.markError();
+            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void editDecompiledButtonActionPerformed(ActionEvent evt) {
+        if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            setDecompiledEditMode(true);
+        }
+    }
+
+    private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
+        setDecompiledEditMode(false);
+    }
+
+    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+        try {
+            ActionScriptParser par = new ActionScriptParser(mainPanel.getCurrentSwf().version);
+            src.setActions(par.actionsFromString(decompiledEditor.getText()));
+            src.setModified();
+            setSource(src, false);
+
+            View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            setDecompiledEditMode(false);
+        } catch (IOException ex) {
+            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
+        } catch (ActionParseException ex) {
+            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (CompilationException ex) {
+            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         }
     }
 

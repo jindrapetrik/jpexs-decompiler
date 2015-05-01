@@ -36,9 +36,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class MainFrameStatusPanel extends JPanel implements ActionListener {
-
-    private static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
+public class MainFrameStatusPanel extends JPanel {
 
     private final MainPanel mainPanel;
 
@@ -96,8 +94,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         errorNotificationButton.setContentAreaFilled(false);
         errorNotificationButton.setMargin(new Insets(2, 2, 2, 2));
         errorNotificationButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        errorNotificationButton.setActionCommand(ACTION_SHOW_ERROR_LOG);
-        errorNotificationButton.addActionListener(this);
+        errorNotificationButton.addActionListener(this::showErrorLogButtonActionPerformed);
         errorNotificationButton.setToolTipText(translate("errors.none"));
         add(errorNotificationButton, BorderLayout.EAST);
 
@@ -105,13 +102,8 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         cancelButton.setVisible(false);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_SHOW_ERROR_LOG:
-                Main.displayErrorFrame();
-                break;
-        }
+    private void showErrorLogButtonActionPerformed(ActionEvent evt) {
+        Main.displayErrorFrame();
     }
 
     private String translate(String key) {

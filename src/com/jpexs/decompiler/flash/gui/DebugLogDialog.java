@@ -24,7 +24,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,13 +35,9 @@ import javax.swing.text.Document;
  *
  * @author JPEXS
  */
-public class DebugLogDialog extends AppDialog implements ActionListener {
+public class DebugLogDialog extends AppDialog {
 
     private final JTextArea logTextArea = new JTextArea();
-
-    private final String ACTION_CLOSE = "CLOSE";
-
-    private final String ACTION_CLEAR = "CLEAR";
 
     private final Debugger debug;
 
@@ -73,12 +68,10 @@ public class DebugLogDialog extends AppDialog implements ActionListener {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton clearButton = new JButton(translate("button.clear"));
-        clearButton.setActionCommand(ACTION_CLEAR);
-        clearButton.addActionListener(this);
+        clearButton.addActionListener(this::clearButtonActionPerformed);
 
         JButton closeButton = new JButton(translate("button.close"));
-        closeButton.setActionCommand(ACTION_CLOSE);
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(this::closeButtonActionPerformed);
 
         buttonsPanel.add(clearButton);
         buttonsPanel.add(closeButton);
@@ -96,15 +89,11 @@ public class DebugLogDialog extends AppDialog implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_CLEAR:
-                logTextArea.setText("");
-                break;
-            case ACTION_CLOSE:
-                setVisible(false);
-                break;
-        }
+    private void clearButtonActionPerformed(ActionEvent evt) {
+        logTextArea.setText("");
+    }
+
+    private void closeButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
     }
 }

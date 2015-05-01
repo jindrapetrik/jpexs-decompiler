@@ -47,8 +47,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -70,7 +68,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
+public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
 
@@ -462,15 +460,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     private synchronized void redraw() {
-        if (!isPlaying()){
+        if (!isPlaying()) {
             counter++;
         }
-        
+
         if (timer == null) {
             startTimer(counter, timelined.getTimeline(), false);
         }
     }
-    
+
     @Override
     public synchronized void zoom(Zoom zoom) {
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
@@ -483,11 +481,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             fireMediaDisplayStateChanged();
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
     }
 
     @Override
@@ -955,7 +948,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             if (!stillFrame && frame == timeline.getFrameCount() - 1) {
                 frame = 0;
             }
-            
+
             startTimer(counter, timeline, true);
         }
     }
@@ -987,7 +980,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                                 timer = null;
                             }
                         }
-                        
+
                         fireMediaDisplayStateChanged();
                     } else {
                         nextFrame(taskCounter);
@@ -1017,11 +1010,11 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined == null) {
             return false;
         }
-        
+
         if (stillFrame) {
             return false;
         }
-        
+
         return (timelined.getTimeline().getFrameCount() <= 1) || (timer != null);
     }
 

@@ -151,7 +151,6 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -208,7 +207,7 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, SearchListener<TextTag>, Freed {
+public final class MainPanel extends JPanel implements TreeSelectionListener, SearchListener<TextTag>, Freed {
 
     private final MainFrame mainFrame;
 
@@ -227,8 +226,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final MainFrameMenu mainMenu;
 
     private final JProgressBar progressBar = new JProgressBar(0, 100);
-
-    private DeobfuscationDialog deobfuscationDialog;
 
     public TagTree tagTree;
 
@@ -293,14 +290,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private CancellableWorker setSourceWorker;
 
     public TreeItem oldItem;
-
-    private SearchDialog searchDialog;
-
-    private SearchDialog replaceDialog;
-
-    public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-
-    public static final String ACTION_REPLACE = "REPLACE";
 
     // play morph shape in 2 second(s)
     public static final int MORPH_SHAPE_ANIMATION_LENGTH = 2;
@@ -544,8 +533,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(searchPanel, BorderLayout.SOUTH);
-
-        filterField.addActionListener(this);
 
         searchPanel.setVisible(false);
 
@@ -1354,10 +1341,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void searchInActionScriptOrText(Boolean searchInText) {
-        if (searchDialog == null) {
-            searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
-        }
-
+        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
         if (searchInText != null) {
             if (searchInText) {
                 searchDialog.searchInTextsRadioButton.setSelected(true);
@@ -1366,8 +1350,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
 
-        searchDialog.setVisible(true);
-        if (searchDialog.result) {
+        if (searchDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
                 final SWF swf = getCurrentSwf();
@@ -1411,12 +1394,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void replaceText() {
-        if (replaceDialog == null) {
-            replaceDialog = new SearchDialog(getMainFrame().getWindow(), true);
-        }
-
-        replaceDialog.setVisible(true);
-        if (replaceDialog.result) {
+        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true);
+        if (replaceDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {
                 final SWF swf = getCurrentSwf();
@@ -1818,8 +1797,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
         final ExportDialog export = new ExportDialog(sel);
-        export.setVisible(true);
-        if (!export.cancelled) {
+        if (export.showExportDialog() == AppDialog.OK_OPTION) {
             final String selFile = selectExportDir();
             if (selFile != null) {
                 final long timeBefore = System.currentTimeMillis();
@@ -2004,11 +1982,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void deobfuscate() {
-        if (deobfuscationDialog == null) {
-            deobfuscationDialog = new DeobfuscationDialog();
-        }
-        deobfuscationDialog.setVisible(true);
-        if (deobfuscationDialog.ok) {
+        DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog();
+        if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
             Main.startWork(translate("work.deobfuscating") + "...");
             new CancellableWorker() {
                 @Override
@@ -2221,121 +2196,129 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return false;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_SELECT_BKCOLOR:
-                Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
-                if (newColor != null) {
-                    View.setSwfBackgroundColor(newColor);
+    public void selectBkColorButtonActionPerformed(ActionEvent evt) {
+        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
+        if (newColor != null) {
+            View.setSwfBackgroundColor(newColor);
+            reload(true);
+        }
+    }
+
+    public void replaceButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof DefineSoundTag) {
+            File selectedFile = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                DefineSoundTag ds = (DefineSoundTag) item;
+                int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                if (selfile.getName().toLowerCase().endsWith(".mp3")) {
+                    soundFormat = SoundFormat.FORMAT_MP3;
+                }
+                boolean ok = false;
+                try {
+                    ok = ds.setSound(new FileInputStream(selfile), soundFormat);
+                } catch (IOException ex) {
+                    //ignore
+                }
+                if (!ok) {
+                    View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                } else {
                     reload(true);
                 }
-                break;
-            case ACTION_REPLACE: {
-                TreeItem item = tagTree.getCurrentTreeItem();
-                if (item == null) {
-                    return;
-                }
-
-                if (item instanceof DefineSoundTag) {
-                    File selectedFile = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
-                    if (selectedFile != null) {
-                        File selfile = Helper.fixDialogFile(selectedFile);
-                        DefineSoundTag ds = (DefineSoundTag) item;
-                        int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                        if (selfile.getName().toLowerCase().endsWith(".mp3")) {
-                            soundFormat = SoundFormat.FORMAT_MP3;
+            }
+        }
+        if (item instanceof ImageTag) {
+            ImageTag it = (ImageTag) item;
+            if (it.importSupported()) {
+                File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+                if (selectedFile != null) {
+                    File selfile = Helper.fixDialogFile(selectedFile);
+                    byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                    try {
+                        Tag newTag = new ImageImporter().importImage(it, data);
+                        SWF swf = it.getSwf();
+                        if (newTag != null) {
+                            refreshTree(swf);
+                            setTagTreeSelectedNode(newTag);
                         }
-                        boolean ok = false;
-                        try {
-                            ok = ds.setSound(new FileInputStream(selfile), soundFormat);
-                        } catch (IOException ex) {
-                            //ignore
-                        }
-                        if (!ok) {
-                            View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            reload(true);
-                        }
+                        swf.clearImageCache();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, "Invalid image", ex);
+                        View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
-                }
-                if (item instanceof ImageTag) {
-                    ImageTag it = (ImageTag) item;
-                    if (it.importSupported()) {
-                        File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
-                        if (selectedFile != null) {
-                            File selfile = Helper.fixDialogFile(selectedFile);
-                            byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                            try {
-                                Tag newTag = new ImageImporter().importImage(it, data);
-                                SWF swf = it.getSwf();
-                                if (newTag != null) {
-                                    refreshTree(swf);
-                                    setTagTreeSelectedNode(newTag);
-                                }
-                                swf.clearImageCache();
-                            } catch (IOException ex) {
-                                logger.log(Level.SEVERE, "Invalid image", ex);
-                                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                            }
-                            reload(true);
-                        }
-                    }
-                }
-                if (item instanceof ShapeTag) {
-                    ShapeTag st = (ShapeTag) item;
-                    File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
-                    if (selectedFile != null) {
-                        File selfile = Helper.fixDialogFile(selectedFile);
-                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                        try {
-                            Tag newTag = new ShapeImporter().importImage(st, data);
-                            SWF swf = st.getSwf();
-                            if (newTag != null) {
-                                refreshTree(swf);
-                                setTagTreeSelectedNode(newTag);
-                            }
-                            swf.clearImageCache();
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, "Invalid image", ex);
-                            View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
-                        reload(true);
-                    }
-                }
-                if (item instanceof DefineBinaryDataTag) {
-                    DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
-                    File selectedFile = showImportFileChooser("");
-                    if (selectedFile != null) {
-                        File selfile = Helper.fixDialogFile(selectedFile);
-                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                        new BinaryDataImporter().importData(bt, data);
-                        refreshTree(bt.getSwf());
-                        reload(true);
-                    }
+                    reload(true);
                 }
             }
-            break;
         }
+        if (item instanceof ShapeTag) {
+            ShapeTag st = (ShapeTag) item;
+            File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                try {
+                    Tag newTag = new ShapeImporter().importImage(st, data);
+                    SWF swf = st.getSwf();
+                    if (newTag != null) {
+                        refreshTree(swf);
+                        setTagTreeSelectedNode(newTag);
+                    }
+                    swf.clearImageCache();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, "Invalid image", ex);
+                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                reload(true);
+            }
+        }
+        if (item instanceof DefineBinaryDataTag) {
+            DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
+            File selectedFile = showImportFileChooser("");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                new BinaryDataImporter().importData(bt, data);
+                refreshTree(bt.getSwf());
+                reload(true);
+            }
+        }
+    }
+
+    public void exportJavaSourceActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
         }
 
-        switch (e.getActionCommand()) {
+        exportJavaSource();
+    }
 
-            case MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE:
-                exportJavaSource();
-                break;
-            case MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML:
-                exportSwfXml();
-                break;
-            case MainFrameRibbonMenu.ACTION_IMPORT_SWF_XML:
-                importSwfXml();
-                break;
-            case MainFrameRibbonMenu.ACTION_EXPORT_SEL:
-                export(true);
-                break;
+    public void exportSwfXmlActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
         }
+
+        exportSwfXml();
+    }
+
+    public void importSwfXmlActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        importSwfXml();
+    }
+
+    public void exportSelectionActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        export(true);
     }
 
     private File showImportFileChooser(String filter) {

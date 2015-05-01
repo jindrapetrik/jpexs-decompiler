@@ -286,7 +286,7 @@ public class FontPanel extends JPanel {
         contentPanel = new JPanel();
         contentScrollPane.setBorder(null);
         contentScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        
+
         TableLayout tlFontParamsPanel;
         fontParamsPanel.setLayout(tlFontParamsPanel = new TableLayout(new double[][]{
             {TableLayout.PREFERRED, TableLayout.FILL},
@@ -475,7 +475,7 @@ public class FontPanel extends JPanel {
         contentPanel.add(buttonsPanel, "0,1");
         contentPanel.add(addCharsPanel, "0,2");
         contentScrollPane.setViewportView(contentPanel);
-        
+
         setLayout(new BorderLayout());
         add(contentScrollPane, BorderLayout.CENTER);
 
@@ -504,7 +504,7 @@ public class FontPanel extends JPanel {
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
             FontEmbedDialog fed = new FontEmbedDialog((FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
-            if (fed.display()) {
+            if (fed.showDialog() == AppDialog.OK_OPTION) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
                     Font selFont = fed.getSelectedFont();

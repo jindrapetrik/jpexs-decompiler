@@ -32,7 +32,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -75,15 +74,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author JPEXS
  */
-public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
-
-    private static final String ACTION_SELECT_PROCESS = "SELECTPROCESS";
-
-    private static final String ACTION_REFRESH_PROCESS_LIST = "REFRESHPROCESSLIST";
-
-    private static final String ACTION_OPEN_SWF = "OPENSWF";
-
-    private static final String ACTION_SAVE = "SAVE";
+public class LoadFromMemoryFrame extends AppFrame {
 
     private MainFrame mainFrame;
 
@@ -191,7 +182,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         }
     }
 
-    private void openSWF() {
+    private void openSwf() {
         if (foundIs == null) {
             return;
         }
@@ -324,7 +315,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
-                    openSWF();
+                    openSwf();
                 }
             }
         });
@@ -332,7 +323,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == 10) { //Enter pressed
-                    openSWF();
+                    openSwf();
                 }
             }
         });
@@ -362,11 +353,9 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         leftPanel.add(new JScrollPane(list), BorderLayout.CENTER);
         JPanel leftButtonsPanel = new JPanel(new FlowLayout());
         JButton selectButton = new JButton(translate("button.select"));
-        selectButton.setActionCommand(ACTION_SELECT_PROCESS);
-        selectButton.addActionListener(this);
+        selectButton.addActionListener(this::selectProcessButtonActionPerformed);
         JButton refreshButton = new JButton(translate("button.refresh"));
-        refreshButton.setActionCommand(ACTION_REFRESH_PROCESS_LIST);
-        refreshButton.addActionListener(this);
+        refreshButton.addActionListener(this::refreshProcessListButtonActionPerformed);
         leftButtonsPanel.add(selectButton);
         leftButtonsPanel.add(refreshButton);
         leftPanel.add(leftButtonsPanel, BorderLayout.SOUTH);
@@ -375,12 +364,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         rightPanel.add(new JScrollPane(tableRes), BorderLayout.CENTER);
         JPanel rightButtonsPanel = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("button.open"));
-        openButton.setActionCommand(ACTION_OPEN_SWF);
-        openButton.addActionListener(this);
+        openButton.addActionListener(this::openSwfButtonActionPerformed);
 
         JButton saveButton = new JButton(translate("button.save"));
-        saveButton.setActionCommand(ACTION_SAVE);
-        saveButton.addActionListener(this);
+        saveButton.addActionListener(this::saveButtonActionPerformed);
 
         rightButtonsPanel.add(openButton);
         rightButtonsPanel.add(saveButton);
@@ -405,68 +392,67 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         setIconImages(images);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_SELECT_PROCESS:
-                selectProcess();
-                break;
-            case ACTION_OPEN_SWF:
-                openSWF();
-                break;
-            case ACTION_REFRESH_PROCESS_LIST:
-                refreshList();
-                break;
-            case ACTION_SAVE:
-                if (foundIs == null) {
-                    return;
-                }
-                int[] selected = tableRes.getSelectedRows();
-                if (selected.length > 0) {
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
-                    if (selected.length > 1) {
-                        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    } else {
-                        fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), "movie.swf"));
-                        fc.setFileFilter(new FileFilter() {
-                            @Override
-                            public boolean accept(File f) {
-                                return (f.getName().endsWith(".swf")) || (f.isDirectory());
-                            }
+    private void selectProcessButtonActionPerformed(ActionEvent evt) {
+        selectProcess();
+    }
 
-                            @Override
-                            public String getDescription() {
-                                return AppStrings.translate("filter.swf");
-                            }
-                        });
+    private void openSwfButtonActionPerformed(ActionEvent evt) {
+        openSwf();
+    }
+
+    private void refreshProcessListButtonActionPerformed(ActionEvent evt) {
+        refreshList();
+    }
+
+    private void saveButtonActionPerformed(ActionEvent evt) {
+        if (foundIs == null) {
+            return;
+        }
+
+        int[] selected = tableRes.getSelectedRows();
+        if (selected.length > 0) {
+            JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+            if (selected.length > 1) {
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            } else {
+                fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), "movie.swf"));
+                fc.setFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return (f.getName().endsWith(".swf")) || (f.isDirectory());
                     }
-                    fc.setAcceptAllFileFilterUsed(false);
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
-                        File file = Helper.fixDialogFile(fc.getSelectedFile());
-                        try {
-                            if (selected.length == 1) {
-                                SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(selected[0]));
-                                ReReadableInputStream bis = swf.is;
-                                bis.seek(0);
-                                Helper.saveStream(bis, file);
-                            } else {
-                                for (int sel : selected) {
-                                    SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(sel));
-                                    ReReadableInputStream bis = swf.is;
-                                    bis.seek(0);
-                                    Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
-                                }
-                            }
-                            Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
-                        } catch (IOException ex) {
-                            View.showMessageDialog(null, translate("error.file.write"));
+
+                    @Override
+                    public String getDescription() {
+                        return AppStrings.translate("filter.swf");
+                    }
+                });
+            }
+            fc.setAcceptAllFileFilterUsed(false);
+            JFrame f = new JFrame();
+            View.setWindowIcon(f);
+            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+                File file = Helper.fixDialogFile(fc.getSelectedFile());
+                try {
+                    if (selected.length == 1) {
+                        SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(selected[0]));
+                        ReReadableInputStream bis = swf.is;
+                        bis.seek(0);
+                        Helper.saveStream(bis, file);
+                    } else {
+                        for (int sel : selected) {
+                            SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(sel));
+                            ReReadableInputStream bis = swf.is;
+                            bis.seek(0);
+                            Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
                         }
                     }
+                    Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
+                } catch (IOException ex) {
+                    View.showMessageDialog(null, translate("error.file.write"));
                 }
-                break;
+            }
         }
     }
 }

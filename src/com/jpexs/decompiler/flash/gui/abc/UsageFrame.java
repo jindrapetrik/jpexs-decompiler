@@ -31,7 +31,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
@@ -44,11 +43,7 @@ import javax.swing.JScrollPane;
  *
  * @author JPEXS
  */
-public class UsageFrame extends AppDialog implements ActionListener, MouseListener {
-
-    private static final String ACTION_GOTO = "GOTO";
-
-    private static final String ACTION_CANCEL = "CANCEL";
+public class UsageFrame extends AppDialog implements MouseListener {
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
 
@@ -83,10 +78,9 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
         }
         usageList = new JList<>(usageListModel);
         usageList.setBackground(Color.white);
-        gotoButton.setActionCommand(ACTION_GOTO);
-        gotoButton.addActionListener(this);
-        cancelButton.setActionCommand(ACTION_CANCEL);
-        cancelButton.addActionListener(this);
+        gotoButton.addActionListener(this::gotoButtonActionPerformed);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
+
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.add(gotoButton);
@@ -151,17 +145,13 @@ public class UsageFrame extends AppDialog implements ActionListener, MouseListen
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_GOTO:
-                gotoUsage();
-                setVisible(false);
-                break;
-            case ACTION_CANCEL:
-                setVisible(false);
-                break;
-        }
+    private void gotoButtonActionPerformed(ActionEvent evt) {
+        gotoUsage();
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
     }
 
     @Override

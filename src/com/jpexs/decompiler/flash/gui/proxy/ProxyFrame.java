@@ -43,7 +43,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -88,25 +87,9 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author JPEXS
  */
-public class ProxyFrame extends AppFrame implements ActionListener, CatchedListener, MouseListener, ReplacedListener {
+public class ProxyFrame extends AppFrame implements CatchedListener, MouseListener, ReplacedListener {
 
     private static final String REPLACEMENTS_NAME = "replacements.cfg";
-
-    private static final String ACTION_SWITCH_STATE = "SWITCHSTATE";
-
-    private static final String ACTION_OPEN = "OPEN";
-
-    private static final String ACTION_CLEAR = "CLEAR";
-
-    private static final String ACTION_RENAME = "RENAME";
-
-    private static final String ACTION_REMOVE = "REMOVE";
-
-    private static final String ACTION_COPYURL = "COPYURL";
-
-    private static final String ACTION_SAVEAS = "SAVEAS";
-
-    private static final String ACTION_REPLACE = "REPLACE";
 
     private JTable replacementsTable;
 
@@ -278,8 +261,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
         replacementsTable.addMouseListener(this);
         replacementsTable.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        switchButton.addActionListener(this);
-        switchButton.setActionCommand(ACTION_SWITCH_STATE);
+        switchButton.addActionListener(this::switchStateButtonActionPerformed);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         cnt.add(new JScrollPane(replacementsTable), BorderLayout.CENTER);
@@ -297,36 +279,29 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
         JPanel buttonsPanel21 = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("open"));
-        openButton.setActionCommand(ACTION_OPEN);
-        openButton.addActionListener(this);
+        openButton.addActionListener(this::openButtonActionPerformed);
         buttonsPanel21.add(openButton);
         JButton clearButton = new JButton(translate("clear"));
-        clearButton.setActionCommand(ACTION_CLEAR);
-        clearButton.addActionListener(this);
+        clearButton.addActionListener(this::clearButtonActionPerformed);
         buttonsPanel21.add(clearButton);
         JButton renameButton = new JButton(translate("rename"));
-        renameButton.setActionCommand(ACTION_RENAME);
-        renameButton.addActionListener(this);
+        renameButton.addActionListener(this::renameButtonActionPerformed);
         buttonsPanel21.add(renameButton);
         JButton removeButton = new JButton(translate("remove"));
-        removeButton.setActionCommand(ACTION_REMOVE);
-        removeButton.addActionListener(this);
+        removeButton.addActionListener(this::removeButtonActionPerformed);
         buttonsPanel21.add(removeButton);
 
         //JPanel buttonsPanel22 = new JPanel(new FlowLayout());
         JButton copyUrlButton = new JButton(translate("copy.url"));
-        copyUrlButton.setActionCommand(ACTION_COPYURL);
-        copyUrlButton.addActionListener(this);
+        copyUrlButton.addActionListener(this::copyUrlButtonActionPerformed);
         buttonsPanel21.add(copyUrlButton);
 
         JButton saveAsButton = new JButton(translate("save.as"));
-        saveAsButton.setActionCommand(ACTION_SAVEAS);
-        saveAsButton.addActionListener(this);
+        saveAsButton.addActionListener(this::saveAsButtonActionPerformed);
         buttonsPanel21.add(saveAsButton);
 
         JButton replaceButton = new JButton(translate("replace"));
-        replaceButton.setActionCommand(ACTION_REPLACE);
-        replaceButton.addActionListener(this);
+        replaceButton.addActionListener(this::replaceButtonActionPerformed);
         buttonsPanel21.add(replaceButton);
 
         JPanel buttonsPanel3 = new JPanel();
@@ -394,191 +369,197 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         return null;
     }
 
-    /**
-     * Method handling actions from buttons
-     *
-     * @param e event
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private int[] getSelectedRows() {
         int sel[] = replacementsTable.getSelectedRows();
         for (int i = 0; i < sel.length; i++) {
             sel[i] = replacementsTable.getRowSorter().convertRowIndexToModel(sel[i]);
         }
-        switch (e.getActionCommand()) {
-            case ACTION_OPEN:
-                open();
-                break;
-            case ACTION_SAVEAS:
-                if (sel.length == 1) {
-                    Replacement r = replacements.get(sel[0]);
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
-                    String n = r.urlPattern;
-                    if (n.contains("?")) {
-                        n = n.substring(0, n.indexOf('?'));
+
+        return sel;
+    }
+
+    private void openButtonActionPerformed(ActionEvent evt) {
+        open();
+    }
+
+    private void saveAsButtonActionPerformed(ActionEvent evt) {
+        int[] sel = getSelectedRows();
+        if (sel.length == 1) {
+            Replacement r = replacements.get(sel[0]);
+            JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+            String n = r.urlPattern;
+            if (n.contains("?")) {
+                n = n.substring(0, n.indexOf('?'));
+            }
+            if (n.contains("/")) {
+                n = n.substring(n.lastIndexOf('/'));
+            }
+            n = Helper.makeFileName(n);
+            fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), n));
+            String ext = ".swf";
+            final String extension = ext;
+            FileFilter swfFilter = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                }
+
+                @Override
+                public String getDescription() {
+                    return AppStrings.translate("filter" + extension);
+                }
+            };
+            fc.setFileFilter(swfFilter);
+            fc.setAcceptAllFileFilterUsed(true);
+            JFrame f = new JFrame();
+            View.setWindowIcon(f);
+            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+                File file = Helper.fixDialogFile(fc.getSelectedFile());
+                try {
+                    Files.copy(new File(r.targetFile).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    View.showMessageDialog(this, translate("error.save.as") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            GuiAbortRetryIgnoreHandler handler = new GuiAbortRetryIgnoreHandler();
+            File exportDir = new File(selectExportDir());
+            for (int s : sel) {
+                final Replacement r = replacements.get(s);
+                String n = r.urlPattern;
+                if (n.contains("?")) {
+                    n = n.substring(0, n.indexOf('?'));
+                }
+                if (n.contains("/")) {
+                    n = n.substring(n.lastIndexOf('/'));
+                }
+                n = Helper.makeFileName(n);
+                int c = 2;
+                String n2 = n;
+                while (new File(exportDir, n2).exists()) {
+                    if (n.contains(".")) {
+                        n2 = n.substring(0, n.lastIndexOf('.')) + c + n.substring(n.lastIndexOf('.'));
+                        c++;
+                    } else {
+                        n2 = n + c + ".swf";
+                        c++;
                     }
-                    if (n.contains("/")) {
-                        n = n.substring(n.lastIndexOf('/'));
-                    }
-                    n = Helper.makeFileName(n);
-                    fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), n));
-                    String ext = ".swf";
-                    final String extension = ext;
-                    FileFilter swfFilter = new FileFilter() {
+                }
+
+                final File outfile = new File(exportDir, n2);
+                try {
+                    new RetryTask(new RunnableIOEx() {
                         @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                        public void run() throws IOException {
+                            Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         }
-
-                        @Override
-                        public String getDescription() {
-                            return AppStrings.translate("filter" + extension);
-                        }
-                    };
-                    fc.setFileFilter(swfFilter);
-                    fc.setAcceptAllFileFilterUsed(true);
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
-                        File file = Helper.fixDialogFile(fc.getSelectedFile());
-                        try {
-                            Files.copy(new File(r.targetFile).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException ex) {
-                            View.showMessageDialog(this, translate("error.save.as") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                } else {
-                    GuiAbortRetryIgnoreHandler handler = new GuiAbortRetryIgnoreHandler();
-                    File exportDir = new File(selectExportDir());
-                    for (int s : sel) {
-                        final Replacement r = replacements.get(s);
-                        String n = r.urlPattern;
-                        if (n.contains("?")) {
-                            n = n.substring(0, n.indexOf('?'));
-                        }
-                        if (n.contains("/")) {
-                            n = n.substring(n.lastIndexOf('/'));
-                        }
-                        n = Helper.makeFileName(n);
-                        int c = 2;
-                        String n2 = n;
-                        while (new File(exportDir, n2).exists()) {
-                            if (n.contains(".")) {
-                                n2 = n.substring(0, n.lastIndexOf('.')) + c + n.substring(n.lastIndexOf('.'));
-                                c++;
-                            } else {
-                                n2 = n + c + ".swf";
-                                c++;
-                            }
-                        }
-
-                        final File outfile = new File(exportDir, n2);
-                        try {
-                            new RetryTask(new RunnableIOEx() {
-                                @Override
-                                public void run() throws IOException {
-                                    Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                                }
-                            }, handler).run();
-                        } catch (IOException ex) {
-                            break;
-                        }
-                    }
+                    }, handler).run();
+                } catch (IOException ex) {
+                    break;
                 }
-                break;
-            case ACTION_REPLACE:
-                if (sel.length > 0) {
-                    Replacement r = replacements.get(sel[0]);
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                    String ext = ".swf";
-                    final String extension = ext;
-                    FileFilter swfFilter = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return AppStrings.translate("filter" + extension);
-                        }
-                    };
-                    fc.setFileFilter(swfFilter);
-                    fc.setAcceptAllFileFilterUsed(true);
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-                        File file = Helper.fixDialogFile(fc.getSelectedFile());
-                        try {
-                            Files.copy(file.toPath(), new File(r.targetFile).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
-                        } catch (IOException ex) {
-                            View.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
-                break;
-            case ACTION_COPYURL:
-                String copyText = "";
-                for (int sc : sel) {
-                    Replacement r = replacements.get(sc);
-                    if (!copyText.isEmpty()) {
-                        copyText += System.lineSeparator();
-                    }
-                    copyText += r.urlPattern;
-                }
-
-                if (!copyText.isEmpty()) {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    StringSelection stringSelection = new StringSelection(copyText);
-                    clipboard.setContents(stringSelection, null);
-                }
-                break;
-            case ACTION_RENAME:
-                if (sel.length > 0) {
-                    Replacement r = replacements.get(sel[0]);
-                    String s = View.showInputDialog("URL", r.urlPattern);
-                    if (s != null) {
-                        r.urlPattern = s;
-                        tableModel.setValueAt(s, sel[0], 2/*url*/);
-                    }
-                }
-                break;
-            case ACTION_CLEAR:
-                for (Replacement r : replacements) {
-                    File f;
-                    try {
-                        f = (new File(Main.tempFile(r.targetFile)));
-                        if (f.exists()) {
-                            f.delete();
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                tableModel.setRowCount(0);
-                replacements.clear();
-                saveReplacements();
-                break;
-            case ACTION_REMOVE:
-
-                Arrays.sort(sel);
-                for (int i = sel.length - 1; i >= 0; i--) {
-                    tableModel.removeRow(sel[i]);
-                    Replacement r = replacements.remove(sel[i]);
-                    saveReplacements();
-                    File f = (new File(r.targetFile));
-                    if (f.exists()) {
-                        f.delete();
-                    }
-                }
-                break;
-            case ACTION_SWITCH_STATE:
-                Main.switchProxy();
-                break;
+            }
         }
+    }
+
+    private void replaceButtonActionPerformed(ActionEvent evt) {
+        int[] sel = getSelectedRows();
+        if (sel.length > 0) {
+            Replacement r = replacements.get(sel[0]);
+            JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+            String ext = ".swf";
+            final String extension = ext;
+            FileFilter swfFilter = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
+                }
+
+                @Override
+                public String getDescription() {
+                    return AppStrings.translate("filter" + extension);
+                }
+            };
+            fc.setFileFilter(swfFilter);
+            fc.setAcceptAllFileFilterUsed(true);
+            JFrame f = new JFrame();
+            View.setWindowIcon(f);
+            if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+                File file = Helper.fixDialogFile(fc.getSelectedFile());
+                try {
+                    Files.copy(file.toPath(), new File(r.targetFile).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
+                } catch (IOException ex) {
+                    View.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    private void copyUrlButtonActionPerformed(ActionEvent evt) {
+        int[] sel = getSelectedRows();
+        String copyText = "";
+        for (int sc : sel) {
+            Replacement r = replacements.get(sc);
+            if (!copyText.isEmpty()) {
+                copyText += System.lineSeparator();
+            }
+            copyText += r.urlPattern;
+        }
+
+        if (!copyText.isEmpty()) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(copyText);
+            clipboard.setContents(stringSelection, null);
+        }
+    }
+
+    private void renameButtonActionPerformed(ActionEvent evt) {
+        int[] sel = getSelectedRows();
+        if (sel.length > 0) {
+            Replacement r = replacements.get(sel[0]);
+            String s = View.showInputDialog("URL", r.urlPattern);
+            if (s != null) {
+                r.urlPattern = s;
+                tableModel.setValueAt(s, sel[0], 2/*url*/);
+            }
+        }
+    }
+
+    private void clearButtonActionPerformed(ActionEvent evt) {
+        for (Replacement r : replacements) {
+            File f;
+            try {
+                f = (new File(Main.tempFile(r.targetFile)));
+                if (f.exists()) {
+                    f.delete();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        tableModel.setRowCount(0);
+        replacements.clear();
+        saveReplacements();
+    }
+
+    private void removeButtonActionPerformed(ActionEvent evt) {
+        int[] sel = getSelectedRows();
+        Arrays.sort(sel);
+        for (int i = sel.length - 1; i >= 0; i--) {
+            tableModel.removeRow(sel[i]);
+            Replacement r = replacements.remove(sel[i]);
+            saveReplacements();
+            File f = (new File(r.targetFile));
+            if (f.exists()) {
+                f.delete();
+            }
+        }
+    }
+
+    private void switchStateButtonActionPerformed(ActionEvent evt) {
+        Main.switchProxy();
     }
 
     /**

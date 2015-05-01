@@ -21,7 +21,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
@@ -45,7 +44,7 @@ import jsyntaxpane.components.Markers;
  *
  * @author JPEXS
  */
-public class QuickFindPanel extends JPanel implements ActionListener {
+public class QuickFindPanel extends JPanel {
 
     public JTextField findTextField;
 
@@ -102,8 +101,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         prevButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         prevButton.setOpaque(false);
         prevButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        prevButton.setActionCommand("PREVIOUS");
-        prevButton.addActionListener(this);
+        prevButton.addActionListener(this::previousButtonActionPerformed);
         pan1.add(prevButton);
 
         nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-down.png")));
@@ -112,8 +110,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         nextButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         nextButton.setOpaque(false);
         nextButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        nextButton.setActionCommand("NEXT");
-        nextButton.addActionListener(this);
+        nextButton.addActionListener(this::nextButtonActionPerformed);
         pan1.add(nextButton);
 
         ignoreCaseCheckbox.setMnemonic('C');
@@ -122,7 +119,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         ignoreCaseCheckbox.setOpaque(false);
         ignoreCaseCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         pan2.add(ignoreCaseCheckbox);
-        ignoreCaseCheckbox.addActionListener(this);
+        //ignoreCaseCheckbox.addActionListener(this);
 
         regExpCheckbox.setMnemonic('R');
         regExpCheckbox.setText(bundle.getString("QuickFindDialog.jChkRegExp.text"));
@@ -130,7 +127,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         regExpCheckbox.setOpaque(false);
         regExpCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         pan2.add(regExpCheckbox);
-        regExpCheckbox.addActionListener(this);
+        //regExpCheckbox.addActionListener(this);
 
         wrapCheckbox.setMnemonic('W');
         wrapCheckbox.setText(bundle.getString("QuickFindDialog.jChkWrap.text"));
@@ -138,7 +135,7 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         wrapCheckbox.setOpaque(false);
         wrapCheckbox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         pan2.add(wrapCheckbox);
-        wrapCheckbox.addActionListener(this);
+        //wrapCheckbox.addActionListener(this);
 
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getStyle() | java.awt.Font.BOLD, statusLabel.getFont().getSize() - 2));
         statusLabel.setForeground(Color.red);
@@ -150,23 +147,19 @@ public class QuickFindPanel extends JPanel implements ActionListener {
         setVisible(false);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "PREVIOUS":
-                if (dsd.get().doFindPrev(target.get())) {
-                    statusLabel.setText(null);
-                } else {
-                    statusLabel.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
-                }
-                break;
-            case "NEXT":
-                if (dsd.get().doFindNext(target.get())) {
-                    statusLabel.setText(null);
-                } else {
-                    statusLabel.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
-                }
-                break;
+    private void previousButtonActionPerformed(ActionEvent evt) {
+        if (dsd.get().doFindPrev(target.get())) {
+            statusLabel.setText(null);
+        } else {
+            statusLabel.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
+        }
+    }
+
+    private void nextButtonActionPerformed(ActionEvent evt) {
+        if (dsd.get().doFindNext(target.get())) {
+            statusLabel.setText(null);
+        } else {
+            statusLabel.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
         }
     }
 

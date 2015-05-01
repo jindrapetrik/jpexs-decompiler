@@ -22,7 +22,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,11 +43,7 @@ import javax.swing.UIManager;
  *
  * @author JPEXS
  */
-public class NewVersionDialog extends AppDialog implements ActionListener {
-
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
+public class NewVersionDialog extends AppDialog {
 
     private Version latestVersion;
 
@@ -116,12 +111,10 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         cnt.add(span);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton buttonOk = new JButton(translate("button.ok"));
-        buttonOk.setActionCommand(ACTION_OK);
-        buttonOk.addActionListener(this);
+        buttonOk.addActionListener(this::okButtonActionPerformed);
 
         JButton buttonCancel = new JButton(translate("button.cancel"));
-        buttonCancel.setActionCommand(ACTION_CANCEL);
-        buttonCancel.addActionListener(this);
+        buttonCancel.addActionListener(this::cancelButtonActionPerformed);
 
         buttonsPanel.add(buttonOk);
         buttonsPanel.add(buttonCancel);
@@ -141,21 +134,23 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         View.setWindowIcon(this);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(ACTION_OK)) {
-            String url;
-            if (latestVersion.updateLink != null) {
-                url = latestVersion.updateLink;
-            } else {
-                url = ApplicationInfo.updateUrl;
-            }
-            if (View.navigateUrl(url)) {
-                Main.exit();
-            } else {
-                View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
-            }
+    private void okButtonActionPerformed(ActionEvent evt) {
+        String url;
+        if (latestVersion.updateLink != null) {
+            url = latestVersion.updateLink;
+        } else {
+            url = ApplicationInfo.updateUrl;
         }
+        if (View.navigateUrl(url)) {
+            Main.exit();
+        } else {
+            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
         setVisible(false);
     }
 }

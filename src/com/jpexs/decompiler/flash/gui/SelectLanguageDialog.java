@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
@@ -36,13 +35,9 @@ import jsyntaxpane.DefaultSyntaxKit;
  *
  * @author JPEXS
  */
-public class SelectLanguageDialog extends AppDialog implements ActionListener {
+public class SelectLanguageDialog extends AppDialog {
 
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
-
-    JComboBox<Language> languageCombobox = new JComboBox<>();
+    private JComboBox<Language> languageCombobox = new JComboBox<>();
 
     public String languageCode = null;
 
@@ -86,11 +81,9 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.setAlignmentX(0.5f);
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.setActionCommand(ACTION_OK);
-        okButton.addActionListener(this);
+        okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.setActionCommand(ACTION_CANCEL);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
         cnt.add(buttonsPanel);
@@ -105,26 +98,22 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OK:
-                if (languageCombobox.getSelectedIndex() == -1) {
-                } else {
-                    languageCode = ((Language) languageCombobox.getSelectedItem()).code;
-                    String newLanguage = languageCode;
-                    if (newLanguage.equals("en")) {
-                        newLanguage = "";
-                    }
-                    Configuration.locale.set(newLanguage);
-                    setVisible(false);
-                    reloadUi();
-                }
-                break;
-            case ACTION_CANCEL:
-                setVisible(false);
-                break;
+    private void okButtonActionPerformed(ActionEvent evt) {
+        if (languageCombobox.getSelectedIndex() != -1) {
+            languageCode = ((Language) languageCombobox.getSelectedItem()).code;
+            String newLanguage = languageCode;
+            if (newLanguage.equals("en")) {
+                newLanguage = "";
+            }
+            Configuration.locale.set(newLanguage);
+            reloadUi();
         }
+
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
     }
 
     public static void reloadUi() {

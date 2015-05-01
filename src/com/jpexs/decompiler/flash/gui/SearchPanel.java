@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -33,13 +32,7 @@ import jsyntaxpane.actions.DocumentSearchData;
  * @author JPEXS
  * @param <E> Element to search
  */
-public class SearchPanel<E> extends JPanel implements ActionListener {
-
-    private static final String ACTION_SEARCH_PREV = "SEARCHPREV";
-
-    private static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
-
-    private static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
+public class SearchPanel<E> extends JPanel {
 
     private final SearchListener<E> listener;
 
@@ -64,16 +57,13 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
 
         JButton prevSearchButton = new JButton(View.getIcon("prev16"));
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        prevSearchButton.addActionListener(this);
-        prevSearchButton.setActionCommand(ACTION_SEARCH_PREV);
+        prevSearchButton.addActionListener(this::prevButtonActionPerformed);
         JButton nextSearchButton = new JButton(View.getIcon("next16"));
         nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        nextSearchButton.addActionListener(this);
-        nextSearchButton.setActionCommand(ACTION_SEARCH_NEXT);
+        nextSearchButton.addActionListener(this::nextButtonActionPerformed);
         JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
         cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        cancelSearchButton.addActionListener(this);
-        cancelSearchButton.setActionCommand(ACTION_SEARCH_CANCEL);
+        cancelSearchButton.addActionListener(this::cancelButtonActionPerformed);
         searchPos = new JLabel("0/0");
         searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", ""));
         add(searchForLabel);
@@ -130,26 +120,23 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
         });
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_SEARCH_CANCEL:
-                foundPos = 0;
-                setVisible(false);
-                found = new ArrayList<>();
-                searchFor = null;
-                break;
-            case ACTION_SEARCH_PREV:
-                foundPos--;
-                if (foundPos < 0) {
-                    foundPos += found.size();
-                }
-                doUpdate();
-                break;
-            case ACTION_SEARCH_NEXT:
-                foundPos = (foundPos + 1) % found.size();
-                doUpdate();
-                break;
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        foundPos = 0;
+        setVisible(false);
+        found = new ArrayList<>();
+        searchFor = null;
+    }
+
+    private void prevButtonActionPerformed(ActionEvent evt) {
+        foundPos--;
+        if (foundPos < 0) {
+            foundPos += found.size();
         }
+        doUpdate();
+    }
+
+    private void nextButtonActionPerformed(ActionEvent evt) {
+        foundPos = (foundPos + 1) % found.size();
+        doUpdate();
     }
 }

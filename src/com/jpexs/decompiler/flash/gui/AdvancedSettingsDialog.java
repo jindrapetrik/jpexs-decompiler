@@ -30,7 +30,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
@@ -68,9 +67,15 @@ import org.pushingpixels.substance.api.skin.SkinInfo;
  *
  * @author JPEXS
  */
-public class AdvancedSettingsDialog extends AppDialog implements ActionListener {
+public class AdvancedSettingsDialog extends AppDialog {
 
     private final Map<String, Component> componentsMap = new HashMap<>();
+
+    private JButton cancelButton;
+
+    private JButton okButton;
+
+    private JButton resetButton;
 
     /**
      * Creates new form AdvancedSettingsDialog
@@ -145,16 +150,13 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         setPreferredSize(new java.awt.Dimension(800, 500));
 
         okButton.setText(AppStrings.translate("button.ok"));
-        okButton.addActionListener(this);
-        okButton.setActionCommand("OK");
+        okButton.addActionListener(this::okButtonActionPerformed);
 
         cancelButton.setText(AppStrings.translate("button.cancel"));
-        cancelButton.addActionListener(this);
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
 
         resetButton.setText(AppStrings.translate("button.reset"));
-        resetButton.addActionListener(this);
-        resetButton.setActionCommand("RESET");
+        resetButton.addActionListener(this::resetButtonActionPerformed);
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
@@ -376,120 +378,109 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         }
     }
 
-    private JButton cancelButton;
-
-    private JButton okButton;
-
-    private JButton resetButton;
-    //private EachRowRendererEditor configurationTable;
-
-    @Override
     @SuppressWarnings("unchecked")
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "OK":
-                boolean modified = false;
-                Map<String, Field> fields = Configuration.getConfigurationFields();
-                Map<String, Object> values = new HashMap<>();
-                for (String name : fields.keySet()) {
-                    Component c = componentsMap.get(name);
-                    Object value = null;
+    private void okButtonActionPerformed(ActionEvent evt) {
+        boolean modified = false;
+        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Object> values = new HashMap<>();
+        for (String name : fields.keySet()) {
+            Component c = componentsMap.get(name);
+            Object value = null;
 
-                    ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
-                    Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
-                    if (name.equals("gui.skin")) {
-                        value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
-                    } else if (itemType == String.class) {
-                        value = ((JTextField) c).getText();
-                    }
-                    if (itemType == Boolean.class) {
-                        value = ((JCheckBox) c).isSelected();
-                    }
+            ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
+            Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
+            if (name.equals("gui.skin")) {
+                value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
+            } else if (itemType == String.class) {
+                value = ((JTextField) c).getText();
+            }
+            if (itemType == Boolean.class) {
+                value = ((JCheckBox) c).isSelected();
+            }
 
-                    if (itemType == Calendar.class) {
-                        Calendar cal = Calendar.getInstance();
-                        try {
-                            cal.setTime(new SimpleDateFormat().parse(((JTextField) c).getText()));
-                        } catch (ParseException ex) {
-                            c.requestFocusInWindow();
-                            return;
-                        }
-                        value = cal;
-                    }
-
-                    if (itemType.isEnum()) {
-                        String stringValue = (String) ((JComboBox<String>) c).getSelectedItem();
-                        value = Enum.valueOf(itemType, stringValue);
-                    }
-
-                    try {
-                        if (itemType == Integer.class) {
-                            value = Integer.parseInt(((JTextField) c).getText());
-                        }
-                        if (itemType == Long.class) {
-                            value = Long.parseLong(((JTextField) c).getText());
-                        }
-                        if (itemType == Double.class) {
-                            value = Double.parseDouble(((JTextField) c).getText());
-                        }
-                        if (itemType == Float.class) {
-                            value = Float.parseFloat(((JTextField) c).getText());
-                        }
-                    } catch (NumberFormatException nfe) {
-                        if (!((JTextField) c).getText().isEmpty()) {
-                            c.requestFocusInWindow();
-                            return;
-                        } // else null
-                    }
-                    values.put(name, value);
+            if (itemType == Calendar.class) {
+                Calendar cal = Calendar.getInstance();
+                try {
+                    cal.setTime(new SimpleDateFormat().parse(((JTextField) c).getText()));
+                } catch (ParseException ex) {
+                    c.requestFocusInWindow();
+                    return;
                 }
+                value = cal;
+            }
 
-                for (String name : fields.keySet()) {
-                    Component c = componentsMap.get(name);
-                    Object value = values.get(name);
+            if (itemType.isEnum()) {
+                String stringValue = (String) ((JComboBox<String>) c).getSelectedItem();
+                value = Enum.valueOf(itemType, stringValue);
+            }
 
-                    Field field = fields.get(name);
-                    ConfigurationItem item = null;
-                    try {
-                        item = (ConfigurationItem) field.get(null);
-                    } catch (IllegalArgumentException | IllegalAccessException ex) {
-                        // Reflection exceptions. This should never happen
-                        throw new Error(ex.getMessage());
-                    }
-                    if (item.get() == null || !item.get().equals(value)) {
-                        if (item.hasValue() || value != null) {
-                            item.set(value);
-                            modified = true;
-                        }
-                    }
+            try {
+                if (itemType == Integer.class) {
+                    value = Integer.parseInt(((JTextField) c).getText());
                 }
-                Configuration.saveConfig();
-                setVisible(false);
-                if (modified) {
-                    showRestartConfirmDialod();
+                if (itemType == Long.class) {
+                    value = Long.parseLong(((JTextField) c).getText());
                 }
-                break;
-            case "CANCEL":
-                setVisible(false);
-                break;
-            case "RESET":
-
-                Map<String, Field> rfields = Configuration.getConfigurationFields();
-                for (Entry<String, Field> entry : rfields.entrySet()) {
-                    String name = entry.getKey();
-                    Field field = entry.getValue();
-                    try {
-                        ConfigurationItem item = (ConfigurationItem) field.get(null);
-                        item.unset();
-                    } catch (IllegalArgumentException | IllegalAccessException ex) {
-                        // Reflection exceptions. This should never happen
-                        throw new Error(ex.getMessage());
-                    }
+                if (itemType == Double.class) {
+                    value = Double.parseDouble(((JTextField) c).getText());
                 }
-                Configuration.saveConfig();
-                setVisible(false);
-                showRestartConfirmDialod();
-                break;
+                if (itemType == Float.class) {
+                    value = Float.parseFloat(((JTextField) c).getText());
+                }
+            } catch (NumberFormatException nfe) {
+                if (!((JTextField) c).getText().isEmpty()) {
+                    c.requestFocusInWindow();
+                    return;
+                } // else null
+            }
+            values.put(name, value);
         }
+
+        for (String name : fields.keySet()) {
+            Component c = componentsMap.get(name);
+            Object value = values.get(name);
+
+            Field field = fields.get(name);
+            ConfigurationItem item = null;
+            try {
+                item = (ConfigurationItem) field.get(null);
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                // Reflection exceptions. This should never happen
+                throw new Error(ex.getMessage());
+            }
+            if (item.get() == null || !item.get().equals(value)) {
+                if (item.hasValue() || value != null) {
+                    item.set(value);
+                    modified = true;
+                }
+            }
+        }
+        Configuration.saveConfig();
+        setVisible(false);
+        if (modified) {
+            showRestartConfirmDialod();
+        }
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
+    }
+
+    private void resetButtonActionPerformed(ActionEvent evt) {
+        Map<String, Field> rfields = Configuration.getConfigurationFields();
+        for (Entry<String, Field> entry : rfields.entrySet()) {
+            String name = entry.getKey();
+            Field field = entry.getValue();
+            try {
+                ConfigurationItem item = (ConfigurationItem) field.get(null);
+                item.unset();
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                // Reflection exceptions. This should never happen
+                throw new Error(ex.getMessage());
+            }
+        }
+        Configuration.saveConfig();
+        setVisible(false);
+        showRestartConfirmDialod();
     }
 }

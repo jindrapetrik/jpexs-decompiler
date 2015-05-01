@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
@@ -133,13 +132,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(undoTagMenuItem);
 
         exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
-        exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
-        exportSelectionMenuItem.addActionListener(mainPanel);
+        exportSelectionMenuItem.addActionListener(mainPanel::exportSelectionActionPerformed);
         add(exportSelectionMenuItem);
 
         replaceMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
-        replaceMenuItem.setActionCommand(MainPanel.ACTION_REPLACE);
-        replaceMenuItem.addActionListener(mainPanel);
+        replaceMenuItem.addActionListener(mainPanel::replaceButtonActionPerformed);
         add(replaceMenuItem);
 
         replaceWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithTag"));
@@ -155,18 +152,15 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(jumpToCharacterMenuItem);
 
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
-        exportJavaSourceMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_JAVA_SOURCE);
-        exportJavaSourceMenuItem.addActionListener(mainPanel);
+        exportJavaSourceMenuItem.addActionListener(mainPanel::exportJavaSourceActionPerformed);
         add(exportJavaSourceMenuItem);
 
         exportSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportSwfXml"));
-        exportSwfXmlMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SWF_XML);
-        exportSwfXmlMenuItem.addActionListener(mainPanel);
+        exportSwfXmlMenuItem.addActionListener(mainPanel::exportSwfXmlActionPerformed);
         add(exportSwfXmlMenuItem);
 
         importSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.importSwfXml"));
-        importSwfXmlMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_IMPORT_SWF_XML);
-        importSwfXmlMenuItem.addActionListener(mainPanel);
+        importSwfXmlMenuItem.addActionListener(mainPanel::importSwfXmlActionPerformed);
         add(importSwfXmlMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));

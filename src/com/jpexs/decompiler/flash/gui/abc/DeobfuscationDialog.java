@@ -23,7 +23,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -36,17 +35,13 @@ import javax.swing.JSlider;
  *
  * @author JPEXS
  */
-public class DeobfuscationDialog extends AppDialog implements ActionListener {
-
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
+public class DeobfuscationDialog extends AppDialog {
 
     public JCheckBox processAllCheckbox = new JCheckBox(translate("processallclasses"));
 
     public JSlider codeProcessingLevel;
 
-    public boolean ok = false;
+    private int result = ERROR_OPTION;
 
     public static final int LEVEL_REMOVE_DEAD_CODE = 1;
 
@@ -92,11 +87,9 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
         processAllCheckbox.setSelected(true);
 
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.addActionListener(this);
-        cancelButton.setActionCommand(ACTION_CANCEL);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.addActionListener(this);
-        okButton.setActionCommand(ACTION_OK);
+        okButton.addActionListener(this::okButtonActionPerformed);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.add(okButton);
@@ -111,24 +104,26 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OK:
-                ok = true;
-                setVisible(false);
-                break;
-            case ACTION_CANCEL:
-                ok = false;
-                setVisible(false);
-                break;
-        }
-    }
-
-    @Override
     public void setVisible(boolean b) {
         if (b) {
-            ok = false;
+            result = ERROR_OPTION;
         }
+
         super.setVisible(b);
+    }
+
+    private void okButtonActionPerformed(ActionEvent evt) {
+        result = OK_OPTION;
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        result = CANCEL_OPTION;
+        setVisible(false);
+    }
+
+    public int showDialog() {
+        setVisible(true);
+        return result;
     }
 }

@@ -34,7 +34,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
@@ -61,19 +60,7 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public class DumpTree extends JTree implements ActionListener {
-
-    private static final String ACTION_CLOSE_SWF = "CLOSESWF";
-
-    private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
-
-    private static final String ACTION_SAVE_TO_FILE = "SAVETOFILE";
-
-    private static final String ACTION_PARSE_ACTIONS = "PARSEACTIONS";
-
-    private static final String ACTION_PARSE_ABC = "PARSEABC";
-
-    private static final String ACTION_PARSE_INSTRUCTIONS = "PARSEINSTRUCTIONS";
+public class DumpTree extends JTree {
 
     private final MainPanel mainPanel;
 
@@ -103,33 +90,27 @@ public class DumpTree extends JTree implements ActionListener {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
 
         final JMenuItem expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
-        expandRecursiveMenuItem.addActionListener(this);
-        expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
+        expandRecursiveMenuItem.addActionListener(this::expandRecursiveButtonActionPerformed);
         contextPopupMenu.add(expandRecursiveMenuItem);
 
         final JMenuItem saveToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveToFile"));
-        saveToFileMenuItem.addActionListener(this);
-        saveToFileMenuItem.setActionCommand(ACTION_SAVE_TO_FILE);
+        saveToFileMenuItem.addActionListener(this::saveToFileButtonActionPerformed);
         contextPopupMenu.add(saveToFileMenuItem);
 
         final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
-        closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
-        closeSelectionMenuItem.addActionListener(this);
+        closeSelectionMenuItem.addActionListener(this::closeSwfButtonActionPerformed);
         contextPopupMenu.add(closeSelectionMenuItem);
 
         final JMenuItem parseActionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseActions"));
-        parseActionsMenuItem.setActionCommand(ACTION_PARSE_ACTIONS);
-        parseActionsMenuItem.addActionListener(this);
+        parseActionsMenuItem.addActionListener(this::parseActionsButtonActionPerformed);
         contextPopupMenu.add(parseActionsMenuItem);
 
         final JMenuItem parseAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseABC"));
-        parseAbcMenuItem.setActionCommand(ACTION_PARSE_ABC);
-        parseAbcMenuItem.addActionListener(this);
+        parseAbcMenuItem.addActionListener(this::parseAbcButtonActionPerformed);
         contextPopupMenu.add(parseAbcMenuItem);
 
         final JMenuItem parseInstructionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseInstructions"));
-        parseInstructionsMenuItem.setActionCommand(ACTION_PARSE_INSTRUCTIONS);
-        parseInstructionsMenuItem.addActionListener(this);
+        parseInstructionsMenuItem.addActionListener(this::parseInstructionsButtonActionPerformed);
         contextPopupMenu.add(parseInstructionsMenuItem);
 
         addMouseListener(new MouseAdapter() {
@@ -188,104 +169,98 @@ public class DumpTree extends JTree implements ActionListener {
         });
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_EXPAND_RECURSIVE: {
-                TreePath path = getSelectionPath();
-                if (path == null) {
-                    return;
-                }
-                View.expandTreeNodes(this, path, true);
-            }
-            break;
-            case ACTION_SAVE_TO_FILE: {
-                TreePath[] paths = getSelectionPaths();
-                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
-                JFileChooser fc = new JFileChooser();
-                String selDir = Configuration.lastOpenDir.get();
-                fc.setCurrentDirectory(new File(selDir));
-                if (!selDir.endsWith(File.separator)) {
-                    selDir += File.separator;
-                }
-                JFrame f = new JFrame();
-                View.setWindowIcon(f);
-                if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
-                    File sf = Helper.fixDialogFile(fc.getSelectedFile());
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
-                        byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
-                        fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
-                    } catch (IOException ex) {
-                        Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-            break;
-            case ACTION_PARSE_ACTIONS: {
-                TreePath[] paths = getSelectionPaths();
-                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
-                SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.originalUncompressedData;
-                int prevLength = (int) dumpInfo.startByte;
-                try {
-                    SWFInputStream rri = new SWFInputStream(swf, data);
-                    if (prevLength != 0) {
-                        rri.seek(prevLength);
-                    }
-                    List<Action> actions = ActionListReader.getOriginalActions(rri, prevLength, (int) dumpInfo.getEndByte());
-                    for (Action action : actions) {
-                        DumpInfo di = new DumpInfo(action.toString(), "Action", null, action.getAddress(), action.getTotalActionLength());
-                        di.parent = dumpInfo;
-                        rri.dumpInfo = di;
-                        rri.seek(action.getAddress());
-                        rri.readAction(new ConstantPool());
-                        dumpInfo.getChildInfos().add(di);
-                    }
-                    repaint();
-                } catch (IOException | InterruptedException ex) {
-                    Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            break;
-            case ACTION_PARSE_ABC: {
-                TreePath[] paths = getSelectionPaths();
-                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
-                SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.originalUncompressedData;
-                int prevLength = (int) dumpInfo.startByte;
-                try {
-                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
-                    ais.seek(prevLength);
-                    ais.dumpInfo = dumpInfo;
-                    new ABC(ais, swf, null);
-                } catch (IOException ex) {
-                    Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                repaint();
-            }
-            break;
-            case ACTION_PARSE_INSTRUCTIONS: {
-                TreePath[] paths = getSelectionPaths();
-                DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
-                SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
-                byte[] data = swf.originalUncompressedData;
-                int prevLength = (int) dumpInfo.startByte;
-                try {
-                    ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
-                    ais.seek(prevLength);
-                    ais.dumpInfo = dumpInfo;
-                    new AVM2Code(ais);
-                } catch (IOException ex) {
-                    Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                repaint();
-            }
-            break;
-            case ACTION_CLOSE_SWF: {
-                Main.closeFile(mainPanel.getCurrentSwfList());
-            }
-            break;
+    private void expandRecursiveButtonActionPerformed(ActionEvent evt) {
+        TreePath path = getSelectionPath();
+        if (path == null) {
+            return;
         }
+        View.expandTreeNodes(this, path, true);
+    }
+
+    private void saveToFileButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+        JFileChooser fc = new JFileChooser();
+        String selDir = Configuration.lastOpenDir.get();
+        fc.setCurrentDirectory(new File(selDir));
+        if (!selDir.endsWith(File.separator)) {
+            selDir += File.separator;
+        }
+        JFrame f = new JFrame();
+        View.setWindowIcon(f);
+        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+            File sf = Helper.fixDialogFile(fc.getSelectedFile());
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
+                byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
+                fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
+            } catch (IOException ex) {
+                Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void parseActionsButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        byte[] data = swf.originalUncompressedData;
+        int prevLength = (int) dumpInfo.startByte;
+        try {
+            SWFInputStream rri = new SWFInputStream(swf, data);
+            if (prevLength != 0) {
+                rri.seek(prevLength);
+            }
+            List<Action> actions = ActionListReader.getOriginalActions(rri, prevLength, (int) dumpInfo.getEndByte());
+            for (Action action : actions) {
+                DumpInfo di = new DumpInfo(action.toString(), "Action", null, action.getAddress(), action.getTotalActionLength());
+                di.parent = dumpInfo;
+                rri.dumpInfo = di;
+                rri.seek(action.getAddress());
+                rri.readAction(new ConstantPool());
+                dumpInfo.getChildInfos().add(di);
+            }
+            repaint();
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void parseAbcButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        byte[] data = swf.originalUncompressedData;
+        int prevLength = (int) dumpInfo.startByte;
+        try {
+            ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
+            ais.seek(prevLength);
+            ais.dumpInfo = dumpInfo;
+            new ABC(ais, swf, null);
+        } catch (IOException ex) {
+            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        repaint();
+    }
+
+    private void parseInstructionsButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        byte[] data = swf.originalUncompressedData;
+        int prevLength = (int) dumpInfo.startByte;
+        try {
+            ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
+            ais.seek(prevLength);
+            ais.dumpInfo = dumpInfo;
+            new AVM2Code(ais);
+        } catch (IOException ex) {
+            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        repaint();
+    }
+
+    private void closeSwfButtonActionPerformed(ActionEvent evt) {
+        Main.closeFile(mainPanel.getCurrentSwfList());
     }
 
     @Override

@@ -35,7 +35,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -62,31 +61,7 @@ import javax.swing.event.AncestorListener;
  *
  * @author JPEXS
  */
-public class PlayerControls extends JPanel implements ActionListener, MediaDisplayListener {
-
-    private static final String ACTION_PAUSE = "PAUSE";
-
-    private static final String ACTION_STOP = "STOP";
-
-    private static final String ACTION_LOOP = "LOOP";
-
-    private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-
-    private static final String ACTION_ZOOMIN = "ZOOMIN";
-
-    private static final String ACTION_ZOOMOUT = "ZOOMOUT";
-
-    private static final String ACTION_ZOOMFIT = "ZOOMFIT";
-
-    private static final String ACTION_ZOOMNONE = "ZOOMNONE";
-
-    private static final String ACTION_SNAPSHOT = "SNAPSHOT";
-
-    private static final String ACTION_NEXTFRAME = "NEXTFRAME";
-
-    private static final String ACTION_PREVFRAME = "PREVFRAME";
-
-    private static final String ACTION_GOTOFRAME = "SELECTFRAME";
+public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final JButton pauseButton;
 
@@ -159,33 +134,27 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
         graphicControls = new JPanel(new BorderLayout());
         JPanel graphicButtonsPanel = new JPanel(new FlowLayout());
         JButton selectColorButton = new JButton(View.getIcon("color16"));
-        selectColorButton.addActionListener(this);
-        selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
+        selectColorButton.addActionListener(this::selectBkColorButtonActionPerformed);
         selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
 
         JButton zoomInButton = new JButton(View.getIcon("zoomin16"));
-        zoomInButton.addActionListener(this);
-        zoomInButton.setActionCommand(ACTION_ZOOMIN);
+        zoomInButton.addActionListener(this::zoomInButtonActionPerformed);
         zoomInButton.setToolTipText(AppStrings.translate("button.zoomin.hint"));
 
         JButton zoomOutButton = new JButton(View.getIcon("zoomout16"));
-        zoomOutButton.addActionListener(this);
-        zoomOutButton.setActionCommand(ACTION_ZOOMOUT);
+        zoomOutButton.addActionListener(this::zoomOutButtonActionPerformed);
         zoomOutButton.setToolTipText(AppStrings.translate("button.zoomout.hint"));
 
         zoomFitButton = new JButton(View.getIcon("zoomfit16"));
-        zoomFitButton.addActionListener(this);
-        zoomFitButton.setActionCommand(ACTION_ZOOMFIT);
+        zoomFitButton.addActionListener(this::zoomFitButtonActionPerformed);
         zoomFitButton.setToolTipText(AppStrings.translate("button.zoomfit.hint"));
 
         JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
-        zoomNoneButton.addActionListener(this);
-        zoomNoneButton.setActionCommand(ACTION_ZOOMNONE);
+        zoomNoneButton.addActionListener(this::zoomNoneButtonActionPerformed);
         zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
 
         snapshotButton = new JButton(View.getIcon("snapshot16"));
-        snapshotButton.addActionListener(this);
-        snapshotButton.setActionCommand(ACTION_SNAPSHOT);
+        snapshotButton.addActionListener(this::snapShotButtonActionPerformed);
         snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
 
         zoomPanel = new JPanel(new FlowLayout());
@@ -255,8 +224,7 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
         JButton prevFrameButton = new JButton(View.getIcon("prevframe16"));
         prevFrameButton.setToolTipText(AppStrings.translate("preview.prevframe"));
         prevFrameButton.setMargin(new Insets(4, 2, 2, 2));
-        prevFrameButton.setActionCommand(ACTION_PREVFRAME);
-        prevFrameButton.addActionListener(this);
+        prevFrameButton.addActionListener(this::prevFrameButtonActionPerformed);
         frameControls.add(prevFrameButton);
         frameControls.setVisible(display.screenAvailable());
 
@@ -265,15 +233,13 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
         JButton nextFrameButton = new JButton(View.getIcon("nextframe16"));
         nextFrameButton.setToolTipText(AppStrings.translate("preview.nextframe"));
         nextFrameButton.setMargin(new Insets(4, 2, 2, 2));
-        nextFrameButton.setActionCommand(ACTION_NEXTFRAME);
-        nextFrameButton.addActionListener(this);
+        nextFrameButton.addActionListener(this::nextFrameButtonActionPerformed);
         frameControls.add(nextFrameButton);
 
         JButton gotoFrameButton = new JButton(View.getIcon("gotoframe16"));
         gotoFrameButton.setToolTipText(AppStrings.translate("preview.gotoframe"));
         gotoFrameButton.setMargin(new Insets(4, 2, 2, 2));
-        gotoFrameButton.setActionCommand(ACTION_GOTOFRAME);
-        gotoFrameButton.addActionListener(this);
+        gotoFrameButton.addActionListener(this::gotoFrameButtonActionPerformed);
         frameControls.add(gotoFrameButton);
 
         JPanel currentPanel = new JPanel(new FlowLayout());
@@ -291,18 +257,15 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
         pauseButton = new JButton(pauseIcon);
         pauseButton.setToolTipText(AppStrings.translate("preview.pause"));
         pauseButton.setMargin(new Insets(4, 2, 2, 2));
-        pauseButton.setActionCommand(ACTION_PAUSE);
-        pauseButton.addActionListener(this);
+        pauseButton.addActionListener(this::pauseButtonActionPerformed);
         JButton stopButton = new JButton(View.getIcon("stop16"));
         stopButton.setToolTipText(AppStrings.translate("preview.stop"));
         stopButton.setMargin(new Insets(4, 2, 2, 2));
-        stopButton.setActionCommand(ACTION_STOP);
-        stopButton.addActionListener(this);
+        stopButton.addActionListener(this::stopButtonActionPerformed);
         loopButton = new JButton(pauseIcon);
         loopButton.setToolTipText(AppStrings.translate("preview.loop"));
         loopButton.setMargin(new Insets(4, 2, 2, 2));
-        loopButton.setActionCommand(ACTION_LOOP);
-        loopButton.addActionListener(this);
+        loopButton.addActionListener(this::loopButtonActionPerformed);
         boolean loop = Configuration.loopMedia.get();
         loopButton.setIcon(loop ? loopIcon : noLoopIcon);
         buttonsPanel.add(pauseButton);
@@ -449,108 +412,110 @@ public class PlayerControls extends JPanel implements ActionListener, MediaDispl
         display.zoom(zoomObj);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_PAUSE:
-                if (display.isPlaying()) {
-                    display.pause();
-                } else {
-                    display.play();
-                }
-                break;
-
-            case ACTION_LOOP:
-                boolean loop = !Configuration.loopMedia.get();
-                Configuration.loopMedia.set(loop);
-                loopButton.setIcon(loop ? loopIcon : noLoopIcon);
-                display.setLoop(loop);
-                break;
-
-            case ACTION_GOTOFRAME:
-                final JPanel gotoPanel = new JPanel(new BorderLayout());
-                final JTextField frameField = new JTextField("" + display.getCurrentFrame());
-                gotoPanel.add(new JLabel(AppStrings.translate("preview.gotoframe.dialog.message").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames())), BorderLayout.NORTH);
-                gotoPanel.add(frameField, BorderLayout.CENTER);
-                gotoPanel.addAncestorListener(new AncestorListener() {
-
-                    @Override
-                    public void ancestorAdded(AncestorEvent event) {
-                        final AncestorListener al = this;
-                        View.execInEventDispatchLater(() -> {
-                            frameField.selectAll();
-                            frameField.requestFocusInWindow();
-                            gotoPanel.removeAncestorListener(al);
-                        });
-
-                    }
-
-                    @Override
-                    public void ancestorRemoved(AncestorEvent event) {
-
-                    }
-
-                    @Override
-                    public void ancestorMoved(AncestorEvent event) {
-
-                    }
-                });
-                if (View.showConfirmDialog(this, gotoPanel, AppStrings.translate("preview.gotoframe.dialog.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
-                    int frame = -1;
-                    try {
-                        frame = Integer.parseInt(frameField.getText());
-                    } catch (NumberFormatException nfe) {
-                        //handled as -1
-                    }
-                    if (frame <= 0 || frame > display.getTotalFrames()) {
-                        View.showMessageDialog(this, AppStrings.translate("preview.gotoframe.dialog.frame.error").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    display.gotoFrame(frame - 1);
-                }
-                break;
-            case ACTION_NEXTFRAME:
-                display.gotoFrame(display.getCurrentFrame() + 1);
-                break;
-            case ACTION_PREVFRAME:
-                display.gotoFrame(display.getCurrentFrame() - 1);
-                break;
-            case ACTION_STOP:
-                display.stop();
-                break;
-            case ACTION_SELECT_BKCOLOR:
-                View.execInEventDispatch(() -> {
-                    Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
-                    if (newColor != null) {
-                        View.setSwfBackgroundColor(newColor);
-                        display.setBackground(newColor);
-                    }
-                });
-                break;
-            case ACTION_ZOOMIN:
-                realZoom = getRealZoom() * ZOOM_MULTIPLIER;
-                zoomToFit = false;
-                updateZoom();
-                break;
-            case ACTION_ZOOMOUT:
-                realZoom = getRealZoom() / ZOOM_MULTIPLIER;
-                zoomToFit = false;
-                updateZoom();
-                break;
-            case ACTION_ZOOMNONE:
-                realZoom = 1.0;
-                zoomToFit = false;
-                updateZoom();
-                break;
-            case ACTION_ZOOMFIT:
-                realZoom = 1.0;
-                zoomToFit = true;
-                updateZoom();
-                break;
-            case ACTION_SNAPSHOT:
-                putImageToClipBoard(display.printScreen());
-                break;
+    private void pauseButtonActionPerformed(ActionEvent evt) {
+        if (display.isPlaying()) {
+            display.pause();
+        } else {
+            display.play();
         }
+    }
+
+    private void loopButtonActionPerformed(ActionEvent evt) {
+        boolean loop = !Configuration.loopMedia.get();
+        Configuration.loopMedia.set(loop);
+        loopButton.setIcon(loop ? loopIcon : noLoopIcon);
+        display.setLoop(loop);
+    }
+
+    private void gotoFrameButtonActionPerformed(ActionEvent evt) {
+        final JPanel gotoPanel = new JPanel(new BorderLayout());
+        final JTextField frameField = new JTextField("" + display.getCurrentFrame());
+        gotoPanel.add(new JLabel(AppStrings.translate("preview.gotoframe.dialog.message").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames())), BorderLayout.NORTH);
+        gotoPanel.add(frameField, BorderLayout.CENTER);
+        gotoPanel.addAncestorListener(new AncestorListener() {
+
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                final AncestorListener al = this;
+                View.execInEventDispatchLater(() -> {
+                    frameField.selectAll();
+                    frameField.requestFocusInWindow();
+                    gotoPanel.removeAncestorListener(al);
+                });
+
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+
+            }
+        });
+        if (View.showConfirmDialog(this, gotoPanel, AppStrings.translate("preview.gotoframe.dialog.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+            int frame = -1;
+            try {
+                frame = Integer.parseInt(frameField.getText());
+            } catch (NumberFormatException nfe) {
+                //handled as -1
+            }
+            if (frame <= 0 || frame > display.getTotalFrames()) {
+                View.showMessageDialog(this, AppStrings.translate("preview.gotoframe.dialog.frame.error").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            display.gotoFrame(frame - 1);
+        }
+    }
+
+    private void nextFrameButtonActionPerformed(ActionEvent evt) {
+        display.gotoFrame(display.getCurrentFrame() + 1);
+    }
+
+    private void prevFrameButtonActionPerformed(ActionEvent evt) {
+        display.gotoFrame(display.getCurrentFrame() - 1);
+    }
+
+    private void stopButtonActionPerformed(ActionEvent evt) {
+        display.stop();
+    }
+
+    private void selectBkColorButtonActionPerformed(ActionEvent evt) {
+        Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.getSwfBackgroundColor());
+        if (newColor != null) {
+            View.setSwfBackgroundColor(newColor);
+            display.setBackground(newColor);
+        }
+    }
+
+    private void zoomInButtonActionPerformed(ActionEvent evt) {
+        realZoom = getRealZoom() * ZOOM_MULTIPLIER;
+        zoomToFit = false;
+        updateZoom();
+    }
+
+    private void zoomOutButtonActionPerformed(ActionEvent evt) {
+        realZoom = getRealZoom() / ZOOM_MULTIPLIER;
+        zoomToFit = false;
+        updateZoom();
+    }
+
+    private void zoomNoneButtonActionPerformed(ActionEvent evt) {
+        realZoom = 1.0;
+        zoomToFit = false;
+        updateZoom();
+    }
+
+    private void zoomFitButtonActionPerformed(ActionEvent evt) {
+        realZoom = 1.0;
+        zoomToFit = true;
+        updateZoom();
+    }
+
+    private void snapShotButtonActionPerformed(ActionEvent evt) {
+        putImageToClipBoard(display.printScreen());
     }
 
     private double getRealZoom() {

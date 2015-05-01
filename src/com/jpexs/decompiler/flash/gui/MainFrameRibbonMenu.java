@@ -840,16 +840,16 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
                 }
                 break;
             case ACTION_RELOAD:
-                reload();
+                reload(null);
                 break;
             case ACTION_ADVANCED_SETTINGS:
-                advancedSettings();
+                advancedSettings(null);
                 break;
             case ACTION_LOAD_MEMORY:
-                loadFromMemory();
+                loadFromMemory(null);
                 break;
             case ACTION_LOAD_CACHE:
-                loadFromCache();
+                loadFromCache(null);
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
                 Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());

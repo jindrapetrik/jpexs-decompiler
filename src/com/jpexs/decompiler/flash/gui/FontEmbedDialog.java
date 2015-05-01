@@ -26,7 +26,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -56,13 +55,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author JPEXS
  */
-public class FontEmbedDialog extends AppDialog implements ActionListener {
-
-    private static final String ACTION_OK = "OK";
-
-    private static final String ACTION_CANCEL = "CANCEL";
-
-    private static final String ACTION_LOAD_FROM_DISK = "LOAD_FROM_DISK";
+public class FontEmbedDialog extends AppDialog {
 
     private static final int SAMPLE_MAX_LENGTH = 50;
 
@@ -78,7 +71,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private final JTextField individualCharsField;
 
-    private boolean result = false;
+    private int result = ERROR_OPTION;
 
     private JLabel individialSample;
 
@@ -167,8 +160,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         faceSelection.setSelectedItem(selectedFace);
         JButton loadFromDiskButton = new JButton(View.getIcon("open16"));
         loadFromDiskButton.setToolTipText(translate("button.loadfont"));
-        loadFromDiskButton.addActionListener(this);
-        loadFromDiskButton.setActionCommand(ACTION_LOAD_FROM_DISK);
+        loadFromDiskButton.addActionListener(this::loadFromDiscButtonActionPerformed);
         selFontPanel.add(installedRadio);
         selFontPanel.add(familyNamesSelection);
         selFontPanel.add(faceSelection);
@@ -268,11 +260,9 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
-        okButton.setActionCommand(ACTION_OK);
-        okButton.addActionListener(this);
+        okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(AppStrings.translate("button.cancel"));
-        cancelButton.setActionCommand(ACTION_CANCEL);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
         cnt.add(buttonsPanel);
@@ -345,25 +335,32 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_OK:
-                result = true;
-                setVisible(false);
-                break;
-            case ACTION_CANCEL:
-                result = false;
-                setVisible(false);
-                break;
-            case ACTION_LOAD_FROM_DISK:
-                if (customFont != null) {
-                    if (loadFromDisk()) {
-                        updateCheckboxes();
-                    }
-                }
-                ttfFileRadio.setSelected(true);
-                break;
+    public void setVisible(boolean b) {
+        if (b) {
+            result = ERROR_OPTION;
         }
+
+        super.setVisible(b);
+    }
+
+    private void okButtonActionPerformed(ActionEvent evt) {
+        result = OK_OPTION;
+        setVisible(false);
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        result = CANCEL_OPTION;
+        setVisible(false);
+    }
+
+    private void loadFromDiscButtonActionPerformed(ActionEvent evt) {
+        if (customFont != null) {
+            if (loadFromDisk()) {
+                updateCheckboxes();
+            }
+        }
+
+        ttfFileRadio.setSelected(true);
     }
 
     private boolean loadFromDisk() {
@@ -401,8 +398,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         return false;
     }
 
-    public boolean display() {
-        result = false;
+    public int showDialog() {
         setVisible(true);
         return result;
     }

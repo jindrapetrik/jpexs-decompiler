@@ -27,7 +27,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -38,13 +37,7 @@ import javax.swing.JToggleButton;
  *
  * @author JPEXS
  */
-public class MethodCodePanel extends JPanel implements ActionListener {
-
-    private static final String ACTION_GRAPH = "GRAPH";
-
-    private static final String ACTION_HEX = "HEX";
-
-    private static final String ACTION_HEX_ONLY = "HEXONLY";
+public class MethodCodePanel extends JPanel {
 
     private final ASMSourceEditorPane sourceTextArea;
 
@@ -110,20 +103,17 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
-        graphButton.setActionCommand(ACTION_GRAPH);
-        graphButton.addActionListener(this);
+        graphButton.addActionListener(this::graphButtonActionPerformed);
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hexas16"));
-        hexButton.setActionCommand(ACTION_HEX);
-        hexButton.addActionListener(this);
+        hexButton.addActionListener(this::hexButtonActionPerformed);
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
-        hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
-        hexOnlyButton.addActionListener(this);
+        hexOnlyButton.addActionListener(this::hexOnlyButtonActionPerformed);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
@@ -137,26 +127,30 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         add(buttonsPanel, BorderLayout.NORTH);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void graphButtonActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
         }
 
-        switch (e.getActionCommand()) {
-            case ACTION_GRAPH:
-                sourceTextArea.graph();
-                break;
-            case ACTION_HEX:
-            case ACTION_HEX_ONLY:
-                if (e.getActionCommand().equals(ACTION_HEX)) {
-                    hexOnlyButton.setSelected(false);
-                } else {
-                    hexButton.setSelected(false);
-                }
-                sourceTextArea.setHex(getExportMode(), false);
-                break;
+        sourceTextArea.graph();
+    }
+
+    private void hexButtonActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
         }
+
+        hexOnlyButton.setSelected(false);
+        sourceTextArea.setHex(getExportMode(), false);
+    }
+
+    private void hexOnlyButtonActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        hexButton.setSelected(false);
+        sourceTextArea.setHex(getExportMode(), false);
     }
 
     private ScriptExportMode getExportMode() {

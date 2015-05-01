@@ -27,7 +27,6 @@ import java.awt.CardLayout;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BoxLayout;
@@ -43,13 +42,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class DetailPanel extends JPanel implements ActionListener {
-
-    private static final String ACTION_SAVE_DETAIL = "SAVEDETAIL";
-
-    private static final String ACTION_EDIT_DETAIL = "EDITDETAIL";
-
-    private static final String ACTION_CANCEL_DETAIL = "CANCELDETAIL";
+public class DetailPanel extends JPanel {
 
     public MethodTraitDetailPanel methodTraitPanel;
 
@@ -115,12 +108,9 @@ public class DetailPanel extends JPanel implements ActionListener {
 
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
-        saveButton.setActionCommand(ACTION_SAVE_DETAIL);
-        saveButton.addActionListener(this);
-        editButton.setActionCommand(ACTION_EDIT_DETAIL);
-        editButton.addActionListener(this);
-        cancelButton.setActionCommand(ACTION_CANCEL_DETAIL);
-        cancelButton.addActionListener(this);
+        saveButton.addActionListener(this::saveButtonActionPerformed);
+        editButton.addActionListener(this::editButtonActionPerformed);
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
         buttonsPanel.add(editButton);
         buttonsPanel.add(saveButton);
@@ -194,40 +184,37 @@ public class DetailPanel extends JPanel implements ActionListener {
 
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_EDIT_DETAIL:
-                setEditMode(true);
-                methodTraitPanel.methodCodePanel.focusEditor();
-                break;
-            case ACTION_CANCEL_DETAIL:
-                setEditMode(false);
-                abcPanel.decompiledTextArea.resetEditing();
-                break;
-            case ACTION_SAVE_DETAIL:
-                if (cardMap.get(selectedCard) instanceof TraitDetail) {
-                    if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-                        CancellableWorker worker = new CancellableWorker() {
+    private void editButtonActionPerformed(ActionEvent evt) {
+        setEditMode(true);
+        methodTraitPanel.methodCodePanel.focusEditor();
+    }
 
-                            @Override
-                            public Void doInBackground() throws Exception {
-                                int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-                                abcPanel.decompiledTextArea.reloadClass();
-                                abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                                return null;
-                            }
+    private void cancelButtonActionPerformed(ActionEvent evt) {
+        setEditMode(false);
+        abcPanel.decompiledTextArea.resetEditing();
+    }
 
-                            @Override
-                            protected void done() {
-                                setEditMode(false);
-                                View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
-                            }
-                        };
-                        worker.execute();
+    private void saveButtonActionPerformed(ActionEvent evt) {
+        if (cardMap.get(selectedCard) instanceof TraitDetail) {
+            if (((TraitDetail) cardMap.get(selectedCard)).save()) {
+                CancellableWorker worker = new CancellableWorker() {
+
+                    @Override
+                    public Void doInBackground() throws Exception {
+                        int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
+                        abcPanel.decompiledTextArea.reloadClass();
+                        abcPanel.decompiledTextArea.gotoTrait(lasttrait);
+                        return null;
                     }
-                }
-                break;
+
+                    @Override
+                    protected void done() {
+                        setEditMode(false);
+                        View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
+                    }
+                };
+                worker.execute();
+            }
         }
     }
 }

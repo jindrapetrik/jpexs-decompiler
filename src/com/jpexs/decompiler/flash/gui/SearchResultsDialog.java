@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -37,17 +36,13 @@ import javax.swing.JScrollPane;
  * @author JPEXS
  * @param <E> Element to search
  */
-public class SearchResultsDialog<E> extends AppDialog implements ActionListener {
+public class SearchResultsDialog<E> extends AppDialog {
 
     private final JList<E> resultsList;
 
     private final DefaultListModel<E> model;
 
     private final SearchListener<E> listener;
-
-    private static final String ACTION_GOTO = "GOTO";
-
-    private static final String ACTION_CANCEL = "CLOSE";
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
 
@@ -61,10 +56,9 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
         resultsList = new JList<>(model);
         this.listener = listener;
 
-        gotoButton.setActionCommand(ACTION_GOTO);
-        gotoButton.addActionListener(this);
-        closeButton.setActionCommand(ACTION_CANCEL);
-        closeButton.addActionListener(this);
+        gotoButton.addActionListener(this::gotoButtonActionPerformed);
+        closeButton.addActionListener(this::closeButtonActionPerformed);
+
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.add(gotoButton);
@@ -97,17 +91,13 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener 
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_GOTO:
-                gotoElement();
-                setVisible(false);
-                break;
-            case ACTION_CANCEL:
-                setVisible(false);
-                break;
-        }
+    private void gotoButtonActionPerformed(ActionEvent evt) {
+        gotoElement();
+        setVisible(false);
+    }
+
+    private void closeButtonActionPerformed(ActionEvent evt) {
+        setVisible(false);
     }
 
     private void gotoElement() {

@@ -28,7 +28,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -55,13 +54,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author JPEXS
  */
-public class LoadFromCacheFrame extends AppFrame implements ActionListener {
-
-    private static final String ACTION_OPEN = "OPEN";
-
-    private static final String ACTION_SAVE = "SAVE";
-
-    private static final String ACTION_REFRESH = "REFRESH";
+public class LoadFromCacheFrame extends AppFrame {
 
     private final JList<CacheEntry> list;
 
@@ -120,18 +113,15 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
         openButton = new JButton(translate("button.open"));
-        openButton.setActionCommand(ACTION_OPEN);
-        openButton.addActionListener(this);
+        openButton.addActionListener(this::openButtonActionPerformed);
         buttonsPanel.add(openButton);
 
         saveButton = new JButton(translate("button.save"));
-        saveButton.setActionCommand(ACTION_SAVE);
-        saveButton.addActionListener(this);
+        saveButton.addActionListener(this::saveButtonActionPerformed);
         buttonsPanel.add(saveButton);
 
         refreshButton = new JButton(translate("button.refresh"));
-        refreshButton.setActionCommand(ACTION_REFRESH);
-        refreshButton.addActionListener(this);
+        refreshButton.addActionListener(this::refreshButtonActionPerformed);
         buttonsPanel.add(refreshButton);
 
         JPanel browsersPanel = new JPanel(new FlowLayout());
@@ -243,56 +233,53 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_REFRESH:
-                refresh();
-                break;
-            case ACTION_OPEN:
-                openSWF();
-                break;
-            case ACTION_SAVE:
-                List<CacheEntry> selected = list.getSelectedValuesList();
-                if (!selected.isEmpty()) {
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
-                    if (selected.size() > 1) {
-                        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    } else {
-                        fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), entryToFileName(selected.get(0))));
-                        fc.setFileFilter(new FileFilter() {
-                            @Override
-                            public boolean accept(File f) {
-                                return (f.getName().endsWith(".swf")) || (f.isDirectory());
-                            }
+    private void refreshButtonActionPerformed(ActionEvent evt) {
+        refresh();
+    }
 
-                            @Override
-                            public String getDescription() {
-                                return AppStrings.translate("filter.swf");
-                            }
-                        });
+    private void openButtonActionPerformed(ActionEvent evt) {
+        openSWF();
+    }
+
+    private void saveButtonActionPerformed(ActionEvent evt) {
+        List<CacheEntry> selected = list.getSelectedValuesList();
+        if (!selected.isEmpty()) {
+            JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+            if (selected.size() > 1) {
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            } else {
+                fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), entryToFileName(selected.get(0))));
+                fc.setFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return (f.getName().endsWith(".swf")) || (f.isDirectory());
                     }
-                    fc.setAcceptAllFileFilterUsed(false);
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
-                        File file = Helper.fixDialogFile(fc.getSelectedFile());
-                        try {
-                            if (selected.size() == 1) {
-                                Helper.saveStream(selected.get(0).getResponseDataStream(), file);
-                            } else {
-                                for (CacheEntry sel : selected) {
-                                    Helper.saveStream(sel.getResponseDataStream(), new File(file, entryToFileName(sel)));
-                                }
-                            }
-                            Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
-                        } catch (IOException ex) {
-                            View.showMessageDialog(null, translate("error.file.write"));
+
+                    @Override
+                    public String getDescription() {
+                        return AppStrings.translate("filter.swf");
+                    }
+                });
+            }
+            fc.setAcceptAllFileFilterUsed(false);
+            JFrame f = new JFrame();
+            View.setWindowIcon(f);
+            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+                File file = Helper.fixDialogFile(fc.getSelectedFile());
+                try {
+                    if (selected.size() == 1) {
+                        Helper.saveStream(selected.get(0).getResponseDataStream(), file);
+                    } else {
+                        for (CacheEntry sel : selected) {
+                            Helper.saveStream(sel.getResponseDataStream(), new File(file, entryToFileName(sel)));
                         }
                     }
+                    Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
+                } catch (IOException ex) {
+                    View.showMessageDialog(null, translate("error.file.write"));
                 }
-                break;
+            }
         }
     }
 }

@@ -74,7 +74,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
@@ -115,7 +114,7 @@ import jsyntaxpane.DefaultSyntaxKit;
  *
  * @author JPEXS
  */
-public class PreviewPanel extends JSplitPane implements ActionListener {
+public class PreviewPanel extends JSplitPane {
 
     private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
 
@@ -130,22 +129,6 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private static final String CARDTEXTPANEL = "Text card";
 
     private static final String CARDFONTPANEL = "Font card";
-
-    private static final String ACTION_EDIT_GENERIC_TAG = "EDITGENERICTAG";
-
-    private static final String ACTION_SAVE_GENERIC_TAG = "SAVEGENERICTAG";
-
-    private static final String ACTION_CANCEL_GENERIC_TAG = "CANCELGENERICTAG";
-
-    private static final String ACTION_PREV_FONTS = "PREVFONTS";
-
-    private static final String ACTION_NEXT_FONTS = "NEXTFONTS";
-
-    private static final String ACTION_EDIT_METADATA_TAG = "EDITMETADATATAG";
-
-    private static final String ACTION_SAVE_METADATA_TAG = "SAVEMETADATATAG";
-
-    private static final String ACTION_CANCEL_METADATA_TAG = "CANCELMETADATATAG";
 
     private final MainPanel mainPanel;
 
@@ -271,20 +254,17 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private JPanel createImageButtonsPanel() {
         replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceImageButton.setActionCommand(MainPanel.ACTION_REPLACE);
-        replaceImageButton.addActionListener(mainPanel);
+        replaceImageButton.addActionListener(mainPanel::replaceButtonActionPerformed);
         replaceImageButton.setVisible(false);
 
         prevFontsButton = new JButton(mainPanel.translate("button.prev"), View.getIcon("prev16"));
         prevFontsButton.setMargin(new Insets(3, 3, 3, 10));
-        prevFontsButton.setActionCommand(ACTION_PREV_FONTS);
-        prevFontsButton.addActionListener(this);
+        prevFontsButton.addActionListener(this::prevFontsButtonActionPerformed);
         prevFontsButton.setVisible(false);
 
         nextFontsButton = new JButton(mainPanel.translate("button.next"), View.getIcon("next16"));
         nextFontsButton.setMargin(new Insets(3, 3, 3, 10));
-        nextFontsButton.setActionCommand(ACTION_NEXT_FONTS);
-        nextFontsButton.addActionListener(this);
+        nextFontsButton.addActionListener(this::nextFontsButtonActionPerformed);
         nextFontsButton.setVisible(false);
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
@@ -297,8 +277,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private JPanel createBinaryButtonsPanel() {
         replaceBinaryButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceBinaryButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceBinaryButton.setActionCommand(MainPanel.ACTION_REPLACE);
-        replaceBinaryButton.addActionListener(mainPanel);
+        replaceBinaryButton.addActionListener(mainPanel::replaceButtonActionPerformed);
 
         ButtonsPanel binaryButtonsPanel = new ButtonsPanel();
         binaryButtonsPanel.add(replaceBinaryButton);
@@ -308,17 +287,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private JPanel createGenericTagButtonsPanel() {
         genericEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
         genericEditButton.setMargin(new Insets(3, 3, 3, 10));
-        genericEditButton.setActionCommand(ACTION_EDIT_GENERIC_TAG);
-        genericEditButton.addActionListener(this);
+        genericEditButton.addActionListener(this::editGenericTagButtonActionPerformed);
         genericSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         genericSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        genericSaveButton.setActionCommand(ACTION_SAVE_GENERIC_TAG);
-        genericSaveButton.addActionListener(this);
+        genericSaveButton.addActionListener(this::saveGenericTagButtonActionPerformed);
         genericSaveButton.setVisible(false);
         genericCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         genericCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        genericCancelButton.setActionCommand(ACTION_CANCEL_GENERIC_TAG);
-        genericCancelButton.addActionListener(this);
+        genericCancelButton.addActionListener(this::cancelGenericTagButtonActionPerformed);
         genericCancelButton.setVisible(false);
 
         ButtonsPanel genericTagButtonsPanel = new ButtonsPanel();
@@ -331,17 +307,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private JPanel createMetadataButtonsPanel() {
         metadataEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
         metadataEditButton.setMargin(new Insets(3, 3, 3, 10));
-        metadataEditButton.setActionCommand(ACTION_EDIT_METADATA_TAG);
-        metadataEditButton.addActionListener(this);
+        metadataEditButton.addActionListener(this::editMetadataButtonActionPerformed);
         metadataSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         metadataSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        metadataSaveButton.setActionCommand(ACTION_SAVE_METADATA_TAG);
-        metadataSaveButton.addActionListener(this);
+        metadataSaveButton.addActionListener(this::saveMetadataButtonActionPerformed);
         metadataSaveButton.setVisible(false);
         metadataCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         metadataCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        metadataCancelButton.setActionCommand(ACTION_CANCEL_METADATA_TAG);
-        metadataCancelButton.addActionListener(this);
+        metadataCancelButton.addActionListener(this::cancelMetadataButtonActionPerformed);
         metadataCancelButton.setVisible(false);
 
         ButtonsPanel metadataTagButtonsPanel = new ButtonsPanel();
@@ -1135,95 +1108,86 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_EDIT_METADATA_TAG: {
-                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-                if (item == null) {
-                    return;
-                }
+    private void editMetadataButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
 
-                if (item instanceof MetadataTag) {
-                    metadataEditor.setEditable(true);
-                    updateMetadataButtonsVisibility();
-                }
-            }
-            break;
-            case ACTION_SAVE_METADATA_TAG: {
-                metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
-                metadataTag.setModified(true);
-                metadataEditor.setEditable(Configuration.editorMode.get());
-                metadataModified = false;
-                updateMetadataButtonsVisibility();
-                mainPanel.repaintTree();
-            }
-            break;
+        if (item instanceof MetadataTag) {
+            metadataEditor.setEditable(true);
+            updateMetadataButtonsVisibility();
+        }
+    }
 
-            case ACTION_CANCEL_METADATA_TAG: {
-                metadataEditor.setEditable(false);
-                metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
-                metadataEditor.setEditable(Configuration.editorMode.get());
-                metadataModified = false;
-                updateMetadataButtonsVisibility();
-            }
-            break;
+    private void saveMetadataButtonActionPerformed(ActionEvent evt) {
+        metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
+        metadataTag.setModified(true);
+        metadataEditor.setEditable(Configuration.editorMode.get());
+        metadataModified = false;
+        updateMetadataButtonsVisibility();
+        mainPanel.repaintTree();
+    }
 
-            case ACTION_EDIT_GENERIC_TAG: {
-                TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
-                if (item == null) {
-                    return;
-                }
+    private void cancelMetadataButtonActionPerformed(ActionEvent evt) {
+        metadataEditor.setEditable(false);
+        metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
+        metadataEditor.setEditable(Configuration.editorMode.get());
+        metadataModified = false;
+        updateMetadataButtonsVisibility();
+    }
 
-                if (item instanceof Tag) {
-                    genericEditButton.setVisible(false);
-                    genericSaveButton.setVisible(true);
-                    genericCancelButton.setVisible(true);
-                    genericTagPanel.setEditMode(true, (Tag) item);
-                }
-            }
-            break;
+    private void editGenericTagButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
 
-            case ACTION_SAVE_GENERIC_TAG: {
-                genericTagPanel.save();
-                Tag tag = genericTagPanel.getTag();
-                SWF swf = tag.getSwf();
-                swf.clearImageCache();
-                swf.updateCharacters();
-                tag.getTimelined().resetTimeline();
-                mainPanel.repaintTree();
-                mainPanel.setTagTreeSelectedNode(tag);
-                genericEditButton.setVisible(true);
-                genericSaveButton.setVisible(false);
-                genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false, null);
-            }
-            break;
-            case ACTION_CANCEL_GENERIC_TAG: {
-                genericEditButton.setVisible(true);
-                genericSaveButton.setVisible(false);
-                genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false, null);
-            }
-            break;
-            case ACTION_PREV_FONTS: {
-                FontTag fontTag = fontPanel.getFontTag();
-                int pageCount = getFontPageCount(fontTag);
-                fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
-                if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
-                }
-            }
-            break;
-            case ACTION_NEXT_FONTS: {
-                FontTag fontTag = fontPanel.getFontTag();
-                int pageCount = getFontPageCount(fontTag);
-                fontPageNum = (fontPageNum + 1) % pageCount;
-                if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-                    imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
-                }
-            }
-            break;
+        if (item instanceof Tag) {
+            genericEditButton.setVisible(false);
+            genericSaveButton.setVisible(true);
+            genericCancelButton.setVisible(true);
+            genericTagPanel.setEditMode(true, (Tag) item);
+        }
+    }
+
+    private void saveGenericTagButtonActionPerformed(ActionEvent evt) {
+        genericTagPanel.save();
+        Tag tag = genericTagPanel.getTag();
+        SWF swf = tag.getSwf();
+        swf.clearImageCache();
+        swf.updateCharacters();
+        tag.getTimelined().resetTimeline();
+        mainPanel.repaintTree();
+        mainPanel.setTagTreeSelectedNode(tag);
+        genericEditButton.setVisible(true);
+        genericSaveButton.setVisible(false);
+        genericCancelButton.setVisible(false);
+        genericTagPanel.setEditMode(false, null);
+    }
+
+    private void cancelGenericTagButtonActionPerformed(ActionEvent evt) {
+        genericEditButton.setVisible(true);
+        genericSaveButton.setVisible(false);
+        genericCancelButton.setVisible(false);
+        genericTagPanel.setEditMode(false, null);
+    }
+
+    private void prevFontsButtonActionPerformed(ActionEvent evt) {
+        FontTag fontTag = fontPanel.getFontTag();
+        int pageCount = getFontPageCount(fontTag);
+        fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
+        if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
+        }
+    }
+
+    private void nextFontsButtonActionPerformed(ActionEvent evt) {
+        FontTag fontTag = fontPanel.getFontTag();
+        int pageCount = getFontPageCount(fontTag);
+        fontPageNum = (fontPageNum + 1) % pageCount;
+        if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
         }
     }
 }

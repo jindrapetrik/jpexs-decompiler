@@ -30,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
@@ -308,7 +309,7 @@ public abstract class MainFrameMenu {
         Main.about();
     }
 
-    protected boolean reload() {
+    protected boolean reload(ActionEvent evt) {
         if (swf != null) {
             if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
@@ -320,16 +321,21 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected void advancedSettings() {
+    protected void advancedSettings(ActionEvent evt) {
         Main.advancedSettings();
     }
 
-    protected void loadFromMemory() {
+    protected void loadFromMemory(ActionEvent evt) {
         Main.loadFromMemory();
     }
 
-    protected void loadFromCache() {
+    protected void loadFromCache(ActionEvent evt) {
         Main.loadFromCache();
+    }
+
+    protected void gotoDucumentClassOnStartup(ActionEvent evt) {
+        boolean selected = true; // todo: honfika: get from evt.getSource()
+        Configuration.gotoMainClassOnStartup.set(selected);
     }
 
     protected void setLanguage() {
@@ -367,7 +373,7 @@ public abstract class MainFrameMenu {
                             case KeyEvent.VK_T:
                                 return search(true);
                             case KeyEvent.VK_R:
-                                return reload();
+                                return reload(null);
                             case KeyEvent.VK_X:
                                 return closeAll();
                             case KeyEvent.VK_D:
