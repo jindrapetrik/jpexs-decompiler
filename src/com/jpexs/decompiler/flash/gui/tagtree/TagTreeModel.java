@@ -466,29 +466,34 @@ public class TagTreeModel implements TreeModel {
         return root;
     }
 
-    private List<TreeItem> getSwfFolders(SWF swf) {
+    private TagTreeSwfInfo getSwfInfo(SWF swf) {
         TagTreeSwfInfo swfInfo = swfInfos.get(swf);
         if (swfInfo == null) {
             createTagList(swf);
             swfInfo = swfInfos.get(swf);
         }
 
+        return swfInfo;
+    }
+
+    private List<TreeItem> getSwfFolders(SWF swf) {
+        TagTreeSwfInfo swfInfo = getSwfInfo(swf);
         return swfInfo.folders;
     }
 
     private List<TreeItem> getMappedCharacters(SWF swf, CharacterTag tag) {
-        TagTreeSwfInfo swfInfo = swfInfos.get(swf);
-        if (swfInfo == null) {
-            createTagList(swf);
-            swfInfo = swfInfos.get(swf);
-        }
-
+        TagTreeSwfInfo swfInfo = getSwfInfo(swf);
         List<TreeItem> mapped = swfInfo.mappedTags.get(tag.getCharacterId());
         if (mapped == null) {
             mapped = new ArrayList<>();
         }
 
         return mapped;
+    }
+
+    private Map<Tag, TagScript> getTagScriptCache(SWF swf) {
+        TagTreeSwfInfo swfInfo = getSwfInfo(swf);
+        return swfInfo.tagScriptCache;
     }
 
     public List<? extends TreeItem> getAllChildren(Object parent) {
@@ -532,7 +537,7 @@ public class TagTreeModel implements TreeModel {
                 TreeItem item = result.get(i);
                 if (item instanceof Tag) {
                     Tag resultTag = (Tag) item;
-                    Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(item.getSwf()).tagScriptCache;
+                    Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache(item.getSwf());
                     TagScript tagScript = currentTagScriptCache.get(resultTag);
                     if (tagScript == null) {
                         List<TreeItem> subNodes = new ArrayList<>();
@@ -600,7 +605,7 @@ public class TagTreeModel implements TreeModel {
             }
             if (result instanceof Tag) {
                 Tag resultTag = (Tag) result;
-                Map<Tag, TagScript> currentTagScriptCache = swfInfos.get(result.getSwf()).tagScriptCache;
+                Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache(result.getSwf());
                 TagScript tagScript = currentTagScriptCache.get(resultTag);
                 if (tagScript == null) {
                     List<TreeItem> subNodes = new ArrayList<>();

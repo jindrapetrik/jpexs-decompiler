@@ -70,6 +70,15 @@ public class Helper {
 
     private static final Map<String, Area> shapeCache = new HashMap<>();
 
+    private static final String[] hexStringCache;
+
+    static {
+        hexStringCache = new String[256];
+        for (int i = 0; i < hexStringCache.length; i++) {
+            hexStringCache[i] = String.format("%02x", i);
+        }
+    }
+
     /**
      * Converts array of int values to string
      *
@@ -332,11 +341,16 @@ public class Helper {
         return ret;
     }
 
-    public static String byteArrayToHex(byte[] a) {
-        StringBuilder sb = new StringBuilder(a.length * 2);
-        for (byte b : a) {
-            sb.append(String.format("%02x", b & 0xff));
+    public static String byteToHex(byte b) {
+        return hexStringCache[b & 0xff];
+    }
+
+    public static String byteArrayToHex(byte[] data) {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        for (byte b : data) {
+            sb.append(hexStringCache[b & 0xff]);
         }
+
         return sb.toString();
     }
 
@@ -775,7 +789,7 @@ public class Helper {
                     if (i > 0 && i % groupSize == 0) {
                         writer.appendNoHilight(" ");
                     }
-                    writer.appendNoHilight(String.format("%02x ", data[idx]));
+                    writer.appendNoHilight(byteToHex(data[idx])).appendNoHilight(" ");
                 } else {
                     if (addChars) {
                         if (i > 0 && i % groupSize == 0) {

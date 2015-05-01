@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.helpers.Stopwatch;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
@@ -62,6 +63,7 @@ public class UndoFixedEditorPane extends JEditorPane {
                     }
                 }
 
+                Stopwatch sw = Stopwatch.startNew();
                 try {
                     Document doc = getDocument();
                     setDocument(new SyntaxDocument(null));
@@ -72,6 +74,11 @@ public class UndoFixedEditorPane extends JEditorPane {
                     setDocument(doc);
                 } catch (BadLocationException | IOException ex) {
                     Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                sw.stop();
+                if (!plain && sw.getElapsedMilliseconds() > 5000) {
+                    Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.WARNING, "Syntax highlightig took long time. You can try to decrease the syntax highlight limit in advanced settings.");
                 }
 
                 clearUndos();

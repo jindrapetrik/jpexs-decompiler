@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
-import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -62,28 +61,15 @@ public class SwfXmlExporter {
 
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
 
-    private static final String[] hexStringCache;
-
-    static {
-        hexStringCache = new String[256];
-        for (int i = 0; i < hexStringCache.length; i++) {
-            hexStringCache[i] = String.format("%02x", i);
-        }
-    }
-
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
-            Stopwatch sw = Stopwatch.startNew();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document xmlDoc = docBuilder.newDocument();
             exportXml(swf, xmlDoc, xmlDoc);
-            System.out.println(sw.getElapsedMilliseconds());
             try (Writer writer = new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outFile)))) {
                 writer.append(getXml(xmlDoc));
             }
-            sw.stop();
-            System.out.println(sw.getElapsedMilliseconds());
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -111,15 +97,6 @@ public class SwfXmlExporter {
 
     public void exportXml(SWF swf, Document doc, Node node) throws IOException {
         generateXml(doc, node, "swf", swf, false, 0);
-    }
-
-    private static String byteArrayToString(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        for (int i = 0; i < data.length; i++) {
-            sb.append(hexStringCache[data[i] & 0xFF]);
-        }
-
-        return sb.toString();
     }
 
     public List<Field> getSwfFieldsCached(Class cls) {
@@ -161,10 +138,10 @@ public class SwfXmlExporter {
         } else if (obj instanceof ByteArrayRange) {
             ByteArrayRange range = (ByteArrayRange) obj;
             byte[] data = range.getRangeData();
-            ((Element) node).setAttribute(name, byteArrayToString(data));
+            ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
         } else if (obj instanceof byte[]) {
             byte[] data = (byte[]) obj;
-            ((Element) node).setAttribute(name, byteArrayToString(data));
+            ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
         } else if (cls != null && List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
             Element listNode = doc.createElement(name);

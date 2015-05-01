@@ -440,6 +440,7 @@ public abstract class Action implements GraphSourceItem {
                 writer.appendNoHilight(Helper.bytesToHexString(a.getBytes(version)));
                 writer.newLine();
             }
+
             offset = a.getAddress();
 
             if ((!(a.isIgnored())) && (a instanceof GraphSourceItemContainer)) {
@@ -561,6 +562,7 @@ public abstract class Action implements GraphSourceItem {
         if (lastPush) {
             writer.newLine();
         }
+
         if (containers.containsKey(offset)) {
             for (int i = 0; i < containers.get(offset).size(); i++) {
                 writer.appendNoHilight("}");
@@ -572,12 +574,14 @@ public abstract class Action implements GraphSourceItem {
                 containersPos.put(cnt, cntPos);
             }
         }
+
         if (importantOffsets.contains(offset)) {
             writer.appendNoHilight("loc");
             writer.appendNoHilight(Helper.formatAddress(offset));
             writer.appendNoHilight(":");
             writer.newLine();
         }
+
         return writer;
     }
 
@@ -1297,5 +1301,4 @@ public abstract class Action implements GraphSourceItem {
     public String getFile() {
         return null;
     }
-
 }

@@ -176,7 +176,7 @@ public class SwfJavaExporter {
                 int from = i * maxBytePerString;
                 int to = Math.min(from + maxBytePerString, data.length);
                 for (int j = from; j < to; j++) {
-                    sb2.append(String.format("%02x", data[j]));
+                    sb2.append(Helper.byteToHex(data[j]));
                 }
 
                 sb2.append("\"");
