@@ -1966,8 +1966,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return;
         }
         if (confirmExperimental()) {
-            final RenameType renameType = new RenameDialog().display();
-            if (renameType != null) {
+            RenameDialog renameDialog = new RenameDialog();
+            if (renameDialog.showRenameDialog() == AppDialog.OK_OPTION) {
+                final RenameType renameType = renameDialog.getRenameType();
                 Main.startWork(translate("work.renaming.identifiers") + "...");
                 new CancellableWorker<Integer>() {
                     @Override
@@ -2686,14 +2687,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.setImageReplaceButtonVisible(false);
 
         /*if (treeItem instanceof Tag) {
-            Tag tag = (Tag) treeItem;
-            Set<Integer> needed = new HashSet<>();
-            tag.getNeededCharactersDeep(needed);
-            String neededStr = Helper.joinStrings(needed, ", ");
-            // todo: it would be usefule to show this information on the UI
-            System.out.println("Needed characters: " + neededStr);
-        }*/
-        
+         Tag tag = (Tag) treeItem;
+         Set<Integer> needed = new HashSet<>();
+         tag.getNeededCharactersDeep(needed);
+         String neededStr = Helper.joinStrings(needed, ", ");
+         // todo: it would be usefule to show this information on the UI
+         System.out.println("Needed characters: " + neededStr);
+         }*/
         boolean internalViewer = isInternalFlashViewerSelected();
 
         if (treeItem instanceof HeaderItem) {

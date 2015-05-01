@@ -16,51 +16,42 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.abc.RenameType;
-import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.SWF;
+import static com.jpexs.decompiler.flash.gui.AppDialog.ERROR_OPTION;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
+import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 /**
  *
  * @author JPEXS
  */
-public class RenameDialog extends AppDialog {
-
-    private final JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
-
-    private final JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));
+public class ReplaceCharacterDialog extends AppDialog {
 
     private final JButton okButton = new JButton(translate("button.ok"));
 
     private final JButton cancelButton = new JButton(translate("button.cancel"));
 
+    private final JComboBox<ComboBoxItem<Integer>> charactersComboBox = new JComboBox<>();
+
     private int result = ERROR_OPTION;
 
-    public RenameDialog() {
-        setSize(300, 150);
+    public ReplaceCharacterDialog() {
+        setSize(400, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        int renameType = Configuration.lastRenameType.get();
-        ButtonGroup group = new ButtonGroup();
-        group.add(typeNumberRadioButton);
-        group.add(randomWordRadioButton);
-        JPanel pan = new JPanel();
-        pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-        pan.add(typeNumberRadioButton);
-        pan.add(randomWordRadioButton);
-        typeNumberRadioButton.setSelected(renameType == 1);
-        randomWordRadioButton.setSelected(renameType == 2);
         setLayout(new BorderLayout());
-        add(new JLabel(translate("rename.type")), BorderLayout.NORTH);
-        add(pan, BorderLayout.CENTER);
+        add(new JLabel(translate("replace.width")), BorderLayout.NORTH);
+
+        charactersComboBox.setPreferredSize(new Dimension(400, charactersComboBox.getPreferredSize().height));
+        add(charactersComboBox, BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new FlowLayout());
         okButton.addActionListener(this::okButtonActionPerformed);
@@ -78,18 +69,8 @@ public class RenameDialog extends AppDialog {
         View.centerScreen(this);
     }
 
-    @Override
-    public void setVisible(boolean b) {
-        if (b) {
-            result = ERROR_OPTION;
-        }
-
-        super.setVisible(b);
-    }
-
     private void okButtonActionPerformed(ActionEvent evt) {
         result = OK_OPTION;
-        Configuration.lastRenameType.set((Integer) (getRenameType() == RenameType.TYPENUMBER ? 1 : 2));
         setVisible(false);
     }
 
@@ -98,19 +79,26 @@ public class RenameDialog extends AppDialog {
         setVisible(false);
     }
 
-    public RenameType getRenameType() {
+    public Integer getCharacterId() {
         if (result == ERROR_OPTION) {
             return null;
         }
 
-        if (typeNumberRadioButton.isSelected()) {
-            return RenameType.TYPENUMBER;
-        }
-
-        return RenameType.RANDOMWORD;
+        @SuppressWarnings("unchecked")
+        ComboBoxItem<Integer> item = (ComboBoxItem<Integer>) charactersComboBox.getSelectedItem();
+        return item.getValue();
     }
 
-    public int showRenameDialog() {
+    public int showDialog(SWF swf, int selectedCharacterId) {
+        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        for (Integer key : characters.keySet()) {
+            CharacterTag character = characters.get(key);
+            int characterId = character.getCharacterId();
+            if (characterId != selectedCharacterId) {
+                charactersComboBox.addItem(new ComboBoxItem<>(character.getName(), characterId));
+            }
+        }
+
         setVisible(true);
         return result;
     }

@@ -17,9 +17,11 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrameRibbonMenu;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
@@ -83,6 +85,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem replaceMenuItem;
 
+    private JMenuItem replaceWithTagMenuItem;
+
     private JMenuItem rawEditMenuItem;
 
     private JMenuItem jumpToCharacterMenuItem;
@@ -138,14 +142,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceMenuItem.addActionListener(mainPanel);
         add(replaceMenuItem);
 
+        replaceWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithTag"));
+        replaceWithTagMenuItem.addActionListener(this::replaceWithTagActionPerformed);
+        add(replaceWithTagMenuItem);
+
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
-        rawEditMenuItem.setVisible(false);
         add(rawEditMenuItem);
 
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
-        jumpToCharacterMenuItem.setVisible(false);
         add(jumpToCharacterMenuItem);
 
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
@@ -295,6 +301,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
+        replaceWithTagMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
@@ -311,6 +318,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (singleSelect) {
             final TreeItem firstItem = items.get(0);
+
+            if (firstItem instanceof CharacterTag) {
+                replaceWithTagMenuItem.setVisible(true);
+            }
 
             // replace
             if (firstItem instanceof ImageTag && ((ImageTag) firstItem).importSupported()) {
@@ -452,10 +463,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 logger.log(Level.WARNING, "Target SWF already contained chatacter tag with id = {0} => id changed to {1}", new Object[]{characterId, newCharacterId});
                 return newCharacterId;
             }
-            
+
             return characterId;
         }
-        
+
         return -1;
     }
 
@@ -523,7 +534,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 for (Integer characterId : needed) {
                     neededList.add(characterId);
                 }
-                
+
                 // first add dependencies in reverse order
                 for (int i = neededList.size() - 1; i >= 0; i--) {
                     int characterId = neededList.get(i);
@@ -556,7 +567,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     int newCharacterId = chechUniqueCharacterId(copyTag);
                     changedCharacterIds.put(oldCharacterId, newCharacterId);
                 }
-                
+
                 targetSwf.updateCharacters();
                 targetSwf.getCharacters(); // force rebuild character id cache
                 copyTag.setModified(true);
@@ -593,6 +604,32 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         mainPanel.loadFromBinaryTag(binaryDatas);
+    }
+
+    private void replaceWithTagActionPerformed(ActionEvent evt) {
+        TreeItem itemr = tagTree.getCurrentTreeItem();
+        if (itemr == null) {
+            return;
+        }
+
+        SWF swf = itemr.getSwf();
+        CharacterTag characterTag = (CharacterTag) itemr;
+        int characterId = characterTag.getCharacterId();
+        ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog();
+        if (replaceCharacterDialog.showDialog(swf, characterId) == AppDialog.OK_OPTION) {
+            int newCharacterId = replaceCharacterDialog.getCharacterId();
+            CharacterTag newCharacter = swf.getCharacter(newCharacterId);
+            newCharacter.setCharacterId(characterId);
+            characterTag.setCharacterId(newCharacterId);
+            newCharacter.setModified(true);
+            characterTag.setModified(true);
+
+            swf.assignExportNamesToSymbols();
+            swf.assignClassesToSymbols();
+            swf.clearImageCache();
+            swf.updateCharacters();
+            mainPanel.refreshTree(swf);
+        }
     }
 
     private void rawEditActionPerformed(ActionEvent evt) {

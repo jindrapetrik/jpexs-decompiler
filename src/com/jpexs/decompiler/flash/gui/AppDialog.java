@@ -28,6 +28,12 @@ import javax.swing.JRootPane;
  */
 public abstract class AppDialog extends JDialog {
 
+    public static final int ERROR_OPTION = -1;
+
+    public static final int OK_OPTION = 0;
+
+    public static final int CANCEL_OPTION = 1;
+
     private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
 
     public AppDialog() {

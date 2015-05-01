@@ -442,6 +442,7 @@ public class Timeline {
             Tag t = tags.get(i);
             if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == oldCharacterId) {
                 ((CharacterIdTag) t).setCharacterId(newCharacterId);
+                ((Tag) t).setModified(true);
                 modified = true;
             }
         }

@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.ModeFrame;
 import com.jpexs.decompiler.flash.gui.NewVersionDialog;
 import com.jpexs.decompiler.flash.gui.RenameDialog;
+import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceTraceDialog;
 import com.jpexs.decompiler.flash.gui.SearchDialog;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
@@ -73,6 +74,7 @@ public class CheckResources {
             ModeFrame.class,
             NewVersionDialog.class,
             RenameDialog.class,
+            ReplaceCharacterDialog.class,
             ReplaceTraceDialog.class,
             SearchDialog.class,
             SearchResultsDialog.class,
