@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="common build script for library" default="build" basedir=".">
+<project name="common build script for library" default="build" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
     <description>Builds project</description>      
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
@@ -19,28 +19,10 @@
         <include name="**/?*.js"/>
     </patternset>
 
-    <path id="emma.lib">
-        <pathelement location="${TESTLIBDIR}/emma.jar"/>
-        <pathelement location="${TESTLIBDIR}/emma_ant.jar"/>
-    </path>
-    <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
-
-    <target name="coverage.instrumentation">
-        <mkdir dir="${INSTRDIR}"/>
-        <mkdir dir="${COVERAGEDIR}"/>
-        <emma>
-            <instr instrpath="${COMPILEDIR}" destdir="${INSTRDIR}" metadatafile="${COVERAGEDIR}/metadata.emma"
-                   mode="copy">
-            </instr>
-        </emma>
-        <copy todir="${INSTRDIR}">
-            <fileset dir="${SOURCEDIR}">
-                <patternset refid="compiler.resources" />
-                <type type="file" />
-            </fileset>
-        </copy>
-    </target>
-
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+        <classpath path="${TESTLIBDIR}/jacocoant.jar"/>
+    </taskdef>
+   
     <target name="compile" depends="lexers">
         <mkdir dir="${COMPILEDIR}"/>
         <mkdir dir="${LIBRARIESDIR}"/>        
@@ -85,11 +67,11 @@
         <mkdir dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
         
-        <antcall target="coverage.instrumentation"/>
         
         <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
     
-        
+        <mkdir dir="${COVERAGEDIR}" />
+        <jacoco:coverage destfile="${COVERAGEDIR}/jacoco.exec">
         <testng 
             outputDir="${TESTRESULTSDIR}"
             haltOnFailure="${TESTHALT}" verbose="2" workingDir="${basedir}" >
@@ -102,21 +84,27 @@
                 <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify" />
-            <jvmarg value="-Demma.coverage.out.file=${COVERAGEDIR}/coverage.emma"/>
-            <jvmarg value="-Demma.coverage.out.merge=true"/>
             <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                        
             
-        </testng>                
+        </testng>      
+        </jacoco:coverage>          
         <!-- Coverage report -->
         <mkdir dir="${COVERAGERESULTSDIR}"/>
-        <emma>
-            <report sourcepath="${SOURCEDIR}" depth="method">
-                <fileset dir="${COVERAGEDIR}">
-                    <include name="*.emma"/>
-                </fileset>
-                <html outfile="${COVERAGERESULTSDIR}/index.html" />
-            </report>
-        </emma>
+        
+        <jacoco:report>
+            <executiondata>
+                <file file="${COVERAGEDIR}/jacoco.exec" />
+            </executiondata>
+            <structure name="${PROJECTNAME}">
+                <classfiles>
+                    <fileset dir="${COMPILEDIR}" />
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${SOURCEDIR}" />
+                </sourcefiles>
+            </structure>
+            <html destdir="${COVERAGERESULTSDIR}" />
+        </jacoco:report>        
     </target>
     
    
