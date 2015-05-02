@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
@@ -1565,11 +1564,10 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one Action from the stream
      *
-     * @param cpool
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
-    public Action readAction(ConstantPool cpool) throws IOException {
+    public Action readAction() throws IOException {
         int actionCode = -1;
 
         try {
@@ -1603,7 +1601,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x09:
                     return new ActionStopSounds();
                 case 0x8A:
-                    return new ActionWaitForFrame(actionLength, this, cpool);
+                    return new ActionWaitForFrame(actionLength, this);
                 case 0x8B:
                     return new ActionSetTarget(actionLength, this, swf.version);
                 case 0x8C:
@@ -1684,7 +1682,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x28:
                     return new ActionEndDrag();
                 case 0x8D:
-                    return new ActionWaitForFrame2(actionLength, this, cpool);
+                    return new ActionWaitForFrame2(actionLength, this);
                 case 0x26:
                     return new ActionTrace();
                 case 0x34:

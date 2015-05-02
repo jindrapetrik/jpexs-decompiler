@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -46,7 +45,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
 
     public List<Action> skipped;
 
-    public ActionWaitForFrame(int actionLength, SWFInputStream sis, ConstantPool cpool) throws IOException {
+    public ActionWaitForFrame(int actionLength, SWFInputStream sis) throws IOException {
         super(0x8A, actionLength);
         frame = sis.readUI16("frame");
         skipCount = sis.readUI8("skipCount");

@@ -196,6 +196,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             if (prevLength != 0) {
                 rri.seek(prevLength);
             }
+
             ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
