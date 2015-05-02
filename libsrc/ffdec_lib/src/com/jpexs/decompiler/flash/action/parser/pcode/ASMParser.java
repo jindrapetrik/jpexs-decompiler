@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library. */
 package com.jpexs.decompiler.flash.action.parser.pcode;
@@ -128,14 +128,16 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ASMParser {
 
-    public static ActionList parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
         ActionList list = new ActionList();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
@@ -192,6 +194,7 @@ public class ASMParser {
                 }
                 if (a != null) {
                     list.add(a);
+                    lineMap.put(a, lexer.yyline());
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
             } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
@@ -464,7 +467,8 @@ public class ASMParser {
 
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
-        ActionList ret = parse(ignoreNops, labels, address, lexer, constantPool, version);
+        Map<Action, Integer> lineMap = new HashMap<>();
+        ActionList ret = parse(ignoreNops, labels, lineMap, address, lexer, constantPool, version);
         //Action.setActionsAddresses(ret, address, version);
         for (Action link : ret) {
             if (!(link instanceof ActionIf || link instanceof ActionJump)) {
@@ -480,7 +484,22 @@ public class ASMParser {
                     ActionJump actionJump = (ActionJump) link;
 
                     if (actionJump.identifier.equals(label.name)) {
-                        actionJump.setJumpOffset((int) (label.address - (actionJump.getAddress() + actionJump.getTotalActionLength())));
+                        int offset = (int) (label.address - (actionJump.getAddress() + actionJump.getTotalActionLength()));
+                        if (offset < -0x8000 || offset > 0x7fff) {
+                            String message = "Jump offset is too large:" + offset + " addr: ofs" + Helper.formatAddress(link.getAddress());
+                            if (throwOnError) {
+                                Integer line = lineMap.get(link);
+                                if (line == null) {
+                                    line = -1;
+                                }
+
+                                throw new ActionParseException(message, line);
+                            } else {
+                                Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
+                            }
+                        }
+
+                        actionJump.setJumpOffset(offset);
                         found = true;
                         break;
                     }
@@ -491,7 +510,22 @@ public class ASMParser {
 
                 for (Label label : labels) {
                     if (actionIf.identifier.equals(label.name)) {
-                        actionIf.setJumpOffset((int) (label.address - (actionIf.getAddress() + actionIf.getTotalActionLength())));
+                        int offset = (int) (label.address - (actionIf.getAddress() + actionIf.getTotalActionLength()));
+                        if (offset < -0x8000 || offset > 0x7fff) {
+                            String message = "If offset is too large:" + offset + " addr: ofs" + Helper.formatAddress(link.getAddress());
+                            if (throwOnError) {
+                                Integer line = lineMap.get(link);
+                                if (line == null) {
+                                    line = -1;
+                                }
+
+                                throw new ActionParseException(message, line);
+                            } else {
+                                Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
+                            }
+                        }
+
+                        actionIf.setJumpOffset(offset);
                         found = true;
                         break;
                     }
@@ -499,13 +533,20 @@ public class ASMParser {
             }
 
             if (!found) {
+                String message = "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress());
                 if (throwOnError) {
-                    throw new ActionParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
+                    Integer line = lineMap.get(link);
+                    if (line == null) {
+                        line = -1;
+                    }
+
+                    throw new ActionParseException(message, line);
                 } else {
-                    Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
+                    Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
                 }
             }
         }
+
         return ret;
     }
 }
