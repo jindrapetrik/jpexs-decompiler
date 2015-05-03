@@ -146,6 +146,12 @@
             </export>
             <export>
                 <type>folder</type>
+                <location>reports</location>
+                <script>nbproject/nbjdk.xml</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
                 <location>build/test</location>
                 <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
@@ -218,6 +224,8 @@
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>
                 <built-to>locales</built-to>
+                <built-to>reports</built-to>
+                <javadoc-built-to>javadoc</javadoc-built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>

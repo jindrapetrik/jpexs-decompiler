@@ -757,6 +757,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
+
+            SWF.uncache(src);
             src.setModified();
             mainPanel.refreshTree(src.getSwf());
             setSource(this.src, false);
