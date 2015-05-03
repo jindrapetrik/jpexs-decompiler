@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -1140,6 +1141,10 @@ public class PreviewPanel extends JSplitPane {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item == null) {
             return;
+        }
+
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
         }
 
         if (item instanceof Tag) {

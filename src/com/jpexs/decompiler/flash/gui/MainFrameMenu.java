@@ -120,6 +120,7 @@ public abstract class MainFrameMenu {
             }
             if (saved) {
                 swf.clearModified();
+                mainFrame.getPanel().refreshTree(swf);
             }
 
             return true;

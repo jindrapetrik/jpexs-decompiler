@@ -758,6 +758,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
             src.setModified();
+            mainPanel.refreshTree(src.getSwf());
             setSource(this.src, false);
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             saveButton.setVisible(false);
