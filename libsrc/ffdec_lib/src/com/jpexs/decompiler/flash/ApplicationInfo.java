@@ -54,12 +54,12 @@ public class ApplicationInfo {
     /**
      * URL for checking new updates
      */
-    public static String updateCheckUrl = "https://www.free-decompiler.com/flash/update.html?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
+    public static String updateCheckUrl = "https://www.free-decompiler.com/flash/update/check/?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
 
     /**
      * URL for doing update
      */
-    public static String updateUrl = "https://www.free-decompiler.com/flash/update.html?action=check&currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
+    public static String updateUrl = "https://www.free-decompiler.com/flash/update/update/?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
 
     static {
         loadProperties();

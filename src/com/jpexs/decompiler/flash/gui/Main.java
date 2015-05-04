@@ -1271,7 +1271,7 @@ public class Main {
             URL url = new URL(ApplicationInfo.updateCheckUrl);
 
             URLConnection uc = null;
-            if (proxyAddress != null) {
+            if (proxyAddress != null && !proxyAddress.isEmpty()) {
                 int port = 8080;
                 if (proxyAddress.contains(":")) {
                     String[] parts = proxyAddress.split(":");
