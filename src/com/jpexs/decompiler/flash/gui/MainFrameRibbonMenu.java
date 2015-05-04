@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
@@ -30,13 +29,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
 import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
@@ -61,113 +57,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
  *
  * @author JPEXS
  */
-public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener {
-
-    private static final String ACTION_RELOAD = "RELOAD";
-
-    private static final String ACTION_ADVANCED_SETTINGS = "ADVANCEDSETTINGS";
-
-    private static final String ACTION_LOAD_MEMORY = "LOADMEMORY";
-
-    private static final String ACTION_LOAD_CACHE = "LOADCACHE";
-
-    private static final String ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP = "GOTODOCUMENTCLASSONSTARTUP";
-
-    private static final String ACTION_AUTO_RENAME_IDENTIFIERS = "AUTORENAMEIDENTIFIERS";
-
-    private static final String ACTION_CACHE_ON_DISK = "CACHEONDISK";
-
-    private static final String ACTION_SET_LANGUAGE = "SETLANGUAGE";
-
-    private static final String ACTION_DISABLE_DECOMPILATION = "DISABLEDECOMPILATION";
-
-    private static final String ACTION_ASSOCIATE = "ASSOCIATE";
-
-    private static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
-
-    private static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
-
-    private static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
-
-    private static final String ACTION_SEARCH = "SEARCH";
-
-    private static final String ACTION_REPLACE = "REPLACE";
-
-    private static final String ACTION_TIMELINE = "TIMELINE";
-
-    private static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
-
-    private static final String ACTION_EXIT = "EXIT";
-
-    private static final String ACTION_DEBUGGER_SWITCH = "DEBUGGER_SWITCH";
-
-    private static final String ACTION_DEBUGGER_REPLACE_TRACE = "DEBUGGER_REPLACE_TRACE";
-
-    private static final String ACTION_DEBUGGER_LOG = "DEBUGGER_LOG";
-
-    private static final String ACTION_RENAME_ONE_IDENTIFIER = "RENAMEONEIDENTIFIER";
-
-    private static final String ACTION_ABOUT = "ABOUT";
-
-    private static final String ACTION_SHOW_PROXY = "SHOWPROXY";
-
-    private static final String ACTION_SUB_LIMITER = "SUBLIMITER";
-
-    private static final String ACTION_SAVE = "SAVE";
-
-    private static final String ACTION_SAVE_AS = "SAVEAS";
-
-    private static final String ACTION_SAVE_AS_EXE = "SAVEASEXE";
-
-    private static final String ACTION_OPEN = "OPEN";
-
-    private static final String ACTION_CLOSE = "CLOSE";
-
-    private static final String ACTION_CLOSE_ALL = "CLOSEALL";
-
-    private static final String ACTION_EXPORT_FLA = "EXPORTFLA";
-
-    public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
-
-    public static final String ACTION_EXPORT_JAVA_SOURCE = "EXPORTJAVASOURCE";
-
-    public static final String ACTION_EXPORT_SWF_XML = "EXPORTSWFXML";
-
-    public static final String ACTION_IMPORT_SWF_XML = "IMPORTSWFXML";
-
-    private static final String ACTION_EXPORT = "EXPORT";
-
-    private static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
-
-    private static final String ACTION_IMPORT_SCRIPT = "IMPORTSCRIPT";
-
-    private static final String ACTION_IMPORT_SYMBOL_CLASS = "IMPORTSYMBOLCLASS";
-
-    private static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
-
-    private static final String ACTION_HELP_US = "HELPUS";
-
-    private static final String ACTION_HOMEPAGE = "HOMEPAGE";
-
-    private static final String ACTION_RESTORE_CONTROL_FLOW = "RESTORECONTROLFLOW";
-
-    private static final String ACTION_RESTORE_CONTROL_FLOW_ALL = "RESTORECONTROLFLOWALL";
-
-    private static final String ACTION_RENAME_IDENTIFIERS = "RENAMEIDENTIFIERS";
-
-    private static final String ACTION_DEOBFUSCATE = "DEOBFUSCATE";
-
-    private static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
-
-    private static final String ACTION_CLEAR_RECENT_FILES = "CLEARRECENTFILES";
-
-    private static final String ACTION_VIEWMODE_RESOURCES = "VIEWMODERESOURCES";
-
-    private static final String ACTION_VIEWMODE_HEX_DUMP = "VIEWMODEHEXDUMP";
-
-    private static final String ACTION_DEOBFUSCATION_MODE_OLD = "DEOBFUSCATIONMODEOLD";
-
-    private static final String ACTION_DEOBFUSCATION_MODE_NEW = "DEOBFUSCATIONMODENEW";
+public class MainFrameRibbonMenu extends MainFrameMenu {
 
     private final MainFrameRibbon mainFrame;
 
@@ -282,16 +172,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         return miInternalViewer.isSelected();
     }
 
-    private void assignListener(AbstractCommandButton b, final String command) {
-        final MainFrameRibbonMenu t = this;
-        b.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                t.actionPerformed(new ActionEvent(e.getSource(), 0, command));
-            }
-        });
-    }
-
     private String fixCommandTitle(String title) {
         if (title.length() > 2) {
             if (title.charAt(1) == ' ') {
@@ -303,16 +183,16 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
     private RibbonApplicationMenu createMainMenu() {
         RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
-        exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), new ActionRedirector(this, ACTION_EXPORT_FLA), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, ACTION_EXPORT), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, ACTION_EXPORT_SEL), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, ACTION_CHECK_UPDATES), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, ACTION_ABOUT), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, ACTION_OPEN), JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
-        saveFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("save32"), translate("menu.file.save"), new ActionRedirector(this, ACTION_SAVE), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        saveAsFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("saveas32"), translate("menu.file.saveas"), new ActionRedirector(this, ACTION_SAVE_AS), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        closeFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.close"), new ActionRedirector(this, ACTION_CLOSE), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        closeAllFilesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.closeAll"), new ActionRedirector(this, ACTION_CLOSE_ALL), JCommandButton.CommandButtonKind.ACTION_ONLY);
+        exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), this::exportFla, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), this::exportAll, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), this::exportSelected, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), this::checkUpdates, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), this::about, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), this::open, JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
+        saveFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("save32"), translate("menu.file.save"), this::save, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        saveAsFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("saveas32"), translate("menu.file.saveas"), this::saveAs, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        closeFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.close"), this::close, JCommandButton.CommandButtonKind.ACTION_ONLY);
+        closeAllFilesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.closeAll"), this::closeAll, JCommandButton.CommandButtonKind.ACTION_ONLY);
         openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
             @Override
             public void menuEntryActivated(JPanel targetPanel) {
@@ -348,7 +228,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
             }
         });
 
-        RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
+        RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), this::exit);
 
         mainMenu.addMenuEntry(openFileMenu);
         mainMenu.addMenuEntry(saveFileMenu);
@@ -412,17 +292,17 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
         editBand.setResizePolicies(getResizePolicies(editBand));
         JCommandButton openCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.open")), View.getResizableIcon("open32"));
-        assignListener(openCommandButton, ACTION_OPEN);
+        openCommandButton.addActionListener(this::open);
         saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
-        assignListener(saveCommandButton, ACTION_SAVE);
+        saveCommandButton.addActionListener(this::save);
         saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
-        assignListener(saveasCommandButton, ACTION_SAVE_AS);
+        saveasCommandButton.addActionListener(this::saveAs);
 
         reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
-        assignListener(reloadCommandButton, ACTION_RELOAD);
+        reloadCommandButton.addActionListener(this::reload);
 
         saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveasexe16"));
-        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
+        saveasexeCommandButton.addActionListener(this::saveAsExe);;
 
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
@@ -433,14 +313,14 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
         exportBand.setResizePolicies(getResizePolicies(exportBand));
         exportFlaCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.fla")), View.getResizableIcon("exportfla32"));
-        assignListener(exportFlaCommandButton, ACTION_EXPORT_FLA);
+        exportFlaCommandButton.addActionListener(this::exportFla);
         exportAllCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.all")), View.getResizableIcon("export16"));
-        assignListener(exportAllCommandButton, ACTION_EXPORT);
+        exportAllCommandButton.addActionListener(this::exportAll);
         exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
-        assignListener(exportSelectionCommandButton, ACTION_EXPORT_SEL);
+        exportSelectionCommandButton.addActionListener(this::exportSelected);
 
         exportXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.xml")), View.getResizableIcon("exportxml32"));
-        assignListener(exportXmlCommandButton, ACTION_EXPORT_SWF_XML);
+        exportXmlCommandButton.addActionListener(this::exportSwfXml);
 
         exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
         exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
@@ -450,17 +330,17 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         JRibbonBand importBand = new JRibbonBand(translate("menu.import"), null);
         importBand.setResizePolicies(getResizePolicies(importBand));
         importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("importtext32"));
-        assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
+        importTextCommandButton.addActionListener(this::importText);
 
         // todo: icon
         importScriptCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.script")), View.getResizableIcon("importtext32"));
-        assignListener(importScriptCommandButton, ACTION_IMPORT_SCRIPT);
+        importScriptCommandButton.addActionListener(this::importScript);
 
         importSymbolClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.symbolClass")), View.getResizableIcon("importsymbolclass32"));
-        assignListener(importSymbolClassCommandButton, ACTION_IMPORT_SYMBOL_CLASS);
+        importSymbolClassCommandButton.addActionListener(this::importSymbolClass);
 
         importXmlCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.xml")), View.getResizableIcon("importxml32"));
-        assignListener(importXmlCommandButton, ACTION_IMPORT_SWF_XML);
+        importXmlCommandButton.addActionListener(this::importSwfXml);
 
         importBand.addCommandButton(importXmlCommandButton, RibbonElementPriority.TOP);
         importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.MEDIUM);
@@ -473,10 +353,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         viewModeToggleGroup = new CommandToggleButtonGroup();
 
         viewModeResourcesToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.resources")), View.getResizableIcon("viewresources16"));
-        assignListener(viewModeResourcesToggleButton, ACTION_VIEWMODE_RESOURCES);
+        viewModeResourcesToggleButton.addActionListener(this::viewModeResouresButtonActionPerformed);
 
         viewModeHexToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.hex")), View.getResizableIcon("viewhex16"));
-        assignListener(viewModeHexToggleButton, ACTION_VIEWMODE_HEX_DUMP);
+        viewModeHexToggleButton.addActionListener(this::viewModeHexDumpButtonActionPerformed);;
 
         viewModeToggleGroup.add(viewModeResourcesToggleButton);
         viewModeToggleGroup.add(viewModeHexToggleButton);
@@ -499,15 +379,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         debuggerBand.setResizePolicies(getResizePolicies(debuggerBand));
 
         debuggerSwitchCommandButton = new JCommandToggleButton(translate("menu.debugger.switch"), View.getResizableIcon("debugger32"));
-        assignListener(debuggerSwitchCommandButton, ACTION_DEBUGGER_SWITCH);
+        debuggerSwitchCommandButton.addActionListener(this::debuggerSwitchButtonActionPerformed);
 
         //debuggerDetachCommandButton = new JCommandButton("Detach debugger",View.getResizableIcon("debuggerremove16"));
-        //assignListener(debuggerDetachCommandButton, ACTION_DEBUGGER_DETACH);
+        //debuggerDetachCommandButton.addActionListener(this::debuggerDetach);
         debuggerReplaceTraceCommandButton = new JCommandButton(translate("menu.debugger.replacetrace"), View.getResizableIcon("debuggerreplace16"));
-        assignListener(debuggerReplaceTraceCommandButton, ACTION_DEBUGGER_REPLACE_TRACE);
+        debuggerReplaceTraceCommandButton.addActionListener(this::debuggerReplaceTraceCalls);
 
         debuggerLogCommandButton = new JCommandButton(translate("menu.debugger.showlog"), View.getResizableIcon("debuggerlog16"));
-        assignListener(debuggerLogCommandButton, ACTION_DEBUGGER_LOG);
+        debuggerLogCommandButton.addActionListener(this::debuggerShowLog);
 
         debuggerSwitchGroup = new CommandToggleButtonGroup();
         debuggerSwitchGroup.add(debuggerSwitchCommandButton);
@@ -525,28 +405,30 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         toolsBand.setResizePolicies(getResizePolicies(toolsBand));
 
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
-        assignListener(searchCommandButton, ACTION_SEARCH);
+        searchCommandButton.addActionListener((ActionEvent e) -> {
+            search(e, null);
+        });
 
         replaceCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.replace")), View.getResizableIcon("replace32"));
-        assignListener(replaceCommandButton, ACTION_REPLACE);
+        replaceCommandButton.addActionListener(this::replace);
 
         timeLineToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
-        assignListener(timeLineToggleButton, ACTION_TIMELINE);
+        timeLineToggleButton.addActionListener(this::timelineButtonActionPerformed);
 
         timeLineToggleGroup = new CommandToggleButtonGroup();
         timeLineToggleGroup.add(timeLineToggleButton);
 
         gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
-        assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
+        gotoDocumentClassCommandButton.addActionListener(this::gotoDucumentClass);
 
         JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy16"));
-        assignListener(proxyCommandButton, ACTION_SHOW_PROXY);
+        proxyCommandButton.addActionListener(this::showProxy);
 
         JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("loadmemory16"));
-        assignListener(loadMemoryCommandButton, ACTION_LOAD_MEMORY);
+        loadMemoryCommandButton.addActionListener(this::loadFromMemory);
 
         JCommandButton loadCacheCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchcache")), View.getResizableIcon("loadcache16"));
-        assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
+        loadCacheCommandButton.addActionListener(this::loadFromCache);
 
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(replaceCommandButton, RibbonElementPriority.TOP);
@@ -562,11 +444,11 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         deobfuscationBand.setResizePolicies(getResizePolicies(deobfuscationBand));
 
         deobfuscationCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.pcode")), View.getResizableIcon("deobfuscate32"));
-        assignListener(deobfuscationCommandButton, ACTION_DEOBFUSCATE);
+        deobfuscationCommandButton.addActionListener(this::deobfuscate);
         globalRenameCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.globalrename")), View.getResizableIcon("rename16"));
-        assignListener(globalRenameCommandButton, ACTION_RENAME_ONE_IDENTIFIER);
+        globalRenameCommandButton.addActionListener(this::renameOneIdentifier);
         renameInvalidCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.renameinvalid")), View.getResizableIcon("renameall16"));
-        assignListener(renameInvalidCommandButton, ACTION_RENAME_IDENTIFIERS);
+        renameInvalidCommandButton.addActionListener(this::renameIdentifiers);
 
         deobfuscationBand.addCommandButton(deobfuscationCommandButton, RibbonElementPriority.TOP);
         deobfuscationBand.addCommandButton(globalRenameCommandButton, RibbonElementPriority.MEDIUM);
@@ -585,46 +467,38 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
 
         miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
         miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
-        miAutoDeobfuscation.addActionListener(this);
-        miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
+        miAutoDeobfuscation.addActionListener(this::autoDeobfuscate);
 
         miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
         miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
         if (externalFlashPlayerUnavailable) {
             miInternalViewer.setEnabled(false);
         }
-        miInternalViewer.setActionCommand(ACTION_INTERNAL_VIEWER_SWITCH);
-        miInternalViewer.addActionListener(this);
+        miInternalViewer.addActionListener(this::internalViewerSwitch);
 
         miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
         miParallelSpeedUp.setSelected(Configuration.parallelSpeedUp.get());
-        miParallelSpeedUp.setActionCommand(ACTION_PARALLEL_SPEED_UP);
-        miParallelSpeedUp.addActionListener(this);
+        miParallelSpeedUp.addActionListener(this::parallelSpeedUp);
 
         miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
         miDecompile.setSelected(!Configuration.decompile.get());
-        miDecompile.setActionCommand(ACTION_DISABLE_DECOMPILATION);
-        miDecompile.addActionListener(this);
+        miDecompile.addActionListener(this::disableDecompilation);
 
         miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
-        miAssociate.setActionCommand(ACTION_ASSOCIATE);
-        miAssociate.addActionListener(this);
+        miAssociate.addActionListener(this::associate);
         miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
 
         miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
         miCacheDisk.setSelected(Configuration.cacheOnDisk.get());
-        miCacheDisk.setActionCommand(ACTION_CACHE_ON_DISK);
-        miCacheDisk.addActionListener(this);
+        miCacheDisk.addActionListener(this::cacheOnDisk);
 
         miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
         miGotoMainClassOnStartup.setSelected(Configuration.gotoMainClassOnStartup.get());
-        miGotoMainClassOnStartup.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP);
-        miGotoMainClassOnStartup.addActionListener(this);
+        miGotoMainClassOnStartup.addActionListener(this::gotoDucumentClassOnStartup);
 
         miAutoRenameIdentifiers = new JCheckBox(translate("menu.settings.autoRenameIdentifiers"));
         miAutoRenameIdentifiers.setSelected(Configuration.autoRenameIdentifiers.get());
-        miAutoRenameIdentifiers.setActionCommand(ACTION_AUTO_RENAME_IDENTIFIERS);
-        miAutoRenameIdentifiers.addActionListener(this);
+        miAutoRenameIdentifiers.addActionListener(this::autoRenameIdentifiers);
 
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
@@ -641,17 +515,17 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         List<RibbonBandResizePolicy> languageBandResizePolicies = getIconBandResizePolicies(languageBand);
         languageBand.setResizePolicies(languageBandResizePolicies);
         JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
-        assignListener(setLanguageCommandButton, ACTION_SET_LANGUAGE);
+        setLanguageCommandButton.addActionListener(this::setLanguage);
         languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
 
         JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
         advancedSettingsBand.setResizePolicies(getResizePolicies(advancedSettingsBand));
         JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings32"));
-        assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
+        advancedSettingsCommandButton.addActionListener(this::advancedSettings);
         advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.TOP);
 
         clearRecentFilesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.otherTools.clearRecentFiles")), View.getResizableIcon("clearrecent16"));
-        assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
+        clearRecentFilesCommandButton.addActionListener(this::clearRecentFiles);
         advancedSettingsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.deobfuscation"), null);
@@ -660,10 +534,14 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         CommandToggleButtonGroup grpDeobfuscation = new CommandToggleButtonGroup();
 
         deobfuscationModeOldToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.old")), View.getResizableIcon("deobfuscateold16"));
-        assignListener(deobfuscationModeOldToggleButton, ACTION_DEOBFUSCATION_MODE_OLD);
+        deobfuscationModeOldToggleButton.addActionListener((ActionEvent e) -> {
+            deobfuscationMode(e, 0);
+        });
 
         deobfuscationModeNewToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.deobfuscation.new")), View.getResizableIcon("deobfuscatenew16"));
-        assignListener(deobfuscationModeNewToggleButton, ACTION_DEOBFUSCATION_MODE_NEW);
+        deobfuscationModeNewToggleButton.addActionListener((ActionEvent e) -> {
+            deobfuscationMode(e, 1);
+        });
 
         grpDeobfuscation.add(deobfuscationModeOldToggleButton);
         grpDeobfuscation.add(deobfuscationModeNewToggleButton);
@@ -691,13 +569,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         helpBand.setResizePolicies(getResizePolicies(helpBand));
 
         JCommandButton checkForUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.checkupdates")), View.getResizableIcon("update16"));
-        assignListener(checkForUpdatesCommandButton, ACTION_CHECK_UPDATES);
+        checkForUpdatesCommandButton.addActionListener(this::checkUpdates);
         JCommandButton helpUsUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.helpus")), View.getResizableIcon("donate32"));
-        assignListener(helpUsUpdatesCommandButton, ACTION_HELP_US);
+        helpUsUpdatesCommandButton.addActionListener(this::helpUs);
         JCommandButton homepageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.homepage")), View.getResizableIcon("homepage16"));
-        assignListener(homepageCommandButton, ACTION_HOMEPAGE);
+        homepageCommandButton.addActionListener(this::homePage);
         JCommandButton aboutCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.about")), View.getResizableIcon("about32"));
-        assignListener(aboutCommandButton, ACTION_ABOUT);
+        aboutCommandButton.addActionListener(this::about);
 
         helpBand.addCommandButton(aboutCommandButton, RibbonElementPriority.TOP);
         helpBand.addCommandButton(checkForUpdatesCommandButton, RibbonElementPriority.MEDIUM);
@@ -810,245 +688,51 @@ public class MainFrameRibbonMenu extends MainFrameMenu implements ActionListener
         //debuggerSwitchCommandButton.
         //debuggerDetachCommandButton.setEnabled(hasDebugger);
         debuggerReplaceTraceCommandButton.setEnabled(hasAbc && hasDebugger);
-
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_DEBUGGER_SWITCH:
-                if (debuggerSwitchGroup.getSelected() == null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-                    switchDebugger();
-                    mainFrame.getPanel().refreshDecompiled();
-                } else {
-                    if (debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton) {
-                        debuggerSwitchGroup.setSelected(debuggerSwitchCommandButton, false);
-                    }
-                }
-                debuggerReplaceTraceCommandButton.setEnabled(debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton);
-                break;
-            case ACTION_DEBUGGER_LOG:
-                debuggerShowLog();
-                break;
-            case ACTION_DEBUGGER_REPLACE_TRACE:
-                ReplaceTraceDialog rtd = new ReplaceTraceDialog(mainFrame, Configuration.lastDebuggerReplaceFunction.get());
-                rtd.setVisible(true);
-                if (rtd.getValue() != null) {
-                    replaceTraceCalls(rtd.getValue());
-                    mainFrame.getPanel().refreshDecompiled();
-                    Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
-                }
-                break;
-            case ACTION_RELOAD:
-                reload(null);
-                break;
-            case ACTION_ADVANCED_SETTINGS:
-                advancedSettings(null);
-                break;
-            case ACTION_LOAD_MEMORY:
-                loadFromMemory(null);
-                break;
-            case ACTION_LOAD_CACHE:
-                loadFromCache(null);
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
-                Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
-                break;
-            case ACTION_AUTO_RENAME_IDENTIFIERS:
-                Configuration.autoRenameIdentifiers.set(miAutoRenameIdentifiers.isSelected());
-                break;
-            case ACTION_CACHE_ON_DISK:
-                Configuration.cacheOnDisk.set(miCacheDisk.isSelected());
-                if (miCacheDisk.isSelected()) {
-                    Cache.setStorageType(Cache.STORAGE_FILES);
-                } else {
-                    Cache.setStorageType(Cache.STORAGE_MEMORY);
-                }
-                break;
-            case ACTION_SET_LANGUAGE:
-                setLanguage();
-                break;
-            case ACTION_DISABLE_DECOMPILATION:
-                Configuration.decompile.set(!miDecompile.isSelected());
-                mainFrame.getPanel().disableDecompilationChanged();
-                break;
-            case ACTION_ASSOCIATE:
-                if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
-                    return;
-                }
-                ContextMenuTools.addToContextMenu(miAssociate.isSelected(), false);
+    private void debuggerSwitchButtonActionPerformed(ActionEvent evt) {
+        if (debuggerSwitchGroup.getSelected() == null || View.showConfirmDialog(mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            switchDebugger();
+            mainFrame.getPanel().refreshDecompiled();
+        } else {
+            if (debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton) {
+                debuggerSwitchGroup.setSelected(debuggerSwitchCommandButton, false);
+            }
+        }
+        debuggerReplaceTraceCommandButton.setEnabled(debuggerSwitchGroup.getSelected() == debuggerSwitchCommandButton);
+    }
 
-                // Update checkbox menuitem accordingly (User can cancel rights elevation)
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
-                    }
-                }, 1000); // It takes some time registry change to apply
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS:
-                mainFrame.getPanel().gotoDocumentClass(mainFrame.getPanel().getCurrentSwf());
-                break;
-            case ACTION_PARALLEL_SPEED_UP:
-                String confStr = translate("message.confirm.parallel") + "\r\n";
-                if (miParallelSpeedUp.isSelected()) {
-                    confStr += " " + translate("message.confirm.on");
-                } else {
-                    confStr += " " + translate("message.confirm.off");
-                }
-                if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.parallelSpeedUp.set((Boolean) miParallelSpeedUp.isSelected());
-                } else {
-                    miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
-                }
-                break;
-            case ACTION_INTERNAL_VIEWER_SWITCH:
-                Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
-                mainFrame.getPanel().reload(true);
-                break;
+    private void viewModeResouresButtonActionPerformed(ActionEvent evt) {
+        Configuration.dumpView.set(false);
+        mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
+        timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+        viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
+    }
 
-            case ACTION_VIEWMODE_RESOURCES:
-                Configuration.dumpView.set(false);
-                mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
+    private void viewModeHexDumpButtonActionPerformed(ActionEvent evt) {
+        Configuration.dumpView.set(true);
+        mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
+        timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+        viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
+    }
+
+    private void timelineButtonActionPerformed(ActionEvent evt) {
+        timeLineToggleGroup.setSelected(timeLineToggleButton, timeLineToggleGroup.getSelected() == timeLineToggleButton);
+        if (timeLineToggleGroup.getSelected() == timeLineToggleButton) {
+            if (!mainFrame.getPanel().showView(MainPanel.VIEW_TIMELINE)) {
                 timeLineToggleGroup.setSelected(timeLineToggleButton, false);
-                viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
-                break;
-            case ACTION_VIEWMODE_HEX_DUMP:
-                Configuration.dumpView.set(true);
-                mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
-                timeLineToggleGroup.setSelected(timeLineToggleButton, false);
+            } else {
+                viewModeToggleGroup.setSelected(viewModeHexToggleButton, false);
+                viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, false);
+            }
+        } else {
+            if (Configuration.dumpView.get()) {
                 viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
-                break;
-            case ACTION_DEOBFUSCATION_MODE_OLD:
-                Configuration.deobfuscationMode.set(0);
-                mainFrame.getPanel().autoDeobfuscateChanged();
-                break;
-            case ACTION_DEOBFUSCATION_MODE_NEW:
-                Configuration.deobfuscationMode.set(1);
-                mainFrame.getPanel().autoDeobfuscateChanged();
-                break;
-            case ACTION_SEARCH:
-                search(null);
-                break;
-            case ACTION_REPLACE:
-                replace();
-                break;
-            case ACTION_TIMELINE:
-                timeLineToggleGroup.setSelected(timeLineToggleButton, timeLineToggleGroup.getSelected() == timeLineToggleButton);
-                if (timeLineToggleGroup.getSelected() == timeLineToggleButton) {
-                    if (!mainFrame.getPanel().showView(MainPanel.VIEW_TIMELINE)) {
-                        timeLineToggleGroup.setSelected(timeLineToggleButton, false);
-                    } else {
-                        viewModeToggleGroup.setSelected(viewModeHexToggleButton, false);
-                        viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, false);
-                    }
-                } else {
-                    if (Configuration.dumpView.get()) {
-                        viewModeToggleGroup.setSelected(viewModeHexToggleButton, true);
-                        mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
-                    } else {
-                        viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
-                        mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
-                    }
-
-                }
-                break;
-            case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    mainFrame.getPanel().autoDeobfuscateChanged();
-                } else {
-                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-                }
-                break;
-            case ACTION_CLEAR_RECENT_FILES:
-                Configuration.recentFiles.set(null);
-                break;
-            case ACTION_EXIT:
-                exit();
-                break;
-        }
-
-        if (Main.isWorking()) {
-            return;
-        }
-
-        switch (e.getActionCommand()) {
-            case ACTION_RENAME_ONE_IDENTIFIER:
-                renameOneIdentifier();
-                break;
-            case ACTION_SHOW_PROXY:
-                showProxy();
-                break;
-            case ACTION_SUB_LIMITER:
-                setSubLimiter(((JCheckBox) e.getSource()).isSelected());
-                break;
-            case ACTION_SAVE:
-                save();
-                break;
-            case ACTION_SAVE_AS:
-                saveAs();
-                break;
-            case ACTION_SAVE_AS_EXE:
-                saveAsExe();
-                break;
-            case ACTION_OPEN:
-                open();
-                break;
-            case ACTION_CLOSE:
-                close();
-                break;
-            case ACTION_CLOSE_ALL:
-                closeAll();
-                break;
-            case ACTION_IMPORT_TEXT:
-                importText();
-                break;
-            case ACTION_IMPORT_SCRIPT:
-                importScript();
-                break;
-            case ACTION_IMPORT_SYMBOL_CLASS:
-                importSymbolClass();
-                break;
-
-            case ACTION_EXPORT_SWF_XML:
-                mainFrame.getPanel().exportSwfXml();
-                break;
-            case ACTION_IMPORT_SWF_XML:
-                mainFrame.getPanel().importSwfXml();
-                break;
-            case ACTION_EXPORT_SEL:
-            case ACTION_EXPORT:
-                boolean onlySel = e.getActionCommand().equals(ACTION_EXPORT_SEL);
-                export(onlySel);
-                break;
-            case ACTION_EXPORT_FLA:
-                exportFla();
-                break;
-            case ACTION_CHECK_UPDATES:
-                checkUpdates();
-                break;
-            case ACTION_HELP_US:
-                helpUs();
-                break;
-            case ACTION_HOMEPAGE:
-                homePage();
-                break;
-            case ACTION_ABOUT:
-                about();
-                break;
-            case ACTION_RESTORE_CONTROL_FLOW:
-            case ACTION_RESTORE_CONTROL_FLOW_ALL:
-                boolean all = e.getActionCommand().equals(ACTION_RESTORE_CONTROL_FLOW_ALL);
-                restoreControlFlow(all);
-                break;
-            case ACTION_RENAME_IDENTIFIERS:
-                renameIdentifiers();
-                break;
-            case ACTION_DEOBFUSCATE:
-            case ACTION_DEOBFUSCATE_ALL:
-                deobfuscate();
-                break;
+                mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
+            } else {
+                viewModeToggleGroup.setSelected(viewModeResourcesToggleButton, true);
+                mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
+            }
         }
     }
 }

@@ -46,6 +46,7 @@ public class ConstantIndex implements Serializable {
                 }
             }
         }
+
         return "constant" + index;
     }
 
@@ -58,6 +59,7 @@ public class ConstantIndex implements Serializable {
                 }
             }
         }
+
         return "constant" + index;
     }
 }

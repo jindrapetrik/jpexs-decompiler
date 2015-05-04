@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -131,13 +131,11 @@ public class ActionListReader {
      * @throws java.lang.InterruptedException
      */
     public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
-        ConstantPool cpool = new ConstantPool();
-
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         // actionMap and nextOffsets should contain exaclty the same keys
         Map<Long, Action> actionMap = new TreeMap<>();
         Map<Long, Long> nextOffsets = new HashMap<>();
-        Action entryAction = readActionListAtPos(listeners, cpool,
+        Action entryAction = readActionListAtPos(listeners, null,
                 sis, actionMap, nextOffsets,
                 ip, 0, endIp, path, false, new ArrayList<Long>());
 
@@ -238,12 +236,10 @@ public class ActionListReader {
     }
 
     public static List<Action> getOriginalActions(SWFInputStream sis, int startIp, int endIp) throws IOException, InterruptedException {
-        ConstantPool cpool = new ConstantPool();
-
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         Map<Long, Action> actionMap = new TreeMap<>();
         Map<Long, Long> nextOffsets = new HashMap<>();
-        readActionListAtPos(new ArrayList<DisassemblyListener>(), cpool,
+        readActionListAtPos(new ArrayList<DisassemblyListener>(), null,
                 sis, actionMap, nextOffsets,
                 startIp, startIp, endIp + 1, "", false, new ArrayList<Long>());
 
@@ -690,7 +686,7 @@ public class ActionListReader {
                 sis.seek((int) ip);
 
                 Action a;
-                if ((a = sis.readAction(cpool)) == null) {
+                if ((a = sis.readAction()) == null) {
                     break;
                 }
 
@@ -729,10 +725,7 @@ public class ActionListReader {
                 if (a instanceof ActionPush && cpool != null) {
                     ((ActionPush) a).constantPool = cpool.constants;
                 } else if (a instanceof ActionConstantPool) {
-                    if (cpool == null) {
-                        cpool = new ConstantPool();
-                    }
-                    cpool.setNew(((ActionConstantPool) a).constantPool);
+                    cpool = new ConstantPool(((ActionConstantPool) a).constantPool);
                 } else if (a instanceof ActionIf) {
                     ActionIf aIf = (ActionIf) a;
                     long nIp = ip + actionLengthWithHeader + aIf.getJumpOffset();

@@ -282,6 +282,14 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         super.setModified(value);
     }
 
+    @Override
+    public void createOriginalData() {
+        super.createOriginalData();
+        for (Tag subTag : subTags) {
+            subTag.createOriginalData();
+        }
+    }
+
     public static void clearCache() {
         rectCache.clear();
     }

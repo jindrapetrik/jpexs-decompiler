@@ -153,11 +153,15 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Writes UI8 (Unsigned 8bit integer) value to the stream
      *
-     * @param val UI8 value to write
+     * @param value UI8 value to write
      * @throws IOException
      */
-    public void writeUI8(int val) throws IOException {
-        write(val);
+    public void writeUI8(int value) throws IOException {
+        if (value > 0xff) {
+            throw new Error("Value is too large for UI8: " + value);
+        }
+
+        write(value);
     }
 
     /**
@@ -167,7 +171,14 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeString(String value) throws IOException {
-        write(Utf8Helper.getBytes(value));
+        byte[] data = Utf8Helper.getBytes(value);
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] == 0) {
+                throw new IOException("String should not contain null character.");
+            }
+        }
+
+        write(data);
         write(0);
     }
 
@@ -178,6 +189,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeUI32(long value) throws IOException {
+        if (value > 0xffffffffL) {
+            throw new Error("Value is too large for UI32: " + value);
+        }
+
         write((int) (value & 0xff));
         write((int) ((value >> 8) & 0xff));
         write((int) ((value >> 16) & 0xff));
@@ -191,6 +206,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeUI16(int value) throws IOException {
+        if (value > 0xffff) {
+            throw new Error("Value is too large for UI16: " + value);
+        }
+
         write((int) (value & 0xff));
         write((int) ((value >> 8) & 0xff));
     }
@@ -202,6 +221,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSI32(long value) throws IOException {
+        if (value > 0x7fffffffL) {
+            throw new Error("Value is too large for SI32: " + value);
+        }
+
         writeUI32(value);
     }
 
@@ -212,6 +235,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSI16(int value) throws IOException {
+        if (value > 0x7fff) {
+            throw new Error("Value is too large for SI16: " + value);
+        }
+
         writeUI16(value);
     }
 
@@ -222,6 +249,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSI8(int value) throws IOException {
+        if (value > 0x7ff) {
+            throw new Error("Value is too large for SI8: " + value);
+        }
+
         writeUI8(value);
     }
 

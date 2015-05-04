@@ -51,6 +51,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -68,6 +69,7 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -113,6 +115,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public JToggleButton hexButton;
 
     public JToggleButton hexOnlyButton;
+
+    public JToggleButton resolveConstantsButton;
 
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
 
@@ -477,11 +481,20 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
+        resolveConstantsButton = new JToggleButton(View.getIcon("constantpool16"));
+        resolveConstantsButton.addActionListener(this::resolveConstantsButtonActionPerformed);
+        resolveConstantsButton.setToolTipText(AppStrings.translate("button.resolveConstants"));
+        resolveConstantsButton.setMargin(new Insets(3, 3, 3, 3));
+        resolveConstantsButton.setSelected(Configuration.resolveConstants.get());
+
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
         topButtonsPan.add(hexButton);
         topButtonsPan.add(hexOnlyButton);
+        topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
+        topButtonsPan.add(resolveConstantsButton);
+
         JPanel panCode = new JPanel(new BorderLayout());
         panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
         panCode.add(topButtonsPan, BorderLayout.NORTH);
@@ -721,6 +734,16 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         setHex(getExportMode());
     }
 
+    private void resolveConstantsButtonActionPerformed(ActionEvent evt) {
+        boolean resolve = resolveConstantsButton.isSelected();
+        Configuration.resolveConstants.set(resolve);
+
+        srcWithHex = null;
+        srcNoHex = null;
+        // srcHexOnly = null; is not needed since it does not contains the resolved constant names
+        setHex(getExportMode());
+    }
+
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
         setHex(getExportMode());
@@ -734,7 +757,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
+
+            SWF.uncache(src);
             src.setModified();
+            mainPanel.refreshTree(src.getSwf());
             setSource(this.src, false);
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             saveButton.setVisible(false);

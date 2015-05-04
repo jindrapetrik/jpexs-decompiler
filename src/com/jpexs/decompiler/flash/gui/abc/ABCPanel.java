@@ -111,7 +111,7 @@ import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
-public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
+public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, Freed {
 
     private MainPanel mainPanel;
 
@@ -149,12 +149,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public JLabel scriptNameLabel;
 
-    private static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
-
-    private static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
-
-    private static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
-
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
@@ -162,8 +156,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
-
-    private static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
     private static List<Long> modifiedPacks = new ArrayList<>();
 
@@ -354,8 +346,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
         JButton newTraitButton = new JButton(View.getIcon("traitadd16"));
         newTraitButton.setMargin(new Insets(5, 5, 5, 5));
-        newTraitButton.addActionListener(this);
-        newTraitButton.setActionCommand(ACTION_ADD_TRAIT);
+        newTraitButton.addActionListener(this::addTraitButtonActionPerformed);
         newTraitButton.setToolTipText(AppStrings.translate("button.addtrait"));
         iconsPanel.add(newTraitButton);
 
@@ -378,13 +369,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
 
-        saveDecompiledButton.addActionListener(this);
-        saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
-        editDecompiledButton.addActionListener(this);
-        editDecompiledButton.setActionCommand(ACTION_EDIT_DECOMPILED);
+        saveDecompiledButton.addActionListener(this::saveDecompiledButtonActionPerformed);
+        editDecompiledButton.addActionListener(this::editDecompiledButtonActionPerformed);
+        cancelDecompiledButton.addActionListener(this::cancelDecompiledButtonActionPerformed);
 
-        cancelDecompiledButton.addActionListener(this);
-        cancelDecompiledButton.setActionCommand(ACTION_CANCEL_DECOMPILED);
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
         decButtonsPan.setAlignmentX(0);
@@ -762,171 +750,168 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         decompiledTextArea.requestFocusInWindow();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_EDIT_DECOMPILED:
-                File swc = Configuration.getPlayerSWC();
-                final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-                if (swc == null) {
-                    if (View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%", adobePage), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
+    private void editDecompiledButtonActionPerformed(ActionEvent evt) {
+        File swc = Configuration.getPlayerSWC();
+        final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+        if (swc == null) {
+            if (View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%", adobePage), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
 
-                        View.navigateUrl(adobePage);
+                View.navigateUrl(adobePage);
 
-                        int ret;
-                        do {
-                            ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                            swc = Configuration.getPlayerSWC();
-                        } while (ret == JOptionPane.OK_OPTION && swc == null);
-                    }
-                }
-                if (swc != null) {
-                    if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-                        setDecompiledEditMode(true);
-                    }
-                }
-                break;
-            case ACTION_CANCEL_DECOMPILED:
-                setDecompiledEditMode(false);
-                break;
-            case ACTION_SAVE_DECOMPILED:
-                ScriptPack pack = decompiledTextArea.getScriptLeaf();
-                int oldIndex = pack.scriptIndex;
-                SWF.uncache(pack);
-
-                try {
-                    String oldSp = null;
-                    List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null);
-                    if (!packs.isEmpty()) {
-                        oldSp = packs.get(0).getClassPath().toString();
-                    }
-
-                    String as = decompiledTextArea.getText();
-                    abc.replaceScriptPack(pack, as);
-                    lastDecompiled = as;
-                    mainPanel.updateClassesList();
-
-                    if (oldSp != null) {
-                        hilightScript(getSwf(), oldSp);
-                    }
-                    setDecompiledEditMode(false);
-                    reload();
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-                } catch (AVM2ParseException ex) {
-                    abc.script_info.get(oldIndex).delete(abc, false);
-                    decompiledTextArea.gotoLine((int) ex.line);
-                    decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                } catch (CompilationException ex) {
-                    abc.script_info.get(oldIndex).delete(abc, false);
-                    decompiledTextArea.gotoLine((int) ex.line);
-                    decompiledTextArea.markError();
-                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                } catch (IOException | InterruptedException ex) {
-                    //ignore
-                }
-                break;
-            case ACTION_ADD_TRAIT:
-                int class_index = decompiledTextArea.getClassIndex();
-                if (class_index < 0) {
-                    return;
-                }
-                if (newTraitDialog == null) {
-                    newTraitDialog = new NewTraitDialog();
-                }
-                int void_type = abc.constants.getPublicQnameId("void", true);//abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("void"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
-                int int_type = abc.constants.getPublicQnameId("int", true); //abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("int"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
-
-                Trait t = null;
-                int kind;
-                int nskind;
-                String name = null;
-                boolean isStatic;
-                Multiname m;
-
-                boolean again = false;
-                loopm:
+                int ret;
                 do {
-                    if (again) {
-                        View.showMessageDialog(null, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    }
-                    again = false;
-                    if (newTraitDialog.showDialog() != AppDialog.OK_OPTION) {
-                        return;
-                    }
-                    kind = newTraitDialog.getTraitType();
-                    nskind = newTraitDialog.getNamespaceKind();
-                    name = newTraitDialog.getTraitName();
-                    isStatic = newTraitDialog.getStatic();
-                    m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(nskind, abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>());
-                    int mid = abc.constants.getMultinameId(m);
-                    if (mid == 0) {
-                        break;
-                    }
-                    for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
-                        if (tr.name_index == mid) {
-                            again = true;
-                            break;
-                        }
-                    }
+                    ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    swc = Configuration.getPlayerSWC();
+                } while (ret == JOptionPane.OK_OPTION && swc == null);
+            }
+        }
+        if (swc != null) {
+            if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+                setDecompiledEditMode(true);
+            }
+        }
+    }
 
-                    for (Trait tr : abc.instance_info.get(class_index).instance_traits.traits) {
-                        if (tr.name_index == mid) {
-                            again = true;
-                            break;
-                        }
-                    }
-                } while (again);
-                switch (kind) {
-                    case Trait.TRAIT_GETTER:
-                    case Trait.TRAIT_SETTER:
-                    case Trait.TRAIT_METHOD:
-                        TraitMethodGetterSetter tm = new TraitMethodGetterSetter();
-                        MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
-                        int method_info = abc.addMethodInfo(mi);
-                        tm.method_info = method_info;
-                        MethodBody body = new MethodBody();
-                        body.method_info = method_info;
-                        body.init_scope_depth = 1;
-                        body.max_regs = 1;
-                        body.max_scope_depth = 1;
-                        body.max_stack = 1;
-                        body.exceptions = new ABCException[0];
-                        AVM2Code code = new AVM2Code();
-                        code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0]));
-                        code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0]));
-                        code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0]));
-                        body.setCode(code);
-                        Traits traits = new Traits();
-                        traits.traits = new ArrayList<>();
-                        body.traits = traits;
-                        abc.addMethodBody(body);
-                        mi.setBody(body);
-                        t = tm;
-                        break;
-                    case Trait.TRAIT_SLOT:
-                    case Trait.TRAIT_CONST:
-                        TraitSlotConst ts = new TraitSlotConst();
-                        ts.type_index = int_type;
-                        ts.value_kind = ValueKind.CONSTANT_Int;
-                        ts.value_index = abc.constants.getIntId(0, true);
-                        t = ts;
-                        break;
-                }
-                if (t != null) {
-                    t.kindType = kind;
-                    t.name_index = abc.constants.getMultinameId(m, true);
-                    int traitId;
-                    if (isStatic) {
-                        traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
-                    } else {
-                        traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
-                    }
-                    reload();
-                    decompiledTextArea.gotoTrait(traitId);
-                }
+    private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
+        setDecompiledEditMode(false);
+    }
 
+    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+        ScriptPack pack = decompiledTextArea.getScriptLeaf();
+        int oldIndex = pack.scriptIndex;
+        SWF.uncache(pack);
+
+        try {
+            String oldSp = null;
+            List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null);
+            if (!packs.isEmpty()) {
+                oldSp = packs.get(0).getClassPath().toString();
+            }
+
+            String as = decompiledTextArea.getText();
+            abc.replaceScriptPack(pack, as);
+            lastDecompiled = as;
+            mainPanel.updateClassesList();
+
+            if (oldSp != null) {
+                hilightScript(getSwf(), oldSp);
+            }
+            setDecompiledEditMode(false);
+            reload();
+            View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+        } catch (AVM2ParseException ex) {
+            abc.script_info.get(oldIndex).delete(abc, false);
+            decompiledTextArea.gotoLine((int) ex.line);
+            decompiledTextArea.markError();
+            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (CompilationException ex) {
+            abc.script_info.get(oldIndex).delete(abc, false);
+            decompiledTextArea.gotoLine((int) ex.line);
+            decompiledTextArea.markError();
+            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (IOException | InterruptedException ex) {
+            //ignore
+        }
+    }
+
+    private void addTraitButtonActionPerformed(ActionEvent evt) {
+        int class_index = decompiledTextArea.getClassIndex();
+        if (class_index < 0) {
+            return;
+        }
+        if (newTraitDialog == null) {
+            newTraitDialog = new NewTraitDialog();
+        }
+        int void_type = abc.constants.getPublicQnameId("void", true);//abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("void"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
+        int int_type = abc.constants.getPublicQnameId("int", true); //abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("int"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
+
+        Trait t = null;
+        int kind;
+        int nskind;
+        String name = null;
+        boolean isStatic;
+        Multiname m;
+
+        boolean again = false;
+        loopm:
+        do {
+            if (again) {
+                View.showMessageDialog(null, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+            again = false;
+            if (newTraitDialog.showDialog() != AppDialog.OK_OPTION) {
+                return;
+            }
+            kind = newTraitDialog.getTraitType();
+            nskind = newTraitDialog.getNamespaceKind();
+            name = newTraitDialog.getTraitName();
+            isStatic = newTraitDialog.getStatic();
+            m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(nskind, abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>());
+            int mid = abc.constants.getMultinameId(m);
+            if (mid == 0) {
                 break;
+            }
+            for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
+                if (tr.name_index == mid) {
+                    again = true;
+                    break;
+                }
+            }
+
+            for (Trait tr : abc.instance_info.get(class_index).instance_traits.traits) {
+                if (tr.name_index == mid) {
+                    again = true;
+                    break;
+                }
+            }
+        } while (again);
+        switch (kind) {
+            case Trait.TRAIT_GETTER:
+            case Trait.TRAIT_SETTER:
+            case Trait.TRAIT_METHOD:
+                TraitMethodGetterSetter tm = new TraitMethodGetterSetter();
+                MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
+                int method_info = abc.addMethodInfo(mi);
+                tm.method_info = method_info;
+                MethodBody body = new MethodBody();
+                body.method_info = method_info;
+                body.init_scope_depth = 1;
+                body.max_regs = 1;
+                body.max_scope_depth = 1;
+                body.max_stack = 1;
+                body.exceptions = new ABCException[0];
+                AVM2Code code = new AVM2Code();
+                code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0]));
+                code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0]));
+                code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0]));
+                body.setCode(code);
+                Traits traits = new Traits();
+                traits.traits = new ArrayList<>();
+                body.traits = traits;
+                abc.addMethodBody(body);
+                mi.setBody(body);
+                t = tm;
+                break;
+            case Trait.TRAIT_SLOT:
+            case Trait.TRAIT_CONST:
+                TraitSlotConst ts = new TraitSlotConst();
+                ts.type_index = int_type;
+                ts.value_kind = ValueKind.CONSTANT_Int;
+                ts.value_index = abc.constants.getIntId(0, true);
+                t = ts;
+                break;
+        }
+        if (t != null) {
+            t.kindType = kind;
+            t.name_index = abc.constants.getMultinameId(m, true);
+            int traitId;
+            if (isStatic) {
+                traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
+            } else {
+                traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
+            }
+            reload();
+            decompiledTextArea.gotoTrait(traitId);
         }
     }
 }

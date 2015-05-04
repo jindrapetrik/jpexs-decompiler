@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -61,8 +60,7 @@ public class ReplaceTraceDialog extends AppDialog {
         return value;
     }
 
-    public ReplaceTraceDialog(Window owner, String defaultVal) {
-        super(owner);
+    public ReplaceTraceDialog(String defaultVal) {
         setTitle(translate("dialog.title"));
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));

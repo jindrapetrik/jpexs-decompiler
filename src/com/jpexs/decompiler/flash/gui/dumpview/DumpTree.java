@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
@@ -216,7 +215,7 @@ public class DumpTree extends JTree {
                 di.parent = dumpInfo;
                 rri.dumpInfo = di;
                 rri.seek(action.getAddress());
-                rri.readAction(new ConstantPool());
+                rri.readAction();
                 dumpInfo.getChildInfos().add(di);
             }
             repaint();

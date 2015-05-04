@@ -235,6 +235,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
             }
+
             ((Tag) abc.parentTag).setModified(true);
             abc.script_info.get(scriptIndex).setModified(true);
             textWithHex = null;

@@ -20,9 +20,11 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -37,8 +39,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -65,12 +70,20 @@ public abstract class MainFrameMenu {
         return mainFrame.translate(key);
     }
 
-    protected boolean open() {
+    protected boolean open(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return false;
+        }
+
         Main.openFileDialog();
         return true;
     }
 
-    protected boolean save() {
+    protected boolean save(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return false;
+        }
+
         if (swf != null) {
             boolean saved = false;
             if (swf.swfList != null && swf.swfList.isBundle()) {
@@ -107,6 +120,7 @@ public abstract class MainFrameMenu {
             }
             if (saved) {
                 swf.clearModified();
+                mainFrame.getPanel().refreshTree(swf);
             }
 
             return true;
@@ -115,7 +129,11 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected boolean saveAs() {
+    protected boolean saveAs(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return false;
+        }
+
         if (swf != null) {
             if (saveAs(swf, SaveFileMode.SAVEAS)) {
                 swf.clearModified();
@@ -136,13 +154,21 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected void saveAsExe() {
+    protected void saveAsExe(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         if (swf != null) {
             saveAs(swf, SaveFileMode.EXE);
         }
     }
 
-    protected void close() {
+    protected void close(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         if (swf == null) {
             return;
         }
@@ -150,7 +176,11 @@ public abstract class MainFrameMenu {
         Main.closeFile(swf.swfList);
     }
 
-    protected boolean closeAll() {
+    protected boolean closeAll(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return false;
+        }
+
         if (swf != null) {
             Main.closeAll();
             return true;
@@ -159,16 +189,44 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected void importText() {
+    protected void importText(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().importText(swf);
     }
 
-    protected void importScript() {
+    protected void importScript(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().importScript(swf);
     }
 
-    protected void importSymbolClass() {
+    protected void importSymbolClass(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().importSymbolClass(swf);
+    }
+
+    protected void exportAll(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        export(false);
+    }
+
+    protected void exportSelected(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        export(true);
     }
 
     protected boolean export(boolean onlySelected) {
@@ -180,11 +238,31 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected void exportFla() {
+    protected void exportFla(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().exportFla(swf);
     }
 
-    protected boolean search(Boolean searchInText) {
+    protected void importSwfXml(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        mainFrame.getPanel().importSwfXml();
+    }
+
+    protected void exportSwfXml(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        mainFrame.getPanel().exportSwfXml();
+    }
+
+    protected boolean search(ActionEvent evt, Boolean searchInText) {
         if (swf != null) {
             mainFrame.getPanel().searchInActionScriptOrText(searchInText);
             return true;
@@ -193,7 +271,7 @@ public abstract class MainFrameMenu {
         return false;
     }
 
-    protected boolean replace() {
+    protected boolean replace(ActionEvent evt) {
         if (swf != null) {
             mainFrame.getPanel().replaceText();
             return true;
@@ -202,11 +280,31 @@ public abstract class MainFrameMenu {
         return false;
     }
 
+    protected void restoreControlFlow(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        restoreControlFlow(false);
+    }
+
+    protected void restoreControlFlowAll(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        restoreControlFlow(true);
+    }
+
     protected void restoreControlFlow(boolean all) {
         mainFrame.getPanel().restoreControlFlow(all);
     }
 
-    protected void showProxy() {
+    protected void showProxy(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         Main.showProxy();
     }
 
@@ -215,32 +313,61 @@ public abstract class MainFrameMenu {
         return true;
     }
 
-    protected void renameOneIdentifier() {
+    protected void renameOneIdentifier(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().renameOneIdentifier(swf);
     }
 
-    protected void renameIdentifiers() {
+    protected void renameIdentifiers(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().renameIdentifiers(swf);
     }
 
-    protected void deobfuscate() {
+    protected void deobfuscate(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         mainFrame.getPanel().deobfuscate();
     }
 
-    protected void setSubLimiter(boolean value) {
-        Main.setSubLimiter(value);
+    protected void setSubLimiter(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+        Main.setSubLimiter(selected);
     }
 
     protected void switchDebugger() {
         DebuggerTools.switchDebugger(swf);
     }
 
-    protected void debuggerShowLog() {
+    protected void debuggerShowLog(ActionEvent evt) {
         DebuggerTools.debuggerShowLog();
     }
 
-    protected void replaceTraceCalls(String fname) {
-        DebuggerTools.replaceTraceCalls(swf, fname);
+    protected void debuggerReplaceTraceCalls(ActionEvent evt) {
+        ReplaceTraceDialog rtd = new ReplaceTraceDialog(Configuration.lastDebuggerReplaceFunction.get());
+        rtd.setVisible(true);
+        if (rtd.getValue() != null) {
+            String fname = rtd.getValue();
+            DebuggerTools.replaceTraceCalls(swf, fname);
+            mainFrame.getPanel().refreshDecompiled();
+            Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
+        }
+    }
+
+    protected void clearRecentFiles(ActionEvent evt) {
+        Configuration.recentFiles.set(null);
     }
 
     protected void removeNonScripts() {
@@ -285,27 +412,43 @@ public abstract class MainFrameMenu {
         dialog.setVisible(true);
     }
 
-    protected void checkUpdates() {
+    protected void checkUpdates(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         if (!Main.checkForUpdates()) {
             View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    protected void helpUs() {
+    protected void helpUs(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html?utm_source=app&utm_medium=menu&utm_campaign=app";
         if (!View.navigateUrl(helpUsURL)) {
             View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
         }
     }
 
-    protected void homePage() {
+    protected void homePage(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         String homePageURL = ApplicationInfo.PROJECT_PAGE + "?utm_source=app&utm_medium=menu&utm_campaign=app";
         if (!View.navigateUrl(homePageURL)) {
             View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
         }
     }
 
-    protected void about() {
+    protected void about(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
         Main.about();
     }
 
@@ -334,15 +477,108 @@ public abstract class MainFrameMenu {
     }
 
     protected void gotoDucumentClassOnStartup(ActionEvent evt) {
-        boolean selected = true; // todo: honfika: get from evt.getSource()
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
         Configuration.gotoMainClassOnStartup.set(selected);
     }
 
-    protected void setLanguage() {
+    protected void autoRenameIdentifiers(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.autoRenameIdentifiers.set(selected);
+    }
+
+    protected void cacheOnDisk(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.cacheOnDisk.set(selected);
+        if (selected) {
+            Cache.setStorageType(Cache.STORAGE_FILES);
+        } else {
+            Cache.setStorageType(Cache.STORAGE_MEMORY);
+        }
+    }
+
+    protected void setLanguage(ActionEvent evt) {
         new SelectLanguageDialog().display();
     }
 
-    protected void exit() {
+    protected void disableDecompilation(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.decompile.set(!selected);
+        mainFrame.getPanel().disableDecompilationChanged();
+    }
+
+    protected void associate(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        if (selected == ContextMenuTools.isAddedToContextMenu()) {
+            return;
+        }
+        ContextMenuTools.addToContextMenu(selected, false);
+
+        // Update checkbox menuitem accordingly (User can cancel rights elevation)
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                button.setSelected(ContextMenuTools.isAddedToContextMenu());
+            }
+        }, 1000); // It takes some time registry change to apply
+    }
+
+    protected void gotoDucumentClass(ActionEvent evt) {
+        mainFrame.getPanel().gotoDocumentClass(mainFrame.getPanel().getCurrentSwf());
+    }
+
+    protected void parallelSpeedUp(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        String confStr = translate("message.confirm.parallel") + "\r\n";
+        if (selected) {
+            confStr += " " + translate("message.confirm.on");
+        } else {
+            confStr += " " + translate("message.confirm.off");
+        }
+        if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            Configuration.parallelSpeedUp.set(selected);
+        } else {
+            button.setSelected(Configuration.parallelSpeedUp.get());
+        }
+    }
+
+    protected void internalViewerSwitch(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.internalFlashViewer.set(selected);
+        mainFrame.getPanel().reload(true);
+    }
+
+    protected void autoDeobfuscate(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            Configuration.autoDeobfuscate.set(selected);
+            mainFrame.getPanel().autoDeobfuscateChanged();
+        } else {
+            button.setSelected(Configuration.autoDeobfuscate.get());
+        }
+    }
+
+    protected void deobfuscationMode(ActionEvent evt, int mode) {
+        Configuration.deobfuscationMode.set(mode);
+        mainFrame.getPanel().autoDeobfuscateChanged();
+    }
+
+    protected void exit(ActionEvent evt) {
         JFrame frame = (JFrame) mainFrame;
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
@@ -363,19 +599,19 @@ public abstract class MainFrameMenu {
                     if (e.isControlDown() && e.isShiftDown()) {
                         switch (code) {
                             case KeyEvent.VK_O:
-                                return open();
+                                return open(null);
                             case KeyEvent.VK_S:
-                                return save();
+                                return save(null);
                             case KeyEvent.VK_A:
-                                return saveAs();
+                                return saveAs(null);
                             case KeyEvent.VK_F:
-                                return search(false);
+                                return search(null, false);
                             case KeyEvent.VK_T:
-                                return search(true);
+                                return search(null, true);
                             case KeyEvent.VK_R:
                                 return reload(null);
                             case KeyEvent.VK_X:
-                                return closeAll();
+                                return closeAll(null);
                             case KeyEvent.VK_D:
                                 return clearLog();
                             case KeyEvent.VK_E:

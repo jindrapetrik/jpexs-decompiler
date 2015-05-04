@@ -659,6 +659,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
+
             sos.close();
             os.write(Utf8Helper.getBytes(getHeaderBytes(compression, gfx)));
             os.write(version);
@@ -711,6 +712,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             } else if (compression == SWFCompression.ZLIB) {
                 os = new DeflaterOutputStream(os);
             }
+
             os.write(data);
         } finally {
             if (os != null) {
@@ -2028,11 +2030,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                 ret++;
             }
         }
+
         for (ASMSource src : actionsMap.keySet()) {
             actionsMap.get(src).removeNops();
             src.setActions(actionsMap.get(src));
             src.setModified();
         }
+
         deobfuscation.deobfuscateInstanceNames(false, deobfuscated, renameType, tags, selected);
         return ret;
     }

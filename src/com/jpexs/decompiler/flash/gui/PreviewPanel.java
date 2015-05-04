@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -340,8 +341,7 @@ public class PreviewPanel extends JSplitPane {
             /*JPanel bottomPanel = new JPanel(new BorderLayout());
              JPanel buttonsPanel = new JPanel(new FlowLayout());
              JButton selectColorButton = new JButton(View.getIcon("color16"));
-             selectColorButton.addActionListener(mainPanel);
-             selectColorButton.setActionCommand(MainPanel.ACTION_SELECT_BKCOLOR);
+             selectColorButton.addActionListener(mainPanel::selectBkColor);
              selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
              buttonsPanel.add(selectColorButton);
              bottomPanel.add(buttonsPanel, BorderLayout.EAST);
@@ -1141,6 +1141,10 @@ public class PreviewPanel extends JSplitPane {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item == null) {
             return;
+        }
+
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
         }
 
         if (item instanceof Tag) {
