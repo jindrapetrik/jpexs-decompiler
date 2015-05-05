@@ -181,11 +181,10 @@ public class Main {
     }
 
     public static void startProxy(int port) {
-        View.execInEventDispatch(() -> {
-            if (proxyFrame == null) {
-                proxyFrame = new ProxyFrame(mainFrame);
-            }
-        });
+        if (proxyFrame == null) {
+            proxyFrame = new ProxyFrame(mainFrame);
+        }
+
         proxyFrame.setPort(port);
         addTrayIcon();
         switchProxy();
@@ -472,13 +471,13 @@ public class Main {
                 if (firstSWF == null) {
                     firstSWF = swfs1.get(0);
                 }
+                
                 try {
-                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                     View.execInEventDispatch(() -> {
+                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                         ensureMainFrame();
                         mainFrame.getPanel().load(swfs1, first1);
                     });
-
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -839,22 +838,17 @@ public class Main {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        View.execInEventDispatch(() -> {
-            ErrorLogFrame.createNewInstance();
-        });
+
+        ErrorLogFrame.createNewInstance();
 
         autoCheckForUpdates();
         offerAssociation();
-        View.execInEventDispatch(() -> {
-            loadingDialog = new LoadingDialog();
-        });
+        loadingDialog = new LoadingDialog();
     }
 
     public static void showModeFrame() {
-        View.execInEventDispatch(() -> {
-            ensureMainFrame();
-            mainFrame.setVisible(true);
-        });
+        ensureMainFrame();
+        mainFrame.setVisible(true);
     }
 
     private static void offerAssociation() {
@@ -1073,26 +1067,29 @@ public class Main {
         }
 
         if (args.length == 0) {
-            initGui();
-            if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
-                Main.exit();
-            } else {
-                showModeFrame();
-                reloadLastSession();
-            }
-
+            View.execInEventDispatch(() -> {
+                initGui();
+                if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
+                    Main.exit();
+                } else {
+                    showModeFrame();
+                    reloadLastSession();
+                }
+            });
         } else {
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
-                initGui();
-                shouldCloseWhenClosingLoadingDialog = true;
-                if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
-                    Main.exit();
-                } else {
-                    for (String fileToOpen : filesToOpen) {
-                        openFile(fileToOpen, null);
+                View.execInEventDispatch(() -> {
+                    initGui();
+                    shouldCloseWhenClosingLoadingDialog = true;
+                    if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
+                        Main.exit();
+                    } else {
+                        for (String fileToOpen : filesToOpen) {
+                            openFile(fileToOpen, null);
+                        }
                     }
-                }
+                });
             }
         }
     }

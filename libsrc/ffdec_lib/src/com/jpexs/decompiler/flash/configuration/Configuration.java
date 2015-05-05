@@ -251,20 +251,20 @@ public class Configuration {
     @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
 
-    @ConfigurationName("gui.avm2.splitPane.dividerLocation")
-    public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocation = null;
+    @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocationPercent = null;
 
-    @ConfigurationName("guiActionSplitPaneDividerLocation")
-    public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocation = null;
+    @ConfigurationName("guiActionSplitPaneDividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocationPercent = null;
 
-    @ConfigurationName("guiPreviewSplitPaneDividerLocation")
-    public static final ConfigurationItem<Integer> guiPreviewSplitPaneDividerLocation = null;
+    @ConfigurationName("guiPreviewSplitPaneDividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiPreviewSplitPaneDividerLocationPercent = null;
 
-    @ConfigurationName("gui.splitPane1.dividerLocation")
-    public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
+    @ConfigurationName("gui.splitPane1.dividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiSplitPane1DividerLocationPercent = null;
 
-    @ConfigurationName("gui.splitPane2.dividerLocation")
-    public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
+    @ConfigurationName("gui.splitPane2.dividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiSplitPane2DividerLocationPercent = null;
 
     @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
     @ConfigurationName("gui.skin")

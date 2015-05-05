@@ -57,7 +57,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -557,10 +556,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         setLayout(new BorderLayout());
         add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
         splitPane.setResizeWeight(0.5);
-        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.guiActionSplitPaneDividerLocation.set((Integer) pce.getNewValue());
+        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            int width = ((JSplitPane) pce.getSource()).getWidth();
+            if (width != 0) {
+                int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                Configuration.guiActionSplitPaneDividerLocationPercent.set(p);
             }
         });
 
@@ -628,16 +628,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void initSplits() {
-        int split = Configuration.guiActionSplitPaneDividerLocation.get(getWidth() / 2);
-        if (split == 0) {
-            split = getWidth() / 2;
-        }
-        splitPane.setDividerLocation(split);
-    }
-
-    public void display() {
-        setVisible(true);
-        splitPane.setDividerLocation(0.5);
+        int split = Configuration.guiActionSplitPaneDividerLocationPercent.get(50);
+        splitPane.setDividerLocation(split / 100.0);
     }
 
     public void setEditMode(boolean val) {

@@ -85,24 +85,22 @@ public class ErrorLogFrame extends AppFrame {
     public static ErrorLogFrame getInstance() {
         if (instance == null) {
             instance = new ErrorLogFrame();
-            View.execInEventDispatch(() -> {
-                Logger logger = Logger.getLogger("");
-                logger.addHandler(instance.getHandler());
-            });
+            Logger logger = Logger.getLogger("");
+            logger.addHandler(instance.getHandler());
         }
+        
         return instance;
     }
 
     public static ErrorLogFrame createNewInstance() {
         if (instance != null) {
-            View.execInEventDispatch(() -> {
-                Logger logger = Logger.getLogger("");
-                logger.removeHandler(instance.getHandler());
-            });
+            Logger logger = Logger.getLogger("");
+            logger.removeHandler(instance.getHandler());
             instance.setVisible(false);
             instance.dispose();
             instance = null;
         }
+        
         return getInstance();
     }
 

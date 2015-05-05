@@ -156,7 +156,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -564,20 +563,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
 
-        splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                if (splitsInited) {
-                    Configuration.guiSplitPane1DividerLocation.set((Integer) pce.getNewValue());
+        splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            if (splitsInited) {
+                int width = ((JSplitPane) pce.getSource()).getWidth();
+                if (width != 0) {
+                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                    Configuration.guiSplitPane1DividerLocationPercent.set(p);
                 }
             }
         });
 
-        splitPane2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                if (detailPanel.isVisible()) {
-                    Configuration.guiSplitPane2DividerLocation.set((Integer) pce.getNewValue());
+        splitPane2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            if (detailPanel.isVisible()) {
+                int width = ((JSplitPane) pce.getSource()).getWidth();
+                if (width != 0) {
+                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                    Configuration.guiSplitPane2DividerLocationPercent.set(p);
                 }
             }
         });
@@ -657,6 +658,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (abcPanel != null) {
                         abcPanel.reload();
                     }
+                    
                     updateClassesList();
                 } catch (InterruptedException ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -678,21 +680,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             abcPanel = new ABCPanel(this);
             displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
             detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
+            abcPanel.initSplits();
         }
+        
         return abcPanel;
     }
 
-    private void ensureActionPanel() {
-        if (actionPanel == null) {
-            View.execInEventDispatch(() -> {
-                actionPanel = new ActionPanel(MainPanel.this);
-                displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
-            });
-        }
-    }
-
     private ActionPanel getActionPanel() {
-        ensureActionPanel();
+        if (actionPanel == null) {
+            actionPanel = new ActionPanel(MainPanel.this);
+            displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+            actionPanel.initSplits();
+        }
+
         return actionPanel;
     }
 
@@ -840,9 +840,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         refreshTree();
 
         if (updateNeeded) {
-            View.execInEventDispatch(() -> {
-                tagTree.updateUI();
-            });
+            tagTree.updateUI();
         }
     }
 
@@ -863,27 +861,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void setVisible(boolean b) {
         super.setVisible(b);
         if (b) {
-            if (abcPanel != null) {
-                abcPanel.initSplits();
-            }
-            if (actionPanel != null) {
-                actionPanel.initSplits();
-            }
+            int split = Configuration.guiSplitPane1DividerLocationPercent.get(33);
+            splitPane1.setDividerLocation(split / 100.0);
 
-            View.execInEventDispatchLater(() -> {
-                splitPane1.setDividerLocation(Configuration.guiSplitPane1DividerLocation.get(getWidth() / 3));
-                int confDivLoc = Configuration.guiSplitPane2DividerLocation.get(splitPane2.getHeight() * 3 / 5);
-                if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
-                    confDivLoc = splitPane2.getHeight() * 3 / 5;
-                }
-                splitPane2.setDividerLocation(confDivLoc);
-                previewPanel.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewPanel.getWidth() / 2));
+            int confDivLoc = Configuration.guiSplitPane2DividerLocationPercent.get(60);
+            splitPane2.setDividerLocation(confDivLoc / 100.0);
+            
+            split = Configuration.guiPreviewSplitPaneDividerLocationPercent.get(50);
+            previewPanel.setDividerLocation(split / 100.0);
 
-                splitPos = splitPane2.getDividerLocation();
-                splitsInited = true;
-                previewPanel.setSplitsInited();
-            });
-
+            splitPos = splitPane2.getDividerLocation();
+            splitsInited = true;
+            previewPanel.setSplitsInited();
         }
     }
 
@@ -1361,7 +1350,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         boolean found = false;
                         if (searchDialog.searchInASRadioButton.isSelected()) {
                             if (swf.isAS3()) {
-                                if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                // todo: honfika: do not call this from background thread
+                                View.execInEventDispatch(() -> {
+                                    getActionPanel();
+                                });
+
+                                if (getABCPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
                                     View.execInEventDispatch(() -> {
                                         showDetail(DETAILCARDAS3NAVIGATOR);
@@ -1369,6 +1363,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     });
                                 }
                             } else {
+                                // todo: honfika: do not call this from background thread
+                                View.execInEventDispatch(() -> {
+                                    getActionPanel();
+                                });
+                                
                                 if (getActionPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
                                     View.execInEventDispatch(() -> {
@@ -1927,10 +1926,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 protected void done() {
-                    Main.stopWork();
-                    View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
-
                     View.execInEventDispatch(() -> {
+                        Main.stopWork();
+                        View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
+
                         getABCPanel().reload();
                         updateClassesList();
                     });
@@ -2023,10 +2022,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 protected void done() {
-                    Main.stopWork();
-                    View.showMessageDialog(null, translate("work.deobfuscating.complete"));
-
                     View.execInEventDispatch(() -> {
+                        Main.stopWork();
+                        View.showMessageDialog(null, translate("work.deobfuscating.complete"));
+
                         clearAllScriptCache();
                         getABCPanel().reload();
                         updateClassesList();
@@ -2129,9 +2128,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
                     return false;
                 }
-                View.execInEventDispatch(() -> {
+
+                //View.execInEventDispatch(() -> {
                     font.addCharacter(character, f);
-                });
+                //});
 
                 return true;
             }
@@ -2706,7 +2706,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
             previewPanel.showBinaryPanel(binaryTag);
         } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {
-            ensureActionPanel();
             showCard(CARDACTIONSCRIPTPANEL);
             getActionPanel().setSource((ASMSource) treeItem, !forceReload);
         } else if (treeItem instanceof ImageTag) {

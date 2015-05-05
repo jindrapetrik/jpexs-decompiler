@@ -80,7 +80,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -127,8 +126,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public JSplitPane splitPane;
 
-    //public JSplitPane splitPaneTreeVSNavigator;
-    //public JSplitPane splitPaneTreeNavVSDecompiledDetail;
     private JTable constantTable;
 
     public JComboBox<String> constantTypeList;
@@ -278,21 +275,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void initSplits() {
-        //splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth() * 1 / 3);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        splitPane.setDividerLocation(Configuration.guiAvm2SplitPaneDividerLocation.get(splitPane.getWidth() * 1 / 2));
-
+        splitPane.setDividerLocation(Configuration.guiAvm2SplitPaneDividerLocationPercent.get(50) / 100.0);
     }
 
     private boolean isFreeing;
@@ -393,11 +376,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         splitPane.setResizeWeight(0.5);
         splitPane.setContinuousLayout(true);
 
-        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                if (!directEditing) {
-                    Configuration.guiAvm2SplitPaneDividerLocation.set((Integer) pce.getNewValue());
+        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            if (!directEditing) {
+                int width = ((JSplitPane) pce.getSource()).getWidth();
+                if (width != 0) {
+                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                    Configuration.guiAvm2SplitPaneDividerLocationPercent.set(p);
                 }
             }
         });

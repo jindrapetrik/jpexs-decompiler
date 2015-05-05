@@ -39,7 +39,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -218,31 +217,27 @@ public class LoadFromMemoryFrame extends AppFrame {
             progress.setStringPainted(true);
             progress.setVisible(true);
             final SelectProcessWorker wrk = new SelectProcessWorker(selProcesses);
-            wrk.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    switch (evt.getPropertyName()) {
-                        case "progress":
-                            progress.setIndeterminate(false);
-                            progress.setStringPainted(false);
-                            progress.setValue((Integer) evt.getNewValue());
-                            break;
-                        case "state":
-                            if (((StateValue) evt.getNewValue()) == StateValue.DONE) {
-                                try {
-                                    foundIs = wrk.get();
-                                } catch (InterruptedException | ExecutionException ex) {
-                                    Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                if (foundIs == null) {
-                                    addResultRow(null);
-                                }
-                                tableRes.setEnabled(foundIs != null);
-                                progress.setVisible(false);
-                                processing = false;
+            wrk.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                switch (evt.getPropertyName()) {
+                    case "progress":
+                        progress.setIndeterminate(false);
+                        progress.setStringPainted(false);
+                        progress.setValue((Integer) evt.getNewValue());
+                        break;
+                    case "state":
+                        if (((StateValue) evt.getNewValue()) == StateValue.DONE) {
+                            try {
+                                foundIs = wrk.get();
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                    }
-
+                            if (foundIs == null) {
+                                addResultRow(null);
+                            }
+                            tableRes.setEnabled(foundIs != null);
+                            progress.setVisible(false);
+                            processing = false;
+                        }
                 }
             });
             wrk.execute();

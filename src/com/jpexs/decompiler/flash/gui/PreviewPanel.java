@@ -76,7 +76,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -209,11 +208,12 @@ public class PreviewPanel extends JSplitPane {
 
         });
 
-        addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                if (splitsInited && getRightComponent().isVisible()) {
-                    Configuration.guiPreviewSplitPaneDividerLocation.set((Integer) pce.getNewValue());
+        addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            if (splitsInited && getRightComponent().isVisible()) {
+                int width = ((JSplitPane) pce.getSource()).getWidth();
+                if (width != 0) {
+                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                    Configuration.guiPreviewSplitPaneDividerLocationPercent.set(p);
                 }
             }
         });
@@ -505,7 +505,7 @@ public class PreviewPanel extends JSplitPane {
 
         showCardRight(CARDFONTPANEL);
         parametersPanel.setVisible(true);
-        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(getWidth() / 2));
+        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocationPercent.get(50) / 100.0);
         fontPanel.showFontTag(fontTag);
 
         int pageCount = getFontPageCount(fontTag);
@@ -536,7 +536,7 @@ public class PreviewPanel extends JSplitPane {
 
         showCardRight(CARDTEXTPANEL);
         parametersPanel.setVisible(true);
-        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(getWidth() / 2));
+        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocationPercent.get(50) / 100.0);
         textPanel.setText(textTag);
     }
 

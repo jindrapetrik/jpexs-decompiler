@@ -313,6 +313,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                 View.execInEventDispatch(() -> {
                     genericTagPropertiesEditPanelScrollPanel.getVerticalScrollBar().setValue(val);
                 });
@@ -359,6 +360,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                 View.execInEventDispatch(() -> {
                     genericTagPropertiesEditPanelScrollPanel.getVerticalScrollBar().setValue(val);
                 });
