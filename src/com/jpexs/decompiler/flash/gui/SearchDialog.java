@@ -112,7 +112,6 @@ public class SearchDialog extends AppDialog {
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);
-        //View.setWindowIcon(this);
         setIconImage(View.loadImage(replace ? "replace16" : "search16"));
         setTitle(replace ? translate("dialog.title.replace") : translate("dialog.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);

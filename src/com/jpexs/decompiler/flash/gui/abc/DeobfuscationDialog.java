@@ -99,7 +99,6 @@ public class DeobfuscationDialog extends AppDialog {
 
         setModal(true);
         View.centerScreen(this);
-        //View.setWindowIcon(this);
         setIconImage(View.loadImage("deobfuscate16"));
     }
 

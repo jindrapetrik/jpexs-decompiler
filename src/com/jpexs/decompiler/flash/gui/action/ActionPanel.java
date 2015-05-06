@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -56,7 +57,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public LineMarkedEditorPane decompiledEditor;
 
-    public JSplitPane splitPane;
+    public JPersistentSplitPane splitPane;
 
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
@@ -420,6 +420,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     if (!useCache) {
                         SWF.uncache(asm);
                     }
+
                     CachedScript sc = SWF.getCached(asm, actions);
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
@@ -433,10 +434,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
             @Override
             protected void done() {
-                setSourceWorker = null;
-                Main.stopWork();
-
                 View.execInEventDispatch(() -> {
+                    setSourceWorker = null;
+                    Main.stopWork();
+
                     try {
                         get();
                     } catch (CancellationException ex) {
@@ -554,15 +555,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
         setLayout(new BorderLayout());
-        add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
-        splitPane.setResizeWeight(0.5);
-        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
-            int width = ((JSplitPane) pce.getSource()).getWidth();
-            if (width != 0) {
-                int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
-                Configuration.guiActionSplitPaneDividerLocationPercent.set(p);
-            }
-        });
+        add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
 
         editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
         decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
@@ -625,11 +618,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
             }
         });
-    }
-
-    public void initSplits() {
-        int split = Configuration.guiActionSplitPaneDividerLocationPercent.get(50);
-        splitPane.setDividerLocation(split / 100.0);
     }
 
     public void setEditMode(boolean val) {

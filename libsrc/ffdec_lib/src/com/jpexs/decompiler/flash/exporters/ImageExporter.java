@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
@@ -85,14 +84,11 @@ public class ImageExporter {
                     final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
                     final String ffileFormat = fileFormat;
 
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            if (ffileFormat.equals("bmp")) {
-                                BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
-                            } else {
-                                ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
-                            }
+                    new RetryTask(() -> {
+                        if (ffileFormat.equals("bmp")) {
+                            BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
+                        } else {
+                            ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
                         }
                     }, handler).run();
                     ret.add(file);

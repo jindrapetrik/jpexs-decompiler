@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -75,7 +76,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -114,7 +114,7 @@ import jsyntaxpane.DefaultSyntaxKit;
  *
  * @author JPEXS
  */
-public class PreviewPanel extends JSplitPane {
+public class PreviewPanel extends JPersistentSplitPane {
 
     private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
 
@@ -184,12 +184,10 @@ public class PreviewPanel extends JSplitPane {
 
     private TextPanel textPanel;
 
-    private boolean splitsInited;
-
     private MetadataTag metadataTag;
 
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
-        super(JSplitPane.HORIZONTAL_SPLIT);
+        super(JSplitPane.HORIZONTAL_SPLIT, Configuration.guiPreviewSplitPaneDividerLocationPercent);
         this.mainPanel = mainPanel;
         this.flashPanel = flashPanel;
 
@@ -201,21 +199,10 @@ public class PreviewPanel extends JSplitPane {
                     try {
                         tempFile.delete();
                     } catch (Exception ex) {
-
                     }
                 }
             }
 
-        });
-
-        addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
-            if (splitsInited && getRightComponent().isVisible()) {
-                int width = ((JSplitPane) pce.getSource()).getWidth();
-                if (width != 0) {
-                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
-                    Configuration.guiPreviewSplitPaneDividerLocationPercent.set(p);
-                }
-            }
         });
 
         viewerCards = new JPanel();
@@ -459,10 +446,6 @@ public class PreviewPanel extends JSplitPane {
         cl.show(displayWithPreview, card);
     }
 
-    public void setSplitsInited() {
-        splitsInited = true;
-    }
-
     public TextPanel getTextPanel() {
         return textPanel;
     }
@@ -505,7 +488,6 @@ public class PreviewPanel extends JSplitPane {
 
         showCardRight(CARDFONTPANEL);
         parametersPanel.setVisible(true);
-        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocationPercent.get(50) / 100.0);
         fontPanel.showFontTag(fontTag);
 
         int pageCount = getFontPageCount(fontTag);
@@ -536,7 +518,6 @@ public class PreviewPanel extends JSplitPane {
 
         showCardRight(CARDTEXTPANEL);
         parametersPanel.setVisible(true);
-        setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocationPercent.get(50) / 100.0);
         textPanel.setText(textTag);
     }
 

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -78,12 +77,9 @@ public class MovieExporter {
 
                 final DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
                 final File file = new File(outdir + File.separator + Helper.makeFileName(videoStream.getCharacterExportFileName() + ".flv"));
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                            fos.write(exportMovie(videoStream, settings.mode));
-                        }
+                new RetryTask(() -> {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                        fos.write(exportMovie(videoStream, settings.mode));
                     }
                 }, handler).run();
 

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -2294,12 +2293,9 @@ public class XFLConverter {
     }
 
     private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException {
-        new RetryTask(new RunnableIOEx() {
-            @Override
-            public void run() throws IOException {
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(data);
-                }
+        new RetryTask(() -> {
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(data);
             }
         }, handler).run();
     }
@@ -2988,22 +2984,19 @@ public class XFLConverter {
             final String domDocumentF = domDocumentStr;
             final String publishSettingsF = publishSettingsStr;
             final String outfileF = outfile;
-            new RetryTask(new RunnableIOEx() {
-                @Override
-                public void run() throws IOException {
-                    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
-                        out.putNextEntry(new ZipEntry("DOMDocument.xml"));
-                        out.write(Utf8Helper.getBytes(domDocumentF));
-                        out.putNextEntry(new ZipEntry("PublishSettings.xml"));
-                        out.write(Utf8Helper.getBytes(publishSettingsF));
-                        for (String fileName : files.keySet()) {
-                            out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
-                            out.write(files.get(fileName));
-                        }
-                        for (String fileName : datfiles.keySet()) {
-                            out.putNextEntry(new ZipEntry("bin/" + fileName));
-                            out.write(datfiles.get(fileName));
-                        }
+            new RetryTask(() -> {
+                try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
+                    out.putNextEntry(new ZipEntry("DOMDocument.xml"));
+                    out.write(Utf8Helper.getBytes(domDocumentF));
+                    out.putNextEntry(new ZipEntry("PublishSettings.xml"));
+                    out.write(Utf8Helper.getBytes(publishSettingsF));
+                    for (String fileName : files.keySet()) {
+                        out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
+                        out.write(files.get(fileName));
+                    }
+                    for (String fileName : datfiles.keySet()) {
+                        out.putNextEntry(new ZipEntry("bin/" + fileName));
+                        out.write(datfiles.get(fileName));
                     }
                 }
             }, handler).run();

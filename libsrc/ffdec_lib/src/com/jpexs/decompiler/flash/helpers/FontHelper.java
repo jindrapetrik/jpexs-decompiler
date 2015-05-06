@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import java.awt.Canvas;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
@@ -36,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.swing.JPanel;
 
 /**
  *
@@ -175,7 +175,8 @@ public class FontHelper {
     }
 
     private static FontRenderContext getFontRenderContext(Font font) {
-        return (new JPanel()).getFontMetrics(font).getFontRenderContext();
+        // Canvas works in headless mode
+        return (new Canvas()).getFontMetrics(font).getFontRenderContext();
     }
 
     private static List<KerningPair> getFontKerningPairsOneChar(List<Character> availableChars, Font font, char firstChar) {

@@ -20,7 +20,6 @@ import com.jpacker.JPacker;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -157,26 +156,23 @@ public class FrameExporter {
 
                 final int fi = i;
                 final Color fbackgroundColor = backgroundColor;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        int frame = fframes.get(fi);
-                        File f = new File(foutdir + File.separator + frame + ".svg");
-                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                            ExportRectangle rect = new ExportRectangle(tim.displayRect);
-                            rect.xMax *= settings.zoom;
-                            rect.yMax *= settings.zoom;
-                            rect.xMin *= settings.zoom;
-                            rect.yMin *= settings.zoom;
-                            SVGExporter exporter = new SVGExporter(rect);
-                            if (fbackgroundColor != null) {
-                                exporter.setBackGroundColor(fbackgroundColor);
-                            }
-                            SWF.frameToSvg(tim, frame, 0, null, 0, exporter, new ColorTransform(), 0, settings.zoom);
-                            fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                new RetryTask(() -> {
+                    int frame = fframes.get(fi);
+                    File f = new File(foutdir + File.separator + frame + ".svg");
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                        ExportRectangle rect = new ExportRectangle(tim.displayRect);
+                        rect.xMax *= settings.zoom;
+                        rect.yMax *= settings.zoom;
+                        rect.xMin *= settings.zoom;
+                        rect.yMin *= settings.zoom;
+                        SVGExporter exporter = new SVGExporter(rect);
+                        if (fbackgroundColor != null) {
+                            exporter.setBackGroundColor(fbackgroundColor);
                         }
-                        ret.add(f);
+                        SWF.frameToSvg(tim, frame, 0, null, 0, exporter, new ColorTransform(), 0, settings.zoom);
+                        fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
+                    ret.add(f);
                 }, handler).run();
 
                 if (evl != null) {
@@ -195,105 +191,103 @@ public class FrameExporter {
             final Timeline ftim = tim;
             final Color fbackgroundColor = backgroundColor;
             final SWF fswf = swf;
-            new RetryTask(new RunnableIOEx() {
-                @Override
-                public void run() throws IOException {
-                    File fcanvas = new File(foutdir + File.separator + "canvas.js");
-                    Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
-                    ret.add(fcanvas);
+            new RetryTask(() -> {
+                File fcanvas = new File(foutdir + File.separator + "canvas.js");
+                Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
+                ret.add(fcanvas);
 
-                    File f = new File(foutdir + File.separator + "frames.js");
-                    File fmin = new File(foutdir + File.separator + "frames.min.js");
-                    int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
-                    int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                        fos.write(Utf8Helper.getBytes("\r\n"));
-                        Set<Integer> library = new HashSet<>();
-                        ftim.getNeededCharacters(fframes, library);
+                File f = new File(foutdir + File.separator + "frames.js");
+                File fmin = new File(foutdir + File.separator + "frames.min.js");
+                int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
+                int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
+                try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                    fos.write(Utf8Helper.getBytes("\r\n"));
+                    Set<Integer> library = new HashSet<>();
+                    ftim.getNeededCharacters(fframes, library);
 
-                        SWF.writeLibrary(fswf, library, fos);
+                    SWF.writeLibrary(fswf, library, fos);
 
-                        String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
+                    String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
 
-                        fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor) + "," + (-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor) + ");\r\n"));
-                        fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
-                        fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
-                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                    fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor) + "," + (-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor) + ");\r\n"));
+                    fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
+                    fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
+                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
-                        fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
-                        fos.write(Utf8Helper.getBytes("var time = 0;\r\n"));
-                        fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
-                        for (int i : fframes) {
-                            fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
+                    fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
+                    fos.write(Utf8Helper.getBytes("var time = 0;\r\n"));
+                    fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
+                    for (int i : fframes) {
+                        fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
+                    }
+                    fos.write(Utf8Helper.getBytes("\r\n"));
+                    RGB backgroundColor1 = new RGB(255, 255, 255);
+                    for (Tag t : fswf.tags) {
+                        if (t instanceof SetBackgroundColorTag) {
+                            SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
+                            backgroundColor1 = sb.backgroundColor;
                         }
-                        fos.write(Utf8Helper.getBytes("\r\n"));
-                        RGB backgroundColor = new RGB(255, 255, 255);
-                        for (Tag t : fswf.tags) {
-                            if (t instanceof SetBackgroundColorTag) {
-                                SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
-                                backgroundColor = sb.backgroundColor;
-                            }
-                        }
-
-                        fos.write(Utf8Helper.getBytes("var backgroundColor = \"" + backgroundColor.toHexRGB() + "\";\r\n"));
-                        fos.write(Utf8Helper.getBytes("var originalWidth = " + width + ";\r\n"));
-                        fos.write(Utf8Helper.getBytes("var originalHeight= " + height + ";\r\n"));
-                        fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tvar oldframe = frame;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tif(frame==oldframe){time++;}else{time=0;};\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tdrawFrame();\r\n"));
-                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-
-                        fos.write(Utf8Helper.getBytes("function drawFrame(){\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.fillStyle = backgroundColor;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"));
-                        fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0,time);\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
-                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-                        if (ftim.swf.frameRate > 0) {
-                            fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / ftim.swf.frameRate) + ");\r\n"));
-                        }
-                        fos.write(Utf8Helper.getBytes("nextFrame(ctx,ctrans);\r\n"));
                     }
 
-                    boolean packed = false;
-                    if (Configuration.packJavaScripts.get()) {
-                        try {
-                            JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
-                            f.delete();
-                            packed = true;
-                        } catch (Exception | Error e) { // Something wrong in the packer
-                            logger.log(Level.WARNING, "JPacker: Cannot minimize script");
-                            f.renameTo(fmin);
-                        }
-                    } else {
+                    fos.write(Utf8Helper.getBytes("var backgroundColor = \"" + backgroundColor1.toHexRGB() + "\";\r\n"));
+                    fos.write(Utf8Helper.getBytes("var originalWidth = " + width + ";\r\n"));
+                    fos.write(Utf8Helper.getBytes("var originalHeight= " + height + ";\r\n"));
+                    fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tvar oldframe = frame;\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tif(frame==oldframe){time++;}else{time=0;};\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tdrawFrame();\r\n"));
+                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+
+                    fos.write(Utf8Helper.getBytes("function drawFrame(){\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.fillStyle = backgroundColor;\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"));
+                    fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0,time);\r\n"));
+                    fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
+                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                    if (ftim.swf.frameRate > 0) {
+                        fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / ftim.swf.frameRate) + ");\r\n"));
+                    }
+                    fos.write(Utf8Helper.getBytes("nextFrame(ctx,ctrans);\r\n"));
+                }
+
+                boolean packed = false;
+                if (Configuration.packJavaScripts.get()) {
+                    try {
+                        JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
+                        f.delete();
+                        packed = true;
+                    } catch (Exception | Error e) { // Something wrong in the packer
+                        logger.log(Level.WARNING, "JPacker: Cannot minimize script");
                         f.renameTo(fmin);
                     }
-
-                    File fh = new File(foutdir + File.separator + "frames.html");
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fh)); FileInputStream fis = new FileInputStream(fmin)) {
-                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
-                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
-                        byte[] buf = new byte[1000];
-                        int cnt;
-                        while ((cnt = fis.read(buf)) > 0) {
-                            fos.write(buf, 0, cnt);
-                        }
-                        if (packed) {
-                            fos.write(Utf8Helper.getBytes(";"));
-                        }
-                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));
-                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
-                    }
-                    fmin.delete();
-
-                    ret.add(f);
+                } else {
+                    f.renameTo(fmin);
                 }
+
+                File fh = new File(foutdir + File.separator + "frames.html");
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fh)); FileInputStream fis = new FileInputStream(fmin)) {
+                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
+                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
+                    byte[] buf = new byte[1000];
+                    int cnt;
+                    while ((cnt = fis.read(buf)) > 0) {
+                        fos.write(buf, 0, cnt);
+                    }
+                    if (packed) {
+                        fos.write(Utf8Helper.getBytes(";"));
+                    }
+                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));
+                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
+                }
+
+                fmin.delete();
+
+                ret.add(f);
             }, handler).run();
 
             if (evl != null) {
@@ -340,76 +334,61 @@ public class FrameExporter {
 
         switch (settings.mode) {
             case GIF:
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        File f = new File(foutdir + File.separator + "frames.gif");
-                        makeGIF(frameImages, swf.frameRate, f, evl);
-                        ret.add(f);
-                    }
+                new RetryTask(() -> {
+                    File f = new File(foutdir + File.separator + "frames.gif");
+                    makeGIF(frameImages, swf.frameRate, f, evl);
+                    ret.add(f);
                 }, handler).run();
                 break;
             case BMP:
                 for (int i = 0; frameImages.hasNext(); i++) {
                     final int fi = i;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
-                            BMPFile.saveBitmap(frameImages.next(), f);
-                            ret.add(f);
-                        }
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
+                        BMPFile.saveBitmap(frameImages.next(), f);
+                        ret.add(f);
                     }, handler).run();
                 }
                 break;
             case PNG:
                 for (int i = 0; frameImages.hasNext(); i++) {
                     final int fi = i;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                            ImageHelper.write(frameImages.next(), "PNG", file);
-                            ret.add(file);
-                        }
+                    new RetryTask(() -> {
+                        File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
+                        ImageHelper.write(frameImages.next(), "PNG", file);
+                        ret.add(file);
                     }, handler).run();
                 }
 
                 //ShapeExporterBase.clearCache();
                 break;
             case PDF:
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        File f = new File(foutdir + File.separator + "frames.pdf");
-                        PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
-                        PageFormat pf = new PageFormat();
-                        pf.setOrientation(PageFormat.PORTRAIT);
-                        Paper p = new Paper();
-                        BufferedImage img0 = frameImages.next();
-                        p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
-                        pf.setPaper(p);
+                new RetryTask(() -> {
+                    File f = new File(foutdir + File.separator + "frames.pdf");
+                    PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
+                    PageFormat pf = new PageFormat();
+                    pf.setOrientation(PageFormat.PORTRAIT);
+                    Paper p = new Paper();
+                    BufferedImage img0 = frameImages.next();
+                    p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
+                    pf.setPaper(p);
 
-                        for (int i = 0; frameImages.hasNext(); i++) {
-                            BufferedImage img = frameImages.next();
-                            Graphics g = job.getGraphics(pf);
-                            g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
-                            g.dispose();
-                        }
-
-                        job.end();
-                        ret.add(f);
+                    for (int i = 0; frameImages.hasNext(); i++) {
+                        BufferedImage img = frameImages.next();
+                        Graphics g = job.getGraphics(pf);
+                        g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
+                        g.dispose();
                     }
+
+                    job.end();
+                    ret.add(f);
                 }, handler).run();
                 break;
             case AVI:
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        File f = new File(foutdir + File.separator + "frames.avi");
-                        makeAVI(frameImages, swf.frameRate, f, evl);
-                        ret.add(f);
-                    }
+                new RetryTask(() -> {
+                    File f = new File(foutdir + File.separator + "frames.avi");
+                    makeAVI(frameImages, swf.frameRate, f, evl);
+                    ret.add(f);
                 }, handler).run();
                 break;
         }

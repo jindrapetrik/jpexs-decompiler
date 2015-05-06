@@ -89,18 +89,18 @@ auxiliary.show.customizer.message=<message>
             </view>
             <subprojects/>
         </general-data>
-        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
                 <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../src</classpath>
                 <built-to>build</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
                 <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;testlib/emma.jar;testlib/emma_ant.jar;testlib/testng-6.8.jar;src</classpath>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
         </java-data>
     </configuration>

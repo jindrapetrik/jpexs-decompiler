@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
@@ -90,11 +89,8 @@ public class FontExporter {
                     ext = ".woff";
                 }
                 final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + ext));
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        exportFont(st, settings.mode, file);
-                    }
+                new RetryTask(() -> {
+                    exportFont(st, settings.mode, file);
                 }, handler).run();
 
                 ret.add(file);

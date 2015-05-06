@@ -22,6 +22,7 @@ import java.util.EventListener;
  *
  * @author JPEXS
  */
+@FunctionalInterface
 public interface CollectionChangedListener<E> extends EventListener {
 
     public void collectionChanged(CollectionChangedEvent<E> e);

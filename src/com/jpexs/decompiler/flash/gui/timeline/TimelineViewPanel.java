@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
@@ -45,7 +47,7 @@ public class TimelineViewPanel extends JPanel {
         setLayout(new BorderLayout());
         timeline = new TimelinePanel();
         timeline.setTimelined(timelined);
-        add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, timeline, previewPanel = new ImagePanel()));
+        add(new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, timeline, previewPanel = new ImagePanel(), Configuration.guiTimeLineSplitPaneDividerLocationPercent));
 
         previewPanel.setTimelined(timelined, timelined.getTimeline().swf, 0);
         //previewPanel.setPreferredSize(new Dimension(400,300));

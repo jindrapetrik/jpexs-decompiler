@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -79,7 +80,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,7 +124,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public JScrollPane decompiledScrollPane;
 
-    public JSplitPane splitPane;
+    public JPersistentSplitPane splitPane;
 
     private JTable constantTable;
 
@@ -274,10 +274,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledTextArea.clearScript();
     }
 
-    public void initSplits() {
-        splitPane.setDividerLocation(Configuration.guiAvm2SplitPaneDividerLocationPercent.get(50) / 100.0);
-    }
-
     private boolean isFreeing;
 
     @Override
@@ -371,20 +367,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         panB.add(decLabel, BorderLayout.NORTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                panB, detailPanel);
-        splitPane.setResizeWeight(0.5);
+        splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
         splitPane.setContinuousLayout(true);
-
-        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
-            if (!directEditing) {
-                int width = ((JSplitPane) pce.getSource()).getWidth();
-                if (width != 0) {
-                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
-                    Configuration.guiAvm2SplitPaneDividerLocationPercent.set(p);
-                }
-            }
-        });
 
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
@@ -697,10 +681,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public boolean directEditing = false;
 
-    private int detWidth = 0;
-
-    private int detsp = 0;
-
     public void setDecompiledEditMode(boolean val) {
         if (val) {
             lastDecompiled = decompiledTextArea.getText();
@@ -712,8 +692,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             decompiledTextArea.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
             directEditing = true;
-            detWidth = detailPanel.getWidth();
-            detsp = splitPane.getDividerLocation();
             detailPanel.setVisible(false);
         } else {
             decompiledTextArea.setText(lastDecompiled);
@@ -726,11 +704,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             decLabel.setIcon(null);
             directEditing = false;
             detailPanel.setVisible(true);
-            detailPanel.setSize(detailPanel.getHeight(), detWidth);
-            splitPane.setDividerLocation(detsp);
         }
-        decompiledTextArea.ignoreCarret = directEditing;
 
+        decompiledTextArea.ignoreCarret = directEditing;
         decompiledTextArea.requestFocusInWindow();
     }
 

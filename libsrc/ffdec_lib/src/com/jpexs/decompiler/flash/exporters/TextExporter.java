@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -79,15 +78,12 @@ public class TextExporter {
 
                     final TextTag textTag = (TextTag) t;
                     final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".svg"));
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                ExportRectangle rect = new ExportRectangle(textTag.getRect());
-                                SVGExporter exporter = new SVGExporter(rect);
-                                textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
-                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
-                            }
+                    new RetryTask(() -> {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                            ExportRectangle rect = new ExportRectangle(textTag.getRect());
+                            SVGExporter exporter = new SVGExporter(rect);
+                            textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
+                            fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                     }, handler).run();
                     ret.add(file);
@@ -115,20 +111,17 @@ public class TextExporter {
                 for (final Tag t : tags) {
                     if (t instanceof TextTag) {
                         final TextTag textTag = (TextTag) t;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                fos.write(Utf8Helper.getBytes("ID: " + textTag.getCharacterId() + Helper.newLine));
-                                if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
-                                } else {
-                                    String separator = Configuration.textExportSingleFileRecordSeparator.get();
-                                    separator = Helper.newLine + separator + Helper.newLine;
-                                    List<String> texts = textTag.getTexts();
-                                    fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
-                                }
-                                fos.write(Utf8Helper.getBytes(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine));
+                        new RetryTask(() -> {
+                            fos.write(Utf8Helper.getBytes("ID: " + textTag.getCharacterId() + Helper.newLine));
+                            if (settings.mode == TextExportMode.FORMATTED) {
+                                fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
+                            } else {
+                                String separator = Configuration.textExportSingleFileRecordSeparator.get();
+                                separator = Helper.newLine + separator + Helper.newLine;
+                                List<String> texts = textTag.getTexts();
+                                fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
                             }
+                            fos.write(Utf8Helper.getBytes(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine));
                         }, handler).run();
                     }
                 }
@@ -143,18 +136,15 @@ public class TextExporter {
 
                     final TextTag textTag = (TextTag) t;
                     final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".txt"));
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
-                                } else {
-                                    String separator = Configuration.textExportSingleFileRecordSeparator.get();
-                                    separator = Helper.newLine + separator + Helper.newLine;
-                                    List<String> texts = textTag.getTexts();
-                                    fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
-                                }
+                    new RetryTask(() -> {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                            if (settings.mode == TextExportMode.FORMATTED) {
+                                fos.write(Utf8Helper.getBytes(textTag.getFormattedText().text));
+                            } else {
+                                String separator = Configuration.textExportSingleFileRecordSeparator.get();
+                                separator = Helper.newLine + separator + Helper.newLine;
+                                List<String> texts = textTag.getTexts();
+                                fos.write(Utf8Helper.getBytes(String.join(separator, texts)));
                             }
                         }
                     }, handler).run();

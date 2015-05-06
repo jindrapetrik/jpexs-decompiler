@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -86,40 +85,36 @@ public class MorphShapeExporter {
                 String ext = settings.mode == MorphShapeExportMode.CANVAS ? "html" : "svg";
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        MorphShapeTag mst = (MorphShapeTag) t;
-                        switch (settings.mode) {
-                            case SVG:
-                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                    ExportRectangle rect = new ExportRectangle(mst.getRect());
-                                    rect.xMax *= settings.zoom;
-                                    rect.yMax *= settings.zoom;
-                                    rect.xMin *= settings.zoom;
-                                    rect.yMin *= settings.zoom;
-                                    SVGExporter exporter = new SVGExporter(rect);
-                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
-                                    fos.write(Utf8Helper.getBytes(exporter.getSVG()));
-                                }
-                                break;
-                            case CANVAS:
-                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                    int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);
-                                    int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
-                                    CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
-                                    cse.export();
-                                    Set<Integer> needed = new HashSet<>();
-                                    CharacterTag ct = ((CharacterTag) mst);
-                                    needed.add(ct.getCharacterId());
-                                    ct.getNeededCharactersDeep(needed);
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    SWF.writeLibrary(ct.getSwf(), needed, baos);
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
-                                }
-                                break;
-                        }
-
+                new RetryTask(() -> {
+                    MorphShapeTag mst = (MorphShapeTag) t;
+                    switch (settings.mode) {
+                        case SVG:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                ExportRectangle rect = new ExportRectangle(mst.getRect());
+                                rect.xMax *= settings.zoom;
+                                rect.yMax *= settings.zoom;
+                                rect.xMin *= settings.zoom;
+                                rect.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect);
+                                mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                            break;
+                        case CANVAS:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);
+                                int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
+                                CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
+                                cse.export();
+                                Set<Integer> needed = new HashSet<>();
+                                CharacterTag ct = ((CharacterTag) mst);
+                                needed.add(ct.getCharacterId());
+                                ct.getNeededCharactersDeep(needed);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                SWF.writeLibrary(ct.getSwf(), needed, baos);
+                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
+                            }
+                            break;
                     }
                 }, handler).run();
                 ret.add(file);

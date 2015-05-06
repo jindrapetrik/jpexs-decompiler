@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -68,12 +67,9 @@ public class BinaryDataExporter {
                 int characterID = ((DefineBinaryDataTag) t).getCharacterId();
 
                 final File file = new File(outdir + File.separator + characterID + ".bin");
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                            fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
-                        }
+                new RetryTask(() -> {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                        fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
                     }
                 }, handler).run();
                 ret.add(file);

@@ -251,20 +251,29 @@ public class Configuration {
     @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
 
+    @ConfigurationDefaultInt(50)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
     public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocationPercent = null;
 
-    @ConfigurationName("guiActionSplitPaneDividerLocationPercent")
+    @ConfigurationDefaultInt(50)
+    @ConfigurationName("gui.actionSplitPane.dividerLocationPercent")
     public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocationPercent = null;
 
-    @ConfigurationName("guiPreviewSplitPaneDividerLocationPercent")
+    @ConfigurationDefaultInt(50)
+    @ConfigurationName("gui.previewSplitPane.dividerLocationPercent")
     public static final ConfigurationItem<Integer> guiPreviewSplitPaneDividerLocationPercent = null;
 
+    @ConfigurationDefaultInt(33)
     @ConfigurationName("gui.splitPane1.dividerLocationPercent")
     public static final ConfigurationItem<Integer> guiSplitPane1DividerLocationPercent = null;
 
+    @ConfigurationDefaultInt(60)
     @ConfigurationName("gui.splitPane2.dividerLocationPercent")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocationPercent = null;
+
+    @ConfigurationDefaultInt(50)
+    @ConfigurationName("gui.timeLineSplitPane.dividerLocationPercent")
+    public static final ConfigurationItem<Integer> guiTimeLineSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
     @ConfigurationName("gui.skin")
@@ -595,16 +604,16 @@ public class Configuration {
     }
 
     private static HashMap<String, Object> loadFromFile(String file) {
-        HashMap<String, Object> config = new HashMap<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
 
             @SuppressWarnings("unchecked")
             HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
-            config = cfg;
+            //return cfg;
         } catch (ClassNotFoundException | IOException ex) {
             // ignore
         }
-        return config;
+
+        return new HashMap<>();
     }
 
     private static void saveToFile(String file) {

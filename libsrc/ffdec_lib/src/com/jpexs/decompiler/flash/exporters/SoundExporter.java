@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
@@ -99,12 +98,9 @@ public class SoundExporter {
                 }
 
                 final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + "." + ext);
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                            exportSound(os, st, settings.mode);
-                        }
+                new RetryTask(() -> {
+                    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                        exportSound(os, st, settings.mode);
                     }
                 }, handler).run();
 

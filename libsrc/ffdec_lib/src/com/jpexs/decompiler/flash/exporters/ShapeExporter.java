@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -100,57 +99,53 @@ public class ShapeExporter {
                 }
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        ShapeTag st = (ShapeTag) t;
-                        switch (settings.mode) {
-                            case SVG:
-                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                    ExportRectangle rect = new ExportRectangle(st.getRect());
-                                    rect.xMax *= settings.zoom;
-                                    rect.yMax *= settings.zoom;
-                                    rect.xMin *= settings.zoom;
-                                    rect.yMin *= settings.zoom;
-                                    SVGExporter exporter = new SVGExporter(rect);
-                                    st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
-                                    fos.write(Utf8Helper.getBytes(exporter.getSVG()));
-                                }
-                                break;
-                            case PNG:
-                            case BMP:
-                                RECT rect = st.getRect();
-                                int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
-                                int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
-                                SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
-                                img.fillTransparent();
-                                Matrix m = new Matrix();
-                                m.translate(-rect.Xmin, -rect.Ymin);
-                                m.scale(settings.zoom);
-                                st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
-                                if (settings.mode == ShapeExportMode.PNG) {
-                                    ImageHelper.write(img.getBufferedImage(), "PNG", file);
-                                } else {
-                                    BMPFile.saveBitmap(img.getBufferedImage(), file);
-                                }
-                                break;
-                            case CANVAS:
-                                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                    SHAPE shp = st.getShapes();
-                                    int deltaX = -shp.getBounds().Xmin;
-                                    int deltaY = -shp.getBounds().Ymin;
-                                    CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
-                                    cse.export();
-                                    Set<Integer> needed = new HashSet<>();
-                                    needed.add(st.getCharacterId());
-                                    st.getNeededCharactersDeep(needed);
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    SWF.writeLibrary(st.getSwf(), needed, baos);
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
-                                }
-                                break;
-                        }
-
+                new RetryTask(() -> {
+                    ShapeTag st = (ShapeTag) t;
+                    switch (settings.mode) {
+                        case SVG:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                ExportRectangle rect = new ExportRectangle(st.getRect());
+                                rect.xMax *= settings.zoom;
+                                rect.yMax *= settings.zoom;
+                                rect.xMin *= settings.zoom;
+                                rect.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect);
+                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                            break;
+                        case PNG:
+                        case BMP:
+                            RECT rect = st.getRect();
+                            int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
+                            int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                            img.fillTransparent();
+                            Matrix m = new Matrix();
+                            m.translate(-rect.Xmin, -rect.Ymin);
+                            m.scale(settings.zoom);
+                            st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
+                            if (settings.mode == ShapeExportMode.PNG) {
+                                ImageHelper.write(img.getBufferedImage(), "PNG", file);
+                            } else {
+                                BMPFile.saveBitmap(img.getBufferedImage(), file);
+                            }
+                            break;
+                        case CANVAS:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                SHAPE shp = st.getShapes();
+                                int deltaX = -shp.getBounds().Xmin;
+                                int deltaY = -shp.getBounds().Ymin;
+                                CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
+                                cse.export();
+                                Set<Integer> needed = new HashSet<>();
+                                needed.add(st.getCharacterId());
+                                st.getNeededCharactersDeep(needed);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                SWF.writeLibrary(st.getSwf(), needed, baos);
+                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
+                            }
+                            break;
                     }
                 }, handler).run();
                 ret.add(file);
