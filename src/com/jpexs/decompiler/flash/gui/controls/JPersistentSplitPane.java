@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import javax.swing.JSplitPane;
 
@@ -33,6 +36,8 @@ public class JPersistentSplitPane extends JSplitPane {
 
     private boolean resize = false;
 
+    private ComponentListener childComponentListener;
+
     public JPersistentSplitPane(int newOrientation, ConfigurationItem<Integer> config) {
         super(newOrientation);
         initialize(config);
@@ -44,17 +49,19 @@ public class JPersistentSplitPane extends JSplitPane {
             ConfigurationItem<Integer> config) {
         super(newOrientation, newLeftComponent, newRightComponent);
         initialize(config);
+        newLeftComponent.addComponentListener(childComponentListener);
+        newRightComponent.addComponentListener(childComponentListener);
     }
 
     private double getConfigValue(ConfigurationItem<Integer> config) {
-        double pos = config.get() / 100.0;
+        int pos = config.get();
         if (pos < 0) {
             pos = 0;
-        } else if (pos > 1) {
-            pos = 1;
+        } else if (pos > 100) {
+            pos = 100;
         }
 
-        return pos;
+        return pos / 100.0;
     }
 
     private void initialize(ConfigurationItem<Integer> config) {
@@ -79,6 +86,28 @@ public class JPersistentSplitPane extends JSplitPane {
             }
         });
 
+        childComponentListener = new ComponentAdapter() {
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                double pos = getConfigValue(config);
+                setDividerLocation(pos);
+            }
+        };
+
+        addContainerListener(new ContainerListener() {
+
+            @Override
+            public void componentAdded(ContainerEvent e) {
+                e.getComponent().addComponentListener(childComponentListener);
+            }
+
+            @Override
+            public void componentRemoved(ContainerEvent e) {
+                e.getComponent().removeComponentListener(childComponentListener);
+            }
+        });
+
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
             if (resize) {
                 resize = false;
@@ -87,9 +116,10 @@ public class JPersistentSplitPane extends JSplitPane {
 
             if (getLeftComponent().isVisible() && getRightComponent().isVisible()) {
                 JPersistentSplitPane pane = (JPersistentSplitPane) pce.getSource();
-                int width = pane.getWidth() - pane.getDividerSize();
-                if (width != 0) {
-                    int p = Math.round(100.0f * (Integer) pce.getNewValue() / width);
+                int size = (getOrientation() == JSplitPane.HORIZONTAL_SPLIT
+                        ? pane.getWidth() : pane.getHeight()) - pane.getDividerSize();
+                if (size != 0) {
+                    int p = Math.round(100.0f * (Integer) pce.getNewValue() / size);
                     config.set(p);
                 }
             }
