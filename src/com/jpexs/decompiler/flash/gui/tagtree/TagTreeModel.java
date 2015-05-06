@@ -430,13 +430,14 @@ public class TagTreeModel implements TreeModel {
                     return newPath;
                 }
             } else {
-                TreeItem n2 = n;
-                if (n2 instanceof TagScript) {
-                    n2 = ((TagScript) n2).getTag();
+                if (obj.equals(n)) {
+                    return newPath;
                 }
 
-                if (obj.equals(n2)) {
-                    return newPath;
+                if (n instanceof TagScript) {
+                    if (obj.equals(((TagScript) n).getTag())) {
+                        return newPath;
+                    }
                 }
             }
 
@@ -457,6 +458,7 @@ public class TagTreeModel implements TreeModel {
         if (path == null) {
             return null;
         }
+
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         return tp;
     }
