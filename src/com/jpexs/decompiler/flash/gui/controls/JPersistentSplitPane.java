@@ -29,6 +29,10 @@ import javax.swing.JSplitPane;
  */
 public class JPersistentSplitPane extends JSplitPane {
 
+    private ConfigurationItem<Integer> config;
+
+    private boolean resize = false;
+
     public JPersistentSplitPane(int newOrientation, ConfigurationItem<Integer> config) {
         super(newOrientation);
         initialize(config);
@@ -54,25 +58,32 @@ public class JPersistentSplitPane extends JSplitPane {
     }
 
     private void initialize(ConfigurationItem<Integer> config) {
+        this.config = config;
         double pos = getConfigValue(config);
         setDividerLocation(pos);
-        setResizeWeight(0);
+        setResizeWeight(pos);
 
         addComponentListener(new ComponentAdapter() {
 
             @Override
             public void componentResized(ComponentEvent e) {
+                resize = true;
                 double pos = getConfigValue(config);
                 setDividerLocation(pos);
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
-                componentResized(e);
+                double pos = getConfigValue(config);
+                setDividerLocation(pos);
             }
         });
 
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            if (resize) {
+                return;
+            }
+
             if (getLeftComponent().isVisible() && getRightComponent().isVisible()) {
                 JPersistentSplitPane pane = (JPersistentSplitPane) pce.getSource();
                 int width = pane.getWidth() - pane.getDividerSize();

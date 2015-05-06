@@ -1260,10 +1260,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (documentClass != null && !Configuration.dumpView.get()) {
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
-                showDetail(DETAILCARDAS3NAVIGATOR);
-                showCard(CARDACTIONSCRIPT3PANEL);
                 getABCPanel().setAbc(abcList.get(0).getABC());
                 getABCPanel().hilightScript(swf, documentClass);
+                showDetail(DETAILCARDAS3NAVIGATOR);
+                showCard(CARDACTIONSCRIPT3PANEL);
             }
         }
     }
@@ -2632,14 +2632,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         boolean internalViewer = isInternalFlashViewerSelected();
 
         if (treeItem instanceof HeaderItem) {
-            showCard(CARDHEADER);
             headerPanel.load(((HeaderItem) treeItem).getSwf());
+            showCard(CARDHEADER);
         } else if (treeItem instanceof FolderItem) {
-            showCard(CARDFOLDERPREVIEWPANEL);
             showFolderPreview(treeItem);
+            showCard(CARDFOLDERPREVIEWPANEL);
         } else if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
-            showCard(CARDPREVIEWPANEL);
             if (internalViewer) {
                 previewPanel.showImagePanel(swf, swf, -1);
             } else {
@@ -2649,25 +2648,26 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     previewPanel.showSwf(swf);
                 }
             }
+
+            showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
-            showCard(CARDPREVIEWPANEL);
             previewPanel.showMetaDataPanel(metadataTag);
+            showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
-            showCard(CARDPREVIEWPANEL);
             previewPanel.showBinaryPanel(binaryTag);
+            showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {
-            showCard(CARDACTIONSCRIPTPANEL);
             getActionPanel().setSource((ASMSource) treeItem, !forceReload);
+            showCard(CARDACTIONSCRIPTPANEL);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
             previewPanel.setImageReplaceButtonVisible(imageTag.importSupported());
-            showCard(CARDPREVIEWPANEL);
             previewPanel.showImagePanel(imageTag.getImage());
+            showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
-            showCard(CARDPREVIEWPANEL);
             DrawableTag d = (DrawableTag) tag;
             Timelined timelined;
             if (treeItem instanceof Timelined && !(treeItem instanceof ButtonTag)) {
@@ -2678,16 +2678,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             previewPanel.setParametersPanelVisible(false);
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1);
+            showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof FontTag) && internalViewer) {
             FontTag fontTag = (FontTag) treeItem;
-            showCard(CARDPREVIEWPANEL);
             showFontTag(fontTag);
+            showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof TextTag) && internalViewer) {
             TextTag textTag = (TextTag) treeItem;
-            showCard(CARDPREVIEWPANEL);
             showTextTag(textTag);
-        } else if (treeItem instanceof Frame && internalViewer) {
             showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
             List<Tag> controlTags = swf.tags;
@@ -2703,9 +2703,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 totalFrameCount = parentSprite.frameCount;
                 timelined = parentSprite;
             }
+
             previewPanel.showImagePanel(timelined, swf, fn.frame);
-        } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDPREVIEWPANEL);
+        } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag);
             try {
@@ -2714,8 +2715,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-        } else if ((treeItem instanceof Frame) || ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag)) && (treeItem instanceof Tag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
+
             showCard(CARDPREVIEWPANEL);
+        } else if ((treeItem instanceof Frame) || ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag)) && (treeItem instanceof Tag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
             previewPanel.createAndShowTempSwf(treeItem);
 
             if (treeItem instanceof TextTag) {
@@ -2725,6 +2727,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 previewPanel.setParametersPanelVisible(false);
             }
+
+            showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);
         } else {
@@ -2738,9 +2742,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void showGenericTag(Tag tag) {
-
-        showCard(CARDPREVIEWPANEL);
         previewPanel.showGenericTagPanel(tag);
+        showCard(CARDPREVIEWPANEL);
     }
 
     private void showFontTag(FontTag ft) {

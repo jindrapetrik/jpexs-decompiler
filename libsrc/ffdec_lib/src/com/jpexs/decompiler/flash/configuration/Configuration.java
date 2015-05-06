@@ -608,7 +608,7 @@ public class Configuration {
 
             @SuppressWarnings("unchecked")
             HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
-            return cfg;
+            //return cfg;
         } catch (ClassNotFoundException | IOException ex) {
             // ignore
         }
