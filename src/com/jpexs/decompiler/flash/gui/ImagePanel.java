@@ -464,7 +464,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             counter++;
         }
 
-        if (timer == null) {
+        if (timer == null && timelined != null) {
             startTimer(counter, timelined.getTimeline(), false);
         }
     }
