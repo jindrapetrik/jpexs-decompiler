@@ -81,6 +81,7 @@ public class JPersistentSplitPane extends JSplitPane {
 
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
             if (resize) {
+                resize = false;
                 return;
             }
 
