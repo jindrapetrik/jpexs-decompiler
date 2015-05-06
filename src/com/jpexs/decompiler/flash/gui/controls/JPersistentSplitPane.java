@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.gui.controls;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Component;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import javax.swing.JSplitPane;
 
@@ -40,14 +42,42 @@ public class JPersistentSplitPane extends JSplitPane {
         initialize(config);
     }
 
+    private double getConfigValue(ConfigurationItem<Integer> config) {
+        double pos = config.get() / 100.0;
+        if (pos < 0) {
+            pos = 0;
+        } else if (pos > 1) {
+            pos = 1;
+        }
+
+        return pos;
+    }
+
     private void initialize(ConfigurationItem<Integer> config) {
-        setResizeWeight(0.5);
+        double pos = getConfigValue(config);
+        setDividerLocation(pos);
+        setResizeWeight(0);
+
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                double pos = getConfigValue(config);
+                setDividerLocation(pos);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                componentResized(e);
+            }
+        });
 
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
             if (getLeftComponent().isVisible() && getRightComponent().isVisible()) {
-                int width = ((JSplitPane) pce.getSource()).getWidth();
+                JPersistentSplitPane pane = (JPersistentSplitPane) pce.getSource();
+                int width = pane.getWidth() - pane.getDividerSize();
                 if (width != 0) {
-                    int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
+                    int p = Math.round(100.0f * (Integer) pce.getNewValue() / width);
                     config.set(p);
                 }
             }

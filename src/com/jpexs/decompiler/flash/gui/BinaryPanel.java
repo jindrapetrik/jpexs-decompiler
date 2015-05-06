@@ -22,8 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
@@ -36,7 +34,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public final class BinaryPanel extends JPanel implements ComponentListener {
+public final class BinaryPanel extends JPanel {
 
     public HexView hexEditor = new HexView();
 
@@ -58,7 +56,15 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
-        addComponentListener(this);
+
+        // todo: honfika: dynamically resize the hex data
+        /*addComponentListener(new ComponentAdapter() {
+
+         @Override
+         public void componentResized(ComponentEvent e) {
+         setBinaryData(binaryDataTag);
+         }
+         });*/
         swfInsidePanel = new JPanel();
         swfInsidePanel.setBackground(new Color(253, 205, 137));
         swfInsidePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -88,24 +94,8 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
             hexEditor.setData(new byte[0], null, null);
             swfInsidePanel.setVisible(false);
         }
+
         hexEditor.revalidate();
         hexEditor.repaint();
-    }
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-        setBinaryData(binaryDataTag);
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent ce) {
-    }
-
-    @Override
-    public void componentShown(ComponentEvent ce) {
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent ce) {
     }
 }
