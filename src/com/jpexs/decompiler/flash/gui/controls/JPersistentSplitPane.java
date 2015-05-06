@@ -18,12 +18,14 @@ package com.jpexs.decompiler.flash.gui.controls;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
+import java.util.Date;
 import javax.swing.JSplitPane;
 
 /**
@@ -32,13 +34,15 @@ import javax.swing.JSplitPane;
  */
 public class JPersistentSplitPane extends JSplitPane {
 
-    private ConfigurationItem<Integer> config;
+    private ConfigurationItem<Double> config;
 
-    private boolean resize = false;
+    private boolean painted = false;
+
+    private Date resize = new Date();
 
     private ComponentListener childComponentListener;
 
-    public JPersistentSplitPane(int newOrientation, ConfigurationItem<Integer> config) {
+    public JPersistentSplitPane(int newOrientation, ConfigurationItem<Double> config) {
         super(newOrientation);
         initialize(config);
     }
@@ -46,27 +50,28 @@ public class JPersistentSplitPane extends JSplitPane {
     public JPersistentSplitPane(int newOrientation,
             Component newLeftComponent,
             Component newRightComponent,
-            ConfigurationItem<Integer> config) {
+            ConfigurationItem<Double> config) {
         super(newOrientation, newLeftComponent, newRightComponent);
         initialize(config);
         newLeftComponent.addComponentListener(childComponentListener);
         newRightComponent.addComponentListener(childComponentListener);
     }
 
-    private double getConfigValue(ConfigurationItem<Integer> config) {
-        int pos = config.get();
+    private double getConfigValue(ConfigurationItem<Double> config) {
+        double pos = config.get();
         if (pos < 0) {
             pos = 0;
-        } else if (pos > 100) {
-            pos = 100;
+        } else if (pos > 1) {
+            pos = 1;
         }
 
-        return pos / 100.0;
+        return pos;
     }
 
-    private void initialize(ConfigurationItem<Integer> config) {
+    private void initialize(ConfigurationItem<Double> config) {
         this.config = config;
         double pos = getConfigValue(config);
+        //System.out.println("init " + config.getName() + ": " + pos);
         setDividerLocation(pos);
         setResizeWeight(pos);
 
@@ -74,15 +79,19 @@ public class JPersistentSplitPane extends JSplitPane {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                resize = true;
+                resize = new Date();
                 double pos = getConfigValue(config);
+                //System.out.println("resized " + config.getName() + ": " + pos);
                 setDividerLocation(pos);
+                setResizeWeight(pos);
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
                 double pos = getConfigValue(config);
+                //System.out.println("shown " + config.getName() + ": " + pos);
                 setDividerLocation(pos);
+                setResizeWeight(pos);
             }
         });
 
@@ -91,7 +100,9 @@ public class JPersistentSplitPane extends JSplitPane {
             @Override
             public void componentShown(ComponentEvent e) {
                 double pos = getConfigValue(config);
+                //System.out.println("childShown " + config.getName() + ": " + pos);
                 setDividerLocation(pos);
+                setResizeWeight(pos);
             }
         };
 
@@ -99,30 +110,44 @@ public class JPersistentSplitPane extends JSplitPane {
 
             @Override
             public void componentAdded(ContainerEvent e) {
-                e.getComponent().addComponentListener(childComponentListener);
+                e.getChild().addComponentListener(childComponentListener);
             }
 
             @Override
             public void componentRemoved(ContainerEvent e) {
-                e.getComponent().removeComponentListener(childComponentListener);
+                e.getChild().removeComponentListener(childComponentListener);
             }
         });
 
         addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
-            if (resize) {
-                resize = false;
+            if (!painted) {
+                return;
+            }
+
+            // hack
+            long diff = new Date().getTime() - resize.getTime();
+            if (diff >= 0 && diff < 100) {
+                resize = new Date(0);
                 return;
             }
 
             if (getLeftComponent().isVisible() && getRightComponent().isVisible()) {
                 JPersistentSplitPane pane = (JPersistentSplitPane) pce.getSource();
-                int size = (getOrientation() == JSplitPane.HORIZONTAL_SPLIT
+                double size = (getOrientation() == JSplitPane.HORIZONTAL_SPLIT
                         ? pane.getWidth() : pane.getHeight()) - pane.getDividerSize();
                 if (size != 0) {
-                    int p = Math.round(100.0f * (Integer) pce.getNewValue() / size);
+                    double p = (Integer) pce.getNewValue() / size;
+                    setResizeWeight(p);
+                    //System.out.println("set " + config.getName() + ": " + p);
                     config.set(p);
                 }
             }
         });
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        painted = true;
     }
 }
