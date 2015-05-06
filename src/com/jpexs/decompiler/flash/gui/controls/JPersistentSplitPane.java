@@ -48,7 +48,6 @@ public class JPersistentSplitPane extends JSplitPane {
                 int width = ((JSplitPane) pce.getSource()).getWidth();
                 if (width != 0) {
                     int p = Math.round((100.0f * (Integer) pce.getNewValue() / width));
-                    System.out.println(config.getName() + ": " + p);
                     config.set(p);
                 }
             }
