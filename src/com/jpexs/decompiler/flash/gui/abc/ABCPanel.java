@@ -224,6 +224,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void setAbc(ABC abc) {
         this.abc = abc;
+        navigator.setAbc(abc);
         updateConstList();
     }
 

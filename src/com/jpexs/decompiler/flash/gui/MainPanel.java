@@ -1314,10 +1314,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                                 if (getABCPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
-                                    View.execInEventDispatch(() -> {
-                                        showDetail(DETAILCARDAS3NAVIGATOR);
-                                        showCard(CARDACTIONSCRIPT3PANEL);
-                                    });
                                 }
                             } else {
                                 // todo: honfika: do not call this from background thread
@@ -1327,9 +1323,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                                 if (getActionPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                     found = true;
-                                    View.execInEventDispatch(() -> {
-                                        showCard(CARDACTIONSCRIPTPANEL);
-                                    });
                                 }
                             }
                         } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
@@ -2583,11 +2576,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.clear();
-                        getABCPanel().navigator.setAbc(scriptLeaf.abc);
-                        getABCPanel().setAbc(scriptLeaf.abc);
-                        getABCPanel().decompiledTextArea.setScript(scriptLeaf);
-                        getABCPanel().decompiledTextArea.setNoTrait();
+                        ABCPanel abcPanel = getABCPanel();
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
+                        abcPanel.setAbc(scriptLeaf.abc);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf);
+                        abcPanel.decompiledTextArea.setNoTrait();
                         return null;
                     }
 
