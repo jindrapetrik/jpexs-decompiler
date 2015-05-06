@@ -40,6 +40,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
@@ -54,6 +55,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -90,7 +92,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     }
 
     private DefaultTableModel getModel() {
-        return new javax.swing.table.DefaultTableModel(
+        return new DefaultTableModel(
                 new Object[][]{},
                 new String[]{
                     translate("advancedSettings.columns.name"),
@@ -144,10 +146,10 @@ public class AdvancedSettingsDialog extends AppDialog {
         cancelButton = new JButton();
         resetButton = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(translate("advancedSettings.dialog.title"));
         setModal(true);
-        setPreferredSize(new java.awt.Dimension(800, 500));
+        setPreferredSize(new Dimension(800, 500));
 
         okButton.setText(AppStrings.translate("button.ok"));
         okButton.addActionListener(this::okButtonActionPerformed);
@@ -176,25 +178,7 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
 
-        Map<String, Field> fields = Configuration.getConfigurationFields();
-        String[] keys = new String[fields.size()];
-        keys = fields.keySet().toArray(keys);
-        Arrays.sort(keys);
-
-        Map<String, Map<String, Field>> categorized = new HashMap<>();
-
-        for (String name : keys) {
-            Field field = fields.get(name);
-            ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
-            String scat = cat == null ? "other" : cat.value();
-            if (!categorized.containsKey(scat)) {
-                categorized.put(scat, new HashMap<>());
-            }
-            categorized.get(scat).put(name, field);
-        }
-
         JTabbedPane tabPane = new JTabbedPane();
-        Map<String, Component> tabs = new HashMap<>();
 
         JComboBox<SkinSelect> skinComboBox = new JComboBox<>();
         skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer() {
@@ -254,21 +238,57 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
         }
 
+        Map<String, Component> tabs = new HashMap<>();
+        getCategories(componentsMap, tabs, skinComboBox, getResourceBundle());
+
+        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "limit", "update", "debug", "other"};
+
+        for (String cat : catOrder) {
+            if (!tabs.containsKey(cat)) {
+                continue;
+            }
+
+            tabPane.add(translate("config.group.name." + cat), tabs.get(cat));
+            tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
+        }
+
+        cnt.add(tabPane, BorderLayout.CENTER);
+        pack();
+    }
+
+    public static void getCategories(Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
+        Map<String, Map<String, Field>> categorized = new HashMap<>();
+
+        Map<String, Field> fields = Configuration.getConfigurationFields();
+        String[] keys = new String[fields.size()];
+        keys = fields.keySet().toArray(keys);
+        Arrays.sort(keys);
+
+        for (String name : keys) {
+            Field field = fields.get(name);
+            ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
+            String scat = cat == null ? "other" : cat.value();
+            if (!categorized.containsKey(scat)) {
+                categorized.put(scat, new HashMap<>());
+            }
+
+            categorized.get(scat).put(name, field);
+        }
+
         for (String cat : categorized.keySet()) {
             JPanel configPanel = new JPanel(new SpringLayout());
             for (String name : categorized.get(cat).keySet()) {
                 Field field = categorized.get(cat).get(name);
 
-                String locName = translate("config.name." + name);
+                String locName = resourceBundle.getString("config.name." + name);
 
                 try {
-
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
 
                     ParameterizedType listType = (ParameterizedType) field.getGenericType();
                     Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
 
-                    String description = translate("config.description." + name);
+                    String description = resourceBundle.getString("config.description." + name);
 
                     Object defaultValue = Configuration.getDefaultValue(field);
                     if (name.equals("gui.skin")) {
@@ -279,10 +299,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                         } catch (ClassNotFoundException | NoSuchFieldException | SecurityException ex) {
                             Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                         }
-
                     }
+
                     if (defaultValue != null) {
-                        description += " (" + translate("default") + ": " + defaultValue + ")";
+                        description += " (" + resourceBundle.getString("default") + ": " + defaultValue + ")";
                     }
 
                     JLabel l = new JLabel(locName, JLabel.TRAILING);
@@ -334,34 +354,22 @@ public class AdvancedSettingsDialog extends AppDialog {
                     } else {
                         throw new UnsupportedOperationException("Configuration ttem type '" + itemType.getName() + "' is not supported");
                     }
+
                     componentsMap.put(name, c);
                     l.setLabelFor(c);
                     configPanel.add(c);
-
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());
                 }
             }
+
             SpringUtilities.makeCompactGrid(configPanel,
                     categorized.get(cat).size(), 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
             tabs.put(cat, new JScrollPane(configPanel));
         }
-
-        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "limit", "update", "debug", "other"};
-
-        for (String cat : catOrder) {
-            if (!tabs.containsKey(cat)) {
-                continue;
-            }
-            tabPane.add(translate("config.group.name." + cat), tabs.get(cat));
-            tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
-        }
-
-        cnt.add(tabPane, BorderLayout.CENTER);
-        pack();
     }
 
     private void showRestartConfirmDialod() {

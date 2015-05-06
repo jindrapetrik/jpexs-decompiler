@@ -156,18 +156,21 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         snapshotButton = new JButton(View.getIcon("snapshot16"));
         snapshotButton.addActionListener(this::snapShotButtonActionPerformed);
         snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
+        snapshotButton.setVisible(false);
 
         zoomPanel = new JPanel(new FlowLayout());
-        //updateZoom();
         zoomPanel.add(percentLabel);
         zoomPanel.add(zoomInButton);
         zoomPanel.add(zoomOutButton);
         zoomPanel.add(zoomNoneButton);
         zoomPanel.add(zoomFitButton);
         zoomPanel.add(selectColorButton);
+        zoomPanel.setVisible(false);
+
         graphicButtonsPanel.add(zoomPanel);
         graphicButtonsPanel.add(snapshotButton);
         graphicControls.add(graphicButtonsPanel, BorderLayout.EAST);
+        graphicControls.setVisible(false);
 
         add(graphicControls);
         graphicControls.setVisible(display.screenAvailable());
@@ -186,7 +189,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
         });
 
-        frameLabel.setVisible(display.screenAvailable());
+        frameLabel.setVisible(false);
 
         Dimension min = new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"), frameLabel.getPreferredSize().height);
         frameLabel.setMinimumSize(min);
@@ -216,8 +219,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         timeLabel = new JLabel("(00:00.00)");
         totalTimeLabel = new JLabel("(00:00.00)");
         totalFrameLabel = new JLabel("0");
-
-        totalFrameLabel.setVisible(display.screenAvailable());
+        totalFrameLabel.setVisible(false);
 
         frameControls = new JPanel(new FlowLayout());
 
@@ -241,6 +243,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         gotoFrameButton.setMargin(new Insets(4, 2, 2, 2));
         gotoFrameButton.addActionListener(this::gotoFrameButtonActionPerformed);
         frameControls.add(gotoFrameButton);
+        frameControls.setVisible(false);
 
         JPanel currentPanel = new JPanel(new FlowLayout());
         currentPanel.add(frameControls);
