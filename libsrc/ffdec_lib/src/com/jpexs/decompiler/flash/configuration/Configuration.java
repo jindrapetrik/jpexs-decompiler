@@ -30,6 +30,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -684,6 +685,12 @@ public class Configuration {
                 Object value = null;
                 if (config.containsKey(name)) {
                     value = config.get(name);
+
+                    Class<?> type = (Class<?>) (((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0]);
+                    if (value != null && !type.isAssignableFrom(value.getClass())) {
+                        System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
+                        value = null;
+                    }
                 }
 
                 if (value != null) {
