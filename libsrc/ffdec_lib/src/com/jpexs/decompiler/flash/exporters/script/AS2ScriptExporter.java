@@ -122,7 +122,7 @@ public class AS2ScriptExporter {
                     Path.createDirectorySafe(new File(outdir));
                 }
 
-                String f = outdir + name + exportSettings.getFileExtension();
+                String f = Path.combine(outdir, name) + exportSettings.getFileExtension();
                 if (evl != null) {
                     evl.handleExportingEvent("script", currentIndex, count, f);
                 }
