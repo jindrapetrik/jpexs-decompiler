@@ -594,11 +594,13 @@ public abstract class Action implements GraphSourceItem {
         writer.appendNoHilight(Helper.constants).newLine();
         for (Action a : list) {
             if (a instanceof ActionConstantPool) {
+                if (poolIdx > 0) {
+                    writer.appendNoHilight("---").newLine();
+                }
+
                 ActionConstantPool cPool = (ActionConstantPool) a;
                 int constIdx = 0;
                 for (String c : cPool.constantPool) {
-                    writer.appendNoHilight(poolIdx);
-                    writer.appendNoHilight("|");
                     writer.appendNoHilight(constIdx);
                     writer.appendNoHilight("|");
                     writer.appendNoHilight(c);

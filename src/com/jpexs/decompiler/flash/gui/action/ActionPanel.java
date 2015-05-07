@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -773,7 +774,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             if (trimmed.startsWith(Helper.hexData)) {
                 src.setActionBytes(Helper.getBytesFromHexaText(text));
             } else if (trimmed.startsWith(Helper.constants)) {
-                throw new Error("Saving constants is not supported, yet.");
+                setConstantPools(Helper.getConstantPoolsFromText(text));
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
@@ -793,6 +794,29 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             editor.gotoLine((int) ex.line);
             editor.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void setConstantPools(List<List<String>> constantPools) {
+        try {
+            ActionList actions = src.getActions();
+            int poolIdx = 0;
+            for (Action action : actions) {
+                if (action instanceof ActionConstantPool) {
+                    ActionConstantPool cPool = (ActionConstantPool) action;
+                    List<String> constantPool = constantPools.get(poolIdx);
+                    cPool.constantPool = constantPool;
+
+                    poolIdx++;
+                    if (constantPools.size() <= poolIdx) {
+                        break;
+                    }
+                }
+            }
+
+            src.setActions(actions);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

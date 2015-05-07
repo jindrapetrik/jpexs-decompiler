@@ -848,6 +848,28 @@ public class Helper {
         return data;
     }
 
+    public static List<List<String>> getConstantPoolsFromText(String text) {
+        Scanner scanner = new Scanner(text);
+        scanner.nextLine(); // ignore first line
+        List<List<String>> result = new ArrayList<>();
+        List<String> cPool = new ArrayList<>();
+        result.add(cPool);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (line.startsWith("---")) {
+                cPool = new ArrayList<>();
+                result.add(cPool);
+            }
+
+            String[] parts = line.split("\\|", 2);
+            if (parts.length >= 2) {
+                cPool.add(parts[1]);
+            }
+        }
+
+        return result;
+    }
+
     public static boolean contains(int[] array, int value) {
         if (array == null) {
             return false;
