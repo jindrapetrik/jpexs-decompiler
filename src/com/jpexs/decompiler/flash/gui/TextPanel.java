@@ -87,8 +87,6 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     private TextTag textTag;
 
-    private boolean modified = false;
-
     public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
 
@@ -190,13 +188,21 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         this.textTag = textTag;
         textValue.setText(textTag.getFormattedText().text);
         textValue.setCaretPosition(0);
-        modified = false;
+        setModified(false);
         setEditText(false);
+    }
+
+    private boolean isModified() {
+        return textSaveButton.isVisible() && textSaveButton.isEnabled();
+    }
+
+    private void setModified(boolean value) {
+        textSaveButton.setEnabled(value);
     }
 
     public void focusTextValue() {
         textValue.requestFocusInWindow();
-        if (!modified) {
+        if (!isModified()) {
             HighlightedText text = textTag.getFormattedText();
             for (Highlighting highlight : text.specialHilights) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
@@ -274,16 +280,6 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     public void closeTag() {
-        if (modified && Configuration.autoSaveTagModifications.get()) {
-            try {
-                saveText(false);
-                updateButtonsVisibility();
-            } catch (Exception ex) {
-                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, "Cannot auto-save text tag.", ex);
-            }
-        }
-
-        modified = false;
         textTag = null;
     }
 
@@ -297,7 +293,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         boolean editorMode = Configuration.editorMode.get();
         textEditButton.setVisible(!edit);
         textSaveButton.setVisible(edit);
-        textSaveButton.setEnabled(modified);
+        boolean modified = isModified();
         textCancelButton.setVisible(edit);
         textCancelButton.setEnabled(modified || !editorMode);
         changeCaseButton.setEnabled(!modified);
@@ -337,7 +333,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     private void saveText(boolean refresh) {
         if (mainPanel.saveText(textTag, textValue.getText(), null)) {
             setEditText(false);
-            modified = false;
+            setModified(false);
             textTag.getSwf().clearImageCache();
             if (refresh) {
                 mainPanel.repaintTree();
@@ -373,7 +369,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void textChanged() {
-        modified = true;
+        setModified(true);
         updateButtonsVisibility();
 
         showTextComparingPreview();
@@ -410,8 +406,16 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     @Override
     public boolean tryAutoSave() {
-        closeTag();
-        return true;
+        if (isModified() && Configuration.autoSaveTagModifications.get()) {
+            try {
+                saveText(false);
+                updateButtonsVisibility();
+            } catch (Exception ex) {
+                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, "Cannot auto-save text tag.", ex);
+            }
+        }
+
+        return !isModified();
     }
 
     @Override

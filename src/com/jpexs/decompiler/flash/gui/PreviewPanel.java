@@ -401,10 +401,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return metadataCard;
     }
 
-    private boolean metadataModified = false;
+    private boolean isMetadataModified() {
+        return metadataSaveButton.isVisible() && metadataSaveButton.isEnabled();
+    }
+
+    private void setMetadataModified(boolean value) {
+        metadataSaveButton.setEnabled(value);
+    }
 
     private void metadataTextChanged() {
-        metadataModified = true;
+        setMetadataModified(true);
         updateMetadataButtonsVisibility();
     }
 
@@ -413,7 +419,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         boolean editorMode = Configuration.editorMode.get();
         metadataEditButton.setVisible(!edit);
         metadataSaveButton.setVisible(edit);
-        metadataSaveButton.setEnabled(metadataModified);
+        boolean metadataModified = isMetadataModified();
         metadataCancelButton.setVisible(edit);
         metadataCancelButton.setEnabled(metadataModified || !editorMode);
     }
@@ -565,7 +571,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         this.metadataTag = metadataTag;
         metadataEditor.setEditable(Configuration.editorMode.get());
         metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
-        metadataModified = false;
+        setMetadataModified(false);
         updateMetadataButtonsVisibility();
         parametersPanel.setVisible(false);
     }
@@ -1103,7 +1109,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
         metadataTag.setModified(true);
         metadataEditor.setEditable(Configuration.editorMode.get());
-        metadataModified = false;
+        setMetadataModified(false);
         updateMetadataButtonsVisibility();
         mainPanel.repaintTree();
     }
@@ -1112,7 +1118,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         metadataEditor.setEditable(false);
         metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
         metadataEditor.setEditable(Configuration.editorMode.get());
-        metadataModified = false;
+        setMetadataModified(false);
         updateMetadataButtonsVisibility();
     }
 
