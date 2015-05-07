@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
+import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
@@ -42,7 +43,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class DetailPanel extends JPanel {
+public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public MethodTraitDetailPanel methodTraitPanel;
 
@@ -69,8 +70,6 @@ public class DetailPanel extends JPanel {
     private String selectedCard;
 
     private final JLabel selectedLabel;
-
-    private boolean editMode = false;
 
     private final JPanel buttonsPanel;
 
@@ -111,6 +110,8 @@ public class DetailPanel extends JPanel {
         saveButton.addActionListener(this::saveButtonActionPerformed);
         editButton.addActionListener(this::editButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
+        saveButton.setVisible(false);
+        cancelButton.setVisible(false);
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
         buttonsPanel.add(editButton);
         buttonsPanel.add(saveButton);
@@ -140,7 +141,6 @@ public class DetailPanel extends JPanel {
         saveButton.setVisible(val);
         editButton.setVisible(!val);
         cancelButton.setVisible(val);
-        editMode = val;
         if (val) {
             selectedLabel.setIcon(View.getIcon("editing16"));
         } else {
@@ -213,5 +213,16 @@ public class DetailPanel extends JPanel {
                 worker.execute();
             }
         }
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        // todo: implement
+        return false;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return saveButton.isVisible() && saveButton.isEnabled();
     }
 }

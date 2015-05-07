@@ -37,7 +37,7 @@ import layout.TableLayout;
  *
  * @author JPEXS
  */
-public class HeaderInfoPanel extends JPanel {
+public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private final JLabel signatureLabel = new JLabel();
 
@@ -229,10 +229,11 @@ public class HeaderInfoPanel extends JPanel {
     }
 
     private String fmtDouble(double d) {
-        String r = "" + d;
+        String r = Double.toString(d);
         if (r.endsWith(".0")) {
             r = r.substring(0, r.length() - 2);
         }
+
         return r;
     }
 
@@ -251,5 +252,16 @@ public class HeaderInfoPanel extends JPanel {
         editButton.setVisible(!edit);
         saveButton.setVisible(edit);
         cancelButton.setVisible(edit);
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        // todo: implement
+        return false;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return saveButton.isVisible();
     }
 }

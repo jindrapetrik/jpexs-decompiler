@@ -46,13 +46,12 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
  * @author JPEXS
  */
-public class TextPanel extends JPanel {
+public class TextPanel extends JPanel implements TagEditorPanel {
 
     private final MainPanel mainPanel;
 
@@ -93,7 +92,6 @@ public class TextPanel extends JPanel {
     public TextPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
 
-        DefaultSyntaxKit.initKit();
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);
         textSearchPanel.setAlignmentX(0);
@@ -156,7 +154,7 @@ public class TextPanel extends JPanel {
         textEditButton = createButton("button.edit", "edit16", null, e -> editText());
         textSaveButton = createButton("button.save", "save16", null, e -> saveText(true));
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
-        
+
         // hide the buttonts to aviod panel resize problems on other views
         textEditButton.setVisible(false);
         textSaveButton.setVisible(false);
@@ -279,6 +277,7 @@ public class TextPanel extends JPanel {
         if (modified && Configuration.autoSaveTagModifications.get()) {
             try {
                 saveText(false);
+                updateButtonsVisibility();
             } catch (Exception ex) {
                 Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, "Cannot auto-save text tag.", ex);
             }
@@ -407,5 +406,16 @@ public class TextPanel extends JPanel {
                 mainPanel.showTextTagWithNewValue(textTag, null);
             }
         }
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        closeTag();
+        return true;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return textSaveButton.isVisible() && textSaveButton.isEnabled();
     }
 }

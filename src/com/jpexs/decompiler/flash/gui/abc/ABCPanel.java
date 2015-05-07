@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
+import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
@@ -105,12 +106,11 @@ import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
-public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, Freed {
+public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, Freed, TagEditorPanel {
 
     private MainPanel mainPanel;
 
@@ -154,7 +154,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
-    private static List<Long> modifiedPacks = new ArrayList<>();
+    public String lastDecompiled = null;
 
     public MainPanel getMainPanel() {
         return mainPanel;
@@ -289,8 +289,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public ABCPanel(MainPanel mainPanel) {
-
-        DefaultSyntaxKit.initKit();
 
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
@@ -678,9 +676,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     }
 
-    public String lastDecompiled = null;
-
-    public boolean directEditing = false;
+    public boolean isDirectEditing() {
+        return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
+    }
 
     public void setDecompiledEditMode(boolean val) {
         if (val) {
@@ -692,7 +690,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             cancelDecompiledButton.setVisible(true);
             decompiledTextArea.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
-            directEditing = true;
             detailPanel.setVisible(false);
         } else {
             decompiledTextArea.setText(lastDecompiled);
@@ -703,11 +700,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             cancelDecompiledButton.setVisible(false);
             decompiledTextArea.getCaret().setVisible(true);
             decLabel.setIcon(null);
-            directEditing = false;
             detailPanel.setVisible(true);
         }
 
-        decompiledTextArea.ignoreCarret = directEditing;
+        decompiledTextArea.ignoreCarret = val;
         decompiledTextArea.requestFocusInWindow();
     }
 
@@ -874,5 +870,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             reload();
             decompiledTextArea.gotoTrait(traitId);
         }
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        // todo: implement
+        return false;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return detailPanel.isEditing()
+                || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }
 }

@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
+import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
@@ -83,13 +84,12 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 
-public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult> {
+public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult>, TagEditorPanel {
 
     private MainPanel mainPanel;
 
@@ -479,7 +479,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public ActionPanel(MainPanel mainPanel) {
-        DefaultSyntaxKit.initKit();
         this.mainPanel = mainPanel;
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
@@ -867,5 +866,17 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         View.execInEventDispatchLater(() -> {
             searchPanel.showQuickFindDialog(decompiledEditor);
         });
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        // todo: implement
+        return false;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return (saveButton.isVisible() && saveButton.isEnabled())
+                || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }
 }

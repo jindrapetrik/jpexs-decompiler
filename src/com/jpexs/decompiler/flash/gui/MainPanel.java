@@ -200,7 +200,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
+import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
@@ -211,10 +213,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final MainFrame mainFrame;
 
     private final ObservableList<SWFList> swfs;
-
-    private ABCPanel abcPanel;
-
-    private ActionPanel actionPanel;
 
     private final JPanel welcomePanel;
 
@@ -273,6 +271,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JTextField filterField = new MyTextField("");
 
     private JPanel searchPanel;
+
+    private ABCPanel abcPanel;
+
+    private ActionPanel actionPanel;
 
     private final PreviewPanel previewPanel;
 
@@ -418,6 +420,101 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
         tagTree = new TagTree(null, this);
         tagTree.addTreeSelectionListener(this);
+        tagTree.setSelectionModel(new DefaultTreeSelectionModel() {
+
+            private boolean isModified() {
+                if (abcPanel != null && abcPanel.isEditing()) {
+                    abcPanel.tryAutoSave();
+                }
+
+                if (actionPanel != null && actionPanel.isEditing()) {
+                    actionPanel.tryAutoSave();
+                }
+
+                if (previewPanel.isEditing()) {
+                    previewPanel.tryAutoSave();
+                }
+
+                if (headerPanel.isEditing()) {
+                    headerPanel.tryAutoSave();
+                }
+
+                return (abcPanel != null && abcPanel.isEditing())
+                        || (actionPanel != null && actionPanel.isEditing())
+                        || previewPanel.isEditing() || headerPanel.isEditing();
+            }
+
+            @Override
+            public void addSelectionPath(TreePath path) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.addSelectionPath(path);
+            }
+
+            @Override
+            public void addSelectionPaths(TreePath[] paths) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.addSelectionPaths(paths);
+            }
+
+            @Override
+            public void setSelectionPath(TreePath path) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.setSelectionPath(path);
+            }
+
+            @Override
+            public void setSelectionPaths(TreePath[] pPaths) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.setSelectionPaths(pPaths);
+            }
+
+            @Override
+            public void clearSelection() {
+                if (isModified()) {
+                    return;
+                }
+
+                super.clearSelection();
+            }
+
+            public void setSelection(TreePath[] selection) {
+                if (isModified()) {
+                    return;
+                }
+
+                this.selection = selection;
+            }
+
+            @Override
+            public void removeSelectionPath(TreePath path) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.removeSelectionPath(path);
+            }
+
+            @Override
+            public void removeSelectionPaths(TreePath[] paths) {
+                if (isModified()) {
+                    return;
+                }
+
+                super.removeSelectionPaths(paths);
+            }
+        });
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
@@ -503,6 +600,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         displayPanel = new JPanel(new CardLayout());
 
+        DefaultSyntaxKit.initKit();
         previewPanel = new PreviewPanel(this, flashPanel);
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);

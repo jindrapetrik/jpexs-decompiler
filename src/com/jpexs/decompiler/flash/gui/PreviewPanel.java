@@ -108,13 +108,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
  * @author JPEXS
  */
-public class PreviewPanel extends JPersistentSplitPane {
+public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel {
 
     private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
 
@@ -372,7 +371,6 @@ public class PreviewPanel extends JPersistentSplitPane {
     }
 
     private JPanel createMetadataCard() {
-        DefaultSyntaxKit.initKit();
         JPanel metadataCard = new JPanel(new BorderLayout());
         metadataEditor = new LineMarkedEditorPane();
         metadataCard.add(new JScrollPane(metadataEditor), BorderLayout.CENTER);
@@ -1174,5 +1172,18 @@ public class PreviewPanel extends JPersistentSplitPane {
         if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
         }
+    }
+
+    @Override
+    public boolean tryAutoSave() {
+        // todo: implement
+        return textPanel.tryAutoSave() && false;
+    }
+
+    @Override
+    public boolean isEditing() {
+        return textPanel.isEditing()
+                || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
+                || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled());
     }
 }
