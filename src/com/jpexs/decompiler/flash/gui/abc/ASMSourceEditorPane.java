@@ -205,7 +205,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public boolean save() {
         try {
             String text = getText();
-            if (text.trim().startsWith("#hexdata")) {
+            if (text.trim().startsWith(Helper.hexData)) {
                 byte[] data = Helper.getBytesFromHexaText(text);
                 MethodBody mb = abc.bodies.get(bodyIndex);
                 mb.setCodeBytes(data);

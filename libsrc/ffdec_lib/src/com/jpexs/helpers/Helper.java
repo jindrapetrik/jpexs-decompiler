@@ -66,6 +66,10 @@ public class Helper {
 
     public static String newLine = System.getProperty("line.separator");
 
+    public static String hexData = "#hexdata";
+
+    public static String constants = "#constants";
+
     public static String decompilationErrorAdd = null;
 
     private static final Map<String, Area> shapeCache = new HashMap<>();

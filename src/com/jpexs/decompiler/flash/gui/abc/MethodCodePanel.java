@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -117,6 +118,10 @@ public class MethodCodePanel extends JPanel {
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
+        NoneSelectedButtonGroup exportModeButtonGroup = new NoneSelectedButtonGroup();
+        exportModeButtonGroup.add(hexButton);
+        exportModeButtonGroup.add(hexOnlyButton);
+
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);
         buttonsPanel.add(hexOnlyButton);
@@ -140,7 +145,6 @@ public class MethodCodePanel extends JPanel {
             return;
         }
 
-        hexOnlyButton.setSelected(false);
         sourceTextArea.setHex(getExportMode(), false);
     }
 
@@ -149,7 +153,6 @@ public class MethodCodePanel extends JPanel {
             return;
         }
 
-        hexButton.setSelected(false);
         sourceTextArea.setHex(getExportMode(), false);
     }
 

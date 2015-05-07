@@ -1566,7 +1566,7 @@ public class CommandLineArgumentParser {
 
     private static void replaceAS2PCode(String text, ASMSource src) throws IOException, InterruptedException {
         System.out.println("Replace AS1/2 PCode");
-        if (text.trim().startsWith("#hexdata")) {
+        if (text.trim().startsWith(Helper.hexData)) {
             src.setActionBytes(Helper.getBytesFromHexaText(text));
         } else {
             try {
@@ -1597,7 +1597,7 @@ public class CommandLineArgumentParser {
 
     private static void replaceAS3PCode(String text, ABC abc, int bodyIndex, Trait trait) throws IOException, InterruptedException {
         System.out.println("Replace AS3 PCode");
-        if (text.trim().startsWith("#hexdata")) {
+        if (text.trim().startsWith(Helper.hexData)) {
             byte[] data = Helper.getBytesFromHexaText(text);
             MethodBody mb = abc.bodies.get(bodyIndex);
             mb.setCodeBytes(data);

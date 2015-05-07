@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -412,6 +413,10 @@ public abstract class Action implements GraphSourceItem {
      * @return GraphTextWriter
      */
     public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
+        if (exportMode == ScriptExportMode.CONSTANTS) {
+            return constantPoolActionsToString(listeners, address, list, version, exportMode, writer);
+        }
+
         long offset;
         Set<Long> importantOffsets = getActionsAllRefs(list);
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
@@ -423,14 +428,13 @@ public abstract class Action implements GraphSourceItem {
         offset = address;
         int pos = 0;
         boolean lastPush = false;
-        for (GraphSourceItem s : list) {
+        for (Action a : list) {
             if (pos % INFORM_LISTENER_RESOLUTION == 0) {
                 for (DisassemblyListener listener : listeners) {
                     listener.progressToString(pos + 1, list.size());
                 }
             }
 
-            Action a = (Action) s;
             if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {
                     writer.newLine();
@@ -580,6 +584,30 @@ public abstract class Action implements GraphSourceItem {
             writer.appendNoHilight(Helper.formatAddress(offset));
             writer.appendNoHilight(":");
             writer.newLine();
+        }
+
+        return writer;
+    }
+
+    public static GraphTextWriter constantPoolActionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
+        int poolIdx = 0;
+        writer.appendNoHilight(Helper.constants).newLine();
+        for (Action a : list) {
+            if (a instanceof ActionConstantPool) {
+                ActionConstantPool cPool = (ActionConstantPool) a;
+                int constIdx = 0;
+                for (String c : cPool.constantPool) {
+                    writer.appendNoHilight(poolIdx);
+                    writer.appendNoHilight("|");
+                    writer.appendNoHilight(constIdx);
+                    writer.appendNoHilight("|");
+                    writer.appendNoHilight(c);
+                    writer.newLine();
+                    constIdx++;
+                }
+
+                poolIdx++;
+            }
         }
 
         return writer;

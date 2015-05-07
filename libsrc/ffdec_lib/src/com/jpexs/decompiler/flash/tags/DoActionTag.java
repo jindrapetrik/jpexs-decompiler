@@ -110,6 +110,7 @@ public class DoActionTag extends Tag implements ASMSource {
         if (actions == null) {
             actions = getActions();
         }
+
         return Action.actionsToString(listeners, 0, actions, swf.version, exportMode, writer);
     }
 

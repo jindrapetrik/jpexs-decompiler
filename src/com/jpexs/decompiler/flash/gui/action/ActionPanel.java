@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -115,6 +116,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public JToggleButton hexOnlyButton;
 
+    public JToggleButton constantsViewButton;
+
     public JToggleButton resolveConstantsButton;
 
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
@@ -143,6 +146,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private HighlightedText srcHexOnly;
 
+    private HighlightedText srcConstants;
+
     private String lastDecompiled = "";
 
     private ASMSource lastASM;
@@ -160,6 +165,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcWithHex = null;
         srcNoHex = null;
         srcHexOnly = null;
+        srcConstants = null;
     }
 
     public String getStringUnderCursor() {
@@ -327,25 +333,39 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setHex(ScriptExportMode exportMode) {
-        if (exportMode != ScriptExportMode.HEX) {
-            if (exportMode == ScriptExportMode.PCODE) {
+        switch (exportMode) {
+            case PCODE:
                 if (srcNoHex == null) {
                     srcNoHex = getHighlightedText(exportMode);
                 }
+
                 setText(srcNoHex, "text/flasm");
-            } else {
+                break;
+            case PCODE_HEX:
                 if (srcWithHex == null) {
                     srcWithHex = getHighlightedText(exportMode);
                 }
+
                 setText(srcWithHex, "text/flasm");
-            }
-        } else {
-            if (srcHexOnly == null) {
-                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
-                srcHexOnly = new HighlightedText(writer);
-            }
-            setText(srcHexOnly, "text/plain");
+                break;
+            case HEX:
+                if (srcHexOnly == null) {
+                    HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+                    Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
+                    srcHexOnly = new HighlightedText(writer);
+                }
+
+                setText(srcHexOnly, "text/plain");
+                break;
+            case CONSTANTS:
+                if (srcConstants == null) {
+                    srcConstants = getHighlightedText(exportMode);
+                }
+
+                setText(srcConstants, "text/plain");
+                break;
+            default:
+                throw new Error("Export mode not supported: " + exportMode);
         }
     }
 
@@ -414,6 +434,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 srcWithHex = null;
                 srcNoHex = null;
                 srcHexOnly = null;
+                srcConstants = null;
                 setHex(getExportMode());
                 if (Configuration.decompile.get()) {
                     setDecompiledText("// " + AppStrings.translate("work.decompiling") + "...");
@@ -481,6 +502,17 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
+        // todo: change icon
+        constantsViewButton = new JToggleButton(View.getIcon("constantpool16"));
+        constantsViewButton.addActionListener(this::constantsViewButtonActionPerformed);
+        constantsViewButton.setToolTipText(AppStrings.translate("button.viewConstants"));
+        constantsViewButton.setMargin(new Insets(3, 3, 3, 3));
+
+        NoneSelectedButtonGroup exportModeButtonGroup = new NoneSelectedButtonGroup();
+        exportModeButtonGroup.add(hexButton);
+        exportModeButtonGroup.add(hexOnlyButton);
+        exportModeButtonGroup.add(constantsViewButton);
+
         resolveConstantsButton = new JToggleButton(View.getIcon("constantpool16"));
         resolveConstantsButton.addActionListener(this::resolveConstantsButtonActionPerformed);
         resolveConstantsButton.setToolTipText(AppStrings.translate("button.resolveConstants"));
@@ -492,6 +524,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan.add(graphButton);
         topButtonsPan.add(hexButton);
         topButtonsPan.add(hexOnlyButton);
+        topButtonsPan.add(constantsViewButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(resolveConstantsButton);
 
@@ -621,14 +654,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setEditMode(boolean val) {
-        boolean rawEdit = hexOnlyButton.isSelected();
-
         if (val) {
-            if (rawEdit) {
+            if (hexOnlyButton.isSelected()) {
                 setHex(ScriptExportMode.HEX);
+            } else if (constantsViewButton.isSelected()) {
+                setHex(ScriptExportMode.CONSTANTS);
             } else {
                 setHex(ScriptExportMode.PCODE);
             }
+
             editor.setEditable(true);
             saveButton.setVisible(true);
             editButton.setVisible(false);
@@ -644,6 +678,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             editor.getCaret().setVisible(true);
             asmLabel.setIcon(null);
         }
+
         topButtonsPan.setVisible(!val);
         editMode = val;
         editor.requestFocusInWindow();
@@ -705,12 +740,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void hexButtonActionPerformed(ActionEvent evt) {
-        hexOnlyButton.setSelected(false);
         setHex(getExportMode());
     }
 
     private void hexOnlyButtonActionPerformed(ActionEvent evt) {
-        hexButton.setSelected(false);
+        setHex(getExportMode());
+    }
+
+    private void constantsViewButtonActionPerformed(ActionEvent evt) {
         setHex(getExportMode());
     }
 
@@ -732,8 +769,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private void saveActionButtonActionPerformed(ActionEvent evt) {
         try {
             String text = editor.getText();
-            if (text.trim().startsWith("#hexdata")) {
+            String trimmed = text.trim();
+            if (trimmed.startsWith(Helper.hexData)) {
                 src.setActionBytes(Helper.getBytesFromHexaText(text));
+            } else if (trimmed.startsWith(Helper.constants)) {
+                throw new Error("Saving constants is not supported, yet.");
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
@@ -786,7 +826,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private ScriptExportMode getExportMode() {
         ScriptExportMode exportMode = hexOnlyButton.isSelected() ? ScriptExportMode.HEX
-                : (hexButton.isSelected() ? ScriptExportMode.PCODE_HEX : ScriptExportMode.PCODE);
+                : hexButton.isSelected() ? ScriptExportMode.PCODE_HEX
+                        : constantsViewButton.isSelected() ? ScriptExportMode.CONSTANTS
+                                : ScriptExportMode.PCODE;
         return exportMode;
     }
 
