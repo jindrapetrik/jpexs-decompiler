@@ -97,6 +97,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         if (zoomint == 100) {
             zoomint = 0;
         }
+
         flash.Zoom(0); // hack, but this call is needed otherwise unzoom will fail for larger zoom values
         flash.Zoom(zoomint);
     }
@@ -121,7 +122,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
         try {
             return flash.getFrameNum();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
         return 0;
     }
@@ -135,7 +136,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
             if (flash.getReadyState() == 4) {
                 return flash.getTotalFrames();
             }
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
         return 0;
     }
@@ -144,7 +145,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public synchronized void setBackground(Color color) {
         try {
             flash.setBackgroundColor((color.getRed() << 16) + (color.getGreen() << 8) + color.getBlue());
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -262,7 +263,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public void pause() {
         try {
             flash.Stop();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -271,7 +272,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         try {
             flash.Stop();
             flash.Rewind();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -279,7 +280,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public void rewind() {
         try {
             flash.Rewind();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -287,7 +288,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public void play() {
         try {
             flash.Play();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 
@@ -295,7 +296,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public boolean isPlaying() {
         try {
             return flash.IsPlaying();
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
             return false;
         }
     }
@@ -314,7 +315,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
         try {
             flash.GotoFrame(frame);
-        } catch (ActiveXException ex) { // Can be "Data not available yet exception"
+        } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
 

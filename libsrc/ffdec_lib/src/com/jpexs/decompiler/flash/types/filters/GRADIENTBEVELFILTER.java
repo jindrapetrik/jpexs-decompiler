@@ -114,10 +114,11 @@ public class GRADIENTBEVELFILTER extends FILTER {
             colors.add(gradientColors[i].toColor());
             ratios.add(gradientRatio[i] / 255f);
         }
-        float[] ratiosAr = new float[ratios.size()];
+        float[] ratiosArr = new float[ratios.size()];
         for (int i = 0; i < ratios.size(); i++) {
-            ratiosAr[i] = ratios.get(i);
+            ratiosArr[i] = ratios.get(i);
         }
+
         Color[] colorsArr = colors.toArray(new Color[colors.size()]);
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
@@ -126,7 +127,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
             type = Filtering.OUTER;
         }
 
-        return Filtering.gradientBevel(src, colorsArr, ratiosAr, (int) blurX, (int) blurY, strength, type, (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
+        return Filtering.gradientBevel(src, colorsArr, ratiosArr, (int) blurX, (int) blurY, strength, type, (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
     }
 
     @Override

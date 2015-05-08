@@ -109,7 +109,7 @@ public class BEVELFILTER extends FILTER {
         } else if (!innerShadow) {
             type = Filtering.OUTER;
         }
-        return Filtering.bevel(src, (int) blurX, (int) blurY, strength, type, highlightColor.toColor(), shadowColor.toColor(), (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
+        return Filtering.bevel(src, (int) blurX, (int) blurY, strength, type, highlightColor.toInt(), shadowColor.toInt(), (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
     }
 
     @Override
