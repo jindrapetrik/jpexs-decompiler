@@ -168,7 +168,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             if (catchInRegisterFlag) {
                 ret.append("register").append(catchRegister);
             } else {
-                ret.append("\"").append(Helper.escapeString(catchName)).append("\"");
+                ret.append("\"").append(Helper.escapeActionScriptString(catchName)).append("\"");
             }
             ret.append(" ");
         }

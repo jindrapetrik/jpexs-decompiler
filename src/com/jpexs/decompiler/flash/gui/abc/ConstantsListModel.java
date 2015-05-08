@@ -91,7 +91,7 @@ public class ConstantsListModel implements ListModel {
             case TYPE_DECIMAL:
                 return (index + 1) + ":" + constants.getDecimal(index + 1);
             case TYPE_STRING:
-                return (index + 1) + ":" + Helper.escapeString(constants.getString(index + 1));
+                return (index + 1) + ":" + Helper.escapeActionScriptString(constants.getString(index + 1));
             case TYPE_NAMESPACE:
                 return (index + 1) + ":" + constants.getNamespace(index + 1).getNameWithKind(constants);
             case TYPE_NAMESPACESET:

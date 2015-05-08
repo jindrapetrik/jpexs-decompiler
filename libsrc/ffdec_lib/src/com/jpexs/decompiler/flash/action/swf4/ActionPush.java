@@ -279,7 +279,7 @@ public class ActionPush extends Action {
             ((ConstantIndex) values.get(i)).constantPool = constantPool;
             ret = ((ConstantIndex) values.get(i)).toString();
         } else if (values.get(i) instanceof String) {
-            ret = "\"" + Helper.escapeString((String) values.get(i)) + "\"";
+            ret = "\"" + Helper.escapeActionScriptString((String) values.get(i)) + "\"";
         } else if (values.get(i) instanceof RegisterNumber) {
             ret = ((RegisterNumber) values.get(i)).toStringNoName();
         } else {

@@ -166,10 +166,10 @@ public class DirectValueActionItem extends ActionItem {
             }
         }
         if (value instanceof String) {
-            return writer.append("\"" + Helper.escapeString((String) value) + "\"");
+            return writer.append("\"" + Helper.escapeActionScriptString((String) value) + "\"");
         }
         if (value instanceof ConstantIndex) {
-            return writer.append("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
+            return writer.append("\"" + Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index)) + "\"");
         }
         if (value instanceof RegisterNumber) {
             return writer.append(((RegisterNumber) value).translate());

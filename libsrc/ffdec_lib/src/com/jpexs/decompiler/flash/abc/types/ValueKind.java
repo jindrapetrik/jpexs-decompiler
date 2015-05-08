@@ -137,7 +137,7 @@ public class ValueKind {
                 ret = "" + constants.getDecimal(value_index);
                 break;
             case CONSTANT_Utf8:
-                ret = "\"" + Helper.escapeString(constants.getString(value_index)) + "\"";
+                ret = "\"" + Helper.escapeActionScriptString(constants.getString(value_index)) + "\"";
                 break;
             case CONSTANT_True:
                 ret = "true";
@@ -179,7 +179,7 @@ public class ValueKind {
                 ret = "Decimal(" + constants.getDecimal(value_index) + ")";
                 break;
             case CONSTANT_Utf8:
-                ret = "Utf8(\"" + Helper.escapeString(constants.getString(value_index)) + "\")";
+                ret = "Utf8(\"" + Helper.escapeActionScriptString(constants.getString(value_index)) + "\")";
                 break;
             case CONSTANT_True:
                 ret = "True";

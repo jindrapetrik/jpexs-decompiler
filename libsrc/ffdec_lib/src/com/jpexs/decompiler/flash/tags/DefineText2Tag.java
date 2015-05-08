@@ -189,7 +189,7 @@ public class DefineText2Tag extends TextTag {
             if (fnt == null) {
                 writer.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
             } else {
-                writer.hilightSpecial(Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
+                writer.hilightSpecial(Helper.escapeActionScriptString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
             }
         }
         return new HighlightedText(writer);

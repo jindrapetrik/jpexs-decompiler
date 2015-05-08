@@ -191,7 +191,7 @@ public class Multiname {
                 break;
             }
         }
-        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapeString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
+        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapeActionScriptString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
     private static String namespaceSetToString(AVM2ConstantPool constants, int index) {
@@ -222,16 +222,16 @@ public class Multiname {
         switch (kind) {
             case QNAME:
             case QNAMEA:
-                return getKindStr() + "(" + namespaceToString(constants, namespace_index) + "," + (name_index == 0 ? "null" : "\"" + Helper.escapeString(constants.getString(name_index)) + "\"") + ")";
+                return getKindStr() + "(" + namespaceToString(constants, namespace_index) + "," + (name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(constants.getString(name_index)) + "\"") + ")";
             case RTQNAME:
             case RTQNAMEA:
-                return getKindStr() + "(" + (name_index == 0 ? "null" : "\"" + Helper.escapeString(constants.getString(name_index))) + "\"" + ")";
+                return getKindStr() + "(" + (name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(constants.getString(name_index))) + "\"" + ")";
             case RTQNAMEL:
             case RTQNAMELA:
                 return getKindStr() + "()";
             case MULTINAME:
             case MULTINAMEA:
-                return getKindStr() + "(" + (name_index == 0 ? "null" : "\"" + Helper.escapeString(constants.getString(name_index)) + "\"") + "," + namespaceSetToString(constants, namespace_set_index) + ")";
+                return getKindStr() + "(" + (name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(constants.getString(name_index)) + "\"") + "," + namespaceSetToString(constants, namespace_set_index) + ")";
             case MULTINAMEL:
             case MULTINAMELA:
                 return getKindStr() + "(" + namespaceSetToString(constants, namespace_set_index) + ")";

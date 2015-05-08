@@ -211,7 +211,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" \"");
-                        s.append(Helper.escapeString(constants.getString(operands[i])));
+                        s.append(Helper.escapeActionScriptString(constants.getString(operands[i])));
                         s.append("\"");
                     }
                     break;

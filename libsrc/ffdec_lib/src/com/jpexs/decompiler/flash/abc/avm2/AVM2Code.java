@@ -914,7 +914,7 @@ public class AVM2Code implements Cloneable {
         if (info != null) {
             writer.appendNoHilight("method").newLine();
             writer.appendNoHilight("name ");
-            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
+            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
             writer.newLine();
             if (info.flagExplicit()) {
                 writer.appendNoHilight("flag ");

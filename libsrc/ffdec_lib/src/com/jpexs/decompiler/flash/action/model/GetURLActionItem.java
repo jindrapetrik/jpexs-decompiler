@@ -37,7 +37,7 @@ public class GetURLActionItem extends ActionItem {
         writer.append("getUrl");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(\"");
-        writer.append(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString));
+        writer.append(Helper.escapeActionScriptString(urlString) + "\", \"" + Helper.escapeActionScriptString(targetString));
         return writer.append("\")");
     }
 

@@ -202,10 +202,10 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
         StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
-            paramStr.append(paramRegisters.get(i)).append(" \"").append(Helper.escapeString(paramNames.get(i))).append("\" ");
+            paramStr.append(paramRegisters.get(i)).append(" \"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\" ");
         }
 
-        return ("DefineFunction2 \"" + Helper.escapeString(functionName) + "\" " + paramRegisters.size() + " " + registerCount
+        return ("DefineFunction2 \"" + Helper.escapeActionScriptString(functionName) + "\" " + paramRegisters.size() + " " + registerCount
                 + " " + preloadParentFlag
                 + " " + preloadRootFlag
                 + " " + suppressSuperFlag

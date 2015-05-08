@@ -55,7 +55,7 @@ public class ConstantIndex implements Serializable {
         if (Configuration.resolveConstants.get()) {
             if (constantPool != null) {
                 if (index < constantPool.size()) {
-                    return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";
+                    return "\"" + Helper.escapeActionScriptString(constantPool.get(index)) + "\"";
                 }
             }
         }
