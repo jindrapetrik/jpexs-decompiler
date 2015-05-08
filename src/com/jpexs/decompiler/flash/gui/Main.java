@@ -337,22 +337,22 @@ public class Main {
             swf.addEventListener(new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
-                    // todo honfika: localize
-                    String text = "Exporting ";
+                    String text = AppStrings.translate("work.exporting");
                     if (type != null && type.length() > 0) {
-                        text += type + " ";
+                        text += " " + type;
                     }
-                    startWork(text + index + "/" + count + " " + data);
+
+                    startWork(text + " " + index + "/" + count + " " + data);
                 }
 
                 @Override
                 public void handleExportedEvent(String type, int index, int count, Object data) {
-                    // todo honfika: localize
-                    String text = "Exported ";
+                    String text = AppStrings.translate("work.exported");
                     if (type != null && type.length() > 0) {
-                        text += type + " ";
+                        text += " " + type;
                     }
-                    startWork(text + index + "/" + count + " " + data);
+
+                    startWork(text + " " + index + "/" + count + " " + data);
                 }
 
                 @Override
