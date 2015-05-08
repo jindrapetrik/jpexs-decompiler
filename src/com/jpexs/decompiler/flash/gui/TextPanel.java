@@ -184,7 +184,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     public void focusTextValue() {
         textValue.requestFocusInWindow();
-        if (!isModified()) {
+        if (textTag != null && !isModified()) {
             HighlightedText text = textTag.getFormattedText();
             for (Highlighting highlight : text.specialHilights) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
