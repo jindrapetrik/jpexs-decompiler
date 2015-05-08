@@ -63,6 +63,16 @@ auxiliary.show.customizer.message=<message>
                 <location>build</location>
                 <build-target>build</build-target>
             </export>
+            <export>
+                <type>folder</type>
+                <location>reports</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>dist</location>
+                <build-target>build</build-target>
+            </export>
             <view>
                 <items>
                     <source-folder style="packages">
@@ -94,6 +104,8 @@ auxiliary.show.customizer.message=<message>
                 <package-root>src</package-root>
                 <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../src</classpath>
                 <built-to>build</built-to>
+                <built-to>reports</built-to>
+                <built-to>dist</built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
