@@ -132,20 +132,31 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         //traitInfoPanel.add(new JLabel("  " + translate("abc.detail.traitname")));
         traitInfoPanel.add(traitNameLabel);
         topPanel.add(traitInfoPanel, BorderLayout.CENTER);
+        methodTraitPanel.methodCodePanel.getSourceTextArea().addTextChangedListener(this::editorTextChanged);
+        slotConstTraitPanel.slotConstEditor.addTextChangedListener(this::editorTextChanged);
         add(topPanel, BorderLayout.NORTH);
+    }
+
+    private void editorTextChanged() {
+        setModified(true);
+    }
+
+    private boolean isModified() {
+        return saveButton.isVisible() && saveButton.isEnabled();
+    }
+
+    private void setModified(boolean value) {
+        saveButton.setEnabled(value);
     }
 
     public void setEditMode(boolean val) {
         slotConstTraitPanel.setEditMode(val);
         methodTraitPanel.setEditMode(val);
         saveButton.setVisible(val);
+        saveButton.setEnabled(false);
         editButton.setVisible(!val);
         cancelButton.setVisible(val);
-        if (val) {
-            selectedLabel.setIcon(View.getIcon("editing16"));
-        } else {
-            selectedLabel.setIcon(null);
-        }
+        selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
     }
 
     public void showCard(final String name, final Trait trait) {

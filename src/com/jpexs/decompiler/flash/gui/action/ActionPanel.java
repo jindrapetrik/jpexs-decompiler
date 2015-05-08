@@ -43,9 +43,9 @@ import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -290,7 +290,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private void setEditorText(final String text, final String contentType) {
         View.execInEventDispatch(() -> {
             ignoreCarret = true;
-            editor.setContentType(contentType);
+            editor.changeContentType(contentType);
             editor.setText(text);
             ignoreCarret = false;
         });
@@ -592,9 +592,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
         decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
-        decompiledEditor.setContentType("text/actionscript");
+        decompiledEditor.changeContentType("text/actionscript");
 
-        //tagTree.addTreeSelectionListener(this);
         editor.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
@@ -626,6 +625,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
             }
         });
+
         decompiledEditor.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
@@ -651,6 +651,33 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
             }
         });
+
+        editor.addTextChangedListener(this::editorTextChanged);
+        decompiledEditor.addTextChangedListener(this::decompiledEditorTextChanged);
+    }
+
+    private void editorTextChanged() {
+        setModified(true);
+    }
+
+    private void decompiledEditorTextChanged() {
+        setDecompiledModified(true);
+    }
+
+    private boolean isModified() {
+        return saveButton.isVisible() && saveButton.isEnabled();
+    }
+
+    private void setModified(boolean value) {
+        saveButton.setEnabled(value);
+    }
+
+    private boolean isDecompiledModified() {
+        return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
+    }
+
+    private void setDecompiledModified(boolean value) {
+        saveDecompiledButton.setEnabled(value);
     }
 
     public void setEditMode(boolean val) {
@@ -662,23 +689,16 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             } else {
                 setHex(ScriptExportMode.PCODE);
             }
-
-            editor.setEditable(true);
-            saveButton.setVisible(true);
-            editButton.setVisible(false);
-            cancelButton.setVisible(true);
-            editor.getCaret().setVisible(true);
-            asmLabel.setIcon(View.getIcon("editing16"));
-        } else {
-            setHex(getExportMode());
-            editor.setEditable(false);
-            saveButton.setVisible(false);
-            editButton.setVisible(true);
-            cancelButton.setVisible(false);
-            editor.getCaret().setVisible(true);
-            asmLabel.setIcon(null);
         }
 
+        editor.setEditable(val);
+        saveButton.setVisible(val);
+        saveButton.setEnabled(false);
+        editButton.setVisible(!val);
+        cancelButton.setVisible(val);
+
+        editor.getCaret().setVisible(true);
+        asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
         topButtonsPan.setVisible(!val);
         editMode = val;
         editor.requestFocusInWindow();
@@ -699,27 +719,23 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     decompiledEditor.gotoLine(lastLine - prefLines + 1);
                 }
             }
-            decompiledEditor.setEditable(true);
-            saveDecompiledButton.setVisible(true);
-            editDecompiledButton.setVisible(false);
-            experimentalLabel.setVisible(false);
-            cancelDecompiledButton.setVisible(true);
-            decompiledEditor.getCaret().setVisible(true);
-            decLabel.setIcon(View.getIcon("editing16"));
         } else {
             String newText = lastDecompiled;
             setDecompiledText(newText);
             if (lastLine > -1) {
                 decompiledEditor.gotoLine(lastLine + prefLines + 1);
             }
-            decompiledEditor.setEditable(false);
-            saveDecompiledButton.setVisible(false);
-            editDecompiledButton.setVisible(true);
-            experimentalLabel.setVisible(true);
-            cancelDecompiledButton.setVisible(false);
-            decompiledEditor.getCaret().setVisible(true);
-            decLabel.setIcon(null);
         }
+
+        decompiledEditor.setEditable(val);
+        saveDecompiledButton.setVisible(val);
+        saveDecompiledButton.setEnabled(false);
+        editDecompiledButton.setVisible(!val);
+        experimentalLabel.setVisible(!val);
+        cancelDecompiledButton.setVisible(val);
+
+        decompiledEditor.getCaret().setVisible(true);
+        decLabel.setIcon(val ? View.getIcon("editing16") : null);
         editDecompiledMode = val;
         decompiledEditor.requestFocusInWindow();
     }

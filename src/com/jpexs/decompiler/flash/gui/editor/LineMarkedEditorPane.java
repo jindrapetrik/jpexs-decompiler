@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.abc;
+package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -58,6 +58,12 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private int lastLine = -1;
 
     private boolean error = false;
+
+    private Token lastUnderlined = null;
+
+    private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
+
+    private LinkHandler linkHandler = this;
 
     public int getLine() {
         return lastLine;
@@ -143,12 +149,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                     }
                 });
     }
-
-    private Token lastUnderlined = null;
-
-    private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
-
-    private LinkHandler linkHandler = this;
 
     private class LinkAdapter extends MouseAdapter implements KeyListener {
 

@@ -59,6 +59,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -146,15 +147,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public JLabel scriptNameLabel;
 
-    public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    private JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
-    public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    private JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
 
-    public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    private JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
-    public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+    private JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
-    public String lastDecompiled = null;
+    private String lastDecompiled = null;
 
     public MainPanel getMainPanel() {
         return mainPanel;
@@ -294,6 +295,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
+        decompiledTextArea.addTextChangedListener(this::decompiledTextAreaTextChanged);
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
 
@@ -369,7 +371,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
         splitPane.setContinuousLayout(true);
 
-        decompiledTextArea.setContentType("text/actionscript");
+        decompiledTextArea.changeContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
 
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
@@ -450,6 +452,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         panConstants.add(constantTypeList, BorderLayout.NORTH);
         panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
+    }
+
+    private void decompiledTextAreaTextChanged() {
+        setModified(true);
+    }
+
+    private boolean isModified() {
+        return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
+    }
+
+    private void setModified(boolean value) {
+        saveDecompiledButton.setEnabled(value);
     }
 
     private boolean hasDeclaration(int pos) {
@@ -683,25 +697,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     public void setDecompiledEditMode(boolean val) {
         if (val) {
             lastDecompiled = decompiledTextArea.getText();
-            decompiledTextArea.setEditable(true);
-            saveDecompiledButton.setVisible(true);
-            editDecompiledButton.setVisible(false);
-            experimentalLabel.setVisible(false);
-            cancelDecompiledButton.setVisible(true);
-            decompiledTextArea.getCaret().setVisible(true);
-            decLabel.setIcon(View.getIcon("editing16"));
-            detailPanel.setVisible(false);
         } else {
             decompiledTextArea.setText(lastDecompiled);
-            decompiledTextArea.setEditable(false);
-            saveDecompiledButton.setVisible(false);
-            editDecompiledButton.setVisible(true);
-            experimentalLabel.setVisible(true);
-            cancelDecompiledButton.setVisible(false);
-            decompiledTextArea.getCaret().setVisible(true);
-            decLabel.setIcon(null);
-            detailPanel.setVisible(true);
         }
+
+        decompiledTextArea.setEditable(val);
+        saveDecompiledButton.setVisible(val);
+        saveDecompiledButton.setEnabled(false);
+        editDecompiledButton.setVisible(!val);
+        experimentalLabel.setVisible(!val);
+        cancelDecompiledButton.setVisible(val);
+        decompiledTextArea.getCaret().setVisible(true);
+        decLabel.setIcon(val ? View.getIcon("editing16") : null);
+        detailPanel.setVisible(!val);
 
         decompiledTextArea.ignoreCarret = val;
         decompiledTextArea.requestFocusInWindow();
@@ -880,7 +888,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     @Override
     public boolean isEditing() {
-        return detailPanel.isEditing()
-                || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
+        return detailPanel.isEditing() || isModified();
     }
 }

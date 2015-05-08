@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -33,7 +34,6 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,7 +46,7 @@ import javax.swing.event.CaretListener;
  */
 public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
-    public JEditorPane slotConstEditor;
+    public LineMarkedEditorPane slotConstEditor;
 
     private ABC abc;
 
@@ -62,7 +62,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         slotConstEditor = new LineMarkedEditorPane();
         setLayout(new BorderLayout());
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
-        slotConstEditor.setContentType("text/flasm3");
+        slotConstEditor.changeContentType("text/flasm3");
         slotConstEditor.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {

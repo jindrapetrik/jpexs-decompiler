@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -98,19 +99,19 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         this.exportMode = exportMode;
         long oldOffset = getSelectedOffset();
         if (exportMode == ScriptExportMode.PCODE) {
-            setContentType("text/flasm3");
+            changeContentType("text/flasm3");
             if (textNoHex == null) {
                 textNoHex = getHighlightedText(exportMode);
             }
             setText(textNoHex);
         } else if (exportMode == ScriptExportMode.PCODE_HEX) {
-            setContentType("text/flasm3");
+            changeContentType("text/flasm3");
             if (textWithHex == null) {
                 textWithHex = getHighlightedText(exportMode);
             }
             setText(textWithHex);
         } else {
-            setContentType("text/plain");
+            changeContentType("text/plain");
             if (textHexOnly == null) {
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCode().getBytes());

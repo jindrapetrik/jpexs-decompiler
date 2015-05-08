@@ -97,7 +97,7 @@ public class MethodCodePanel extends JPanel {
 
         setLayout(new BorderLayout());
         add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
-        sourceTextArea.setContentType("text/flasm3");
+        sourceTextArea.changeContentType("text/flasm3");
         sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
 
         buttonsPanel = new JPanel();
@@ -126,8 +126,6 @@ public class MethodCodePanel extends JPanel {
         buttonsPanel.add(hexButton);
         buttonsPanel.add(hexOnlyButton);
         buttonsPanel.add(new JPanel());
-        // buttonsPanel.add(saveButton);
-        // buttonsPan.add(execButton);
 
         add(buttonsPanel, BorderLayout.NORTH);
     }
@@ -154,6 +152,10 @@ public class MethodCodePanel extends JPanel {
         }
 
         sourceTextArea.setHex(getExportMode(), false);
+    }
+
+    public ASMSourceEditorPane getSourceTextArea() {
+        return sourceTextArea;
     }
 
     private ScriptExportMode getExportMode() {

@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JRepeatButton;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -43,8 +43,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 /**
@@ -99,24 +97,8 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textValue = new LineMarkedEditorPane();
         add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setFont(new Font("Monospaced", Font.PLAIN, textValue.getFont().getSize()));
-        textValue.setContentType("text/swftext");
-        textValue.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                textChanged();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                textChanged();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                textChanged();
-            }
-        });
+        textValue.changeContentType("text/swftext");
+        textValue.addTextChangedListener(this::textChanged);
 
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
@@ -370,7 +352,6 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     private void textChanged() {
         setModified(true);
-        updateButtonsVisibility();
 
         showTextComparingPreview();
     }

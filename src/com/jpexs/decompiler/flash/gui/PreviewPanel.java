@@ -23,8 +23,8 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -99,8 +99,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -378,24 +376,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         metadataEditor.setEditable(false);
 
         metadataEditor.setFont(new Font("Monospaced", Font.PLAIN, metadataEditor.getFont().getSize()));
-        metadataEditor.setContentType("text/xml");
-        metadataEditor.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                metadataTextChanged();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                metadataTextChanged();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                metadataTextChanged();
-            }
-        });
+        metadataEditor.changeContentType("text/xml");
+        metadataEditor.addTextChangedListener(this::metadataTextChanged);
 
         metadataCard.add(createMetadataButtonsPanel(), BorderLayout.SOUTH);
         return metadataCard;
@@ -411,7 +393,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void metadataTextChanged() {
         setMetadataModified(true);
-        updateMetadataButtonsVisibility();
     }
 
     private void updateMetadataButtonsVisibility() {

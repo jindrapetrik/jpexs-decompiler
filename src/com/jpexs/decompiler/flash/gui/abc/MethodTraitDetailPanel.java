@@ -29,6 +29,8 @@ public class MethodTraitDetailPanel extends JPanel implements TraitDetail {
 
     public ABCPanel abcPanel;
 
+    private boolean active = false;
+
     public MethodTraitDetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         methodCodePanel = new MethodCodePanel(abcPanel.decompiledTextArea);
@@ -45,8 +47,6 @@ public class MethodTraitDetailPanel extends JPanel implements TraitDetail {
     public void setEditMode(boolean val) {
         methodCodePanel.setEditMode(val);
     }
-
-    private boolean active = false;
 
     @Override
     public void setActive(boolean val) {
