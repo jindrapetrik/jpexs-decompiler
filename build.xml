@@ -93,5 +93,8 @@ Key Features:
 - Multilanguage support (see language list)
 - Can decompile some kinds of obfuscated code too</property>
     
+    <property name="app.installer.dir" value="${basedir}/mac/installer"/>
+    <property name="app.bundle.dir" value="${basedir}/mac/bundle"/>
+    
     <import file="${basedir}/build_common.xml"/>
 </project>

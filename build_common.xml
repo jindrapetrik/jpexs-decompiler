@@ -2,7 +2,8 @@
 <project name="common build script" default="all" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
     <description>Builds project</description>      
     
-      
+    <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpath="${basedir}/jbomutils.jar" />                
+   <!-- <taskdef name="xar" classname="com.jpexs.xarant.XarTask" classpath="${basedir}/xarant.jar;${basedir}/xarlib-2.0.1.jar" />-->
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
@@ -159,6 +160,8 @@
     
     
     
+    
+    
     <target name="installer" depends="-loadversion,-load-tools,dist">
         <taskdef name="nsis" classname="com.danielreese.nsisant.Task">
             <classpath location="${basedir}/nsisant-1.3.jar" />
@@ -223,12 +226,104 @@
         <delete file="${app.deb.desktop.temp}" />
     </target>   
     
-    <target name="osx-app-archive" depends="-loadversion,dist">
-        <mkdir dir="${RELEASESDIR}"/>
-        <property  name="osx.zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />
-        <tempfile property="app.script.temp" deleteonexit="true" prefix="appscript" />
+    <target name="osx-app-installer" depends="osx-app-bundle">
+        <mkdir dir="${app.installer.dir}/flat/base.pkg"/>
+        <mkdir dir="${app.installer.dir}/flat/Resources/en.lproj"/>
+        <mkdir dir="${app.installer.dir}/root/Applications"/>
+        <copy todir="${app.installer.dir}/root/Applications/">
+            <fileset dir="${app.bundle.dir}">
+                <include  name="${app.osx.dir}.app/**" />
+            </fileset>
+        </copy>
+        
+        <tar destfile="${app.installer.dir}/flat/base.pkg/Payload" compression="gzip">
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="755" />            
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80">
+                <exclude name="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" />
+                <exclude name="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
+            </tarfileset>
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />  
+        </tar>
+        
+        <resourcecount property="app.installer.files.number">
+            <fileset dir="${app.installer.dir}/root" />
+        </resourcecount>
+        <length property="app.installer.files.size.bytes">
+            <fileset dir="${app.installer.dir}/root" />
+        </length>
+        
+        <script language="javascript">
+        <![CDATA[
+            var length_bytes = project.getProperty("app.installer.files.size.bytes");
+            var length_kbytes = Math.round((length_bytes / 1024) * Math.pow(10,2))
+                              / Math.pow(10,2);            
+            project.setNewProperty("app.installer.files.size.kilobytes", length_kbytes);
+        ]]>
+        </script>
+        
+        <echo file="${app.installer.dir}/flat/base.pkg/PackageInfo"><![CDATA[<pkg-info format-version="2" identifier="${MACBUNDLE}.base.pkg" version="${VERSION}${VERSIONSUFFIX}" install-location="/" auth="root">
+  <payload installKBytes="${app.installer.files.size.kilobytes}" numberOfFiles="${app.installer.files.number}"/>
+<bundle-version>
+    <bundle id="${MACBUNDLE}" CFBundleIdentifier="${MACBUNDLE}" path="./Applications/${app.osx.dir}.app" CFBundleVersion="${VERSION}${VERSIONSUFFIX}"/>
+</bundle-version>
+</pkg-info>]]></echo>
+
+
+        <mkbom destfile="${app.installer.dir}/flat/base.pkg/Bom">
+            <bomfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" filemode="755" />            
+            <bomfileset dir="${app.installer.dir}/root" uid="0" gid="80">
+                <exclude name="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" />
+                <exclude name="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
+            </bomfileset>
+            <bomfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />  
+        </mkbom>
+        
+        <echo file="${app.installer.dir}/flat/Distribution"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<installer-script minSpecVersion="1.000000" authoringTool="com.apple.PackageMaker" authoringToolVersion="3.0.3" authoringToolBuild="174">
+    <title>${PRODUCTNAME} ${VERSION}${VERSIONSUFFIX}</title>
+    <options customize="never" allow-external-scripts="no"/>
+    <domains enable_anywhere="true"/>
+    <installation-check script="pm_install_check();"/>
+    <script>function pm_install_check() {
+  if(!(system.compareVersions(system.version.ProductVersion,'10.5') >= 0)) {
+    my.result.title = 'Failure';
+    my.result.message = 'You need at least Mac OS X 10.5 to install ${PRODUCTNAME}';
+    my.result.type = 'Fatal';
+    return false;
+  }
+  return true;
+}
+</script>
+    <choices-outline>
+        <line choice="choice1"/>
+    </choices-outline>
+    <choice id="choice1" title="base">
+        <pkg-ref id="${MACBUNDLE}.base.pkg"/>
+    </choice>
+    <pkg-ref id="${MACBUNDLE}.base.pkg" installKBytes="${app.installer.files.size.kilobytes}" version="${VERSION}${VERSIONSUFFIX}" auth="Root">#base.pkg</pkg-ref>
+</installer-script>]]></echo>                       
+       <property name="pkg.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.pkg"/> 
+       <!-- XAR archiver, linux only :-( -->
+       
+       <fileset id="xarfileset" dir="${app.installer.dir}/flat">
+            
+       </fileset>
+       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" " />
+       
+       <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
+            <arg value="--compression" />
+            <arg value="none" />
+            <arg value="-cf" />
+            <arg value="${pkg.file}" />
+            <arg line="${xarconverted}" />            
+       </exec>  
+    </target>
+    
+    
+    <target name="osx-app-bundle" depends="-loadversion,dist">
+        <property name="app.script.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"/>
         <echo file="${app.script.temp}">#!/bin/bash&#10;cd "$(dirname "$${BASH_SOURCE[0]}")"&#10;cd ../Resources&#10;./${app.script}</echo>
-        <tempfile property="app.info.temp" deleteonexit="true" prefix="appinfo" />        
+        <property name="app.info.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/Info.plist"/>
         <echo file="${app.info.temp}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -255,15 +350,23 @@
 	<string>${MACCATEGORYTYPE}</string>
 </dict>
 </plist>]]></echo>        
-        
+        <copy todir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/">
+            <fileset dir="${DISTRIBUTIONDIR}" />
+        </copy>                  
+    </target>
+    
+    <target name="osx-app-archive" depends="osx-app-bundle">        
+        <mkdir dir="${RELEASESDIR}"/>        
+        <property  name="osx.zip.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}_macosx.zip" />        
         <zip destfile="${osx.zip.file}">
-            <zipfileset file="${app.script.temp}" fullpath="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" filemode="755" />
-            <zipfileset file="${app.info.temp}" fullpath="${app.osx.dir}.app/Contents/Info.plist" />            
-            <zipfileset dir="${DISTRIBUTIONDIR}" excludes="${app.script}" prefix="${app.osx.dir}.app/Contents/Resources/" />
-            <zipfileset dir="${DISTRIBUTIONDIR}" includes="${app.script}" fullpath="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />           
-        </zip>   
-        <delete file="${app.script.temp}" />
-        <delete file="${app.info.temp}" />
+            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="755" />
+            <zipfileset dir="${app.bundle.dir}">
+                <exclude name="${app.osx.dir}.app/Contents/Resources/${app.script}" />
+                <exclude name="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
+            </zipfileset>
+            
+            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />           
+        </zip>           
     </target>
     
     <target name="-set-gui-type">
