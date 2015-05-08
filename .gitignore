@@ -15,6 +15,7 @@ Thumbs.db
 /javadoc/
 /coverage/
 /dist/
+/mac/
 /testdata/decompile/
 /testdata/recompile/
 /build_exe.xml
