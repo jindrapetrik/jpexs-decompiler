@@ -112,7 +112,7 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
             currentDrawCommand = DRAW_COMMAND_L;
             pathData.append("L");
         }
-        
+
         pathData.append(roundPixels20(x * zoom / SWF.unitDivisor)).append(" ")
                 .append(roundPixels20(y * zoom / SWF.unitDivisor)).append(" ");
     }
@@ -123,7 +123,7 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
             currentDrawCommand = DRAW_COMMAND_Q;
             pathData.append("Q");
         }
-        
+
         pathData.append(roundPixels20(controlX * zoom / SWF.unitDivisor)).append(" ")
                 .append(roundPixels20(controlY * zoom / SWF.unitDivisor)).append(" ")
                 .append(roundPixels20(anchorX * zoom / SWF.unitDivisor)).append(" ")

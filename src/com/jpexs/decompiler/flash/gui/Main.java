@@ -471,7 +471,7 @@ public class Main {
                 if (firstSWF == null) {
                     firstSWF = swfs1.get(0);
                 }
-                
+
                 try {
                     View.execInEventDispatch(() -> {
                         Main.startWork(AppStrings.translate("work.creatingwindow") + "...");

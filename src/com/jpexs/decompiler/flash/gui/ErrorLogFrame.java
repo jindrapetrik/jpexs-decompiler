@@ -88,7 +88,7 @@ public class ErrorLogFrame extends AppFrame {
             Logger logger = Logger.getLogger("");
             logger.addHandler(instance.getHandler());
         }
-        
+
         return instance;
     }
 
@@ -100,7 +100,7 @@ public class ErrorLogFrame extends AppFrame {
             instance.dispose();
             instance = null;
         }
-        
+
         return getInstance();
     }
 

@@ -401,5 +401,4 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     public String getFile() {
         return file;
     }
-
 }

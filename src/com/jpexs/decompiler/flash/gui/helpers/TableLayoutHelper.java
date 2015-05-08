@@ -23,7 +23,7 @@ import layout.TableLayout;
  * @author JPEXS
  */
 public class TableLayoutHelper {
-    
+
     public static void addTableSpaces(TableLayout tl, double size) {
         int cols = tl.getNumColumn();
         int rows = tl.getNumRow();
