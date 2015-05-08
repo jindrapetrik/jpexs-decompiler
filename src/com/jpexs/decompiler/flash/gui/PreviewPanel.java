@@ -979,9 +979,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         new ShowFrameTag(swf).writeTag(sos2);
 
                         new ShowFrameTag(swf).writeTag(sos2);
-                        //if (flashPanel != null) {
-                        //    flashPanel.specialPlayback = true;
-                        //}
                     } else if (tagObj instanceof DefineVideoStreamTag) {
 
                         new PlaceObject2Tag(swf, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);

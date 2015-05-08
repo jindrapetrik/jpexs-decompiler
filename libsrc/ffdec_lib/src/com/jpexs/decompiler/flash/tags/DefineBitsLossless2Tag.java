@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
-import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
@@ -33,6 +32,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.Stopwatch;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,9 +86,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     private byte[] createEmptyImage() {
         try {
             ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
-            bitmapData.bitmapPixelData = new ARGB[1];
-            bitmapData.bitmapPixelData[0] = new ARGB();
-            bitmapData.bitmapPixelData[0].alpha = 0xff;
+            bitmapData.bitmapPixelData = new int[]{0xff000000};
             ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
             SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
             sos.writeALPHABITMAPDATA(bitmapData, FORMAT_32BIT_ARGB, 1, 1);
@@ -108,7 +106,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
         int width = image.getWidth();
         int height = image.getHeight();
-        bitmapData.bitmapPixelData = new ARGB[width * height];
+        bitmapData.bitmapPixelData = new int[width * height];
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         for (int pos = 0; pos < pixels.length; pos++) {
             int argb = pixels[pos];
@@ -121,11 +119,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             g = g * a / 255;
             b = b * a / 255;
 
-            bitmapData.bitmapPixelData[pos] = new ARGB();
-            bitmapData.bitmapPixelData[pos].alpha = a;
-            bitmapData.bitmapPixelData[pos].red = r;
-            bitmapData.bitmapPixelData[pos].green = g;
-            bitmapData.bitmapPixelData[pos].blue = b;
+            bitmapData.bitmapPixelData[pos] = ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
         }
 
         int format = FORMAT_32BIT_ARGB;
@@ -196,7 +190,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
             }
             if (bitmapFormat == FORMAT_32BIT_ARGB) {
+                Stopwatch sw = Stopwatch.startNew();
                 bitmapData = sis.readALPHABITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
+                sw.stop();
+                System.out.println("uncompress: " + sw.getElapsedMilliseconds());
             }
         } catch (IOException ex) {
         }
@@ -260,11 +257,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
                     int colorTableIndex = colorMapData.colorMapPixelData[pos32aligned] & 0xff;
                     if (colorTableIndex < colorMapData.colorTableRGB.length) {
-                        c = multiplyAlpha(colorMapData.colorTableRGB[colorTableIndex].toInt());
+                        c = multiplyAlpha(colorMapData.colorTableRGB[colorTableIndex]);
                     }
                 }
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
-                    c = multiplyAlpha(bitmapData.bitmapPixelData[pos].toInt());
+                    c = multiplyAlpha(bitmapData.bitmapPixelData[pos]);
                 }
                 bi.setRGB(x, y, c);
                 pos32aligned++;

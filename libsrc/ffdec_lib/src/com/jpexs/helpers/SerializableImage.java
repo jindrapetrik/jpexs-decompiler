@@ -61,6 +61,15 @@ public class SerializableImage implements Serializable {
         image = new BufferedImage(width, height, imageType);
     }
 
+    public SerializableImage(int width, int height, int imageType, int[] pixels) {
+        if (imageType != BufferedImage.TYPE_INT_ARGB && imageType != BufferedImage.TYPE_INT_RGB) {
+            throw new Error("Unsuppported image type: " + imageType);
+        }
+
+        image = new BufferedImage(width, height, imageType);
+        image.getRaster().setDataElements(0, 0, width, height, pixels);
+    }
+
     public SerializableImage(ColorModel cm, WritableRaster raster, boolean isRasterPremultiplied, Hashtable<?, ?> properties) {
         image = new BufferedImage(cm, raster, isRasterPremultiplied, properties);
     }

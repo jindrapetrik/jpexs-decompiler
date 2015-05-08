@@ -838,6 +838,19 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
+     * Writes ARGB value to the stream
+     *
+     * @param value ARGB value
+     * @throws IOException
+     */
+    public void writeARGB(int value) throws IOException {
+        writeUI8((value >> 24) & 0xff);
+        writeUI8((value >> 16) & 0xff);
+        writeUI8((value >> 8) & 0xff);
+        writeUI8(value & 0xff);
+    }
+
+    /**
      * Writes RGB value to the stream
      *
      * @param value RGB value
@@ -1835,15 +1848,41 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
+     * Writes PIX24 value to the stream
+     *
+     * @param value PIX24 value
+     * @throws IOException
+     */
+    public void writePIX24(int value) throws IOException {
+        writeUI8((value >> 24) & 0xff);
+        writeUI8((value >> 16) & 0xff);
+        writeUI8((value >> 8) & 0xff);
+        writeUI8(value & 0xff);
+    }
+
+    /**
      * Writes PIX15 value to the stream
      *
      * @param value PIX15 value
      * @throws IOException
      */
     public void writePIX15(PIX15 value) throws IOException {
-        writeUB(1, 0);
+        writeUB(1, value.reserved);
         writeUB(5, value.red);
         writeUB(5, value.green);
         writeUB(5, value.blue);
+    }
+
+    /**
+     * Writes PIX15 value to the stream
+     *
+     * @param value PIX15 value
+     * @throws IOException
+     */
+    public void writePIX15(int value) throws IOException {
+        writeUB(1, (value >> 24) & 0xff);
+        writeUB(5, (value >> 19) & 0xff);
+        writeUB(5, (value >> 11) & 0xff);
+        writeUB(5, (value >> 3) & 0xff);
     }
 }

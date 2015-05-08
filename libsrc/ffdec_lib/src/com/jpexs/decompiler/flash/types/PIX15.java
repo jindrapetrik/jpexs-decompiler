@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
@@ -25,6 +26,10 @@ import java.io.Serializable;
  * @author JPEXS
  */
 public class PIX15 implements Serializable {
+
+    @SWFType(value = BasicType.UB, count = 1)
+    @Reserved
+    public int reserved;
 
     /**
      * Red color value

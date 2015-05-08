@@ -2013,6 +2013,23 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
+     * Reads one RGBA value from the stream
+     *
+     * @param name
+     * @return RGBA value
+     * @throws IOException
+     */
+    public int readRGBAInt(String name) throws IOException {
+        newDumpLevel(name, "RGBA");
+        int ret = (readUI8("red") << 16)
+                | (readUI8("green") << 8)
+                | readUI8("blue")
+                | (readUI8("alpha") << 24);
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
      * Reads one ARGB value from the stream
      *
      * @param name
@@ -2031,6 +2048,23 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
+     * Reads one ARGB value from the stream
+     *
+     * @param name
+     * @return ARGB value
+     * @throws IOException
+     */
+    public int readARGBInt(String name) throws IOException {
+        newDumpLevel(name, "ARGB");
+        int ret = (readUI8("alpha") << 24)
+                | (readUI8("red") << 16)
+                | (readUI8("green") << 8)
+                | readUI8("blue");
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
      * Reads one RGB value from the stream
      *
      * @param name
@@ -2043,6 +2077,23 @@ public class SWFInputStream implements AutoCloseable {
         ret.red = readUI8("red");
         ret.green = readUI8("green");
         ret.blue = readUI8("blue");
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
+     * Reads one RGB value from the stream
+     *
+     * @param name
+     * @return RGB value
+     * @throws IOException
+     */
+    public int readRGBInt(String name) throws IOException {
+        newDumpLevel(name, "RGB");
+        int ret = (0xff << 24)
+                | (readUI8("red") << 16)
+                | (readUI8("green") << 8)
+                | readUI8("blue");
         endDumpLevel();
         return ret;
     }
@@ -3185,10 +3236,27 @@ public class SWFInputStream implements AutoCloseable {
     public PIX15 readPIX15(String name) throws IOException {
         PIX15 ret = new PIX15();
         newDumpLevel(name, "PIX15");
-        readUB(1, "reserved");
+        ret.reserved = (int) readUB(1, "reserved");
         ret.red = (int) readUB(5, "red");
         ret.green = (int) readUB(5, "green");
         ret.blue = (int) readUB(5, "blue");
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
+     * Reads one PIX15 value from the stream
+     *
+     * @param name
+     * @return PIX15 value
+     * @throws IOException
+     */
+    public int readPIX15Int(String name) throws IOException {
+        newDumpLevel(name, "PIX15");
+        int ret = ((int) readUB(1, "reserved") << 24)
+                | ((int) readUB(5, "red") << 19)
+                | ((int) readUB(5, "green") << 11)
+                | ((int) readUB(5, "blue") << 3);
         endDumpLevel();
         return ret;
     }
@@ -3212,6 +3280,23 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
+     * Reads one PIX24 value from the stream
+     *
+     * @param name
+     * @return PIX24 value
+     * @throws IOException
+     */
+    public int readPIX24Int(String name) throws IOException {
+        newDumpLevel(name, "PIX24");
+        int ret = (readUI8("reserved") << 24)
+                | (readUI8("red") << 16)
+                | (readUI8("green") << 8)
+                | readUI8("blue");
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
      * Reads one COLORMAPDATA value from the stream
      *
      * @param colorTableSize
@@ -3224,9 +3309,9 @@ public class SWFInputStream implements AutoCloseable {
     public COLORMAPDATA readCOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         COLORMAPDATA ret = new COLORMAPDATA();
         newDumpLevel(name, "COLORMAPDATA");
-        ret.colorTableRGB = new RGB[colorTableSize + 1];
+        ret.colorTableRGB = new int[colorTableSize + 1];
         for (int i = 0; i < colorTableSize + 1; i++) {
-            ret.colorTableRGB[i] = readRGB("colorTableRGB");
+            ret.colorTableRGB[i] = readRGBInt("colorTableRGB");
         }
         int dataLen = 0;
         for (int y = 0; y < bitmapHeight; y++) {
@@ -3258,19 +3343,18 @@ public class SWFInputStream implements AutoCloseable {
         BITMAPDATA ret = new BITMAPDATA();
         newDumpLevel(name, "BITMAPDATA");
         int pixelCount = bitmapWidth * bitmapHeight;
-        PIX15[] pix15 = bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB ? new PIX15[pixelCount] : null;
-        PIX24[] pix24 = bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB ? new PIX24[pixelCount] : null;
+        int[] pix15 = bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB ? new int[pixelCount] : null;
+        int[] pix24 = bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB ? new int[pixelCount] : null;
         int dataLen = 0;
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
                     dataLen += 2;
-                    pix15[pos++] = readPIX15("pix15");
-                }
-                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+                    pix15[pos++] = readPIX15Int("pix15");
+                } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
                     dataLen += 4;
-                    pix24[pos++] = readPIX24("pix24");
+                    pix24[pos++] = readPIX24Int("pix24");
                 }
             }
             while ((dataLen % 4) != 0) {
@@ -3278,11 +3362,13 @@ public class SWFInputStream implements AutoCloseable {
                 readUI8("padding");
             }
         }
+
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
             ret.bitmapPixelDataPix15 = pix15;
         } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
             ret.bitmapPixelDataPix24 = pix24;
         }
+
         endDumpLevel();
         return ret;
     }
@@ -3300,10 +3386,10 @@ public class SWFInputStream implements AutoCloseable {
     public ALPHABITMAPDATA readALPHABITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         ALPHABITMAPDATA ret = new ALPHABITMAPDATA();
         newDumpLevel(name, "ALPHABITMAPDATA");
-        ret.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];
+        ret.bitmapPixelData = new int[bitmapWidth * bitmapHeight];
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
-                ret.bitmapPixelData[y * bitmapWidth + x] = readARGB("bitmapPixelData");
+                ret.bitmapPixelData[y * bitmapWidth + x] = readARGBInt("bitmapPixelData");
             }
         }
         endDumpLevel();
@@ -3323,9 +3409,9 @@ public class SWFInputStream implements AutoCloseable {
     public ALPHACOLORMAPDATA readALPHACOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         ALPHACOLORMAPDATA ret = new ALPHACOLORMAPDATA();
         newDumpLevel(name, "ALPHACOLORMAPDATA");
-        ret.colorTableRGB = new RGBA[colorTableSize + 1];
+        ret.colorTableRGB = new int[colorTableSize + 1];
         for (int i = 0; i < colorTableSize + 1; i++) {
-            ret.colorTableRGB[i] = readRGBA("colorTableRGB");
+            ret.colorTableRGB[i] = readRGBAInt("colorTableRGB");
         }
         int dataLen = 0;
         for (int y = 0; y < bitmapHeight; y++) {

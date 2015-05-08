@@ -25,7 +25,7 @@ import java.io.Serializable;
  */
 public class ALPHACOLORMAPDATA implements Serializable {
 
-    public RGBA[] colorTableRGB;
+    public int[] colorTableRGB;
 
     public byte[] colorMapPixelData;
 }

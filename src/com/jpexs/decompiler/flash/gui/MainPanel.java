@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -67,6 +68,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
@@ -742,13 +744,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        showDetail(DETAILCARDEMPTYPANEL);
-        showCard(CARDEMPTYPANEL);
         swfs.add(newSwfs);
         SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
         if (swf != null) {
             updateUi(swf);
         }
+
+        reload(false);
     }
 
     private ABCPanel getABCPanel() {
@@ -946,9 +948,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void renameMultiname(List<ABCContainerTag> abcList, int multiNameIndex) {
         String oldName = "";
-        if (getABCPanel().abc.constants.getMultiname(multiNameIndex).name_index > 0) {
-            oldName = getABCPanel().abc.constants.getString(getABCPanel().abc.constants.getMultiname(multiNameIndex).name_index);
+        AVM2ConstantPool constants = getABCPanel().abc.constants;
+        if (constants.getMultiname(multiNameIndex).name_index > 0) {
+            oldName = constants.getString(constants.getMultiname(multiNameIndex).name_index);
         }
+
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
@@ -967,13 +971,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         }
                     }
                 }
+
                 View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", Integer.toString(mulCount)));
                 if (abcPanel != null) {
                     abcPanel.reload();
                 }
+
                 updateClassesList();
                 reload(true);
-                getABCPanel().hilightScript(getABCPanel().getSwf(), getABCPanel().decompiledTextArea.getScriptLeaf().getClassPath().toString());
+                ABCPanel abcPanel = getABCPanel();
+                abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString());
             }
         }
     }
@@ -1354,14 +1361,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (swf == null) {
             return;
         }
+
         String documentClass = swf.getDocumentClass();
         if (documentClass != null && !Configuration.dumpView.get()) {
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
-                getABCPanel().setAbc(abcList.get(0).getABC());
-                getABCPanel().hilightScript(swf, documentClass);
-                showDetail(DETAILCARDAS3NAVIGATOR);
-                showCard(CARDACTIONSCRIPT3PANEL);
+                ABCPanel abcPanel = getABCPanel();
+                abcPanel.setAbc(abcList.get(0).getABC());
+                abcPanel.hilightScript(swf, documentClass);
             }
         }
     }
@@ -1958,17 +1965,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             new CancellableWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    int cnt = 0;
+                    ABCPanel abcPanel = getABCPanel();
                     if (all) {
-                        for (ABCContainerTag tag : getABCPanel().getAbcList()) {
+                        for (ABCContainerTag tag : abcPanel.getAbcList()) {
                             tag.getABC().restoreControlFlow();
                         }
                     } else {
-                        int bi = getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                        ABC abc = abcPanel.abc;
+                        int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                         if (bi != -1) {
-                            getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
+                            abc.bodies.get(bi).restoreControlFlow(abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abc.method_info.get(abc.bodies.get(bi).method_info));
                         }
-                        getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, getABCPanel().decompiledTextArea.getCurrentTrait(), getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                     }
                     return true;
                 }
@@ -2037,8 +2046,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 protected Object doInBackground() throws Exception {
                     try {
+                        ABCPanel aBCPanel = getABCPanel();
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : getABCPanel().getAbcList()) {
+                            for (ABCContainerTag tag : abcPanel.getAbcList()) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
@@ -2049,19 +2059,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 }
                             }
                         } else {
-                            int bi = getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                            Trait t = getABCPanel().decompiledTextArea.getCurrentTrait();
+                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                            DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+                            Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
+                            ABC abc = abcPanel.abc;
                             if (bi != -1) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                    getABCPanel().abc.bodies.get(bi).removeDeadCode(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
+                                    abc.bodies.get(bi).removeDeadCode(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    getABCPanel().abc.bodies.get(bi).removeTraps(getABCPanel().abc.constants, getABCPanel().abc, t, getABCPanel().decompiledTextArea.getScriptLeaf().scriptIndex, getABCPanel().decompiledTextArea.getClassIndex(), getABCPanel().decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    getABCPanel().abc.bodies.get(bi).removeTraps(getABCPanel().abc.constants, getABCPanel().abc, t, getABCPanel().decompiledTextArea.getScriptLeaf().scriptIndex, getABCPanel().decompiledTextArea.getClassIndex(), getABCPanel().decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                    getABCPanel().abc.bodies.get(bi).restoreControlFlow(getABCPanel().abc.constants, t, getABCPanel().abc.method_info.get(getABCPanel().abc.bodies.get(bi).method_info));
+                                    abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    abc.bodies.get(bi).restoreControlFlow(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
                                 }
                             }
-                            getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, getABCPanel().abc, t, getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+
+                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
@@ -2144,6 +2157,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (abcPanel != null) {
             abcPanel.reload();
         }
+
         reload(true);
         updateClassesList();
     }
@@ -2266,12 +2280,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 if (selfile.getName().toLowerCase().endsWith(".mp3")) {
                     soundFormat = SoundFormat.FORMAT_MP3;
                 }
+
                 boolean ok = false;
                 try {
                     ok = ds.setSound(new FileInputStream(selfile), soundFormat);
                 } catch (IOException ex) {
                     //ignore
                 }
+
                 if (!ok) {
                     View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -2298,6 +2314,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         logger.log(Level.SEVERE, "Invalid image", ex);
                         View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
+
                     reload(true);
                 }
             }
@@ -2315,6 +2332,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         refreshTree(swf);
                         setTagTreeSelectedNode(newTag);
                     }
+
                     swf.clearImageCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
@@ -2422,7 +2440,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return null;
     }
 
-    public void showDetail(String card) {
+    private void showDetail(String card) {
         CardLayout cl = (CardLayout) (detailPanel.getLayout());
         cl.show(detailPanel, card);
         if (card.equals(DETAILCARDEMPTYPANEL)) {
@@ -2437,7 +2455,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     }
 
-    public void showCard(String card) {
+    private void showCard(String card) {
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
         cl.show(displayPanel, card);
     }
@@ -2656,12 +2674,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             preferScript = true;
         }
 
-        //if (flashPanel != null) {
-        //    flashPanel.specialPlayback = false;
-        //}
         folderPreviewPanel.setItems(new ArrayList<>());
         previewPanel.clear();
         stopFlashPlayer();
+
+        previewPanel.setImageReplaceButtonVisible(false);
+
+        /*if (treeItem instanceof Tag) {
+         Tag tag = (Tag) treeItem;
+         Set<Integer> needed = new HashSet<>();
+         tag.getNeededCharactersDeep(needed);
+         String neededStr = Helper.joinStrings(needed, ", ");
+         // todo: it would be usefule to show this information on the UI
+         System.out.println("Needed characters: " + neededStr);
+         }*/
+        boolean internalViewer = isInternalFlashViewerSelected();
+
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
             if (setSourceWorker != null) {
@@ -2706,28 +2734,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
             return;
-        } else {
-            showDetail(DETAILCARDEMPTYPANEL);
         }
 
-        previewPanel.setImageReplaceButtonVisible(false);
-
-        /*if (treeItem instanceof Tag) {
-         Tag tag = (Tag) treeItem;
-         Set<Integer> needed = new HashSet<>();
-         tag.getNeededCharactersDeep(needed);
-         String neededStr = Helper.joinStrings(needed, ", ");
-         // todo: it would be usefule to show this information on the UI
-         System.out.println("Needed characters: " + neededStr);
-         }*/
-        boolean internalViewer = isInternalFlashViewerSelected();
-
+        showDetail(DETAILCARDEMPTYPANEL);
         if (treeItem instanceof HeaderItem) {
             headerPanel.load(((HeaderItem) treeItem).getSwf());
             showCard(CARDHEADER);
         } else if (treeItem instanceof FolderItem) {
-            showFolderPreview(treeItem);
-            showCard(CARDFOLDERPREVIEWPANEL);
+            showFolderPreview((FolderItem) treeItem);
         } else if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
@@ -2771,13 +2785,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof FontTag) && internalViewer) {
-            FontTag fontTag = (FontTag) treeItem;
-            showFontTag(fontTag);
-            showCard(CARDPREVIEWPANEL);
+            showFontTag((FontTag) treeItem);
         } else if ((treeItem instanceof TextTag) && internalViewer) {
-            TextTag textTag = (TextTag) treeItem;
-            showTextTag(textTag);
-            showCard(CARDPREVIEWPANEL);
+            showTextTag((TextTag) treeItem);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
@@ -2840,11 +2850,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private void showFontTag(FontTag ft) {
 
         previewPanel.showFontPanel(ft);
+        showCard(CARDPREVIEWPANEL);
     }
 
     private void showTextTag(TextTag textTag) {
 
         previewPanel.showTextPanel(textTag);
+        showCard(CARDPREVIEWPANEL);
     }
 
     public void showTextTagWithNewValue(TextTag textTag, TextTag newTextTag) {
@@ -2852,9 +2864,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.showTextComparePanel(textTag, newTextTag);
     }
 
-    private void showFolderPreview(TreeItem treeNode) {
+    private void showFolderPreview(FolderItem item) {
         List<TreeItem> folderPreviewItems = new ArrayList<>();
-        FolderItem item = (FolderItem) treeNode;
         String folderName = item.getName();
         SWF swf = item.swf;
         switch (folderName) {
@@ -2913,7 +2924,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 break;
         }
+
         folderPreviewPanel.setItems(folderPreviewItems);
+        showCard(CARDFOLDERPREVIEWPANEL);
     }
 
     private boolean isFreeing;

@@ -25,7 +25,7 @@ import java.io.Serializable;
  */
 public class BITMAPDATA implements Serializable {
 
-    public PIX15[] bitmapPixelDataPix15 = new PIX15[0];
+    public int[] bitmapPixelDataPix15 = new int[0];
 
-    public PIX24[] bitmapPixelDataPix24 = new PIX24[0];
+    public int[] bitmapPixelDataPix24 = new int[0];
 }

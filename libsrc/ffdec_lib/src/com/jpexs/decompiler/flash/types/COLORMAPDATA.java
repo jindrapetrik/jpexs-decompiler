@@ -23,7 +23,7 @@ import java.io.Serializable;
  */
 public class COLORMAPDATA implements Serializable {
 
-    public RGB[] colorTableRGB;
+    public int[] colorTableRGB;
 
     public byte[] colorMapPixelData;
 }

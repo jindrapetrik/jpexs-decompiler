@@ -509,7 +509,7 @@ public class Filtering {
         return image.getRGB(0, 0, width, image.getHeight(), null, 0, width);
     }
 
-    private static void setRGB(BufferedImage image, int width, int height, int[] pixels) {
+    public static void setRGB(BufferedImage image, int width, int height, int[] pixels) {
         int type = image.getType();
         if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
             image.getRaster().setDataElements(0, 0, width, height, pixels);

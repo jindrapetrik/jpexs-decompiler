@@ -25,8 +25,6 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BITMAPDATA;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.COLORMAPDATA;
-import com.jpexs.decompiler.flash.types.PIX24;
-import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -84,9 +82,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     private byte[] createEmptyImage() {
         try {
             BITMAPDATA bitmapData = new BITMAPDATA();
-            bitmapData.bitmapPixelDataPix24 = new PIX24[1];
-            bitmapData.bitmapPixelDataPix24[0] = new PIX24();
-            bitmapData.bitmapPixelDataPix24[0].reserved = 0xff;
+            bitmapData.bitmapPixelDataPix24 = new int[]{0xff000000};
             ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
             SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
             sos.writeBITMAPDATA(bitmapData, FORMAT_24BIT_RGB, 1, 1);
@@ -106,19 +102,13 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         int width = image.getWidth();
         int height = image.getHeight();
         bitmapData = new BITMAPDATA();
-        bitmapData.bitmapPixelDataPix24 = new PIX24[width * height];
+        bitmapData.bitmapPixelDataPix24 = new int[width * height];
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         for (int pos = 0; pos < pixels.length; pos++) {
-            int argb = pixels[pos];
-            //int a = (argb >> 24) & 0xff;
-            int r = (argb >> 16) & 0xff;
-            int g = (argb >> 8) & 0xff;
-            int b = (argb) & 0xff;
-            bitmapData.bitmapPixelDataPix24[pos] = new PIX24();
-            bitmapData.bitmapPixelDataPix24[pos].red = r;
-            bitmapData.bitmapPixelDataPix24[pos].green = g;
-            bitmapData.bitmapPixelDataPix24[pos].blue = b;
-            bitmapData.bitmapPixelDataPix24[pos].reserved = 0xff; //documentation says 0, but image is sometimes broken with 0, so there is 0xff, which works (maybe alpha?)
+            // set the reserved bits to 0xff, because:
+            // documentation says 0, but image is sometimes broken with 0, so there is 0xff, which works (maybe alpha?)
+            int argb = pixels[pos] | 0xff000000;
+            bitmapData.bitmapPixelDataPix24[pos] = argb;
         }
 
         int format = FORMAT_24BIT_RGB;
@@ -147,41 +137,47 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         if (cachedImage != null) {
             return cachedImage;
         }
-        SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_RGB);
-        COLORMAPDATA colorMapData = null;
-        BITMAPDATA bitmapData = null;
+
+        int[] pixels = new int[bitmapWidth * bitmapHeight];
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
-            colorMapData = getColorMapData();
-        }
-        if ((bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB)) {
-            bitmapData = getBitmapData();
-        }
-        int pos32aligned = 0;
-        int pos = 0;
-        for (int y = 0; y < bitmapHeight; y++) {
-            for (int x = 0; x < bitmapWidth; x++) {
-                int c = 0;
-                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
+            COLORMAPDATA colorMapData = getColorMapData();
+            int pos32aligned = 0;
+            int pos = 0;
+            for (int y = 0; y < bitmapHeight; y++) {
+                for (int x = 0; x < bitmapWidth; x++) {
+                    int c = 0;
                     int colorTableIndex = colorMapData.colorMapPixelData[pos32aligned] & 0xff;
                     if (colorTableIndex < colorMapData.colorTableRGB.length) {
-                        RGB color = colorMapData.colorTableRGB[colorTableIndex];
-                        c = color.toInt();
+                        c = colorMapData.colorTableRGB[colorTableIndex];
                     }
+
+                    pixels[pos++] = c;
+                    pos32aligned++;
                 }
-                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
-                    c = new RGB(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8).toInt();
+
+                while ((pos32aligned % 4 != 0)) {
+                    pos32aligned++;
                 }
-                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
-                    c = new RGB(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue).toInt();
-                }
-                bi.setRGB(x, y, c);
-                pos32aligned++;
-                pos++;
             }
-            while ((pos32aligned % 4 != 0)) {
-                pos32aligned++;
+        } else if ((bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB)) {
+            BITMAPDATA bitmapData = getBitmapData();
+            int pos = 0;
+            int[] bitmapPixelData = null;
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+                bitmapPixelData = bitmapData.bitmapPixelDataPix15;
+            } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+                bitmapPixelData = bitmapData.bitmapPixelDataPix24;
+            }
+
+            for (int y = 0; y < bitmapHeight; y++) {
+                for (int x = 0; x < bitmapWidth; x++) {
+                    int c = bitmapPixelData[pos] | 0xff000000;
+                    pixels[pos++] = c;
+                }
             }
         }
+
+        SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_RGB, pixels);
         cachedImage = bi;
         return bi;
     }
@@ -207,11 +203,11 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength()))));
+            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength())));
+            SWFInputStream sis = new SWFInputStream(swf, uncompressedData);
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
-            }
-            if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
+            } else if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
                 bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
             }
         } catch (IOException ex) {
