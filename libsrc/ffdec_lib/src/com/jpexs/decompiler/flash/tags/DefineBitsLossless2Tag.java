@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import com.jpexs.helpers.Stopwatch;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -190,10 +189,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
             }
             if (bitmapFormat == FORMAT_32BIT_ARGB) {
-                Stopwatch sw = Stopwatch.startNew();
                 bitmapData = sis.readALPHABITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
-                sw.stop();
-                System.out.println("uncompress: " + sw.getElapsedMilliseconds());
             }
         } catch (IOException ex) {
         }
