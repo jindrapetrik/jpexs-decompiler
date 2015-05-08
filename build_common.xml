@@ -306,9 +306,9 @@
        <!-- XAR archiver, linux only :-( -->
        
        <fileset id="xarfileset" dir="${app.installer.dir}/flat">
-            <include name="*"/>
+            
        </fileset>
-       <pathconvert refid="xarfileset" property="xarconverted"/>
+       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" " />
        
        <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
             <arg value="--compression" />
