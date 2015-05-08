@@ -304,15 +304,21 @@
 </installer-script>]]></echo>                       
        <property name="pkg.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.pkg"/> 
        <!-- XAR archiver, linux only :-( -->
-       <exec executable="xar" failonerror="true">
+       
+       <fileset id="xarfileset" dir="${app.installer.dir}/flat">
+            <include name="*"/>
+       </fileset>
+       <pathconvert refid="xarfileset" property="xarconverted"/>
+       
+       <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
             <arg value="--compression" />
             <arg value="none" />
             <arg value="-cf" />
-            <arg value="none" />
             <arg value="${pkg.file}" />
-            <arg value="*" />            
+            <arg line="${xarconverted}" />            
        </exec>  
     </target>
+    
     
     <target name="osx-app-bundle" depends="-loadversion,dist">
         <property name="app.script.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"/>
