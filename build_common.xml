@@ -308,15 +308,19 @@
        <fileset id="xarfileset" dir="${app.installer.dir}/flat">
             
        </fileset>
-       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" " />
-       
+       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" ">
+           <map from="${app.installer.dir}/flat/" to="" />
+       </pathconvert>
+       <echo>
+           ${xarconverted}
+       </echo>
        <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
-            <arg value="--compression" />
+            <arg value="- -compression" />
             <arg value="none" />
             <arg value="-cf" />
             <arg value="${pkg.file}" />
             <arg line="${xarconverted}" />            
-       </exec>  
+       </exec>
     </target>
     
     
