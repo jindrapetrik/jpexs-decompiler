@@ -315,7 +315,7 @@
            ${xarconverted}
        </echo>
        <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
-            <arg value="- -compression" />
+            <arg value="--compression" />
             <arg value="none" />
             <arg value="-cf" />
             <arg value="${pkg.file}" />
