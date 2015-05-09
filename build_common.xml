@@ -3,7 +3,7 @@
     <description>Builds project</description>      
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpath="${basedir}/jbomutils.jar" />                
-   <!-- <taskdef name="xar" classname="com.jpexs.xarant.XarTask" classpath="${basedir}/xarant.jar;${basedir}/xarlib-2.0.1.jar" />-->
+    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.0.1.jar" />
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
@@ -308,21 +308,10 @@
     <pkg-ref id="${MACBUNDLE}.base.pkg" installKBytes="${app.installer.files.size.kilobytes}" version="${VERSION}${VERSIONSUFFIX}" auth="Root">#base.pkg</pkg-ref>
 </installer-script>]]></echo>                       
        <property name="pkg.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.pkg"/> 
-       <!-- XAR archiver, linux only :-( -->
-       
-       <fileset id="xarfileset" dir="${app.installer.dir}/flat">
-            
-       </fileset>
-       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" ">
-           <map from="${app.installer.dir}/flat/" to="" />
-       </pathconvert>       
-       <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
-            <arg value="--compression" />
-            <arg value="none" />
-            <arg value="-cf" />
-            <arg value="${pkg.file}" />
-            <arg line="${xarconverted}" />            
-       </exec>
+              
+       <xar destfile="${pkg.file}" encoding="none">
+           <tarfileset dir="${app.installer.dir}/flat" />
+       </xar>                 
     </target>
     
     
