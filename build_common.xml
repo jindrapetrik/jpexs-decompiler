@@ -3,7 +3,7 @@
     <description>Builds project</description>      
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpath="${basedir}/jbomutils.jar" />                
-    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.0.1.jar" />
+    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.0.0.jar" />
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
@@ -459,7 +459,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,deb,osx-app-archive,installer,locales">        
+    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">        
 
     </target>
          
@@ -543,6 +543,10 @@
             <arg value="-file" />
             <arg value="fileOSXZip" />
             <arg value="${osx.zip.file}" />
+            
+            <arg value="-file" />
+            <arg value="filePkg" />
+            <arg value="${pkg.file}" />
             
             <arg value="-file" />
             <arg value="fileDeb" />
