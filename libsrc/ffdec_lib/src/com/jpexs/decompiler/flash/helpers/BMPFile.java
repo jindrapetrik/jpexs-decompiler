@@ -124,7 +124,8 @@ public class BMPFile extends Component {
         } catch (InterruptedException e) {
             return (false);
         }
-        pad = (4 - ((parWidth * 3) % 4)) * parHeight;
+
+        pad = ((4 - ((parWidth * 3) % 4)) % 4) * parHeight;
         biSizeImage = ((parWidth * parHeight) * 3) + pad;
         bfSize = biSizeImage + BITMAPFILEHEADER_SIZE
                 + BITMAPINFOHEADER_SIZE;
@@ -151,8 +152,8 @@ public class BMPFile extends Component {
         int pad;
         int padCount;
         byte[] rgb = new byte[3];
-        size = (biWidth * biHeight);
-        pad = (biWidth * 3) % 4;
+        size = biWidth * biHeight;
+        pad = ((4 - ((biWidth * 3) % 4)) % 4);
         rowCount = 1;
         padCount = 0;
         rowIndex = size - biWidth;

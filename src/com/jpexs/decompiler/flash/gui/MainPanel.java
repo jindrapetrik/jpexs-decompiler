@@ -1222,42 +1222,42 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         EventListener evl = swf.getExportEventListener();
 
         if (export.isOptionEnabled(ImageExportMode.class)) {
-            new ImageExporter().exportImages(handler, selFile + File.separator + "images", swf.tags,
+            new ImageExporter().exportImages(handler, Path.combine(selFile, "images"), swf.tags,
                     new ImageExportSettings(export.getValue(ImageExportMode.class)), evl);
         }
 
         if (export.isOptionEnabled(ShapeExportMode.class)) {
-            new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", swf.tags,
+            new ShapeExporter().exportShapes(handler, Path.combine(selFile, "shapes"), swf.tags,
                     new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl);
         }
 
         if (export.isOptionEnabled(MorphShapeExportMode.class)) {
-            new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", swf.tags,
+            new MorphShapeExporter().exportMorphShapes(handler, Path.combine(selFile, "morphshapes"), swf.tags,
                     new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl);
         }
 
         if (export.isOptionEnabled(TextExportMode.class)) {
-            new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, swf.tags,
+            new TextExporter().exportTexts(handler, Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME), swf.tags,
                     new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl);
         }
 
         if (export.isOptionEnabled(MovieExportMode.class)) {
-            new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", swf.tags,
+            new MovieExporter().exportMovies(handler, Path.combine(selFile, "movies"), swf.tags,
                     new MovieExportSettings(export.getValue(MovieExportMode.class)), evl);
         }
 
         if (export.isOptionEnabled(SoundExportMode.class)) {
-            new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", swf.tags,
+            new SoundExporter().exportSounds(handler, Path.combine(selFile, "sounds"), swf.tags,
                     new SoundExportSettings(export.getValue(SoundExportMode.class)), evl);
         }
 
         if (export.isOptionEnabled(BinaryDataExportMode.class)) {
-            new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", swf.tags,
+            new BinaryDataExporter().exportBinaryData(handler, Path.combine(selFile, "binaryData"), swf.tags,
                     new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl);
         }
 
         if (export.isOptionEnabled(FontExportMode.class)) {
-            new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", swf.tags,
+            new FontExporter().exportFonts(handler, Path.combine(selFile, "fonts"), swf.tags,
                     new FontExportSettings(export.getValue(FontExportMode.class)), evl);
         }
 
@@ -1272,7 +1272,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             frameExporter.exportFrames(handler, selFile + File.separator + "frames", swf, 0, null, fes, evl);
             for (CharacterTag c : swf.getCharacters().values()) {
                 if (c instanceof DefineSpriteTag) {
-                    frameExporter.exportFrames(handler, selFile + File.separator + "sprites", swf, c.getCharacterId(), null, fes, evl);
+                    frameExporter.exportFrames(handler, Path.combine(selFile, "sprites"), swf, c.getCharacterId(), null, fes, evl);
                 }
             }
         }
@@ -1283,7 +1283,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 if (c instanceof ButtonTag) {
                     List<Integer> frameNums = new ArrayList<>();
                     frameNums.add(0); // todo: export all frames
-                    frameExporter.exportFrames(handler, selFile + File.separator + "buttons", swf, c.getCharacterId(), frameNums, bes, evl);
+                    frameExporter.exportFrames(handler, Path.combine(selFile, "buttons"), swf, c.getCharacterId(), frameNums, bes, evl);
                 }
             }
         }
@@ -1297,6 +1297,113 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
                 swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
+            }
+        }
+    }
+
+    public void exportAllDebug(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
+        EventListener evl = swf.getExportEventListener();
+
+        if (export.isOptionEnabled(ImageExportMode.class)) {
+            for (ImageExportMode exportMode : ImageExportMode.values()) {
+                new ImageExporter().exportImages(handler, Path.combine(selFile, "images", exportMode.name()), swf.tags,
+                        new ImageExportSettings(exportMode), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(ShapeExportMode.class)) {
+            for (ShapeExportMode exportMode : ShapeExportMode.values()) {
+                new ShapeExporter().exportShapes(handler, Path.combine(selFile, "shapes", exportMode.name()), swf.tags,
+                        new ShapeExportSettings(exportMode, export.getZoom()), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(MorphShapeExportMode.class)) {
+            for (MorphShapeExportMode exportMode : MorphShapeExportMode.values()) {
+                new MorphShapeExporter().exportMorphShapes(handler, Path.combine(selFile, "morphshapes", exportMode.name()), swf.tags,
+                        new MorphShapeExportSettings(exportMode, export.getZoom()), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(TextExportMode.class)) {
+            for (TextExportMode exportMode : TextExportMode.values()) {
+                new TextExporter().exportTexts(handler, Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf.tags,
+                        new TextExportSettings(exportMode, Configuration.textExportSingleFile.get(), export.getZoom()), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(MovieExportMode.class)) {
+            for (MovieExportMode exportMode : MovieExportMode.values()) {
+                new MovieExporter().exportMovies(handler, Path.combine(selFile, "movies", exportMode.name()), swf.tags,
+                        new MovieExportSettings(exportMode), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(SoundExportMode.class)) {
+            for (SoundExportMode exportMode : SoundExportMode.values()) {
+                new SoundExporter().exportSounds(handler, Path.combine(selFile, "sounds", exportMode.name()), swf.tags,
+                        new SoundExportSettings(exportMode), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(BinaryDataExportMode.class)) {
+            for (BinaryDataExportMode exportMode : BinaryDataExportMode.values()) {
+                new BinaryDataExporter().exportBinaryData(handler, Path.combine(selFile, "binaryData", exportMode.name()), swf.tags,
+                        new BinaryDataExportSettings(exportMode), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(FontExportMode.class)) {
+            for (FontExportMode exportMode : FontExportMode.values()) {
+                new FontExporter().exportFonts(handler, Path.combine(selFile, "fonts", exportMode.name()), swf.tags,
+                        new FontExportSettings(exportMode), evl);
+            }
+        }
+
+        if (export.isOptionEnabled(SymbolClassExportMode.class)) {
+            for (SymbolClassExportMode exportMode : SymbolClassExportMode.values()) {
+                new SymbolClassExporter().exportNames(selFile, swf.tags, evl);
+            }
+        }
+
+        FrameExporter frameExporter = new FrameExporter();
+
+        if (export.isOptionEnabled(FramesExportMode.class)) {
+            for (FramesExportMode exportMode : FramesExportMode.values()) {
+                FramesExportSettings fes = new FramesExportSettings(exportMode, export.getZoom());
+                frameExporter.exportFrames(handler, Path.combine(selFile, "frames", exportMode.name()), swf, 0, null, fes, evl);
+                for (CharacterTag c : swf.getCharacters().values()) {
+                    if (c instanceof DefineSpriteTag) {
+                        frameExporter.exportFrames(handler, Path.combine(selFile, "sprites", exportMode.name()), swf, c.getCharacterId(), null, fes, evl);
+                    }
+                }
+            }
+        }
+
+        if (export.isOptionEnabled(ButtonExportMode.class)) {
+            for (ButtonExportMode exportMode : ButtonExportMode.values()) {
+                ButtonExportSettings bes = new ButtonExportSettings(exportMode, export.getZoom());
+                for (CharacterTag c : swf.getCharacters().values()) {
+                    if (c instanceof ButtonTag) {
+                        List<Integer> frameNums = new ArrayList<>();
+                        frameNums.add(0); // todo: export all frames
+                        frameExporter.exportFrames(handler, Path.combine(selFile, "buttons", exportMode.name()), swf, c.getCharacterId(), frameNums, bes, evl);
+                    }
+                }
+            }
+        }
+
+        if (export.isOptionEnabled(ScriptExportMode.class)) {
+            boolean parallel = Configuration.parallelSpeedUp.get();
+            for (ScriptExportMode exportMode : ScriptExportMode.values()) {
+                String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME, exportMode.name());
+                Path.createDirectorySafe(new File(scriptsFolder));
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, !parallel && Configuration.scriptExportSingleFile.get());
+                String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
+                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    scriptExportSettings.singleFileWriter = writer;
+                    swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
+                }
             }
         }
     }

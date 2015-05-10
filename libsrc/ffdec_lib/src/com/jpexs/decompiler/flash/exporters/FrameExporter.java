@@ -363,26 +363,28 @@ public class FrameExporter {
                 //ShapeExporterBase.clearCache();
                 break;
             case PDF:
-                new RetryTask(() -> {
-                    File f = new File(foutdir + File.separator + "frames.pdf");
-                    PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
-                    PageFormat pf = new PageFormat();
-                    pf.setOrientation(PageFormat.PORTRAIT);
-                    Paper p = new Paper();
-                    BufferedImage img0 = frameImages.next();
-                    p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
-                    pf.setPaper(p);
+                if (frameImages.hasNext()) {
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.pdf");
+                        PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
+                        PageFormat pf = new PageFormat();
+                        pf.setOrientation(PageFormat.PORTRAIT);
+                        Paper p = new Paper();
+                        BufferedImage img0 = frameImages.next();
+                        p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
+                        pf.setPaper(p);
 
-                    for (int i = 0; frameImages.hasNext(); i++) {
-                        BufferedImage img = frameImages.next();
-                        Graphics g = job.getGraphics(pf);
-                        g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
-                        g.dispose();
-                    }
+                        for (int i = 0; frameImages.hasNext(); i++) {
+                            BufferedImage img = frameImages.next();
+                            Graphics g = job.getGraphics(pf);
+                            g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
+                            g.dispose();
+                        }
 
-                    job.end();
-                    ret.add(f);
-                }, handler).run();
+                        job.end();
+                        ret.add(f);
+                    }, handler).run();
+                }
                 break;
             case AVI:
                 new RetryTask(() -> {

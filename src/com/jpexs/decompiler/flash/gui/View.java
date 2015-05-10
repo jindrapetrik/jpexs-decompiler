@@ -150,107 +150,105 @@ public class View {
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
         }
 
-        execInEventDispatch(() -> {
-            try {
-                UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
-                SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
-                UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
-                UIManager.put("Tree.expandedIcon", getIcon("expand16"));
-                UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
-                UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
-                UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
-                UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
-                UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
-                UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
-                UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
-                UIManager.put("TextField.background", Color.white);
-                UIManager.put("FormattedTextField.background", Color.white);
-                UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
+        try {
+            UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
+            SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
+            UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
+            UIManager.put("Tree.expandedIcon", getIcon("expand16"));
+            UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
+            UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
+            UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
+            UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
+            UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
+            UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
+            UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
+            UIManager.put("TextField.background", Color.white);
+            UIManager.put("FormattedTextField.background", Color.white);
+            UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
 
-                FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
-                final FontSet fs = pol.getFontSet("Substance", null);
+            FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
+            final FontSet fs = pol.getFontSet("Substance", null);
 
-                //Restore default font for chinese characters
-                SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
+            //Restore default font for chinese characters
+            SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
 
-                    private final FontSet fontSet = new FontSet() {
+                private final FontSet fontSet = new FontSet() {
 
-                        private FontUIResource controlFont;
+                    private FontUIResource controlFont;
 
-                        private FontUIResource menuFont;
+                    private FontUIResource menuFont;
 
-                        private FontUIResource titleFont;
+                    private FontUIResource titleFont;
 
-                        private FontUIResource windowTitleFont;
+                    private FontUIResource windowTitleFont;
 
-                        private FontUIResource smallFont;
+                    private FontUIResource smallFont;
 
-                        private FontUIResource messageFont;
-
-                        @Override
-                        public FontUIResource getControlFont() {
-                            if (controlFont == null) {
-                                FontUIResource f = fs.getControlFont();
-                                controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return controlFont;
-                        }
-
-                        @Override
-                        public FontUIResource getMenuFont() {
-                            if (menuFont == null) {
-                                FontUIResource f = fs.getMenuFont();
-                                menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return menuFont;
-                        }
-
-                        @Override
-                        public FontUIResource getTitleFont() {
-                            if (titleFont == null) {
-                                FontUIResource f = fs.getTitleFont();
-                                titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return titleFont;
-                        }
-
-                        @Override
-                        public FontUIResource getWindowTitleFont() {
-                            if (windowTitleFont == null) {
-                                FontUIResource f = fs.getWindowTitleFont();
-                                windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return windowTitleFont;
-                        }
-
-                        @Override
-                        public FontUIResource getSmallFont() {
-                            if (smallFont == null) {
-                                FontUIResource f = fs.getSmallFont();
-                                smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return smallFont;
-                        }
-
-                        @Override
-                        public FontUIResource getMessageFont() {
-                            if (messageFont == null) {
-                                FontUIResource f = fs.getMessageFont();
-                                messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                            }
-                            return messageFont;
-                        }
-                    };
+                    private FontUIResource messageFont;
 
                     @Override
-                    public FontSet getFontSet(String string, UIDefaults uid) {
-                        return fontSet;
+                    public FontUIResource getControlFont() {
+                        if (controlFont == null) {
+                            FontUIResource f = fs.getControlFont();
+                            controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return controlFont;
                     }
-                });
-            } catch (UnsupportedLookAndFeelException ex) {
-                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+
+                    @Override
+                    public FontUIResource getMenuFont() {
+                        if (menuFont == null) {
+                            FontUIResource f = fs.getMenuFont();
+                            menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return menuFont;
+                    }
+
+                    @Override
+                    public FontUIResource getTitleFont() {
+                        if (titleFont == null) {
+                            FontUIResource f = fs.getTitleFont();
+                            titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return titleFont;
+                    }
+
+                    @Override
+                    public FontUIResource getWindowTitleFont() {
+                        if (windowTitleFont == null) {
+                            FontUIResource f = fs.getWindowTitleFont();
+                            windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return windowTitleFont;
+                    }
+
+                    @Override
+                    public FontUIResource getSmallFont() {
+                        if (smallFont == null) {
+                            FontUIResource f = fs.getSmallFont();
+                            smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return smallFont;
+                    }
+
+                    @Override
+                    public FontUIResource getMessageFont() {
+                        if (messageFont == null) {
+                            FontUIResource f = fs.getMessageFont();
+                            messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                        }
+                        return messageFont;
+                    }
+                };
+
+                @Override
+                public FontSet getFontSet(String string, UIDefaults uid) {
+                    return fontSet;
+                }
+            });
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         UIManager.put(SubstanceLookAndFeel.TABBED_PANE_CONTENT_BORDER_KIND, SubstanceConstants.TabContentPaneBorderKind.SINGLE_FULL);
 

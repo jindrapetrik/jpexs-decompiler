@@ -429,7 +429,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
             double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
 
-            Color textColor2 = new Color(textColor);
+            Color textColor2 = new Color(textColor, true);
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = transformation.clone();
                 mat = mat.concatenate(new Matrix(textMatrix));

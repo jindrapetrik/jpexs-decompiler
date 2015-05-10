@@ -41,7 +41,19 @@ public class GuiAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
                 return AbortRetryIgnoreHandler.IGNORE;
             }
 
-            int result = View.showOptionDialog(null, AppStrings.translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
+            String msg = null;
+            if (thrown != null) {
+                msg = thrown.getLocalizedMessage();
+                if (msg == null) {
+                    msg = thrown.toString();
+                }
+            }
+
+            if (msg == null) {
+                msg = "";
+            }
+
+            int result = View.showOptionDialog(null, AppStrings.translate("error.occured").replace("%error%", msg), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
             if (result == AbortRetryIgnoreHandler.IGNORE_ALL) {
                 ignoreAll = true;
                 result = AbortRetryIgnoreHandler.IGNORE;
