@@ -3,7 +3,7 @@
     <description>Builds project</description>      
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpath="${basedir}/jbomutils.jar" />                
-   <!-- <taskdef name="xar" classname="com.jpexs.xarant.XarTask" classpath="${basedir}/xarant.jar;${basedir}/xarlib-2.0.1.jar" />-->
+    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.0.1.jar" />
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
@@ -28,6 +28,8 @@
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
         <classpath path="${TESTLIBDIR}/jacocoant.jar"/>
     </taskdef>    
+    
+    <taskdef name="cpio" classname="org.apache.ant.compress.taskdefs.Cpio" classpath="${basedir}/ant-compress-1.4.jar;${basedir}/commons-compress-1.9.jar" />
     
     <path id="ant-deb.classpath">
         <pathelement location="${basedir}/ant-deb-0.0.1.jar"/>
@@ -236,15 +238,18 @@
             </fileset>
         </copy>
         
-        <tar destfile="${app.installer.dir}/flat/base.pkg/Payload" compression="gzip">
+        <tempfile deleteonexit="true" property="app.cpio.temp" prefix="cpio"/>
+        
+        <cpio destfile="${app.cpio.temp}" format="odc">
             <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="755" />            
             <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80">
                 <exclude name="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" />
                 <exclude name="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
             </tarfileset>
-            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />  
-        </tar>
-        
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />        
+        </cpio>
+        <gzip src="${app.cpio.temp}" destfile="${app.installer.dir}/flat/base.pkg/Payload" />
+        <delete file="${app.cpio.temp}" />
         <resourcecount property="app.installer.files.number">
             <fileset dir="${app.installer.dir}/root" />
         </resourcecount>
@@ -303,20 +308,10 @@
     <pkg-ref id="${MACBUNDLE}.base.pkg" installKBytes="${app.installer.files.size.kilobytes}" version="${VERSION}${VERSIONSUFFIX}" auth="Root">#base.pkg</pkg-ref>
 </installer-script>]]></echo>                       
        <property name="pkg.file" value="${RELEASESDIR}/${PREFIXFILENAME}_${VERSION}${VERSIONSUFFIX}.pkg"/> 
-       <!-- XAR archiver, linux only :-( -->
-       
-       <fileset id="xarfileset" dir="${app.installer.dir}/flat">
-            
-       </fileset>
-       <pathconvert refid="xarfileset" property="xarconverted" pathsep=" " />
-       
-       <exec executable="xar" failonerror="true" dir="${app.installer.dir}/flat">
-            <arg value="--compression" />
-            <arg value="none" />
-            <arg value="-cf" />
-            <arg value="${pkg.file}" />
-            <arg line="${xarconverted}" />            
-       </exec>  
+              
+       <xar destfile="${pkg.file}" encoding="none">
+           <tarfileset dir="${app.installer.dir}/flat" />
+       </xar>                 
     </target>
     
     
