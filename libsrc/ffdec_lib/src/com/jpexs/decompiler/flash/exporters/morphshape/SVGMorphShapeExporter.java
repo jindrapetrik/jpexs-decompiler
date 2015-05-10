@@ -145,10 +145,12 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
+                    matrix = matrix.clone();
                     matrix.rotateSkew0 *= zoom / SWF.unitDivisor;
                     matrix.rotateSkew1 *= zoom / SWF.unitDivisor;
                     matrix.scaleX *= zoom / SWF.unitDivisor;
                     matrix.scaleY *= zoom / SWF.unitDivisor;
+                    matrixEnd = matrixEnd.clone();
                     matrixEnd.rotateSkew0 *= zoom / SWF.unitDivisor;
                     matrixEnd.rotateSkew1 *= zoom / SWF.unitDivisor;
                     matrixEnd.scaleX *= zoom / SWF.unitDivisor;

@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters.shape;
 
-import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.exporters.commonshape.FillStyle;
+import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import java.util.List;
 
 /**
@@ -26,9 +26,9 @@ import java.util.List;
  */
 public class ShapeExportData {
 
-    public List<FILLSTYLE> fillStyles;
+    public List<FillStyle> fillStyles;
 
-    public List<LINESTYLE> lineStyles;
+    public List<LineStyle> lineStyles;
 
     public List<List<IEdge>> fillPaths;
 

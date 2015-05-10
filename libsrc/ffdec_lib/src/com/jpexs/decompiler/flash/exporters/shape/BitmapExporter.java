@@ -36,6 +36,7 @@ import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -52,15 +53,17 @@ import java.util.List;
  */
 public class BitmapExporter extends ShapeExporterBase {
 
+    private static final Point POINT_NEG16384_0 = new Point(-16384, 0);
+
+    private static final Point POINT_16384_0 = new Point(16384, 0);
+
+    private static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
+
     private SerializableImage image;
 
     private Graphics2D graphics;
 
     private final Color defaultColor;
-
-    private double deltaX;
-
-    private double deltaY;
 
     private final SWF swf;
 
@@ -77,8 +80,6 @@ public class BitmapExporter extends ShapeExporterBase {
     private Stroke lineStroke;
 
     private Stroke defaultStroke;
-
-    private double unitDivisor;
 
     private class TransformedStroke implements Stroke {
 
@@ -147,7 +148,6 @@ public class BitmapExporter extends ShapeExporterBase {
         graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        unitDivisor = 1;
         graphics.setTransform(at);
         defaultStroke = graphics.getStroke();
         super.export();
@@ -199,12 +199,6 @@ public class BitmapExporter extends ShapeExporterBase {
         if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
             cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
         }
-        matrix.translateX /= unitDivisor;
-        matrix.translateY /= unitDivisor;
-        matrix.scaleX /= unitDivisor;
-        matrix.scaleY /= unitDivisor;
-        matrix.rotateSkew0 /= unitDivisor;
-        matrix.rotateSkew1 /= unitDivisor;
         switch (type) {
             case FILLSTYLE.LINEAR_GRADIENT: {
                 List<Color> colors = new ArrayList<>();
@@ -233,9 +227,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 fillPathPaint = null;
-                fillPaint = new LinearGradientPaint(new java.awt.Point(-16384, 0), new java.awt.Point(16384, 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
-                matrix.translateX -= deltaX;
-                matrix.translateY -= deltaY;
+                fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
                 fillTransform = matrix.toTransform();
             }
             break;
@@ -268,8 +260,6 @@ public class BitmapExporter extends ShapeExporterBase {
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
-                matrix.translateX -= deltaX;
-                matrix.translateY -= deltaY;
                 fillTransform = matrix.toTransform();
             }
             break;
@@ -302,8 +292,6 @@ public class BitmapExporter extends ShapeExporterBase {
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
-                matrix.translateX -= deltaX;
-                matrix.translateY -= deltaY;
                 fillTransform = matrix.toTransform();
             }
             break;
@@ -313,12 +301,6 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
-        matrix.translateX /= unitDivisor;
-        matrix.translateY /= unitDivisor;
-        matrix.scaleX /= unitDivisor;
-        matrix.scaleY /= unitDivisor;
-        matrix.rotateSkew0 /= unitDivisor;
-        matrix.rotateSkew1 /= unitDivisor;
         ImageTag image = null;
         for (Tag t : swf.tags) {
             if (t instanceof ImageTag) {
@@ -334,8 +316,6 @@ public class BitmapExporter extends ShapeExporterBase {
             if (img != null) {
                 img = colorTransform.apply(img);
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
-                matrix.translateX -= deltaX;
-                matrix.translateY -= deltaY;
                 fillTransform = matrix.toTransform();
             }
         }
@@ -350,7 +330,6 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= unitDivisor;
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -412,18 +391,17 @@ public class BitmapExporter extends ShapeExporterBase {
 
     @Override
     public void moveTo(double x, double y) {
-        path.moveTo(x / unitDivisor - deltaX, y / unitDivisor - deltaY);
+        path.moveTo(x, y);
     }
 
     @Override
     public void lineTo(double x, double y) {
-        path.lineTo(x / unitDivisor - deltaX, y / unitDivisor - deltaY);
+        path.lineTo(x, y);
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX / unitDivisor - deltaX, controlY / unitDivisor - deltaY,
-                anchorX / unitDivisor - deltaX, anchorY / unitDivisor - deltaY);
+        path.quadTo(controlX, controlY, anchorX, anchorY);
     }
 
     protected void finalizePath() {

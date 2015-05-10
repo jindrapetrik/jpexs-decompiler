@@ -181,26 +181,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
             fillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
         } else {
-            matrix.translateX /= unitDivisor;
-            matrix.translateY /= unitDivisor;
-            matrix.scaleX /= unitDivisor;
-            matrix.scaleY /= unitDivisor;
-            matrix.rotateSkew0 /= unitDivisor;
-            matrix.rotateSkew1 /= unitDivisor;
-            matrix.translateX += deltaX / unitDivisor;
-            matrix.translateY += deltaY / unitDivisor;
             fillMatrix = matrix;
-
-            matrixEnd.translateX /= unitDivisor;
-            matrixEnd.translateY /= unitDivisor;
-            matrixEnd.scaleX /= unitDivisor;
-            matrixEnd.scaleY /= unitDivisor;
-            matrixEnd.rotateSkew0 /= unitDivisor;
-            matrixEnd.rotateSkew1 /= unitDivisor;
-            matrixEnd.translateX += deltaX / unitDivisor;
-            matrixEnd.translateY += deltaY / unitDivisor;
             fillMatrixEnd = matrixEnd;
-
             fillData += "\tvar grd=ctx.createRadialGradient(" + useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384) + ",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
@@ -250,26 +232,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             if (img != null) {
                 colorTransform.apply(img);
                 if (matrix != null) {
-                    fillMatrix = matrix.clone();
-                    fillMatrix.translateX /= unitDivisor;
-                    fillMatrix.translateY /= unitDivisor;
-                    fillMatrix.scaleX /= unitDivisor;
-                    fillMatrix.scaleY /= unitDivisor;
-                    fillMatrix.rotateSkew0 /= unitDivisor;
-                    fillMatrix.rotateSkew1 /= unitDivisor;
-                    fillMatrix.translateX += deltaX / unitDivisor;
-                    fillMatrix.translateY += deltaY / unitDivisor;
-
-                    fillMatrixEnd = matrixEnd.clone();
-                    fillMatrixEnd.translateX /= unitDivisor;
-                    fillMatrixEnd.translateY /= unitDivisor;
-                    fillMatrixEnd.scaleX /= unitDivisor;
-                    fillMatrixEnd.scaleY /= unitDivisor;
-                    fillMatrixEnd.rotateSkew0 /= unitDivisor;
-                    fillMatrixEnd.rotateSkew1 /= unitDivisor;
-                    fillMatrixEnd.translateX += deltaX / unitDivisor;
-                    fillMatrixEnd.translateY += deltaY / unitDivisor;
-
+                    fillMatrix = matrix;
+                    fillMatrixEnd = matrixEnd;
                 }
 
                 fillData += "\tvar fimg = ctrans.applyToImage(imageObj" + bitmapId + ");\r\n";
@@ -344,26 +308,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             end2.y += deltaY;
             lineFillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
         } else {
-            matrix.translateX /= unitDivisor;
-            matrix.translateY /= unitDivisor;
-            matrix.scaleX /= unitDivisor;
-            matrix.scaleY /= unitDivisor;
-            matrix.rotateSkew0 /= unitDivisor;
-            matrix.rotateSkew1 /= unitDivisor;
-            matrix.translateX += deltaX / unitDivisor;
-            matrix.translateY += deltaY / unitDivisor;
             lineFillMatrix = matrix;
-
-            matrixEnd.translateX /= unitDivisor;
-            matrixEnd.translateY /= unitDivisor;
-            matrixEnd.scaleX /= unitDivisor;
-            matrixEnd.scaleY /= unitDivisor;
-            matrixEnd.rotateSkew0 /= unitDivisor;
-            matrixEnd.rotateSkew1 /= unitDivisor;
-            matrixEnd.translateX += deltaX / unitDivisor;
-            matrixEnd.translateY += deltaY / unitDivisor;
             lineFillMatrixEnd = matrixEnd;
-
             lineFillData += "\tvar grd=ctx.createRadialGradient(" + useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384) + ",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = lineRepeatCnt * 2 + 1;
@@ -471,7 +417,12 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 if (lineLastRadColor != null) {
                     preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
-                preLineFillData += "\tctx.transform(" + useRatioDouble(lineFillMatrix.scaleX, lineFillMatrixEnd.scaleX) + "," + useRatioDouble(lineFillMatrix.rotateSkew0, lineFillMatrixEnd.rotateSkew0) + "," + useRatioDouble(lineFillMatrix.rotateSkew1, lineFillMatrixEnd.rotateSkew1) + "," + useRatioDouble(lineFillMatrix.scaleY, lineFillMatrixEnd.scaleY) + "," + useRatioDouble(lineFillMatrix.translateX, lineFillMatrixEnd.translateX) + "," + useRatioDouble(lineFillMatrix.translateY, lineFillMatrixEnd.translateY) + ");\r\n";
+                preLineFillData += "\tctx.transform(" + useRatioDouble(lineFillMatrix.scaleX / unitDivisor, lineFillMatrixEnd.scaleX / unitDivisor)
+                        + "," + useRatioDouble(lineFillMatrix.rotateSkew0 / unitDivisor, lineFillMatrixEnd.rotateSkew0 / unitDivisor)
+                        + "," + useRatioDouble(lineFillMatrix.rotateSkew1 / unitDivisor, lineFillMatrixEnd.rotateSkew1 / unitDivisor)
+                        + "," + useRatioDouble(lineFillMatrix.scaleY / unitDivisor, lineFillMatrixEnd.scaleY / unitDivisor)
+                        + "," + useRatioDouble((lineFillMatrix.translateX + deltaX) / unitDivisor, (lineFillMatrixEnd.translateX + deltaX) / unitDivisor)
+                        + "," + useRatioDouble((lineFillMatrix.translateY + deltaY) / unitDivisor, (lineFillMatrixEnd.translateY + deltaY) / unitDivisor) + ");\r\n";
                 lineFillData = preLineFillData + lineFillData;
                 lineFillData += "\tctx.fillRect(" + (-16384 - 32768 * lineRepeatCnt) + "," + (-16384 - 32768 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + ");\r\n";
                 lineFillData += "\tctx = oldctx;\r\n";
@@ -500,7 +451,12 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 }
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
-                pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX, fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0, fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1, fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY, fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX, fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY, fillMatrixEnd.translateY) + ");\r\n";
+                pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX / unitDivisor, fillMatrixEnd.scaleX / unitDivisor)
+                        + "," + useRatioDouble(fillMatrix.rotateSkew0 / unitDivisor, fillMatrixEnd.rotateSkew0 / unitDivisor)
+                        + "," + useRatioDouble(fillMatrix.rotateSkew1 / unitDivisor, fillMatrixEnd.rotateSkew1 / unitDivisor)
+                        + "," + useRatioDouble(fillMatrix.scaleY / unitDivisor, fillMatrixEnd.scaleY / unitDivisor)
+                        + "," + useRatioDouble((fillMatrix.translateX + deltaX) / unitDivisor, (fillMatrixEnd.translateX + deltaX) / unitDivisor)
+                        + "," + useRatioDouble((fillMatrix.translateY + deltaY) / unitDivisor, (fillMatrixEnd.translateY + deltaY) / unitDivisor) + ");\r\n";
 
                 if (fillWidth > 0) {//repeating bitmap glitch fix
                     //make bitmap 1px wider

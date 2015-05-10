@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters.shape;
 
-import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.FillStyle;
+import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import com.jpexs.decompiler.flash.exporters.commonshape.PointInt;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -34,7 +35,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Cache;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +48,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected final SHAPE shape;
 
-    private final List<FILLSTYLE> _fillStyles;
+    private final List<FillStyle> _fillStyles;
 
-    private final List<LINESTYLE> _lineStyles;
+    private final List<LineStyle> _lineStyles;
 
     private final List<List<IEdge>> _fillPaths;
 
@@ -66,12 +66,17 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
         ShapeExportData cachedData = exportDataCache.get(shape);
         if (cachedData == null) {
-            List<FILLSTYLE> fillStyles = new ArrayList<>();
-            List<LINESTYLE> lineStyles = new ArrayList<>();
+            List<FillStyle> fillStyles = new ArrayList<>();
+            List<LineStyle> lineStyles = new ArrayList<>();
             if (shape instanceof SHAPEWITHSTYLE) {
                 SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
-                fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
-                lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+                for (FILLSTYLE fillStyle : shapeWithStyle.fillStyles.fillStyles) {
+                    fillStyles.add(new FillStyle(fillStyle));
+                }
+
+                for (LINESTYLE lineStyle : shapeWithStyle.lineStyles.lineStyles) {
+                    lineStyles.add(new LineStyle(lineStyle));
+                }
             }
 
             // Create edge maps
@@ -114,7 +119,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         endShape();
     }
 
-    private void createEdgeMaps(SHAPE shape, List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
+    private void createEdgeMaps(SHAPE shape, List<FillStyle> fillStyles, List<LineStyle> lineStyles,
             List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
         int xPos = 0;
         int yPos = 0;
@@ -260,8 +265,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     fillStyleIdx = e.getFillStyleIdx();
                     pos = PointInt.MAX;
                     if (fillStyleIdx - 1 < _fillStyles.size()) {
-                        Matrix matrix;
-                        FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
+                        FillStyle fillStyle = _fillStyles.get(fillStyleIdx - 1);
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
                                 // Solid fill
@@ -271,11 +275,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             case FILLSTYLE.RADIAL_GRADIENT:
                             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                 // Gradient fill
-                                matrix = new Matrix(fillStyle.gradientMatrix);
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
                                         colorTransform.apply(fillStyle.gradient.gradientRecords),
-                                        matrix,
+                                        fillStyle.gradientMatrix,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
                                         (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
@@ -286,10 +289,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
                             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                                 // Bitmap fill
-                                matrix = new Matrix(fillStyle.bitmapMatrix);
                                 beginBitmapFill(
                                         fillStyle.bitmapId,
-                                        matrix,
+                                        fillStyle.bitmapMatrix,
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
                                         colorTransform
@@ -330,7 +332,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
                     pos = PointInt.MAX;
-                    LINESTYLE lineStyle = null;
+                    LineStyle lineStyle = null;
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
@@ -343,21 +345,20 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         int joinStyle = LINESTYLE2.ROUND_JOIN;
                         int miterLimitFactor = 3;
                         boolean hasFillFlag = false;
-                        if (lineStyle instanceof LINESTYLE2) {
-                            LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
-                            if (lineStyle2.noHScaleFlag && lineStyle2.noVScaleFlag) {
+                        if (lineStyle.isLineStyle2) {
+                            if (lineStyle.noHScaleFlag && lineStyle.noVScaleFlag) {
                                 scaleMode = "NONE";
-                            } else if (lineStyle2.noHScaleFlag) {
+                            } else if (lineStyle.noHScaleFlag) {
                                 scaleMode = "VERTICAL";
-                            } else if (lineStyle2.noVScaleFlag) {
+                            } else if (lineStyle.noVScaleFlag) {
                                 scaleMode = "HORIZONTAL";
                             }
-                            pixelHintingFlag = lineStyle2.pixelHintingFlag;
-                            startCapStyle = lineStyle2.startCapStyle;
-                            endCapStyle = lineStyle2.endCapStyle;
-                            joinStyle = lineStyle2.joinStyle;
-                            miterLimitFactor = lineStyle2.miterLimitFactor;
-                            hasFillFlag = lineStyle2.hasFillFlag;
+                            pixelHintingFlag = lineStyle.pixelHintingFlag;
+                            startCapStyle = lineStyle.startCapStyle;
+                            endCapStyle = lineStyle.endCapStyle;
+                            joinStyle = lineStyle.joinStyle;
+                            miterLimitFactor = lineStyle.miterLimitFactor;
+                            hasFillFlag = lineStyle.hasFillFlag;
                         }
                         lineStyle(
                                 lineStyle.width,
@@ -370,18 +371,16 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 miterLimitFactor);
 
                         if (hasFillFlag) {
-                            LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
-                            FILLSTYLE fillStyle = lineStyle2.fillType;
+                            FillStyle fillStyle = lineStyle.fillType;
                             switch (fillStyle.fillStyleType) {
                                 case FILLSTYLE.LINEAR_GRADIENT:
                                 case FILLSTYLE.RADIAL_GRADIENT:
                                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                     // Gradient fill
-                                    Matrix matrix = new Matrix(fillStyle.gradientMatrix);
                                     lineGradientStyle(
                                             fillStyle.fillStyleType,
                                             fillStyle.gradient.gradientRecords,
-                                            matrix,
+                                            fillStyle.gradientMatrix,
                                             fillStyle.gradient.spreadMode,
                                             fillStyle.gradient.interpolationMode,
                                             (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
@@ -495,12 +494,16 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return null;
     }
 
-    private void appendFillStyles(List<FILLSTYLE> v1, FILLSTYLE[] v2) {
-        v1.addAll(Arrays.asList(v2));
+    private void appendFillStyles(List<FillStyle> v1, FILLSTYLE[] v2) {
+        for (FILLSTYLE s : v2) {
+            v1.add(new FillStyle(s));
+        }
     }
 
-    private void appendLineStyles(List<LINESTYLE> v1, LINESTYLE[] v2) {
-        v1.addAll(Arrays.asList(v2));
+    private void appendLineStyles(List<LineStyle> v1, LINESTYLE[] v2) {
+        for (LINESTYLE s : v2) {
+            v1.add(new LineStyle(s));
+        }
     }
 
     private void appendEdges(List<IEdge> v1, List<IEdge> v2) {
