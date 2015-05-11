@@ -129,27 +129,32 @@
         <property name="version.suffix" value=""/>         
     </target>
     
-    <target name="-timestamp">
+    
+    <target name="-git-check-exists" >
+        <property environment="env" />
+        <available file="git" filepath="${env.PATH}" property="git.present" />
+        <available file="git.exe" filepath="${env.Path}" property="git.present"/>
+        <available file="git.exe" filepath="${env.PATH}" property="git.present" />
+    </target>
+    
+    <target name="-git-required" depends="-git-check-exists">             
+        <fail unless="git.present" message="Git not found. Please install git with commandline support."/>
+    </target>
+      
+    <target name="-timestamp" depends="-git-required">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
             <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
         </tstamp>
-        <exec executable="git" outputproperty="git.tag">
+        <exec executable="git" outputproperty="git.tag" failonerror="true">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  
-        <echo level="info" message="${git.tag}" file="${rev.file}"/>
-        
-        
-        <loadfile srcfile="${rev.file}" property="git.short.tag">
-            <filterchain>
-               <headfilter lines="1" skip="0"/>
-               <tokenfilter>
-                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
-               </tokenfilter>
-               <striplinebreaks/>
-            </filterchain>
-        </loadfile>
+        <exec executable="git" outputproperty="git.short.tag" failonerror="true">
+            <arg value="rev-parse"/>
+            <arg value="--short"/>
+            <arg value="HEAD"/>
+        </exec>                
         <echo level="info" message="Git tag:${git.tag}"/>
         <echo level="info" message="Git shorttag:${git.short.tag}"/>
         <echo level="info" message="Library Version: ${version}"/>
