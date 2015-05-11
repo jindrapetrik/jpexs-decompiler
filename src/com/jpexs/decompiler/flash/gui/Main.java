@@ -305,7 +305,9 @@ public class Main {
                     return swf;
                 }
             };
-            loadingDialog.setWroker(worker);
+            if (loadingDialog != null) {
+                loadingDialog.setWroker(worker);
+            }
             worker.execute();
 
             try {
