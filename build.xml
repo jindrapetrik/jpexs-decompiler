@@ -477,7 +477,7 @@
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Checking version online: ${newversion.type}...</echo>
         <!-- Note: You must have developer account to upload to JPEXS website -->
-        <java jar="uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
+        <java jar="${ant.lib.dir}/uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
             <arg value="${website.version.url}" />                
 
             <arg value="-field" />
@@ -508,7 +508,7 @@
         <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
         <echo level="info">Uploading...</echo>
         <!-- Note: You must have developer account to upload to JPEXS website -->
-        <java jar="uploader.jar" fork="true" failonerror="true">    
+        <java jar="${ant.lib.dir}/uploader.jar" fork="true" failonerror="true">    
             <arg value="${website.upload.url}" />                
 
             <arg value="-field" />
