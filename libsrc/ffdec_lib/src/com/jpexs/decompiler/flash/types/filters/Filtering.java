@@ -54,7 +54,7 @@ public class Filtering {
 
     private static final Rectangle RECTANGLE_256_1 = new Rectangle(256, 1);
 
-    private static final Rectangle RECTANGLE_512_1 = new Rectangle(256, 1);
+    private static final Rectangle RECTANGLE_512_1 = new Rectangle(512, 1);
 
     private static void boxBlurHorizontal(int[] pixels, int[] mask, int[] newColors, int w, int h, int radius) {
         int index = 0;
@@ -102,7 +102,6 @@ public class Filtering {
                             newColors[x] = 0;
                         } else {
                             newColors[x] = RGBA.toInt((int) (r / hits) & 0xff, (int) (g / hits) & 0xff, (int) (b / hits) & 0xff, (int) (a / hits));
-
                         }
                     } else {
                         newColors[x] = 0;
