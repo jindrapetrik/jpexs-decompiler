@@ -245,9 +245,9 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     @Override
     protected void finalizePath() {
-        if (path != null && !"".equals(pathData)) {
-            path.setAttribute("d", pathData.trim());
-            path.appendChild(createAnimateElement("d", pathData.trim(), pathDataEnd.trim()));
+        if (path != null && pathData != null && pathData.length() > 0) {
+            path.setAttribute("d", pathData.toString().trim());
+            path.appendChild(createAnimateElement("d", pathData.toString().trim(), pathDataEnd.toString().trim()));
             exporter.addToGroup(path);
         }
         path = exporter.createElement("path");
