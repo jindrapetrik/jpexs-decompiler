@@ -3,7 +3,7 @@
     <description>Builds project</description>      
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpath="${basedir}/jbomutils.jar" />                
-    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.0.0.jar" />
+    <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpath="${basedir}/jxar_1.1.0.jar" />
     
     <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
     <patternset id="compiler.resources">
