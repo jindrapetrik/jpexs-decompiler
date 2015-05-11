@@ -636,7 +636,7 @@
         <property name="version.suffix" value=""/>         
     </target>
     
-    <target name="-private-suffix" if="private">
+    <target name="-private-suffix" if="private">                
         <property name="version.suffix" value="_private_${git.short.tag}"/>         
     </target>
     
@@ -681,11 +681,11 @@
         <available file="git.exe" filepath="${env.PATH}" property="git.present" />
     </target>
     
-    <target name="-git-required" depends="-git-check-exists">             
+    <target name="-git-required" depends="-git-check-exists" unless="private">             
         <fail unless="git.present" message="Git not found. Please install git with commandline support."/>
     </target>
-    
-    <target name="git-tag" depends="-git-required">        
+            
+    <target name="-do-git-tag" if="git.present">
         <exec executable="git" outputproperty="git.tag" failonerror="true">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
@@ -697,6 +697,16 @@
         </exec>        
         <echo level="info" message="Git tag:${git.tag}"/>
         <echo level="info" message="Git shorttag:${git.short.tag}"/>
+    </target>
+    
+    <target name="-no-git-tag" if="private" unless="git.present">        
+        <property name="git.tag" value="unknown" />
+        <property name="git.short.tag" value="unk" />
+        <echo level="warning" message="Warning: Git executable not found. No revision hash will be included in release." />
+    </target>
+    
+    <target name="git-tag" depends="-git-required,-no-git-tag,-do-git-tag">        
+        
     </target>
     
     <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
@@ -804,7 +814,7 @@
     </target>
     
     
-    <target name="git-pull">
+    <target name="git-pull" depends="-git-required">
         <exec executable="git" failonerror="true">
             <arg value="pull"/>            
         </exec> 
