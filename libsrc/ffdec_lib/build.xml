@@ -1,45 +1,258 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project name="FFDec Library" basedir="." default="build">
+<project name="FFDec Library" basedir="." default="build" xmlns:jacoco="antlib:org.jacoco.ant">
     <description>Builds project FFDec Library</description>  
     <!--
     TODO: Figure out how to make versioning which (not) depends(?) on GUI
-    -->  
-    <property name="VERSION" value="1.0.0" />
-    <property name="VERSIONNUMBER" value="1.0.0" />
-    <property name="BUILDER" value="jpexs" />
-    <property name="PROJECTNAME" value="FFDec_Lib"/>
+    -->              
+    <loadproperties srcfile="build.properties" />
     
-    <property name="PREFIXFILENAME" value="ffdec_lib"/>
-    <property name="JARFILENAME" value="${PREFIXFILENAME}"/>
-    <property name="TARGETJAVA" value="1.8"/>
-    <property name="MINJAVAVERSION" value="1.8.0"/>
-    <property name="VENDOR" value="JPEXS" />
-    <property name="INTERNALNAME" value="FFDec_Lib" />
-    <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler Library" />
-       
+    
+    <property name="jar.filename" value="${prefix.filename}"/>  
+    <description>Builds project</description>      
+    <property name="dist.lib.dir" value="${dist.dir}/${dist.lib.dirname}"/>    
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>        
+        <include name="**/?*.bin"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.txt"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.mid"/>
+        <include name="**/?*.wav"/>
+        <include name="**/?*.js"/>
+    </patternset>
+
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+        <classpath path="${test.lib.dir}/jacocoant.jar"/>
+    </taskdef>
+   
+    <target name="compile" depends="lexers">
+        <mkdir dir="${compile.dir}"/>
+        <mkdir dir="${lib.dir}"/>        
+        <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
+               debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
+            <compilerarg line="-Xlint:unchecked"/> <!-- For Java 8: -Xdiags:verbose -->
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <copy todir="${compile.dir}">
+            <fileset dir="${src.dir}">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="compile-tests">
+        <delete dir="${compile.test.dir}"/>
+        <mkdir dir="${compile.test.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${compile.test.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true" includeantruntime="false" encoding="utf-8">                        
+            <classpath>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="-test-sethalt" depends="">
+        <property name="test.halt" value="true" />
+    </target>
+    <target name="-test-setnohalt" unless="test.halt">
+        <property name="test.halt" value="false" />
+    </target>
+    <target name="testhalt" depends="-test-sethalt,test">
+    </target>
+
+    <target name="test" depends="-test-setnohalt,compile,compile-tests">
+        <delete dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}/raw/"/>
         
-    <property name="SOURCEDIR" value="${basedir}/src"/>
+        
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${test.lib.dir}/testng-6.8.jar" name="testng" />
     
-    <property name="TESTDIR" value="${basedir}/test"/>
-    <property name="TESTLIBDIR" value="${basedir}/testlib"/>
-    <property name="TESTRESULTSDIR" value="${basedir}/reports/tests"/>
-    <property name="COVERAGERESULTSDIR" value="${basedir}/reports/coverage"/>
-    <property name="DISTRIBUTIONDIR" value="${basedir}/dist"/>
-    <property name="COMPILEDIR" value="${basedir}/build/classes"/>
-    <property name="INSTRDIR" value="${basedir}/build/instr-classes"/>
-    <property name="COVERAGEDIR" value="${basedir}/coverage"/>
-    <property name="COMPILETESTSDIR" value="${basedir}/build/test"/>
-    <property name="LIBRARIESDIR" value="${basedir}/../../lib"/>
-    <property name="PROPERTIESNAME" value="project.properties"/>
-
-    <property name="RELEASESDIR" value="${basedir}/releases"/>
-    <property name="DISTLIBRARIESDIRNAME" value="lib"/>
-    <property name="JAVADOCDIR" value="${basedir}/javadoc"/>             
-    <property name="REVFILE" value="${basedir}/revision.txt"/>
-    <property name="LEXERSDIR" value="${basedir}/lexers"/>  
+        <mkdir dir="${coverage.dir}" />
+        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
+        <testng 
+            outputDir="${test.results.dir}"
+            haltOnFailure="${test.halt}" verbose="2" workingDir="${basedir}" >
+        
+            <classpath>
+                <pathelement path="${compile.test.dir}"/>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
+            
+        </testng>      
+        </jacoco:coverage>          
+        <!-- Coverage report -->
+        <mkdir dir="${coverage.results.dir}"/>
+        
+        <jacoco:report>
+            <executiondata>
+                <file file="${coverage.dir}/jacoco.exec" />
+            </executiondata>
+            <structure name="${project.name}">
+                <classfiles>
+                    <fileset dir="${compile.dir}" />
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${src.dir}" />
+                </sourcefiles>
+            </structure>
+            <html destdir="${coverage.results.dir}" />
+        </jacoco:report>        
+    </target>
     
-    <property name="RUNPARAMS" value=""/>
+   
+    
+    <target name="nightly">
+        <property name="nightly" value="true" />                                 
+        <antcall target="all" />      
+    </target>             
+    
+    <target name="-nightly-suffix" if="nightly">        
+        <property name="version.suffix" value="_${git.short.tag}"/>         
+    </target>
+    
+    <target name="-nonightly-suffix" unless="nightly">
+        <property name="version.suffix" value=""/>         
+    </target>
+    
+    <target name="-timestamp">
+        <tstamp>
+            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
+            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
+        </tstamp>
+        <exec executable="git" outputproperty="git.tag">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>  
+        <echo level="info" message="${git.tag}" file="${rev.file}"/>
+        
+        
+        <loadfile srcfile="${rev.file}" property="git.short.tag">
+            <filterchain>
+               <headfilter lines="1" skip="0"/>
+               <tokenfilter>
+                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
+               </tokenfilter>
+               <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo level="info" message="Git tag:${git.tag}"/>
+        <echo level="info" message="Git shorttag:${git.short.tag}"/>
+        <echo level="info" message="Library Version: ${version}"/>
+    </target>
+    
+    <target name="build" depends="-timestamp,-nightly-suffix,-nonightly-suffix,compile">
+        <mkdir dir="${dist.dir}"/>                        
+                                                     
+        <propertyfile file="${compile.dir}/${properties.name}"
+                      comment="This file is automatically generated - DO NOT EDIT">        
+            <entry key="buildtime" value="${BUILTAT}"/>
+            <entry key="build" value="${git.tag}"/>
+            <entry key="builder" value="${builder}"/>             
+            <entry key="version" value="${version}"/>          
+            <entry key="nightly" value="${nightly}"/>
+        </propertyfile>        
 
-    <import file="${basedir}/build_common.xml"/>
+        <jar destfile="${dist.dir}/${jar.filename}.jar" basedir="${compile.dir}">
+            
+        </jar>
+    </target>
+    
+    <target name="javadoc">
+        <mkdir dir="${javadoc.dir}"/>
+        <javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" windowtitle="${project.name}"
+                 useexternalfile="yes">
+            <fileset dir="${src.dir}" includes="**/*.java"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+    <target name="clean">        
+        <delete dir="${dist.dir}"/>
+        <delete dir="${compile.test.dir}"/>
+        <delete dir="${compile.dir}"/>
+        <delete dir="${coverage.dir}"/>
+        <delete dir="${test.results.dir}"/>
+    </target>
+    
+    <!-- Debug one test method (Netbeans IDE) -->
+    <target name="debug-test-method" depends="compile-tests">
+        <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
+        <fail unless="test.method">Must select some method in the IDE or set test.method</fail>
+        <delete dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}/raw/"/>
+     
+        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
+            <classpath>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </nbjpdastart>
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${test.lib.dir}/testng-6.8.jar" name="testng" />
+    
+        <testng 
+            outputDir="${test.results.dir}"
+            haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
+        
+            <classpath>
+                <pathelement path="${compile.test.dir}"/>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
+        </testng>     
+    </target>
+    
+    <target name="run">        
+        <ant antfile="../../build.xml" target="run" inheritall="false"/>
+    </target>
+            
+    <target name="-lexer" if="lexer">
+        <taskdef classname="jflex.anttask.JFlexTask" classpath="${basedir}/jflex-1.6.0.jar" name="jflex" />
+        <jflex file="${lexer}" destdir="${src.dir}" nobak="on"></jflex>        
+    </target>
+    
+    <target name="lexers">       
+        <pathconvert pathsep="|" property="lexers">
+            <fileset dir="${lexers.dir}" includes="**/*.flex"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="/*"/>
+            </chainedmapper>
+        </pathconvert>
+        <script language="javascript"><![CDATA[
+        var classpath = project.getProperty("lexers");
+        // + '' converts from a Java string to a JavaScript string, in order
+        // to have .split() behave predictably on all installations.
+        // Otherwise, some versions of ANT will treat it's argument as a regex
+        // while others will not.
+        var parts = (classpath + '').split('|');
+        for each (var part in parts) {
+            project.setProperty("lexer",project.getProperty("lexers.dir")+part);
+            self.project.executeTarget("-lexer");
+        }
+    ]]></script>
+    </target>
 </project>
+

@@ -187,6 +187,15 @@
                     <source-file>
                         <location>build.xml</location>
                     </source-file>
+                    <source-file>
+                        <location>build.properties</location>
+                    </source-file>                    
+                    <source-file>
+                        <location>tools.properties</location>
+                    </source-file>
+                    <source-file>
+                        <location>jpexs_website.properties</location>
+                    </source-file>                    
                 </items>
                 <context-menu>
                     <ide-action name="build"/>
