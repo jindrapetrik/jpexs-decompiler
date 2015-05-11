@@ -852,7 +852,7 @@ var cxform = function (r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mul
         d[0] = this._cut(Math.round(d[0] * this.r_mult / 255 + this.r_add), 0, 255);
         d[1] = this._cut(Math.round(d[1] * this.g_mult / 255 + this.g_add), 0, 255);
         d[2] = this._cut(Math.round(d[2] * this.b_mult / 255 + this.b_add), 0, 255);
-        d[3] = this._cut(Math.round(d[3] * this.a_mult / 255 + this.a_add / 255), 0, 1);
+        d[3] = this._cut(d[3] * this.a_mult / 255 + this.a_add / 255, 0, 1);
         return d;
     };
     this.applyToImage = function (fimg) {
