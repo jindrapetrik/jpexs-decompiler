@@ -218,7 +218,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     protected void finalizePath() {
-        if (path != null && pathData.length() > 0) {
+        if (path != null && pathData != null && pathData.length() > 0) {
             path.setAttribute("d", pathData.toString().trim());
             exporter.addToGroup(path);
         }

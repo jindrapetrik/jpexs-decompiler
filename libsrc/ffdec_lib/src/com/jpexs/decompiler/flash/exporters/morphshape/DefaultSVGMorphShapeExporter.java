@@ -35,9 +35,9 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
 
     protected String currentDrawCommand = "";
 
-    protected String pathData;
+    protected StringBuilder pathData;
 
-    protected String pathDataEnd;
+    protected StringBuilder pathDataEnd;
 
     protected double zoom;
 
@@ -103,47 +103,47 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     @Override
     public void moveTo(double x, double y, double x2, double y2) {
         currentDrawCommand = "";
-        pathData += "M"
-                + roundPixels20(x * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
-        pathDataEnd += "M"
-                + roundPixels20(x2 * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y2 * zoom / SWF.unitDivisor) + " ";
+        pathData.append("M")
+                .append(roundPixels20(x * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y * zoom / SWF.unitDivisor)).append(" ");
+        pathDataEnd.append("M")
+                .append(roundPixels20(x2 * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y2 * zoom / SWF.unitDivisor)).append(" ");
     }
 
     @Override
     public void lineTo(double x, double y, double x2, double y2) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_L)) {
             currentDrawCommand = DRAW_COMMAND_L;
-            pathData += "L";
-            pathDataEnd += "L";
+            pathData.append("L");
+            pathDataEnd.append("L");
         }
-        pathData += roundPixels20(x * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y * zoom / SWF.unitDivisor) + " ";
-        pathDataEnd += roundPixels20(x2 * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(y2 * zoom / SWF.unitDivisor) + " ";
+        pathData.append(roundPixels20(x * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y * zoom / SWF.unitDivisor)).append(" ");
+        pathDataEnd.append(roundPixels20(x2 * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(y2 * zoom / SWF.unitDivisor)).append(" ");
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY, double controlX2, double controlY2, double anchorX2, double anchorY2) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_Q)) {
             currentDrawCommand = DRAW_COMMAND_Q;
-            pathData += "Q";
-            pathDataEnd += "Q";
+            pathData.append("Q");
+            pathDataEnd.append("Q");
         }
-        pathData += roundPixels20(controlX * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(controlY * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY * zoom / SWF.unitDivisor) + " ";
-        pathDataEnd += roundPixels20(controlX2 * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(controlY2 * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorX2 * zoom / SWF.unitDivisor) + " "
-                + roundPixels20(anchorY2 * zoom / SWF.unitDivisor) + " ";
+        pathData.append(roundPixels20(controlX * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(controlY * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorX * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorY * zoom / SWF.unitDivisor)).append(" ");
+        pathDataEnd.append(roundPixels20(controlX2 * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(controlY2 * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorX2 * zoom / SWF.unitDivisor)).append(" ")
+                .append(roundPixels20(anchorY2 * zoom / SWF.unitDivisor)).append(" ");
     }
 
     protected void finalizePath() {
-        pathData = "";
-        pathDataEnd = "";
+        pathData = new StringBuilder();
+        pathDataEnd = new StringBuilder();
         currentDrawCommand = "";
     }
 
