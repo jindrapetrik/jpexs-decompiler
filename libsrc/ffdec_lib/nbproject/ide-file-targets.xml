@@ -3,9 +3,9 @@
     <import file="../../../build.xml"/>
     <target name="debug-nb" depends="build">
         <path id="cp">
-            <pathelement path="${basedir}/build/classes"/>
+            <pathelement path="${basedir}/${compile.dir}"/>
             <pathelement path="${basedir}/libsrc/ffdec_lib/build/classes"/>
-            <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+            <fileset dir="${basedir}/${lib.dir}" includes="**/*.jar"/>
         </path>
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath refid="cp"/>
@@ -15,7 +15,7 @@
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx8192m"/>
-            <arg line="${RUNPARAMS}"/>
+            <arg line="${run.params}"/>
         </java>
     </target>
 </project>

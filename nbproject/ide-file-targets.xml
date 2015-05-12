@@ -3,9 +3,9 @@
     <import file="../build.xml"/>
     <target name="debug-nb" depends="compile">
         <path id="cp">
-            <pathelement path="${basedir}/build/classes"/>
-            <pathelement path="${basedir}/libsrc/ffdec_lib/build/classes"/>
-            <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+            <pathelement path="${compile.dir}"/>
+            <pathelement path="libsrc/ffdec_lib/build/classes"/>
+            <fileset dir="${lib.dir}" includes="**/*.jar"/>
         </path>
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath refid="cp"/>
@@ -15,7 +15,7 @@
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx8192m"/>
-            <arg line="${RUNPARAMS}"/>
+            <arg line="${run.params}"/>
         </java>
     </target>
     <!-- TODO: edit the following target according to your needs -->
@@ -23,9 +23,9 @@
     <target name="run-selected-file-in-src">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
-            <classpath>
-                <pathelement path="lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar"/>
-                <pathelement location="build/classes"/>
+            <classpath id="cp">
+                <pathelement path="${compile.dir}"/>>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </java>
     </target>
@@ -34,26 +34,29 @@
     <target name="run-selected-file-in-test">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
-            <classpath>
-                <pathelement path="lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar"/>
-                <pathelement location="build/classes"/>
-                <pathelement location="build/test"/>
-            </classpath>
+            <classpath id="cp">
+                <pathelement path="${compile.dir}"/>
+                <pathelement path="${compile.test.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>            
         </java>
     </target>
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
     <target name="debug-selected-file-in-test" depends="compile-tests">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
-        <delete dir="${TESTRESULTSDIR}"/>
-        <mkdir dir="${TESTRESULTSDIR}"/>
-        <mkdir dir="${TESTRESULTSDIR}/raw/"/>        
+        <delete dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}"/>
+        <mkdir dir="${test.results.dir}/raw/"/>        
+        
+        <path id="cp">
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+        </path>
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
-            <classpath id="cp">
-                <pathelement path="${COMPILEDIR}"/>
-                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
-                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
-            </classpath>
+            <classpath refid="cp" />
         </nbjpdastart>
         
         <java classname="${debug.class}" fork="true">
