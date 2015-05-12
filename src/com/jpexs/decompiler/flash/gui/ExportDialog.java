@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
@@ -109,7 +109,7 @@ public class ExportDialog extends AppDialog {
         SoundExportMode.class,
         ScriptExportMode.class,
         BinaryDataExportMode.class,
-        FramesExportMode.class,
+        FrameExportMode.class,
         ButtonExportMode.class,
         FontExportMode.class,
         MorphShapeExportMode.class,
@@ -119,7 +119,7 @@ public class ExportDialog extends AppDialog {
     Class[] zoomClasses = {
         ShapeExportMode.class,
         TextExportMode.class,
-        FramesExportMode.class,
+        FrameExportMode.class,
         MorphShapeExportMode.class
     };
 

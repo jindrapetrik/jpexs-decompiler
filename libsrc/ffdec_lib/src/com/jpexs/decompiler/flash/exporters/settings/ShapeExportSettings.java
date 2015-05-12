@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
  */
 public class ShapeExportSettings {
 
+    public static final String EXPORT_FOLDER_NAME = "shapes";
+
     public ShapeExportMode mode;
 
     public double zoom;
