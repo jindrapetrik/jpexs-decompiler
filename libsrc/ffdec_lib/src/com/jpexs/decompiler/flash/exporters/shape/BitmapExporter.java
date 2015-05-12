@@ -76,6 +76,12 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private AffineTransform fillTransform;
 
+    private Paint linePathPaint;
+
+    private Paint linePaint;
+
+    private AffineTransform lineTransform;
+
     private Color lineColor;
 
     private Stroke lineStroke;
@@ -323,6 +329,9 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
+        linePathPaint = null;
+        linePaint = null;
+        lineTransform = null;
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -380,6 +389,107 @@ public class BitmapExporter extends ShapeExporterBase {
 
     @Override
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+        MultipleGradientPaint.ColorSpaceType cstype = MultipleGradientPaint.ColorSpaceType.SRGB;
+        if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
+            cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
+        }
+        switch (type) {
+            case FILLSTYLE.LINEAR_GRADIENT: {
+                List<Color> colors = new ArrayList<>();
+                List<Float> ratios = new ArrayList<>();
+                for (int i = 0; i < gradientRecords.length; i++) {
+                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
+                        continue;
+                    }
+                    ratios.add(gradientRecords[i].getRatioFloat());
+                    colors.add(gradientRecords[i].color.toColor());
+                }
+
+                float[] ratiosArr = new float[ratios.size()];
+                for (int i = 0; i < ratios.size(); i++) {
+                    ratiosArr[i] = ratios.get(i);
+                }
+                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+
+                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                }
+
+                linePathPaint = null;
+                linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
+                lineTransform = matrix.toTransform();
+            }
+            break;
+            case FILLSTYLE.RADIAL_GRADIENT: {
+                List<Color> colors = new ArrayList<>();
+                List<Float> ratios = new ArrayList<>();
+                for (int i = 0; i < gradientRecords.length; i++) {
+                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
+                        continue;
+                    }
+                    ratios.add(gradientRecords[i].getRatioFloat());
+                    colors.add(gradientRecords[i].color.toColor());
+                }
+
+                float[] ratiosArr = new float[ratios.size()];
+                for (int i = 0; i < ratios.size(); i++) {
+                    ratiosArr[i] = ratios.get(i);
+                }
+                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+
+                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                }
+
+                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
+                linePathPaint = endColor;
+                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
+                lineTransform = matrix.toTransform();
+            }
+            break;
+            case FILLSTYLE.FOCAL_RADIAL_GRADIENT: {
+                List<Color> colors = new ArrayList<>();
+                List<Float> ratios = new ArrayList<>();
+                for (int i = 0; i < gradientRecords.length; i++) {
+                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
+                        continue;
+                    }
+                    ratios.add(gradientRecords[i].getRatioFloat());
+                    colors.add(gradientRecords[i].color.toColor());
+                }
+
+                float[] ratiosArr = new float[ratios.size()];
+                for (int i = 0; i < ratios.size(); i++) {
+                    ratiosArr[i] = ratios.get(i);
+                }
+                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+
+                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
+                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                }
+
+                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
+                linePathPaint = endColor;
+                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
+                lineTransform = matrix.toTransform();
+            }
+            break;
+        }
     }
 
     @Override
@@ -479,7 +589,87 @@ public class BitmapExporter extends ShapeExporterBase {
                     graphics.fill(path);
                 }
             }
-            if (lineColor != null) {
+            if (linePaint != null && lineStroke != null) {
+                Shape strokedShape = lineStroke.createStrokedShape(path);
+                graphics.setComposite(AlphaComposite.SrcOver);
+                if (linePaint instanceof MultipleGradientPaint) {
+                    AffineTransform oldAf = graphics.getTransform();
+                    if (linePathPaint != null) {
+                        graphics.setPaint(linePathPaint);
+                    }
+                    graphics.fill(strokedShape);
+                    graphics.setClip(strokedShape);
+                    Matrix inverse = null;
+                    try {
+                        double scx = lineTransform.getScaleX();
+                        double scy = lineTransform.getScaleY();
+                        double shx = lineTransform.getShearX();
+                        double shy = lineTransform.getShearY();
+                        double det = scx * scy - shx * shy;
+                        if (Math.abs(det) <= Double.MIN_VALUE) {
+                            // use only the translate values
+                            // todo: make it better
+                            lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
+                        }
+
+                        inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
+
+                    } catch (NoninvertibleTransformException ex) {
+                        // it should never happen as we already checked the determinant of the matrix
+                    }
+
+                    lineTransform.preConcatenate(oldAf);
+                    graphics.setTransform(lineTransform);
+                    graphics.setPaint(linePaint);
+
+                    if (inverse != null) {
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(strokedShape.getBounds2D()));
+                        double minX = rect.xMin;
+                        double minY = rect.yMin;
+                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                    }
+
+                    graphics.setTransform(oldAf);
+                    graphics.setClip(null);
+                } else if (linePaint instanceof TexturePaint) {
+                    AffineTransform oldAf = graphics.getTransform();
+                    graphics.setClip(strokedShape);
+                    Matrix inverse = null;
+                    try {
+                        double scx = lineTransform.getScaleX();
+                        double scy = lineTransform.getScaleY();
+                        double shx = lineTransform.getShearX();
+                        double shy = lineTransform.getShearY();
+                        double det = scx * scy - shx * shy;
+                        if (Math.abs(det) <= Double.MIN_VALUE) {
+                            // use only the translate values
+                            // todo: make it better
+                            lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
+                        }
+
+                        inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
+                    } catch (NoninvertibleTransformException ex) {
+                        // it should never happen as we already checked the determinant of the matrix
+                    }
+
+                    lineTransform.preConcatenate(oldAf);
+                    graphics.setTransform(lineTransform);
+                    graphics.setPaint(linePaint);
+
+                    if (inverse != null) {
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                        double minX = rect.xMin;
+                        double minY = rect.yMin;
+                        graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                    }
+
+                    graphics.setTransform(oldAf);
+                    graphics.setClip(null);
+                } else {
+                    graphics.setPaint(linePaint);
+                    graphics.fill(strokedShape);
+                }
+            } else if (lineColor != null) {
                 graphics.setColor(lineColor);
                 graphics.setStroke(lineStroke == null ? defaultStroke : lineStroke);
                 graphics.draw(path);
