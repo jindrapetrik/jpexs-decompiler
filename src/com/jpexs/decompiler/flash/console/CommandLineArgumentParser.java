@@ -49,7 +49,7 @@ import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
@@ -59,7 +59,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
@@ -1002,37 +1002,37 @@ public class CommandLineArgumentParser {
 
                 if (exportAll || exportFormats.contains("image")) {
                     System.out.println("Exporting images...");
-                    new ImageExporter().exportImages(handler, outDir + (multipleExportTypes ? File.separator + "images" : ""), extags, new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)), evl);
+                    new ImageExporter().exportImages(handler, outDir + (multipleExportTypes ? File.separator + ImageExportSettings.EXPORT_FOLDER_NAME : ""), extags, new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("shape")) {
                     System.out.println("Exporting shapes...");
-                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + "shapes" : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
+                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("morphshape")) {
                     System.out.println("Exporting morphshapes...");
-                    new MorphShapeExporter().exportMorphShapes(handler, outDir + (multipleExportTypes ? File.separator + "morphshapes" : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom), evl);
+                    new MorphShapeExporter().exportMorphShapes(handler, outDir + (multipleExportTypes ? File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("movie")) {
                     System.out.println("Exporting movies...");
-                    new MovieExporter().exportMovies(handler, outDir + (multipleExportTypes ? File.separator + "movies" : ""), extags, new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)), evl);
+                    new MovieExporter().exportMovies(handler, outDir + (multipleExportTypes ? File.separator + MovieExportSettings.EXPORT_FOLDER_NAME : ""), extags, new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("font")) {
                     System.out.println("Exporting fonts...");
-                    new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + "fonts" : ""), extags, new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)), evl);
+                    new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), extags, new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
-                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + "sounds" : ""), extags, new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
+                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), extags, new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("binarydata")) {
                     System.out.println("Exporting binaryData...");
-                    new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + "binaryData" : ""), extags, new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
+                    new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME : ""), extags, new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("text")) {
@@ -1052,7 +1052,7 @@ public class CommandLineArgumentParser {
                             frames.add(i);
                         }
                     }
-                    new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + "frames" : ""), swf, 0, frames, new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class), zoom), evl);
+                    new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom), evl);
                 }
 
                 boolean parallel = Configuration.parallelSpeedUp.get();

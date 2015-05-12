@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
  */
 public class ButtonExportSettings {
 
+    public static final String EXPORT_FOLDER_NAME = "buttons";
+
     public ButtonExportMode mode;
 
     public double zoom;

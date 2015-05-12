@@ -14,22 +14,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.exporters.settings;
-
-import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
+package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
  *
  * @author JPEXS
  */
-public class FramesExportSettings {
+public enum FrameExportMode {
 
-    public FramesExportMode mode;
-
-    public double zoom;
-
-    public FramesExportSettings(FramesExportMode mode, double zoom) {
-        this.mode = mode;
-        this.zoom = zoom;
-    }
+    PNG,
+    GIF,
+    AVI,
+    SVG,
+    CANVAS,
+    PDF,
+    BMP
 }

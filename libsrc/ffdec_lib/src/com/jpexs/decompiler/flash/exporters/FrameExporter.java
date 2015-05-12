@@ -25,9 +25,9 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
-import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -90,26 +90,26 @@ public class FrameExporter {
     private static final Logger logger = Logger.getLogger(FrameExporter.class.getName());
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException {
-        FramesExportMode fem;
+        FrameExportMode fem;
         switch (settings.mode) {
             case BMP:
-                fem = FramesExportMode.BMP;
+                fem = FrameExportMode.BMP;
                 break;
             case PNG:
-                fem = FramesExportMode.PNG;
+                fem = FrameExportMode.PNG;
                 break;
             case SVG:
-                fem = FramesExportMode.SVG;
+                fem = FrameExportMode.SVG;
                 break;
             default:
                 throw new Error("Unsupported button export mode");
         }
 
-        FramesExportSettings fes = new FramesExportSettings(fem, settings.zoom);
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FramesExportSettings settings, final EventListener evl) throws IOException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException {
         final List<File> ret = new ArrayList<>();
         if (swf.tags.isEmpty()) {
             return ret;
@@ -139,7 +139,7 @@ public class FrameExporter {
         final List<Integer> fframes = frames;
 
         Color backgroundColor = null;
-        if (settings.mode == FramesExportMode.AVI) {
+        if (settings.mode == FrameExportMode.AVI) {
             for (Tag t : swf.tags) {
                 if (t instanceof SetBackgroundColorTag) {
                     SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
@@ -148,7 +148,7 @@ public class FrameExporter {
             }
         }
 
-        if (settings.mode == FramesExportMode.SVG) {
+        if (settings.mode == FrameExportMode.SVG) {
             for (int i = 0; i < frames.size(); i++) {
                 if (evl != null) {
                     evl.handleExportingEvent("frame", i + 1, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
@@ -183,7 +183,7 @@ public class FrameExporter {
             return ret;
         }
 
-        if (settings.mode == FramesExportMode.CANVAS) {
+        if (settings.mode == FrameExportMode.CANVAS) {
             if (evl != null) {
                 evl.handleExportingEvent("canvas", 1, 1, tim.parentTag == null ? "" : tim.parentTag.getName());
             }

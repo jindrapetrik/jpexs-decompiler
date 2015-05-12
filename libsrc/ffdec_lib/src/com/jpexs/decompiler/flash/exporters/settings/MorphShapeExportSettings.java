@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
  */
 public class MorphShapeExportSettings {
 
+    public static final String EXPORT_FOLDER_NAME = "morphshapes";
+
     public MorphShapeExportMode mode;
 
     public double zoom;
