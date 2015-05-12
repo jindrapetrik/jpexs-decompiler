@@ -143,7 +143,7 @@ public class ShapeExporter {
                                 st.getNeededCharactersDeep(needed);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 SWF.writeLibrary(st.getSwf(), needed, baos);
-                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
+                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }
                             break;
                     }

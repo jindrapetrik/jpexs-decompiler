@@ -397,7 +397,6 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     public String toHtmlCanvas(double unitDivisor) {
         CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
         cmse.export();
-
         return cmse.getShapeData();
     }
 

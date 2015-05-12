@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -94,16 +95,23 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         this.swf = swf;
     }
 
-    public String getHtml(String needed) {
-        int width = (int) (Math.max(shape.getBounds().getWidth(), shapeEnd.getBounds().getWidth()) / unitDivisor);
-        int height = (int) (Math.max(shape.getBounds().getHeight(), shapeEnd.getBounds().getHeight()) / unitDivisor);
-
-        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + needed + CanvasShapeExporter.getDrawJs(width, height, shapeData.toString()) + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
+    private String getDrawJs(int width, int height, String id, RECT rect) {
+        return "var originalWidth=" + width + ";\r\nvar originalHeight=" + height + ";\r\n function drawFrame(ctx,ratio){\r\n"
+                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"
+                + "\tplace(\"" + id + "\",canvas,ctx,[" + (1 / unitDivisor) + ",0.0,0.0," + (1 / unitDivisor) + ","
+                + (-rect.Xmin / unitDivisor) + "," + (-rect.Ymin / unitDivisor) + "],ctrans,1,0,ratio,0);\r\n"
+                + "\tctx.restore();\r\n}\r\n";
     }
 
-    public static String getJsSuffix(int width, int height) {
+    public String getHtml(String needed, String id, RECT rect) {
+        int width = (int) (rect.getWidth() / unitDivisor);
+        int height = (int) (rect.getHeight() / unitDivisor);
+
+        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, id, rect) + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
+    }
+
+    private static String getJsSuffix(int width, int height) {
         StringBuilder ret = new StringBuilder();
-        ret.append("}\r\n");
         int step = Math.round(65535 / 100);
         int rate = 10;
         ret.append("var step = ").append(step).append(";\r\n");
@@ -111,16 +119,15 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         ret.append("function nextFrame(ctx){\r\n");
         ret.append("\tctx.clearRect(0,0,").append(width).append(",").append(height).append(");\r\n");
         ret.append("\tratio = (ratio+step)%65535;\r\n");
-        ret.append("\tmorphshape(ctx,ratio);\r\n");
+        ret.append("\tdrawFrame(ctx,ratio);\r\n");
         ret.append("}\r\n");
         ret.append("window.setInterval(function(){nextFrame(ctx)},").append(rate).append(");\r\n");
         ret.append(CanvasShapeExporter.getJsSuffix());
         return ret.toString();
     }
 
-    public static String getJsPrefix() {
+    private static String getJsPrefix() {
         String ret = CanvasShapeExporter.getJsPrefix();
-        ret += "function morphshape(ctx,ratio){\r\n";
         return ret;
     }
 

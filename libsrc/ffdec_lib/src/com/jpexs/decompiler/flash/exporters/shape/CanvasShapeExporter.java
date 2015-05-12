@@ -130,17 +130,19 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "</html>";
     }
 
-    public static String getDrawJs(int width, int height, String data) {
+    private String getDrawJs(int width, int height, String id, RECT rect) {
         return "var originalWidth=" + width + ";\r\nvar originalHeight=" + height + ";\r\n function drawFrame(){\r\n"
-                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n" + data + "\tctx.restore();\r\n}\r\n\tdrawFrame();\r\n";
+                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"
+                + "\tplace(\"" + id + "\",canvas,ctx,[" + (1 / unitDivisor) + ",0.0,0.0," + (1 / unitDivisor) + ","
+                + (-rect.Xmin / unitDivisor) + "," + (-rect.Ymin / unitDivisor) + "],ctrans,1,0,0,0);\r\n"
+                + "\tctx.restore();\r\n}\r\n\tdrawFrame();\r\n";
     }
 
-    public String getHtml(String needed) {
-        RECT r = shape.getBounds();
-        int width = (int) (r.getWidth() / unitDivisor);
-        int height = (int) (r.getHeight() / unitDivisor);
+    public String getHtml(String needed, String id, RECT rect) {
+        int width = (int) (rect.getWidth() / unitDivisor);
+        int height = (int) (rect.getHeight() / unitDivisor);
 
-        return getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, shapeData.toString()) + getJsSuffix() + getHtmlSuffix();
+        return getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, id, rect) + getJsSuffix() + getHtmlSuffix();
     }
 
     public String getShapeData() {
@@ -208,7 +210,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            fillData.append("\tvar grd=ctx.createLinearGradient(").append(Double.toString(start.x / unitDivisor)).append(",").append(Double.toString(start.y / unitDivisor)).append(",").append(Double.toString(end.x / unitDivisor)).append(",").append(Double.toString(end.y / unitDivisor)).append(");\r\n");
+            fillData.append("\tvar grd=ctx.createLinearGradient(").append(start.x / unitDivisor).append(",").append(start.y / unitDivisor).append(",").append(end.x / unitDivisor).append(",").append(end.y / unitDivisor).append(");\r\n");
         } else {
             fillMatrix = matrix;
             fillData.append("\tvar grd=ctx.createRadialGradient(").append(focalPointRatio * 16384).append(",0,0,0,0,").append(16384 + 32768 * repeatCnt).append(");\r\n");
@@ -225,7 +227,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 revert = !revert;
             }
             for (GRADRECORD r : gradientRecords) {
-                fillData.append("\tgrd.addColorStop(").append(Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0))).append(",").append(color(r.color)).append(");\r\n");
+                fillData.append("\tgrd.addColorStop(").append(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)).append(",").append(color(r.color)).append(");\r\n");
                 lastRadColor = color(r.color);
             }
             pos += oneHeight;
