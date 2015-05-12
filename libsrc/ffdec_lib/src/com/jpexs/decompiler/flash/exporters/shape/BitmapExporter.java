@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.shape;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -38,6 +38,7 @@ import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
@@ -301,16 +302,8 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
-        ImageTag image = null;
-        for (Tag t : swf.tags) {
-            if (t instanceof ImageTag) {
-                ImageTag i = (ImageTag) t;
-                if (i.getCharacterId() == bitmapId) {
-                    image = i;
-                    break;
-                }
-            }
-        }
+        CharacterTag character = swf.getCharacter(bitmapId);
+        ImageTag image = character instanceof ImageTag ? (ImageTag) character : null;
         if (image != null) {
             SerializableImage img = image.getImage();
             if (img != null) {
@@ -476,7 +469,7 @@ public class BitmapExporter extends ShapeExporterBase {
                         ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
                         double minX = rect.xMin;
                         double minY = rect.yMin;
-                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                        graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
 
                     graphics.setTransform(oldAf);

@@ -57,7 +57,7 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
 
     @Override
     public RECT getRect() {
-        return getRect(new HashSet<BoundedTag>());
+        return getRect(new HashSet<>());
     }
 
     @Override

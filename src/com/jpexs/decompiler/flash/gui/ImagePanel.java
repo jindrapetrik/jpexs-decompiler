@@ -723,13 +723,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
                 RECT rect = bounded.getRect();
-                if (rect == null) { //??? Why?
-                    rect = new RECT(0, 0, 1, 1);
-                }
+
                 int width = (int) (rect.getWidth() * zoom);
                 int height = (int) (rect.getHeight() * zoom);
-                SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
-                        (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
+                        (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);

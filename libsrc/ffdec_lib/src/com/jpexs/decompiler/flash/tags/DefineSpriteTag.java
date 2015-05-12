@@ -135,7 +135,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     @Override
     public RECT getRect() {
-        return getRect(new HashSet<BoundedTag>());
+        return getRect(new HashSet<>());
     }
 
     @Override
