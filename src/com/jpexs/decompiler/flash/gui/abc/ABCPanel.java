@@ -111,6 +111,10 @@ import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, Freed, TagEditorPanel {
 
     private MainPanel mainPanel;

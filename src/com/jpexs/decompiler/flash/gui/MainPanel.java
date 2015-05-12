@@ -256,6 +256,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
 
+    private static final String DETAILCARDTAGINFO = "Tag information";
+
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
 
     private static final String SPLIT_PANE1 = "SPLITPANE1";
@@ -285,6 +287,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private DumpViewPanel dumpViewPanel;
 
     private final JPanel treePanel;
+
+    private final TagInfoPanel tagInfoPanel;
 
     private TreePanelMode treePanelMode;
 
@@ -413,11 +417,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         detailPanel = new JPanel();
         detailPanel.setLayout(new CardLayout());
+
         JPanel whitePanel = new JPanel();
         whitePanel.setBackground(Color.white);
         detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
-        CardLayout cl2 = (CardLayout) (detailPanel.getLayout());
-        cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
+
+        tagInfoPanel = new TagInfoPanel();
+        detailPanel.add(tagInfoPanel, DETAILCARDTAGINFO);
 
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
         tagTree = new TagTree(null, this);
@@ -2794,14 +2800,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         previewPanel.setImageReplaceButtonVisible(false);
 
-        /*if (treeItem instanceof Tag) {
-         Tag tag = (Tag) treeItem;
-         Set<Integer> needed = new HashSet<>();
-         tag.getNeededCharactersDeep(needed);
-         String neededStr = Helper.joinStrings(needed, ", ");
-         // todo: it would be usefule to show this information on the UI
-         System.out.println("Needed characters: " + neededStr);
-         }*/
         boolean internalViewer = isInternalFlashViewerSelected();
 
         if (treeItem instanceof ScriptPack) {
@@ -2850,7 +2848,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        showDetail(DETAILCARDEMPTYPANEL);
+        if (treeItem instanceof Tag) {
+            Tag tag = (Tag) treeItem;
+            Set<Integer> needed = new HashSet<>();
+            tag.getNeededCharactersDeep(needed);
+            if (needed.size() > 0) {
+                tagInfoPanel.setNeededCharacters(needed);
+                showDetail(DETAILCARDTAGINFO);
+            } else {
+                showDetail(DETAILCARDEMPTYPANEL);
+            }
+        } else {
+            showDetail(DETAILCARDEMPTYPANEL);
+        }
+
         if (treeItem instanceof HeaderItem) {
             headerPanel.load(((HeaderItem) treeItem).getSwf());
             showCard(CARDHEADER);
