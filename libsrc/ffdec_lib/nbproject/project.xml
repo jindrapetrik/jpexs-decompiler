@@ -52,11 +52,136 @@ auxiliary.show.customizer.message=<message>
                 <action name="rebuild">
                     <target>clean</target>
                     <target>build</target>
-                </action>
+                </action>                  
                 <action name="debug">
-                    <script>nbproject/ide-file-targets.xml</script>
+                    <script>../../nbproject/ide-targets.xml</script>
                     <target>debug-nb</target>
                 </action>
+                <action name="profile">
+                    <script>../../nbproject/ide-targets.xml</script>
+                    <target>profile</target>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-src</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-test</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>debug-selected-file-in-src</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="test.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-selected-file</target>
+                    <context>
+                        <property>test.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="run.single.method">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-selected-method</target>
+                    <context>
+                        <property>test.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single.method">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-debug-selected-method</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>                    
+                </action>
+                <action name="debug.test.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-debug-selected-file</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>                            
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="profile">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>profile-nb</target>
+                </action>
+                <action name="profile.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>profile-selected-file-in-src</target>
+                    <context>
+                        <property>profile.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>debug-selected-file-in-test</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>              
             </ide-actions>
             <export>
                 <type>folder</type>
@@ -89,6 +214,12 @@ auxiliary.show.customizer.message=<message>
                     <source-file>
                         <location>build.properties</location>
                     </source-file>
+                    <source-file>
+                        <location>nbproject/project.xml</location>
+                    </source-file>
+                    <source-file>
+                        <location>nbproject/ide-file-targets.xml</location>
+                    </source-file>                    
                 </items>
                 <context-menu>
                     <ide-action name="build"/>
@@ -114,7 +245,7 @@ auxiliary.show.customizer.message=<message>
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;testlib/emma.jar;testlib/emma_ant.jar;testlib/testng-6.8.jar;src</classpath>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;antlib/testng-6.8.jar;src</classpath>
                 <source-level>1.8</source-level>
             </compilation-unit>
         </java-data>

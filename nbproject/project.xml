@@ -48,40 +48,30 @@
             </folders>
             <ide-actions>
                 <action name="build">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>build</target>
                 </action>
                 <action name="clean">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>clean</target>
                 </action>
                 <action name="javadoc">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>javadoc</target>
                 </action>
                 <action name="run">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>run</target>
                 </action>
                 <action name="test">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>test</target>
                 </action>
                 <action name="rebuild">
-                    <script>nbproject/nbjdk.xml</script>
                     <target>clean</target>
                     <target>build</target>
                 </action>
-                <action name="profile">
-                    <script>nbproject/nbjdk.xml</script>
-                    <target>profile-nb</target>
-                </action>
                 <action name="debug">
-                    <script>nbproject/nbjdk.xml</script>
+                    <script>nbproject/ide-targets.xml</script>
                     <target>debug-nb</target>
-                </action>
+                </action>                
                 <action name="run.single">
-                    <script>nbproject/nbjdk.xml</script>
+                    <script>nbproject/ide-file-targets.xml</script>
                     <target>run-selected-file-in-src</target>
                     <context>
                         <property>run.class</property>
@@ -94,7 +84,7 @@
                     </context>
                 </action>
                 <action name="run.single">
-                    <script>nbproject/nbjdk.xml</script>
+                    <script>nbproject/ide-file-targets.xml</script>
                     <target>run-selected-file-in-test</target>
                     <context>
                         <property>run.class</property>
@@ -107,7 +97,89 @@
                     </context>
                 </action>
                 <action name="debug.single">
-                    <script>nbproject/nbjdk.xml</script>
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>debug-selected-file-in-src</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="test.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-selected-file</target>
+                    <context>
+                        <property>test.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="run.single.method">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-selected-method</target>
+                    <context>
+                        <property>test.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single.method">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-debug-selected-method</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>                    
+                </action>
+                <action name="debug.test.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>test-debug-selected-file</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>                            
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="profile">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>profile-nb</target>
+                </action>
+                <action name="profile.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>profile-selected-file-in-src</target>
+                    <context>
+                        <property>profile.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/ide-file-targets.xml</script>
                     <target>debug-selected-file-in-test</target>
                     <context>
                         <property>debug.class</property>
@@ -122,44 +194,12 @@
             </ide-actions>
             <export>
                 <type>folder</type>
-                <location>build</location>
-                <script>nbproject/nbjdk.xml</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>javadoc</location>
-                <script>nbproject/nbjdk.xml</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>reports</location>
-                <script>nbproject/nbjdk.xml</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>locales</location>
-                <script>nbproject/nbjdk.xml</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>reports</location>
-                <script>nbproject/nbjdk.xml</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>dist</location>
-                <script>nbproject/nbjdk.xml</script>
+                <location>build/classes</location>
                 <build-target>build</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>build/test</location>
-                <script>nbproject/nbjdk.xml</script>
                 <build-target>build</build-target>
             </export>
             <view>
@@ -173,15 +213,15 @@
                         <location>test</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>libsrc\ffdec_lib\src</label>
+                        <label>core.src</label>
                         <location>libsrc/ffdec_lib/src</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>libsrc\ffdec_lib\test</label>
+                        <label>core.test</label>
                         <location>libsrc/ffdec_lib/test</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>libsrc\ffdec_lib\lexers</label>
+                        <label>core.lexers</label>
                         <location>libsrc/ffdec_lib/lexers</location>
                     </source-folder>
                     <source-file>
@@ -195,7 +235,16 @@
                     </source-file>
                     <source-file>
                         <location>jpexs_website.properties</location>
-                    </source-file>                    
+                    </source-file> 
+                    <source-file>
+                        <location>nbproject/project.xml</location>
+                    </source-file>
+                    <source-file>
+                        <location>nbproject/ide-file-targets.xml</location>
+                    </source-file>
+                    <source-file>
+                        <location>nbproject/ide-targets.xml</location>
+                    </source-file>                   
                 </items>
                 <context-menu>
                     <ide-action name="build"/>

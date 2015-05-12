@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".." name="ffdec-IDE">
+<project basedir=".." name="nb-IDE">
     <import file="../build.xml"/>
+    <target depends="compile" name="debug-nb">
+        <path id="cp">
+            <pathelement path="${basedir}/build/classes"/>
+            <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+        </path>
+        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
+            <classpath refid="cp"/>
+        </nbjpdastart>
+        <java classname="${main.class}" fork="true">
+            <classpath refid="cp"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg value="-Xmx8192m"/>
+            <arg line="${run.params}"/>
+        </java>
+    </target>
     <target name="-profile-check">
         <startprofiler freeform="true"/>
     </target>
-    <target depends="-profile-check" if="profiler.configured" name="profile-nb">
-        <antcall target="run" />
+    
+    <target name="profile-nb" if="profiler.configured" depends="-profile-check">
+            <java classname="${main.class}" dir="." fork="true">
+                <classpath>
+                    <pathelement path="${compile.dir}"/>
+                    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                </classpath>
+                <jvmarg line="${agent.jvmargs}" />
+            </java>
     </target>
 </project>

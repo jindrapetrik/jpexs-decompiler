@@ -7,6 +7,15 @@
     <loadproperties srcfile="build.properties" />
     
     
+    <path id="ant.lib.classpath">
+        <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
+    </path>
+    <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
+    <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpathref="ant.lib.classpath" />
+        
+    
+    
     <property name="jar.filename" value="${prefix.filename}"/>  
     <description>Builds project</description>      
     <property name="dist.lib.dir" value="${dist.dir}/${dist.lib.dirname}"/>    
@@ -27,9 +36,7 @@
         <include name="**/?*.js"/>
     </patternset>
 
-    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-        <classpath path="${test.lib.dir}/jacocoant.jar"/>
-    </taskdef>
+    
    
     <target name="compile" depends="lexers">
         <mkdir dir="${compile.dir}"/>
@@ -75,10 +82,7 @@
         <mkdir dir="${test.results.dir}"/>
         <mkdir dir="${test.results.dir}/raw/"/>
         
-        
-        <taskdef classname="org.testng.TestNGAntTask" classpath="${test.lib.dir}/testng-6.8.jar" name="testng" />
-    
-        <mkdir dir="${coverage.dir}" />
+         <mkdir dir="${coverage.dir}" />
         <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
         <testng 
             outputDir="${test.results.dir}"
@@ -96,7 +100,7 @@
         </testng>      
         </jacoco:coverage>          
         <!-- Coverage report -->
-        <mkdir dir="${coverage.results.dir}"/>
+        <mkdir dir="${coverage.result.dir}"/>
         
         <jacoco:report>
             <executiondata>
@@ -110,7 +114,7 @@
                     <fileset dir="${src.dir}" />
                 </sourcefiles>
             </structure>
-            <html destdir="${coverage.results.dir}" />
+            <html destdir="${coverage.result.dir}" />
         </jacoco:report>        
     </target>
     
@@ -223,8 +227,7 @@
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </nbjpdastart>
-        <taskdef classname="org.testng.TestNGAntTask" classpath="${test.lib.dir}/testng-6.8.jar" name="testng" />
-    
+        
         <testng 
             outputDir="${test.results.dir}"
             haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
@@ -247,7 +250,6 @@
     </target>
             
     <target name="-lexer" if="lexer">
-        <taskdef classname="jflex.anttask.JFlexTask" classpath="${basedir}/jflex-1.6.0.jar" name="jflex" />
         <jflex file="${lexer}" destdir="${src.dir}" nobak="on"></jflex>        
     </target>
     

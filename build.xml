@@ -9,7 +9,7 @@
         
     <path id="ant.lib.classpath">
         <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
-    </path>
+    </path>    
     
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpathref="ant.lib.classpath" />
@@ -20,7 +20,6 @@
     <taskdef name="desktopentry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant.lib.classpath" />
     <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
     <taskdef name="nsis" classname="com.danielreese.nsisant.Task" classpathref="ant.lib.classpath" />
-    <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath" />
     
     
     <property name="dist.lib.dir" value="${dist.dir}/${dist.lib.dirname}"/>    
@@ -117,16 +116,16 @@
     </target>
 
     <target name="test" depends="-test-halt-newver,-test-halt-nonewver,test_lib,compile,compile-tests">
-        <delete dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}/raw/"/>
+        <delete dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}/raw/"/>
         
          
         
         <mkdir dir="${coverage.dir}" />
         <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
             <testng 
-                outputDir="${test.results.dir}"
+                outputDir="${test.result.dir}"
                 haltOnFailure="${test.halt.failure}" verbose="2" workingDir="${basedir}">
         
                 <classpath>
@@ -141,7 +140,7 @@
         </jacoco:coverage>
                   
         <!-- Coverage report -->
-        <mkdir dir="${coverage.results.dir}"/>
+        <mkdir dir="${coverage.result.dir}"/>
         <jacoco:report>
             <executiondata>
                 <file file="${coverage.dir}/jacoco.exec" />
@@ -154,7 +153,7 @@
                     <fileset dir="${src.dir}" />
                 </sourcefiles>
             </structure>
-            <html destdir="${coverage.results.dir}" />
+            <html destdir="${coverage.result.dir}" />
         </jacoco:report> 
     </target>
     
@@ -776,7 +775,7 @@
         <delete dir="${compile.test.dir}"/>
         <delete dir="${compile.dir}"/>
         <delete dir="${coverage.dir}"/>
-        <delete dir="${test.results.dir}"/>
+        <delete dir="${test.result.dir}"/>
         <delete dir="${locales.target.dir}"/>
     </target>
     
@@ -784,9 +783,9 @@
     <target name="debug-test-method" depends="compile-tests">
         <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
         <fail unless="test.method">Must select some method in the IDE or set test.method</fail>
-        <delete dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}/raw/"/>
+        <delete dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}/raw/"/>
      
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath>
@@ -797,7 +796,7 @@
         </nbjpdastart>
         
         <testng 
-            outputDir="${test.results.dir}"
+            outputDir="${test.result.dir}"
             haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
         
             <classpath>
