@@ -35,8 +35,6 @@ public class PathExporter extends ShapeExporterBase {
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
-    private final double unitDivisor = 1;
-
     public static List<GeneralPath> export(SHAPE shape) {
         PathExporter exporter = new PathExporter(shape, new ColorTransform());
         exporter.export();
@@ -114,18 +112,17 @@ public class PathExporter extends ShapeExporterBase {
 
     @Override
     public void moveTo(double x, double y) {
-        path.moveTo(x / unitDivisor, y / unitDivisor);
+        path.moveTo(x, y);
     }
 
     @Override
     public void lineTo(double x, double y) {
-        path.lineTo(x / unitDivisor, y / unitDivisor);
+        path.lineTo(x, y);
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX / unitDivisor, controlY / unitDivisor,
-                anchorX / unitDivisor, anchorY / unitDivisor);
+        path.quadTo(controlX, controlY, anchorX, anchorY);
     }
 
     protected void finalizePath() {

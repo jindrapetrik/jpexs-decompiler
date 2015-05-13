@@ -68,7 +68,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private final SWF swf;
 
-    private GeneralPath path;
+    private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
 
     private Paint fillPathPaint;
 
@@ -508,174 +508,173 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     protected void finalizePath() {
-        if (path != null) {
-            if (fillPaint != null) {
-                graphics.setComposite(AlphaComposite.SrcOver);
-                if (fillPaint instanceof MultipleGradientPaint) {
-                    AffineTransform oldAf = graphics.getTransform();
-                    if (fillPathPaint != null) {
-                        graphics.setPaint(fillPathPaint);
-                    }
-                    graphics.fill(path);
-                    graphics.setClip(path);
-                    Matrix inverse = null;
-                    try {
-                        double scx = fillTransform.getScaleX();
-                        double scy = fillTransform.getScaleY();
-                        double shx = fillTransform.getShearX();
-                        double shy = fillTransform.getShearY();
-                        double det = scx * scy - shx * shy;
-                        if (Math.abs(det) <= Double.MIN_VALUE) {
-                            // use only the translate values
-                            // todo: make it better
-                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
-                        }
-
-                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
-
-                    } catch (NoninvertibleTransformException ex) {
-                        // it should never happen as we already checked the determinant of the matrix
-                    }
-
-                    fillTransform.preConcatenate(oldAf);
-                    graphics.setTransform(fillTransform);
-                    graphics.setPaint(fillPaint);
-
-                    if (inverse != null) {
-                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
-                        double minX = rect.xMin;
-                        double minY = rect.yMin;
-                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
-                    }
-
-                    graphics.setTransform(oldAf);
-                    graphics.setClip(null);
-                } else if (fillPaint instanceof TexturePaint) {
-                    AffineTransform oldAf = graphics.getTransform();
-                    graphics.setClip(path);
-                    Matrix inverse = null;
-                    try {
-                        double scx = fillTransform.getScaleX();
-                        double scy = fillTransform.getScaleY();
-                        double shx = fillTransform.getShearX();
-                        double shy = fillTransform.getShearY();
-                        double det = scx * scy - shx * shy;
-                        if (Math.abs(det) <= Double.MIN_VALUE) {
-                            // use only the translate values
-                            // todo: make it better
-                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
-                        }
-
-                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
-                    } catch (NoninvertibleTransformException ex) {
-                        // it should never happen as we already checked the determinant of the matrix
-                    }
-
-                    fillTransform.preConcatenate(oldAf);
-                    graphics.setTransform(fillTransform);
-                    graphics.setPaint(fillPaint);
-
-                    if (inverse != null) {
-                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
-                        double minX = rect.xMin;
-                        double minY = rect.yMin;
-                        graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
-                    }
-
-                    graphics.setTransform(oldAf);
-                    graphics.setClip(null);
-                } else {
-                    graphics.setPaint(fillPaint);
-                    graphics.fill(path);
+        if (fillPaint != null) {
+            graphics.setComposite(AlphaComposite.SrcOver);
+            if (fillPaint instanceof MultipleGradientPaint) {
+                AffineTransform oldAf = graphics.getTransform();
+                if (fillPathPaint != null) {
+                    graphics.setPaint(fillPathPaint);
                 }
-            }
-            if (linePaint != null && lineStroke != null) {
-                Shape strokedShape = lineStroke.createStrokedShape(path);
-                graphics.setComposite(AlphaComposite.SrcOver);
-                if (linePaint instanceof MultipleGradientPaint) {
-                    AffineTransform oldAf = graphics.getTransform();
-                    if (linePathPaint != null) {
-                        graphics.setPaint(linePathPaint);
-                    }
-                    graphics.fill(strokedShape);
-                    graphics.setClip(strokedShape);
-                    Matrix inverse = null;
-                    try {
-                        double scx = lineTransform.getScaleX();
-                        double scy = lineTransform.getScaleY();
-                        double shx = lineTransform.getShearX();
-                        double shy = lineTransform.getShearY();
-                        double det = scx * scy - shx * shy;
-                        if (Math.abs(det) <= Double.MIN_VALUE) {
-                            // use only the translate values
-                            // todo: make it better
-                            lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
-                        }
-
-                        inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
-
-                    } catch (NoninvertibleTransformException ex) {
-                        // it should never happen as we already checked the determinant of the matrix
+                graphics.fill(path);
+                graphics.setClip(path);
+                Matrix inverse = null;
+                try {
+                    double scx = fillTransform.getScaleX();
+                    double scy = fillTransform.getScaleY();
+                    double shx = fillTransform.getShearX();
+                    double shy = fillTransform.getShearY();
+                    double det = scx * scy - shx * shy;
+                    if (Math.abs(det) <= Double.MIN_VALUE) {
+                        // use only the translate values
+                        // todo: make it better
+                        fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
                     }
 
-                    lineTransform.preConcatenate(oldAf);
-                    graphics.setTransform(lineTransform);
-                    graphics.setPaint(linePaint);
+                    inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
 
-                    if (inverse != null) {
-                        ExportRectangle rect = inverse.transform(new ExportRectangle(strokedShape.getBounds2D()));
-                        double minX = rect.xMin;
-                        double minY = rect.yMin;
-                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
-                    }
-
-                    graphics.setTransform(oldAf);
-                    graphics.setClip(null);
-                } else if (linePaint instanceof TexturePaint) {
-                    AffineTransform oldAf = graphics.getTransform();
-                    graphics.setClip(strokedShape);
-                    Matrix inverse = null;
-                    try {
-                        double scx = lineTransform.getScaleX();
-                        double scy = lineTransform.getScaleY();
-                        double shx = lineTransform.getShearX();
-                        double shy = lineTransform.getShearY();
-                        double det = scx * scy - shx * shy;
-                        if (Math.abs(det) <= Double.MIN_VALUE) {
-                            // use only the translate values
-                            // todo: make it better
-                            lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
-                        }
-
-                        inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
-                    } catch (NoninvertibleTransformException ex) {
-                        // it should never happen as we already checked the determinant of the matrix
-                    }
-
-                    lineTransform.preConcatenate(oldAf);
-                    graphics.setTransform(lineTransform);
-                    graphics.setPaint(linePaint);
-
-                    if (inverse != null) {
-                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
-                        double minX = rect.xMin;
-                        double minY = rect.yMin;
-                        graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
-                    }
-
-                    graphics.setTransform(oldAf);
-                    graphics.setClip(null);
-                } else {
-                    graphics.setPaint(linePaint);
-                    graphics.fill(strokedShape);
+                } catch (NoninvertibleTransformException ex) {
+                    // it should never happen as we already checked the determinant of the matrix
                 }
-            } else if (lineColor != null) {
-                graphics.setColor(lineColor);
-                graphics.setStroke(lineStroke == null ? defaultStroke : lineStroke);
-                graphics.draw(path);
+
+                fillTransform.preConcatenate(oldAf);
+                graphics.setTransform(fillTransform);
+                graphics.setPaint(fillPaint);
+
+                if (inverse != null) {
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                    double minX = rect.xMin;
+                    double minY = rect.yMin;
+                    graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                }
+
+                graphics.setTransform(oldAf);
+                graphics.setClip(null);
+            } else if (fillPaint instanceof TexturePaint) {
+                AffineTransform oldAf = graphics.getTransform();
+                graphics.setClip(path);
+                Matrix inverse = null;
+                try {
+                    double scx = fillTransform.getScaleX();
+                    double scy = fillTransform.getScaleY();
+                    double shx = fillTransform.getShearX();
+                    double shy = fillTransform.getShearY();
+                    double det = scx * scy - shx * shy;
+                    if (Math.abs(det) <= Double.MIN_VALUE) {
+                        // use only the translate values
+                        // todo: make it better
+                        fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
+                    }
+
+                    inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                } catch (NoninvertibleTransformException ex) {
+                    // it should never happen as we already checked the determinant of the matrix
+                }
+
+                fillTransform.preConcatenate(oldAf);
+                graphics.setTransform(fillTransform);
+                graphics.setPaint(fillPaint);
+
+                if (inverse != null) {
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                    double minX = rect.xMin;
+                    double minY = rect.yMin;
+                    graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                }
+
+                graphics.setTransform(oldAf);
+                graphics.setClip(null);
+            } else {
+                graphics.setPaint(fillPaint);
+                graphics.fill(path);
             }
         }
-        path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
+        if (linePaint != null && lineStroke != null) {
+            Shape strokedShape = lineStroke.createStrokedShape(path);
+            graphics.setComposite(AlphaComposite.SrcOver);
+            if (linePaint instanceof MultipleGradientPaint) {
+                AffineTransform oldAf = graphics.getTransform();
+                if (linePathPaint != null) {
+                    graphics.setPaint(linePathPaint);
+                }
+                graphics.fill(strokedShape);
+                graphics.setClip(strokedShape);
+                Matrix inverse = null;
+                try {
+                    double scx = lineTransform.getScaleX();
+                    double scy = lineTransform.getScaleY();
+                    double shx = lineTransform.getShearX();
+                    double shy = lineTransform.getShearY();
+                    double det = scx * scy - shx * shy;
+                    if (Math.abs(det) <= Double.MIN_VALUE) {
+                        // use only the translate values
+                        // todo: make it better
+                        lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
+                    }
+
+                    inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
+
+                } catch (NoninvertibleTransformException ex) {
+                    // it should never happen as we already checked the determinant of the matrix
+                }
+
+                lineTransform.preConcatenate(oldAf);
+                graphics.setTransform(lineTransform);
+                graphics.setPaint(linePaint);
+
+                if (inverse != null) {
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(strokedShape.getBounds2D()));
+                    double minX = rect.xMin;
+                    double minY = rect.yMin;
+                    graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                }
+
+                graphics.setTransform(oldAf);
+                graphics.setClip(null);
+            } else if (linePaint instanceof TexturePaint) {
+                AffineTransform oldAf = graphics.getTransform();
+                graphics.setClip(strokedShape);
+                Matrix inverse = null;
+                try {
+                    double scx = lineTransform.getScaleX();
+                    double scy = lineTransform.getScaleY();
+                    double shx = lineTransform.getShearX();
+                    double shy = lineTransform.getShearY();
+                    double det = scx * scy - shx * shy;
+                    if (Math.abs(det) <= Double.MIN_VALUE) {
+                        // use only the translate values
+                        // todo: make it better
+                        lineTransform.setToTranslation(lineTransform.getTranslateX(), lineTransform.getTranslateY());
+                    }
+
+                    inverse = new Matrix(new AffineTransform(lineTransform).createInverse());
+                } catch (NoninvertibleTransformException ex) {
+                    // it should never happen as we already checked the determinant of the matrix
+                }
+
+                lineTransform.preConcatenate(oldAf);
+                graphics.setTransform(lineTransform);
+                graphics.setPaint(linePaint);
+
+                if (inverse != null) {
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                    double minX = rect.xMin;
+                    double minY = rect.yMin;
+                    graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                }
+
+                graphics.setTransform(oldAf);
+                graphics.setClip(null);
+            } else {
+                graphics.setPaint(linePaint);
+                graphics.fill(strokedShape);
+            }
+        } else if (lineColor != null) {
+            graphics.setColor(lineColor);
+            graphics.setStroke(lineStroke == null ? defaultStroke : lineStroke);
+            graphics.draw(path);
+        }
+
+        path.reset();
         lineStroke = null;
         lineColor = null;
         fillPaint = null;

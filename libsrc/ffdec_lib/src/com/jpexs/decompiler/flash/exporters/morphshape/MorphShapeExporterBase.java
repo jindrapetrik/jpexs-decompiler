@@ -491,7 +491,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                 int idx;
                 IMorphEdge prevEdge = null;
                 List<IMorphEdge> tmpPath = new ArrayList<>();
-                Map<String, List<IMorphEdge>> coordMap = createCoordMap(subPath);
+                Map<PointInt, List<IMorphEdge>> coordMap = createCoordMap(subPath);
                 while (subPath.size() > 0) {
                     idx = 0;
                     while (idx < subPath.size()) {
@@ -516,16 +516,15 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         }
     }
 
-    protected Map<String, List<IMorphEdge>> createCoordMap(List<IMorphEdge> path) {
-        Map<String, List<IMorphEdge>> coordMap = new HashMap<>();
+    protected Map<PointInt, List<IMorphEdge>> createCoordMap(List<IMorphEdge> path) {
+        Map<PointInt, List<IMorphEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
-            String key = from.getX() + "_" + from.getY();
-            List<IMorphEdge> coordMapArray = coordMap.get(key);
+            List<IMorphEdge> coordMapArray = coordMap.get(from);
             if (coordMapArray == null) {
                 List<IMorphEdge> list = new ArrayList<>();
                 list.add(path.get(i));
-                coordMap.put(key, list);
+                coordMap.put(from, list);
             } else {
                 coordMapArray.add(path.get(i));
             }
@@ -533,12 +532,12 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         return coordMap;
     }
 
-    protected void removeEdgeFromCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
-        String key = edge.getFrom().getX() + "_" + edge.getFrom().getY();
-        List<IMorphEdge> coordMapArray = coordMap.get(key);
+    protected void removeEdgeFromCoordMap(Map<PointInt, List<IMorphEdge>> coordMap, IMorphEdge edge) {
+        PointInt from = edge.getFrom();
+        List<IMorphEdge> coordMapArray = coordMap.get(from);
         if (coordMapArray != null) {
             if (coordMapArray.size() == 1) {
-                coordMap.remove(key);
+                coordMap.remove(from);
             } else {
                 int i = coordMapArray.indexOf(edge);
                 if (i > -1) {
@@ -548,9 +547,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         }
     }
 
-    protected IMorphEdge findNextEdgeInCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
-        String key = edge.getTo().getX() + "_" + edge.getTo().getY();
-        List<IMorphEdge> coordMapArray = coordMap.get(key);
+    protected IMorphEdge findNextEdgeInCoordMap(Map<PointInt, List<IMorphEdge>> coordMap, IMorphEdge edge) {
+        List<IMorphEdge> coordMapArray = coordMap.get(edge.getTo());
         if (coordMapArray != null && coordMapArray.size() > 0) {
             return coordMapArray.get(0);
         }

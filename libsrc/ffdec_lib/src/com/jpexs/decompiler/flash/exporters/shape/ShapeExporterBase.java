@@ -428,7 +428,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 int idx;
                 IEdge prevEdge = null;
                 List<IEdge> tmpPath = new ArrayList<>();
-                Map<String, List<IEdge>> coordMap = createCoordMap(subPath);
+                Map<PointInt, List<IEdge>> coordMap = createCoordMap(subPath);
                 while (subPath.size() > 0) {
                     idx = 0;
                     while (idx < subPath.size()) {
@@ -453,16 +453,15 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    private Map<String, List<IEdge>> createCoordMap(List<IEdge> path) {
-        Map<String, List<IEdge>> coordMap = new HashMap<>();
+    private Map<PointInt, List<IEdge>> createCoordMap(List<IEdge> path) {
+        Map<PointInt, List<IEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
-            String key = from.getX() + "_" + from.getY();
-            List<IEdge> coordMapArray = coordMap.get(key);
+            List<IEdge> coordMapArray = coordMap.get(from);
             if (coordMapArray == null) {
                 List<IEdge> list = new ArrayList<>();
                 list.add(path.get(i));
-                coordMap.put(key, list);
+                coordMap.put(from, list);
             } else {
                 coordMapArray.add(path.get(i));
             }
@@ -470,12 +469,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return coordMap;
     }
 
-    private void removeEdgeFromCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
-        String key = edge.getFrom().getX() + "_" + edge.getFrom().getY();
-        List<IEdge> coordMapArray = coordMap.get(key);
+    private void removeEdgeFromCoordMap(Map<PointInt, List<IEdge>> coordMap, IEdge edge) {
+        PointInt from = edge.getFrom();
+        List<IEdge> coordMapArray = coordMap.get(from);
         if (coordMapArray != null) {
             if (coordMapArray.size() == 1) {
-                coordMap.remove(key);
+                coordMap.remove(from);
             } else {
                 int i = coordMapArray.indexOf(edge);
                 if (i > -1) {
@@ -485,9 +484,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    private IEdge findNextEdgeInCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
-        String key = edge.getTo().getX() + "_" + edge.getTo().getY();
-        List<IEdge> coordMapArray = coordMap.get(key);
+    private IEdge findNextEdgeInCoordMap(Map<PointInt, List<IEdge>> coordMap, IEdge edge) {
+        List<IEdge> coordMapArray = coordMap.get(edge.getTo());
         if (coordMapArray != null && coordMapArray.size() > 0) {
             return coordMapArray.get(0);
         }
