@@ -1,12 +1,3 @@
-package com.jpexs.decompiler.flash.gui;
-
-import com.jpexs.decompiler.flash.gui.AdvancedSettingsDialog;
-import com.jpexs.decompiler.flash.gui.AppStrings;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-import javax.swing.JComboBox;
-import org.testng.annotations.Test;
-
 /*
  *  Copyright (C) 2010-2015 JPEXS
  *
@@ -23,6 +14,13 @@ import org.testng.annotations.Test;
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jpexs.decompiler.flash.gui;
+
+import java.util.HashMap;
+import java.util.ResourceBundle;
+import javax.swing.JComboBox;
+import org.testng.annotations.Test;
+
 /**
  *
  * @author JPEXS
