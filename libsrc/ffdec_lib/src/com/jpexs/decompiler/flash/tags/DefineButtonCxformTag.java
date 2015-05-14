@@ -34,14 +34,14 @@ import java.io.OutputStream;
  */
 public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 23;
+
+    public static final String NAME = "DefineButtonCxform";
+
     @SWFType(BasicType.UI16)
     public int buttonId;
 
     public CXFORM buttonColorTransform;
-
-    public static final int ID = 23;
-
-    public static final String NAME = "DefineButtonCxform";
 
     /**
      * Gets data bytes

@@ -42,6 +42,10 @@ import java.util.logging.Logger;
  */
 public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
+    public static final int ID = 90;
+
+    public static final String NAME = "DefineBitsJPEG4";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
@@ -53,10 +57,6 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI8)
     public ByteArrayRange bitmapAlphaData;
-
-    public static final int ID = 90;
-
-    public static final String NAME = "DefineBitsJPEG4";
 
     @Override
     public int getCharacterId() {

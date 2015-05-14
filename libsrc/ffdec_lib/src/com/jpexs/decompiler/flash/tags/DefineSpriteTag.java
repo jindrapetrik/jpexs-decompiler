@@ -58,6 +58,10 @@ import java.util.Set;
  */
 public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timelined {
 
+    public static final int ID = 39;
+
+    public static final String NAME = "DefineSprite";
+
     /**
      * Character ID of sprite
      */
@@ -76,10 +80,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     public List<Tag> subTags;
 
     public boolean hasEndTag;
-
-    public static final int ID = 39;
-
-    public static final String NAME = "DefineSprite";
 
     private Timeline timeline;
 

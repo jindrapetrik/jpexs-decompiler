@@ -41,6 +41,10 @@ import java.io.OutputStream;
  */
 public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
+    public static final int ID = 82;
+
+    public static final String NAME = "DoABCDefine";
+
     /**
      * ActionScript 3 bytecodes
      */
@@ -61,20 +65,6 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * The name assigned to the bytecode.
      */
     public String name;
-
-    public static final int ID = 82;
-
-    public static final String NAME = "DoABCDefine";
-
-    @Override
-    public ABC getABC() {
-        return abc;
-    }
-
-    @Override
-    public String getName() {
-        return super.getName() + " (" + name + ")";
-    }
 
     /**
      * Constructor
@@ -132,6 +122,16 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         } catch (IOException e) {
             throw new Error("This should never happen.", e);
         }
+    }
+
+    @Override
+    public ABC getABC() {
+        return abc;
+    }
+
+    @Override
+    public String getName() {
+        return super.getName() + " (" + name + ")";
     }
 
     @Override

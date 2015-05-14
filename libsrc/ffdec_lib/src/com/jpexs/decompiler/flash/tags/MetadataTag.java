@@ -27,12 +27,12 @@ import java.io.OutputStream;
 
 public class MetadataTag extends Tag {
 
-    @Multiline
-    public String xmlMetadata;
-
     public static final int ID = 77;
 
     public static final String NAME = "Metadata";
+
+    @Multiline
+    public String xmlMetadata;
 
     /**
      * Constructor

@@ -71,9 +71,9 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         ret.fillStyles = new FILLSTYLEARRAY();
         ret.fillStyles.fillStyles = new FILLSTYLE[0];
         ret.lineStyles = new LINESTYLEARRAY();
-        if ((shapeNum == 1 || shapeNum == 2 || shapeNum == 3)) {
+        if (shapeNum <= 3) {
             ret.lineStyles.lineStyles = new LINESTYLE[0];
-        } else if (shapeNum == 4) {
+        } else {
             ret.lineStyles.lineStyles = new LINESTYLE2[0];
         }
 

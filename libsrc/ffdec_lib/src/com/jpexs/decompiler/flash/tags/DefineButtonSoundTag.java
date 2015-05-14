@@ -34,6 +34,10 @@ import java.io.OutputStream;
  */
 public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 17;
+
+    public static final String NAME = "DefineButtonSound";
+
     @SWFType(BasicType.UI16)
     public int buttonId;
 
@@ -56,10 +60,6 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     public int buttonSoundChar3;
 
     public SOUNDINFO buttonSoundInfo3;
-
-    public static final int ID = 17;
-
-    public static final String NAME = "DefineButtonSound";
 
     @Override
     public int getCharacterId() {

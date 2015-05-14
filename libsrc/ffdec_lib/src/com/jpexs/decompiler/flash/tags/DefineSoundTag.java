@@ -47,6 +47,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class DefineSoundTag extends CharacterTag implements SoundTag {
 
+    public static final int ID = 14;
+
+    public static final String NAME = "DefineSound";
+
     @SWFType(BasicType.UI16)
     public int soundId;
 
@@ -64,10 +68,6 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public long soundSampleCount;
 
     public ByteArrayRange soundData;
-
-    public static final int ID = 14;
-
-    public static final String NAME = "DefineSound";
 
     @Override
     public int getCharacterId() {

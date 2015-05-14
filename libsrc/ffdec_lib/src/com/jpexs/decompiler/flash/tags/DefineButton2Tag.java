@@ -53,6 +53,10 @@ import java.util.Set;
  */
 public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
+    public static final int ID = 34;
+
+    public static final String NAME = "DefineButton2";
+
     /**
      * ID for this character
      */
@@ -77,10 +81,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      * Actions to execute at particular button events
      */
     public List<BUTTONCONDACTION> actions = new ArrayList<>();
-
-    public static final int ID = 34;
-
-    public static final String NAME = "DefineButton2";
 
     private Timeline timeline;
 

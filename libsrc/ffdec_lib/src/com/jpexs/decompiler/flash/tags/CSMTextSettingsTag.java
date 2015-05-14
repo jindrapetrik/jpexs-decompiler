@@ -34,6 +34,10 @@ import java.io.OutputStream;
  */
 public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 74;
+
+    public static final String NAME = "CSMTextSettings";
+
     @SWFType(BasicType.UI16)
     public int textID;
 
@@ -56,34 +60,6 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     @Reserved
     @SWFType(BasicType.UI8)
     public int reserved2;
-
-    public static final int ID = 74;
-
-    public static final String NAME = "CSMTextSettings";
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(textID);
-            sos.writeUB(2, useFlashType);
-            sos.writeUB(3, gridFit);
-            sos.writeUB(3, reserved);
-            sos.writeFLOAT(thickness); //F32 = FLOAT
-            sos.writeFLOAT(sharpness); //F32 = FLOAT
-            sos.writeUI8(reserved2);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -115,6 +91,30 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
         thickness = sis.readFLOAT("thickness"); //F32 = FLOAT
         sharpness = sis.readFLOAT("sharpness"); //F32 = FLOAT
         reserved2 = sis.readUI8("reserved2"); //reserved
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(textID);
+            sos.writeUB(2, useFlashType);
+            sos.writeUB(3, gridFit);
+            sos.writeUB(3, reserved);
+            sos.writeFLOAT(thickness); //F32 = FLOAT
+            sos.writeFLOAT(sharpness); //F32 = FLOAT
+            sos.writeUI8(reserved2);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

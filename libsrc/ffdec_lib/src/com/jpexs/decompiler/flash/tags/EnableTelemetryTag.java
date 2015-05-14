@@ -48,27 +48,6 @@ public class EnableTelemetryTag extends Tag {
     public byte[] passwordHash;
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(16, reserved);
-            if (passwordHash != null) {
-                sos.write(passwordHash);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -96,5 +75,26 @@ public class EnableTelemetryTag extends Tag {
         if (sis.available() > 0) {
             passwordHash = sis.readBytesEx(32, "passwordHash");
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUB(16, reserved);
+            if (passwordHash != null) {
+                sos.write(passwordHash);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

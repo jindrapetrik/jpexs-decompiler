@@ -34,14 +34,14 @@ import java.io.OutputStream;
  */
 public class DefineScalingGridTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 78;
+
+    public static final String NAME = "DefineScalingGrid";
+
     @SWFType(BasicType.UI16)
     public int characterId;
 
     public RECT splitter;
-
-    public static final int ID = 78;
-
-    public static final String NAME = "DefineScalingGrid";
 
     /**
      * Constructor

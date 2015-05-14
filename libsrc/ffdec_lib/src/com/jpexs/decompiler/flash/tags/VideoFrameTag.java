@@ -34,6 +34,10 @@ import java.io.OutputStream;
  */
 public class VideoFrameTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 61;
+
+    public static final String NAME = "VideoFrame";
+
     @SWFType(BasicType.UI16)
     public int streamID;
 
@@ -41,30 +45,6 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
     public int frameNum;
 
     public ByteArrayRange videoData;
-
-    public static final int ID = 61;
-
-    public static final String NAME = "VideoFrame";
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(streamID);
-            sos.writeUI16(frameNum);
-            sos.write(videoData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -93,6 +73,26 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
         streamID = sis.readUI16("streamID");
         frameNum = sis.readUI16("frameNum");
         videoData = sis.readByteRangeEx(sis.available(), "videoData"); //TODO: Parse video packets
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(streamID);
+            sos.writeUI16(frameNum);
+            sos.write(videoData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

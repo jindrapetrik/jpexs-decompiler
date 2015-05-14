@@ -45,6 +45,10 @@ import java.util.logging.Logger;
  */
 public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
+    public static final int ID = 59;
+
+    public static final String NAME = "DoInitAction";
+
     /**
      * Identifier of Sprite
      */
@@ -57,10 +61,6 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
-
-    public static final int ID = 59;
-
-    public static final String NAME = "DoInitAction";
 
     /**
      * Constructor

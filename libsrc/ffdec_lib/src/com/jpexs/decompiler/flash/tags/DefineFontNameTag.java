@@ -33,16 +33,16 @@ import java.io.OutputStream;
  */
 public class DefineFontNameTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 88;
+
+    public static final String NAME = "DefineFontName";
+
     @SWFType(BasicType.UI16)
     public int fontId;
 
     public String fontName;
 
     public String fontCopyright;
-
-    public static final int ID = 88;
-
-    public static final String NAME = "DefineFontName";
 
     /**
      * Constructor

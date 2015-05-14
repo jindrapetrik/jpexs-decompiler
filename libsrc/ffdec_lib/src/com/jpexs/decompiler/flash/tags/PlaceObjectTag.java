@@ -43,41 +43,48 @@ import java.util.Set;
  */
 public class PlaceObjectTag extends PlaceObjectTypeTag {
 
-    /**
-     * ID of character to place
-     */
-    @SWFType(BasicType.UI16)
-    public int characterId;
-
-    /**
-     * Depth of character
-     */
-    @SWFType(BasicType.UI16)
-    public int depth;
-
-    /**
-     * Transform matrix data
-     */
-    public MATRIX matrix;
-
-    /**
-     * Color transform data
-     */
-    @Optional
-    public CXFORM colorTransform;
-
     public static final int ID = 4;
 
     public static final String NAME = "PlaceObject";
 
-    @Override
-    public List<FILTER> getFilters() {
-        return null;
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public PlaceObjectTag(SWF swf) {
+        super(swf, ID, NAME, null);
+        matrix = new MATRIX();
+    }
+
+    public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
+        super(swf, ID, NAME, null);
+        this.characterId = characterId;
+        this.depth = depth;
+        this.matrix = matrix;
+        this.colorTransform = colorTransform;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
+    public PlaceObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
     }
 
     @Override
-    public int getClipDepth() {
-        return -1;
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        characterId = sis.readUI16("characterId");
+        depth = sis.readUI16("depth");
+        matrix = sis.readMatrix("matrix");
+        if (sis.available() > 0) {
+            colorTransform = sis.readCXFORM("colorTransform");
+        }
     }
 
     /**
@@ -104,43 +111,36 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     }
 
     /**
-     * Constructor
-     *
-     * @param swf
+     * ID of character to place
      */
-    public PlaceObjectTag(SWF swf) {
-        super(swf, ID, NAME, null);
-        matrix = new MATRIX();
-    }
+    @SWFType(BasicType.UI16)
+    public int characterId;
 
     /**
-     * Constructor
-     *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * Depth of character
      */
-    public PlaceObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
+    @SWFType(BasicType.UI16)
+    public int depth;
+
+    /**
+     * Transform matrix data
+     */
+    public MATRIX matrix;
+
+    /**
+     * Color transform data
+     */
+    @Optional
+    public CXFORM colorTransform;
+
+    @Override
+    public List<FILTER> getFilters() {
+        return null;
     }
 
     @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterId = sis.readUI16("characterId");
-        depth = sis.readUI16("depth");
-        matrix = sis.readMatrix("matrix");
-        if (sis.available() > 0) {
-            colorTransform = sis.readCXFORM("colorTransform");
-        }
-    }
-
-    public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, NAME, null);
-        this.characterId = characterId;
-        this.depth = depth;
-        this.matrix = matrix;
-        this.colorTransform = colorTransform;
+    public int getClipDepth() {
+        return -1;
     }
 
     @Override

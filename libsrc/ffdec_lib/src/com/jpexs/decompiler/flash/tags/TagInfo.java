@@ -22,15 +22,27 @@ package com.jpexs.decompiler.flash.tags;
  */
 public class TagInfo {
 
-    public int id;
+    private final int id;
 
-    public Class cls;
+    private final Class cls;
 
-    public String name;
+    private final String name;
 
     public TagInfo(int id, Class cls, String name) {
         this.id = id;
         this.cls = cls;
         this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Class getCls() {
+        return cls;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -28,16 +28,6 @@ import java.io.IOException;
  */
 public class EndTag extends Tag {
 
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        return new byte[0];
-    }
-
     public static final int ID = 0;
 
     public static final String NAME = "End";
@@ -65,5 +55,15 @@ public class EndTag extends Tag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        return new byte[0];
     }
 }

@@ -28,15 +28,15 @@ import java.io.OutputStream;
 
 public class ScriptLimitsTag extends Tag {
 
+    public static final int ID = 65;
+
+    public static final String NAME = "ScriptLimits";
+
     @SWFType(BasicType.UI16)
     public int maxRecursionDepth;
 
     @SWFType(BasicType.UI16)
     public int scriptTimeoutSeconds;
-
-    public static final int ID = 65;
-
-    public static final String NAME = "ScriptLimits";
 
     /**
      * Constructor

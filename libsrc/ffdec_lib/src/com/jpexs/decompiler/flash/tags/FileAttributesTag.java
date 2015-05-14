@@ -29,6 +29,10 @@ import java.io.OutputStream;
 
 public class FileAttributesTag extends Tag {
 
+    public static final int ID = 69;
+
+    public static final String NAME = "FileAttributes";
+
     public boolean useDirectBlit;
 
     public boolean useGPU;
@@ -50,10 +54,6 @@ public class FileAttributesTag extends Tag {
     @SWFType(value = BasicType.UB, count = 24)
     @Reserved
     public int reserved3;
-
-    public static final int ID = 69;
-
-    public static final String NAME = "FileAttributes";
 
     /**
      * Constructor

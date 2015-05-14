@@ -31,34 +31,14 @@ import java.io.OutputStream;
  */
 public class ProtectTag extends Tag {
 
-    /**
-     * MD5 hash of password
-     */
-    public String passwordHash;
-
     public static final int ID = 24;
 
     public static final String NAME = "Protect";
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
+     * MD5 hash of password
      */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            if (!"".equals(passwordHash)) {
-                sos.writeString(passwordHash);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
+    public String passwordHash;
 
     /**
      * Constructor
@@ -89,5 +69,25 @@ public class ProtectTag extends Tag {
         } else {
             passwordHash = "";
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            if (!"".equals(passwordHash)) {
+                sos.writeString(passwordHash);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

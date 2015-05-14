@@ -33,6 +33,10 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
+    public static final int ID = 86;
+
+    public static final String NAME = "DefineSceneAndFrameLabelData";
+
     @SWFType(value = BasicType.EncodedU32)
     @SWFArray(value = "offset", countField = "sceneCount")
     public long[] sceneOffsets;
@@ -46,10 +50,6 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
 
     @SWFArray(countField = "frameLabelCount")
     public String[] frameNames;
-
-    public static final int ID = 86;
-
-    public static final String NAME = "DefineSceneAndFrameLabelData";
 
     /**
      * Gets data bytes

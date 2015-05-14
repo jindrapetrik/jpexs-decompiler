@@ -37,6 +37,10 @@ import java.util.List;
  */
 public class ExportAssetsTag extends SymbolClassTypeTag {
 
+    public static final int ID = 56;
+
+    public static final String NAME = "ExportAssets";
+
     /**
      * HashMap with assets
      */
@@ -46,10 +50,6 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
 
     @SWFArray(value = "name", countField = "count")
     public List<String> names;
-
-    public static final int ID = 56;
-
-    public static final String NAME = "ExportAssets";
 
     /**
      * Constructor

@@ -41,6 +41,10 @@ import java.util.List;
  */
 public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
 
+    public static final int ID = 18;
+
+    public static final String NAME = "SoundStreamHead";
+
     @Reserved
     @SWFType(value = BasicType.UB, count = 4)
     public int reserved;
@@ -71,9 +75,71 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     @Internal
     private int virtualCharacterId = 0;
 
-    public static final int ID = 18;
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public SoundStreamHeadTag(SWF swf) {
+        super(swf, ID, NAME, null);
+    }
 
-    public static final String NAME = "SoundStreamHead";
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
+    public SoundStreamHeadTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        reserved = (int) sis.readUB(4, "reserved");
+        playBackSoundRate = (int) sis.readUB(2, "playBackSoundRate");
+        playBackSoundSize = sis.readUB(1, "playBackSoundSize") == 1;
+        playBackSoundType = sis.readUB(1, "playBackSoundType") == 1;
+        streamSoundCompression = (int) sis.readUB(4, "streamSoundCompression");
+        streamSoundRate = (int) sis.readUB(2, "streamSoundRate");
+        streamSoundSize = sis.readUB(1, "streamSoundSize") == 1;
+        streamSoundType = sis.readUB(1, "streamSoundType") == 1;
+        streamSoundSampleCount = sis.readUI16("streamSoundSampleCount");
+        if (streamSoundCompression == 2) {
+            latencySeek = sis.readSI16("latencySeek");
+        }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUB(4, reserved);
+            sos.writeUB(2, playBackSoundRate);
+            sos.writeUB(1, playBackSoundSize ? 1 : 0);
+            sos.writeUB(1, playBackSoundType ? 1 : 0);
+            sos.writeUB(4, streamSoundCompression);
+            sos.writeUB(2, streamSoundRate);
+            sos.writeUB(1, streamSoundSize ? 1 : 0);
+            sos.writeUB(1, streamSoundType ? 1 : 0);
+            sos.writeUI16(streamSoundSampleCount);
+            if (streamSoundCompression == 2) {
+                sos.writeSI16(latencySeek);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
 
     @Override
     public String getExportFormat() {
@@ -113,72 +179,6 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     @Override
     public long getSoundSampleCount() {
         return streamSoundSampleCount;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(4, reserved);
-            sos.writeUB(2, playBackSoundRate);
-            sos.writeUB(1, playBackSoundSize ? 1 : 0);
-            sos.writeUB(1, playBackSoundType ? 1 : 0);
-            sos.writeUB(4, streamSoundCompression);
-            sos.writeUB(2, streamSoundRate);
-            sos.writeUB(1, streamSoundSize ? 1 : 0);
-            sos.writeUB(1, streamSoundType ? 1 : 0);
-            sos.writeUI16(streamSoundSampleCount);
-            if (streamSoundCompression == 2) {
-                sos.writeSI16(latencySeek);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public SoundStreamHeadTag(SWF swf) {
-        super(swf, ID, NAME, null);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param sis
-     * @param data
-     * @throws IOException
-     */
-    public SoundStreamHeadTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        reserved = (int) sis.readUB(4, "reserved");
-        playBackSoundRate = (int) sis.readUB(2, "playBackSoundRate");
-        playBackSoundSize = sis.readUB(1, "playBackSoundSize") == 1;
-        playBackSoundType = sis.readUB(1, "playBackSoundType") == 1;
-        streamSoundCompression = (int) sis.readUB(4, "streamSoundCompression");
-        streamSoundRate = (int) sis.readUB(2, "streamSoundRate");
-        streamSoundSize = sis.readUB(1, "streamSoundSize") == 1;
-        streamSoundType = sis.readUB(1, "streamSoundType") == 1;
-        streamSoundSampleCount = sis.readUI16("streamSoundSampleCount");
-        if (streamSoundCompression == 2) {
-            latencySeek = sis.readSI16("latencySeek");
-        }
     }
 
     @Override

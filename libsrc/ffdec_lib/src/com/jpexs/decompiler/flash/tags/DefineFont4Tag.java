@@ -34,6 +34,10 @@ import java.io.OutputStream;
  */
 public class DefineFont4Tag extends CharacterTag {
 
+    public static final int ID = 91;
+
+    public static final String NAME = "DefineFont4";
+
     @SWFType(BasicType.UI16)
     public int fontID;
 
@@ -50,10 +54,6 @@ public class DefineFont4Tag extends CharacterTag {
     public String fontName;
 
     public byte[] fontData;
-
-    public static final int ID = 91;
-
-    public static final String NAME = "DefineFont4";
 
     @Override
     public int getCharacterId() {

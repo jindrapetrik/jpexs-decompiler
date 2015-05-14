@@ -53,6 +53,10 @@ import java.util.Set;
  */
 public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceContainer {
 
+    public static final int ID = 70;
+
+    public static final String NAME = "PlaceObject3";
+
     /**
      * @since SWF 5 has clip actions (sprite characters only)
      */
@@ -229,107 +233,6 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @Reserved
     public boolean reserved;
 
-    public static final int ID = 70;
-
-    public static final String NAME = "PlaceObject3";
-
-    @Override
-    public List<FILTER> getFilters() {
-        if (placeFlagHasFilterList) {
-            return surfaceFilterList;
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public int getClipDepth() {
-        if (placeFlagHasClipDepth) {
-            return clipDepth;
-        }
-        return -1;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-        }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(1, placeFlagHasClipActions ? 1 : 0);
-            sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
-            sos.writeUB(1, placeFlagHasName ? 1 : 0);
-            sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
-            sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
-            sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
-            sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
-            sos.writeUB(1, placeFlagMove ? 1 : 0);
-            sos.writeUB(1, reserved ? 1 : 0);
-            sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
-            sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
-            sos.writeUB(1, placeFlagHasImage ? 1 : 0);
-            sos.writeUB(1, placeFlagHasClassName ? 1 : 0);
-            sos.writeUB(1, placeFlagHasCacheAsBitmap ? 1 : 0);
-            sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
-            sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
-            sos.writeUI16(depth);
-
-            if (placeFlagHasClassName) {
-                sos.writeString(className);
-            }
-            if (placeFlagHasCharacter) {
-                sos.writeUI16(characterId);
-            }
-            if (placeFlagHasMatrix) {
-                sos.writeMatrix(matrix);
-            }
-            if (placeFlagHasColorTransform) {
-                sos.writeCXFORMWITHALPHA(colorTransform);
-            }
-            if (placeFlagHasRatio) {
-                sos.writeUI16(ratio);
-            }
-            if (placeFlagHasName) {
-                sos.writeString(name);
-            }
-            if (placeFlagHasClipDepth) {
-                sos.writeUI16(clipDepth);
-            }
-            if (placeFlagHasFilterList) {
-                sos.writeFILTERLIST(surfaceFilterList);
-            }
-            if (placeFlagHasBlendMode) {
-                sos.writeUI8(blendMode);
-            }
-            if (placeFlagHasCacheAsBitmap) {
-                if (!bitmapCacheBug) {
-                    sos.writeUI8(bitmapCache);
-                }
-            }
-            if (placeFlagHasVisible) {
-                sos.writeUI8(visible);
-            }
-            if (placeFlagOpaqueBackground) {
-                sos.writeRGBA(backgroundColor);
-            }
-            if (placeFlagHasClipActions) {
-                sos.writeCLIPACTIONS(clipActions);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
     /**
      * Constructor
      *
@@ -418,6 +321,103 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        if (Configuration.debugCopy.get()) {
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+        }
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUB(1, placeFlagHasClipActions ? 1 : 0);
+            sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
+            sos.writeUB(1, placeFlagHasName ? 1 : 0);
+            sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
+            sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
+            sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
+            sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
+            sos.writeUB(1, placeFlagMove ? 1 : 0);
+            sos.writeUB(1, reserved ? 1 : 0);
+            sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
+            sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
+            sos.writeUB(1, placeFlagHasImage ? 1 : 0);
+            sos.writeUB(1, placeFlagHasClassName ? 1 : 0);
+            sos.writeUB(1, placeFlagHasCacheAsBitmap ? 1 : 0);
+            sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
+            sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
+            sos.writeUI16(depth);
+
+            if (placeFlagHasClassName) {
+                sos.writeString(className);
+            }
+            if (placeFlagHasCharacter) {
+                sos.writeUI16(characterId);
+            }
+            if (placeFlagHasMatrix) {
+                sos.writeMatrix(matrix);
+            }
+            if (placeFlagHasColorTransform) {
+                sos.writeCXFORMWITHALPHA(colorTransform);
+            }
+            if (placeFlagHasRatio) {
+                sos.writeUI16(ratio);
+            }
+            if (placeFlagHasName) {
+                sos.writeString(name);
+            }
+            if (placeFlagHasClipDepth) {
+                sos.writeUI16(clipDepth);
+            }
+            if (placeFlagHasFilterList) {
+                sos.writeFILTERLIST(surfaceFilterList);
+            }
+            if (placeFlagHasBlendMode) {
+                sos.writeUI8(blendMode);
+            }
+            if (placeFlagHasCacheAsBitmap) {
+                if (!bitmapCacheBug) {
+                    sos.writeUI8(bitmapCache);
+                }
+            }
+            if (placeFlagHasVisible) {
+                sos.writeUI8(visible);
+            }
+            if (placeFlagOpaqueBackground) {
+                sos.writeRGBA(backgroundColor);
+            }
+            if (placeFlagHasClipActions) {
+                sos.writeCLIPACTIONS(clipActions);
+            }
+            sos.close();
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public List<FILTER> getFilters() {
+        if (placeFlagHasFilterList) {
+            return surfaceFilterList;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int getClipDepth() {
+        if (placeFlagHasClipDepth) {
+            return clipDepth;
+        }
+        return -1;
     }
 
     /**

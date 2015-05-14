@@ -41,15 +41,15 @@ import java.util.logging.Logger;
  */
 public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
+    public static final int ID = 21;
+
+    public static final String NAME = "DefineBitsJPEG2";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
     @SWFType(BasicType.UI8)
     public ByteArrayRange imageData;
-
-    public static final int ID = 21;
-
-    public static final String NAME = "DefineBitsJPEG2";
 
     @Override
     public int getCharacterId() {

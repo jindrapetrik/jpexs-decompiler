@@ -39,6 +39,10 @@ import java.util.List;
  */
 public class DefineFontTag extends FontTag {
 
+    public static final int ID = 10;
+
+    public static final String NAME = "DefineFont";
+
     @SWFType(BasicType.UI16)
     public int fontId;
 
@@ -49,10 +53,6 @@ public class DefineFontTag extends FontTag {
 
     @Internal
     private DefineFontInfo2Tag fontInfo2Tag = null;
-
-    public static final int ID = 10;
-
-    public static final String NAME = "DefineFont";
 
     @Override
     public boolean isSmall() {

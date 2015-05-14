@@ -26,11 +26,11 @@ import java.io.IOException;
 
 public class SetBackgroundColorTag extends Tag {
 
-    public RGB backgroundColor;
-
     public static final int ID = 9;
 
     public static final String NAME = "SetBackgroundColor";
+
+    public RGB backgroundColor;
 
     /**
      * Constructor

@@ -48,6 +48,10 @@ import java.util.zip.InflaterInputStream;
  */
 public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
+    public static final int ID = 20;
+
+    public static final String NAME = "DefineBitsLossless";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
@@ -80,10 +84,6 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     @Internal
     private boolean decompressed = false;
-
-    public static final int ID = 20;
-
-    public static final String NAME = "DefineBitsLossless";
 
     private byte[] createEmptyImage() {
         try {

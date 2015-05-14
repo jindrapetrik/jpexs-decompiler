@@ -816,7 +816,7 @@ public class CommandLineArgumentParser {
                 try {
                     tagId = Integer.parseInt(tagIdOrName);
                 } catch (NumberFormatException e) {
-                    tagId = Tag.getKnownClassesByName().get(tagIdOrName).id;
+                    tagId = Tag.getKnownClassesByName().get(tagIdOrName).getId();
                 }
 
                 File[] files = new File(folder).listFiles(getSwfFilter());

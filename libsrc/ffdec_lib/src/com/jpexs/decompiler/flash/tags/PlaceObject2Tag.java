@@ -50,6 +50,10 @@ import java.util.Set;
  */
 public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceContainer {
 
+    public static final int ID = 26;
+
+    public static final String NAME = "PlaceObject2";
+
     /**
      * @since SWF 5 Has clip actions (sprite characters only)
      */
@@ -141,74 +145,6 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
 
-    public static final int ID = 26;
-
-    public static final String NAME = "PlaceObject2";
-
-    @Override
-    public int getClipDepth() {
-        if (placeFlagHasClipDepth) {
-            return clipDepth;
-        }
-        return -1;
-    }
-
-    @Override
-    public List<FILTER> getFilters() {
-        return null;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-        }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(1, placeFlagHasClipActions ? 1 : 0);
-            sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
-            sos.writeUB(1, placeFlagHasName ? 1 : 0);
-            sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
-            sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
-            sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
-            sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
-            sos.writeUB(1, placeFlagMove ? 1 : 0);
-            sos.writeUI16(depth);
-            if (placeFlagHasCharacter) {
-                sos.writeUI16(characterId);
-            }
-            if (placeFlagHasMatrix) {
-                sos.writeMatrix(matrix);
-            }
-            if (placeFlagHasColorTransform) {
-                sos.writeCXFORMWITHALPHA(colorTransform);
-            }
-            if (placeFlagHasRatio) {
-                sos.writeUI16(ratio);
-            }
-            if (placeFlagHasName) {
-                sos.writeString(name);
-            }
-            if (placeFlagHasClipDepth) {
-                sos.writeUI16(clipDepth);
-            }
-            if (placeFlagHasClipActions) {
-                sos.writeCLIPACTIONS(clipActions);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
     /**
      * Constructor
      *
@@ -283,6 +219,70 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        if (Configuration.debugCopy.get()) {
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+        }
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUB(1, placeFlagHasClipActions ? 1 : 0);
+            sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
+            sos.writeUB(1, placeFlagHasName ? 1 : 0);
+            sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
+            sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
+            sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
+            sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
+            sos.writeUB(1, placeFlagMove ? 1 : 0);
+            sos.writeUI16(depth);
+            if (placeFlagHasCharacter) {
+                sos.writeUI16(characterId);
+            }
+            if (placeFlagHasMatrix) {
+                sos.writeMatrix(matrix);
+            }
+            if (placeFlagHasColorTransform) {
+                sos.writeCXFORMWITHALPHA(colorTransform);
+            }
+            if (placeFlagHasRatio) {
+                sos.writeUI16(ratio);
+            }
+            if (placeFlagHasName) {
+                sos.writeString(name);
+            }
+            if (placeFlagHasClipDepth) {
+                sos.writeUI16(clipDepth);
+            }
+            if (placeFlagHasClipActions) {
+                sos.writeCLIPACTIONS(clipActions);
+            }
+            sos.close();
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public int getClipDepth() {
+        if (placeFlagHasClipDepth) {
+            return clipDepth;
+        }
+        return -1;
+    }
+
+    @Override
+    public List<FILTER> getFilters() {
+        return null;
     }
 
     /**

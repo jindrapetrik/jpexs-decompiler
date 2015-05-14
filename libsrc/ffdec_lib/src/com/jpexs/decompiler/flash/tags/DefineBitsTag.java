@@ -39,15 +39,15 @@ import java.util.logging.Logger;
  */
 public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
+    public static final int ID = 6;
+
+    public static final String NAME = "DefineBits";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
     @SWFType(BasicType.UI8)
     public ByteArrayRange jpegData;
-
-    public static final int ID = 6;
-
-    public static final String NAME = "DefineBits";
 
     @Override
     public void setImage(byte[] data) {

@@ -1314,7 +1314,7 @@ public class SWFOutputStream extends OutputStream {
             for (int i = 0; i < lineStyleCount; i++) {
                 writeLINESTYLE(value.lineStyles[i], shapeNum);
             }
-        } else if (shapeNum == 4) {
+        } else {
             lineStyleCount = value.lineStyles.length;
             if (lineStyleCount >= 0xff) {
                 writeUI8(0xff);

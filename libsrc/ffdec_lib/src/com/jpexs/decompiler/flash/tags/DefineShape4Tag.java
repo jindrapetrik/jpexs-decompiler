@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -29,16 +28,16 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
 public class DefineShape4Tag extends ShapeTag {
+
+    public static final int ID = 83;
+
+    public static final String NAME = "DefineShape4";
 
     public RECT edgeBounds;
 
@@ -51,61 +50,6 @@ public class DefineShape4Tag extends ShapeTag {
     public boolean usesNonScalingStrokes;
 
     public boolean usesScalingStrokes;
-
-    public static final int ID = 83;
-
-    public static final String NAME = "DefineShape4";
-
-    private ByteArrayRange shapeData;
-
-    @Override
-    public int getShapeNum() {
-        return 4;
-    }
-
-    @Override
-    public SHAPEWITHSTYLE getShapes() {
-        if (shapes == null && shapeData != null) {
-            try {
-                SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
-                sis.seek(shapeData.getPos());
-                shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
-                shapeData = null; // not needed anymore, give it to GC
-            } catch (IOException ex) {
-                Logger.getLogger(DefineShape4Tag.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        return shapes;
-    }
-
-    @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        getShapes().getNeededCharacters(needed);
-    }
-
-    @Override
-    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
-        boolean modified = getShapes().replaceCharacter(oldCharacterId, newCharacterId);
-        if (modified) {
-            setModified(true);
-        }
-        return modified;
-    }
-
-    @Override
-    public boolean removeCharacter(int characterId) {
-        boolean modified = getShapes().removeCharacter(characterId);
-        if (modified) {
-            setModified(true);
-        }
-        return modified;
-    }
-
-    @Override
-    public RECT getRect(Set<BoundedTag> added) {
-        return shapeBounds;
-    }
 
     /**
      * Constructor
@@ -135,7 +79,7 @@ public class DefineShape4Tag extends ShapeTag {
         usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
         usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
         if (!lazy) {
-            shapes = sis.readSHAPEWITHSTYLE(4, false, "shapes");
+            shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
         } else {
             shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
         }
@@ -149,8 +93,7 @@ public class DefineShape4Tag extends ShapeTag {
     @Override
     public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
         try {
             sos.writeUI16(shapeId);
             sos.writeRECT(shapeBounds);
@@ -159,7 +102,7 @@ public class DefineShape4Tag extends ShapeTag {
             sos.writeUB(1, usesFillWindingRule ? 1 : 0);
             sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
             sos.writeUB(1, usesScalingStrokes ? 1 : 0);
-            sos.writeSHAPEWITHSTYLE(getShapes(), 4);
+            sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
         } catch (IOException e) {
             throw new Error("This should never happen.", e);
         }
@@ -167,22 +110,7 @@ public class DefineShape4Tag extends ShapeTag {
     }
 
     @Override
-    public int getNumFrames() {
-        return 1;
-    }
-
-    @Override
-    public boolean isSingleFrame() {
-        return true;
-    }
-
-    @Override
-    public int getCharacterId() {
-        return shapeId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.shapeId = characterId;
+    public int getShapeNum() {
+        return 4;
     }
 }

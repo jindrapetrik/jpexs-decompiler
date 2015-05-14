@@ -83,6 +83,27 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private final HashSet<TagChangedListener> listeners = new HashSet<>();
 
+    /**
+     * Constructor
+     *
+     * @param swf The SWF
+     * @param id Tag type identifier
+     * @param name Tag name
+     * @param data Original tag data
+     */
+    public Tag(SWF swf, int id, String name, ByteArrayRange data) {
+        this.id = id;
+        this.tagName = name;
+        this.originalRange = data;
+        this.swf = swf;
+        if (swf == null) {
+            throw new Error("swf parameter cannot be null.");
+        }
+        if (data == null) { // it is tag build by constructor
+            modified = true;
+        }
+    }
+
     public String getTagName() {
         return tagName;
     }
@@ -132,27 +153,6 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf The SWF
-     * @param id Tag type identifier
-     * @param name Tag name
-     * @param data Original tag data
-     */
-    public Tag(SWF swf, int id, String name, ByteArrayRange data) {
-        this.id = id;
-        this.tagName = name;
-        this.originalRange = data;
-        this.swf = swf;
-        if (swf == null) {
-            throw new Error("swf parameter cannot be null.");
-        }
-        if (data == null) { // it is tag build by constructor
-            modified = true;
-        }
     }
 
     public abstract void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException;

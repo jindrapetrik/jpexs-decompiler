@@ -37,6 +37,10 @@ import java.util.List;
  */
 public class DefineFontInfoTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 13;
+
+    public static final String NAME = "DefineFontInfo";
+
     @SWFType(BasicType.UI16)
     public int fontId;
 
@@ -60,10 +64,6 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
 
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
-
-    public static final int ID = 13;
-
-    public static final String NAME = "DefineFontInfo";
 
     /**
      * Gets data bytes

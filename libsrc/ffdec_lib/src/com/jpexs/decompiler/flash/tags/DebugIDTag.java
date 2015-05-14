@@ -32,30 +32,12 @@ import java.io.OutputStream;
  */
 public class DebugIDTag extends Tag {
 
-    @SWFType(value = BasicType.UI8, count = 16)
-    public byte[] debugId;
-
     public static final int ID = 63;
 
     public static final String NAME = "DebugID";
 
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.write(debugId);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
+    @SWFType(value = BasicType.UI8, count = 16)
+    public byte[] debugId;
 
     /**
      * Constructor
@@ -82,5 +64,23 @@ public class DebugIDTag extends Tag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         debugId = sis.readBytesEx(16, "debugId");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.write(debugId);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

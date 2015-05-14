@@ -33,6 +33,10 @@ import java.io.OutputStream;
  */
 public class SetTabIndexTag extends Tag {
 
+    public static final int ID = 66;
+
+    public static final String NAME = "SetTabIndex";
+
     /**
      * Depth of character
      */
@@ -44,29 +48,6 @@ public class SetTabIndexTag extends Tag {
      */
     @SWFType(BasicType.UI16)
     public int tabIndex;
-
-    public static final int ID = 66;
-
-    public static final String NAME = "SetTabIndex";
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(depth);
-            sos.writeUI16(tabIndex);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -93,5 +74,24 @@ public class SetTabIndexTag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         depth = sis.readUI16("depth");
         tabIndex = sis.readUI16("tabIndex");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(depth);
+            sos.writeUI16(tabIndex);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

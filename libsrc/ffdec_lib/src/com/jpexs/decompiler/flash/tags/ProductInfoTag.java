@@ -28,6 +28,10 @@ import java.io.OutputStream;
 
 public class ProductInfoTag extends Tag {
 
+    public static final int ID = 41;
+
+    public static final String NAME = "ProductInfo";
+
     @SWFType(BasicType.UI32)
     public long productID;
 
@@ -51,10 +55,6 @@ public class ProductInfoTag extends Tag {
 
     @SWFType(BasicType.UI32)
     public long compilationDateHigh;
-
-    public static final int ID = 41;
-
-    public static final String NAME = "ProductInfo";
 
     /**
      * Constructor

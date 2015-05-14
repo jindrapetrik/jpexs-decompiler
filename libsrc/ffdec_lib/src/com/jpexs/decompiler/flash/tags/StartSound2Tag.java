@@ -31,32 +31,13 @@ import java.io.OutputStream;
  */
 public class StartSound2Tag extends Tag {
 
-    public String soundClassName;
-
-    public SOUNDINFO soundInfo;
-
     public static final int ID = 89;
 
     public static final String NAME = "StartSound2";
 
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeString(soundClassName);
-            sos.writeSOUNDINFO(soundInfo);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
+    public String soundClassName;
+
+    public SOUNDINFO soundInfo;
 
     /**
      * Constructor
@@ -85,5 +66,24 @@ public class StartSound2Tag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         soundClassName = sis.readString("soundClassName");
         soundInfo = sis.readSOUNDINFO("soundInfo");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeString(soundClassName);
+            sos.writeSOUNDINFO(soundInfo);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

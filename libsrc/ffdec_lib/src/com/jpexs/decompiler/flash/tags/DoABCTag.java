@@ -39,21 +39,16 @@ import java.io.OutputStream;
  */
 public class DoABCTag extends Tag implements ABCContainerTag {
 
+    public static final int ID = 72;
+
+    public static final String NAME = "DoABC";
+
     /**
      * ActionScript 3 bytecodes
      */
     @HideInRawEdit
     @SWFField
     private ABC abc;
-
-    public static final int ID = 72;
-
-    public static final String NAME = "DoABC";
-
-    @Override
-    public ABC getABC() {
-        return abc;
-    }
 
     /**
      * Constructor
@@ -105,6 +100,11 @@ public class DoABCTag extends Tag implements ABCContainerTag {
         } catch (IOException e) {
             throw new Error("This should never happen.", e);
         }
+    }
+
+    @Override
+    public ABC getABC() {
+        return abc;
     }
 
     @Override

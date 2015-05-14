@@ -47,6 +47,10 @@ import java.util.List;
  */
 public class DefineFont3Tag extends FontTag {
 
+    public static final int ID = 75;
+
+    public static final String NAME = "DefineFont3";
+
     @SWFType(BasicType.UI16)
     public int fontId;
 
@@ -96,10 +100,6 @@ public class DefineFont3Tag extends FontTag {
 
     @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
-
-    public static final int ID = 75;
-
-    public static final String NAME = "DefineFont3";
 
     @Override
     public boolean isSmall() {

@@ -19,16 +19,12 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,57 +35,6 @@ public class DefineShapeTag extends ShapeTag {
     public static final int ID = 2;
 
     public static final String NAME = "DefineShape";
-
-    private ByteArrayRange shapeData;
-
-    @Override
-    public int getShapeNum() {
-        return 1;
-    }
-
-    @Override
-    public SHAPEWITHSTYLE getShapes() {
-        if (shapes == null && shapeData != null) {
-            try {
-                SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
-                sis.seek(shapeData.getPos());
-                shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
-                shapeData = null; // not needed anymore, give it to GC
-            } catch (IOException ex) {
-                Logger.getLogger(DefineShapeTag.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        return shapes;
-    }
-
-    @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        getShapes().getNeededCharacters(needed);
-    }
-
-    @Override
-    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
-        boolean modified = getShapes().replaceCharacter(oldCharacterId, newCharacterId);
-        if (modified) {
-            setModified(true);
-        }
-        return modified;
-    }
-
-    @Override
-    public boolean removeCharacter(int characterId) {
-        boolean modified = getShapes().removeCharacter(characterId);
-        if (modified) {
-            setModified(true);
-        }
-        return modified;
-    }
-
-    @Override
-    public RECT getRect(Set<BoundedTag> added) {
-        return shapeBounds;
-    }
 
     /**
      * Constructor
@@ -139,22 +84,7 @@ public class DefineShapeTag extends ShapeTag {
     }
 
     @Override
-    public int getNumFrames() {
+    public int getShapeNum() {
         return 1;
-    }
-
-    @Override
-    public boolean isSingleFrame() {
-        return true;
-    }
-
-    @Override
-    public int getCharacterId() {
-        return shapeId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.shapeId = characterId;
     }
 }

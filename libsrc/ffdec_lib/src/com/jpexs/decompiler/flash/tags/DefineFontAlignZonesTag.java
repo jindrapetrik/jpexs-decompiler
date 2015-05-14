@@ -38,6 +38,10 @@ import java.util.List;
  */
 public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 73;
+
+    public static final String NAME = "DefineFontAlignZones";
+
     @SWFType(BasicType.UI16)
     public int fontID;
 
@@ -50,10 +54,6 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
     @SWFArray(value = "zone", countField = "glyphCount")
     public List<ZONERECORD> zoneTable;
-
-    public static final int ID = 73;
-
-    public static final String NAME = "DefineFontAlignZones";
 
     /**
      * Constructor

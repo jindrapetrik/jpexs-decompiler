@@ -37,6 +37,10 @@ import java.util.Set;
  */
 public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
+    public static final int ID = 60;
+
+    public static final String NAME = "DefineVideoStream";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
@@ -68,45 +72,6 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     public static final int CODEC_VP6 = 4;
 
     public static final int CODEC_VP6_ALPHA = 5;
-
-    public static final int ID = 60;
-
-    public static final String NAME = "DefineVideoStream";
-
-    @Override
-    public int getCharacterId() {
-        return characterID;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI16(numFrames);
-            sos.writeUI16(width);
-            sos.writeUI16(height);
-            sos.writeUB(4, reserved);
-            sos.writeUB(3, videoFlagsDeblocking);
-            sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
-            sos.writeUI8(codecID);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -140,6 +105,41 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
         videoFlagsDeblocking = (int) sis.readUB(3, "videoFlagsDeblocking");
         videoFlagsSmoothing = sis.readUB(1, "videoFlagsSmoothing") == 1;
         codecID = sis.readUI8("codecID");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI16(numFrames);
+            sos.writeUI16(width);
+            sos.writeUI16(height);
+            sos.writeUB(4, reserved);
+            sos.writeUB(3, videoFlagsDeblocking);
+            sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
+            sos.writeUI8(codecID);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public int getCharacterId() {
+        return characterID;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
     }
 
     @Override

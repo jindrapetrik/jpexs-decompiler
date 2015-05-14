@@ -32,16 +32,16 @@ import java.util.List;
 
 public class SymbolClassTag extends SymbolClassTypeTag {
 
+    public static final int ID = 76;
+
+    public static final String NAME = "SymbolClass";
+
     @SWFType(value = BasicType.UI16)
     @SWFArray(value = "tag", countField = "numSymbols")
     public List<Integer> tags;
 
     @SWFArray(value = "name", countField = "numSymbols")
     public List<String> names;
-
-    public static final int ID = 76;
-
-    public static final String NAME = "SymbolClass";
 
     /**
      * Constructor

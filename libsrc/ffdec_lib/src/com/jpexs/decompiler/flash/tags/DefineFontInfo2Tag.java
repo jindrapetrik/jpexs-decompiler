@@ -38,6 +38,10 @@ import java.util.List;
  */
 public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
 
+    public static final int ID = 62;
+
+    public static final String NAME = "DefineFontInfo2";
+
     @SWFType(BasicType.UI16)
     public int fontID;
 
@@ -63,10 +67,6 @@ public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)
     public List<Integer> codeTable;
-
-    public static final int ID = 62;
-
-    public static final String NAME = "DefineFontInfo2";
 
     /**
      * Gets data bytes

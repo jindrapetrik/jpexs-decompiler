@@ -27,14 +27,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class RemoveObject2Tag extends RemoveTag {
-
-    @SWFType(BasicType.UI16)
-    public int depth;
 
     public static final int ID = 28;
 
     public static final String NAME = "RemoveObject2";
+
+    @SWFType(BasicType.UI16)
+    public int depth;
 
     /**
      * Constructor
@@ -45,6 +49,13 @@ public class RemoveObject2Tag extends RemoveTag {
         super(swf, ID, NAME, null);
     }
 
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
     public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);

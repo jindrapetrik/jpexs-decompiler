@@ -35,6 +35,10 @@ import java.io.OutputStream;
  */
 public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
 
+    public static final int ID = 5;
+
+    public static final String NAME = "RemoveObject";
+
     /**
      * ID of character to place
      */
@@ -46,29 +50,6 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
      */
     @SWFType(BasicType.UI16)
     public int depth;
-
-    public static final int ID = 5;
-
-    public static final String NAME = "RemoveObject";
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterId);
-            sos.writeUI16(depth);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -96,6 +77,25 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterId = sis.readUI16("characterId");
         depth = sis.readUI16("depth");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterId);
+            sos.writeUI16(depth);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

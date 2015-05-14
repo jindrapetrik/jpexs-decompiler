@@ -39,6 +39,10 @@ import java.util.Map;
  */
 public class ImportAssetsTag extends Tag implements ImportTag {
 
+    public static final int ID = 57;
+
+    public static final String NAME = "ImportAssets";
+
     public String url;
 
     /**
@@ -50,10 +54,6 @@ public class ImportAssetsTag extends Tag implements ImportTag {
 
     @SWFArray(value = "name", countField = "count")
     public List<String> names;
-
-    public static final int ID = 57;
-
-    public static final String NAME = "ImportAssets";
 
     /**
      * Constructor

@@ -40,6 +40,10 @@ import java.util.Map;
  */
 public class ImportAssets2Tag extends Tag implements ImportTag {
 
+    public static final int ID = 71;
+
+    public static final String NAME = "ImportAssets2";
+
     public String url;
 
     @Reserved
@@ -59,10 +63,6 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
 
     @SWFArray(value = "name", countField = "count")
     public List<String> names;
-
-    public static final int ID = 71;
-
-    public static final String NAME = "ImportAssets2";
 
     /**
      * Constructor

@@ -26,21 +26,13 @@ import java.io.OutputStream;
 
 public class FrameLabelTag extends Tag {
 
-    public String name;
-
-    public boolean namedAnchor = false;
-
     public static final int ID = 43;
 
     public static final String NAME = "FrameLabel";
 
-    public String getLabelName() {
-        return name;
-    }
+    public String name;
 
-    public boolean isNamedAnchor() {
-        return namedAnchor;
-    }
+    public boolean namedAnchor = false;
 
     /**
      * Constructor
@@ -86,5 +78,13 @@ public class FrameLabelTag extends Tag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    public String getLabelName() {
+        return name;
+    }
+
+    public boolean isNamedAnchor() {
+        return namedAnchor;
     }
 }

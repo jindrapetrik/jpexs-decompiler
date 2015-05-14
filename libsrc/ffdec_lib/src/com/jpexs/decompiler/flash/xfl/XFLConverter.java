@@ -550,17 +550,17 @@ public class XFLConverter {
             }
         }
         if (lineStyles != null) {
-            if ((shapeNum == 4) && (lineStyles.lineStyles != null)) { //(shapeNum == 4) {
+            if (shapeNum <= 3 && lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum);
+                    strokesStr += convertLineStyle(lineStyles.lineStyles[l], shapeNum);
                     strokesStr += "</StrokeStyle>";
                     lineStyleCount++;
                 }
             } else if (lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(lineStyles.lineStyles[l], shapeNum);
+                    strokesStr += convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum);
                     strokesStr += "</StrokeStyle>";
                     lineStyleCount++;
                 }
@@ -646,17 +646,17 @@ public class XFLConverter {
                     }
 
                     lineStyleCount = 0;
-                    if (shapeNum == 4) {
+                    if (shapeNum <= 3) {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum);
+                            strokesStr += convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum);
                             strokesStr += "</StrokeStyle>";
                             lineStyleCount++;
                         }
                     } else {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum);
+                            strokesStr += convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum);
                             strokesStr += "</StrokeStyle>";
                             lineStyleCount++;
                         }

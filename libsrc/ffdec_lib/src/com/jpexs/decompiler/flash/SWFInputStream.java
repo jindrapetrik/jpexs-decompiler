@@ -2650,7 +2650,7 @@ public class SWFInputStream implements AutoCloseable {
             for (int i = 0; i < lineStyleCount; i++) {
                 ret.lineStyles[i] = readLINESTYLE(shapeNum, "lineStyle");
             }
-        } else if (shapeNum == 4) {
+        } else {
             ret.lineStyles = new LINESTYLE2[lineStyleCount];
             for (int i = 0; i < lineStyleCount; i++) {
                 ret.lineStyles[i] = readLINESTYLE2(shapeNum, "lineStyle");

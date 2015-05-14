@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -41,6 +42,8 @@ import java.awt.geom.PathIterator;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,13 +58,13 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
 
     public SHAPEWITHSTYLE shapes;
 
+    protected ByteArrayRange shapeData;
+
     private final int markerSize = 10;
 
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
-
-    public abstract SHAPEWITHSTYLE getShapes();
 
     @Override
     public void load() {
@@ -69,6 +72,49 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     public abstract int getShapeNum();
+
+    public SHAPEWITHSTYLE getShapes() {
+        if (shapes == null && shapeData != null) {
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
+                sis.seek(shapeData.getPos());
+                shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
+                shapeData = null; // not needed anymore, give it to GC
+            } catch (IOException ex) {
+                Logger.getLogger(ShapeTag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        return shapes;
+    }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        getShapes().getNeededCharacters(needed);
+    }
+
+    @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = getShapes().replaceCharacter(oldCharacterId, newCharacterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = getShapes().removeCharacter(characterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
+    public RECT getRect(Set<BoundedTag> added) {
+        return shapeBounds;
+    }
 
     @Override
     public RECT getRect() {
@@ -143,17 +189,22 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        getShapes().getNeededCharacters(needed);
+    public int getNumFrames() {
+        return 1;
     }
 
     @Override
-    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
-        return getShapes().replaceCharacter(oldCharacterId, newCharacterId);
+    public boolean isSingleFrame() {
+        return true;
     }
 
     @Override
-    public boolean removeCharacter(int characterId) {
-        return getShapes().removeCharacter(characterId);
+    public int getCharacterId() {
+        return shapeId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.shapeId = characterId;
     }
 }

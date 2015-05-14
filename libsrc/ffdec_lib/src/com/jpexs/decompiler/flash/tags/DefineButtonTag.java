@@ -61,6 +61,10 @@ import java.util.logging.Logger;
  */
 public class DefineButtonTag extends ButtonTag implements ASMSource {
 
+    public static final int ID = 7;
+
+    public static final String NAME = "DefineButton";
+
     /**
      * ID for this character
      */
@@ -78,10 +82,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     //public List<Action> actions;
     @HideInRawEdit
     public ByteArrayRange actionBytes;
-
-    public static final int ID = 7;
-
-    public static final String NAME = "DefineButton";
 
     @Override
     public int getCharacterId() {

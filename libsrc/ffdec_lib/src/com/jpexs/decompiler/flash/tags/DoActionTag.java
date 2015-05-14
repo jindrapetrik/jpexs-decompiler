@@ -42,16 +42,16 @@ import java.util.logging.Logger;
  */
 public class DoActionTag extends Tag implements ASMSource {
 
+    public static final int ID = 12;
+
+    public static final String NAME = "DoAction";
+
     /**
      * List of actions to perform
      */
     //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
-
-    public static final int ID = 12;
-
-    public static final String NAME = "DoAction";
 
     /**
      * Constructor
@@ -60,6 +60,17 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     public DoActionTag(SWF swf) {
         super(swf, ID, NAME, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param swf
+     * @param data
+     */
+    public DoActionTag(SWF swf, ByteArrayRange data) {
+        super(swf, ID, NAME, data);
+        actionBytes = ByteArrayRange.EMPTY;
     }
 
     /**
@@ -77,17 +88,6 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     * @param data
-     */
-    public DoActionTag(SWF swf, ByteArrayRange data) {
-        super(swf, ID, NAME, data);
-        actionBytes = ByteArrayRange.EMPTY;
     }
 
     /**

@@ -40,6 +40,10 @@ import java.io.OutputStream;
  */
 public class DefineMorphShape2Tag extends MorphShapeTag {
 
+    public static final int ID = 84;
+
+    public static final String NAME = "DefineMorphShape2";
+
     public RECT startEdgeBounds;
 
     public RECT endEdgeBounds;
@@ -51,10 +55,6 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
     public boolean usesNonScalingStrokes;
 
     public boolean usesScalingStrokes;
-
-    public static final int ID = 84;
-
-    public static final String NAME = "DefineMorphShape2";
 
     /**
      * Gets data bytes

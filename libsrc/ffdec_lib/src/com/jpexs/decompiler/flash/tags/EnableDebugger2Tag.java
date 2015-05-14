@@ -34,6 +34,10 @@ import java.io.OutputStream;
  */
 public class EnableDebugger2Tag extends Tag {
 
+    public static final int ID = 64;
+
+    public static final String NAME = "EnableDebugger2";
+
     @Reserved
     @SWFType(BasicType.UI16)
     public int reserved;
@@ -42,30 +46,6 @@ public class EnableDebugger2Tag extends Tag {
      * MD5 hash of password
      */
     public String passwordHash;
-
-    public static final int ID = 64;
-
-    public static final String NAME = "EnableDebugger2";
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(reserved);
-            sos.writeString(passwordHash);
-
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      * Constructor
@@ -93,5 +73,25 @@ public class EnableDebugger2Tag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         reserved = sis.readUI16("reserved");
         passwordHash = sis.readString("passwordHash");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(reserved);
+            sos.writeString(passwordHash);
+
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

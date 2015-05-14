@@ -40,6 +40,10 @@ import java.util.Arrays;
  */
 public class DefineBinaryDataTag extends CharacterTag {
 
+    public static final int ID = 87;
+
+    public static final String NAME = "DefineBinaryData";
+
     @SWFType(BasicType.UI16)
     public int tag;
 
@@ -48,10 +52,6 @@ public class DefineBinaryDataTag extends CharacterTag {
     @Reserved
     @SWFType(BasicType.UI32)
     public long reserved;
-
-    public static final int ID = 87;
-
-    public static final String NAME = "DefineBinaryData";
 
     @Internal
     public SWF innerSwf;

@@ -83,6 +83,10 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class DefineEditTextTag extends TextTag {
 
+    public static final int ID = 37;
+
+    public static final String NAME = "DefineEditText";
+
     @SWFType(BasicType.UI16)
     public int characterID;
 
@@ -162,10 +166,6 @@ public class DefineEditTextTag extends TextTag {
 
     @Conditional("hasText")
     public String initialText;
-
-    public static final int ID = 37;
-
-    public static final String NAME = "DefineEditText";
 
     @Override
     public RECT getBounds() {

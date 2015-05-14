@@ -31,34 +31,14 @@ import java.io.OutputStream;
  */
 public class EnableDebuggerTag extends Tag {
 
-    /**
-     * MD5 hash of password
-     */
-    public String passwordHash;
-
     public static final int ID = 58;
 
     public static final String NAME = "EnableDebugger";
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
+     * MD5 hash of password
      */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            if (passwordHash != null) {
-                sos.writeString(passwordHash);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
+    public String passwordHash;
 
     /**
      * Constructor
@@ -85,5 +65,25 @@ public class EnableDebuggerTag extends Tag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         passwordHash = sis.readString("passwordHash");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            if (passwordHash != null) {
+                sos.writeString(passwordHash);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }
