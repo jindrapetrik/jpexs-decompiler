@@ -960,30 +960,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        synchronized (ImagePanel.class) {
-                            if (timer != thisTimer) {
-                                return;
-                            }
+                try {
+                    synchronized (ImagePanel.class) {
+                        if (timer != thisTimer) {
+                            return;
                         }
-
-                        if (isSingleFrame) {
-                            drawFrame(thisTimer);
-                            synchronized (ImagePanel.class) {
-                                thisTimer.cancel();
-                                if (timer == thisTimer) {
-                                    timer = null;
-                                }
-                            }
-
-                            fireMediaDisplayStateChanged();
-                        } else {
-                            nextFrame(thisTimer);
-                        }
-                    } catch (Exception ex) {
-                        Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
+
+                    if (isSingleFrame) {
+                        drawFrame(thisTimer);
+                        synchronized (ImagePanel.class) {
+                            thisTimer.cancel();
+                            if (timer == thisTimer) {
+                                timer = null;
+                            }
+                        }
+
+                        fireMediaDisplayStateChanged();
+                    } else {
+                        nextFrame(thisTimer);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
@@ -991,7 +989,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (singleFrame) {
             timer.schedule(task, 0);
         } else {
-            timer.schedule(task, 0);
+            timer.schedule(task, 0, msPerFrame);
         }
     }
 
