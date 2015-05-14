@@ -102,7 +102,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        SerializableImage image = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(data)));
+        SerializableImage image = new SerializableImage(ImageHelper.read(data));
         int width = image.getWidth();
         int height = image.getHeight();
         bitmapData = new BITMAPDATA();

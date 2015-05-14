@@ -61,7 +61,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {
-            SerializableImage image = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(data)));
+            SerializableImage image = new SerializableImage(ImageHelper.read(data));
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -97,7 +97,12 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         }
         try {
             BufferedImage image = ImageHelper.read(getImageData());
-            SerializableImage img = image == null ? null : new SerializableImage(image);
+            if (image == null) {
+                Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
+                return null;
+            }
+
+            SerializableImage img = new SerializableImage(image);
             if (bitmapAlphaData.length == 0) {
                 cachedImage = img;
                 return img;

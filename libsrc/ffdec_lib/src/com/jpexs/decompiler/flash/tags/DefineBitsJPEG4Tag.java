@@ -99,7 +99,12 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         }
         try {
             BufferedImage image = ImageHelper.read(getImageData());
-            SerializableImage img = image == null ? null : new SerializableImage(image);
+            if (image == null) {
+                Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
+                return null;
+            }
+
+            SerializableImage img = new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
                 cachedImage = img;
                 return img;

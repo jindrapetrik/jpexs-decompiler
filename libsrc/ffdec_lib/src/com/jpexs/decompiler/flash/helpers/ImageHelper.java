@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +33,16 @@ import javax.imageio.ImageIO;
  */
 public class ImageHelper {
 
+    public static BufferedImage read(byte[] data) throws IOException {
+        return read(new ByteArrayInputStream(data));
+    }
+
     public static BufferedImage read(InputStream input) throws IOException {
         BufferedImage in = ImageIO.read(input);
+        if (in == null) {
+            return null;
+        }
+
         int type = in.getType();
         if (type != BufferedImage.TYPE_INT_ARGB && type != BufferedImage.TYPE_INT_RGB) {
             // convert to ARGB

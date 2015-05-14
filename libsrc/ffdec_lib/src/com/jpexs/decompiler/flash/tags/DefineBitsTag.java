@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.io.ByteArrayInputStream;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,9 +98,16 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                     baos.write(jttdata, jttErrorLength, jttdata.length - jttErrorLength - 2);
                 }
 
-                int jpegDataErrorLength = hasErrorHeader(jpegData) ? 4 : 0;
-                baos.write(jpegData.getArray(), jpegData.getPos() + jpegDataErrorLength + 2, jpegData.getLength() - jpegDataErrorLength - 2);
-                SerializableImage ret = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(baos.toByteArray())));
+                int errorLength = hasErrorHeader(jpegData) ? 4 : 0;
+                baos.write(jpegData.getArray(), jpegData.getPos() + errorLength, jpegData.getLength() - errorLength);
+
+                BufferedImage image = ImageHelper.read(baos.toByteArray());
+                if (image == null) {
+                    Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to load image");
+                    return null;
+                }
+
+                SerializableImage ret = new SerializableImage(image);
                 cachedImage = ret;
                 return ret;
             } catch (IOException ex) {
