@@ -771,12 +771,16 @@
         </javadoc>
     </target>
     <target name="clean" depends="clean_lib">        
-        <delete dir="${dist.dir}"/>
+        <delete dir="${compile.dir}"/>        
         <delete dir="${compile.test.dir}"/>
-        <delete dir="${compile.dir}"/>
         <delete dir="${coverage.dir}"/>
+        <delete dir="${coverage.result.dir}"/>        
         <delete dir="${test.result.dir}"/>
         <delete dir="${locales.target.dir}"/>
+        <delete dir="${javadoc.dir}"/>
+        <delete dir="${dist.dir}"/>  
+        <delete dir="${app.installer.dir}"/>  
+        <delete dir="${app.bundle.dir}"/>  
     </target>
     
     <!-- Debug one test method (Netbeans IDE) -->

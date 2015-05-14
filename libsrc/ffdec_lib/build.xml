@@ -78,14 +78,14 @@
     </target>
 
     <target name="test" depends="-test-setnohalt,compile,compile-tests">
-        <delete dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}/raw/"/>
+        <delete dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}/raw/"/>
         
          <mkdir dir="${coverage.dir}" />
         <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
         <testng 
-            outputDir="${test.results.dir}"
+            outputDir="${test.result.dir}"
             haltOnFailure="${test.halt}" verbose="2" workingDir="${basedir}" >
         
             <classpath>
@@ -209,42 +209,11 @@
         <delete dir="${compile.test.dir}"/>
         <delete dir="${compile.dir}"/>
         <delete dir="${coverage.dir}"/>
-        <delete dir="${test.results.dir}"/>
+        <delete dir="${test.result.dir}"/>
+        <delete dir="${coverage.result.dir}"/>
+        <delete dir="${javadoc.dir}"/>
     </target>
-    
-    <!-- Debug one test method (Netbeans IDE) -->
-    <target name="debug-test-method" depends="compile-tests">
-        <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
-        <fail unless="test.method">Must select some method in the IDE or set test.method</fail>
-        <delete dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}"/>
-        <mkdir dir="${test.results.dir}/raw/"/>
-     
-        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
-            <classpath>
-                <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
-                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
-            </classpath>
-        </nbjpdastart>
-        
-        <testng 
-            outputDir="${test.results.dir}"
-            haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
-        
-            <classpath>
-                <pathelement path="${compile.test.dir}"/>
-                <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
-                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
-            </classpath>
-            <jvmarg value="-noverify" />
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
-        </testng>     
-    </target>
-    
+   
     <target name="run">        
         <ant antfile="../../build.xml" target="run" inheritall="false"/>
     </target>
