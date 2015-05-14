@@ -670,6 +670,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void setModified(boolean value) {
         saveButton.setEnabled(value);
+        cancelButton.setEnabled(value);
     }
 
     private boolean isDecompiledModified() {
@@ -678,6 +679,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void setDecompiledModified(boolean value) {
         saveDecompiledButton.setEnabled(value);
+        cancelDecompiledButton.setEnabled(value);
     }
 
     public void setEditMode(boolean val) {

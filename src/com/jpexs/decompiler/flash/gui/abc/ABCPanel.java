@@ -468,6 +468,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     private void setModified(boolean value) {
         saveDecompiledButton.setEnabled(value);
+        cancelDecompiledButton.setEnabled(value);
     }
 
     private boolean hasDeclaration(int pos) {

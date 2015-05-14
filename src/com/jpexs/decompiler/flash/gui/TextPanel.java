@@ -180,6 +180,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     private void setModified(boolean value) {
         textSaveButton.setEnabled(value);
+        textCancelButton.setEnabled(value);
     }
 
     public void focusTextValue() {

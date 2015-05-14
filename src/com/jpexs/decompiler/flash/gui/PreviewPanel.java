@@ -389,6 +389,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void setMetadataModified(boolean value) {
         metadataSaveButton.setEnabled(value);
+        metadataCancelButton.setEnabled(value);
     }
 
     private void metadataTextChanged() {

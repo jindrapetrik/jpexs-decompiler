@@ -147,6 +147,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     private void setModified(boolean value) {
         saveButton.setEnabled(value);
+        cancelButton.setEnabled(value);
     }
 
     public void setEditMode(boolean val) {
