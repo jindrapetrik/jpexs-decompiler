@@ -61,6 +61,11 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
+    public int getUsedParameters() {
+        return PARAMETER_FRAME | PARAMETER_TIME | PARAMETER_RATIO; // inner tags can contain morphshapes, too
+    }
+
+    @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
         return getTimeline().getOutline(frame, time, ratio, renderContext, transformation);
     }

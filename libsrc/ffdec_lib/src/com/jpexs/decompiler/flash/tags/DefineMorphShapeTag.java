@@ -354,6 +354,11 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     }
 
     @Override
+    public int getUsedParameters() {
+        return PARAMETER_RATIO;
+    }
+
+    @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // shapeNum: 3

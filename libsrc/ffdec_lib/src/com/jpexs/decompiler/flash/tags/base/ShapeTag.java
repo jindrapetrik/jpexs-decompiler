@@ -67,6 +67,11 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
+    public int getUsedParameters() {
+        return 0;
+    }
+
+    @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShapes().getOutline());
     }

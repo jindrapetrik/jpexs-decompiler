@@ -69,7 +69,7 @@
                 <action name="debug">
                     <script>nbproject/ide-targets.xml</script>
                     <target>debug-nb</target>
-                </action>                
+                </action>
                 <action name="run.single">
                     <script>nbproject/ide-file-targets.xml</script>
                     <target>run-selected-file-in-src</target>
@@ -146,7 +146,7 @@
                         <arity>
                             <one-file-only/>
                         </arity>
-                    </context>                    
+                    </context>
                 </action>
                 <action name="debug.test.single">
                     <script>nbproject/ide-file-targets.xml</script>
@@ -156,7 +156,7 @@
                         <folder>test</folder>
                         <pattern>\.java$</pattern>
                         <format>java-name</format>
-                        <arity>                            
+                        <arity>
                             <one-file-only/>
                         </arity>
                     </context>
@@ -194,7 +194,32 @@
             </ide-actions>
             <export>
                 <type>folder</type>
-                <location>build/classes</location>
+                <location>build</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>javadoc</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>reports</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>locales</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>reports</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>dist</location>
                 <build-target>build</build-target>
             </export>
             <export>
@@ -229,13 +254,13 @@
                     </source-file>
                     <source-file>
                         <location>build.properties</location>
-                    </source-file>                    
+                    </source-file>
                     <source-file>
                         <location>tools.properties</location>
                     </source-file>
                     <source-file>
                         <location>jpexs_website.properties</location>
-                    </source-file> 
+                    </source-file>
                     <source-file>
                         <location>nbproject/project.xml</location>
                     </source-file>
@@ -244,7 +269,7 @@
                     </source-file>
                     <source-file>
                         <location>nbproject/ide-targets.xml</location>
-                    </source-file>                   
+                    </source-file>
                 </items>
                 <context-menu>
                     <ide-action name="build"/>

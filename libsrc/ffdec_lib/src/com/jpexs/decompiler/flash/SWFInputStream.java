@@ -2889,14 +2889,14 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one TEXTRECORD value from the stream
      *
-     * @param inDefineText2
+     * @param defineTextNum
      * @param glyphBits
      * @param advanceBits
      * @param name
      * @return TEXTRECORD value
      * @throws IOException
      */
-    public TEXTRECORD readTEXTRECORD(boolean inDefineText2, int glyphBits, int advanceBits, String name) throws IOException {
+    public TEXTRECORD readTEXTRECORD(int defineTextNum, int glyphBits, int advanceBits, String name) throws IOException {
         TEXTRECORD ret = new TEXTRECORD();
         newDumpLevel(name, "TEXTRECORD");
         int first = (int) readUB(1, "first"); // always 1
@@ -2913,7 +2913,7 @@ public class SWFInputStream implements AutoCloseable {
             ret.fontId = readUI16("fontId");
         }
         if (ret.styleFlagsHasColor) {
-            if (inDefineText2) {
+            if (defineTextNum == 2) {
                 ret.textColorA = readRGBA("textColorA");
             } else {
                 ret.textColor = readRGB("textColor");

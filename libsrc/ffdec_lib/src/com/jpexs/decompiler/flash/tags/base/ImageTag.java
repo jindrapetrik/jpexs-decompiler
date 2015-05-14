@@ -183,6 +183,16 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
+    public int getUsedParameters() {
+        return 0;
+    }
+
+    @Override
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+        return transformation.toTransform().createTransformedShape(getShape().getOutline());
+    }
+
+    @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShape(), null, image, transformation, colorTransform);
     }
@@ -208,11 +218,6 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     @Override
     public boolean isSingleFrame() {
         return true;
-    }
-
-    @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return transformation.toTransform().createTransformedShape(getShape().getOutline());
     }
 
     public void clearCache() {

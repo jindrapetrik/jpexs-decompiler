@@ -228,7 +228,7 @@ public class DefineEditTextTag extends TextTag {
     private List<CharacterWithStyle> getTextWithStyle() {
         String str = "";
         TextStyle style = new TextStyle();
-        style.font = getFontTag();
+        style.font = swf.getFont(fontId);
         style.fontHeight = fontHeight;
         style.fontLeading = leading;
         if (hasTextColor) {
@@ -901,8 +901,23 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
+    public int getUsedParameters() {
+        return 0;
+    }
+
+    @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         render(false, image, transformation, colorTransform);
+    }
+
+    @Override
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
+        // todo: implement
+    }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return render(true, null, new Matrix(), new ColorTransform());
     }
 
     private String render(boolean canvas, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
@@ -1099,25 +1114,8 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public ExportRectangle calculateTextBounds() {
         return null;
-    }
-
-    private FontTag getFontTag() {
-        FontTag font = null;
-        for (Tag tag : swf.tags) {
-            if (tag instanceof FontTag) {
-                if (((FontTag) tag).getFontId() == fontId) {
-                    font = (FontTag) tag;
-                }
-            }
-        }
-        return font;
     }
 
     @Override
@@ -1128,11 +1126,6 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public boolean isSingleFrame() {
         return true;
-    }
-
-    @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return render(true, null, new Matrix(), new ColorTransform());
     }
 
     @Override

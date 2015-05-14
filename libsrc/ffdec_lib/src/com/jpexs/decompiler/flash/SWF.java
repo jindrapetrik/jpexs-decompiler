@@ -390,6 +390,32 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
+    public ImageTag getImage(int imageId) {
+        CharacterTag characterTag = getCharacters().get(imageId);
+        if (characterTag instanceof ImageTag) {
+            return (ImageTag) characterTag;
+        }
+
+        if (characterTag != null) {
+            logger.log(Level.SEVERE, "CharacterTag should be an ImageTag. characterId: {0}", imageId);
+        }
+
+        return null;
+    }
+
+    public TextTag getText(int textId) {
+        CharacterTag characterTag = getCharacters().get(textId);
+        if (characterTag instanceof TextTag) {
+            return (TextTag) characterTag;
+        }
+
+        if (characterTag != null) {
+            logger.log(Level.SEVERE, "CharacterTag should be a TextTag. characterId: {0}", textId);
+        }
+
+        return null;
+    }
+
     public List<ABCContainerTag> getAbcList() {
         if (abcList == null) {
             synchronized (this) {

@@ -1484,12 +1484,12 @@ public class SWFOutputStream extends OutputStream {
      * Writes TEXTRECORD value to the stream
      *
      * @param value TEXTRECORD value
-     * @param inDefineText2
+     * @param defineTextNum
      * @param glyphBits
      * @param advanceBits
      * @throws IOException
      */
-    public void writeTEXTRECORD(TEXTRECORD value, boolean inDefineText2, int glyphBits, int advanceBits) throws IOException {
+    public void writeTEXTRECORD(TEXTRECORD value, int defineTextNum, int glyphBits, int advanceBits) throws IOException {
         writeUB(1, 1);
         writeUB(3, 0);
         writeUB(1, value.styleFlagsHasFont ? 1 : 0);
@@ -1500,7 +1500,7 @@ public class SWFOutputStream extends OutputStream {
             writeUI16(value.fontId);
         }
         if (value.styleFlagsHasColor) {
-            if (inDefineText2) {
+            if (defineTextNum == 2) {
                 writeRGBA(value.textColorA);
             } else {
                 writeRGB(value.textColor);

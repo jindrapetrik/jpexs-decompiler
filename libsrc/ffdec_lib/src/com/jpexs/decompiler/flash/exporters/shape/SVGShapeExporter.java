@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -104,16 +103,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
-        ImageTag image = null;
-        for (Tag t : swf.tags) {
-            if (t instanceof ImageTag) {
-                ImageTag i = (ImageTag) t;
-                if (i.getCharacterId() == bitmapId) {
-                    image = i;
-                    break;
-                }
-            }
-        }
+        ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
             SerializableImage img = image.getImage();
             if (img != null) {

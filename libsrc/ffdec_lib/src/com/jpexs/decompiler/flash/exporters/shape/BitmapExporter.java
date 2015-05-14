@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters.shape;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -308,10 +307,9 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
-        CharacterTag character = swf.getCharacter(bitmapId);
-        ImageTag image = character instanceof ImageTag ? (ImageTag) character : null;
-        if (image != null) {
-            SerializableImage img = image.getImage();
+        ImageTag imageTag = swf.getImage(bitmapId);
+        if (imageTag != null) {
+            SerializableImage img = imageTag.getImage();
             if (img != null) {
                 img = colorTransform.apply(img);
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.exporters.shape;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -252,22 +251,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
-        ImageTag image = null;
-        for (Tag t : swf.tags) {
-            if (t instanceof ImageTag) {
-                ImageTag i = (ImageTag) t;
-                if (i.getCharacterId() == bitmapId) {
-                    image = i;
-                    SerializableImage im = i.getImage();
-                    fillWidth = im.getWidth();
-                    fillHeight = im.getHeight();
-                    break;
-                }
-            }
-        }
+        ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
             SerializableImage img = image.getImage();
             if (img != null) {
+                fillWidth = img.getWidth();
+                fillHeight = img.getHeight();
                 colorTransform.apply(img);
                 if (matrix != null) {
                     fillMatrix = matrix;

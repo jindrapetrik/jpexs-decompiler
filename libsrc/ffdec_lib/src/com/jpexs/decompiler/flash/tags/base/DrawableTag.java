@@ -29,6 +29,14 @@ import java.io.IOException;
  */
 public interface DrawableTag extends BoundedTag {
 
+    public static final int PARAMETER_FRAME = 1;
+
+    public static final int PARAMETER_TIME = 2;
+
+    public static final int PARAMETER_RATIO = 4;
+
+    public int getUsedParameters();
+
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation);
 
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform);

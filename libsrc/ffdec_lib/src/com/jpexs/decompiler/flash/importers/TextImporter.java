@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -72,17 +71,12 @@ public class TextImporter {
         Map<Integer, String[]> records = splitTextRecords(texts);
         if (records != null) {
             for (int characterId : records.keySet()) {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String[] currentRecords = records.get(characterId);
-                            String text = textTag.getFormattedText().text;
-                            if (!saveText(textTag, text, currentRecords)) {
-                                return;
-                            }
-                            break;
-                        }
+                TextTag textTag = swf.getText(characterId);
+                if (textTag != null) {
+                    String[] currentRecords = records.get(characterId);
+                    String text = textTag.getFormattedText().text;
+                    if (!saveText(textTag, text, currentRecords)) {
+                        return;
                     }
                 }
             }
@@ -94,16 +88,11 @@ public class TextImporter {
         Map<Integer, String[]> records = splitTextRecords(texts);
         if (records != null) {
             for (int characterId : records.keySet()) {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String[] currentRecords = records.get(characterId);
-                            if (!saveText(textTag, currentRecords[0], null)) {
-                                return;
-                            }
-                            break;
-                        }
+                TextTag textTag = swf.getText(characterId);
+                if (textTag != null) {
+                    String[] currentRecords = records.get(characterId);
+                    if (!saveText(textTag, currentRecords[0], null)) {
+                        return;
                     }
                 }
             }
@@ -134,28 +123,18 @@ public class TextImporter {
             boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
             if (!formatted) {
                 String[] records = texts.split(recordSeparator);
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            String text = textTag.getFormattedText().text;
-                            if (!saveText(textTag, text, records)) {
-                                return;
-                            }
-                            break;
-                        }
+                TextTag textTag = swf.getText(characterId);
+                if (textTag != null) {
+                    String text = textTag.getFormattedText().text;
+                    if (!saveText(textTag, text, records)) {
+                        return;
                     }
                 }
             } else {
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getCharacterId() == characterId) {
-                            if (!saveText(textTag, texts, null)) {
-                                return;
-                            }
-                            break;
-                        }
+                TextTag textTag = swf.getText(characterId);
+                if (textTag != null) {
+                    if (!saveText(textTag, texts, null)) {
+                        return;
                     }
                 }
             }

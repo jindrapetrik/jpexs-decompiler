@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
-import com.jpexs.decompiler.flash.tags.DefineText2Tag;
-import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -196,10 +194,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     protected void shiftGlyphIndices(int fontId, int startIndex) {
         for (Tag t : swf.tags) {
             List<TEXTRECORD> textRecords = null;
-            if (t instanceof DefineTextTag) {
-                textRecords = ((DefineTextTag) t).textRecords;
-            } else if (t instanceof DefineText2Tag) {
-                textRecords = ((DefineText2Tag) t).textRecords;
+            if (t instanceof StaticTextTag) {
+                textRecords = ((StaticTextTag) t).textRecords;
             }
 
             if (textRecords != null) {
@@ -299,12 +295,43 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
+    public int getUsedParameters() {
+        return PARAMETER_FRAME;
+    }
+
+    @Override
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+        RECT r = getRect();
+        return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+    }
+
+    @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
+    }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        List<SHAPE> shapes = getGlyphShapeTable();
+        StringBuilder sb = new StringBuilder();
+        sb.append("\tdefaultFill = textColor;\r\n");
+        sb.append("\tswitch(ch){\r\n");
+        for (int i = 0; i < shapes.size(); i++) {
+            char c = glyphToChar(i);
+            String cs = "" + c;
+            cs = cs.replace("\\", "\\\\").replace("\"", "\\\"");
+            sb.append("\t\tcase \"").append(cs).append("\":\r\n");
+            CanvasShapeExporter exporter = new CanvasShapeExporter(null, unitDivisor, swf, shapes.get(i), new ColorTransform(), 0, 0);
+            exporter.export();
+            sb.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
+            sb.append("\tbreak;\r\n");
+        }
+        sb.append("\t}\r\n");
+        return sb.toString();
     }
 
     @Override
@@ -319,12 +346,6 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     @Override
     public boolean isSingleFrame() {
         return true;
-    }
-
-    @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        RECT r = getRect();
-        return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
     }
 
     @Override
@@ -360,26 +381,6 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
             return null;
         }
         return dfn.fontCopyright;
-    }
-
-    @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        List<SHAPE> shapes = getGlyphShapeTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("\tdefaultFill = textColor;\r\n");
-        sb.append("\tswitch(ch){\r\n");
-        for (int i = 0; i < shapes.size(); i++) {
-            char c = glyphToChar(i);
-            String cs = "" + c;
-            cs = cs.replace("\\", "\\\\").replace("\"", "\\\"");
-            sb.append("\t\tcase \"").append(cs).append("\":\r\n");
-            CanvasShapeExporter exporter = new CanvasShapeExporter(null, unitDivisor, swf, shapes.get(i), new ColorTransform(), 0, 0);
-            exporter.export();
-            sb.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
-            sb.append("\tbreak;\r\n");
-        }
-        sb.append("\t}\r\n");
-        return sb.toString();
     }
 
     public RECT getGlyphBounds(int glyphIndex) {
