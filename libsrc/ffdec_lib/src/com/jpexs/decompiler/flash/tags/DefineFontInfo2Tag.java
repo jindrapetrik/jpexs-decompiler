@@ -34,7 +34,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {

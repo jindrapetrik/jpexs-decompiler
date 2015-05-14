@@ -33,7 +33,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)
@@ -80,7 +86,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        return null;
+        int errorLength = hasErrorHeader(imageData) ? 4 : 0;
+        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
     }
 
     @Override
@@ -89,14 +96,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            InputStream stream;
-            if (SWF.hasErrorHeader(imageData)) {
-                stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + 4, imageData.getLength() - 4);
-            } else {
-                stream = new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
-            }
-
-            BufferedImage image = ImageHelper.read(stream);
+            BufferedImage image = ImageHelper.read(getImageData());
             SerializableImage img = image == null ? null : new SerializableImage(image);
             if (bitmapAlphaData.length == 0) {
                 cachedImage = img;
@@ -112,6 +112,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             cachedImage = img;
             return img;
         } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
         return null;
     }

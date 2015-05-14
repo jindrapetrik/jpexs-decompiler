@@ -33,7 +33,6 @@ import java.util.Set;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {

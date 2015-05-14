@@ -39,7 +39,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineFont2Tag extends FontTag {

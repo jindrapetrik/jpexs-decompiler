@@ -37,6 +37,8 @@ import java.util.logging.Logger;
 /**
  * Instructs Flash Player to perform a list of actions when the current frame is
  * complete.
+ *
+ * @author JPEXS
  */
 public class DoActionTag extends Tag implements ASMSource {
 

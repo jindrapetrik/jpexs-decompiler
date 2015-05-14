@@ -34,6 +34,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBinaryDataTag extends CharacterTag {
 
     @SWFType(BasicType.UI16)

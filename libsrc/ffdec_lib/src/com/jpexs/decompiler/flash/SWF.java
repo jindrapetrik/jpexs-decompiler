@@ -129,7 +129,6 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.NulStream;
@@ -1432,20 +1431,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (EventListener listener : listeners) {
             listener.handleEvent(event, data);
         }
-    }
-
-    public static boolean hasErrorHeader(byte[] data) {
-        return hasErrorHeader(new ByteArrayRange(data));
-    }
-
-    public static boolean hasErrorHeader(ByteArrayRange data) {
-        if (data.getLength() > 4) {
-            if ((data.get(0) & 0xff) == 0xff && (data.get(1) & 0xff) == 0xd9
-                    && (data.get(2) & 0xff) == 0xff && (data.get(3) & 0xff) == 0xd8) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void populateVideoFrames(int streamId, List<Tag> tags, HashMap<Integer, VideoFrameTag> output) {

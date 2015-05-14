@@ -36,6 +36,8 @@ import java.io.OutputStream;
 
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
+ *
+ * @author JPEXS
  */
 public class DoABCDefineTag extends Tag implements ABCContainerTag {
 

@@ -32,6 +32,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
     @SWFType(BasicType.UI16)

@@ -32,7 +32,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)
@@ -55,10 +61,8 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        if (SWF.hasErrorHeader(imageData)) {
-            return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + 4, imageData.getLength() - 4);
-        }
-        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
+        int errorLength = hasErrorHeader(imageData) ? 4 : 0;
+        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
     }
 
     @Override
@@ -72,6 +76,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             cachedImage = ret;
             return ret;
         } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
         return null;
     }

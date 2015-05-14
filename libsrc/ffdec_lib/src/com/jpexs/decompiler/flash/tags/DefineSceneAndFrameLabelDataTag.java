@@ -29,7 +29,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineText2Tag extends StaticTextTag {

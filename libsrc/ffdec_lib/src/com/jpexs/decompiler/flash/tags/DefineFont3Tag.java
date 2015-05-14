@@ -41,6 +41,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineFont3Tag extends FontTag {
 
     @SWFType(BasicType.UI16)

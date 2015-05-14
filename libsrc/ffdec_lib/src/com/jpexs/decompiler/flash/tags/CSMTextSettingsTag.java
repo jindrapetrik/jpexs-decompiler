@@ -30,7 +30,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class CSMTextSettingsTag extends Tag implements CharacterIdTag {

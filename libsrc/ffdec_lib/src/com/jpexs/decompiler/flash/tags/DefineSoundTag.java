@@ -43,7 +43,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineSoundTag extends CharacterTag implements SoundTag {

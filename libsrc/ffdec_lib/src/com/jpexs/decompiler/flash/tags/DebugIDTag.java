@@ -28,7 +28,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DebugIDTag extends Tag {

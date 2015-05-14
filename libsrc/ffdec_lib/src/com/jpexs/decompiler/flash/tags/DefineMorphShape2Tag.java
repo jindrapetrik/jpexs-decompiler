@@ -36,7 +36,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineMorphShape2Tag extends MorphShapeTag {

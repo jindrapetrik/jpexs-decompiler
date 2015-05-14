@@ -53,6 +53,8 @@ import java.util.Set;
 
 /**
  * Defines a sprite character
+ *
+ * @author JPEXS
  */
 public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timelined {
 

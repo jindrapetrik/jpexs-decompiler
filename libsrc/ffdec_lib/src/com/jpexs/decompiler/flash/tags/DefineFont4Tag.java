@@ -28,6 +28,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineFont4Tag extends CharacterTag {
 
     @SWFType(BasicType.UI16)

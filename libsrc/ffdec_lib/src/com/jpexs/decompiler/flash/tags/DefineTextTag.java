@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineTextTag extends StaticTextTag {

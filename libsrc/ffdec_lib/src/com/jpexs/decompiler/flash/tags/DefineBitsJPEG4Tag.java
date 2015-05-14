@@ -33,9 +33,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  *
  * @author JPEXS
  */
@@ -88,7 +89,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        return null;
+        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
     }
 
     @Override
@@ -97,7 +98,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            BufferedImage image = ImageHelper.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
+            BufferedImage image = ImageHelper.read(getImageData());
             SerializableImage img = image == null ? null : new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
                 cachedImage = img;
@@ -113,6 +114,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             cachedImage = img;
             return img;
         } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
         return null;
     }

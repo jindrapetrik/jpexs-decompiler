@@ -33,6 +33,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineShape2Tag extends ShapeTag {
 
     @SWFType(BasicType.UI16)

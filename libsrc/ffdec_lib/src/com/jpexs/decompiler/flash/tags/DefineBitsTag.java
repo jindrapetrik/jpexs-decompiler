@@ -30,7 +30,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @SWFType(BasicType.UI16)
@@ -88,17 +94,17 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte[] jttdata = swf.getJtt().jpegData;
                 if (jttdata.length != 0) {
-                    boolean jttError = SWF.hasErrorHeader(jttdata);
-                    baos.write(jttdata, jttError ? 4 : 0, jttdata.length - (jttError ? 6 : 2));
-                    baos.write(jpegData.getArray(), jpegData.getPos() + (SWF.hasErrorHeader(jpegData) ? 6 : 2), jpegData.getLength() - (jttError ? 6 : 2));
-                } else {
-                    baos.write(jpegData.getArray(), jpegData.getPos(), jpegData.getLength());
+                    int jttErrorLength = hasErrorHeader(jttdata) ? 4 : 0;
+                    baos.write(jttdata, jttErrorLength, jttdata.length - jttErrorLength - 2);
                 }
+
+                int jpegDataErrorLength = hasErrorHeader(jpegData) ? 4 : 0;
+                baos.write(jpegData.getArray(), jpegData.getPos() + jpegDataErrorLength + 2, jpegData.getLength() - jpegDataErrorLength - 2);
                 SerializableImage ret = new SerializableImage(ImageHelper.read(new ByteArrayInputStream(baos.toByteArray())));
                 cachedImage = ret;
                 return ret;
             } catch (IOException ex) {
-                return null;
+                Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
             }
         }
         return null;

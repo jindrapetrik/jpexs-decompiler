@@ -79,7 +79,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineEditTextTag extends TextTag {

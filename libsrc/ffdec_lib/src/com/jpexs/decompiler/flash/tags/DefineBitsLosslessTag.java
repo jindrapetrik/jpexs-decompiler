@@ -42,6 +42,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)

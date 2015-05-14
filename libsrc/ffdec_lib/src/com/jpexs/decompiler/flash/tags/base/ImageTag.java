@@ -71,7 +71,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     public static String getImageFormat(ByteArrayRange data) {
-        if (SWF.hasErrorHeader(data)) {
+        if (hasErrorHeader(data)) {
             return "jpg";
         }
         if (data.getLength() > 2 && ((data.get(0) & 0xff) == 0xff) && ((data.get(1) & 0xff) == 0xd8)) {
@@ -86,6 +86,20 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         }
 
         return "unk";
+    }
+
+    public static boolean hasErrorHeader(byte[] data) {
+        return hasErrorHeader(new ByteArrayRange(data));
+    }
+
+    public static boolean hasErrorHeader(ByteArrayRange data) {
+        if (data.getLength() > 4) {
+            if ((data.get(0) & 0xff) == 0xff && (data.get(1) & 0xff) == 0xd9
+                    && (data.get(2) & 0xff) == 0xff && (data.get(3) & 0xff) == 0xd8) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected static int max255(float val) {

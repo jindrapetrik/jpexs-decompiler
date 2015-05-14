@@ -30,7 +30,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineButtonSoundTag extends Tag implements CharacterIdTag {

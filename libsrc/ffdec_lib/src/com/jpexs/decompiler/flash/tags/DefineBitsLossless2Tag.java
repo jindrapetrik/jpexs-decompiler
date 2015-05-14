@@ -42,6 +42,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)
@@ -267,6 +271,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 pos32aligned++;
             }
         }
+
         cachedImage = bi;
         return bi;
     }

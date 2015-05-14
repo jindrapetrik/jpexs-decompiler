@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ *
  * @author JPEXS
  */
 public class DefineScalingGridTag extends Tag implements CharacterIdTag {
