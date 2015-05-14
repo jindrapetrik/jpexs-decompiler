@@ -51,7 +51,7 @@ public class DefineShapeTag extends ShapeTag {
             try {
                 SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());
                 sis.seek(shapeData.getPos());
-                shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");
+                shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
                 shapeData = null; // not needed anymore, give it to GC
             } catch (IOException ex) {
                 Logger.getLogger(DefineShapeTag.class.getName()).log(Level.SEVERE, null, ex);
@@ -111,7 +111,7 @@ public class DefineShapeTag extends ShapeTag {
         shapeId = sis.readUI16("shapeId");
         shapeBounds = sis.readRECT("shapeBounds");
         if (!lazy) {
-            shapes = sis.readSHAPEWITHSTYLE(1, false, "shapes");
+            shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
         } else {
             shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
         }
@@ -129,7 +129,7 @@ public class DefineShapeTag extends ShapeTag {
         try {
             sos.writeUI16(shapeId);
             sos.writeRECT(shapeBounds);
-            sos.writeSHAPEWITHSTYLE(getShapes(), 1);
+            sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
         } catch (IOException e) {
             throw new Error("This should never happen.", e);
         }
