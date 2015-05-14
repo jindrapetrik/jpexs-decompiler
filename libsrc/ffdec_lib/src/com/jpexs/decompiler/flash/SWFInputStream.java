@@ -2564,7 +2564,7 @@ public class SWFInputStream implements AutoCloseable {
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
         newDumpLevel(name, "FILLSTYLEARRAY");
         int fillStyleCount = readUI8("fillStyleCount");
-        if (((shapeNum == 2) || (shapeNum == 3) || (shapeNum == 4/*?*/)) && (fillStyleCount == 0xff)) {
+        if (shapeNum > 1 && fillStyleCount == 0xff) {
             fillStyleCount = readUI16("fillStyleCount");
         }
         ret.fillStyles = new FILLSTYLE[fillStyleCount];
@@ -2645,7 +2645,7 @@ public class SWFInputStream implements AutoCloseable {
         if (lineStyleCount == 0xff) {
             lineStyleCount = readUI16("lineStyleCount");
         }
-        if ((shapeNum == 1 || shapeNum == 2 || shapeNum == 3)) {
+        if (shapeNum <= 3) {
             ret.lineStyles = new LINESTYLE[lineStyleCount];
             for (int i = 0; i < lineStyleCount; i++) {
                 ret.lineStyles[i] = readLINESTYLE(shapeNum, "lineStyle");

@@ -41,18 +41,20 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 78;
 
+    public static final String NAME = "DefineScalingGrid";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DefineScalingGridTag(SWF swf) {
-        super(swf, ID, "DefineScalingGrid", null);
+        super(swf, ID, NAME, null);
         splitter = new RECT();
     }
 
     public DefineScalingGridTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineScalingGrid", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

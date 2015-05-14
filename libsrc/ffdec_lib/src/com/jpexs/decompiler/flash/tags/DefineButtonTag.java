@@ -81,6 +81,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     public static final int ID = 7;
 
+    public static final String NAME = "DefineButton";
+
     @Override
     public int getCharacterId() {
         return buttonId;
@@ -110,7 +112,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * @param swf
      */
     public DefineButtonTag(SWF swf) {
-        super(swf, ID, "DefineButton", null);
+        super(swf, ID, NAME, null);
         buttonId = swf.getNextCharacterId();
         characters = new ArrayList<>();
         actionBytes = ByteArrayRange.EMPTY;
@@ -124,7 +126,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * @throws IOException
      */
     public DefineButtonTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineButton", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

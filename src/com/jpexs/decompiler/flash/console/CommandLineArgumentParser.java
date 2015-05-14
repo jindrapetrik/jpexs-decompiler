@@ -396,6 +396,9 @@ public class CommandLineArgumentParser {
                     }
                     Configuration.debugMode.set(true);
                     break;
+                case "-debugtool":
+                    parseDebugTool(args);
+                    break;
                 default:
                     break OUTER;
             }
@@ -803,6 +806,34 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseDebugTool(Stack<String> args) {
+        String cmd = args.pop().toLowerCase();
+        switch (cmd) {
+            case "findtag":
+                String folder = args.pop();
+                String tagIdOrName = args.pop();
+                int tagId;
+                try {
+                    tagId = Integer.parseInt(tagIdOrName);
+                } catch (NumberFormatException e) {
+                    tagId = Tag.getKnownClassesByName().get(tagIdOrName).id;
+                }
+
+                File[] files = new File(folder).listFiles(getSwfFilter());
+                for (File file : files) {
+                    SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file.getAbsolutePath(), file.getName());
+                    try {
+                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
+                        swf.swfList = new SWFList();
+                        swf.swfList.sourceInfo = sourceInfo;
+                    } catch (IOException | InterruptedException ex) {
+                        Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+        }
+    }
+
     private static void parseProxy(Stack<String> args) {
         int port = 55555;
         String portStr = args.peek();
@@ -905,13 +936,7 @@ public class CommandLineArgumentParser {
             boolean singleFile = true;
             if (inFileOrFolder.isDirectory()) {
                 singleFile = false;
-                inFiles = inFileOrFolder.listFiles(new FilenameFilter() {
-
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".swf");
-                    }
-                });
+                inFiles = inFileOrFolder.listFiles(getSwfFilter());
             } else {
                 inFiles = new File[]{inFileOrFolder};
             }
@@ -1711,6 +1736,10 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static FilenameFilter getSwfFilter() {
+        return (File dir, String name) -> name.toLowerCase().endsWith(".swf");
     }
 
     private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {

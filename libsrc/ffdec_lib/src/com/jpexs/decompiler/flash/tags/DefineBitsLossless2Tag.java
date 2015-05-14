@@ -81,6 +81,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 36;
 
+    public static final String NAME = "DefineBitsLossless2";
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -152,7 +154,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsLossless2Tag(SWF swf) {
-        super(swf, ID, "DefineBitsLossless2", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         bitmapFormat = DefineBitsLossless2Tag.FORMAT_32BIT_ARGB;
         bitmapWidth = 1;
@@ -161,7 +163,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsLossless2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsLossless2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

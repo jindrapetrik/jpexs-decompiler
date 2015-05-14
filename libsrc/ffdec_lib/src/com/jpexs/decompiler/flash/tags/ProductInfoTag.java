@@ -54,17 +54,19 @@ public class ProductInfoTag extends Tag {
 
     public static final int ID = 41;
 
+    public static final String NAME = "ProductInfo";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public ProductInfoTag(SWF swf) {
-        super(swf, ID, "ProductInfo", null);
+        super(swf, ID, NAME, null);
     }
 
     public ProductInfoTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "ProductInfo", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

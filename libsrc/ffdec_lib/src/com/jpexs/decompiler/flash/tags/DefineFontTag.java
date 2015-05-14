@@ -52,6 +52,8 @@ public class DefineFontTag extends FontTag {
 
     public static final int ID = 10;
 
+    public static final String NAME = "DefineFont";
+
     @Override
     public boolean isSmall() {
         return false;
@@ -145,7 +147,7 @@ public class DefineFontTag extends FontTag {
      * @param swf
      */
     public DefineFontTag(SWF swf) {
-        super(swf, ID, "DefineFont", null);
+        super(swf, ID, NAME, null);
         fontId = swf.getNextCharacterId();
         glyphShapeTable = new ArrayList<>();
     }
@@ -158,7 +160,7 @@ public class DefineFontTag extends FontTag {
      * @throws IOException
      */
     public DefineFontTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

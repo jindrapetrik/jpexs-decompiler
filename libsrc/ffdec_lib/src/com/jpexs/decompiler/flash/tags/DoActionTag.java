@@ -51,13 +51,15 @@ public class DoActionTag extends Tag implements ASMSource {
 
     public static final int ID = 12;
 
+    public static final String NAME = "DoAction";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DoActionTag(SWF swf) {
-        super(swf, ID, "DoAction", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -68,7 +70,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * @throws java.io.IOException
      */
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DoAction", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
@@ -84,7 +86,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * @param data
      */
     public DoActionTag(SWF swf, ByteArrayRange data) {
-        super(swf, ID, "DoAction", data);
+        super(swf, ID, NAME, data);
         actionBytes = ByteArrayRange.EMPTY;
     }
 

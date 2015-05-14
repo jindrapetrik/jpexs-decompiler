@@ -41,19 +41,21 @@ public class SymbolClassTag extends SymbolClassTypeTag {
 
     public static final int ID = 76;
 
+    public static final String NAME = "SymbolClass";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public SymbolClassTag(SWF swf) {
-        super(swf, ID, "SymbolClass", null);
+        super(swf, ID, NAME, null);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }
 
     public SymbolClassTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SymbolClass", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

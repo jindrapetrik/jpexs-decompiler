@@ -231,6 +231,8 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     public static final int ID = 94;
 
+    public static final String NAME = "PlaceObject4";
+
     public byte[] amfData;  //TODO: Parse AMF data?
 
     @Override
@@ -336,7 +338,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @param swf
      */
     public PlaceObject4Tag(SWF swf) {
-        super(swf, ID, "PlaceObject4", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -347,7 +349,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @throws IOException
      */
     public PlaceObject4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject4", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

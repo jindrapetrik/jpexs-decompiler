@@ -33,6 +33,8 @@ public class DefineExternalImage2 extends Tag {
 
     public static final int ID = 1009;
 
+    public static final String NAME = "DefineExternalImage2";
+
     public long characterId;
 
     public int bitmapFormat;
@@ -91,7 +93,7 @@ public class DefineExternalImage2 extends Tag {
      * @throws IOException
      */
     public DefineExternalImage2(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineExternalImage2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

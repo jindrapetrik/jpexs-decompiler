@@ -48,14 +48,11 @@ public class DoABCTag extends Tag implements ABCContainerTag {
 
     public static final int ID = 72;
 
+    public static final String NAME = "DoABC";
+
     @Override
     public ABC getABC() {
         return abc;
-    }
-
-    @Override
-    public String getName() {
-        return "DoABC";
     }
 
     /**
@@ -64,7 +61,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @param swf
      */
     public DoABCTag(SWF swf) {
-        super(swf, ID, "DoABC", null);
+        super(swf, ID, NAME, null);
         abc = new ABC(this);
     }
 
@@ -76,7 +73,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @throws IOException
      */
     public DoABCTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DoABC", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

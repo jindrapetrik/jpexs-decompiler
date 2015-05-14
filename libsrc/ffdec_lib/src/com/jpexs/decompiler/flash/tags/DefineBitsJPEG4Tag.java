@@ -56,6 +56,8 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 90;
 
+    public static final String NAME = "DefineBitsJPEG4";
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -157,7 +159,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsJPEG4Tag(SWF swf) {
-        super(swf, ID, "DefineBitsJPEG4", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         imageData = ByteArrayRange.EMPTY;
         bitmapAlphaData = ByteArrayRange.EMPTY;
@@ -171,7 +173,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
      * @throws IOException
      */
     public DefineBitsJPEG4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsJPEG4", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

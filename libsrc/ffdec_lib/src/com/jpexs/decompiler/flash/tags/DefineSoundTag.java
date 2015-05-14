@@ -67,6 +67,8 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     public static final int ID = 14;
 
+    public static final String NAME = "DefineSound";
+
     @Override
     public int getCharacterId() {
         return soundId;
@@ -108,7 +110,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      * @param swf
      */
     public DefineSoundTag(SWF swf) {
-        super(swf, ID, "DefineSound", null);
+        super(swf, ID, NAME, null);
         soundId = swf.getNextCharacterId();
         soundData = ByteArrayRange.EMPTY;
     }
@@ -121,7 +123,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      * @throws IOException
      */
     public DefineSoundTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineSound", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

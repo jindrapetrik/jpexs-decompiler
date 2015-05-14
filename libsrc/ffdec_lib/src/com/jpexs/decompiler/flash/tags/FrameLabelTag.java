@@ -32,6 +32,8 @@ public class FrameLabelTag extends Tag {
 
     public static final int ID = 43;
 
+    public static final String NAME = "FrameLabel";
+
     public String getLabelName() {
         return name;
     }
@@ -46,12 +48,12 @@ public class FrameLabelTag extends Tag {
      * @param swf
      */
     public FrameLabelTag(SWF swf) {
-        super(swf, ID, "FrameLabel", null);
+        super(swf, ID, NAME, null);
         name = "New frame label";
     }
 
     public FrameLabelTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "FrameLabel", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

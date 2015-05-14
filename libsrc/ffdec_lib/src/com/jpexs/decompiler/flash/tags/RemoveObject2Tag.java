@@ -34,17 +34,19 @@ public class RemoveObject2Tag extends RemoveTag {
 
     public static final int ID = 28;
 
+    public static final String NAME = "RemoveObject2";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public RemoveObject2Tag(SWF swf) {
-        super(swf, ID, "RemoveObject2", null);
+        super(swf, ID, NAME, null);
     }
 
     public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "RemoveObject2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

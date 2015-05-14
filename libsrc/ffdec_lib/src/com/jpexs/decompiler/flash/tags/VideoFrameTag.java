@@ -44,6 +44,8 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 61;
 
+    public static final String NAME = "VideoFrame";
+
     /**
      * Gets data bytes
      *
@@ -70,7 +72,7 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
      * @param swf
      */
     public VideoFrameTag(SWF swf) {
-        super(swf, ID, "VideoFrame", null);
+        super(swf, ID, NAME, null);
         videoData = ByteArrayRange.EMPTY;
     }
 
@@ -82,7 +84,7 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
      * @throws IOException
      */
     public VideoFrameTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "VideoFrame", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

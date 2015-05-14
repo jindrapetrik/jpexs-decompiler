@@ -80,6 +80,8 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     public static final int ID = 34;
 
+    public static final String NAME = "DefineButton2";
+
     private Timeline timeline;
 
     private boolean isSingleFrameInitialized;
@@ -109,7 +111,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      * @param swf
      */
     public DefineButton2Tag(SWF swf) {
-        super(swf, ID, "DefineButton2", null);
+        super(swf, ID, NAME, null);
         buttonId = swf.getNextCharacterId();
         characters = new ArrayList<>();
     }
@@ -122,7 +124,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      * @throws IOException
      */
     public DefineButton2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineButton2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

@@ -53,17 +53,19 @@ public class FileAttributesTag extends Tag {
 
     public static final int ID = 69;
 
+    public static final String NAME = "FileAttributes";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public FileAttributesTag(SWF swf) {
-        super(swf, ID, "FileAttributes", null);
+        super(swf, ID, NAME, null);
     }
 
     public FileAttributesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "FileAttributes", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

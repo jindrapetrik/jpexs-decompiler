@@ -42,19 +42,21 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 88;
 
+    public static final String NAME = "DefineFontName";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DefineFontNameTag(SWF swf) {
-        super(swf, ID, "DefineFontName", null);
+        super(swf, ID, NAME, null);
         fontName = "New Font Name";
         fontCopyright = "Copyright text";
     }
 
     public DefineFontNameTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFontName", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

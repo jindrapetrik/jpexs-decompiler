@@ -79,6 +79,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     public static final int ID = 39;
 
+    public static final String NAME = "DefineSprite";
+
     private Timeline timeline;
 
     private boolean isSingleFrameInitialized;
@@ -214,7 +216,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
      * @param swf
      */
     public DefineSpriteTag(SWF swf) {
-        super(swf, ID, "DefineSprite", null);
+        super(swf, ID, NAME, null);
         spriteId = swf.getNextCharacterId();
         subTags = new ArrayList<>();
     }
@@ -231,7 +233,7 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
      * @throws java.lang.InterruptedException
      */
     public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(sis.getSwf(), ID, "DefineSprite", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, level, parallel, skipUnusualTags, false);
     }
 

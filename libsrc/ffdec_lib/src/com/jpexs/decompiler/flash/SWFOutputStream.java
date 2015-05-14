@@ -1186,7 +1186,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeFILLSTYLEARRAY(FILLSTYLEARRAY value, int shapeNum) throws IOException {
         int fillStyleCount = value.fillStyles.length;
-        if (shapeNum == 2 || shapeNum == 3) {
+        if (shapeNum > 1) {
             if (fillStyleCount >= 0xff) {
                 writeUI8(0xff);
                 writeUI16(fillStyleCount);
@@ -1303,7 +1303,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeLINESTYLEARRAY(LINESTYLEARRAY value, int shapeNum) throws IOException {
         int lineStyleCount;
-        if (shapeNum == 1 || shapeNum == 2 || shapeNum == 3) {
+        if (shapeNum <= 3) {
             lineStyleCount = value.lineStyles.length;
             if (lineStyleCount >= 0xff) {
                 writeUI8(0xff);

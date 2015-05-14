@@ -73,6 +73,8 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
 
     public static final int ID = 18;
 
+    public static final String NAME = "SoundStreamHead";
+
     @Override
     public String getExportFormat() {
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
@@ -148,7 +150,7 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
      * @param swf
      */
     public SoundStreamHeadTag(SWF swf) {
-        super(swf, ID, "SoundStreamHead", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -159,7 +161,7 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
      * @throws IOException
      */
     public SoundStreamHeadTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SoundStreamHead", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

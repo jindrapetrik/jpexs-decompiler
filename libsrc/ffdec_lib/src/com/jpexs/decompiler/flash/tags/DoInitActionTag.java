@@ -60,13 +60,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     public static final int ID = 59;
 
+    public static final String NAME = "DoInitAction";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DoInitActionTag(SWF swf) {
-        super(swf, ID, "DoInitAction", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -77,7 +79,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
      * @throws IOException
      */
     public DoInitActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DoInitAction", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

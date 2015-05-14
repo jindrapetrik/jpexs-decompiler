@@ -29,6 +29,8 @@ public class JPEGTablesTag extends Tag {
 
     public static final int ID = 8;
 
+    public static final String NAME = "JPEGTables";
+
     @HideInRawEdit
     public byte[] jpegData;
 
@@ -38,12 +40,12 @@ public class JPEGTablesTag extends Tag {
      * @param swf
      */
     public JPEGTablesTag(SWF swf) {
-        super(swf, ID, "JPEGTables", null);
+        super(swf, ID, NAME, null);
         jpegData = new byte[0];
     }
 
     public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "JPEGTables", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

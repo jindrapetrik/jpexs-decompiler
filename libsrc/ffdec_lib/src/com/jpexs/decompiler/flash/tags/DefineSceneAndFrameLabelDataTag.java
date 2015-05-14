@@ -49,6 +49,8 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
 
     public static final int ID = 86;
 
+    public static final String NAME = "DefineSceneAndFrameLabelData";
+
     /**
      * Gets data bytes
      *
@@ -84,7 +86,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * @param swf
      */
     public DefineSceneAndFrameLabelDataTag(SWF swf) {
-        super(swf, ID, "DefineSceneAndFrameLabelData", null);
+        super(swf, ID, NAME, null);
         sceneOffsets = new long[0];
         sceneNames = new String[0];
         frameNums = new long[0];
@@ -99,7 +101,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * @throws IOException
      */
     public DefineSceneAndFrameLabelDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineSceneAndFrameLabelData", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

@@ -33,6 +33,8 @@ public class DefineExternalSound extends Tag {
 
     public static final int ID = 1006;
 
+    public static final String NAME = "DefineExternalSound";
+
     public int characterId;
 
     public int soundFormat;
@@ -91,7 +93,7 @@ public class DefineExternalSound extends Tag {
      * @throws IOException
      */
     public DefineExternalSound(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineExternalSound", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

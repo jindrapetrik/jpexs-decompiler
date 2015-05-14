@@ -39,6 +39,8 @@ public class DefineShape3Tag extends ShapeTag {
 
     public static final int ID = 32;
 
+    public static final String NAME = "DefineShape3";
+
     private ByteArrayRange shapeData;
 
     @Override
@@ -96,14 +98,14 @@ public class DefineShape3Tag extends ShapeTag {
      * @param swf
      */
     public DefineShape3Tag(SWF swf) {
-        super(swf, ID, "DefineShape3", null);
+        super(swf, ID, NAME, null);
         shapeId = swf.getNextCharacterId();
         shapeBounds = new RECT();
         shapes = SHAPEWITHSTYLE.createEmpty(3);
     }
 
     public DefineShape3Tag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
-        super(sis.getSwf(), ID, "DefineShape3", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, lazy);
     }
 

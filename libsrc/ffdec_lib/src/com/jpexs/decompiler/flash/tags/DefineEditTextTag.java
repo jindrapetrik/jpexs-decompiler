@@ -165,6 +165,8 @@ public class DefineEditTextTag extends TextTag {
 
     public static final int ID = 37;
 
+    public static final String NAME = "DefineEditText";
+
     @Override
     public RECT getBounds() {
         return bounds;
@@ -809,7 +811,7 @@ public class DefineEditTextTag extends TextTag {
      * @param swf
      */
     public DefineEditTextTag(SWF swf) {
-        super(swf, ID, "DefineEditText", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         bounds = new RECT();
         variableName = "";
@@ -823,7 +825,7 @@ public class DefineEditTextTag extends TextTag {
      * @throws IOException
      */
     public DefineEditTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineEditText", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

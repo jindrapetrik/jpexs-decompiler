@@ -55,6 +55,8 @@ public final class DefineCompactedFont extends FontTag {
 
     public static final int ID = 1005;
 
+    public static final String NAME = "DefineCompactedFont";
+
     public int fontId;
 
     public List<FontType> fonts;
@@ -88,7 +90,7 @@ public final class DefineCompactedFont extends FontTag {
      * @param swf
      */
     public DefineCompactedFont(SWF swf) {
-        super(swf, ID, "DefineCompactedFont", null);
+        super(swf, ID, NAME, null);
         fontId = swf.getNextCharacterId();
 
         fonts = new ArrayList<>();
@@ -106,7 +108,7 @@ public final class DefineCompactedFont extends FontTag {
      * @throws IOException
      */
     public DefineCompactedFont(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineCompactedFont", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

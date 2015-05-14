@@ -49,6 +49,8 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 21;
 
+    public static final String NAME = "DefineBitsJPEG2";
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -97,13 +99,13 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsJPEG2Tag(SWF swf) {
-        super(swf, ID, "DefineBitsJPEG2", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         imageData = ByteArrayRange.EMPTY;
     }
 
     public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsJPEG2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
@@ -114,7 +116,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsJPEG2Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
-        super(swf, ID, "DefineBitsJPEG2", data);
+        super(swf, ID, NAME, data);
         this.characterID = characterID;
         this.imageData = new ByteArrayRange(imageData);
     }

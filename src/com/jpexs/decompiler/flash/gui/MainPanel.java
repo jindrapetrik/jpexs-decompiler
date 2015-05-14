@@ -1227,7 +1227,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportAll(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
-        if (Configuration.debugMode.get()) {
+        boolean exportAll = false;
+        if (exportAll) {
             exportAllDebug(swf, handler, selFile, export);
             return;
         }

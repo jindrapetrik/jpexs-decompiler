@@ -38,6 +38,8 @@ public class EnableDebuggerTag extends Tag {
 
     public static final int ID = 58;
 
+    public static final String NAME = "EnableDebugger";
+
     /**
      * Gets data bytes
      *
@@ -64,7 +66,7 @@ public class EnableDebuggerTag extends Tag {
      * @param swf
      */
     public EnableDebuggerTag(SWF swf) {
-        super(swf, ID, "EnableDebugger", null);
+        super(swf, ID, NAME, null);
         passwordHash = "PasswordHash";
     }
 
@@ -76,7 +78,7 @@ public class EnableDebuggerTag extends Tag {
      * @throws IOException
      */
     public EnableDebuggerTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "EnableDebugger", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

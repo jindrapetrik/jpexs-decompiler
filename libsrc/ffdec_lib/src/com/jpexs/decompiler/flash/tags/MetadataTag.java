@@ -32,18 +32,20 @@ public class MetadataTag extends Tag {
 
     public static final int ID = 77;
 
+    public static final String NAME = "Metadata";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public MetadataTag(SWF swf) {
-        super(swf, ID, "Metadata", null);
+        super(swf, ID, NAME, null);
         xmlMetadata = "";
     }
 
     public MetadataTag(SWFInputStream sis, ByteArrayRange data) {
-        super(sis.getSwf(), ID, "Metadata", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

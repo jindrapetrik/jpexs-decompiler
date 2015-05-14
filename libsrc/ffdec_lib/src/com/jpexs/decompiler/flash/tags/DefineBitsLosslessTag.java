@@ -83,6 +83,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     public static final int ID = 20;
 
+    public static final String NAME = "DefineBitsLossless";
+
     private byte[] createEmptyImage() {
         try {
             BITMAPDATA bitmapData = new BITMAPDATA();
@@ -230,7 +232,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsLosslessTag(SWF swf) {
-        super(swf, ID, "DefineBitsLossless", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
         bitmapWidth = 1;
@@ -239,7 +241,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsLosslessTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsLossless", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

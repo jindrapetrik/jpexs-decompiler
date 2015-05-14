@@ -53,6 +53,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 35;
 
+    public static final String NAME = "DefineBitsJPEG3";
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -133,14 +135,14 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsJPEG3Tag(SWF swf) {
-        super(swf, ID, "DefineBitsJPEG3", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         imageData = ByteArrayRange.EMPTY;
         bitmapAlphaData = new byte[0];
     }
 
     public DefineBitsJPEG3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBitsJPEG3", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

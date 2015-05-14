@@ -39,6 +39,8 @@ public class DefineMorphShapeTag extends MorphShapeTag {
 
     public static final int ID = 46;
 
+    public static final String NAME = "DefineMorphShape";
+
     /**
      * Gets data bytes
      *
@@ -74,7 +76,7 @@ public class DefineMorphShapeTag extends MorphShapeTag {
      * @param swf
      */
     public DefineMorphShapeTag(SWF swf) {
-        super(swf, ID, "DefineMorphShape", null);
+        super(swf, ID, NAME, null);
         characterId = swf.getNextCharacterId();
         startBounds = new RECT();
         endBounds = new RECT();
@@ -94,7 +96,7 @@ public class DefineMorphShapeTag extends MorphShapeTag {
      * @throws IOException
      */
     public DefineMorphShapeTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineMorphShape", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

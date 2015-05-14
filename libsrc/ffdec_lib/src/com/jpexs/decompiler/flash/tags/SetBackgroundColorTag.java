@@ -30,23 +30,25 @@ public class SetBackgroundColorTag extends Tag {
 
     public static final int ID = 9;
 
+    public static final String NAME = "SetBackgroundColor";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public SetBackgroundColorTag(SWF swf) {
-        super(swf, ID, "SetBackgroundColor", null);
+        super(swf, ID, NAME, null);
         backgroundColor = new RGB();
     }
 
     public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {
-        super(swf, ID, "SetBackgroundColor", null);
+        super(swf, ID, NAME, null);
         this.backgroundColor = backgroundColor;
     }
 
     public SetBackgroundColorTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SetBackgroundColor", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

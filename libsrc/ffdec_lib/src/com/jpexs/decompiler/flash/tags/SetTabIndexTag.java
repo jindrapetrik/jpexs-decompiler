@@ -47,6 +47,8 @@ public class SetTabIndexTag extends Tag {
 
     public static final int ID = 66;
 
+    public static final String NAME = "SetTabIndex";
+
     /**
      * Gets data bytes
      *
@@ -72,7 +74,7 @@ public class SetTabIndexTag extends Tag {
      * @param swf
      */
     public SetTabIndexTag(SWF swf) {
-        super(swf, ID, "SetTabIndex", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -83,7 +85,7 @@ public class SetTabIndexTag extends Tag {
      * @throws IOException
      */
     public SetTabIndexTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SetTabIndex", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

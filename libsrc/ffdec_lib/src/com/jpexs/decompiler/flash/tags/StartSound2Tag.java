@@ -27,7 +27,6 @@ import java.io.OutputStream;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class StartSound2Tag extends Tag {
@@ -37,6 +36,8 @@ public class StartSound2Tag extends Tag {
     public SOUNDINFO soundInfo;
 
     public static final int ID = 89;
+
+    public static final String NAME = "StartSound2";
 
     /**
      * Gets data bytes
@@ -63,7 +64,7 @@ public class StartSound2Tag extends Tag {
      * @param swf
      */
     public StartSound2Tag(SWF swf) {
-        super(swf, ID, "StartSound2", null);
+        super(swf, ID, NAME, null);
         soundClassName = "NewSoundClass";
         soundInfo = new SOUNDINFO();
     }
@@ -76,7 +77,7 @@ public class StartSound2Tag extends Tag {
      * @throws IOException
      */
     public StartSound2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "StartSound2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

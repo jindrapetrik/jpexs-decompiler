@@ -37,6 +37,8 @@ public class EnableTelemetryTag extends Tag {
 
     public static final int ID = 93;
 
+    public static final String NAME = "EnableTelemetry";
+
     @SWFType(value = BasicType.UB, count = 16)
     @Reserved
     public int reserved;
@@ -72,7 +74,7 @@ public class EnableTelemetryTag extends Tag {
      * @param swf
      */
     public EnableTelemetryTag(SWF swf) {
-        super(swf, ID, "EnableTelemetry", null);
+        super(swf, ID, NAME, null);
         passwordHash = new byte[32];
     }
 
@@ -84,7 +86,7 @@ public class EnableTelemetryTag extends Tag {
      * @throws IOException
      */
     public EnableTelemetryTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

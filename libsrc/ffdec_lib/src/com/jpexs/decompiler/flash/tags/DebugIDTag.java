@@ -37,6 +37,8 @@ public class DebugIDTag extends Tag {
 
     public static final int ID = 63;
 
+    public static final String NAME = "DebugID";
+
     /**
      * Gets data bytes
      *
@@ -61,7 +63,7 @@ public class DebugIDTag extends Tag {
      * @param swf
      */
     public DebugIDTag(SWF swf) {
-        super(swf, ID, "DebugID", null);
+        super(swf, ID, NAME, null);
         debugId = new byte[16];
     }
 
@@ -73,7 +75,7 @@ public class DebugIDTag extends Tag {
      * @throws IOException
      */
     public DebugIDTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DebugID", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

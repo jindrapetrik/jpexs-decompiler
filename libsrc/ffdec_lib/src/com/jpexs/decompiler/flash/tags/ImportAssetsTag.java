@@ -53,13 +53,15 @@ public class ImportAssetsTag extends Tag implements ImportTag {
 
     public static final int ID = 57;
 
+    public static final String NAME = "ImportAssets";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public ImportAssetsTag(SWF swf) {
-        super(swf, ID, "ImportAssets", null);
+        super(swf, ID, NAME, null);
         url = "";
         tags = new ArrayList<>();
     }
@@ -72,7 +74,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
      * @throws IOException
      */
     public ImportAssetsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "ImportAssets", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

@@ -99,6 +99,8 @@ public class DefineFont3Tag extends FontTag {
 
     public static final int ID = 75;
 
+    public static final String NAME = "DefineFont3";
+
     @Override
     public boolean isSmall() {
         return fontFlagsSmallText;
@@ -134,7 +136,7 @@ public class DefineFont3Tag extends FontTag {
      * @param swf
      */
     public DefineFont3Tag(SWF swf) {
-        super(swf, ID, "DefineFont3", null);
+        super(swf, ID, NAME, null);
         fontId = swf.getNextCharacterId();
         languageCode = new LANGCODE();
         fontName = "New font";
@@ -143,7 +145,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     public DefineFont3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont3", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

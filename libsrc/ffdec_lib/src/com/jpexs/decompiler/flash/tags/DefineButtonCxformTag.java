@@ -41,6 +41,8 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 23;
 
+    public static final String NAME = "DefineButtonCxform";
+
     /**
      * Gets data bytes
      *
@@ -66,7 +68,7 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
      * @param swf
      */
     public DefineButtonCxformTag(SWF swf) {
-        super(swf, ID, "DefineButtonCxform", null);
+        super(swf, ID, NAME, null);
         buttonColorTransform = new CXFORM();
     }
 
@@ -78,7 +80,7 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
      * @throws IOException
      */
     public DefineButtonCxformTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineButtonCxform", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

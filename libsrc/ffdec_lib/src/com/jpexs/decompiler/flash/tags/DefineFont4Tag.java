@@ -53,6 +53,8 @@ public class DefineFont4Tag extends CharacterTag {
 
     public static final int ID = 91;
 
+    public static final String NAME = "DefineFont4";
+
     @Override
     public int getCharacterId() {
         return fontID;
@@ -69,14 +71,14 @@ public class DefineFont4Tag extends CharacterTag {
      * @param swf
      */
     public DefineFont4Tag(SWF swf) {
-        super(swf, ID, "DefineFont4", null);
+        super(swf, ID, NAME, null);
         fontID = swf.getNextCharacterId();
         fontName = "New font";
         fontData = new byte[0];
     }
 
     public DefineFont4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont4", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

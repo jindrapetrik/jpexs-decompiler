@@ -71,6 +71,8 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     public static final int ID = 60;
 
+    public static final String NAME = "DefineVideoStream";
+
     @Override
     public int getCharacterId() {
         return characterID;
@@ -112,7 +114,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      * @param swf
      */
     public DefineVideoStreamTag(SWF swf) {
-        super(swf, ID, "DefineVideoStream", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
     }
 
@@ -124,7 +126,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      * @throws IOException
      */
     public DefineVideoStreamTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineVideoStream", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

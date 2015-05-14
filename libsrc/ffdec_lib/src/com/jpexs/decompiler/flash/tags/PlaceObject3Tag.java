@@ -231,6 +231,8 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     public static final int ID = 70;
 
+    public static final String NAME = "PlaceObject3";
+
     @Override
     public List<FILTER> getFilters() {
         if (placeFlagHasFilterList) {
@@ -334,7 +336,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @param swf
      */
     public PlaceObject3Tag(SWF swf) {
-        super(swf, ID, "PlaceObject3", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -345,7 +347,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @throws IOException
      */
     public PlaceObject3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject3", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

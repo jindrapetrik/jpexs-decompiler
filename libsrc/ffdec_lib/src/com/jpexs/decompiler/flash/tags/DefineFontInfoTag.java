@@ -63,6 +63,8 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 13;
 
+    public static final String NAME = "DefineFontInfo";
+
     /**
      * Gets data bytes
      *
@@ -104,7 +106,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
      * @param swf
      */
     public DefineFontInfoTag(SWF swf) {
-        super(swf, ID, "DefineFontInfo", null);
+        super(swf, ID, NAME, null);
         fontName = "New Font Info Name";
         codeTable = new ArrayList<>();
     }
@@ -117,7 +119,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
      * @throws IOException
      */
     public DefineFontInfoTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFontInfo", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

@@ -143,6 +143,8 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     public static final int ID = 26;
 
+    public static final String NAME = "PlaceObject2";
+
     @Override
     public int getClipDepth() {
         if (placeFlagHasClipDepth) {
@@ -213,11 +215,11 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @param swf
      */
     public PlaceObject2Tag(SWF swf) {
-        super(swf, ID, "PlaceObject2", null);
+        super(swf, ID, NAME, null);
     }
 
     public PlaceObject2Tag(SWF swf, boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
-        super(swf, ID, "PlaceObject2", null);
+        super(swf, ID, NAME, null);
         this.placeFlagHasClipActions = placeFlagHasClipActions;
         this.placeFlagHasClipDepth = placeFlagHasClipDepth;
         this.placeFlagHasName = placeFlagHasName;
@@ -244,7 +246,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @throws IOException
      */
     public PlaceObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

@@ -38,6 +38,8 @@ public class FontTextureInfo extends Tag {
 
     public static final int ID = 1002;
 
+    public static final String NAME = "FontTextureInfo";
+
     public long textureID;
 
     public int textureFormat;
@@ -104,7 +106,7 @@ public class FontTextureInfo extends Tag {
      * @throws IOException
      */
     public FontTextureInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "FontTextureInfo", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

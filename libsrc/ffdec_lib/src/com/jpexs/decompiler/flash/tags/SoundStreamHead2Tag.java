@@ -74,6 +74,8 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
 
     public static final int ID = 45;
 
+    public static final String NAME = "SoundStreamHead2";
+
     @Override
     public int getCharacterId() {
         return virtualCharacterId;
@@ -149,7 +151,7 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
      * @param swf
      */
     public SoundStreamHead2Tag(SWF swf) {
-        super(swf, ID, "SoundStreamHead2", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -160,7 +162,7 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
      * @throws IOException
      */
     public SoundStreamHead2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SoundStreamHead2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

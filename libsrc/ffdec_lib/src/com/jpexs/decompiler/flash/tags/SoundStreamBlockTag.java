@@ -34,6 +34,8 @@ public class SoundStreamBlockTag extends Tag {
 
     public static final int ID = 19;
 
+    public static final String NAME = "SoundStreamBlock";
+
     @HideInRawEdit
     public ByteArrayRange streamSoundData;
 
@@ -43,7 +45,7 @@ public class SoundStreamBlockTag extends Tag {
      * @param swf
      */
     public SoundStreamBlockTag(SWF swf) {
-        super(swf, ID, "SoundStreamBlock", null);
+        super(swf, ID, NAME, null);
         streamSoundData = ByteArrayRange.EMPTY;
     }
 
@@ -55,7 +57,7 @@ public class SoundStreamBlockTag extends Tag {
      * @throws IOException
      */
     public SoundStreamBlockTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "SoundStreamBlock", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

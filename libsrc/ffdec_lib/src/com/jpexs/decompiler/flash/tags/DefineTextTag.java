@@ -35,13 +35,15 @@ public class DefineTextTag extends StaticTextTag {
 
     public static final int ID = 11;
 
+    public static final String NAME = "DefineText";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DefineTextTag(SWF swf) {
-        super(swf, ID, "DefineText", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         textBounds = new RECT();
         textMatrix = new MATRIX();
@@ -51,7 +53,7 @@ public class DefineTextTag extends StaticTextTag {
     }
 
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
-        super(swf, ID, "DefineText", null);
+        super(swf, ID, NAME, null);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -68,7 +70,7 @@ public class DefineTextTag extends StaticTextTag {
      * @throws IOException
      */
     public DefineTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineText", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

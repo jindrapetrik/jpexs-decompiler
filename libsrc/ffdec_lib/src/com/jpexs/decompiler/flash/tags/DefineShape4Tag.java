@@ -54,6 +54,8 @@ public class DefineShape4Tag extends ShapeTag {
 
     public static final int ID = 83;
 
+    public static final String NAME = "DefineShape4";
+
     private ByteArrayRange shapeData;
 
     @Override
@@ -111,7 +113,7 @@ public class DefineShape4Tag extends ShapeTag {
      * @param swf
      */
     public DefineShape4Tag(SWF swf) {
-        super(swf, ID, "DefineShape4", null);
+        super(swf, ID, NAME, null);
         shapeId = swf.getNextCharacterId();
         shapeBounds = new RECT();
         edgeBounds = new RECT();
@@ -119,7 +121,7 @@ public class DefineShape4Tag extends ShapeTag {
     }
 
     public DefineShape4Tag(SWFInputStream sis, ByteArrayRange data, boolean lazy) throws IOException {
-        super(sis.getSwf(), ID, "DefineShape4", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, lazy);
     }
 

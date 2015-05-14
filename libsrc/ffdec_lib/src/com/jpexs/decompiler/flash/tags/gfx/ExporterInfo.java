@@ -35,6 +35,8 @@ public class ExporterInfo extends Tag {
 
     public static final int ID = 1000;
 
+    public static final String NAME = "ExporterInfo";
+
     //Version (1.10 will be encoded as 0x10A)
     public int version;
 
@@ -100,7 +102,7 @@ public class ExporterInfo extends Tag {
      * @throws IOException
      */
     public ExporterInfo(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "ExporterInfo", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

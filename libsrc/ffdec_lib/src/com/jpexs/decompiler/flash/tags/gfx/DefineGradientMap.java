@@ -33,6 +33,8 @@ public class DefineGradientMap extends Tag {
 
     public static final int ID = 1004;
 
+    public static final String NAME = "DefineGradientMap";
+
     public int[] indices;
 
     /**
@@ -64,7 +66,7 @@ public class DefineGradientMap extends Tag {
      * @throws IOException
      */
     public DefineGradientMap(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineGradientMap", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

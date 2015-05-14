@@ -47,6 +47,8 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     public static final int ID = 6;
 
+    public static final String NAME = "DefineBits";
+
     @Override
     public void setImage(byte[] data) {
         throw new UnsupportedOperationException("Set image is not supported for DefineBits");
@@ -64,13 +66,13 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
      * @param swf
      */
     public DefineBitsTag(SWF swf) {
-        super(swf, ID, "DefineBits", null);
+        super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         jpegData = ByteArrayRange.EMPTY;
     }
 
     public DefineBitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBits", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

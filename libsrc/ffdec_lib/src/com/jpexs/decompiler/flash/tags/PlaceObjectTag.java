@@ -68,6 +68,8 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
 
     public static final int ID = 4;
 
+    public static final String NAME = "PlaceObject";
+
     @Override
     public List<FILTER> getFilters() {
         return null;
@@ -107,7 +109,7 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
      * @param swf
      */
     public PlaceObjectTag(SWF swf) {
-        super(swf, ID, "PlaceObject", null);
+        super(swf, ID, NAME, null);
         matrix = new MATRIX();
     }
 
@@ -119,7 +121,7 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
      * @throws IOException
      */
     public PlaceObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "PlaceObject", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
@@ -134,7 +136,7 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     }
 
     public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, "PlaceObject", null);
+        super(swf, ID, NAME, null);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

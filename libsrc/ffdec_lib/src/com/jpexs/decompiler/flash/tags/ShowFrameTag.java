@@ -31,6 +31,8 @@ public class ShowFrameTag extends Tag {
 
     public static final int ID = 1;
 
+    public static final String NAME = "ShowFrame";
+
     private static List<Integer> nestedTagTypeIds = new ArrayList<Integer>() {
         {
             add(PlaceObjectTag.ID);
@@ -55,7 +57,7 @@ public class ShowFrameTag extends Tag {
      * @param swf
      */
     public ShowFrameTag(SWF swf) {
-        super(swf, ID, "ShowFrame", null);
+        super(swf, ID, NAME, null);
     }
 
     /**
@@ -65,7 +67,7 @@ public class ShowFrameTag extends Tag {
      * @param data
      */
     public ShowFrameTag(SWFInputStream sis, ByteArrayRange data) {
-        super(sis.getSwf(), ID, "ShowFrame", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

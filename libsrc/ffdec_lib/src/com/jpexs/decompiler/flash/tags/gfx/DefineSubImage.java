@@ -33,6 +33,8 @@ public class DefineSubImage extends Tag {
 
     public static final int ID = 1008;
 
+    public static final String NAME = "DefineSubImage";
+
     public int characterId;
 
     public int imageCharacterId;
@@ -76,7 +78,7 @@ public class DefineSubImage extends Tag {
      * @throws IOException
      */
     public DefineSubImage(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineSubImage", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

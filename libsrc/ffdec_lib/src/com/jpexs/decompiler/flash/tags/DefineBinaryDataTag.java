@@ -51,6 +51,8 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     public static final int ID = 87;
 
+    public static final String NAME = "DefineBinaryData";
+
     @Internal
     public SWF innerSwf;
 
@@ -80,13 +82,13 @@ public class DefineBinaryDataTag extends CharacterTag {
      * @param swf
      */
     public DefineBinaryDataTag(SWF swf) {
-        super(swf, ID, "DefineBinaryData", null);
+        super(swf, ID, NAME, null);
         tag = swf.getNextCharacterId();
         binaryData = ByteArrayRange.EMPTY;
     }
 
     public DefineBinaryDataTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineBinaryData", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

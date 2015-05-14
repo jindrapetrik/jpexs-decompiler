@@ -53,18 +53,20 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 73;
 
+    public static final String NAME = "DefineFontAlignZones";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public DefineFontAlignZonesTag(SWF swf) {
-        super(swf, ID, "DefineFontAlignZones", null);
+        super(swf, ID, NAME, null);
         zoneTable = new ArrayList<>();
     }
 
     public DefineFontAlignZonesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFontAlignZones", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

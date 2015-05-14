@@ -95,6 +95,8 @@ public class DefineFont2Tag extends FontTag {
 
     public static final int ID = 48;
 
+    public static final String NAME = "DefineFont2";
+
     @Override
     public boolean isSmall() {
         return fontFlagsSmallText;
@@ -209,7 +211,7 @@ public class DefineFont2Tag extends FontTag {
      * @param swf
      */
     public DefineFont2Tag(SWF swf) {
-        super(swf, ID, "DefineFont2", null);
+        super(swf, ID, NAME, null);
         fontId = swf.getNextCharacterId();
         languageCode = new LANGCODE();
         fontName = "New font";
@@ -225,7 +227,7 @@ public class DefineFont2Tag extends FontTag {
      * @throws IOException
      */
     public DefineFont2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineFont2", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

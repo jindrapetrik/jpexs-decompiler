@@ -49,13 +49,15 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
 
     public static final int ID = 56;
 
+    public static final String NAME = "ExportAssets";
+
     /**
      * Constructor
      *
      * @param swf
      */
     public ExportAssetsTag(SWF swf) {
-        super(swf, ID, "ExportAssets", null);
+        super(swf, ID, NAME, null);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }
@@ -68,7 +70,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
      * @throws IOException
      */
     public ExportAssetsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "ExportAssets", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

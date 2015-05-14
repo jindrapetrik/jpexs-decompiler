@@ -33,6 +33,8 @@ public class DefineExternalGradient extends Tag {
 
     public static final int ID = 1003;
 
+    public static final String NAME = "DefineExternalGradient";
+
     public static final int BITMAP_FORMAT_DEFAULT = 0;
 
     public static final int BITMAP_FORMAT_TGA = 1;
@@ -78,7 +80,7 @@ public class DefineExternalGradient extends Tag {
      * @throws IOException
      */
     public DefineExternalGradient(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "DefineExternalGradient", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

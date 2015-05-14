@@ -38,6 +38,8 @@ public class ProtectTag extends Tag {
 
     public static final int ID = 24;
 
+    public static final String NAME = "Protect";
+
     /**
      * Gets data bytes
      *
@@ -64,7 +66,7 @@ public class ProtectTag extends Tag {
      * @param swf
      */
     public ProtectTag(SWF swf) {
-        super(swf, ID, "Protect", null);
+        super(swf, ID, NAME, null);
         passwordHash = "";
     }
 
@@ -76,7 +78,7 @@ public class ProtectTag extends Tag {
      * @throws IOException
      */
     public ProtectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "Protect", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 

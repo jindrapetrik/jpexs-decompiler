@@ -49,6 +49,8 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
 
     public static final int ID = 5;
 
+    public static final String NAME = "RemoveObject";
+
     /**
      * Gets data bytes
      *
@@ -74,7 +76,7 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
      * @param swf
      */
     public RemoveObjectTag(SWF swf) {
-        super(swf, ID, "RemoveObject", null);
+        super(swf, ID, NAME, null);
         characterId = swf.getNextCharacterId();
     }
 
@@ -86,7 +88,7 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
      * @throws IOException
      */
     public RemoveObjectTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, "RemoveObject", data);
+        super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
