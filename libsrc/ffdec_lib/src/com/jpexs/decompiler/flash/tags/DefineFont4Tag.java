@@ -58,6 +58,11 @@ public class DefineFont4Tag extends CharacterTag {
         return fontID;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontID = characterId;
+    }
+
     /**
      * Constructor
      *
@@ -108,10 +113,5 @@ public class DefineFont4Tag extends CharacterTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.fontID = characterId;
     }
 }

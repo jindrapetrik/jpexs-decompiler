@@ -113,6 +113,11 @@ public class DefineBinaryDataTag extends CharacterTag {
         return tag;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.tag = characterId;
+    }
+
     public boolean isSwfData() {
         try {
             if (binaryData.getLength() > 8) {
@@ -142,10 +147,5 @@ public class DefineBinaryDataTag extends CharacterTag {
             return innerSwf.isModified();
         }
         return false;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.tag = characterId;
     }
 }

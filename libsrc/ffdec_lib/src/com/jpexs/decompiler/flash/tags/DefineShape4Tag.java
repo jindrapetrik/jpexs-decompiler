@@ -40,11 +40,6 @@ import java.util.logging.Logger;
  */
 public class DefineShape4Tag extends ShapeTag {
 
-    @SWFType(BasicType.UI16)
-    public int shapeId;
-
-    public RECT shapeBounds;
-
     public RECT edgeBounds;
 
     @Reserved
@@ -56,8 +51,6 @@ public class DefineShape4Tag extends ShapeTag {
     public boolean usesNonScalingStrokes;
 
     public boolean usesScalingStrokes;
-
-    public SHAPEWITHSTYLE shapes;
 
     public static final int ID = 83;
 
@@ -105,11 +98,6 @@ public class DefineShape4Tag extends ShapeTag {
             setModified(true);
         }
         return modified;
-    }
-
-    @Override
-    public int getCharacterId() {
-        return shapeId;
     }
 
     @Override
@@ -184,6 +172,11 @@ public class DefineShape4Tag extends ShapeTag {
     @Override
     public boolean isSingleFrame() {
         return true;
+    }
+
+    @Override
+    public int getCharacterId() {
+        return shapeId;
     }
 
     @Override

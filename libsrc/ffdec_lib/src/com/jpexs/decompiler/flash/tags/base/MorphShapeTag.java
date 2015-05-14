@@ -118,6 +118,11 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
+
+    @Override
     public RECT getRect(Set<BoundedTag> added) {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
@@ -319,10 +324,5 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
         CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
         cmse.export();
         return cmse.getShapeData();
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterId = characterId;
     }
 }

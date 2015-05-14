@@ -62,6 +62,11 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
+    @Override
     public String getImageFormat() {
         String fmt = ImageTag.getImageFormat(imageData);
         if (fmt.equals("jpg")) {
@@ -177,10 +182,5 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         deblockParam = sis.readUI16("deblockParam");
         imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
         bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

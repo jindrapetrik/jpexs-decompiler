@@ -55,6 +55,11 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
+    @Override
     public String getImageFormat() {
         return ImageTag.getImageFormat(imageData);
     }
@@ -133,10 +138,5 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

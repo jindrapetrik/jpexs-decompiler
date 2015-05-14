@@ -163,6 +163,11 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
+    }
+
+    @Override
     public int getDepth() {
         return depth;
     }
@@ -241,10 +246,5 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
         super.writeTag(sos);
         setModified(mod);
         matrix = old;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterId = characterId;
     }
 }

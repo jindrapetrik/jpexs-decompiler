@@ -107,6 +107,11 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         return spriteId;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.spriteId = characterId;
+    }
+
     private RECT getCharacterBounds(Set<Integer> characters, Set<BoundedTag> added) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
@@ -329,6 +334,11 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+        return getTimeline().getOutline(frame, time, ratio, renderContext, transformation);
+    }
+
+    @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SWF.frameToImage(getTimeline(), frame, time, renderContext, image, transformation, colorTransform);
     }
@@ -336,6 +346,11 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException {
         SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporter, colorTransform, level + 1, zoom);
+    }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return getTimeline().toHtmlCanvas(unitDivisor, null);
     }
 
     @Override
@@ -365,11 +380,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return getTimeline().getOutline(frame, time, ratio, renderContext, transformation);
-    }
-
-    @Override
     public boolean isModified() {
         if (super.isModified()) {
             return true;
@@ -380,15 +390,5 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
             }
         }
         return false;
-    }
-
-    @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return getTimeline().toHtmlCanvas(unitDivisor, null);
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.spriteId = characterId;
     }
 }

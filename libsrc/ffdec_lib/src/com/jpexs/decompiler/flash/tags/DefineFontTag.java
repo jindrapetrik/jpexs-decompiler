@@ -200,6 +200,11 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
+
+    @Override
     public String getFontNameIntag() {
         ensureFontInfo();
         if (fontInfo2Tag != null) {
@@ -359,10 +364,5 @@ public class DefineFontTag extends FontTag {
     @Override
     public int getCharKerningAdjustment(char c1, char c2) {
         return 0;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.fontId = characterId;
     }
 }

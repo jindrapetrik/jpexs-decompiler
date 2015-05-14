@@ -21,10 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,13 +36,6 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class DefineShape3Tag extends ShapeTag {
-
-    @SWFType(BasicType.UI16)
-    public int shapeId;
-
-    public RECT shapeBounds;
-
-    public SHAPEWITHSTYLE shapes;
 
     public static final int ID = 32;
 
@@ -97,11 +88,6 @@ public class DefineShape3Tag extends ShapeTag {
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         return shapeBounds;
-    }
-
-    @Override
-    public int getCharacterId() {
-        return shapeId;
     }
 
     /**
@@ -160,6 +146,11 @@ public class DefineShape3Tag extends ShapeTag {
     @Override
     public boolean isSingleFrame() {
         return true;
+    }
+
+    @Override
+    public int getCharacterId() {
+        return shapeId;
     }
 
     @Override

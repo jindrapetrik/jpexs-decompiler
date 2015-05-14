@@ -76,6 +76,11 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
         return characterID;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
     /**
      * Gets data bytes
      *
@@ -143,10 +148,5 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     @Override
     public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (SWF.unitDivisor * width), 0, (int) (SWF.unitDivisor * height));
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

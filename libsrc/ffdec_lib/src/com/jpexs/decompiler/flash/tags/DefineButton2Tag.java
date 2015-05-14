@@ -94,6 +94,11 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
+
+    @Override
     public List<BUTTONRECORD> getRecords() {
         return characters;
     }
@@ -349,10 +354,5 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
 
         timeline.addFrame(frameHit);
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.buttonId = characterId;
     }
 }

@@ -325,6 +325,11 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
+
+    @Override
     public String getFontNameIntag() {
         String ret = fontName;
         if (ret.contains("" + (char) 0)) {
@@ -518,10 +523,5 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         return kerningAdjustment;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.fontId = characterId;
     }
 }

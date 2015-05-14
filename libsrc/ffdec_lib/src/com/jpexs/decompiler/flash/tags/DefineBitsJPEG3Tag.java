@@ -59,6 +59,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
+    @Override
     public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {
             SerializableImage image = new SerializableImage(ImageHelper.read(data));
@@ -166,10 +171,5 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

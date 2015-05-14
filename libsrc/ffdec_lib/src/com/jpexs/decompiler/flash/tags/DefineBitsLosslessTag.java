@@ -191,6 +191,11 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         return characterID;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
     public COLORMAPDATA getColorMapData() {
         if (!decompressed) {
             uncompressData();
@@ -278,10 +283,5 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     @Override
     public String getImageFormat() {
         return "png";
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

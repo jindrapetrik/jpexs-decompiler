@@ -80,6 +80,11 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        virtualCharacterId = characterId;
+    }
+
+    @Override
     public String getExportFormat() {
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
             return "mp3";
@@ -242,10 +247,5 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
     public String getCharacterExportFileName() {
         String exportName = swf.getExportName(getCharacterId());
         return getCharacterId() + (exportName != null ? "_" + exportName : "");
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.virtualCharacterId = characterId;
     }
 }

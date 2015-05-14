@@ -736,6 +736,11 @@ public class DefineEditTextTag extends TextTag {
         return characterID;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
     /**
      * Gets data bytes
      *
@@ -1125,10 +1130,5 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public boolean isSingleFrame() {
         return true;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

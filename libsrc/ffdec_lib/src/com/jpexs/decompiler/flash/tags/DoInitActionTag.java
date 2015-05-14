@@ -184,6 +184,11 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         return spriteId;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.spriteId = characterId;
+    }
+
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override
@@ -249,10 +254,5 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public Tag getSourceTag() {
         return this;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.spriteId = characterId;
     }
 }

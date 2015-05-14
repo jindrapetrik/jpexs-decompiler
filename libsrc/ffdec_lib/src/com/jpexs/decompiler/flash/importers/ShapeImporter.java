@@ -19,15 +19,10 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
-import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -41,7 +36,7 @@ public class ShapeImporter {
         SWF swf = st.getSwf();
 
         if (newData[0] == 'B' && newData[1] == 'M') {
-            BufferedImage b = ImageHelper.read(new ByteArrayInputStream(newData));
+            BufferedImage b = ImageHelper.read(newData);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageHelper.write(b, "PNG", baos);
             newData = baos.toByteArray();
@@ -54,20 +49,7 @@ public class ShapeImporter {
         st.setModified(true);
         SHAPEWITHSTYLE shapes = jpeg2Tag.getShape(st.getRect(), true);
 
-        if (st instanceof DefineShapeTag) {
-            DefineShapeTag dst = (DefineShapeTag) st;
-            dst.shapes = shapes;
-        } else if (st instanceof DefineShape2Tag) {
-            DefineShape2Tag dst = (DefineShape2Tag) st;
-            dst.shapes = shapes;
-        } else if (st instanceof DefineShape3Tag) {
-            DefineShape3Tag dst = (DefineShape3Tag) st;
-            dst.shapes = shapes;
-        } else if (st instanceof DefineShape4Tag) {
-            DefineShape4Tag dst = (DefineShape4Tag) st;
-            dst.shapes = shapes;
-        }
-
+        st.shapes = shapes;
         return (Tag) st;
     }
 }

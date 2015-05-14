@@ -25,9 +25,11 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -45,6 +47,13 @@ import java.util.Set;
  * @author JPEXS
  */
 public abstract class ShapeTag extends CharacterTag implements DrawableTag, LazyObject {
+
+    @SWFType(BasicType.UI16)
+    public int shapeId;
+
+    public RECT shapeBounds;
+
+    public SHAPEWITHSTYLE shapes;
 
     private final int markerSize = 10;
 

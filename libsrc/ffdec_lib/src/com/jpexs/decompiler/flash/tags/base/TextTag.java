@@ -93,9 +93,6 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract boolean translateText(int diff);
 
-    @Override
-    public abstract int getCharacterId();
-
     public abstract RECT getBounds();
 
     public abstract void setBounds(RECT r);

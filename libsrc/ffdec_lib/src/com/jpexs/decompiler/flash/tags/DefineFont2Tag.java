@@ -316,6 +316,11 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
+    }
+
+    @Override
     public char glyphToChar(int glyphIndex) {
         return (char) (int) codeTable.get(glyphIndex);
     }
@@ -498,10 +503,5 @@ public class DefineFont2Tag extends FontTag {
             }
         }
         return kerningAdjustment;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.fontId = characterId;
     }
 }

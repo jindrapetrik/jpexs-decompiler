@@ -86,6 +86,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         return buttonId;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
+
     private Timeline timeline;
 
     private boolean isSingleFrameInitialized;
@@ -440,10 +445,5 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public Tag getSourceTag() {
         return this;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.buttonId = characterId;
     }
 }

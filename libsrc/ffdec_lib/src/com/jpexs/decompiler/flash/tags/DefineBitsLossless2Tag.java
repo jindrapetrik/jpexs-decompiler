@@ -86,6 +86,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         return characterID;
     }
 
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
+    }
+
     private byte[] createEmptyImage() {
         try {
             ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
@@ -274,10 +279,5 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
         cachedImage = bi;
         return bi;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
     }
 }

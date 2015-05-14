@@ -171,13 +171,13 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
+    public int getCharacterId() {
+        return characterID;
     }
 
     @Override
-    public int getCharacterId() {
-        return characterID;
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
     }
 
     @Override

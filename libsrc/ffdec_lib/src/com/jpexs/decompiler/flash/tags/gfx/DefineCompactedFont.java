@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
@@ -146,6 +145,11 @@ public final class DefineCompactedFont extends FontTag {
     @Override
     public int getCharacterId() {
         return fontId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.fontId = characterId;
     }
 
     @Override
@@ -422,10 +426,5 @@ public final class DefineCompactedFont extends FontTag {
     @Override
     public boolean hasLayout() {
         return true;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.fontId = characterId;
     }
 }

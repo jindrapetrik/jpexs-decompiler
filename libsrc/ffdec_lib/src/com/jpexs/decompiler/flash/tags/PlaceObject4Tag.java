@@ -462,6 +462,12 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public void setCharacterId(int characterId) {
+        placeFlagHasCharacter = true;
+        this.characterId = characterId;
+    }
+
+    @Override
     public int getDepth() {
         return depth;
     }
@@ -578,10 +584,5 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super.writeTag(sos);
         setModified(mod);
         matrix = old;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterId = characterId;
     }
 }
