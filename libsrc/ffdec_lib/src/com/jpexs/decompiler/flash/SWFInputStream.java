@@ -297,6 +297,8 @@ public class SWFInputStream implements AutoCloseable {
 
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
+    private static final byte[] BYTE_ARRAY_EMPTY = new byte[0];
+
     private final List<ProgressListener> listeners = new ArrayList<>();
 
     private long percentMax;
@@ -694,7 +696,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public byte[] readBytesEx(long count, String name) throws IOException {
         if (count <= 0) {
-            return new byte[0];
+            return BYTE_ARRAY_EMPTY;
         }
         newDumpLevel(name, "bytes");
         byte[] ret = readBytesInternalEx(count);
@@ -730,7 +732,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     private byte[] readBytesInternalEx(long count) throws IOException {
         if (count <= 0) {
-            return new byte[0];
+            return BYTE_ARRAY_EMPTY;
         }
 
         bitPos = 0;
@@ -787,7 +789,7 @@ public class SWFInputStream implements AutoCloseable {
      */
     public byte[] readBytes(int count, String name) throws IOException {
         if (count <= 0) {
-            return new byte[0];
+            return BYTE_ARRAY_EMPTY;
         }
         newDumpLevel(name, "bytes");
         byte[] ret = new byte[count];
@@ -805,17 +807,23 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     public byte[] readBytesZlib(long count, String name) throws IOException {
+        if (count == 0) {
+            return BYTE_ARRAY_EMPTY;
+        }
+
         newDumpLevel(name, "bytesZlib");
         byte[] data = readBytesInternalEx(count);
         endDumpLevel();
+        return uncompressByteArray(data);
+    }
+
+    public static byte[] uncompressByteArray(byte[] data) throws IOException {
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (count > 0) {
-            byte[] buf = new byte[4096];
-            int c = 0;
-            while ((c = dis.read(buf)) > 0) {
-                baos.write(buf, 0, c);
-            }
+        byte[] buf = new byte[4096];
+        int c = 0;
+        while ((c = dis.read(buf)) > 0) {
+            baos.write(buf, 0, c);
         }
         return baos.toByteArray();
     }

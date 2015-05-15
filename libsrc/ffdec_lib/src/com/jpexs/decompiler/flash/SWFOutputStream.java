@@ -1783,6 +1783,14 @@ public class SWFOutputStream extends OutputStream {
         deflater.finish();
     }
 
+    public static byte[] compressByteArray(byte[] data) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DeflaterOutputStream deflater = new DeflaterOutputStream(baos, new Deflater(9));
+        deflater.write(data);
+        deflater.finish();
+        return baos.toByteArray();
+    }
+
     /**
      * Reads one BITMAPDATA value from the stream
      *
