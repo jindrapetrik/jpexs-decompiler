@@ -47,9 +47,6 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public static final String NAME = "DefineBitsJPEG4";
 
     @SWFType(BasicType.UI16)
-    public int characterID;
-
-    @SWFType(BasicType.UI16)
     public int deblockParam;
 
     @SWFType(BasicType.UI8)
@@ -57,86 +54,6 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI8)
     public ByteArrayRange bitmapAlphaData;
-
-    @Override
-    public int getCharacterId() {
-        return characterID;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
-    }
-
-    @Override
-    public String getImageFormat() {
-        String fmt = ImageTag.getImageFormat(imageData);
-        if (fmt.equals("jpg")) {
-            fmt = "png"; //transparency
-        }
-        return fmt;
-    }
-
-    private byte[] createEmptyImage() {
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-        ImageHelper.write(img, "JPG", bitmapDataOS);
-        return bitmapDataOS.toByteArray();
-    }
-
-    @Override
-    public void setImage(byte[] data) {
-        imageData = new ByteArrayRange(data);
-        if (ImageTag.getImageFormat(data).equals("jpg")) {
-            SerializableImage image = getImage();
-            byte[] ba = new byte[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < ba.length; i++) {
-                ba[i] = (byte) 255;
-            }
-            bitmapAlphaData = new ByteArrayRange(ba);
-        } else {
-            bitmapAlphaData = ByteArrayRange.EMPTY;
-        }
-        clearCache();
-        setModified(true);
-    }
-
-    @Override
-    public InputStream getImageData() {
-        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
-    }
-
-    @Override
-    public SerializableImage getImage() {
-        if (cachedImage != null) {
-            return cachedImage;
-        }
-        try {
-            BufferedImage image = ImageHelper.read(getImageData());
-            if (image == null) {
-                Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
-                return null;
-            }
-
-            SerializableImage img = new SerializableImage(image);
-            if (bitmapAlphaData.getLength() == 0) {
-                cachedImage = img;
-                return img;
-            }
-
-            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-            for (int i = 0; i < pixels.length; i++) {
-                int a = bitmapAlphaData.get(i) & 0xff;
-                pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
-            }
-
-            cachedImage = img;
-            return img;
-        } catch (IOException ex) {
-            Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
-        }
-        return null;
-    }
 
     /**
      * Constructor
@@ -148,6 +65,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         characterID = swf.getNextCharacterId();
         imageData = new ByteArrayRange(createEmptyImage());
         bitmapAlphaData = ByteArrayRange.EMPTY;
+        forceWriteAsLong = true;
     }
 
     /**
@@ -191,5 +109,78 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    private byte[] createEmptyImage() {
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        ImageHelper.write(img, "JPG", bitmapDataOS);
+        return bitmapDataOS.toByteArray();
+    }
+
+    @Override
+    public void setImage(byte[] data) throws IOException {
+        if (ImageTag.getImageFormat(data).equals("jpg")) {
+            SerializableImage image = new SerializableImage(ImageHelper.read(data));
+            byte[] ba = new byte[image.getWidth() * image.getHeight()];
+            for (int i = 0; i < ba.length; i++) {
+                ba[i] = (byte) 255;
+            }
+
+            bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(ba));
+        } else {
+            bitmapAlphaData = ByteArrayRange.EMPTY;
+        }
+
+        imageData = new ByteArrayRange(data);
+        clearCache();
+        setModified(true);
+    }
+
+    @Override
+    public String getImageFormat() {
+        String fmt = ImageTag.getImageFormat(imageData);
+        if (fmt.equals("jpg")) {
+            fmt = "png"; //transparency
+        }
+        return fmt;
+    }
+
+    @Override
+    public InputStream getImageData() {
+        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
+    }
+
+    @Override
+    public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
+        try {
+            BufferedImage image = ImageHelper.read(getImageData());
+            if (image == null) {
+                Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
+                return null;
+            }
+
+            SerializableImage img = new SerializableImage(image);
+            if (bitmapAlphaData.getLength() == 0) {
+                cachedImage = img;
+                return img;
+            }
+
+            byte[] alphaData = SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
+            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+            for (int i = 0; i < pixels.length; i++) {
+                int a = alphaData[i] & 0xff;
+                pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
+            }
+
+            cachedImage = img;
+            return img;
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
+        }
+        return null;
     }
 }

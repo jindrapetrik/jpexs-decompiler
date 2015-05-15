@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -31,6 +32,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
@@ -47,6 +49,9 @@ import java.util.Set;
  * @author JPEXS
  */
 public abstract class ImageTag extends CharacterTag implements DrawableTag {
+
+    @SWFType(BasicType.UI16)
+    public int characterID;
 
     protected SerializableImage cachedImage;
 
@@ -238,5 +243,15 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public void clearCache() {
         cachedImage = null;
+    }
+
+    @Override
+    public int getCharacterId() {
+        return characterID;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterID = characterId;
     }
 }

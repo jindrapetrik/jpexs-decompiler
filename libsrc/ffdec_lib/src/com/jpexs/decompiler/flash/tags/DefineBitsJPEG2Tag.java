@@ -45,20 +45,50 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     public static final String NAME = "DefineBitsJPEG2";
 
-    @SWFType(BasicType.UI16)
-    public int characterID;
-
     @SWFType(BasicType.UI8)
     public ByteArrayRange imageData;
 
-    @Override
-    public int getCharacterId() {
-        return characterID;
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public DefineBitsJPEG2Tag(SWF swf) {
+        super(swf, ID, NAME, null);
+        characterID = swf.getNextCharacterId();
+        imageData = ByteArrayRange.EMPTY;
+        forceWriteAsLong = true;
+    }
+
+    public DefineBitsJPEG2Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
+        super(swf, ID, NAME, data);
+        this.characterID = characterID;
+        this.imageData = new ByteArrayRange(imageData);
+    }
+
+    public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
     }
 
     @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        characterID = sis.readUI16("characterID");
+        imageData = sis.readByteRangeEx(sis.available(), "imageData");
+    }
+
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.write(imageData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override
@@ -93,52 +123,10 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         return null;
     }
 
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public DefineBitsJPEG2Tag(SWF swf) {
-        super(swf, ID, NAME, null);
-        characterID = swf.getNextCharacterId();
-        imageData = ByteArrayRange.EMPTY;
-    }
-
-    public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterID = sis.readUI16("characterID");
-        imageData = sis.readByteRangeEx(sis.available(), "imageData");
-    }
-
-    public DefineBitsJPEG2Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
-        super(swf, ID, NAME, data);
-        this.characterID = characterID;
-        this.imageData = new ByteArrayRange(imageData);
-    }
-
     @Override
     public void setImage(byte[] data) {
         imageData = new ByteArrayRange(data);
         clearCache();
         setModified(true);
-    }
-
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.write(imageData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
     }
 }

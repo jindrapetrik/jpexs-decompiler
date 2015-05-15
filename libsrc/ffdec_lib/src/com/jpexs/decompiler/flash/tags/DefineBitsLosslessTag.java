@@ -52,9 +52,6 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     public static final String NAME = "DefineBitsLossless";
 
-    @SWFType(BasicType.UI16)
-    public int characterID;
-
     @SWFType(BasicType.UI8)
     public int bitmapFormat;
 
@@ -84,6 +81,63 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     @Internal
     private boolean decompressed = false;
+
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public DefineBitsLosslessTag(SWF swf) {
+        super(swf, ID, NAME, null);
+        characterID = swf.getNextCharacterId();
+        bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
+        bitmapWidth = 1;
+        bitmapHeight = 1;
+        zlibBitmapData = new ByteArrayRange(createEmptyImage());
+        forceWriteAsLong = true;
+    }
+
+    public DefineBitsLosslessTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        characterID = sis.readUI16("characterID");
+        bitmapFormat = sis.readUI8("bitmapFormat");
+        bitmapWidth = sis.readUI16("bitmapWidth");
+        bitmapHeight = sis.readUI16("bitmapHeight");
+        if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+            bitmapColorTableSize = sis.readUI8("bitmapColorTableSize");
+        }
+        zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI8(bitmapFormat);
+            sos.writeUI16(bitmapWidth);
+            sos.writeUI16(bitmapHeight);
+            if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+                sos.writeUI8(bitmapColorTableSize);
+            }
+            sos.write(zlibBitmapData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
 
     private byte[] createEmptyImage() {
         try {
@@ -188,16 +242,6 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         return bi;
     }
 
-    @Override
-    public int getCharacterId() {
-        return characterID;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
-    }
-
     public COLORMAPDATA getColorMapData() {
         if (!decompressed) {
             uncompressData();
@@ -224,62 +268,6 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
         }
         decompressed = true;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public DefineBitsLosslessTag(SWF swf) {
-        super(swf, ID, NAME, null);
-        characterID = swf.getNextCharacterId();
-        bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
-        bitmapWidth = 1;
-        bitmapHeight = 1;
-        zlibBitmapData = new ByteArrayRange(createEmptyImage());
-    }
-
-    public DefineBitsLosslessTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterID = sis.readUI16("characterID");
-        bitmapFormat = sis.readUI8("bitmapFormat");
-        bitmapWidth = sis.readUI16("bitmapWidth");
-        bitmapHeight = sis.readUI16("bitmapHeight");
-        if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-            bitmapColorTableSize = sis.readUI8("bitmapColorTableSize");
-        }
-        zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData");
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI8(bitmapFormat);
-            sos.writeUI16(bitmapWidth);
-            sos.writeUI16(bitmapHeight);
-            if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-                sos.writeUI8(bitmapColorTableSize);
-            }
-            sos.write(zlibBitmapData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
     }
 
     @Override

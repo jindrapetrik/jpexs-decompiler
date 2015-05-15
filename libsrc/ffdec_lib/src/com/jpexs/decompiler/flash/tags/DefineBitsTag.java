@@ -43,9 +43,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     public static final String NAME = "DefineBits";
 
-    @SWFType(BasicType.UI16)
-    public int characterID;
-
     @SWFType(BasicType.UI8)
     public ByteArrayRange jpegData;
 
@@ -69,6 +66,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
         super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
         jpegData = ByteArrayRange.EMPTY;
+        forceWriteAsLong = true;
     }
 
     public DefineBitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
@@ -80,6 +78,25 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
         jpegData = sis.readByteRangeEx(sis.available(), "jpegData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.write(jpegData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override
@@ -119,35 +136,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
         return null;
     }
 
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.write(jpegData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    @Override
-    public int getCharacterId() {
-        return characterID;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
-    }
-
     @Override
     public String getImageFormat() {
         return "jpg";
@@ -155,6 +143,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @Override
     public void handleEvent(Tag tag) {
+        // cache should be cleared when Jtt tag changes
         clearCache();
     }
 }

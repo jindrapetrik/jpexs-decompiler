@@ -46,23 +46,64 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public static final String NAME = "DefineBitsJPEG3";
 
-    @SWFType(BasicType.UI16)
-    public int characterID;
-
     @SWFType(BasicType.UI8)
     public ByteArrayRange imageData;
 
     @SWFType(BasicType.UI8)
-    public byte[] bitmapAlphaData;
+    public ByteArrayRange bitmapAlphaData;
 
-    @Override
-    public int getCharacterId() {
-        return characterID;
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public DefineBitsJPEG3Tag(SWF swf) {
+        super(swf, ID, NAME, null);
+        characterID = swf.getNextCharacterId();
+        imageData = new ByteArrayRange(createEmptyImage());
+        bitmapAlphaData = ByteArrayRange.EMPTY;
+        forceWriteAsLong = true;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
+    public DefineBitsJPEG3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
     }
 
     @Override
-    public void setCharacterId(int characterId) {
-        this.characterID = characterId;
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        characterID = sis.readUI16("characterID");
+        long alphaDataOffset = sis.readUI32("alphaDataOffset");
+        imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
+        bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI32(imageData.getLength());
+            sos.write(imageData);
+            sos.write(bitmapAlphaData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     private byte[] createEmptyImage() {
@@ -80,10 +121,12 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
             }
-            bitmapAlphaData = ba;
+
+            bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(ba));
         } else {
-            bitmapAlphaData = new byte[0];
+            bitmapAlphaData = ByteArrayRange.EMPTY;
         }
+
         imageData = new ByteArrayRange(data);
         clearCache();
         setModified(true);
@@ -117,14 +160,15 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             }
 
             SerializableImage img = new SerializableImage(image);
-            if (bitmapAlphaData.length == 0) {
+            if (bitmapAlphaData.getLength() == 0) {
                 cachedImage = img;
                 return img;
             }
 
+            byte[] alphaData = SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
-                int a = bitmapAlphaData[i] & 0xff;
+                int a = alphaData[i] & 0xff;
                 pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
             }
 
@@ -134,51 +178,5 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
         return null;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public DefineBitsJPEG3Tag(SWF swf) {
-        super(swf, ID, NAME, null);
-        characterID = swf.getNextCharacterId();
-        imageData = ByteArrayRange.EMPTY;
-        bitmapAlphaData = new byte[0];
-    }
-
-    public DefineBitsJPEG3Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterID = sis.readUI16("characterID");
-        long alphaDataOffset = sis.readUI32("alphaDataOffset");
-        imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
-        bitmapAlphaData = sis.readBytesZlib(sis.available(), "bitmapAlphaData");
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI32(imageData.getLength());
-            sos.write(imageData);
-            sos.writeBytesZlib(bitmapAlphaData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
     }
 }

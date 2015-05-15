@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -424,16 +425,27 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (isDefineSprite) {
                 ((DefineSpriteTag) firstItem).subTags.add(t);
             } else {
+                int index;
                 if (firstItem instanceof Tag) {
                     if ((t instanceof CharacterIdTag) && (firstItem instanceof CharacterTag)) {
                         ((CharacterIdTag) t).setCharacterId(((CharacterTag) firstItem).getCharacterId());
                     }
-                    int index = swf.tags.indexOf(firstItem);
-                    if (index > -1) {
-                        swf.tags.add(index, t);
-                    } else {
-                        swf.tags.add(t);
+                    index = swf.tags.indexOf(firstItem);
+                } else {
+                    index = -1;
+                    if (t instanceof CharacterTag) {
+                        // add before the last ShowFrame tag
+                        for (int i = swf.tags.size() - 1; i >= 0; i--) {
+                            if (swf.tags.get(i) instanceof ShowFrameTag) {
+                                index = i;
+                                break;
+                            }
+                        }
                     }
+                }
+
+                if (index > -1) {
+                    swf.tags.add(index, t);
                 } else {
                     swf.tags.add(t);
                 }
