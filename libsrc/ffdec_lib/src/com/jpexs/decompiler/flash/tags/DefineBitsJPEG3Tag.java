@@ -65,6 +65,13 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         this.characterID = characterId;
     }
 
+    private byte[] createEmptyImage() {
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        ImageHelper.write(img, "JPG", bitmapDataOS);
+        return bitmapDataOS.toByteArray();
+    }
+
     @Override
     public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {

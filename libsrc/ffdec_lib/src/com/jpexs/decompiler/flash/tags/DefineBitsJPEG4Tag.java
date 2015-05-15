@@ -77,6 +77,13 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         return fmt;
     }
 
+    private byte[] createEmptyImage() {
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        ImageHelper.write(img, "JPG", bitmapDataOS);
+        return bitmapDataOS.toByteArray();
+    }
+
     @Override
     public void setImage(byte[] data) {
         imageData = new ByteArrayRange(data);
@@ -132,28 +139,6 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI32(imageData.getLength());
-            sos.writeUI16(deblockParam);
-            sos.write(imageData);
-            sos.write(bitmapAlphaData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -161,7 +146,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public DefineBitsJPEG4Tag(SWF swf) {
         super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
-        imageData = ByteArrayRange.EMPTY;
+        imageData = new ByteArrayRange(createEmptyImage());
         bitmapAlphaData = ByteArrayRange.EMPTY;
     }
 
@@ -184,5 +169,27 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         deblockParam = sis.readUI16("deblockParam");
         imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
         bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI32(imageData.getLength());
+            sos.writeUI16(deblockParam);
+            sos.write(imageData);
+            sos.write(bitmapAlphaData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

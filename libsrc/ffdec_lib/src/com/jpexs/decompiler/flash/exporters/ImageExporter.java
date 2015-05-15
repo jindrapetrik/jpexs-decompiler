@@ -72,6 +72,7 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = "png";
                 }
+
                 if (settings.mode == ImageExportMode.JPEG) {
                     fileFormat = "jpg";
                 }

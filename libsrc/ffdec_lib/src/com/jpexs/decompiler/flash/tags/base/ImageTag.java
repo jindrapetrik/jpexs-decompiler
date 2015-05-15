@@ -74,9 +74,11 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         if (hasErrorHeader(data)) {
             return "jpg";
         }
+
         if (data.getLength() > 2 && ((data.get(0) & 0xff) == 0xff) && ((data.get(1) & 0xff) == 0xd8)) {
             return "jpg";
         }
+
         if (data.getLength() > 6 && ((data.get(0) & 0xff) == 0x47) && ((data.get(1) & 0xff) == 0x49) && ((data.get(2) & 0xff) == 0x46) && ((data.get(3) & 0xff) == 0x38) && ((data.get(4) & 0xff) == 0x39) && ((data.get(5) & 0xff) == 0x61)) {
             return "gif";
         }

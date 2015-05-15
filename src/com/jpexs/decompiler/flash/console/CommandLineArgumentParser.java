@@ -202,7 +202,7 @@ public class CommandLineArgumentParser {
         out.println("         frame:canvas - HTML5 Canvas format for Frames");
         out.println("         frame:pdf - PDF format for Frames");
         out.println("         frame:bmp - BMP format for Frames");
-        out.println("         image:png_jpeg - PNG/JPEG format for Images");
+        out.println("         image:png_gif_jpeg - PNG/GIF/JPEG format for Images");
         out.println("         image:png - PNG format for Images");
         out.println("         image:jpeg - JPEG format for Images");
         out.println("         image:bmp - BMP format for Images");
