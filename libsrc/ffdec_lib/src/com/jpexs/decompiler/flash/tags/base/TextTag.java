@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.text.JustifyAlignGlyphEntry;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -424,7 +425,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 y = rec.yOffset;
             }
 
-            double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
+            double divider = font == null ? 1 : font.getDivider();
+            double rat = textHeight / 1024.0 / divider;
 
             Color textColor2 = new Color(textColor, true);
             for (GLYPHENTRY entry : rec.glyphEntries) {
@@ -433,9 +435,18 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 Matrix matTr = Matrix.getTranslateInstance(x, y);
                 mat = mat.concatenate(matTr);
                 mat = mat.concatenate(Matrix.getScaleInstance(rat));
+                SHAPE shape = null;
                 if (entry.glyphIndex != -1 && glyphs != null) {
                     // shapeNum: 1
-                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    shape = glyphs.get(entry.glyphIndex);
+                } else if (entry instanceof DynamicTextGlyphEntry) {
+                    DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
+                    if (dynamicEntry.fontFace != null) {
+                        shape = SHAPERECORD.fontCharacterToSHAPE(new Font(dynamicEntry.fontFace, dynamicEntry.fontStyle, 12), (int) Math.round(divider * 1024), dynamicEntry.character);
+                    }
+                }
+
+                if (shape != null) {
                     BitmapExporter.export(swf, shape, textColor2, image, mat, colorTransform);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
@@ -444,8 +455,9 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                         mat = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
                         TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
                     }
-                    x += entry.glyphAdvance;
                 }
+
+                x += entry.glyphAdvance;
             }
         }
     }

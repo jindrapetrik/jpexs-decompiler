@@ -14,41 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags.dynamictext;
-
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.types.RGBA;
+package com.jpexs.decompiler.flash.types;
 
 /**
  *
- *
  * @author JPEXS
  */
-public final class TextStyle implements Cloneable {
-
-    public FontTag font;
+public class DynamicTextGlyphEntry extends GLYPHENTRY {
 
     public String fontFace;
 
-    public int fontHeight;
+    public int fontStyle;
 
-    public int fontLeading;
-
-    public boolean bold;
-
-    public boolean italic;
-
-    public boolean underlined;
-
-    public RGBA textColor;
-
-    @Override
-    public TextStyle clone() {
-        try {
-            TextStyle result = (TextStyle) super.clone();
-            return result;
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException();
-        }
-    }
+    public char character;
 }

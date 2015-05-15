@@ -44,7 +44,7 @@ import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -56,6 +56,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
+import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -290,8 +291,13 @@ public class DefineEditTextTag extends TextTag {
                                         // todo: parse relative sizes
                                     }
                                 }
-                                // todo: parse the following attributes:
-                                // face, letterSpacing, kerning
+                                String face = attributes.getValue("face");
+                                 {
+                                    if (face != null && face.length() > 0) {
+                                        style.fontFace = face;
+                                    }
+                                }
+                                // todo: parse the following attributes: letterSpacing, kerning
                                 styles.add(style);
                                 break;
                             case "br":
@@ -963,7 +969,10 @@ public class DefineEditTextTag extends TextTag {
                     }
                     int advance;
                     FontTag font = lastStyle.font;
-                    GLYPHENTRY ge = new GLYPHENTRY();
+                    DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
+                    ge.fontFace = lastStyle.fontFace;
+                    ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
+                    ge.character = c;
                     ge.glyphIndex = font == null ? -1 : font.charToGlyph(c);
                     if (font != null && font.hasLayout()) {
                         int kerningAdjustment = 0;
@@ -973,8 +982,8 @@ public class DefineEditTextTag extends TextTag {
                         }
                         advance = (int) Math.round(Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                     } else {
-                        String fontName = FontTag.defaultFontName;
-                        int fontStyle = font == null ? 0 : font.getFontStyle();
+                        String fontName = lastStyle.fontFace != null ? lastStyle.fontFace : FontTag.defaultFontName;
+                        int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
                         advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
                     }
                     ge.glyphAdvance = advance;
