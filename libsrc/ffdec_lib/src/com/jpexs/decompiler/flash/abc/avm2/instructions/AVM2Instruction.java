@@ -207,11 +207,12 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                      s.append("\"");*/
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
-                    if (operands[i] == 0) {
+                    String str;
+                    if (operands[i] == 0 || (str = constants.getString(operands[i])) == null) {
                         s.append(" null");
                     } else {
                         s.append(" \"");
-                        s.append(Helper.escapeActionScriptString(constants.getString(operands[i])));
+                        s.append(Helper.escapeActionScriptString(str));
                         s.append("\"");
                     }
                     break;
