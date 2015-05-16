@@ -81,9 +81,13 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Integer> deobfuscationMode = null;
 
-    @ConfigurationDefaultBoolean(true)
-    @ConfigurationCategory("decompilation")
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("")
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("")
+    public static final ConfigurationItem<Boolean> cacheImages = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")

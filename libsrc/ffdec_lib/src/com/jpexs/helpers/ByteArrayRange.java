@@ -79,4 +79,8 @@ public class ByteArrayRange {
         System.arraycopy(array, this.pos + pos, data, 0, length);
         return data;
     }
+
+    public ByteArrayRange getSubRange(int pos, int length) {
+        return new ByteArrayRange(array, this.pos + pos, length);
+    }
 }

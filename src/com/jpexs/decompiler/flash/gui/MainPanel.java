@@ -2243,6 +2243,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         dumpViewPanel.clear();
         previewPanel.clear();
         headerPanel.clear();
+        folderPreviewPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
@@ -2644,7 +2645,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (flashPanel != null) {
             try {
                 flashPanel.close();
-                flashPanel.unload();
             } catch (IOException ex) {
                 // ignore
             }
@@ -2826,7 +2826,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             preferScript = true;
         }
 
-        folderPreviewPanel.setItems(new ArrayList<>());
+        folderPreviewPanel.clear();
         previewPanel.clear();
         stopFlashPlayer();
 

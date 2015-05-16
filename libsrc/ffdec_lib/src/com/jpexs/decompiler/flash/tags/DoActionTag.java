@@ -150,7 +150,7 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public void setActions(List<Action> actions) {
         byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
-        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
+        actionBytes = new ByteArrayRange(bytes);
     }
 
     @Override

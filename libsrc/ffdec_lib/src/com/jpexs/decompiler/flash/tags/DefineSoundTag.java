@@ -330,14 +330,14 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     }
 
     @Override
-    public List<byte[]> getRawSoundData() {
-        List<byte[]> ret = new ArrayList<>();
+    public List<ByteArrayRange> getRawSoundData() {
+        List<ByteArrayRange> ret = new ArrayList<>();
         if (soundFormat == SoundFormat.FORMAT_MP3) {
-            ret.add(soundData.getRangeData(2, soundData.getLength() - 2));
+            ret.add(soundData.getSubRange(2, soundData.getLength() - 2));
             return ret;
         }
 
-        ret.add(soundData.getRangeData());
+        ret.add(soundData);
         return ret;
     }
 

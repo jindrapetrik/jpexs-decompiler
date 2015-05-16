@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -160,16 +161,22 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     private void openSound(SoundTag tag) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<byte[]> soundData = tag.getRawSoundData();
         SWF swf = ((Tag) tag).getSwf();
-        List<SWFInputStream> siss = new ArrayList<>();
-        for (byte[] data : soundData) {
-            siss.add(new SWFInputStream(swf, data));
-        }
+        byte[] wavData = swf.getFromCache(tag);
+        if (wavData == null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            List<ByteArrayRange> soundData = tag.getRawSoundData();
+            List<SWFInputStream> siss = new ArrayList<>();
+            for (ByteArrayRange data : soundData) {
+                SWFInputStream sis = new SWFInputStream(swf, data.getArray(), 0, data.getPos() + data.getLength());
+                sis.seek(data.getPos());
+                siss.add(sis);
+            }
 
-        tag.getSoundFormat().createWav(siss, baos);
-        byte[] wavData = baos.toByteArray();
+            tag.getSoundFormat().createWav(siss, baos);
+            wavData = baos.toByteArray();
+            swf.putToCache(tag, wavData);
+        }
 
         synchronized (playLock) {
             clip.open(AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavData)));
@@ -206,6 +213,12 @@ public class SoundTagPlayer implements MediaDisplay {
         rewindAfterStop = true;
         pause();
         rewind();
+    }
+
+    @Override
+    public void close() {
+        stop();
+        timer.cancel();
     }
 
     @Override

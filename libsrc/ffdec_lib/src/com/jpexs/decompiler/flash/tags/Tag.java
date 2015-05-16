@@ -521,7 +521,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         byte[] tagData = new byte[data.length + headerData.length];
         System.arraycopy(headerData, 0, tagData, 0, headerData.length);
         System.arraycopy(data, 0, tagData, headerData.length, data.length);
-        originalRange = new ByteArrayRange(tagData, 0, tagData.length);
+        originalRange = new ByteArrayRange(tagData);
     }
 
     public boolean isModified() {

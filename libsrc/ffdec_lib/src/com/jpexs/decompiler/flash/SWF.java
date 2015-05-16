@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
@@ -291,6 +292,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     private Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
 
     @Internal
+    private Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
+
+    @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
 
     @Internal
@@ -336,6 +340,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         as2Cache.clear();
         as3Cache.clear();
         frameCache.clear();
+        soundCache.clear();
 
         timeline = null;
         clearDumpInfo(dumpInfo);
@@ -2075,10 +2080,21 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
+    public byte[] getFromCache(SoundTag soundTag) {
+        if (soundCache.contains(soundTag)) {
+            return soundCache.get(soundTag);
+        }
+        return null;
+    }
+
     public void putToCache(String key, SerializableImage img) {
         if (Configuration.useFrameCache.get()) {
             frameCache.put(key, img);
         }
+    }
+
+    public void putToCache(SoundTag soundTag, byte[] data) {
+        soundCache.put(soundTag, data);
     }
 
     public void clearImageCache() {

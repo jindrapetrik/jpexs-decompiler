@@ -252,10 +252,6 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     @Override
     public void close() throws IOException {
-
-    }
-
-    public void unload() {
         timer.cancel();
     }
 

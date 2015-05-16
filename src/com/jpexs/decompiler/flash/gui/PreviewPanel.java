@@ -522,7 +522,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void clear() {
         imagePanel.clearAll();
         if (media != null) {
-            media.pause();
+            try {
+                media.close();
+            } catch (IOException ex) {
+                // ignore
+            }
         }
 
         binaryPanel.setBinaryData(null);

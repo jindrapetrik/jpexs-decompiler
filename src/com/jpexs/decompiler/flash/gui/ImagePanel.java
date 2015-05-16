@@ -659,10 +659,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         redraw();
     }
 
+    @Override
+    public void close() throws IOException {
+        stopInternal();
+    }
+
     private void stopAllSounds() {
         for (int i = soundPlayers.size() - 1; i >= 0; i--) {
             SoundTagPlayer pl = soundPlayers.get(i);
-            pl.pause();
+            pl.close();
         }
         soundPlayers.clear();
     }
@@ -880,6 +885,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void playingFinished(MediaDisplay source) {
                     synchronized (ImagePanel.class) {
+                        sp.close();
                         soundPlayers.remove(sp);
                     }
                 }
@@ -889,6 +895,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (timer != null && timer == thisTimer) {
                     soundPlayers.add(sp);
                     sp.play();
+                } else {
+                    sp.close();
                 }
             }
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {

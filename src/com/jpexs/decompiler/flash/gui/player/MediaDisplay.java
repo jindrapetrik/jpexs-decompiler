@@ -18,12 +18,13 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.Closeable;
 
 /**
  *
  * @author JPEXS
  */
-public interface MediaDisplay {
+public interface MediaDisplay extends Closeable {
 
     public int getCurrentFrame();
 

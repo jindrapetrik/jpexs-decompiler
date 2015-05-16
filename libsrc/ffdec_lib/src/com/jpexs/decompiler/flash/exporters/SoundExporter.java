@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
@@ -127,17 +128,17 @@ public class SoundExporter {
         int nativeFormat = fmt.getNativeExportFormat();
 
         if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
-            List<byte[]> datas = st.getRawSoundData();
-            for (byte[] data : datas) {
-                fos.write(data);
+            List<ByteArrayRange> datas = st.getRawSoundData();
+            for (ByteArrayRange data : datas) {
+                fos.write(data.getRangeData());
             }
         } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
             if (st instanceof DefineSoundTag) {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
-                List<byte[]> datas = st.getRawSoundData();
-                for (byte[] data : datas) {
-                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
+                List<ByteArrayRange> datas = st.getRawSoundData();
+                for (ByteArrayRange data : datas) {
+                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data.getRangeData())));
                 }
             } else if (st instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) st;
@@ -155,11 +156,11 @@ public class SoundExporter {
                 }
             }
         } else {
-            List<byte[]> soundData = st.getRawSoundData();
+            List<ByteArrayRange> soundData = st.getRawSoundData();
             SWF swf = ((Tag) st).getSwf();
             List<SWFInputStream> siss = new ArrayList<>();
-            for (byte[] data : soundData) {
-                siss.add(new SWFInputStream(swf, data));
+            for (ByteArrayRange data : soundData) {
+                siss.add(new SWFInputStream(swf, data.getRangeData()));
             }
             fmt.createWav(siss, fos);
         }

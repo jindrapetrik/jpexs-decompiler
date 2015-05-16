@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JLabel;
@@ -168,6 +167,14 @@ public class FolderPreviewPanel extends JPanel {
         selectedIndex = -1;
     }
 
+    public void clear() {
+        items = new ArrayList<>();
+        executor.shutdownNow();
+        cachedPreviews.clear();
+        selectedItems.clear();
+        selectedIndex = -1;
+    }
+
     @Override
     public Dimension getPreferredSize() {
         int width = getParent().getSize().width - 20;
@@ -247,19 +254,15 @@ public class FolderPreviewPanel extends JPanel {
     }
 
     private synchronized void renderImageTask(final int index, final TreeItem treeItem) {
-        executor.submit(new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                cachedPreviews.put(index, renderImage(treeItem.getSwf(), treeItem));
-                if (!repaintQueued) {
-                    repaintQueued = true;
-                    View.execInEventDispatchLater(() -> {
-                        repaint();
-                    });
-                }
-                return null;
+        executor.submit(() -> {
+            cachedPreviews.put(index, renderImage(treeItem.getSwf(), treeItem));
+            if (!repaintQueued) {
+                repaintQueued = true;
+                View.execInEventDispatchLater(() -> {
+                    repaint();
+                });
             }
+            return null;
         });
     }
 

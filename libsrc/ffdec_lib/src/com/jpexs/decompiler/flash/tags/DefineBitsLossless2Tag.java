@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -268,7 +269,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             }
         }
 
-        cachedImage = bi;
+        if (Configuration.cacheImages.get()) {
+            cachedImage = bi;
+        }
+
         return bi;
     }
 }
