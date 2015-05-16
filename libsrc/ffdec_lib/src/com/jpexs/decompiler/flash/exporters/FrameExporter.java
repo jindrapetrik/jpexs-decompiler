@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -355,7 +356,7 @@ public class FrameExporter {
                     final int fi = i;
                     new RetryTask(() -> {
                         File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                        ImageHelper.write(frameImages.next(), "PNG", file);
+                        ImageHelper.write(frameImages.next(), ImageFormat.PNG, file);
                         ret.add(file);
                     }, handler).run();
                 }

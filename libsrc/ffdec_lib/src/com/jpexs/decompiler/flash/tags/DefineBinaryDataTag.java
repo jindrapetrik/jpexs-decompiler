@@ -57,26 +57,6 @@ public class DefineBinaryDataTag extends CharacterTag {
     public SWF innerSwf;
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(tag);
-            sos.writeUI32(reserved);
-            sos.write(binaryData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -108,6 +88,26 @@ public class DefineBinaryDataTag extends CharacterTag {
                 // ignore
             }
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(tag);
+            sos.writeUI32(reserved);
+            sos.write(binaryData);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

@@ -52,35 +52,6 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
     public String[] frameNames;
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            int sceneCount = sceneOffsets.length;
-            sos.writeEncodedU32(sceneCount);
-            for (int i = 0; i < sceneCount; i++) {
-                sos.writeEncodedU32(sceneOffsets[i]);
-                sos.writeString(sceneNames[i]);
-            }
-            int frameLabelCount = frameNums.length;
-            sos.writeEncodedU32(frameLabelCount);
-            for (int i = 0; i < frameLabelCount; i++) {
-                sos.writeEncodedU32(frameNums[i]);
-                sos.writeString(frameNames[i]);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -122,5 +93,34 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
             frameNames[i] = sis.readString("frameName");
         }
 
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            int sceneCount = sceneOffsets.length;
+            sos.writeEncodedU32(sceneCount);
+            for (int i = 0; i < sceneCount; i++) {
+                sos.writeEncodedU32(sceneOffsets[i]);
+                sos.writeString(sceneNames[i]);
+            }
+            int frameLabelCount = frameNums.length;
+            sos.writeEncodedU32(frameLabelCount);
+            for (int i = 0; i < frameLabelCount; i++) {
+                sos.writeEncodedU32(frameNums[i]);
+                sos.writeString(frameNames[i]);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 }

@@ -91,6 +91,8 @@ import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -2475,6 +2477,34 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof DefineBitsJPEG3Tag || item instanceof DefineBitsJPEG4Tag) {
+            ImageTag it = (ImageTag) item;
+            if (it.importSupported()) {
+                File selectedFile = showImportFileChooser("");
+                if (selectedFile != null) {
+                    File selfile = Helper.fixDialogFile(selectedFile);
+                    byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                    try {
+                        new ImageImporter().importImageAlpha(it, data);
+                        SWF swf = it.getSwf();
+                        swf.clearImageCache();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, "Invalid image", ex);
+                        View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+
+                    reload(true);
+                }
+            }
+        }
+    }
+
     public void exportJavaSourceActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -2799,7 +2829,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         stopFlashPlayer();
 
-        previewPanel.setImageReplaceButtonVisible(false);
+        previewPanel.setImageReplaceButtonVisible(false, false);
 
         boolean internalViewer = isInternalFlashViewerSelected();
 
@@ -2894,7 +2924,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDACTIONSCRIPTPANEL);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(imageTag.importSupported());
+            previewPanel.setImageReplaceButtonVisible(imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
             previewPanel.showImagePanel(imageTag.getImage());
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
@@ -2935,7 +2965,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag);
+            previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag, false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer((SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 previewPanel.setMedia(soundThread);

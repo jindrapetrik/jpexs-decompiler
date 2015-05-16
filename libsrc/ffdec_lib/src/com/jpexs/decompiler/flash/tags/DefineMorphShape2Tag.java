@@ -57,40 +57,6 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
     public boolean usesScalingStrokes;
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterId);
-            sos.writeRECT(startBounds);
-            sos.writeRECT(endBounds);
-            sos.writeRECT(startEdgeBounds);
-            sos.writeRECT(endEdgeBounds);
-            sos.writeUB(6, reserved);
-            sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
-            sos.writeUB(1, usesScalingStrokes ? 1 : 0);
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
-            sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
-            sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
-            sos2.writeSHAPE(startEdges, 2);
-            byte[] ba2 = baos2.toByteArray();
-            sos.writeUI32(ba2.length);
-            sos.write(ba2);
-            sos.writeSHAPE(endEdges, 2);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -137,6 +103,40 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(2, "morphLineStyles");
         startEdges = sis.readSHAPE(2, true, "startEdges");
         endEdges = sis.readSHAPE(2, true, "endEdges");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterId);
+            sos.writeRECT(startBounds);
+            sos.writeRECT(endBounds);
+            sos.writeRECT(startEdgeBounds);
+            sos.writeRECT(endEdgeBounds);
+            sos.writeUB(6, reserved);
+            sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
+            sos.writeUB(1, usesScalingStrokes ? 1 : 0);
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
+            sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
+            sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
+            sos2.writeSHAPE(startEdges, 2);
+            byte[] ba2 = baos2.toByteArray();
+            sos.writeUI32(ba2.length);
+            sos.write(ba2);
+            sos.writeSHAPE(endEdges, 2);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

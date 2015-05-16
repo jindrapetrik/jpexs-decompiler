@@ -54,6 +54,80 @@ public class DefineFontTag extends FontTag {
     @Internal
     private DefineFontInfo2Tag fontInfo2Tag = null;
 
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public DefineFontTag(SWF swf) {
+        super(swf, ID, NAME, null);
+        fontId = swf.getNextCharacterId();
+        glyphShapeTable = new ArrayList<>();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
+    public DefineFontTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        fontId = sis.readUI16("fontId");
+        glyphShapeTable = new ArrayList<>();
+
+        if (sis.available() > 0) {
+            long pos = sis.getPos();
+            int firstOffset = sis.readUI16("firstOffset");
+            int nGlyphs = firstOffset / 2;
+
+            long[] offsetTable = new long[nGlyphs];
+            offsetTable[0] = firstOffset;
+            for (int i = 1; i < nGlyphs; i++) {
+                offsetTable[i] = sis.readUI16("offset");
+            }
+            for (int i = 0; i < nGlyphs; i++) {
+                sis.seek(pos + offsetTable[i]);
+                glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
+            }
+        }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(fontId);
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            List<Integer> offsetTable = new ArrayList<>();
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
+            for (SHAPE shape : glyphShapeTable) {
+                offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
+                sos2.writeSHAPE(shape, 1);
+            }
+            for (int offset : offsetTable) {
+                sos.writeUI16(offset);
+            }
+            sos.write(baos2.toByteArray());
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
     @Override
     public boolean isSmall() {
         return false;
@@ -110,85 +184,6 @@ public class DefineFontTag extends FontTag {
         }
         return -1;
 
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(fontId);
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            List<Integer> offsetTable = new ArrayList<>();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
-            for (SHAPE shape : glyphShapeTable) {
-                offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
-                sos2.writeSHAPE(shape, 1);
-            }
-            for (int offset : offsetTable) {
-                sos.writeUI16(offset);
-            }
-            sos.write(baos2.toByteArray());
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public DefineFontTag(SWF swf) {
-        super(swf, ID, NAME, null);
-        fontId = swf.getNextCharacterId();
-        glyphShapeTable = new ArrayList<>();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param sis
-     * @param data
-     * @throws IOException
-     */
-    public DefineFontTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        fontId = sis.readUI16("fontId");
-        glyphShapeTable = new ArrayList<>();
-
-        if (sis.available() > 0) {
-            long pos = sis.getPos();
-            int firstOffset = sis.readUI16("firstOffset");
-            int nGlyphs = firstOffset / 2;
-
-            long[] offsetTable = new long[nGlyphs];
-            offsetTable[0] = firstOffset;
-            for (int i = 1; i < nGlyphs; i++) {
-                offsetTable[i] = sis.readUI16("offset");
-            }
-            for (int i = 0; i < nGlyphs; i++) {
-                sis.seek(pos + offsetTable[i]);
-                glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
-            }
-        }
-    }
-
-    @Override
-    public int getFontId() {
-        return fontId;
     }
 
     @Override

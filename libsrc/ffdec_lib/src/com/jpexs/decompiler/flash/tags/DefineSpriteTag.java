@@ -89,6 +89,72 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, true, "rect_sprite");
 
+    /**
+     * Constructor
+     *
+     * @param swf
+     */
+    public DefineSpriteTag(SWF swf) {
+        super(swf, ID, NAME, null);
+        spriteId = swf.getNextCharacterId();
+        subTags = new ArrayList<>();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @param level
+     * @param parallel
+     * @param skipUnusualTags
+     * @throws IOException
+     * @throws java.lang.InterruptedException
+     */
+    public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+        super(sis.getSwf(), ID, NAME, data);
+        readData(sis, data, level, parallel, skipUnusualTags, false);
+    }
+
+    @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
+        spriteId = sis.readUI16("spriteId");
+        frameCount = sis.readUI16("frameCount");
+        List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, lazy);
+        if (subTags.size() > 0 && subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
+            hasEndTag = true;
+            subTags.remove(subTags.size() - 1);
+        }
+        this.subTags = subTags;
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        if (Configuration.debugCopy.get()) {
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+        }
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(spriteId);
+            sos.writeUI16(frameCount);
+            sos.writeTags(subTags);
+            if (hasEndTag) {
+                sos.writeUI16(0);
+            }
+            sos.close();
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
@@ -208,72 +274,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         }
         rectCache.put(this, ret);
         return ret;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param swf
-     */
-    public DefineSpriteTag(SWF swf) {
-        super(swf, ID, NAME, null);
-        spriteId = swf.getNextCharacterId();
-        subTags = new ArrayList<>();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param sis
-     * @param data
-     * @param level
-     * @param parallel
-     * @param skipUnusualTags
-     * @throws IOException
-     * @throws java.lang.InterruptedException
-     */
-    public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, level, parallel, skipUnusualTags, false);
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
-        spriteId = sis.readUI16("spriteId");
-        frameCount = sis.readUI16("frameCount");
-        List<Tag> subTags = sis.readTagList(this, level + 1, parallel, skipUnusualTags, true, lazy);
-        if (subTags.size() > 0 && subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
-            hasEndTag = true;
-            subTags.remove(subTags.size() - 1);
-        }
-        this.subTags = subTags;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-        }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(spriteId);
-            sos.writeUI16(frameCount);
-            sos.writeTags(subTags);
-            if (hasEndTag) {
-                sos.writeUI16(0);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
     }
 
     public List<Tag> getSubTags() {

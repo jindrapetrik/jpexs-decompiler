@@ -90,21 +90,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     private static final Cache<DefineButton2Tag, RECT> rectCache = Cache.getInstance(true, true, "rect_button2");
 
-    @Override
-    public int getCharacterId() {
-        return buttonId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.buttonId = characterId;
-    }
-
-    @Override
-    public List<BUTTONRECORD> getRecords() {
-        return characters;
-    }
-
     /**
      * Constructor
      *
@@ -176,6 +161,21 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    @Override
+    public int getCharacterId() {
+        return buttonId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
+
+    @Override
+    public List<BUTTONRECORD> getRecords() {
+        return characters;
     }
 
     /**

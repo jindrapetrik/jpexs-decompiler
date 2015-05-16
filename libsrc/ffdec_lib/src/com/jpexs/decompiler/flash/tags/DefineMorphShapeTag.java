@@ -42,35 +42,6 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     public static final String NAME = "DefineMorphShape";
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterId);
-            sos.writeRECT(startBounds);
-            sos.writeRECT(endBounds);
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
-            sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 1);
-            sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 1);
-            sos2.writeSHAPE(startEdges, 1);
-            byte[] ba2 = baos2.toByteArray();
-            sos.writeUI32(ba2.length);
-            sos.write(ba2);
-            sos.writeSHAPE(endEdges, 1);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -110,6 +81,35 @@ public class DefineMorphShapeTag extends MorphShapeTag {
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(1, "morphLineStyles");
         startEdges = sis.readSHAPE(1, true, "startEdges");
         endEdges = sis.readSHAPE(1, true, "endEdges");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterId);
+            sos.writeRECT(startBounds);
+            sos.writeRECT(endBounds);
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
+            sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 1);
+            sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 1);
+            sos2.writeSHAPE(startEdges, 1);
+            byte[] ba2 = baos2.toByteArray();
+            sos.writeUI32(ba2.length);
+            sos.write(ba2);
+            sos.writeSHAPE(endEdges, 1);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

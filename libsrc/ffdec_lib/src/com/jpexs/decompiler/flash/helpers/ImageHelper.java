@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -57,19 +60,67 @@ public class ImageHelper {
         return in;
     }
 
-    public static void write(BufferedImage image, String formatName, File output) throws IOException {
+    public static void write(BufferedImage image, ImageFormat format, File output) throws IOException {
+        String formatName = getImageFormatString(format).toUpperCase(Locale.ENGLISH);
+        if (format == ImageFormat.JPEG) {
+            image = fixImageIOJpegBug(image);
+        }
+
         ImageIO.write(image, formatName, output);
     }
 
-    public static void write(BufferedImage image, String formatName, OutputStream output) throws IOException {
+    public static void write(BufferedImage image, ImageFormat format, OutputStream output) throws IOException {
+        String formatName = getImageFormatString(format).toUpperCase(Locale.ENGLISH);
+        if (format == ImageFormat.JPEG) {
+            image = fixImageIOJpegBug(image);
+        }
+
         ImageIO.write(image, formatName, output);
     }
 
-    public static void write(BufferedImage image, String formatName, ByteArrayOutputStream output) {
+    public static void write(BufferedImage image, ImageFormat format, ByteArrayOutputStream output) {
+        String formatName = getImageFormatString(format).toUpperCase(Locale.ENGLISH);
+        if (format == ImageFormat.JPEG) {
+            image = fixImageIOJpegBug(image);
+        }
+
         try {
             ImageIO.write(image, formatName, output);
         } catch (IOException ex) {
             Logger.getLogger(ImageHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private static BufferedImage fixImageIOJpegBug(BufferedImage image) {
+        int type = image.getType();
+        if (type != BufferedImage.TYPE_INT_RGB) {
+            // convert to RGB without alpha channel
+            int width = image.getWidth();
+            int height = image.getHeight();
+            int[] imgData = image.getRGB(0, 0, width, height, null, 0, width);
+            ImageTag.divideAlpha(imgData);
+            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            newImage.getRaster().setDataElements(0, 0, width, height, imgData);
+            return newImage;
+        }
+
+        return image;
+    }
+
+    public static String getImageFormatString(ImageFormat format) {
+        switch (format) {
+            case UNKNOWN:
+                return "unk";
+            case JPEG:
+                return "jpg";
+            case GIF:
+                return "gif";
+            case PNG:
+                return "png";
+            case BMP:
+                return "bmp";
+        }
+
+        throw new Error("Unsuported image format: " + format);
     }
 }

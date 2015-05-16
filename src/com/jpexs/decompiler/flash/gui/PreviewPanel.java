@@ -152,6 +152,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     // Image tag buttons
     private JButton replaceImageButton;
 
+    private JButton replaceImageAlphaButton;
+
     private JButton prevFontsButton;
 
     private JButton nextFontsButton;
@@ -242,6 +244,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageButton.addActionListener(mainPanel::replaceButtonActionPerformed);
         replaceImageButton.setVisible(false);
 
+        replaceImageAlphaButton = new JButton(mainPanel.translate("button.replaceAlphaChannel"), View.getIcon("edit16"));
+        replaceImageAlphaButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceImageAlphaButton.addActionListener(mainPanel::replaceAlphaButtonActionPerformed);
+        replaceImageAlphaButton.setVisible(false);
+
         prevFontsButton = new JButton(mainPanel.translate("button.prev"), View.getIcon("prev16"));
         prevFontsButton.setMargin(new Insets(3, 3, 3, 10));
         prevFontsButton.addActionListener(this::prevFontsButtonActionPerformed);
@@ -254,6 +261,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
         imageButtonsPanel.add(replaceImageButton);
+        imageButtonsPanel.add(replaceImageAlphaButton);
         imageButtonsPanel.add(prevFontsButton);
         imageButtonsPanel.add(nextFontsButton);
         return imageButtonsPanel;
@@ -573,8 +581,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         parametersPanel.setVisible(false);
     }
 
-    public void setImageReplaceButtonVisible(boolean show) {
+    public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
         replaceImageButton.setVisible(show);
+        replaceImageAlphaButton.setVisible(showAlpha);
         prevFontsButton.setVisible(false);
         nextFontsButton.setVisible(false);
     }

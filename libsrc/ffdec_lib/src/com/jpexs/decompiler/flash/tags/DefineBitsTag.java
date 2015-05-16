@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -45,17 +46,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @SWFType(BasicType.UI8)
     public ByteArrayRange jpegData;
-
-    @Override
-    public void setImage(byte[] data) {
-        throw new UnsupportedOperationException("Set image is not supported for DefineBits");
-    }
-
-    @Override
-    public boolean importSupported() {
-        // importing a new image will replace the current DefineBitsTag with a new DefineBitsJPEG2Tag
-        return true;
-    }
 
     /**
      * Constructor
@@ -100,6 +90,17 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
+    public void setImage(byte[] data) {
+        throw new UnsupportedOperationException("Set image is not supported for DefineBits");
+    }
+
+    @Override
+    public boolean importSupported() {
+        // importing a new image will replace the current DefineBitsTag with a new DefineBitsJPEG2Tag
+        return true;
+    }
+
+    @Override
     public InputStream getImageData() {
         return null;
     }
@@ -137,8 +138,8 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
-    public String getImageFormat() {
-        return "jpg";
+    public ImageFormat getImageFormat() {
+        return ImageFormat.JPEG;
     }
 
     @Override

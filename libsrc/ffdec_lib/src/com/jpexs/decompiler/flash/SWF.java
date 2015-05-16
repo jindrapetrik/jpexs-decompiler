@@ -104,6 +104,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -157,7 +158,6 @@ import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -1519,14 +1519,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             } else {
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
-                    String format = image.getImageFormat();
+                    ImageFormat format = image.getImageFormat();
                     InputStream imageStream = image.getImageData();
                     byte[] imageData;
                     if (imageStream != null) {
                         imageData = Helper.readStream(image.getImageData());
                     } else {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ImageHelper.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
+                        ImageHelper.write(image.getImage().getBufferedImage(), format, baos);
                         imageData = baos.toByteArray();
                     }
                     String base64ImgData = Helper.byteArrayToBase64String(imageData);

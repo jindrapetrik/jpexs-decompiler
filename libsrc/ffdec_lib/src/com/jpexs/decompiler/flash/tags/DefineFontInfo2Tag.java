@@ -69,38 +69,6 @@ public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
     public List<Integer> codeTable;
 
     /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(fontID);
-            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
-            sos.writeUI8(fontNameBytes.length);
-            sos.write(fontNameBytes);
-            sos.writeUB(2, reserved);
-            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
-            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
-            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
-            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-            sos.writeUB(1, fontFlagsBold ? 1 : 0);
-            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
-            sos.writeLANGCODE(languageCode);
-            for (int c : codeTable) {
-                sos.writeUI16(c);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    /**
      * Constructor
      *
      * @param swf
@@ -146,6 +114,38 @@ public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
         for (int i = 0; i < ctLen; i++) {
             codeTable.add(sis.readUI16("code"));
         }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(fontID);
+            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
+            sos.writeUI8(fontNameBytes.length);
+            sos.write(fontNameBytes);
+            sos.writeUB(2, reserved);
+            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
+            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
+            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
+            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+            sos.writeUB(1, fontFlagsBold ? 1 : 0);
+            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
+            sos.writeLANGCODE(languageCode);
+            for (int c : codeTable) {
+                sos.writeUI16(c);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
     }
 
     @Override

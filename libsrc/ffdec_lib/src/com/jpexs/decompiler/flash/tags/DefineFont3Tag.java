@@ -101,35 +101,6 @@ public class DefineFont3Tag extends FontTag {
     @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
 
-    @Override
-    public boolean isSmall() {
-        return fontFlagsSmallText;
-    }
-
-    @Override
-    public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
-    }
-
-    @Override
-    public double getGlyphAdvance(int glyphIndex) {
-        if (fontFlagsHasLayout && glyphIndex != -1) {
-            return fontAdvanceTable.get(glyphIndex);
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
-    public char glyphToChar(int glyphIndex) {
-        return (char) (int) codeTable.get(glyphIndex);
-    }
-
-    @Override
-    public int charToGlyph(char c) {
-        return codeTable.indexOf((int) c);
-    }
-
     /**
      * Constructor
      *
@@ -312,8 +283,32 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getFontId() {
-        return fontId;
+    public boolean isSmall() {
+        return fontFlagsSmallText;
+    }
+
+    @Override
+    public int getGlyphWidth(int glyphIndex) {
+        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
+    }
+
+    @Override
+    public double getGlyphAdvance(int glyphIndex) {
+        if (fontFlagsHasLayout && glyphIndex != -1) {
+            return fontAdvanceTable.get(glyphIndex);
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public char glyphToChar(int glyphIndex) {
+        return (char) (int) codeTable.get(glyphIndex);
+    }
+
+    @Override
+    public int charToGlyph(char c) {
+        return codeTable.indexOf((int) c);
     }
 
     @Override

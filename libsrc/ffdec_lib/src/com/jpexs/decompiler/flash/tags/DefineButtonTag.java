@@ -83,16 +83,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 
-    @Override
-    public int getCharacterId() {
-        return buttonId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.buttonId = characterId;
-    }
-
     private Timeline timeline;
 
     private boolean isSingleFrameInitialized;
@@ -100,11 +90,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     private boolean isSingleFrame;
 
     private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, true, "rect_button");
-
-    @Override
-    public List<BUTTONRECORD> getRecords() {
-        return characters;
-    }
 
     /**
      * Constructor
@@ -160,6 +145,21 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             throw new Error("This should never happen.", e);
         }
         return baos.toByteArray();
+    }
+
+    @Override
+    public int getCharacterId() {
+        return buttonId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.buttonId = characterId;
+    }
+
+    @Override
+    public List<BUTTONRECORD> getRecords() {
+        return characters;
     }
 
     /**

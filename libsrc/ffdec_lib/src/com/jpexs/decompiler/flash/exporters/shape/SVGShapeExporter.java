@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
@@ -34,7 +35,6 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Locale;
 import org.w3c.dom.Element;
 
 /**
@@ -113,14 +113,14 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 lastPatternId++;
                 String patternId = "PatternID_";
                 patternId += lastPatternId;
-                String format = image.getImageFormat();
+                ImageFormat format = image.getImageFormat();
                 InputStream imageStream = image.getImageData();
                 byte[] imageData;
                 if (imageStream != null) {
                     imageData = Helper.readStream(image.getImageData());
                 } else {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageHelper.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
+                    ImageHelper.write(img.getBufferedImage(), format, baos);
                     imageData = baos.toByteArray();
                 }
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);

@@ -79,6 +79,61 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
+    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        characterID = sis.readUI16("characterID");
+        textBounds = sis.readRECT("textBounds");
+        textMatrix = sis.readMatrix("textMatrix");
+        glyphBits = sis.readUI8("glyphBits");
+        advanceBits = sis.readUI8("advanceBits");
+        textRecords = new ArrayList<>();
+        TEXTRECORD tr;
+        while ((tr = sis.readTEXTRECORD(getTextNum(), glyphBits, advanceBits, "record")) != null) {
+            textRecords.add(tr);
+        }
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(characterID);
+            sos.writeRECT(textBounds);
+            sos.writeMatrix(textMatrix);
+
+            int glyphBits = 0;
+            int advanceBits = 0;
+            for (TEXTRECORD tr : textRecords) {
+                for (GLYPHENTRY ge : tr.glyphEntries) {
+                    glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
+                    advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
+                }
+            }
+
+            if (Configuration.debugCopy.get()) {
+                glyphBits = Math.max(glyphBits, this.glyphBits);
+                advanceBits = Math.max(advanceBits, this.advanceBits);
+            }
+
+            sos.writeUI8(glyphBits);
+            sos.writeUI8(advanceBits);
+            for (TEXTRECORD tr : textRecords) {
+                sos.writeTEXTRECORD(tr, getTextNum(), glyphBits, advanceBits);
+            }
+            sos.writeUI8(0);
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
     public RECT getBounds() {
         return textBounds;
     }
@@ -520,61 +575,6 @@ public abstract class StaticTextTag extends TextTag {
 
         updateTextBounds();
         return true;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeRECT(textBounds);
-            sos.writeMatrix(textMatrix);
-
-            int glyphBits = 0;
-            int advanceBits = 0;
-            for (TEXTRECORD tr : textRecords) {
-                for (GLYPHENTRY ge : tr.glyphEntries) {
-                    glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
-                    advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
-                }
-            }
-
-            if (Configuration.debugCopy.get()) {
-                glyphBits = Math.max(glyphBits, this.glyphBits);
-                advanceBits = Math.max(advanceBits, this.advanceBits);
-            }
-
-            sos.writeUI8(glyphBits);
-            sos.writeUI8(advanceBits);
-            for (TEXTRECORD tr : textRecords) {
-                sos.writeTEXTRECORD(tr, getTextNum(), glyphBits, advanceBits);
-            }
-            sos.writeUI8(0);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
-    @Override
-    public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterID = sis.readUI16("characterID");
-        textBounds = sis.readRECT("textBounds");
-        textMatrix = sis.readMatrix("textMatrix");
-        glyphBits = sis.readUI8("glyphBits");
-        advanceBits = sis.readUI8("advanceBits");
-        textRecords = new ArrayList<>();
-        TEXTRECORD tr;
-        while ((tr = sis.readTEXTRECORD(getTextNum(), glyphBits, advanceBits, "record")) != null) {
-            textRecords.add(tr);
-        }
     }
 
     @Override

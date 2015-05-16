@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -221,8 +222,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public String getImageFormat() {
-        return "png";
+    public ImageFormat getImageFormat() {
+        return ImageFormat.PNG;
     }
 
     @Override

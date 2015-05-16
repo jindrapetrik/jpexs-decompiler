@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -65,34 +66,34 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public abstract void setImage(byte[] data) throws IOException;
 
-    public abstract String getImageFormat();
+    public abstract ImageFormat getImageFormat();
 
     public boolean importSupported() {
         return true;
     }
 
-    public static String getImageFormat(byte[] data) {
+    public static ImageFormat getImageFormat(byte[] data) {
         return getImageFormat(new ByteArrayRange(data));
     }
 
-    public static String getImageFormat(ByteArrayRange data) {
+    public static ImageFormat getImageFormat(ByteArrayRange data) {
         if (hasErrorHeader(data)) {
-            return "jpg";
+            return ImageFormat.JPEG;
         }
 
         if (data.getLength() > 2 && ((data.get(0) & 0xff) == 0xff) && ((data.get(1) & 0xff) == 0xd8)) {
-            return "jpg";
+            return ImageFormat.JPEG;
         }
 
         if (data.getLength() > 6 && ((data.get(0) & 0xff) == 0x47) && ((data.get(1) & 0xff) == 0x49) && ((data.get(2) & 0xff) == 0x46) && ((data.get(3) & 0xff) == 0x38) && ((data.get(4) & 0xff) == 0x39) && ((data.get(5) & 0xff) == 0x61)) {
-            return "gif";
+            return ImageFormat.GIF;
         }
 
         if (data.getLength() > 8 && ((data.get(0) & 0xff) == 0x89) && ((data.get(1) & 0xff) == 0x50) && ((data.get(2) & 0xff) == 0x4e) && ((data.get(3) & 0xff) == 0x47) && ((data.get(4) & 0xff) == 0x0d) && ((data.get(5) & 0xff) == 0x0a) && ((data.get(6) & 0xff) == 0x1a) && ((data.get(7) & 0xff) == 0x0a)) {
-            return "png";
+            return ImageFormat.PNG;
         }
 
-        return "unk";
+        return ImageFormat.UNKNOWN;
     }
 
     public static boolean hasErrorHeader(byte[] data) {
@@ -122,6 +123,24 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         int g = (value >> 8) & 0xFF;
         int b = value & 0xFF;
         float multiplier = a == 0 ? 0 : 255.0f / a;
+        r = max255(r * multiplier);
+        g = max255(g * multiplier);
+        b = max255(b * multiplier);
+        return RGBA.toInt(r, g, b, a);
+    }
+
+    public static void divideAlpha(int[] pixels) {
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = divideAlpha(pixels[i]) & 0xffffff;
+        }
+    }
+
+    protected static int divideAlpha(int value) {
+        int a = (value >> 24) & 0xFF;
+        int r = (value >> 16) & 0xFF;
+        int g = (value >> 8) & 0xFF;
+        int b = value & 0xFF;
+        float multiplier = a / 255.0f;
         r = max255(r * multiplier);
         g = max255(g * multiplier);
         b = max255(b * multiplier);

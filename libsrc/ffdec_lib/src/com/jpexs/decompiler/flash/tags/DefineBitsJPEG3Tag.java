@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -109,14 +110,14 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     private byte[] createEmptyImage() {
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-        ImageHelper.write(img, "JPG", bitmapDataOS);
+        ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
         return bitmapDataOS.toByteArray();
     }
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        if (ImageTag.getImageFormat(data).equals("jpg")) {
-            SerializableImage image = new SerializableImage(ImageHelper.read(data));
+        if (ImageTag.getImageFormat(data) == ImageFormat.JPEG) {
+            BufferedImage image = ImageHelper.read(data);
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -132,11 +133,27 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
+    public void setImageAlpha(byte[] data) throws IOException {
+        ImageFormat fmt = ImageTag.getImageFormat(imageData);
+        if (fmt != ImageFormat.JPEG) {
+            throw new IOException("Only Jpeg can have alpha channel.");
+        }
+
+        SerializableImage image = getImage();
+        if (data == null || data.length != image.getWidth() * image.getHeight()) {
+            throw new IOException("Data length must match the size of the image.");
+        }
+
+        bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(data));
+        clearCache();
+        setModified(true);
+    }
+
     @Override
-    public String getImageFormat() {
-        String fmt = ImageTag.getImageFormat(imageData);
-        if (fmt.equals("jpg")) {
-            fmt = "png"; //transparency
+    public ImageFormat getImageFormat() {
+        ImageFormat fmt = ImageTag.getImageFormat(imageData);
+        if (fmt == ImageFormat.JPEG) {
+            fmt = ImageFormat.PNG; //transparency
         }
         return fmt;
     }

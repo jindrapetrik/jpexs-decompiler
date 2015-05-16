@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +39,7 @@ public class ShapeImporter {
         if (newData[0] == 'B' && newData[1] == 'M') {
             BufferedImage b = ImageHelper.read(newData);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageHelper.write(b, "PNG", baos);
+            ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();
         }
 

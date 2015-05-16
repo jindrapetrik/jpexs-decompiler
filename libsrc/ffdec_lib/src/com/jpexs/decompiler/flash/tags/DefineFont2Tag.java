@@ -97,114 +97,6 @@ public class DefineFont2Tag extends FontTag {
     @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
 
-    @Override
-    public boolean isSmall() {
-        return fontFlagsSmallText;
-    }
-
-    @Override
-    public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
-    }
-
-    @Override
-    public RECT getGlyphBounds(int glyphIndex) {
-        if (fontFlagsHasLayout) {
-            return fontBoundsTable.get(glyphIndex);
-        }
-        return super.getGlyphBounds(glyphIndex);
-    }
-
-    @Override
-    public double getGlyphAdvance(int glyphIndex) {
-        if (fontFlagsHasLayout) {
-            return fontAdvanceTable.get(glyphIndex);
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
-        try {
-            sos.writeUI16(fontId);
-            sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
-            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
-            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
-            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
-            sos.writeUB(1, fontFlagsWideOffsets ? 1 : 0);
-            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
-            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-            sos.writeUB(1, fontFlagsBold ? 1 : 0);
-            sos.writeLANGCODE(languageCode);
-            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
-            sos.writeUI8(fontNameBytes.length);
-            sos.write(fontNameBytes);
-            int numGlyphs = glyphShapeTable.size();
-            sos.writeUI16(numGlyphs);
-
-            List<Long> offsetTable = new ArrayList<>();
-            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
-
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
-            for (int i = 0; i < numGlyphs; i++) {
-                offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
-                sos3.writeSHAPE(glyphShapeTable.get(i), 1);
-            }
-            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
-            for (Long offset : offsetTable) {
-                if (fontFlagsWideOffsets) {
-                    sos.writeUI32(offset);
-                } else {
-                    sos.writeUI16((int) (long) offset);
-                }
-            }
-            if (numGlyphs > 0) {
-                long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
-                if (fontFlagsWideOffsets) {
-                    sos.writeUI32(offset);
-                } else {
-                    sos.writeUI16((int) offset);
-                }
-                sos.write(baGlyphShapes);
-
-                for (int i = 0; i < numGlyphs; i++) {
-                    if (fontFlagsWideCodes) {
-                        sos.writeUI16(codeTable.get(i));
-                    } else {
-                        sos.writeUI8(codeTable.get(i));
-                    }
-                }
-            }
-            if (fontFlagsHasLayout) {
-                sos.writeSI16(fontAscent);
-                sos.writeSI16(fontDescent);
-                sos.writeSI16(fontLeading);
-                for (int i = 0; i < numGlyphs; i++) {
-                    sos.writeSI16(fontAdvanceTable.get(i));
-                }
-                for (int i = 0; i < numGlyphs; i++) {
-                    sos.writeRECT(fontBoundsTable.get(i));
-                }
-                sos.writeUI16(fontKerningTable.size());
-                for (int k = 0; k < fontKerningTable.size(); k++) {
-                    sos.writeKERNINGRECORD(fontKerningTable.get(k), fontFlagsWideCodes);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
     /**
      * Constructor
      *
@@ -302,9 +194,112 @@ public class DefineFont2Tag extends FontTag {
         }
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
     @Override
-    public int getFontId() {
-        return fontId;
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
+        try {
+            sos.writeUI16(fontId);
+            sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
+            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
+            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
+            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
+            sos.writeUB(1, fontFlagsWideOffsets ? 1 : 0);
+            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
+            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+            sos.writeUB(1, fontFlagsBold ? 1 : 0);
+            sos.writeLANGCODE(languageCode);
+            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
+            sos.writeUI8(fontNameBytes.length);
+            sos.write(fontNameBytes);
+            int numGlyphs = glyphShapeTable.size();
+            sos.writeUI16(numGlyphs);
+
+            List<Long> offsetTable = new ArrayList<>();
+            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
+
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            for (int i = 0; i < numGlyphs; i++) {
+                offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
+                sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+            }
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
+            for (Long offset : offsetTable) {
+                if (fontFlagsWideOffsets) {
+                    sos.writeUI32(offset);
+                } else {
+                    sos.writeUI16((int) (long) offset);
+                }
+            }
+            if (numGlyphs > 0) {
+                long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
+                if (fontFlagsWideOffsets) {
+                    sos.writeUI32(offset);
+                } else {
+                    sos.writeUI16((int) offset);
+                }
+                sos.write(baGlyphShapes);
+
+                for (int i = 0; i < numGlyphs; i++) {
+                    if (fontFlagsWideCodes) {
+                        sos.writeUI16(codeTable.get(i));
+                    } else {
+                        sos.writeUI8(codeTable.get(i));
+                    }
+                }
+            }
+            if (fontFlagsHasLayout) {
+                sos.writeSI16(fontAscent);
+                sos.writeSI16(fontDescent);
+                sos.writeSI16(fontLeading);
+                for (int i = 0; i < numGlyphs; i++) {
+                    sos.writeSI16(fontAdvanceTable.get(i));
+                }
+                for (int i = 0; i < numGlyphs; i++) {
+                    sos.writeRECT(fontBoundsTable.get(i));
+                }
+                sos.writeUI16(fontKerningTable.size());
+                for (int k = 0; k < fontKerningTable.size(); k++) {
+                    sos.writeKERNINGRECORD(fontKerningTable.get(k), fontFlagsWideCodes);
+                }
+            }
+
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public boolean isSmall() {
+        return fontFlagsSmallText;
+    }
+
+    @Override
+    public int getGlyphWidth(int glyphIndex) {
+        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
+    }
+
+    @Override
+    public RECT getGlyphBounds(int glyphIndex) {
+        if (fontFlagsHasLayout) {
+            return fontBoundsTable.get(glyphIndex);
+        }
+        return super.getGlyphBounds(glyphIndex);
+    }
+
+    @Override
+    public double getGlyphAdvance(int glyphIndex) {
+        if (fontFlagsHasLayout) {
+            return fontAdvanceTable.get(glyphIndex);
+        } else {
+            return -1;
+        }
     }
 
     @Override

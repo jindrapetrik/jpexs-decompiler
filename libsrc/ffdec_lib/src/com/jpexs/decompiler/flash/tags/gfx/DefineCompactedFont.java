@@ -155,11 +155,6 @@ public final class DefineCompactedFont extends FontTag {
     }
 
     @Override
-    public int getFontId() {
-        return fontId;
-    }
-
-    @Override
     public List<SHAPE> getGlyphShapeTable() {
         return shapeCache;
     }

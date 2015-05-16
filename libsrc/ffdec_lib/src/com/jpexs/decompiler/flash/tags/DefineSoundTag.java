@@ -69,41 +69,6 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     public ByteArrayRange soundData;
 
-    @Override
-    public int getCharacterId() {
-        return soundId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.soundId = characterId;
-    }
-
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(soundId);
-            sos.writeUB(4, soundFormat);
-            sos.writeUB(2, soundRate);
-            sos.writeUB(1, soundSize ? 1 : 0);
-            sos.writeUB(1, soundType ? 1 : 0);
-            sos.writeUI32(soundSampleCount);
-            sos.write(soundData);
-
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
-    }
-
     /**
      * Constructor
      *
@@ -136,6 +101,41 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         soundType = sis.readUB(1, "soundType") == 1;
         soundSampleCount = sis.readUI32("soundSampleCount");
         soundData = sis.readByteRangeEx(sis.available(), "soundData");
+    }
+
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
+        try {
+            sos.writeUI16(soundId);
+            sos.writeUB(4, soundFormat);
+            sos.writeUB(2, soundRate);
+            sos.writeUB(1, soundSize ? 1 : 0);
+            sos.writeUB(1, soundType ? 1 : 0);
+            sos.writeUI32(soundSampleCount);
+            sos.write(soundData);
+
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public int getCharacterId() {
+        return soundId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.soundId = characterId;
     }
 
     @Override

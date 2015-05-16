@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -126,7 +127,7 @@ public class ShapeExporter {
                             m.scale(settings.zoom);
                             st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
                             if (settings.mode == ShapeExportMode.PNG) {
-                                ImageHelper.write(img.getBufferedImage(), "PNG", file);
+                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), file);
                             }

@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -1357,17 +1358,17 @@ public class XFLConverter {
                 SerializableImage image = imageTag.getImage();
                 // do not store the image in cache during xfl conversion
                 imageTag.clearCache();
-                String format = imageTag.getImageFormat();
-                ImageHelper.write(image.getBufferedImage(), format.toUpperCase(), baos);
+                ImageFormat format = imageTag.getImageFormat();
+                ImageHelper.write(image.getBufferedImage(), format, baos);
                 String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
                 files.put(symbolFile, baos.toByteArray());
                 String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
                 switch (format) {
-                    case "png":
-                    case "gif":
+                    case PNG:
+                    case GIF:
                         mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
                         break;
-                    case "jpg":
+                    case JPEG:
                         mediaLinkStr += " isJPEG=\"true\"";
                         break;
                 }

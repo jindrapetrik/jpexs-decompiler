@@ -19,9 +19,12 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,7 +40,7 @@ public class ImageImporter extends TagImporter {
         if (newData[0] == 'B' && newData[1] == 'M') {
             BufferedImage b = ImageHelper.read(newData);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageHelper.write(b, "PNG", baos);
+            ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();
         }
 
@@ -50,6 +53,16 @@ public class ImageImporter extends TagImporter {
             return jpeg2Tag;
         } else {
             it.setImage(newData);
+        }
+        return null;
+    }
+
+    public Tag importImageAlpha(ImageTag it, byte[] newData) throws IOException {
+
+        if (it instanceof DefineBitsJPEG3Tag) {
+            ((DefineBitsJPEG3Tag) it).setImageAlpha(newData);
+        } else if (it instanceof DefineBitsJPEG4Tag) {
+            ((DefineBitsJPEG4Tag) it).setImageAlpha(newData);
         }
         return null;
     }

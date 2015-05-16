@@ -25,13 +25,13 @@ import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  *
@@ -68,28 +68,28 @@ public class ImageExporter {
 
                 final ImageTag imageTag = (ImageTag) t;
 
-                String fileFormat = imageTag.getImageFormat().toUpperCase(Locale.ENGLISH);
+                ImageFormat fileFormat = imageTag.getImageFormat();
                 if (settings.mode == ImageExportMode.PNG) {
-                    fileFormat = "png";
+                    fileFormat = ImageFormat.PNG;
                 }
 
                 if (settings.mode == ImageExportMode.JPEG) {
-                    fileFormat = "jpg";
+                    fileFormat = ImageFormat.JPEG;
                 }
 
                 if (settings.mode == ImageExportMode.BMP) {
-                    fileFormat = "bmp";
+                    fileFormat = ImageFormat.BMP;
                 }
 
                 {
                     final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
-                    final String ffileFormat = fileFormat;
+                    final ImageFormat ffileFormat = fileFormat;
 
                     new RetryTask(() -> {
-                        if (ffileFormat.equals("bmp")) {
+                        if (ffileFormat == ImageFormat.BMP) {
                             BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
                         } else {
-                            ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
+                            ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat, file);
                         }
                     }, handler).run();
                     ret.add(file);

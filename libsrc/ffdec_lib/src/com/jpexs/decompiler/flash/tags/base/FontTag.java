@@ -57,8 +57,6 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         super(swf, id, name, data);
     }
 
-    public abstract int getFontId();
-
     public abstract List<SHAPE> getGlyphShapeTable();
 
     public abstract void addCharacter(char character, Font font);
@@ -129,6 +127,10 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     static {
         reload();
+    }
+
+    public int getFontId() {
+        return getCharacterId();
     }
 
     public boolean hasLayout() {

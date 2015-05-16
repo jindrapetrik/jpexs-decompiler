@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -144,7 +145,7 @@ public class SerializableImage implements Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         try {
-            ImageHelper.write(image, "png", out);
+            ImageHelper.write(image, ImageFormat.PNG, out);
         } catch (Exception ex) {
             // ignore
         }
