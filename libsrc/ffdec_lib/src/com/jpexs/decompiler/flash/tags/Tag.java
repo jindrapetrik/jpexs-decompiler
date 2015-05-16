@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -32,8 +34,10 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -161,9 +165,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private volatile static Integer[] knownTagIds;
 
-    private volatile static Map<Integer, TagInfo> knownTagInfosById;
+    private volatile static Map<Integer, TagTypeInfo> knownTagInfosById;
 
-    private volatile static Map<String, TagInfo> knownTagInfosByName;
+    private volatile static Map<String, TagTypeInfo> knownTagInfosByName;
 
     private volatile static List<Integer> requiredTagIds;
 
@@ -180,12 +184,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagIds;
     }
 
-    public static Map<Integer, TagInfo> getKnownClasses() {
+    public static Map<Integer, TagTypeInfo> getKnownClasses() {
         if (knownTagInfosById == null) {
             synchronized (lockObject) {
                 if (knownTagInfosById == null) {
-                    Map<Integer, TagInfo> map = new HashMap<>();
-                    Map<String, TagInfo> map2 = new HashMap<>();
+                    Map<Integer, TagTypeInfo> map = new HashMap<>();
+                    Map<String, TagTypeInfo> map2 = new HashMap<>();
                     addTagInfo(map, map2, CSMTextSettingsTag.ID, CSMTextSettingsTag.class, CSMTextSettingsTag.NAME);
                     addTagInfo(map, map2, DebugIDTag.ID, DebugIDTag.class, DebugIDTag.NAME);
                     addTagInfo(map, map2, DefineBinaryDataTag.ID, DefineBinaryDataTag.class, DefineBinaryDataTag.NAME);
@@ -273,7 +277,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagInfosById;
     }
 
-    public static Map<String, TagInfo> getKnownClassesByName() {
+    public static Map<String, TagTypeInfo> getKnownClassesByName() {
         // map is filled together with knownTagInfosById
         if (knownTagInfosByName == null) {
             getKnownClasses();
@@ -282,9 +286,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagInfosByName;
     }
 
-    private static void addTagInfo(Map<Integer, TagInfo> map, Map<String, TagInfo> map2, int id, Class cls, String name) {
-        map.put(id, new TagInfo(id, cls, name));
-        map2.put(name, new TagInfo(id, cls, name));
+    private static void addTagInfo(Map<Integer, TagTypeInfo> map, Map<String, TagTypeInfo> map2, int id, Class cls, String name) {
+        map.put(id, new TagTypeInfo(id, cls, name));
+        map2.put(name, new TagTypeInfo(id, cls, name));
     }
 
     public static List<Integer> getRequiredTags() {
@@ -559,6 +563,39 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if (swf.getCharacters().containsKey(characterId)) {
                 needed.add(characterId);
             }
+        }
+    }
+
+    public void getTagInfo(TagInfo tagInfo) {
+
+        tagInfo.addInfo("general", "tagType", String.format("%s (%d)", tagName, id));
+        if (this instanceof CharacterIdTag) {
+            CharacterIdTag characterIdTag = (CharacterIdTag) this;
+            tagInfo.addInfo("general", "characterId", characterIdTag.getCharacterId());
+        }
+
+        if (originalRange != null) {
+            int pos = originalRange.getPos();
+            int length = originalRange.getLength();
+            tagInfo.addInfo("general", "offset", String.format("%d (0x%x)", pos, pos));
+            tagInfo.addInfo("general", "length", String.format("%d (0x%x)", length, length));
+        }
+
+        if (this instanceof BoundedTag) {
+            BoundedTag boundedIdTag = (BoundedTag) this;
+            RECT bounds = boundedIdTag.getRect();
+            tagInfo.addInfo("general", "bounds",
+                    String.format("(%.2f, %.2f)[%.2f x %.2f]", bounds.Xmin / SWF.unitDivisor,
+                            bounds.Ymin / SWF.unitDivisor,
+                            bounds.getWidth() / SWF.unitDivisor,
+                            bounds.getHeight() / SWF.unitDivisor));
+        }
+
+        Set<Integer> needed = new LinkedHashSet<>();
+        getNeededCharactersDeep(needed);
+
+        if (needed.size() > 0) {
+            tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
         }
     }
 }

@@ -36,7 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
@@ -241,7 +241,7 @@ public class SwfXmlImporter {
     private Object createObject(String type, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (swfTags == null) {
             Map<String, Class> tags = new HashMap<>();
-            Map<Integer, TagInfo> knownTags = Tag.getKnownClasses();
+            Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
             for (Integer key : knownTags.keySet()) {
                 Class cls = knownTags.get(key).getCls();
                 if (!ReflectionTools.canInstantiate(cls)) {

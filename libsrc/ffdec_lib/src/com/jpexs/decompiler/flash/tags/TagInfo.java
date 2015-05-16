@@ -16,33 +16,55 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author JPEXS
  */
 public class TagInfo {
 
-    private final int id;
+    private final Map<String, List<TagInfoItem>> infos = new LinkedHashMap<>();
 
-    private final Class cls;
+    public void addInfo(String categoryName, String name, Object value) {
+        categoryName = "general"; // temporary add everything to general catagory
+        List<TagInfoItem> category = infos.get(categoryName);
+        if (category == null) {
+            category = new ArrayList<>();
+            infos.put(categoryName, category);
+        }
 
-    private final String name;
-
-    public TagInfo(int id, Class cls, String name) {
-        this.id = id;
-        this.cls = cls;
-        this.name = name;
+        category.add(new TagInfoItem(name, value));
     }
 
-    public int getId() {
-        return id;
+    public Map<String, List<TagInfoItem>> getInfos() {
+        return infos;
     }
 
-    public Class getCls() {
-        return cls;
+    public boolean isEmpty() {
+        return infos.isEmpty();
     }
 
-    public String getName() {
-        return name;
+    public class TagInfoItem {
+
+        private final String name;
+
+        private final Object value;
+
+        public TagInfoItem(String name, Object value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getValue() {
+            return value;
+        }
     }
 }

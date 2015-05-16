@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -262,6 +263,14 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public void clearCache() {
         cachedImage = null;
+    }
+
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        SerializableImage image = getImage();
+        tagInfo.addInfo("general", "width", image.getWidth());
+        tagInfo.addInfo("general", "height", image.getHeight());
     }
 
     @Override

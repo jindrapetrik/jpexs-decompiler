@@ -100,6 +100,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -424,7 +425,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         whitePanel.setBackground(Color.white);
         detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
 
-        tagInfoPanel = new TagInfoPanel();
+        tagInfoPanel = new TagInfoPanel(this);
         detailPanel.add(tagInfoPanel, DETAILCARDTAGINFO);
 
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
@@ -2881,10 +2882,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (treeItem instanceof Tag) {
             Tag tag = (Tag) treeItem;
-            Set<Integer> needed = new HashSet<>();
-            tag.getNeededCharactersDeep(needed);
-            if (needed.size() > 0) {
-                tagInfoPanel.setNeededCharacters(needed);
+            TagInfo tagInfo = new TagInfo();
+            tag.getTagInfo(tagInfo);
+            if (!tagInfo.isEmpty()) {
+                tagInfoPanel.setTagInfos(tagInfo);
                 showDetail(DETAILCARDTAGINFO);
             } else {
                 showDetail(DETAILCARDEMPTYPANEL);

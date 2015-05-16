@@ -529,7 +529,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (TreeItem item : items) {
                 Set<Tag> copiedTags = new HashSet<>();
                 Set<Tag> newTags = new HashSet<>();
-                LinkedHashSet<Integer> needed = new LinkedHashSet<>();
+                Set<Integer> needed = new LinkedHashSet<>();
                 Map<Integer, Integer> changedCharacterIds = new HashMap<>();
 
                 Tag tag = (Tag) item;

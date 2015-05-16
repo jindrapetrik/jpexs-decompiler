@@ -16,10 +16,19 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.helpers.Helper;
-import java.util.Set;
-import javax.swing.JLabel;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.TagInfo;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -27,18 +36,108 @@ import javax.swing.JPanel;
  */
 public class TagInfoPanel extends JPanel {
 
-    private final JLabel neededCharactersLabel;
+    private final MainPanel mainPanel;
 
-    public TagInfoPanel() {
-        neededCharactersLabel = new JLabel();
-        add(new JLabel("Needed characters:"));
-        add(neededCharactersLabel);
+    private final JTable infoTable = new JTable();
 
-        // todo: add other information
+    private TagInfo tagInfo = new TagInfo();
+
+    public TagInfoPanel(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
+        infoTable.setModel(new InfoTableModel("general"));
+        setLayout(new BorderLayout());
+        infoTable.setAutoCreateRowSorter(true);
+        add(new JScrollPane(infoTable), BorderLayout.CENTER);
     }
 
-    public void setNeededCharacters(Set<Integer> needed) {
-        String neededStr = Helper.joinStrings(needed, ", ");
-        neededCharactersLabel.setText(neededStr);
+    public void setTagInfos(TagInfo tagInfo) {
+        this.tagInfo = tagInfo;
+        infoTable.setBackground(Color.WHITE);
+        infoTable.setModel(new InfoTableModel("general"));
+    }
+
+    private class InfoTableModel implements TableModel {
+
+        private final String categoryName;
+
+        public InfoTableModel(String categoryName) {
+            this.categoryName = categoryName;
+        }
+
+        @Override
+        public int getRowCount() {
+            List<TagInfo.TagInfoItem> category = tagInfo.getInfos().get(categoryName);
+            if (category != null) {
+                return category.size();
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return mainPanel.translate("tagInfo.header.name");
+                case 1:
+                    return mainPanel.translate("tagInfo.header.value");
+            }
+
+            return null;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return String.class;
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            List<TagInfo.TagInfoItem> category = tagInfo.getInfos().get(categoryName);
+            if (category != null) {
+                TagInfo.TagInfoItem item = category.get(rowIndex);
+
+                switch (columnIndex) {
+                    case 0:
+                        String name = item.getName();
+                        String key = "tagInfo." + name;
+                        try {
+                            name = mainPanel.translate(key);
+                        } catch (MissingResourceException mes) {
+                            if (Configuration.debugMode.get()) {
+                                Logger.getLogger(TagInfoPanel.class.getName()).log(Level.WARNING, "Resource not found: {0}", key);
+                            }
+                        }
+
+                        return name;
+                    case 1:
+                        return item.getValue();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        }
+
+        @Override
+        public void addTableModelListener(TableModelListener l) {
+        }
+
+        @Override
+        public void removeTableModelListener(TableModelListener l) {
+        }
     }
 }
