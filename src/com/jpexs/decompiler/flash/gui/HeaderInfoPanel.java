@@ -24,7 +24,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -57,9 +56,13 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private final JLabel displayRectPixelsLabel = new JLabel();
 
-    private final JComboBox<String> versionComboBox = new JComboBox<>();
+    private final JPanel versionEditorPanel = new JPanel();
+
+    private final JSpinner versionEditor = new JSpinner();
 
     private final JCheckBox gfxCheckBox = new JCheckBox();
+
+    private final JPanel frameRateEditorPanel = new JPanel();
 
     private final JSpinner frameRateEditor = new JSpinner();
 
@@ -96,16 +99,32 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
                 TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
         }));
 
-        displayRectEditorPanel.setLayout(new FlowLayout(SwingConstants.WEST));
+        FlowLayout layout = new FlowLayout(SwingConstants.WEST);
+        layout.setHgap(0);
+        layout.setVgap(0);
+
+        versionEditorPanel.setLayout(layout);
+        versionEditor.setPreferredSize(new Dimension(80, versionEditor.getPreferredSize().height));
+        versionEditorPanel.add(versionEditor);
+
+        frameRateEditorPanel.setLayout(layout);
+        frameRateEditor.setPreferredSize(new Dimension(80, frameRateEditor.getPreferredSize().height));
+        frameRateEditorPanel.add(frameRateEditor);
+
+        displayRectEditorPanel.setLayout(layout);
         displayRectEditorPanel.setMinimumSize(new Dimension(10, displayRectEditorPanel.getMinimumSize().height));
         xMinEditor.setPreferredSize(new Dimension(80, xMinEditor.getPreferredSize().height));
         xMaxEditor.setPreferredSize(new Dimension(80, xMaxEditor.getPreferredSize().height));
         yMinEditor.setPreferredSize(new Dimension(80, yMinEditor.getPreferredSize().height));
         yMaxEditor.setPreferredSize(new Dimension(80, yMaxEditor.getPreferredSize().height));
         displayRectEditorPanel.add(xMinEditor);
+        displayRectEditorPanel.add(new JLabel(","));
         displayRectEditorPanel.add(yMinEditor);
+        displayRectEditorPanel.add(new JLabel(" => "));
         displayRectEditorPanel.add(xMaxEditor);
+        displayRectEditorPanel.add(new JLabel(","));
         displayRectEditorPanel.add(yMaxEditor);
+        displayRectEditorPanel.add(new JLabel(" twips"));
 
         propertiesPanel.add(new JLabel(AppStrings.translate("header.signature")), "0,0");
         propertiesPanel.add(signatureLabel, "1,0");
@@ -113,7 +132,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(compressionLabel, "1,1");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.version")), "0,2");
         propertiesPanel.add(versionLabel, "1,2");
-        propertiesPanel.add(versionComboBox, "1,2");
+        propertiesPanel.add(versionEditorPanel, "1,2");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.gfx")), "0,3");
         propertiesPanel.add(gfxLabel, "1,3");
         propertiesPanel.add(gfxCheckBox, "1,3");
@@ -121,7 +140,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(fileSizeLabel, "1,4");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.framerate")), "0,5");
         propertiesPanel.add(frameRateLabel, "1,5");
-        propertiesPanel.add(frameRateEditor, "1,5");
+        propertiesPanel.add(frameRateEditorPanel, "1,5");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.framecount")), "0,6");
         propertiesPanel.add(frameCountLabel, "1,6");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.displayrect")), "0,7");
@@ -129,10 +148,6 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(displayRectEditorPanel, "1,7");
         propertiesPanel.add(new JLabel(""), "0,8");
         propertiesPanel.add(displayRectPixelsLabel, "1,8");
-
-        for (int i = 1; i <= SWF.MAX_VERSION; i++) {
-            versionComboBox.addItem(Integer.toString(i));
-        }
 
         add(propertiesPanel, BorderLayout.CENTER);
 
@@ -161,7 +176,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
-        swf.version = Integer.parseInt((String) versionComboBox.getSelectedItem());
+        swf.version = (int) versionEditor.getModel().getValue();
         swf.gfx = gfxCheckBox.isSelected();
         swf.frameRate = (int) frameRateEditor.getModel().getValue();
         swf.displayRect.Xmin = (int) xMinEditor.getModel().getValue();
@@ -194,7 +209,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         }
 
         versionLabel.setText(Integer.toString(swf.version));
-        versionComboBox.setSelectedItem(Integer.toString(swf.version));
+        versionEditor.setModel(new SpinnerNumberModel(swf.version, 1, SWF.MAX_VERSION, 1));
 
         gfxLabel.setText(swf.gfx ? AppStrings.translate("yes") : AppStrings.translate("no"));
         gfxCheckBox.setSelected(swf.gfx);
@@ -239,7 +254,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private void setEditMode(boolean edit) {
         versionLabel.setVisible(!edit);
-        versionComboBox.setVisible(edit);
+        versionEditor.setVisible(edit);
         gfxLabel.setVisible(!edit);
         gfxCheckBox.setVisible(edit);
         frameRateLabel.setVisible(!edit);
