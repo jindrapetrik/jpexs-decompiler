@@ -82,7 +82,7 @@ public class ImageExporter {
                 }
 
                 {
-                    final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + fileFormat));
+                    final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
                     final ImageFormat ffileFormat = fileFormat;
 
                     new RetryTask(() -> {
