@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 /**
@@ -83,22 +85,26 @@ public class ApplicationInfo {
             // ignore
             version = "unknown";
         }
-        updateCheckUrl = updateCheckUrl
-                .replace("<revision>", revision)
-                .replace("<version>", version)
-                .replace("<version.major>", "" + version_major)
-                .replace("<version.minor>", "" + version_minor)
-                .replace("<version.release>", "" + version_release)
-                .replace("<version.build>", "" + version_build)
-                .replace("<nightly>", nightly ? "1" : "0");
-        updateUrl = updateUrl
-                .replace("<revision>", revision)
-                .replace("<version>", version)
-                .replace("<version.major>", "" + version_major)
-                .replace("<version.minor>", "" + version_minor)
-                .replace("<version.release>", "" + version_release)
-                .replace("<version.build>", "" + version_build)
-                .replace("<nightly>", nightly ? "1" : "0");
+        try {
+            updateCheckUrl = updateCheckUrl
+                    .replace("<revision>", URLEncoder.encode(revision, "UTF-8"))
+                    .replace("<version>", URLEncoder.encode(version, "UTF-8"))
+                    .replace("<version.major>", "" + version_major)
+                    .replace("<version.minor>", "" + version_minor)
+                    .replace("<version.release>", "" + version_release)
+                    .replace("<version.build>", "" + version_build)
+                    .replace("<nightly>", nightly ? "1" : "0");
+            updateUrl = updateUrl
+                    .replace("<revision>", URLEncoder.encode(revision, "UTF-8"))
+                    .replace("<version>", URLEncoder.encode(version, "UTF-8"))
+                    .replace("<version.major>", "" + version_major)
+                    .replace("<version.minor>", "" + version_minor)
+                    .replace("<version.release>", "" + version_release)
+                    .replace("<version.build>", "" + version_build)
+                    .replace("<nightly>", nightly ? "1" : "0");
+        } catch (UnsupportedEncodingException e) {
+
+        }
         applicationVerName = APPLICATION_NAME + " v." + version;
         shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;
     }
