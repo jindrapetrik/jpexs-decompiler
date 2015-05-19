@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -201,34 +202,10 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
         return streamSoundType;
     }
 
-    public static void populateSoundStreamBlocks(int containerId, List<Tag> tags, SoundStreamHeadTypeTag head, List<SoundStreamBlockTag> output) {
-        boolean found = false;
-        for (Tag t : tags) {
-            if (t == head) {
-                found = true;
-                head.setVirtualCharacterId(containerId);
-                continue;
-            }
-            if (t instanceof DefineSpriteTag) {
-                DefineSpriteTag sprite = (DefineSpriteTag) t;
-                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubTags(), head, output);
-            }
-            if (!found) {
-                continue;
-            }
-            if (t instanceof SoundStreamBlockTag) {
-                output.add((SoundStreamBlockTag) t);
-            }
-            if (t instanceof SoundStreamHeadTypeTag) {
-                break;
-            }
-        }
-    }
-
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
-        List<SoundStreamBlockTag> ret = new ArrayList<>();
-        populateSoundStreamBlocks(0, swf.tags, this, ret);
+        Timeline timeline = swf.getTimeline();
+        List<SoundStreamBlockTag> ret = timeline.getSoundStreamBlocks(this);
         return ret;
 
     }

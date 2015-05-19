@@ -19,10 +19,12 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -35,6 +37,7 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -85,6 +88,8 @@ public class Timeline {
 
     private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
 
+    private final Map<SoundStreamHeadTypeTag, List<SoundStreamBlockTag>> soundStramBlocks = new HashMap<>();
+
     private AS2Package as2RootPackage;
 
     public final List<Tag> otherTags = new ArrayList<>();
@@ -124,6 +129,11 @@ public class Timeline {
         return depthMaxFrame;
     }
 
+    public List<SoundStreamBlockTag> getSoundStreamBlocks(SoundStreamHeadTypeTag head) {
+        ensureInitialized();
+        return soundStramBlocks.get(head);
+    }
+
     public void reset(SWF swf) {
         reset(swf, null, swf.tags, 0, swf.displayRect);
     }
@@ -135,6 +145,7 @@ public class Timeline {
         asmSources.clear();
         asmSourceContainers.clear();
         actionFrames.clear();
+        soundStramBlocks.clear();
         otherTags.clear();
         this.id = id;
         this.swf = swf;
@@ -342,6 +353,10 @@ public class Timeline {
         }
 
         createASPackages();
+        if (parentTag == null) {
+            // popuplate only for main timeline
+            populateSoundStreamBlocks(0, tags);
+        }
 
         initialized = true;
     }
@@ -406,6 +421,32 @@ public class Timeline {
                 }
 
                 pkg.scripts.put(pathParts[pathParts.length - 1], asm);
+            }
+        }
+    }
+
+    private void populateSoundStreamBlocks(int containerId, List<Tag> tags) {
+        List<SoundStreamBlockTag> blocks = null;
+        for (Tag t : tags) {
+            if (t instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
+                head.setVirtualCharacterId(containerId);
+                blocks = new ArrayList<>();
+                soundStramBlocks.put(head, blocks);
+                continue;
+            }
+
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
+                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubTags());
+            }
+
+            if (blocks == null) {
+                continue;
+            }
+
+            if (t instanceof SoundStreamBlockTag) {
+                blocks.add((SoundStreamBlockTag) t);
             }
         }
     }

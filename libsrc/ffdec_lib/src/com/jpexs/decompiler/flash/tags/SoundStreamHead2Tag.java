@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -204,8 +205,8 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
 
     @Override
     public List<SoundStreamBlockTag> getBlocks() {
-        List<SoundStreamBlockTag> ret = new ArrayList<>();
-        SoundStreamHeadTag.populateSoundStreamBlocks(0, swf.tags, this, ret);
+        Timeline timeline = swf.getTimeline();
+        List<SoundStreamBlockTag> ret = timeline.getSoundStreamBlocks(this);
         return ret;
 
     }
