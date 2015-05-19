@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
+import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -80,6 +81,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -456,10 +458,23 @@ public class Main {
                 SWFList swfs = null;
                 try {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...");
-                    swfs = parseSWF(sourceInfo);
+                    try {
+                        swfs = parseSWF(sourceInfo);
+                    } catch (ExecutionException ex) {
+                        Throwable cause = ex.getCause();
+                        if (cause instanceof SwfOpenException) {
+                            throw (SwfOpenException) cause;
+                        }
+
+                        throw ex;
+                    }
                 } catch (OutOfMemoryError ex) {
                     logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
+                    continue;
+                } catch (SwfOpenException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                    View.showMessageDialog(null, ex.getMessage());
                     continue;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);

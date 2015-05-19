@@ -1091,7 +1091,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         // SWFheader: signature, version and fileSize
         if (is.read(hdr) != 8) {
-            throw new IOException("SWF header is too short");
+            throw new SwfOpenException("SWF header is too short");
         }
 
         String signature = new String(hdr, 0, 3, Utf8Helper.charset);
@@ -1103,7 +1103,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 "CFX", // Compressed ScaleForm GFx
                 "ABC" // Non-standard LZMA compressed Flash
         ).contains(signature)) {
-            throw new IOException("Invalid SWF file");
+            throw new SwfOpenException("Invalid SWF file, wrong signature.");
         }
 
         int version = hdr[3];
