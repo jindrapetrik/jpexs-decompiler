@@ -317,7 +317,9 @@ public class XFLConverter {
                 }
 
                 ret.append(">");
-                ret.append("<matrix>").append(convertMatrix(fs.bitmapMatrix)).append("</matrix>");
+                ret.append("<matrix>");
+                convertMatrix(fs.bitmapMatrix, ret);
+                ret.append("</matrix>");
                 ret.append("</BitmapFill>");
                 break;
             case FILLSTYLE.LINEAR_GRADIENT:
@@ -366,7 +368,9 @@ public class XFLConverter {
 
                 ret.append(">");
 
-                ret.append("<matrix>").append(convertMatrix(fs.gradientMatrix)).append("</matrix>");
+                ret.append("<matrix>");
+                convertMatrix(fs.gradientMatrix, ret);
+                ret.append("</matrix>");
                 GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.gradient.gradientRecords;
@@ -392,15 +396,8 @@ public class XFLConverter {
         //ret.append("</FillStyle>");
     }
 
-    private static String convertMatrix(MATRIX m) {
-        return convertMatrix(new Matrix(m));
-    }
-
-    private static String convertMatrix(Matrix m) {
-        StringBuilder ret = new StringBuilder();
-        if (m == null) {
-            m = new Matrix();
-        }
+    private static void convertMatrix(MATRIX matrix, StringBuilder ret) {
+        Matrix m = new Matrix(matrix);
         ret.append("<Matrix ");
         ret.append("tx=\"").append(((float) m.translateX) / SWF.unitDivisor).append("\" ");
         ret.append("ty=\"").append(((float) m.translateY) / SWF.unitDivisor).append("\" ");
@@ -413,24 +410,7 @@ public class XFLConverter {
             ret.append("c=\"").append(m.rotateSkew1).append("\" ");
         }
         ret.append("/>");
-        return ret.toString();
     }
-    /*
-     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPE shape) {
-     return convertShape(characters, mat, shapeNum, shape.shapeRecords);
-     }
-
-     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape,boolean morphShape) {
-     return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles, morphShape);
-     }
-
-     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, ShapeTag shape, boolean morphShape) {
-     return convertShape(characters, mat, shape.getShapeNum(), shape.getShapes(),morphShape);
-     }
-
-     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords,boolean useLayers) {
-     return convertShape(characters, mat, shapeNum, shapeRecords, null, null, false,true);
-     }*/
 
     private static boolean shapeHasMultiLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, false);
@@ -909,8 +889,7 @@ public class XFLConverter {
         return ds;
     }
 
-    private static String convertFilter(FILTER filter) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertFilter(FILTER filter, StringBuilder ret) {
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
             ret.append("<DropShadowFilter");
@@ -1046,9 +1025,8 @@ public class XFLConverter {
             ret.append("</GradientBevelFilter>");
         } else if (filter instanceof COLORMATRIXFILTER) {
             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
-            ret.append(convertAdjustColorFilter(cmf));
+            convertAdjustColorFilter(cmf, ret);
         }
-        return ret.toString();
     }
 
     private static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
@@ -1098,7 +1076,7 @@ public class XFLConverter {
         }
         ret.append(">");
         ret.append("<matrix>");
-        ret.append(convertMatrix(matrix));
+        convertMatrix(matrix, ret);
         ret.append("</matrix>");
         ret.append("<transformationPoint><Point/></transformationPoint>");
 
@@ -1142,7 +1120,7 @@ public class XFLConverter {
         if (filters != null) {
             ret.append("<filters>");
             for (FILTER f : filters) {
-                ret.append(convertFilter(f));
+                convertFilter(f, ret);
             }
             ret.append("</filters>");
         }
@@ -1189,11 +1167,10 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion) {
+    private static void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, StringBuilder ret) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
-        StringBuilder ret = new StringBuilder();
         List<String> media = new ArrayList<>();
         List<String> symbols = new ArrayList<>();
         for (int ch : characters.keySet()) {
@@ -1636,7 +1613,6 @@ public class XFLConverter {
             }
             ret.append("</symbols>");
         }
-        return ret.toString();
     }
 
     private static String prettyFormatXML(String input) {
@@ -1659,8 +1635,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, StringBuilder ret) {
         DefineSoundTag sound = null;
         if (startSound != null) {
             for (Tag t : tags) {
@@ -1768,7 +1743,6 @@ public class XFLConverter {
         ret.append(elements);
         ret.append("</elements>");
         ret.append("</DOMFrame>");
-        return ret.toString();
     }
 
     private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video, CLIPACTIONS clipActions) {
@@ -1779,7 +1753,7 @@ public class XFLConverter {
         }
         ret.append(">");
         ret.append("<matrix>");
-        ret.append(convertMatrix(matrix));
+        convertMatrix(matrix, ret);
         ret.append("</matrix>");
         ret.append("<transformationPoint>");
         ret.append("<Point />");
@@ -1788,11 +1762,11 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    private static String convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, StringBuilder ret) {
+        StringBuilder ret2 = new StringBuilder();
         prevStr += "<frames>";
         int frame = -1;
-        String elements = "";
+        String elements;
         String lastElements = "";
 
         int duration = 1;
@@ -1895,33 +1869,33 @@ public class XFLConverter {
             }
 
             if (t instanceof ShowFrameTag) {
-                elements = "";
-
                 if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
                     ShapeTag shape = (ShapeTag) character;
-                    elements += convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
+                    elements = convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
                     shapeTween = false;
                     shapeTweener = null;
                 } else if (character != null) {
                     if (character instanceof MorphShapeTag) {
                         MorphShapeTag m = (MorphShapeTag) character;
-                        elements += convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false);
+                        elements = convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false);
                         shapeTween = true;
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
-                            elements += convertText(instanceName, (TextTag) character, matrix, filters, clipActions);
+                            elements = convertText(instanceName, (TextTag) character, matrix, filters, clipActions);
                         } else if (character instanceof DefineVideoStreamTag) {
-                            elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
+                            elements = convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
                         } else {
-                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
+                            elements = convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
                         }
                     }
+                } else {
+                    elements = "";
                 }
 
                 frame++;
                 if (!elements.equals(lastElements) && frame > 0) {
-                    ret.append(convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files));
+                    convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files, ret2);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -1935,18 +1909,17 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty()) {
             frame++;
-            ret.append(convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files));
+            convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, ret2);
         }
         afterStr = "</frames>" + afterStr;
-        String retStr = ret.toString();
-        if (!retStr.isEmpty()) {
-            retStr = prevStr + retStr + afterStr;
+
+        if (ret2.length() > 0) {
+            ret.append(prevStr).append(ret2).append(afterStr);
         }
-        return retStr;
     }
 
-    private static String convertFonts(List<Tag> tags) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertFonts(List<Tag> tags, StringBuilder ret) {
+        StringBuilder ret2 = new StringBuilder();
         for (Tag t : tags) {
             if (t instanceof FontTag) {
                 FontTag font = (FontTag) t;
@@ -2002,17 +1975,14 @@ public class XFLConverter {
                 if (hasAllRanges) {
                     embedRanges = "9999";
                 }
-                ret.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(xmlString(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "").append(" />");
+                ret2.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(xmlString(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "").append(" />");
             }
 
         }
 
-        String retStr = ret.toString();
-        if (!retStr.isEmpty()) {
-            retStr = "<fonts>" + retStr + "</fonts>";
+        if (ret2.length() > 0) {
+            ret.append("<fonts>").append(ret2).append("</fonts>");
         }
-
-        return retStr;
     }
 
     private static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
@@ -2133,8 +2103,8 @@ public class XFLConverter {
         return retStr;
     }
 
-    private static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files, StringBuilder ret) {
+        StringBuilder ret2 = new StringBuilder();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
         StartSoundTag startSound = null;
@@ -2167,7 +2137,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        ret.append(convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files));
+                        convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, ret2);
                     }
                     frame += duration;
                     duration = 1;
@@ -2185,15 +2155,14 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            ret.append(convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files));
+            convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, ret2);
         }
-        String retStr = ret.toString();
-        if (!retStr.isEmpty()) {
-            retStr = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
-                    + "<frames>" + retStr + "</frames>"
-                    + "</DOMLayer>";
+
+        if (ret2.length() > 0) {
+            ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
+                    + "<frames>").append(ret2).append("</frames>"
+                            + "</DOMLayer>");
         }
-        return retStr;
     }
 
     private static String randomOutlineColor() {
@@ -2241,7 +2210,7 @@ public class XFLConverter {
                         ret.append("<DOMLayer name=\"Layer ").append(index + 1).append("\" color=\"").append(randomOutlineColor()).append("\" ");
                         ret.append(" layerType=\"mask\" locked=\"true\"");
                         ret.append(">");
-                        ret.append(convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files));
+                        convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, ret);
                         ret.append("</DOMLayer>");
                         index++;
                         break;
@@ -2282,16 +2251,16 @@ public class XFLConverter {
             }
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
-            String cf = convertFrames(layerPrev, layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files);
-            if (cf.isEmpty()) {
+            int prevLength = ret.length();
+            convertFrames(layerPrev, layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, ret);
+            if (ret.length() == prevLength) {
                 index--;
             }
-            ret.append(cf);
         }
 
         int soundLayerIndex = layerCount;
         layerCount++;
-        ret.append(convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files));
+        convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files, ret);
         ret.append("</layers>");
         ret.append("</DOMTimeline>");
         return ret.toString();
@@ -2338,18 +2307,15 @@ public class XFLConverter {
     private static String convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
         StringBuilder ret = new StringBuilder();
 
-        if (m == null) {
-            m = new MATRIX();
-        }
-        Matrix matrix = new Matrix(m);
+        MATRIX matrix = new MATRIX(m);
         CSMTextSettingsTag csmts = null;
-        String filterStr = "";
+        StringBuilder filterStr = new StringBuilder();
         if (filters != null) {
-            filterStr += "<filters>";
+            filterStr.append("<filters>");
             for (FILTER f : filters) {
-                filterStr += convertFilter(f);
+                convertFilter(f, ret);
             }
-            filterStr += "</filters>";
+            filterStr.append("</filters>");
         }
 
         SWF swf = tag.getSwf();
@@ -2373,16 +2339,16 @@ public class XFLConverter {
             }
             antiAlias = " antiAliasSharpness=\"" + doubleToString(csmts.sharpness) + "\" antiAliasThickness=\"" + doubleToString(csmts.thickness) + "\"";
         }
-        String matStr = "";
-        matStr += "<matrix>";
         String left = "";
         RECT bounds = tag.getBounds();
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
             MATRIX textMatrix = tag.getTextMatrix();
             left = " left=\"" + doubleToString((textMatrix.translateX) / SWF.unitDivisor) + "\"";
         }
-        matStr += convertMatrix(matrix);
-        matStr += "</matrix>";
+        StringBuilder matStr = new StringBuilder();
+        matStr.append("<matrix>");
+        convertMatrix(matrix, matStr);
+        matStr.append("</matrix>");
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
             List<TEXTRECORD> textRecords = new ArrayList<>();
             if (tag instanceof DefineTextTag) {
@@ -2712,8 +2678,8 @@ public class XFLConverter {
             domDocument.append(" height=\"").append(doubleToString(height)).append("\"");
         }
         domDocument.append(">");
-        domDocument.append(convertFonts(swf.tags));
-        domDocument.append(convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion));
+        convertFonts(swf.tags, domDocument);
+        convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion, domDocument);
         domDocument.append("<timelines>");
         domDocument.append(convertTimeline(0, nonLibraryShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1", flaVersion, files));
         domDocument.append("</timelines>");
@@ -3099,7 +3065,7 @@ public class XFLConverter {
         return a == b ? true : Math.abs(a - b) < EPSILON;
     }
 
-    private static String convertAdjustColorFilter(COLORMATRIXFILTER filter) {
+    private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, StringBuilder ret) {
         float[][] matrix = new float[5][5];
         int index = 0;
         for (int i = 0; i < 4; i++) {
@@ -3143,7 +3109,7 @@ public class XFLConverter {
             h = 0;
         }
 
-        return "<AdjustColorFilter brightness=\"" + normBrightness(b) + "\" contrast=\"" + normContrast(c) + "\" saturation=\"" + normSaturation(s) + "\" hue=\"" + normHue(h) + "\"/>";
+        ret.append("<AdjustColorFilter brightness=\"").append(normBrightness(b)).append("\" contrast=\"").append(normContrast(c)).append("\" saturation=\"").append(normSaturation(s)).append("\" hue=\"").append(normHue(h)).append("\"/>");
     }
 
     private static String convertHTMLText(List<Tag> tags, DefineEditTextTag det, String html) {
