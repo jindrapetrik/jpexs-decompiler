@@ -47,6 +47,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Configuration {
 
     private static final String CONFIG_NAME = "config.bin";

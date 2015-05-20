@@ -157,20 +157,20 @@ public class ExportDialog extends AppDialog {
     }
 
     private void saveConfig() {
-        String cfg = "";
+        StringBuilder cfg = new StringBuilder();
         for (int i = 0; i < optionNames.length; i++) {
             int selIndex = combos[i].getSelectedIndex();
             Class c = optionClasses[i];
             Object vals[] = c.getEnumConstants();
             String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase();
             if (i > 0) {
-                cfg += ",";
+                cfg.append(",");
             }
-            cfg += key;
+            cfg.append(key);
         }
 
         Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
-        Configuration.lastSelectedExportFormats.set(cfg);
+        Configuration.lastSelectedExportFormats.set(cfg.toString());
     }
 
     public ExportDialog(List<TreeItem> exportables) {

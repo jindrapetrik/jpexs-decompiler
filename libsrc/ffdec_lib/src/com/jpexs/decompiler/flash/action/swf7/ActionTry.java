@@ -139,25 +139,20 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public String getASMSourceBetween(int pos) {
-        String ret = "";
         if (pos == 0) {
             if (catchBlockFlag) {
-                ret += "Catch";
-                ret += " {\r\n";
-                return ret;
+                return "Catch {\r\n";
             }
             if (finallyBlockFlag) {
-                ret += "Finally {\r\n";
-                return ret;
+                return "Finally {\r\n";
             }
         }
         if (pos == 1) {
             if (catchBlockFlag && finallyBlockFlag) {
-                ret += "Finally {\r\n";
-                return ret;
+                return "Finally {\r\n";
             }
         }
-        return ret;
+        return "";
     }
 
     @Override

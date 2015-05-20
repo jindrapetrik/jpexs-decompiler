@@ -90,15 +90,20 @@ public class Helper {
      * @return String representation of the array
      */
     public static String intArrToString(int[] array) {
-        String s = "[";
+        StringBuilder sb = new StringBuilder();
+        intArrToStringBuilder(array, sb);
+        return sb.toString();
+    }
+
+    public static void intArrToStringBuilder(int[] array, StringBuilder sb) {
+        sb.append("[");
         for (int i = 0; i < array.length; i++) {
             if (i > 0) {
-                s += ",";
+                sb.append(",");
             }
-            s += array[i];
+            sb.append(array[i]);
         }
-        s += "]";
-        return s;
+        sb.append("]");
     }
 
     /**
@@ -108,15 +113,16 @@ public class Helper {
      * @return String representation of the array
      */
     public static String byteArrToString(byte[] array) {
-        String s = "[";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
         for (int i = 0; i < array.length; i++) {
             if (i > 0) {
-                s += " ";
+                sb.append(" ");
             }
-            s += padZeros(Integer.toHexString(array[i] & 0xff), 2);
+            sb.append(hexStringCache[array[i] & 0xff]);
         }
-        s += "]";
-        return s;
+        sb.append("]");
+        return sb.toString();
     }
 
     /**
@@ -137,30 +143,28 @@ public class Helper {
 
     /**
      * Formats specified address to four numbers xxxx
+     * (or five numbers when showing decimal addresses)
      *
      * @param number Address to format
      * @return String representation of the address
      */
     public static String formatAddress(long number) {
-        if (Configuration.decimalAddress.get()) {
-            return padZeros(Long.toString(number), 4);
-        }
-        return padZeros(Long.toHexString(number), 4);
+        return formatAddress(number, Configuration.decimalAddress.get());
     }
 
     /**
-     * Adds space to text to fill specified width
+     * Formats specified address to four numbers xxxx
+     * (or five numbers when showing decimal addresses)
      *
-     * @param text Text to add spaces to
-     * @param width New width
-     * @return Text with appended spaces
+     * @param number Address to format
+     * @param decimal Use decimal format
+     * @return String representation of the address
      */
-    public static String padSpaceRight(String text, int width) {
-        int oldLen = text.length();
-        for (int i = oldLen; i < width; i++) {
-            text += " ";
+    public static String formatAddress(long number, boolean decimal) {
+        if (decimal) {
+            return String.format("%05d", number);
         }
-        return text;
+        return String.format("%04x", number);
     }
 
     /**
@@ -186,7 +190,7 @@ public class Helper {
             } else if (c == '\\') {
                 ret.append("\\\\");
             } else if (c < 32) {
-                ret.append("\\x").append(padZeros(Integer.toHexString((int) c), 2));
+                ret.append("\\x").append(byteToHex((byte) c));
             } else {
                 ret.append(c);
             }
@@ -222,7 +226,7 @@ public class Helper {
             } else if (c == '\'') {
                 ret.append("\\'");
             } else if (c < 32) {
-                ret.append("\\x").append(padZeros(Integer.toHexString((int) c), 2));
+                ret.append("\\x").append(byteToHex((byte) c));
             } else {
                 ret.append(c);
             }
@@ -256,7 +260,8 @@ public class Helper {
             } else if (c == '"') {
                 ret.append("\\\"");
             } else if (c < 32) {
-                ret.append("\\u").append(padZeros(Integer.toHexString((int) c), 4));
+                // \\x is not available in Java string, we should use \\u instead
+                ret.append("\\u00").append(byteToHex((byte) c));
             } else {
                 ret.append(c);
             }

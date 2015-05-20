@@ -198,16 +198,17 @@ public class Multiname {
         if (index == 0) {
             return "null";
         }
-        String ret = "[";
+        StringBuilder ret = new StringBuilder();
+        ret.append("[");
         for (int n = 0; n < constants.getNamespaceSet(index).namespaces.length; n++) {
             if (n > 0) {
-                ret += ",";
+                ret.append(",");
             }
             int ns = constants.getNamespaceSet(index).namespaces[n];
-            ret += namespaceToString(constants, ns);
+            ret.append(namespaceToString(constants, ns));
         }
-        ret += "]";
-        return ret;
+        ret.append("]");
+        return ret.toString();
     }
 
     private static String multinameToString(AVM2ConstantPool constants, int index, List<String> fullyQualifiedNames) {

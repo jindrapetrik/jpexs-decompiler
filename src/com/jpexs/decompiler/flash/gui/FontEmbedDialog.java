@@ -28,8 +28,6 @@ import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -49,6 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -278,17 +278,24 @@ public class FontEmbedDialog extends AppDialog {
                 updateCheckboxes();
             }
         });
-        faceSelection.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                updateCheckboxes();
-            }
+        faceSelection.addItemListener((ItemEvent e) -> {
+            updateCheckboxes();
         });
         updateCheckboxes();
-        individualCharsField.addKeyListener(new KeyAdapter() {
+        individualCharsField.getDocument().addDocumentListener(new DocumentListener() {
+
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void insertUpdate(DocumentEvent e) {
+                updateIndividual();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateIndividual();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
                 updateIndividual();
             }
         });
@@ -297,13 +304,13 @@ public class FontEmbedDialog extends AppDialog {
     private void updateIndividual() {
         String chars = individualCharsField.getText();
         Font f = getSelectedFont();
-        String visibleChars = "";
+        StringBuilder visibleChars = new StringBuilder();
         for (int i = 0; i < chars.length(); i++) {
             if (f.canDisplay(chars.codePointAt(i))) {
-                visibleChars += "" + chars.charAt(i);
+                visibleChars.append(chars.charAt(i));
             }
         }
-        individialSample.setText(visibleChars);
+        individialSample.setText(visibleChars.toString());
     }
 
     private void updateCheckboxes() {

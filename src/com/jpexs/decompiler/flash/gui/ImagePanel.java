@@ -280,7 +280,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             Point p = lastMouseEvent == null ? null : lastMouseEvent.getPoint();
             List<DepthState> objs = new ArrayList<>();
-            String ret = "";
+            StringBuilder ret = new StringBuilder();
 
             synchronized (ImagePanel.class) {
                 if (timer == thisTimer) {
@@ -290,7 +290,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         int y = p.y;
                         objs = iconPanel.getObjectsUnderPoint(p);
 
-                        ret += " [" + x + "," + y + "] : ";
+                        ret.append(" [").append(x).append(",").append(y).append("] : ");
                     }
                 }
             }
@@ -299,7 +299,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             for (int i = 0; i < objs.size(); i++) {
                 DepthState ds = objs.get(i);
                 if (!first) {
-                    ret += ", ";
+                    ret.append(", ");
                 }
                 first = false;
                 CharacterTag c = tim.swf.getCharacter(ds.characterId);
@@ -307,18 +307,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     newStateUnderCursor = ds;
                     handCursor = true;
                 }
-                ret += c.toString();
+                ret.append(c.toString());
                 if (timelined instanceof ButtonTag) {
                     handCursor = true;
                 }
             }
             if (first) {
-                ret += " - ";
+                ret.append(" - ");
             }
 
             synchronized (ImagePanel.class) {
                 if (timer == thisTimer) {
-                    debugLabel.setText(ret);
+                    debugLabel.setText(ret.toString());
 
                     if (handCursor) {
                         iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

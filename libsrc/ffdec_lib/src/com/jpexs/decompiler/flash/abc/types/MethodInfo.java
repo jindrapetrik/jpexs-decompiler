@@ -226,17 +226,25 @@ public class MethodInfo {
 
     @Override
     public String toString() {
-        String optionalStr = "[";
+        StringBuilder ret = new StringBuilder();
+        ret.append("MethodInfo: param_types=");
+        Helper.intArrToStringBuilder(param_types, ret);
+        ret.append(" ret_type=").append(ret_type)
+                .append(" name_index=").append(name_index)
+                .append(" flags=").append(flags)
+                .append(" optional=[");
         if (optional != null) {
             for (int i = 0; i < optional.length; i++) {
                 if (i > 0) {
-                    optionalStr += ",";
+                    ret.append(",");
                 }
-                optionalStr += optional[i].toString();
+                ret.append(optional[i].toString());
             }
         }
-        optionalStr += "]";
-        return "MethodInfo: param_types=" + Helper.intArrToString(param_types) + " ret_type=" + ret_type + " name_index=" + name_index + " flags=" + flags + " optional=" + optionalStr + " paramNames=" + Helper.intArrToString(paramNames);
+        ret.append("]");
+        ret.append(" paramNames=");
+        Helper.intArrToStringBuilder(paramNames, ret);
+        return ret.toString();
     }
 
     public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {

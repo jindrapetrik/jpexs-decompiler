@@ -220,8 +220,8 @@ public class FontPanel extends JPanel {
             selectedFont = swf.sourceFontNamesMap.get(ft.getFontId());
         } else if (Configuration.getFontToNameMap().containsKey(key)) {
             selectedFont = Configuration.getFontToNameMap().get(key);
-        } else if (Configuration.getFontToNameMap().containsKey(ft.getFontName())) {
-            selectedFont = Configuration.getFontToNameMap().get(ft.getFontName());
+        } else if (Configuration.getFontToNameMap().containsKey(ft.getFontNameIntag())) {
+            selectedFont = Configuration.getFontToNameMap().get(ft.getFontNameIntag());
         } else {
             selectedFont = FontTag.findInstalledFontName(ft.getFontName());
         }

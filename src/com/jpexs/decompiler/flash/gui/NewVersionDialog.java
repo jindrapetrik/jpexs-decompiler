@@ -54,7 +54,6 @@ public class NewVersionDialog extends AppDialog {
         JEditorPane changesText = new JEditorPane();
         changesText.setEditable(false);
         changesText.setFont(UIManager.getFont("TextField.font"));
-        String changesStr = "";
         SimpleDateFormat serverFormatter = new SimpleDateFormat("MM/dd/yyyy");
         DateFormat formatter;
         String customFormat = translate("customDateFormat");
@@ -63,13 +62,17 @@ public class NewVersionDialog extends AppDialog {
         } else {
             formatter = new SimpleDateFormat(customFormat);
         }
+
+        StringBuilder changesStr = new StringBuilder();
+        changesStr.append("<html>");
+
         boolean first = true;
         for (Version v : versions) {
             if (!first) {
-                changesStr += "<hr />";
+                changesStr.append("<hr />");
             }
             first = false;
-            changesStr += "<b>" + translate("version") + " " + v.versionName + "</b><br />";
+            changesStr.append("<b>").append(translate("version")).append(" ").append(v.versionName).append("</b><br />");
             String releaseDate = v.releaseDate;
             try {
                 Date date = serverFormatter.parse(releaseDate);
@@ -77,25 +80,27 @@ public class NewVersionDialog extends AppDialog {
             } catch (ParseException ex) {
                 Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
-            changesStr += translate("releasedate") + " " + releaseDate;
+            changesStr.append(translate("releasedate")).append(" ").append(releaseDate);
             if (!v.changes.isEmpty()) {
-                changesStr += "<br />";
-                changesStr += "<pre>";
+                changesStr.append("<br />");
+                changesStr.append("<pre>");
                 for (String type : v.changes.keySet()) {
-                    changesStr += type + ":" + "<br />";
+                    changesStr.append(type).append(":" + "<br />");
                     for (String ch : v.changes.get(type)) {
-                        changesStr += " - " + ch + "<br />";
+                        changesStr.append(" - ").append(ch).append("<br />");
                     }
                 }
-                changesStr += "</pre>";
+                changesStr.append("</pre>");
             }
         }
+
+        changesStr.append("</html>");
         latestVersion = null;
         if (!versions.isEmpty()) {
             latestVersion = versions.get(0);
         }
         changesText.setContentType("text/html");
-        changesText.setText("<html>" + changesStr + "</html>");
+        changesText.setText(changesStr.toString());
         if (latestVersion != null) {
             JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
             newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);

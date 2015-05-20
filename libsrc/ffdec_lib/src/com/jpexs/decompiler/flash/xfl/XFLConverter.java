@@ -163,17 +163,16 @@ public class XFLConverter {
     private XFLConverter() {
     }
 
-    public static String convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y) {
+    private static void convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y, StringBuilder ret) {
         if (record instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) record;
             Point p = new Point(scr.moveDeltaX, scr.moveDeltaY);
             //p = mat.apply(p);
             if (scr.stateMoveTo) {
-                return "! " + p.x + " " + p.y;
+                ret.append("! ").append(p.x).append(" ").append(p.y);
+                return;
             }
-            return "";
-        }
-        if (record instanceof StraightEdgeRecord) {
+        } else if (record instanceof StraightEdgeRecord) {
             StraightEdgeRecord ser = (StraightEdgeRecord) record;
             if (ser.generalLineFlag || ser.vertLineFlag) {
                 y += ser.deltaY;
@@ -183,9 +182,8 @@ public class XFLConverter {
             }
             Point p = new Point(x, y);
             //p = mat.apply(p);
-            return "| " + p.x + " " + p.y;
-        }
-        if (record instanceof CurvedEdgeRecord) {
+            ret.append("| ").append(p.x).append(" ").append(p.y);
+        } else if (record instanceof CurvedEdgeRecord) {
             CurvedEdgeRecord cer = (CurvedEdgeRecord) record;
             int controlX = cer.controlDeltaX + x;
             int controlY = cer.controlDeltaY + y;
@@ -195,36 +193,33 @@ public class XFLConverter {
             //control = mat.apply(control);
             Point anchor = new Point(anchorX, anchorY);
             //anchor = mat.apply(anchor);
-            return "[ " + control.x + " " + control.y + " " + anchor.x + " " + anchor.y;
+            ret.append("[ ").append(control.x).append(" ").append(control.y).append(" ").append(anchor.x).append(" ").append(anchor.y);
         }
-        return "";
     }
 
-    public static String convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records, StringBuilder ret) {
         int x = startX;
         int y = startY;
         ret.append("!").append(startX).append(" ").append(startY);
         for (SHAPERECORD rec : records) {
-            ret.append(convertShapeEdge(mat, rec, x, y));
+            convertShapeEdge(mat, rec, x, y, ret);
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
-        return ret.toString();
     }
 
-    public static String convertLineStyle(LINESTYLE ls, int shapeNum) {
-        return "<SolidStroke weight=\"" + (((float) ls.width) / SWF.unitDivisor) + "\">"
-                + "<fill>"
-                + "<SolidColor color=\"" + ls.color.toHexRGB() + "\""
-                + (shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "")
-                + " />"
-                + "</fill>"
-                + "</SolidStroke>";
+    private static void convertLineStyle(LINESTYLE ls, int shapeNum, StringBuilder ret) {
+        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor)
+                .append("\">"
+                        + "<fill>"
+                        + "<SolidColor color=\"")
+                .append(ls.color.toHexRGB()).append("\"")
+                .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />"
+                        + "</fill>"
+                        + "</SolidStroke>");
     }
 
-    public static String convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
         StringBuilder params = new StringBuilder();
         if (ls.pixelHintingFlag) {
             params.append(" pixelHinting=\"true\"");
@@ -272,24 +267,22 @@ public class XFLConverter {
                     append(color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "").
                     append(" />");
         } else {
-            ret.append(convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum));
+            convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum, ret);
         }
         ret.append("</fill>");
         ret.append("</SolidStroke>");
-        return ret.toString();
     }
 
     private static float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
 
-    public static String convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
+    private static void convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum, StringBuilder ret) {
         /* todo: use matrix
          if (mat == null) {
          mat = new MATRIX();
          }*/
-        StringBuilder ret = new StringBuilder();
-        //ret += "<FillStyle index=\"" + index + "\">";
+        //ret.append("<FillStyle index=\"").append(index).append("\">");
         switch (fs.fillStyleType) {
             case FILLSTYLE.SOLID:
                 ret.append("<SolidColor color=\"");
@@ -304,17 +297,18 @@ public class XFLConverter {
             case FILLSTYLE.CLIPPED_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                ret.append("<BitmapFill");
-                ret.append(" bitmapPath=\"");
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
                 if (bitmapCh instanceof ImageTag) {
                     ImageTag it = (ImageTag) bitmapCh;
+                    ret.append("<BitmapFill");
+                    ret.append(" bitmapPath=\"");
                     ret.append("bitmap").append(bitmapCh.getCharacterId()).append(".").append(it.getImageFormat());
                 } else {
                     if (bitmapCh != null) {
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:" + bitmapCh.getClass().getSimpleName());
+                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
                     }
-                    return "<SolidColor color=\"#ffffff\" />";
+                    ret.append("<SolidColor color=\"#ffffff\" />");
+                    return;
                 }
                 ret.append("\"");
 
@@ -395,15 +389,14 @@ public class XFLConverter {
                 }
                 break;
         }
-        //ret += "</FillStyle>";
-        return ret.toString();
+        //ret.append("</FillStyle>");
     }
 
-    public static String convertMatrix(MATRIX m) {
+    private static String convertMatrix(MATRIX m) {
         return convertMatrix(new Matrix(m));
     }
 
-    public static String convertMatrix(Matrix m) {
+    private static String convertMatrix(Matrix m) {
         StringBuilder ret = new StringBuilder();
         if (m == null) {
             m = new Matrix();
@@ -444,7 +437,7 @@ public class XFLConverter {
         return layers.size() > 1;
     }
 
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
+    private static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
         StringBuilder ret = new StringBuilder();
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (layers.size() == 1 && !useLayers) {
@@ -524,7 +517,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) {
+    private static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) {
         if (mat == null) {
             mat = new MATRIX();
         }
@@ -534,50 +527,50 @@ public class XFLConverter {
         int fillStyle0 = -1;
         int fillStyle1 = -1;
         int strokeStyle = -1;
-        String fillsStr = "";
-        String strokesStr = "";
-        fillsStr += "<fills>";
-        strokesStr += "<strokes>";
+        StringBuilder fillsStr = new StringBuilder();
+        StringBuilder strokesStr = new StringBuilder();
+        fillsStr.append("<fills>");
+        strokesStr.append("<strokes>");
         List<String> layers = new ArrayList<>();
-        String currentLayer = "";
+        StringBuilder currentLayer = new StringBuilder();
 
         int fillStyleCount = 0;
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
-                fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                fillsStr += convertFillStyle(mat, characters, fs, shapeNum);
-                fillsStr += "</FillStyle>";
+                fillsStr.append("<FillStyle index=\"").append(fillStyleCount + 1).append("\">");
+                convertFillStyle(mat, characters, fs, shapeNum, fillsStr);
+                fillsStr.append("</FillStyle>");
                 fillStyleCount++;
             }
         }
         if (lineStyles != null) {
             if (shapeNum <= 3 && lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
-                    strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(lineStyles.lineStyles[l], shapeNum);
-                    strokesStr += "</StrokeStyle>";
+                    strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                    convertLineStyle(lineStyles.lineStyles[l], shapeNum, strokesStr);
+                    strokesStr.append("</StrokeStyle>");
                     lineStyleCount++;
                 }
             } else if (lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
-                    strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum);
-                    strokesStr += "</StrokeStyle>";
+                    strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                    convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum, strokesStr);
+                    strokesStr.append("</StrokeStyle>");
                     lineStyleCount++;
                 }
             }
         }
 
-        fillsStr += "</fills>";
-        strokesStr += "</strokes>";
+        fillsStr.append("</fills>");
+        strokesStr.append("</strokes>");
 
         int layer = 1;
 
         if ((fillStyleCount > 0) || (lineStyleCount > 0)) {
-            currentLayer += "<DOMShape isFloating=\"true\">";
-            currentLayer += fillsStr;
-            currentLayer += strokesStr;
-            currentLayer += "<edges>";
+            currentLayer.append("<DOMShape isFloating=\"true\">");
+            currentLayer.append(fillsStr);
+            currentLayer.append(strokesStr);
+            currentLayer.append("<edges>");
         }
         int x = 0;
         int y = 0;
@@ -595,8 +588,10 @@ public class XFLConverter {
                 int lastFillStyle0 = fillStyle0;
                 int lastStrokeStyle = strokeStyle;
                 if (scr.stateNewStyles) {
-                    fillsStr = "<fills>";
-                    strokesStr = "<strokes>";
+                    fillsStr.setLength(0);
+                    strokesStr.setLength(0);
+                    fillsStr.append("<fills>");
+                    strokesStr.append("<strokes>");
                     if (fillStyleCount > 0 || lineStyleCount > 0) {
 
                         if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
@@ -615,58 +610,61 @@ public class XFLConverter {
                                 }
                             }
                             if (!empty) {
-                                currentLayer += "<Edge";
+                                currentLayer.append("<Edge");
                                 if (fillStyle0 > -1) {
-                                    currentLayer += " fillStyle0=\"" + fillStyle0 + "\"";
+                                    currentLayer.append(" fillStyle0=\"").append(fillStyle0).append("\"");
                                 }
                                 if (fillStyle1 > -1) {
-                                    currentLayer += " fillStyle1=\"" + fillStyle1 + "\"";
+                                    currentLayer.append(" fillStyle1=\"").append(fillStyle1).append("\"");
                                 }
                                 if (strokeStyle > -1) {
-                                    currentLayer += " strokeStyle=\"" + strokeStyle + "\"";
+                                    currentLayer.append(" strokeStyle=\"").append(strokeStyle).append("\"");
                                 }
-                                currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
+                                currentLayer.append(" edges=\"");
+                                convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
+                                currentLayer.append("\" />");
                             }
                         }
 
-                        currentLayer += "</edges>";
-                        currentLayer += "</DOMShape>";
-                        if (!currentLayer.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
-                            layers.add(currentLayer);
+                        currentLayer.append("</edges>");
+                        currentLayer.append("</DOMShape>");
+                        String currentLayerString = currentLayer.toString();
+                        if (!currentLayerString.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
+                            layers.add(currentLayerString);
                         }
-                        currentLayer = "";
+                        currentLayer.setLength(0);
                     }
 
-                    currentLayer += "<DOMShape isFloating=\"true\">";
+                    currentLayer.append("<DOMShape isFloating=\"true\">");
                     //ret += convertShape(characters, null, shape);
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-                        fillsStr += "<FillStyle index=\"" + (f + 1) + "\">";
-                        fillsStr += convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum);
-                        fillsStr += "</FillStyle>";
+                        fillsStr.append("<FillStyle index=\"").append(f + 1).append("\">");
+                        convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum, fillsStr);
+                        fillsStr.append("</FillStyle>");
                         fillStyleCount++;
                     }
 
                     lineStyleCount = 0;
                     if (shapeNum <= 3) {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
-                            strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum);
-                            strokesStr += "</StrokeStyle>";
+                            strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                            convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum, strokesStr);
+                            strokesStr.append("</StrokeStyle>");
                             lineStyleCount++;
                         }
                     } else {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
-                            strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum);
-                            strokesStr += "</StrokeStyle>";
+                            strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                            convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum, strokesStr);
+                            strokesStr.append("</StrokeStyle>");
                             lineStyleCount++;
                         }
                     }
-                    fillsStr += "</fills>";
-                    strokesStr += "</strokes>";
-                    currentLayer += fillsStr;
-                    currentLayer += strokesStr;
-                    currentLayer += "<edges>";
+                    fillsStr.append("</fills>");
+                    strokesStr.append("</strokes>");
+                    currentLayer.append(fillsStr);
+                    currentLayer.append(strokesStr);
+                    currentLayer.append("<edges>");
                     actualLinestyles = scr.lineStyles;
                 }
                 if (scr.stateFillStyle0) {
@@ -708,17 +706,19 @@ public class XFLConverter {
                             }
                         }
                         if (!empty) {
-                            currentLayer += "<Edge";
+                            currentLayer.append("<Edge");
                             if (fillStyle0 > -1) {
-                                currentLayer += " fillStyle0=\"" + lastFillStyle0 + "\"";
+                                currentLayer.append(" fillStyle0=\"").append(lastFillStyle0).append("\"");
                             }
                             if (fillStyle1 > -1) {
-                                currentLayer += " fillStyle1=\"" + lastFillStyle1 + "\"";
+                                currentLayer.append(" fillStyle1=\"").append(lastFillStyle1).append("\"");
                             }
                             if (strokeStyle > -1) {
-                                currentLayer += " strokeStyle=\"" + lastStrokeStyle + "\"";
+                                currentLayer.append(" strokeStyle=\"").append(lastStrokeStyle).append("\"");
                             }
-                            currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
+                            currentLayer.append(" edges=\"");
+                            convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
+                            currentLayer.append("\" />");
                         }
 
                         startEdgeX = x;
@@ -748,29 +748,32 @@ public class XFLConverter {
                     }
                 }
                 if (!empty) {
-                    currentLayer += "<Edge";
+                    currentLayer.append("<Edge");
                     if (fillStyle0 > -1) {
-                        currentLayer += " fillStyle0=\"" + fillStyle0 + "\"";
+                        currentLayer.append(" fillStyle0=\"").append(fillStyle0).append("\"");
                     }
                     if (fillStyle1 > -1) {
-                        currentLayer += " fillStyle1=\"" + fillStyle1 + "\"";
+                        currentLayer.append(" fillStyle1=\"").append(fillStyle1).append("\"");
                     }
                     if (strokeStyle > -1) {
-                        currentLayer += " strokeStyle=\"" + strokeStyle + "\"";
+                        currentLayer.append(" strokeStyle=\"").append(strokeStyle).append("\"");
                     }
-                    currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
+                    currentLayer.append(" edges=\"");
+                    convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
+                    currentLayer.append("\" />");
                 }
             }
         }
         edges.clear();
-        fillsStr += "</fills>";
-        strokesStr += "</strokes>";
-        if (!currentLayer.isEmpty()) {
-            currentLayer += "</edges>";
-            currentLayer += "</DOMShape>";
+        fillsStr.append("</fills>");
+        strokesStr.append("</strokes>"); // todo: these fillsStr and strokeStr are not used, why?
+        if (currentLayer.length() > 0) {
+            currentLayer.append("</edges>");
+            currentLayer.append("</DOMShape>");
 
-            if (!currentLayer.contains("<edges></edges>")) { //no empty layers, TODO:handle this better
-                layers.add(currentLayer);
+            String currentLayerString = currentLayer.toString();
+            if (!currentLayerString.contains("<edges></edges>")) { //no empty layers, TODO:handle this better
+                layers.add(currentLayerString);
             }
         }
         return layers;
@@ -906,7 +909,7 @@ public class XFLConverter {
         return ds;
     }
 
-    public static String convertFilter(FILTER filter) {
+    private static String convertFilter(FILTER filter) {
         StringBuilder ret = new StringBuilder();
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
@@ -1048,7 +1051,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
+    private static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
         StringBuilder ret = new StringBuilder();
         if (matrix == null) {
             matrix = new MATRIX();
@@ -1181,11 +1184,12 @@ public class XFLConverter {
         return writer.toString();
     }
 
-    private static long getTimestamp() {
-        return new Date().getTime() / 1000;
+    private static long getTimestamp(SWF swf) {
+        Date date = swf.getFileModificationDate();
+        return date.getTime() / 1000;
     }
 
-    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion) {
+    private static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -1200,7 +1204,7 @@ public class XFLConverter {
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 StringBuilder symbolStr = new StringBuilder();
 
-                symbolStr.append("<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol ").append(symbol.getCharacterId()).append("\" lastModified=\"").append(getTimestamp()).append("\""); //TODO:itemID
+                symbolStr.append("<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol ").append(symbol.getCharacterId()).append("\" lastModified=\"").append(getTimestamp(swf)).append("\""); //TODO:itemID
                 if (symbol instanceof ShapeTag) {
                     symbolStr.append(" symbolType=\"graphic\"");
                 } else if (symbol instanceof ButtonTag) {
@@ -1347,7 +1351,7 @@ public class XFLConverter {
                 }
                 symbLinkStr += " loadImmediate=\"false\"";
                 if (flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
-                    symbLinkStr += " lastModified=\"" + getTimestamp() + "\"";
+                    symbLinkStr += " lastModified=\"" + getTimestamp(swf) + "\"";
                     //TODO: itemID=\"518de416-00000341\"
                 }
                 symbLinkStr += "/>";
@@ -1362,7 +1366,7 @@ public class XFLConverter {
                 ImageHelper.write(image.getBufferedImage(), format, baos);
                 String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
                 files.put(symbolFile, baos.toByteArray());
-                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
+                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
                 switch (format) {
                     case PNG:
                     case GIF:
@@ -1375,7 +1379,7 @@ public class XFLConverter {
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                 }
-                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp() + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
+                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp(swf) + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
                 media.add(mediaLinkStr);
 
             } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
@@ -1518,7 +1522,7 @@ public class XFLConverter {
 
                 String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
                 files.put(symbolFile, data);
-                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
                 mediaLinkStr += " href=\"" + symbolFile + "\"";
                 mediaLinkStr += " format=\"";
                 mediaLinkStr += rateMap[soundRate] + "kHz";
@@ -1571,7 +1575,7 @@ public class XFLConverter {
                 String symbolFile = "movie" + symbol.getCharacterId() + "." + "flv";
                 String mediaLinkStr = "";
                 if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"
-                    long ts = getTimestamp();
+                    long ts = getTimestamp(swf);
                     String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
                     mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceExternalFilepath=\"./LIBRARY/" + symbolFile + "\" sourceLastImported=\"" + ts + "\" videoDataHRef=\"" + datFileName + "\" channels=\"0\" isSpecial=\"true\" />";
                     //Use the dat file, otherwise it does not work
@@ -1592,7 +1596,7 @@ public class XFLConverter {
                     });
                 } else {
                     files.put(symbolFile, data);
-                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
                     mediaLinkStr += " href=\"" + symbolFile + "\"";
                     mediaLinkStr += " videoType=\"" + videoType + "\"";
                     mediaLinkStr += " fps=\"" + swf.frameRate + "\"";
@@ -1941,7 +1945,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    public static String convertFonts(List<Tag> tags) {
+    private static String convertFonts(List<Tag> tags) {
         StringBuilder ret = new StringBuilder();
         for (Tag t : tags) {
             if (t instanceof FontTag) {
@@ -2011,7 +2015,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    public static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
+    private static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
         StringBuilder ret = new StringBuilder();
 
         String script = "";
@@ -2073,7 +2077,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    public static String convertLabelsLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
+    private static String convertLabelsLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
         StringBuilder ret = new StringBuilder();
         int duration = 0;
         int frame = 0;
@@ -2129,7 +2133,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files) {
+    private static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files) {
         StringBuilder ret = new StringBuilder();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
@@ -2202,7 +2206,7 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    public static String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
+    private static String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
         StringBuilder ret = new StringBuilder();
         ret.append("<DOMTimeline name=\"").append(name).append("\">");
         ret.append("<layers>");
@@ -2331,7 +2335,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
+    private static String convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
         StringBuilder ret = new StringBuilder();
 
         if (m == null) {
@@ -3095,7 +3099,7 @@ public class XFLConverter {
         return a == b ? true : Math.abs(a - b) < EPSILON;
     }
 
-    public static String convertAdjustColorFilter(COLORMATRIXFILTER filter) {
+    private static String convertAdjustColorFilter(COLORMATRIXFILTER filter) {
         float[][] matrix = new float[5][5];
         int index = 0;
         for (int i = 0; i < 4; i++) {

@@ -124,11 +124,12 @@ public class DumpViewPanel extends JPanel {
 
                 if (address != -1) {
                     int b2 = b & 0xff;
-                    selectedByteInfo.setText("Addr: " + Helper.padZeros(address, 8)
-                            + " Hex: " + Helper.padZeros(Integer.toHexString(b2), 2)
+                    selectedByteInfo.setText("Addr: " + String.format("%08X", address)
+                            + " Hex: " + String.format("%02X", b)
                             + " Dec: " + b2
                             + " Bin: " + Helper.padZeros(Integer.toBinaryString(b2), 8)
-                            + " Ascii: " + (char) b2);
+                            + " Ascii: " + (char) b2
+                    );
                 } else {
                     selectedByteInfo.setText("-");
                 }

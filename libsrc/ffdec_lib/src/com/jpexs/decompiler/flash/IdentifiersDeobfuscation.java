@@ -386,7 +386,7 @@ public class IdentifiersDeobfuscation {
             } else if (c == '\u00A7') {
                 ret.append("\\\u00A7");
             } else if (c < 32) {
-                ret.append("\\x").append(Helper.padZeros(Integer.toHexString((int) c), 2));
+                ret.append("\\x").append(Helper.byteToHex((byte) c));
             } else {
                 ret.append(c);
             }

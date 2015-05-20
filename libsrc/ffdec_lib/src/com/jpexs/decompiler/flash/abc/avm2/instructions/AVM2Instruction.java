@@ -284,7 +284,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
-        writer.appendNoHilight(Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName);
+        writer.appendNoHilight(Helper.formatAddress(offset) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + definition.instructionName);
         writer.appendNoHilight(getParams(localData.constantsAvm2, localData.fullyQualifiedNames) + getComment());
         return writer;
     }

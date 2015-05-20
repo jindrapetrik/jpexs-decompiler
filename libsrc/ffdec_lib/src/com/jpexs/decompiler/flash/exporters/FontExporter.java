@@ -155,13 +155,10 @@ public class FontExporter {
         f.setVersion("1.0");
 
         SWF swf = t.getSwf();
-        if (swf != null && swf.swfList != null && swf.swfList.sourceInfo != null) {
-            String fileName = swf.swfList.sourceInfo.getFile();
-            if (fileName != null) {
-                Date date = new Date(new File(fileName).lastModified());
-                f.setCreationDate(date);
-                f.setModificationDate(date);
-            }
+        if (swf != null) {
+            Date date = swf.getFileModificationDate();
+            f.setCreationDate(date);
+            f.setModificationDate(date);
         }
 
         int ascent = t.getAscent();

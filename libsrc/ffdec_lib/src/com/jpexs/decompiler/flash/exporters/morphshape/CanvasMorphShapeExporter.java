@@ -72,7 +72,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     protected SWF swf;
 
-    protected String lineFillData = null;
+    protected StringBuilder lineFillData = null;
 
     protected String lineLastRadColor = null;
 
@@ -281,7 +281,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     @Override
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
-        lineFillData = "";
+        lineFillData = new StringBuilder();
 
         //TODO: How many repeats is ideal?
         final int REPEAT_CNT = 5;
@@ -302,11 +302,11 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             start2.y += deltaY;
             end2.x += deltaX;
             end2.y += deltaY;
-            lineFillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
+            lineFillData.append("\tvar grd=ctx.createLinearGradient(").append(useRatioPos(start.x, start2.x)).append(",").append(useRatioPos(start.y, start2.y)).append(",").append(useRatioPos(end.x, end2.x)).append(",").append(useRatioPos(end.y, end2.y)).append(");\r\n");
         } else {
             lineFillMatrix = matrix;
             lineFillMatrixEnd = matrixEnd;
-            lineFillData += "\tvar grd=ctx.createRadialGradient(" + useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384) + ",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+            lineFillData.append("\tvar grd=ctx.createRadialGradient(").append(useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384)).append(",0,0,0,0,").append(16384 + 32768 * repeatCnt).append(");\r\n");
         }
         int repeatTotal = lineRepeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -322,14 +322,14 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             for (int j = 0; j < gradientRecords.length; j++) {
                 GRADRECORD r = gradientRecords[j];
                 GRADRECORD r2 = gradientRecordsEnd[j];
-                lineFillData += "\tvar s=" + useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0)) + ";\r\n";
-                lineFillData += "\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
-                lineFillData += "\tgrd.addColorStop(s," + useRatioColor(r.color, r2.color) + ");\r\n";
+                lineFillData.append("\tvar s=").append(useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0))).append(";\r\n");
+                lineFillData.append("\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n");
+                lineFillData.append("\tgrd.addColorStop(s,").append(useRatioColor(r.color, r2.color)).append(");\r\n");
                 lineLastRadColor = useRatioColor(r.color, r2.color);
             }
             pos += oneHeight;
         }
-        lineFillData += "\tctx.fillStyle = grd;\r\n";
+        lineFillData.append("\tctx.fillStyle = grd;\r\n");
 
         String preStrokeData = "";
 
@@ -406,34 +406,37 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             String drawFill = "\tdrawMorphPath(ctx,pathData,ratio,false);\r\n";;
             pathData = new StringBuilder();
             if (lineFillData != null) {
-                String preLineFillData = "";
-                preLineFillData += "\tvar oldctx = ctx;\r\n";
-                preLineFillData += "\tctx.save();\r\n";
-                preLineFillData += strokeData;
-                preLineFillData += drawStroke;
-                preLineFillData += "\tvar lfcanvas = document.createElement(\"canvas\");\r\n";
-                preLineFillData += "\tlfcanvas.width = canvas.width;\r\n";
-                preLineFillData += "\tlfcanvas.height = canvas.height;\r\n";
-                preLineFillData += "\tvar lfctx = lfcanvas.getContext(\"2d\");\r\n";
-                preLineFillData += "\tenhanceContext(lfctx);\r\n";
-                preLineFillData += "\tlfctx.applyTransforms(ctx._matrix);\r\n";
-                preLineFillData += "\tctx = lfctx;";
+                StringBuilder preLineFillData = new StringBuilder();
+                preLineFillData.append("\tvar oldctx = ctx;\r\n");
+                preLineFillData.append("\tctx.save();\r\n");
+                preLineFillData.append(strokeData);
+                preLineFillData.append(drawStroke);
+                preLineFillData.append("\tvar lfcanvas = document.createElement(\"canvas\");\r\n");
+                preLineFillData.append("\tlfcanvas.width = canvas.width;\r\n");
+                preLineFillData.append("\tlfcanvas.height = canvas.height;\r\n");
+                preLineFillData.append("\tvar lfctx = lfcanvas.getContext(\"2d\");\r\n");
+                preLineFillData.append("\tenhanceContext(lfctx);\r\n");
+                preLineFillData.append("\tlfctx.applyTransforms(ctx._matrix);\r\n");
+                preLineFillData.append("\tctx = lfctx;");
                 if (lineLastRadColor != null) {
-                    preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n ctx.fill(\"evenodd\");\r\n";
+                    preLineFillData.append("\tctx.fillStyle=").append(lineLastRadColor).append(";\r\n ctx.fill(\"evenodd\");\r\n");
                 }
-                preLineFillData += "\tctx.transform(" + useRatioDouble(lineFillMatrix.scaleX / unitDivisor, lineFillMatrixEnd.scaleX / unitDivisor)
-                        + "," + useRatioDouble(lineFillMatrix.rotateSkew0 / unitDivisor, lineFillMatrixEnd.rotateSkew0 / unitDivisor)
-                        + "," + useRatioDouble(lineFillMatrix.rotateSkew1 / unitDivisor, lineFillMatrixEnd.rotateSkew1 / unitDivisor)
-                        + "," + useRatioDouble(lineFillMatrix.scaleY / unitDivisor, lineFillMatrixEnd.scaleY / unitDivisor)
-                        + "," + useRatioDouble((lineFillMatrix.translateX + deltaX) / unitDivisor, (lineFillMatrixEnd.translateX + deltaX) / unitDivisor)
-                        + "," + useRatioDouble((lineFillMatrix.translateY + deltaY) / unitDivisor, (lineFillMatrixEnd.translateY + deltaY) / unitDivisor) + ");\r\n";
-                lineFillData = preLineFillData + lineFillData;
-                lineFillData += "\tctx.fillRect(" + (-16384 - 32768 * lineRepeatCnt) + "," + (-16384 - 32768 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + ");\r\n";
-                lineFillData += "\tctx = oldctx;\r\n";
+                preLineFillData.append("\tctx.transform(").append(useRatioDouble(lineFillMatrix.scaleX / unitDivisor, lineFillMatrixEnd.scaleX / unitDivisor))
+                        .append(",").append(useRatioDouble(lineFillMatrix.rotateSkew0 / unitDivisor, lineFillMatrixEnd.rotateSkew0 / unitDivisor))
+                        .append(",").append(useRatioDouble(lineFillMatrix.rotateSkew1 / unitDivisor, lineFillMatrixEnd.rotateSkew1 / unitDivisor))
+                        .append(",").append(useRatioDouble(lineFillMatrix.scaleY / unitDivisor, lineFillMatrixEnd.scaleY / unitDivisor))
+                        .append(",").append(useRatioDouble((lineFillMatrix.translateX + deltaX) / unitDivisor, (lineFillMatrixEnd.translateX + deltaX) / unitDivisor))
+                        .append(",").append(useRatioDouble((lineFillMatrix.translateY + deltaY) / unitDivisor, (lineFillMatrixEnd.translateY + deltaY) / unitDivisor)).append(");\r\n");
+                lineFillData.insert(0, preLineFillData);
+                lineFillData.append("\tctx.fillRect(").append(-16384 - 32768 * lineRepeatCnt)
+                        .append(",").append(-16384 - 32768 * lineRepeatCnt)
+                        .append(",").append(2 * 16384 + 32768 * 2 * lineRepeatCnt)
+                        .append(",").append(2 * 16384 + 32768 * 2 * lineRepeatCnt).append(");\r\n");
+                lineFillData.append("\tctx = oldctx;\r\n");
 
                 //lcanvas - stroke
                 //lfcanvas - stroke background
-                lineFillData += "\tvar limgd = lctx.getImageData(0, 0, lcanvas.width, lcanvas.height);\r\n"
+                lineFillData.append("\tvar limgd = lctx.getImageData(0, 0, lcanvas.width, lcanvas.height);\r\n"
                         + "\tvar lpix = limgd.data;\r\n"
                         + "\tvar lfimgd = lfctx.getImageData(0, 0, lfcanvas.width, lfcanvas.height);\r\n"
                         + "\tvar lfpix = lfimgd.data;\r\n"
@@ -442,8 +445,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                         + "\tfor (var i = 0; i < lpix.length; i += 4) {\r\n"
                         + "\t\tif(lpix[i+3]>0){ pix[i] = lfpix[i]; pix[i+1] = lfpix[i+1]; pix[i+2] = lfpix[i+2]; pix[i+3] = lfpix[i+3];}\r\n"
                         + "\t}\r\n"
-                        + "\tctx.putImageData(imgd, 0, 0);\r\n";
-                lineFillData += "\tctx.restore();\r\n";
+                        + "\tctx.putImageData(imgd, 0, 0);\r\n");
+                lineFillData.append("\tctx.restore();\r\n");
                 strokeData = new StringBuilder();
             } else {
                 pathData.append(strokeData);

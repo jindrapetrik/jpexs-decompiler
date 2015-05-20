@@ -282,7 +282,6 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -859,24 +858,13 @@ public class AVM2Code implements Cloneable {
         StringBuilder s = new StringBuilder();
         for (AVM2Instruction instruction : code) {
             s.append(instruction.toString());
-            s.append("\r\n");
+            s.append(Helper.newLine);
         }
         return s.toString();
     }
 
-    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
-        int i = 0;
-        for (AVM2Instruction instruction : code) {
-            writer.appendNoHilight(Helper.formatAddress(i));
-            writer.appendNoHilight(" ");
-            instruction.toString(writer, localData).newLine();
-            i++;
-        }
-        return writer;
-    }
-
     public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
-        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), exportMode, writer);
+        return toASMSource(constants, trait, info, body, new ArrayList<>(), exportMode, writer);
     }
 
     public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {

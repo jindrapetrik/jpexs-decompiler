@@ -564,15 +564,15 @@ public class FrameExporter {
                     for (FILTER filter : layer.filters) {
                         if (filter instanceof COLORMATRIXFILTER) {
                             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
-                            String mat = "[";
+                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),[");
                             for (int k = 0; k < cmf.matrix.length; k++) {
                                 if (k > 0) {
-                                    mat += ",";
+                                    sb.append(",");
                                 }
-                                mat += cmf.matrix[k];
+                                sb.append(cmf.matrix[k]);
                             }
-                            mat += "]";
-                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),").append(mat).append(");\r\n");
+                            sb.append("]");
+                            sb.append(");\r\n");
                         }
 
                         if (filter instanceof CONVOLUTIONFILTER) {

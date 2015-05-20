@@ -155,6 +155,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -976,6 +977,23 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void setFile(String file) {
         this.file = file;
         fileTitle = null;
+    }
+
+    public Date getFileModificationDate() {
+        try {
+            if (swfList != null && swfList.sourceInfo != null) {
+                String fileName = swfList.sourceInfo.getFile();
+                if (fileName != null) {
+                    long lastModified = new File(fileName).lastModified();
+                    if (lastModified > 0) {
+                        return new Date(lastModified);
+                    }
+                }
+            }
+        } catch (SecurityException sex) {
+        }
+
+        return new Date();
     }
 
     private static void getAbcTags(List<Tag> list, List<ABCContainerTag> actionScripts) {
