@@ -494,7 +494,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         hexButton = new JToggleButton(View.getIcon("hexas16"));
         hexButton.addActionListener(this::hexButtonActionPerformed);
-        hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
+        hexButton.setToolTipText(AppStrings.translate("button.viewhexpcode"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
@@ -522,6 +522,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
+        topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(hexButton);
         topButtonsPan.add(hexOnlyButton);
         topButtonsPan.add(constantsViewButton);

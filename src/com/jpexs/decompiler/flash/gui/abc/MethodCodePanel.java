@@ -25,9 +25,11 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -110,7 +112,7 @@ public class MethodCodePanel extends JPanel {
 
         hexButton = new JToggleButton(View.getIcon("hexas16"));
         hexButton.addActionListener(this::hexButtonActionPerformed);
-        hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
+        hexButton.setToolTipText(AppStrings.translate("button.viewhexpcode"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
@@ -123,6 +125,7 @@ public class MethodCodePanel extends JPanel {
         exportModeButtonGroup.add(hexOnlyButton);
 
         buttonsPanel.add(graphButton);
+        buttonsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonsPanel.add(hexButton);
         buttonsPanel.add(hexOnlyButton);
         buttonsPanel.add(new JPanel());
