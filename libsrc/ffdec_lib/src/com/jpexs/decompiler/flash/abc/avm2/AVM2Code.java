@@ -696,8 +696,12 @@ public class AVM2Code implements Cloneable {
             ins.setFileLine(debugFile, debugLine);
 
             if (ins.definition instanceof NewFunctionIns) {
-                MethodBody innerBody = abc.findBody(ins.operands[0]);
-                innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<Integer>());
+                //Only analyze NewFunction objects that are not immediately discarded by Pop.
+                //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
+                if ((pos+1 < code.size()) && !(code.get(pos+1).definition instanceof PopIns)) {
+                    MethodBody innerBody = abc.findBody(ins.operands[0]);
+                    innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<Integer>());
+                }
             }
 
             if (ins.definition instanceof ReturnValueIns) {
