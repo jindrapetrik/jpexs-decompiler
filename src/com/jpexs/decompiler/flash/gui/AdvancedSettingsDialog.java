@@ -277,6 +277,7 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         for (String cat : categorized.keySet()) {
             JPanel configPanel = new JPanel(new SpringLayout());
+            int itemCount = 0;
             for (String name : categorized.get(cat).keySet()) {
                 Field field = categorized.get(cat).get(name);
 
@@ -286,7 +287,12 @@ public class AdvancedSettingsDialog extends AppDialog {
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
 
                     ParameterizedType listType = (ParameterizedType) field.getGenericType();
-                    Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
+                    java.lang.reflect.Type itemType2 = listType.getActualTypeArguments()[0];
+                    if (!(itemType2 instanceof Class<?>)) {
+                        continue;
+                    }
+
+                    Class itemType = (Class<?>) itemType2;
 
                     String description = resourceBundle.getString("config.description." + name);
 
@@ -362,10 +368,12 @@ public class AdvancedSettingsDialog extends AppDialog {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());
                 }
+
+                itemCount++;
             }
 
             SpringUtilities.makeCompactGrid(configPanel,
-                    categorized.get(cat).size(), 2, //rows, cols
+                    itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
             tabs.put(cat, new JScrollPane(configPanel));
