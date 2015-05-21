@@ -404,7 +404,12 @@ public class AdvancedSettingsDialog extends AppDialog {
             Object value = null;
 
             ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
-            Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
+            java.lang.reflect.Type itemType2 = listType.getActualTypeArguments()[0];
+            if (!(itemType2 instanceof Class<?>)) {
+                continue;
+            }
+
+            Class itemType = (Class<?>) itemType2;
             if (name.equals("gui.skin")) {
                 value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
             } else if (itemType == String.class) {
