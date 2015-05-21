@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -212,18 +213,21 @@ public class FontPanel extends JPanel {
         fontCharactersTextArea.setText(chars);
         fontCharactersScrollPane.getVerticalScrollBar().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
         setAllowSave(false);
-        String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontNameIntag();
 
         String selectedFont;
 
         if (swf.sourceFontNamesMap.containsKey(ft.getFontId())) {
             selectedFont = swf.sourceFontNamesMap.get(ft.getFontId());
-        } else if (Configuration.getFontToNameMap().containsKey(key)) {
-            selectedFont = Configuration.getFontToNameMap().get(key);
-        } else if (Configuration.getFontToNameMap().containsKey(ft.getFontNameIntag())) {
-            selectedFont = Configuration.getFontToNameMap().get(ft.getFontNameIntag());
         } else {
-            selectedFont = FontTag.findInstalledFontName(ft.getFontName());
+            SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(swf.getShortFileName());
+            String key = ft.getFontId() + "_" + ft.getFontNameIntag();
+            if (swfConf != null && swfConf.fontPairingMap.containsKey(key)) {
+                selectedFont = swfConf.fontPairingMap.get(key);
+            } else if (Configuration.getFontToNameMap().containsKey(ft.getFontNameIntag())) {
+                selectedFont = Configuration.getFontToNameMap().get(ft.getFontNameIntag());
+            } else {
+                selectedFont = FontTag.findInstalledFontName(ft.getFontName());
+            }
         }
 
         Font selFont = FontTag.installedFontsByName.get(selectedFont);

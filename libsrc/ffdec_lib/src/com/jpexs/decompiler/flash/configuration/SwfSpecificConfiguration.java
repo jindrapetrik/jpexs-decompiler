@@ -16,9 +16,17 @@
  */
 package com.jpexs.decompiler.flash.configuration;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author JPEXS
  */
-public class SwfSpecificConfiguration {
+public class SwfSpecificConfiguration implements Serializable {
+
+    public final Map<String, String> fontPairingMap = new HashMap<>();
+
+    public final ConfigurationItem<String> lastSessionData = null;
 }

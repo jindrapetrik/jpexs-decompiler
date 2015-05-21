@@ -31,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -240,7 +241,9 @@ public class Configuration {
 
     public static final ConfigurationItem<String> recentFiles = null;
 
-    public static final ConfigurationItem<String> fontPairing = null;
+    public static final ConfigurationItem<HashMap<String, String>> fontPairingMap = null;
+
+    public static final ConfigurationItem<HashMap<String, SwfSpecificConfiguration>> swfSpecificConfigs = null;
 
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
@@ -575,37 +578,41 @@ public class Configuration {
     }
 
     public static Map<String, String> getFontToNameMap() {
-        String fonts = fontPairing.get();
-        if (fonts == null) {
-            return new HashMap<>();
+        HashMap<String, String> map = fontPairingMap.get();
+        if (map == null) {
+            map = new HashMap<>();
+            fontPairingMap.set(map);
         }
 
-        Map<String, String> result = new HashMap<>();
-        for (String pair : fonts.split("::")) {
-            if (!pair.isEmpty()) {
-                String[] splittedPair = pair.split("=");
-                result.put(splittedPair[0], splittedPair[1]);
-            }
-        }
-        return result;
+        return map;
     }
 
     public static void addFontPair(String fileName, int fontId, String fontName, String installedName) {
-        String key = fileName + "_" + fontId + "_" + fontName;
         Map<String, String> fontPairs = getFontToNameMap();
-        fontPairs.put(key, installedName);
         fontPairs.put(fontName, installedName);
 
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (Entry<String, String> pair : fontPairs.entrySet()) {
-            if (i != 0) {
-                sb.append("::");
-            }
-            sb.append(pair.getKey()).append("=").append(pair.getValue());
-            i++;
+        SwfSpecificConfiguration swfConf = getOrCreateSwfSpecificConfiguration(fileName);
+        swfConf.fontPairingMap.put(fontId + "_" + fontName, installedName);
+    }
+
+    public static SwfSpecificConfiguration getSwfSpecificConfiguration(String fileName) {
+        HashMap<String, SwfSpecificConfiguration> map = swfSpecificConfigs.get();
+        if (map == null) {
+            map = new HashMap<>();
+            swfSpecificConfigs.set(map);
         }
-        fontPairing.set(sb.toString());
+
+        return map.get(fileName);
+    }
+
+    public static SwfSpecificConfiguration getOrCreateSwfSpecificConfiguration(String fileName) {
+        SwfSpecificConfiguration swfConf = getSwfSpecificConfiguration(fileName);
+        if (swfConf == null) {
+            swfConf = new SwfSpecificConfiguration();
+            swfSpecificConfigs.get().put(fileName, swfConf);
+        }
+
+        return swfConf;
     }
 
     private static String getConfigFile() throws IOException {
@@ -694,7 +701,13 @@ public class Configuration {
                 if (config.containsKey(name)) {
                     value = config.get(name);
 
-                    Class<?> type = (Class<?>) (((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0]);
+                    Class<?> type;
+                    Type type2 = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+                    if (type2 instanceof Class<?>) {
+                        type = (Class<?>) type2;
+                    } else {
+                        type = (Class<?>) ((ParameterizedType) type2).getRawType();
+                    }
                     if (value != null && !type.isAssignableFrom(value.getClass())) {
                         System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
                         value = null;
