@@ -513,7 +513,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         exportModeButtonGroup.add(hexOnlyButton);
         exportModeButtonGroup.add(constantsViewButton);
 
-        resolveConstantsButton = new JToggleButton(View.getIcon("constantpool16"));
+        resolveConstantsButton = new JToggleButton(View.getIcon("resolveconst16"));
         resolveConstantsButton.addActionListener(this::resolveConstantsButtonActionPerformed);
         resolveConstantsButton.setToolTipText(AppStrings.translate("button.resolveConstants"));
         resolveConstantsButton.setMargin(new Insets(3, 3, 3, 3));
