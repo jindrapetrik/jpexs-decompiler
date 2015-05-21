@@ -621,4 +621,34 @@ public class TagTree extends JTree {
             expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
         }
     }
+
+    public String getSelectionPathString() {
+        StringBuilder sb = new StringBuilder();
+        TreePath path = getSelectionPath();
+        if (path != null) {
+            boolean first = true;
+            for (Object p : path.getPath()) {
+                if (!first) {
+                    sb.append("|");
+                }
+
+                first = false;
+                sb.append(p.toString());
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public void setSelectionPathString(String pathStr) {
+        if (pathStr != null && pathStr.length() > 0) {
+            String[] path = pathStr.split("\\|");
+
+            TreePath tp = View.getTreePathByPathStrings(this, Arrays.asList(path));
+            if (tp != null) {
+                // the current view is the Resources view, otherwise tp is null
+                mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
+            }
+        }
+    }
 }

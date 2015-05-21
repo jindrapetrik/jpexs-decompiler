@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class SwfSpecificConfiguration implements Serializable {
 
-    public final Map<String, String> fontPairingMap = new HashMap<>();
+    public Map<String, String> fontPairingMap = new HashMap<>();
 
-    public final ConfigurationItem<String> lastSessionData = null;
+    public String lastSelectedPath = null;
 }

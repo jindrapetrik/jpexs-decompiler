@@ -33,7 +33,6 @@ import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.util.List;
 import javax.swing.JFrame;
-import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 
@@ -127,17 +126,9 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                         }
                     }
 
-                    TreePath path = panel.tagTree.getLeadSelectionPath();
+                    String path = panel.tagTree.getSelectionPathString();
                     if (path != null) {
-                        boolean first = true;
-                        for (Object p : path.getPath()) {
-                            if (!first) {
-                                sb.append("|");
-                            }
-
-                            first = false;
-                            sb.append(p.toString());
-                        }
+                        sb.append(path);
                     }
 
                     Configuration.lastSessionData.set(sb.toString());

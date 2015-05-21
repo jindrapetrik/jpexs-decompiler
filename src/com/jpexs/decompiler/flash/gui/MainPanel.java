@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -2806,6 +2807,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreePath treePath = tagTree.getSelectionPath();
         if (treePath != null && tagTree.getModel().treePathExists(treePath)) {
             treeItem = (TreeItem) treePath.getLastPathComponent();
+        }
+
+        // save last selected node to config
+        if (treeItem != null) {
+            SWF swf = treeItem.getSwf();
+            if (swf != null) {
+                swf = swf.getRootSwf();
+            }
+
+            if (swf != null) {
+                SwfSpecificConfiguration swfConf = Configuration.getOrCreateSwfSpecificConfiguration(swf.getShortFileName());
+                swfConf.lastSelectedPath = tagTree.getSelectionPathString();
+            }
         }
 
         if (!forceReload && (treeItem == oldItem)) {

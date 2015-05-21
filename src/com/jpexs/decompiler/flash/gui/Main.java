@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
@@ -33,7 +34,6 @@ import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -98,7 +98,6 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.TreePath;
 
 /**
  * Main executable class
@@ -513,6 +512,14 @@ public class Main {
 
                 if (mainFrame != null && Configuration.gotoMainClassOnStartup.get()) {
                     mainFrame.getPanel().gotoDocumentClass(fswf);
+                }
+
+                if (mainFrame != null && fswf != null) {
+                    SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortFileName());
+                    if (swfConf != null) {
+                        String pathStr = swfConf.lastSelectedPath;
+                        mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
+                    }
                 }
 
                 if (executeAfterOpen != null) {
@@ -1126,16 +1133,7 @@ public class Main {
                 openFile(sourceInfos, () -> {
                     // last part contains the selected node in the tagtree
                     String pathStr = filesToOpen[filesToOpen.length - 1];
-                    if (pathStr.length() > 0) {
-                        String[] path = pathStr.split("\\|");
-
-                        MainPanel mainPanel = mainFrame.getPanel();
-                        TreePath tp = View.getTreePathByPathStrings(mainPanel.tagTree, Arrays.asList(path));
-                        if (tp != null) {
-                            // the current view is the Resources view, otherwise tp is null
-                            mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
-                        }
-                    }
+                    mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
                 });
             }
         }
