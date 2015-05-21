@@ -239,12 +239,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private JPanel createImageButtonsPanel() {
-        replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
+        replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceimage16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
         replaceImageButton.addActionListener(mainPanel::replaceButtonActionPerformed);
         replaceImageButton.setVisible(false);
 
-        replaceImageAlphaButton = new JButton(mainPanel.translate("button.replaceAlphaChannel"), View.getIcon("edit16"));
+        replaceImageAlphaButton = new JButton(mainPanel.translate("button.replaceAlphaChannel"), View.getIcon("replacealpha16"));
         replaceImageAlphaButton.setMargin(new Insets(3, 3, 3, 10));
         replaceImageAlphaButton.addActionListener(mainPanel::replaceAlphaButtonActionPerformed);
         replaceImageAlphaButton.setVisible(false);
