@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -47,6 +48,8 @@ public class TagInfoPanel extends JPanel {
         infoTable.setModel(new InfoTableModel("general"));
         setLayout(new BorderLayout());
         infoTable.setAutoCreateRowSorter(true);
+        JLabel topLabel = new JLabel(AppStrings.translate("taginfo.header"), JLabel.CENTER);
+        add(topLabel, BorderLayout.NORTH);
         add(new JScrollPane(infoTable), BorderLayout.CENTER);
     }
 
@@ -121,7 +124,7 @@ public class TagInfoPanel extends JPanel {
 
                         return name;
                     case 1:
-                        return item.getValue();
+                        return "" + item.getValue();
                 }
             }
 
