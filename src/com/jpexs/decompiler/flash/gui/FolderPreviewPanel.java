@@ -200,11 +200,22 @@ public class FolderPreviewPanel extends JPanel {
         JLabel l = new JLabel();
         Font f = l.getFont().deriveFont(AffineTransform.getScaleInstance(0.8, 0.8));
         int finish_y = (int) Math.ceil((r.y + r.height) / (float) CELL_HEIGHT);
-        SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
-        Color color = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
-        Color selectedColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
-        Color borderColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_SELECTED).getUltraDarkColor();
-        Color textColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getForegroundColor();
+        Color color;
+        Color selectedColor;
+        Color borderColor;
+        Color textColor;
+        if (Configuration.useRibbonInterface.get()) {
+            SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+            color = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+            selectedColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
+            borderColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_SELECTED).getUltraDarkColor();
+            textColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getForegroundColor();
+        } else {
+            color = new Color(0xd9, 0xe8, 0xfb);
+            selectedColor = new Color(0xfe, 0xca, 0x81);
+            borderColor = Color.BLACK;
+            textColor = Color.BLACK;
+        }
 
         //g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED));
         for (int y = start_y; y <= finish_y; y++) {

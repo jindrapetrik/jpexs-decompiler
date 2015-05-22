@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
@@ -67,26 +69,36 @@ public class HeaderLabel extends JLabel {
 
     @Override
     public void paint(Graphics g) {
-        SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
-        g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
+        if (Configuration.useRibbonInterface.get()) {
+            SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+            g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
+        } else {
+            g.setColor(new Color(217, 232, 251));
+        }
         g.fillRect(0, 0, getWidth(), getHeight());
-        StandardBorderPainter borderPainter = new StandardBorderPainter();
+        if (Configuration.useRibbonInterface.get()) {
+            StandardBorderPainter borderPainter = new StandardBorderPainter();
 
-        Set<SubstanceConstants.Side> straightSides = EnumSet.of(SubstanceConstants.Side.BOTTOM);
-        int dy = 0;
-        float cornerRadius = 5f;
-        int borderThickness = 1;
-        int borderInsets = 0;
-        GeneralPath contourInner = borderPainter.isPaintingInnerContour() ? SubstanceOutlineUtilities.getBaseOutline(getWidth(), getHeight() + dy,
-                cornerRadius - borderThickness, straightSides, borderThickness + borderInsets)
-                : null;
+            Set<SubstanceConstants.Side> straightSides = EnumSet.of(SubstanceConstants.Side.BOTTOM);
+            int dy = 0;
+            float cornerRadius = 5f;
+            int borderThickness = 1;
+            int borderInsets = 0;
+            GeneralPath contourInner = borderPainter.isPaintingInnerContour() ? SubstanceOutlineUtilities.getBaseOutline(getWidth(), getHeight() + dy,
+                    cornerRadius - borderThickness, straightSides, borderThickness + borderInsets)
+                    : null;
 
-        GeneralPath contour = SubstanceOutlineUtilities.getBaseOutline(getWidth(),
-                getHeight() + dy, cornerRadius, straightSides, borderInsets);
+            GeneralPath contour = SubstanceOutlineUtilities.getBaseOutline(getWidth(),
+                    getHeight() + dy, cornerRadius, straightSides, borderInsets);
 
-        borderPainter.paintBorder(g, this, getWidth(), getHeight() + dy,
-                contour, contourInner, skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
-        g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
+            SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+            borderPainter.paintBorder(g, this, getWidth(), getHeight() + dy,
+                    contour, contourInner, skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
+            g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
+        } else {
+            g.setColor(Color.BLACK);
+        }
+
         JLabel lab = new JLabel(getText(), JLabel.CENTER);
         lab.setSize(getSize());
         lab.paint(g);
