@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.controls;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -81,7 +82,7 @@ public class JPersistentSplitPane extends JSplitPane {
             public void componentResized(ComponentEvent e) {
                 resize = new Date();
                 double pos = getConfigValue(config);
-                //System.out.println("resized " + config.getName() + ": " + pos);
+                //System.out.println("resized " + resize.getTime() + " " + config.getName() + ": " + pos);
                 setDividerLocation(pos);
                 setResizeWeight(pos);
             }
@@ -127,7 +128,8 @@ public class JPersistentSplitPane extends JSplitPane {
             // hack
             long diff = new Date().getTime() - resize.getTime();
             if (diff >= 0 && diff < 100) {
-                resize = new Date(0);
+                resize = new Date();
+                //System.out.println("set after resize " + diff + " " + config.getName());
                 return;
             }
 
@@ -138,11 +140,17 @@ public class JPersistentSplitPane extends JSplitPane {
                 if (size != 0) {
                     double p = (Integer) pce.getNewValue() / size;
                     setResizeWeight(p);
-                    //System.out.println("set " + config.getName() + ": " + p);
+                    //System.out.println("set " + diff + " " + config.getName() + ": " + p);
                     config.set(p);
                 }
             }
         });
+    }
+
+    @Override
+    public void setSize(Dimension d) {
+        resize = new Date();
+        super.setSize(d);
     }
 
     @Override
