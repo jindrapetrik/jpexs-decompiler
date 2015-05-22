@@ -153,6 +153,11 @@ public class View {
         try {
             UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
             SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
+            if (SubstanceLookAndFeel.getCurrentSkin() == null) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Current skin is null");
+                SubstanceLookAndFeel.setSkin("com.jpexs.decompiler.flash.gui.OceanicSkin");
+            }
+
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
             UIManager.put("Tree.expandedIcon", getIcon("expand16"));
             UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));

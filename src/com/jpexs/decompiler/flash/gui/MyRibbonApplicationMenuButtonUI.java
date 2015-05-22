@@ -39,6 +39,7 @@ import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.flamingo.common.ui.ActionPopupTransitionAwareUI;
 import org.pushingpixels.substance.flamingo.utils.CommandButtonVisualStateTracker;
 import org.pushingpixels.substance.internal.animation.StateTransitionTracker;
@@ -83,14 +84,15 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
                     g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5).getUltraLightColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getMidColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED).getUltraDarkColor()
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5).getUltraLightColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getMidColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED).getUltraDarkColor()
                     }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
                     Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
                     g2.fill(s);
-                    g2.setPaint(SubstanceLookAndFeel.getCurrentSkin().getEnabledColorScheme(DecorationAreaType.PRIMARY_TITLE_PANE).getMidColor());
+                    g2.setPaint(skin.getEnabledColorScheme(DecorationAreaType.PRIMARY_TITLE_PANE).getMidColor());
                     super.paintIcon(c, g, x, y);
                 }
             },
@@ -103,10 +105,11 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
                     g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(Color.white, 0.8)*/.getUltraLightColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_UNSELECTED).getMidColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(new Color(0x7c, 0x7c, 0x7c), 0.8)*/.getUltraDarkColor()
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(Color.white, 0.8)*/.getUltraLightColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_UNSELECTED).getMidColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_UNSELECTED)/*.shiftBackground(new Color(0x7c, 0x7c, 0x7c), 0.8)*/.getUltraDarkColor()
                     }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
                     Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
                     g2.fill(s);
@@ -122,10 +125,11 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
                     g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.2f, 0.5f, 0.8f}, new Color[]{
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getUltraLightColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getMidColor(),
-                        SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).shiftBackground(Color.black, 0.7).getUltraDarkColor()
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getUltraLightColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getMidColor(),
+                        skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).shiftBackground(Color.black, 0.7).getUltraDarkColor()
                     }, MultipleGradientPaint.CycleMethod.NO_CYCLE));
                     Shape s = new Ellipse2D.Double(x, y, getIconWidth(), getIconHeight());
                     g2.fill(s);

@@ -26,6 +26,7 @@ import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.painter.border.StandardBorderPainter;
 import org.pushingpixels.substance.internal.utils.SubstanceOutlineUtilities;
 
@@ -66,7 +67,8 @@ public class HeaderLabel extends JLabel {
 
     @Override
     public void paint(Graphics g) {
-        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
+        SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+        g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         StandardBorderPainter borderPainter = new StandardBorderPainter();
 
@@ -83,8 +85,8 @@ public class HeaderLabel extends JLabel {
                 getHeight() + dy, cornerRadius, straightSides, borderInsets);
 
         borderPainter.paintBorder(g, this, getWidth(), getHeight() + dy,
-                contour, contourInner, SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
-        g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
+                contour, contourInner, skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
+        g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
         JLabel lab = new JLabel(getText(), JLabel.CENTER);
         lab.setSize(getSize());
         lab.paint(g);
