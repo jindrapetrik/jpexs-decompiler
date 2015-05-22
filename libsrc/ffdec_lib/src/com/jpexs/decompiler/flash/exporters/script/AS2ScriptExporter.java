@@ -158,7 +158,7 @@ public class AS2ScriptExporter {
                 return file;
             } catch (InterruptedException ex) {
             } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-                Logger.getLogger(AS2ScriptExporter.class.getName()).log(Level.SEVERE, "Decompilation error in script: " + name, ex);
+                logger.log(Level.SEVERE, "Decompilation error in script: " + name, ex);
                 if (handler != null) {
                     int action = handler.getNewInstance().handle(ex);
                     switch (action) {

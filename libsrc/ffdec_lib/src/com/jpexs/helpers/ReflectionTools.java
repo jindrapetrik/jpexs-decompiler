@@ -33,6 +33,8 @@ import java.util.logging.Logger;
  */
 public class ReflectionTools {
 
+    private static final Logger logger = Logger.getLogger(ReflectionTools.class.getName());
+
     public static Object getValue(Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
         Object value = field.get(obj);
         return value;
@@ -135,7 +137,7 @@ public class ReflectionTools {
             try {
                 arrValue = field.get(object);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return false;
             }
             Class componentClass = arrValue.getClass().getComponentType();
@@ -176,7 +178,7 @@ public class ReflectionTools {
         try {
             list = (List) field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         ParameterizedType listType = (ParameterizedType) field.getGenericType();
@@ -188,7 +190,7 @@ public class ReflectionTools {
             }
             list.add(index, val);
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
@@ -219,7 +221,7 @@ public class ReflectionTools {
         try {
             arrValue = field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         Class componentClass = arrValue.getClass().getComponentType();
@@ -228,7 +230,7 @@ public class ReflectionTools {
             try {
                 val = newInstanceOf(componentClass);
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return false;
             }
             if (val == null) {
@@ -253,7 +255,7 @@ public class ReflectionTools {
         try {
             field.set(object, copy);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
@@ -286,7 +288,7 @@ public class ReflectionTools {
         try {
             list = (List) field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         if (index < 0 || index >= list.size()) {
@@ -301,7 +303,7 @@ public class ReflectionTools {
         try {
             arrValue = field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         Class componentClass = arrValue.getClass().getComponentType();
@@ -321,7 +323,7 @@ public class ReflectionTools {
         try {
             field.set(object, copy);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         return true;

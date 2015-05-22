@@ -68,6 +68,8 @@ import javax.swing.SpringLayout;
  */
 public class GenericTagPanel extends JPanel implements ChangeListener {
 
+    private static final Logger logger = Logger.getLogger(GenericTagPanel.class.getName());
+
     private final JEditorPane genericTagPropertiesEditorPane;
 
     private final JPanel genericTagPropertiesEditPanel;
@@ -270,7 +272,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     addButtons.put(name, addButton);
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         return propCount;
@@ -311,7 +313,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
                 View.execInEventDispatch(() -> {
@@ -358,7 +360,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
                 View.execInEventDispatch(() -> {
@@ -411,7 +413,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                         value = ReflectionTools.newInstanceOf(field.getType());
                         field.set(obj, value);
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                         return 0;
                     }
                 } else {
@@ -480,7 +482,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             try {
                 f.set(t, f.get(assigned));
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -553,7 +555,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                         dependentLabel.setVisible(conditionMet);
                         dependentTypeLabel.setVisible(conditionMet);
                     } catch (AnnotationParseException ex) {
-                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, "Invalid condition", ex);
+                        logger.log(Level.SEVERE, "Invalid condition", ex);
                     }
                 }
                 if (!conditionMet) {

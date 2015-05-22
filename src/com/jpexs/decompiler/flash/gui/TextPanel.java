@@ -51,6 +51,8 @@ import javax.swing.text.BadLocationException;
  */
 public class TextPanel extends JPanel implements TagEditorPanel {
 
+    private static final Logger logger = Logger.getLogger(TextPanel.class.getName());
+
     private final MainPanel mainPanel;
 
     private final SearchPanel<TextTag> textSearchPanel;
@@ -220,7 +222,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
                                 break;
                             }
                         } catch (BadLocationException ex) {
-                            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 }
@@ -244,7 +246,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
                             selected.replace(start - selStart, end - selStart, str);
                         } catch (BadLocationException ex) {
-                            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 }
@@ -344,7 +346,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         try {
             textTag.undo();
         } catch (InterruptedException | IOException ex) {
-            Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         textTag.getSwf().clearImageCache();
@@ -393,7 +395,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
                 saveText(false);
                 updateButtonsVisibility();
             } catch (Exception ex) {
-                Logger.getLogger(TextPanel.class.getName()).log(Level.SEVERE, "Cannot auto-save text tag.", ex);
+                logger.log(Level.SEVERE, "Cannot auto-save text tag.", ex);
             }
         }
 

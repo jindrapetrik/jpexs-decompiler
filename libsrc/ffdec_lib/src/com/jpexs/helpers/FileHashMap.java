@@ -42,6 +42,8 @@ import java.util.logging.Logger;
  */
 public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
 
+    private static final Logger logger = Logger.getLogger(FileHashMap.class.getName());
+
     private final Map<K, Integer> lengths = new HashMap<>();
 
     private final Map<K, Long> offsets = new HashMap<>();
@@ -167,11 +169,11 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
                 V ret = (V) ois.readObject();
                 return ret;
             } catch (ClassNotFoundException ex) {
-                Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return null;
             }
         } catch (IOException ex) {
-            Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -231,7 +233,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
                 fileLen += data.length;
             }
         } catch (IOException ex) {
-            Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
                 oos.close();
@@ -291,7 +293,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         try {
             file.setLength(0);
         } catch (IOException ex) {
-            Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -302,7 +304,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {
         try {
             file.close();
         } catch (IOException ex) {
-            Logger.getLogger(FileHashMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         fileName.delete();
         deleted = true;

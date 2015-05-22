@@ -127,6 +127,8 @@ import java.util.logging.Logger;
  */
 public class CommandLineArgumentParser {
 
+    private static final Logger logger = Logger.getLogger(CommandLineArgumentParser.class.getName());
+
     private static boolean commandLineMode = false;
 
     private static String stdOut = null;
@@ -827,7 +829,7 @@ public class CommandLineArgumentParser {
                         swf.swfList = new SWFList();
                         swf.swfList.sourceInfo = sourceInfo;
                     } catch (IOException | InterruptedException ex) {
-                        Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
                 break;
@@ -1141,7 +1143,7 @@ public class CommandLineArgumentParser {
             }
         } catch (OutOfMemoryError | Exception ex) {
             System.err.print("FAIL: Exporting Failed on Exception - ");
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
 
@@ -1174,7 +1176,7 @@ public class CommandLineArgumentParser {
                 System.err.println("File not found.");
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1199,7 +1201,7 @@ public class CommandLineArgumentParser {
                 System.err.println("File not found.");
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1217,10 +1219,10 @@ public class CommandLineArgumentParser {
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
             } catch (InterruptedException ex) {
-                Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1239,7 +1241,7 @@ public class CommandLineArgumentParser {
                 swf.saveTo(new BufferedOutputStream(fos));
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1325,7 +1327,7 @@ public class CommandLineArgumentParser {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1365,7 +1367,7 @@ public class CommandLineArgumentParser {
                 System.err.println("File not found.");
             }
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         System.exit(0);
@@ -1694,7 +1696,7 @@ public class CommandLineArgumentParser {
             SWFSourceInfo sourceInfo = new SWFSourceInfo(null, args.pop(), null);
             Main.parseSWF(sourceInfo);
         } catch (Exception ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
         System.exit(0);
