@@ -85,6 +85,22 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+                    // todo honfika: remove, added only for testing issue #897
+                    if (skin == null) {
+                        throw new Error("skin");
+                    }
+                    if (skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED) == null) {
+                        throw new Error("skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED)");
+                    }
+                    if (skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5) == null) {
+                        throw new Error("skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5)");
+                    }
+                    if (skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED) == null) {
+                        throw new Error("skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED)");
+                    }
+                    if (skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED) == null) {
+                        throw new Error("skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED)");
+                    }
                     g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
                         skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5).getUltraLightColor(),
                         skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getMidColor(),
