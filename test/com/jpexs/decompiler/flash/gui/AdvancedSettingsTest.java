@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import javax.swing.JComboBox;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -31,5 +32,9 @@ public class AdvancedSettingsTest {
     public void testAdvancedSettginsDialog() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
         AdvancedSettingsDialog.getCategories(new HashMap<>(), new HashMap<>(), new JComboBox<>(), resourceBundle);
+    }
+
+    public void testFail() {
+        Assert.fail("Test");
     }
 }
