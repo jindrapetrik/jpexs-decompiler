@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.SystemColor;
 import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class HeaderLabel extends JLabel {
             SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
             g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
         } else {
-            g.setColor(new Color(217, 232, 251));
+            g.setColor(SystemColor.control);
         }
         g.fillRect(0, 0, getWidth(), getHeight());
         if (Configuration.useRibbonInterface.get()) {
@@ -96,7 +97,7 @@ public class HeaderLabel extends JLabel {
                     contour, contourInner, skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
             g.setColor(skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
         } else {
-            g.setColor(Color.BLACK);
+            g.setColor(SystemColor.controlText);
         }
 
         JLabel lab = new JLabel(getText(), JLabel.CENTER);

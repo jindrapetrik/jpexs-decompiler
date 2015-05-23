@@ -29,6 +29,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 import java.awt.TexturePaint;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -100,13 +101,11 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
  */
 public class View {
 
-    private static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
-
     public static Color getDefaultBackgroundColor() {
         if (Configuration.useRibbonInterface.get()) {
             return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
         } else {
-            return DEFAULT_BACKGROUND_COLOR;
+            return SystemColor.control;
         }
     }
 
@@ -343,6 +342,14 @@ public class View {
         windowPosY = ((screenY - f.getHeight()) / 2) + topLeftY;
 
         f.setLocation(windowPosX, windowPosY);
+    }
+
+    public static ImageIcon getIcon(String name, int size) {
+        ImageIcon icon = getIcon(name);
+        icon.getImage();
+        BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        bi.createGraphics().drawImage(icon.getImage(), 0, 0, size, size, null, null);
+        return new ImageIcon(bi);
     }
 
     public static ImageIcon getIcon(String name) {

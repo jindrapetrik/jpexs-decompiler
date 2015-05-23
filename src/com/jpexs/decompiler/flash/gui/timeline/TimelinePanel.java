@@ -16,15 +16,21 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
  *
@@ -48,7 +54,14 @@ public class TimelinePanel extends JPanel {
 
     public static final Color selectedBorderColor = new Color(0xcc, 0, 0);
 
-    public static final Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
+    //public static final Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
+    public static Color getBackgroundColor() {
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        } else {
+            return SystemColor.control;
+        }
+    }
 
     public Timeline getTimeline() {
         return timeline;
@@ -81,7 +94,7 @@ public class TimelinePanel extends JPanel {
         JPanel row1Panel = new JPanel();
         row1Panel.setLayout(new BorderLayout());
         JPanel sepPanel = new JPanel();
-        sepPanel.setBackground(TimelinePanel.backgroundColor);
+        sepPanel.setBackground(getBackgroundColor());
         sepPanel.setPreferredSize(new Dimension(depthPanel.getWidth(), timePanel.getHeight()));
         row1Panel.add(sepPanel, BorderLayout.WEST);
         row1Panel.add(timePanel, BorderLayout.CENTER);

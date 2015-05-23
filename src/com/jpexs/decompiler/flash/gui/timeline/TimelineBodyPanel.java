@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -27,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.SystemColor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -34,6 +36,11 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.internal.utils.SubstanceColorUtilities;
 
 /**
  *
@@ -47,12 +54,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     public static final Color shapeTweenColor = new Color(0xd1, 0xac, 0xf1);
 
-    public static final Color frameColor = new Color(0xbd, 0xd8, 0xfc);
-
-    public static final Color emptyFrameColor = Color.white;
-
-    public static final Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
-
+    //public static final Color frameColor = new Color(0xbd, 0xd8, 0xfc);
+    //public static final Color emptyFrameColor = Color.white;
+    //public static final Color emptyFrameSecondColor = new Color(0xea, 0xf2, 0xfc);
     public static final Color borderColor = Color.black;
 
     public static final Color emptyBorderColor = new Color(0xbd, 0xd8, 0xfc);
@@ -67,8 +71,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     public static final Color borderLinesColor = new Color(0xde, 0xde, 0xde);
 
-    public static final Color selectedColor = new Color(113, 174, 235);
-
+    //public static final Color selectedColor = new Color(113, 174, 235);
     public static final int borderLinesLength = 2;
 
     public static final float fontSize = 10.0f;
@@ -76,6 +79,34 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private final List<FrameSelectionListener> listeners = new ArrayList<>();
 
     public Point cursor = null;
+
+    public static Color getEmptyFrameColor() {
+        return SubstanceColorUtilities.getLighterColor(getControlColor(), 0.7);
+    }
+
+    public static Color getEmptyFrameSecondColor() {
+        return SubstanceColorUtilities.getLighterColor(getControlColor(), 0.9);
+    }
+
+    public static Color getSelectedColor() {
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
+        } else {
+            return SystemColor.textHighlight;
+        }
+    }
+
+    private static Color getControlColor() {
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        } else {
+            return SystemColor.control;
+        }
+    }
+
+    public static Color getFrameColor() {
+        return SubstanceColorUtilities.getDarkerColor(getControlColor(), 0.1);
+    }
 
     public void addFrameSelectionListener(FrameSelectionListener l) {
         listeners.add(l);
@@ -103,7 +134,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setColor(TimelinePanel.backgroundColor);
+        g.setColor(TimelinePanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         Rectangle clip = g.getClipBounds();
         int start_f = clip.x / TimelinePanel.FRAME_WIDTH;
@@ -131,9 +162,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 DepthState fl = timeline.getFrame(f).layers.get(d);
                 if (fl == null) {
                     if ((f + 1) % 5 == 0) {
-                        g.setColor(emptyFrameSecondColor);
+                        g.setColor(getEmptyFrameSecondColor());
                     } else {
-                        g.setColor(emptyFrameColor);
+                        g.setColor(getEmptyFrameColor());
                     }
                     g.fillRect(f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
                     g.setColor(emptyBorderColor);
@@ -173,7 +204,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 if (selected) {
                     //if (!(fl != null && (flNext == null || flNext.key))) {
-                    g.setColor(selectedColor);
+                    g.setColor(getSelectedColor());
                     g.fillRect(f * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
                     //}
                 }
@@ -208,13 +239,13 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                             }
                             num_frames++;
                         }
-                        g.setColor(emptyFrameColor);
+                        g.setColor(getEmptyFrameColor());
                         g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
                         g.setColor(borderColor);
                         g.drawRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
 
                         if (selected) {
-                            g.setColor(selectedColor);
+                            g.setColor(getSelectedColor());
                             g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
                         }
 
@@ -223,7 +254,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                         if (num_frames > 1) {
                             if (cursor != null && cursor.y == d && cursor.x == f + num_frames - 1) {
-                                g.setColor(selectedColor);
+                                g.setColor(getSelectedColor());
                                 g.fillRect((f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
                             }
 
@@ -281,7 +312,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         }
                         num_frames++;
                     }
-                    g.setColor(frameColor);
+                    g.setColor(getFrameColor());
                     g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, num_frames * TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
 
                     if (motionTween) {
@@ -294,7 +325,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     }
 
                     if (selected) {
-                        g.setColor(selectedColor);
+                        g.setColor(getSelectedColor());
                         g.fillRect(draw_f * TimelinePanel.FRAME_WIDTH, d * TimelinePanel.FRAME_HEIGHT, TimelinePanel.FRAME_WIDTH, TimelinePanel.FRAME_HEIGHT);
                     }
 
@@ -314,7 +345,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                     if (num_frames > 1) {
                         if (cursor != null && cursor.y == d && cursor.x == f + num_frames - 1) {
-                            g.setColor(selectedColor);
+                            g.setColor(getSelectedColor());
                             g.fillRect((f + num_frames - 1) * TimelinePanel.FRAME_WIDTH + 1, d * TimelinePanel.FRAME_HEIGHT + 1, TimelinePanel.FRAME_WIDTH - 1, TimelinePanel.FRAME_HEIGHT - 1);
                         }
 

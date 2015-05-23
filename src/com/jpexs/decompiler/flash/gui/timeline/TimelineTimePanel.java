@@ -84,7 +84,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         Rectangle clip = g.getClipBounds();
         int start_f = (scrollOffset + clip.x) / TimelinePanel.FRAME_WIDTH;
         int end_f = (scrollOffset + clip.x + clip.width) / TimelinePanel.FRAME_WIDTH;
-        g.setColor(TimelinePanel.backgroundColor);
+        g.setColor(TimelinePanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(borderColor);
         int xofs = TimelinePanel.FRAME_WIDTH - scrollOffset % TimelinePanel.FRAME_WIDTH - 1;

@@ -63,7 +63,7 @@ public class TimelineDepthPanel extends JPanel {
         int start_d = (scrollOffset + clip.y) / TimelinePanel.FRAME_HEIGHT;
         int end_d = (scrollOffset + clip.y + clip.height) / TimelinePanel.FRAME_HEIGHT;
         int d_count = end_d - start_d;
-        g.setColor(TimelinePanel.backgroundColor);
+        g.setColor(TimelinePanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         for (int d = 0; d < d_count; d++) {
             g.setColor(borderColor);
