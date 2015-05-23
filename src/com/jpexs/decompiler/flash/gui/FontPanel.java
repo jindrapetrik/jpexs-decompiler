@@ -486,6 +486,16 @@ public class FontPanel extends JPanel {
         TableLayoutHelper.addTableSpaces(tlAddCharsPanel, 10);
         TableLayoutHelper.addTableSpaces(tlFontParamsPanel, 10);
         TableLayoutHelper.addTableSpaces(tlAll, 10);
+
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                contentPanel.setPreferredSize(new Dimension(Math.max(getSize().width, addCharsPanel.getPreferredSize().width + 20), getSize().height));
+                contentPanel.revalidate();
+            }
+
+        });
     }
 
     private void fontAddCharsButtonActionPerformed(ActionEvent evt) {
