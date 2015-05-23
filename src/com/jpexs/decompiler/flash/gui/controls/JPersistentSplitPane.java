@@ -39,7 +39,7 @@ public class JPersistentSplitPane extends JSplitPane {
 
     private boolean painted = false;
 
-    private Date resize = new Date();
+    private Date resize = getDateAfter(500);
 
     private ComponentListener childComponentListener;
 
@@ -80,7 +80,7 @@ public class JPersistentSplitPane extends JSplitPane {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                resize = new Date();
+                resize = getDateAfter(500);
                 double pos = getConfigValue(config);
                 //System.out.println("resized " + resize.getTime() + " " + config.getName() + ": " + pos);
                 setDividerLocation(pos);
@@ -127,8 +127,8 @@ public class JPersistentSplitPane extends JSplitPane {
 
             // hack
             long diff = new Date().getTime() - resize.getTime();
-            if (diff >= 0 && diff < 100) {
-                resize = new Date();
+            if (diff < 0) {
+                resize = getDateAfter(100);
                 //System.out.println("set after resize " + diff + " " + config.getName());
                 return;
             }
@@ -149,7 +149,7 @@ public class JPersistentSplitPane extends JSplitPane {
 
     @Override
     public void setSize(Dimension d) {
-        resize = new Date();
+        resize = getDateAfter(500);
         super.setSize(d);
     }
 
@@ -157,5 +157,11 @@ public class JPersistentSplitPane extends JSplitPane {
     public void paint(Graphics g) {
         super.paint(g);
         painted = true;
+    }
+
+    private static Date getDateAfter(int ms) {
+        Date d = new Date();
+        d.setTime(d.getTime() + ms);
+        return d;
     }
 }
