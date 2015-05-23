@@ -100,8 +100,14 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
  */
 public class View {
 
+    private static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
+
     public static Color getDefaultBackgroundColor() {
-        return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        } else {
+            return DEFAULT_BACKGROUND_COLOR;
+        }
     }
 
     private static Color swfBackgroundColor = null;
@@ -153,6 +159,11 @@ public class View {
         try {
             UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
             SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
+            if (SubstanceLookAndFeel.getCurrentSkin() == null) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Current skin is null");
+                SubstanceLookAndFeel.setSkin("com.jpexs.decompiler.flash.gui.OceanicSkin");
+            }
+
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
             UIManager.put("Tree.expandedIcon", getIcon("expand16"));
             UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
@@ -277,17 +288,26 @@ public class View {
      * @param f Frame to set icon in
      */
     public static void setWindowIcon(Window f) {
-        List<Image> images = new ArrayList<>();
-        MyResizableIcon[] icons = MyRibbonApplicationMenuButtonUI.getIcons();
-        MyResizableIcon icon = icons[1];
-        int sizes[] = new int[]{16, 32, 48, 256};
-        for (int size : sizes) {
-            icon.setIconSize(size, size);
-            BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
-            icon.paintIcon(f, bi.getGraphics(), 0, 0);
-            images.add(bi);
+        if (Configuration.useRibbonInterface.get()) {
+            List<Image> images = new ArrayList<>();
+            MyResizableIcon[] icons = MyRibbonApplicationMenuButtonUI.getIcons();
+            MyResizableIcon icon = icons[1];
+            int sizes[] = new int[]{16, 32, 48, 256};
+            for (int size : sizes) {
+                icon.setIconSize(size, size);
+                BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
+                icon.paintIcon(f, bi.getGraphics(), 0, 0);
+                images.add(bi);
+            }
+            f.setIconImages(images);
+        } else {
+            List<Image> images = new ArrayList<>();
+            images.add(loadImage("icon16"));
+            images.add(loadImage("icon32"));
+            images.add(loadImage("icon48"));
+            images.add(loadImage("icon256"));
+            f.setIconImages(images);
         }
-        f.setIconImages(images);
     }
 
     /**

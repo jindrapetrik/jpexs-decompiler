@@ -138,6 +138,8 @@ import java.util.logging.Logger;
 
 public class ASMParser {
 
+    private static final Logger logger = Logger.getLogger(ASMParser.class.getName());
+
     public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
         ActionList list = new ActionList();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
@@ -496,7 +498,7 @@ public class ASMParser {
 
                                 throw new ActionParseException(message, line);
                             } else {
-                                Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
+                                logger.log(Level.SEVERE, message);
                             }
                         }
 
@@ -522,7 +524,7 @@ public class ASMParser {
 
                                 throw new ActionParseException(message, line);
                             } else {
-                                Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
+                                logger.log(Level.SEVERE, message);
                             }
                         }
 
@@ -543,7 +545,7 @@ public class ASMParser {
 
                     throw new ActionParseException(message, line);
                 } else {
-                    Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, message);
+                    logger.log(Level.SEVERE, message);
                 }
             }
         }

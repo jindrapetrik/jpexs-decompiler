@@ -50,6 +50,8 @@ import java.util.logging.Logger;
  */
 public class ScriptPack extends AS3ClassTreeItem {
 
+    private static final Logger logger = Logger.getLogger(ScriptPack.class.getName());
+
     public final ABC abc;
 
     public final int scriptIndex;
@@ -174,12 +176,12 @@ public class ScriptPack extends AS3ClassTreeItem {
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             writer.continueMeasure();
-            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            logger.log(Level.SEVERE, "Decompilation error", ex);
             Helper.appendTimeoutComment(writer, timeout);
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();
-            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            logger.log(Level.SEVERE, "Decompilation error", ex);
             Helper.appendErrorComment(writer, ex);
             return;
         }
@@ -205,10 +207,10 @@ public class ScriptPack extends AS3ClassTreeItem {
                 FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
                 toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "The file path is probably too long", ex);
+            logger.log(Level.SEVERE, "The file path is probably too long", ex);
         }
 
         return file;

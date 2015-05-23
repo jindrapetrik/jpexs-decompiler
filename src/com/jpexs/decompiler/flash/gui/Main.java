@@ -289,7 +289,7 @@ public class Main {
                 try {
                     result.add(worker.get());
                 } catch (CancellationException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
+                    logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
                 }
             }
         } else {
@@ -314,7 +314,7 @@ public class Main {
             try {
                 result.add(worker.get());
             } catch (CancellationException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
+                logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
             }
         }
 

@@ -61,6 +61,8 @@ import javax.swing.tree.TreePath;
  */
 public class DumpTree extends JTree {
 
+    private static final Logger logger = Logger.getLogger(DumpTree.class.getName());
+
     private final MainPanel mainPanel;
 
     public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -193,7 +195,7 @@ public class DumpTree extends JTree {
                 byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                 fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
             } catch (IOException ex) {
-                Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -220,7 +222,7 @@ public class DumpTree extends JTree {
             }
             repaint();
         } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -236,7 +238,7 @@ public class DumpTree extends JTree {
             ais.dumpInfo = dumpInfo;
             new ABC(ais, swf, null);
         } catch (IOException ex) {
-            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         repaint();
     }
@@ -253,7 +255,7 @@ public class DumpTree extends JTree {
             ais.dumpInfo = dumpInfo;
             new AVM2Code(ais);
         } catch (IOException ex) {
-            Logger.getLogger(DumpTree.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         repaint();
     }

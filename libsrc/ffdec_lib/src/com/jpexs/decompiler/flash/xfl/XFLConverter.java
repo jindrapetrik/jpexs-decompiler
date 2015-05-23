@@ -148,6 +148,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class XFLConverter {
 
+    private static final Logger logger = Logger.getLogger(XFLConverter.class.getName());
+
     public static final int KEY_MODE_NORMAL = 9728;
 
     public static final int KEY_MODE_CLASSIC_TWEEN = 22017;
@@ -305,7 +307,7 @@ public class XFLConverter {
                     ret.append("bitmap").append(bitmapCh.getCharacterId()).append(".").append(it.getImageFormat());
                 } else {
                     if (bitmapCh != null) {
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
+                        logger.log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
                     }
                     ret.append("<SolidColor color=\"#ffffff\" />");
                     return;
@@ -1157,7 +1159,7 @@ public class XFLConverter {
         try {
             Action.actionsToSource(as, as.getActions(), as.toString(), writer);
         } catch (InterruptedException ex) {
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return writer.toString();
     }
@@ -1429,7 +1431,7 @@ public class XFLConverter {
                         int adpcmCodeSize = (int) sis.readUB(2, "adpcmCodeSize");
                         bits = 2 + adpcmCodeSize;
                     } catch (IOException ex) {
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
                 if (soundFormat == SoundFormat.FORMAT_MP3) {
@@ -1485,7 +1487,7 @@ public class XFLConverter {
 
                         }
                     } catch (IOException ex) {
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
                 SoundTag st = (SoundTag) symbol;
@@ -1494,7 +1496,7 @@ public class XFLConverter {
                 try {
                     data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
                 } catch (IOException ex) {
-                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
                 String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
@@ -1547,7 +1549,7 @@ public class XFLConverter {
                 try {
                     data = new MovieExporter().exportMovie(video, MovieExportMode.FLV);
                 } catch (IOException ex) {
-                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 String symbolFile = "movie" + symbol.getCharacterId() + "." + "flv";
                 String mediaLinkStr = "";
@@ -1629,8 +1631,7 @@ public class XFLConverter {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (TransformerFactoryConfigurationError | IllegalArgumentException | TransformerException e) {
-            System.err.println(input);
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Pretty print error", e);
+            logger.log(Level.SEVERE, "Pretty print error", e);
             return input;
         }
     }
@@ -2993,7 +2994,7 @@ public class XFLConverter {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
                 swf.exportActionScript(handler, Path.combine(outDir.getAbsolutePath(), "scripts"), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
+                logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }
         }
     }
@@ -3131,7 +3132,7 @@ public class XFLConverter {
                 System.err.println(tparser.result);
             }
         } catch (SAXException | IOException e) {
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
+            logger.log(Level.SEVERE, "Error while converting HTML", e);
         }
         return tparser.result;
     }

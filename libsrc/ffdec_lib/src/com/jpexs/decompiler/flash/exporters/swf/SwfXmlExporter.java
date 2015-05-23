@@ -59,6 +59,8 @@ import org.w3c.dom.Node;
  */
 public class SwfXmlExporter {
 
+    private static final Logger logger = Logger.getLogger(SwfXmlExporter.class.getName());
+
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
 
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
@@ -71,7 +73,7 @@ public class SwfXmlExporter {
                 writer.append(getXml(xmlDoc));
             }
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         List<File> ret = new ArrayList<>();
@@ -90,7 +92,7 @@ public class SwfXmlExporter {
             StreamResult result = new StreamResult(writer);
             transformer.transform(source, result);
         } catch (TransformerException ex) {
-            Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return writer.toString();
     }
@@ -192,7 +194,7 @@ public class SwfXmlExporter {
                     f.setAccessible(true);
                     generateXml(doc, objNode, f.getName(), f.get(obj), false, level + 1);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(SwfXmlExporter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         } else {

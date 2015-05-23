@@ -91,6 +91,8 @@ import jsyntaxpane.actions.ActionUtils;
 
 public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult>, TagEditorPanel {
 
+    private static final Logger logger = Logger.getLogger(ActionPanel.class.getName());
+
     private MainPanel mainPanel;
 
     public LineMarkedEditorPane editor;
@@ -327,7 +329,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         try {
             asm.getASMSource(exportMode, writer, lastCode);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         asm.removeDisassemblyListener(listener);
         return new HighlightedText(writer);
@@ -749,7 +751,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
                 gf.setVisible(true);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -834,7 +836,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
             src.setActions(actions);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -858,11 +860,13 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             setDecompiledEditMode(false);
         } catch (IOException ex) {
-            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
+            logger.log(Level.SEVERE, "IOException during action compiling", ex);
         } catch (ActionParseException ex) {
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (CompilationException ex) {
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

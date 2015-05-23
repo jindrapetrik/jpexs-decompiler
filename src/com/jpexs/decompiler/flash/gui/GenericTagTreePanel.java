@@ -83,6 +83,8 @@ import javax.swing.tree.TreePath;
  */
 public class GenericTagTreePanel extends GenericTagPanel {
 
+    private static final Logger logger = Logger.getLogger(GenericTagTreePanel.class.getName());
+
     private JTree tree;
 
     private Tag editedTag;
@@ -132,7 +134,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 try {
                     type = ReflectionTools.getValue(obj, field, index).getClass();
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
+                    logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
                     return null;
                 }
                 SWFType swfType = field.getAnnotation(SWFType.class);
@@ -368,7 +370,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         ReflectionTools.setValue(obj, field, Array.newInstance(field.getType().getComponentType(), 0));
                     }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -445,7 +447,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         val = ReflectionTools.newInstanceOf(field.getType());
                         ReflectionTools.setValue(obj, field, index, val);
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                         return null;
                     }
                 }
@@ -532,7 +534,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             }
                         }
                     } catch (AnnotationParseException ex) {
-                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -667,7 +669,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             editedTag = tag.cloneTag();
         } catch (InterruptedException ex) {
         } catch (IOException ex) {
-            Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         tree.setEditable(edit);
         if (!edit) {
@@ -693,7 +695,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             try {
                 f.set(t, f.get(assigned));
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -811,7 +813,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             continue;
                         }
                     } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {
-                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }

@@ -83,7 +83,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -779,8 +778,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             decompiledTextArea.gotoLine((int) ex.line);
             decompiledTextArea.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (IOException | InterruptedException ex) {
-            //ignore
+        } catch (Throwable ex) {
+            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

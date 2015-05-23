@@ -125,6 +125,8 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("unchecked")
 public class SwfXmlImporter {
 
+    private static final Logger logger = Logger.getLogger(SwfXmlImporter.class.getName());
+
     private Map<String, Class> swfTags;
 
     private Map<String, Class> swfObjects;
@@ -138,7 +140,7 @@ public class SwfXmlImporter {
             Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
             processElement(doc.getDocumentElement(), swf, swf, null);
         } catch (ParserConfigurationException | SAXException ex) {
-            Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -165,7 +167,7 @@ public class SwfXmlImporter {
                     String attrValue = attr.getValue();
                     field.set(obj, getAs(field.getType(), attrValue));
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -212,7 +214,7 @@ public class SwfXmlImporter {
                         field.set(obj, childObj);
                     }
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
-                    Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

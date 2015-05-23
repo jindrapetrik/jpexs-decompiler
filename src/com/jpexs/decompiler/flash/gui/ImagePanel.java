@@ -70,6 +70,8 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements MediaDisplay {
 
+    private static final Logger logger = Logger.getLogger(ImagePanel.class.getName());
+
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
 
     private Timelined timelined;
@@ -516,7 +518,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         try {
             setImage(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))));
         } catch (IOException ex) {
-            Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -561,7 +563,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             try {
                 delayObject.wait(drawWaitLimit);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -900,7 +902,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
-            Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, "Error during playing sound", ex);
+            logger.log(Level.SEVERE, "Error during playing sound", ex);
         }
     }
 
@@ -989,7 +991,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         nextFrame(thisTimer);
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         };

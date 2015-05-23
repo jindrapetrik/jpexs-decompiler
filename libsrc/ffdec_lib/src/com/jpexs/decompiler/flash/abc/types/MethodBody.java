@@ -50,6 +50,8 @@ import java.util.logging.Logger;
 
 public final class MethodBody implements Cloneable {
 
+    private static final Logger logger = Logger.getLogger(MethodBody.class.getName());
+
     @Internal
     public boolean deleted;
 
@@ -113,7 +115,7 @@ public final class MethodBody implements Cloneable {
                 avm2Code = new AVM2Code(ais);
             } catch (UnknownInstructionCode | IOException ex) {
                 avm2Code = new AVM2Code();
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             avm2Code.compact();
             code = avm2Code;
@@ -224,9 +226,9 @@ public final class MethodBody implements Cloneable {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                 if (ex instanceof TimeoutException) {
-                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation timeout in " + path, ex);
+                    logger.log(Level.SEVERE, "Decompilation timeout in " + path, ex);
                 } else {
-                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex);
+                    logger.log(Level.SEVERE, "Decompilation error in " + path, ex);
                 }
                 convertException = ex;
                 Throwable cause = ex.getCause();
@@ -278,7 +280,7 @@ public final class MethodBody implements Cloneable {
             try {
                 deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (StackOverflowError ex) {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
+                logger.log(Level.SEVERE, "Error during remove traps in " + path, ex);
             }
         }
         //deobfuscated.restoreControlFlow(constants, b);
