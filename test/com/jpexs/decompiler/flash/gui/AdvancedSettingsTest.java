@@ -34,6 +34,7 @@ public class AdvancedSettingsTest {
         AdvancedSettingsDialog.getCategories(new HashMap<>(), new HashMap<>(), new JComboBox<>(), resourceBundle);
     }
 
+    @Test
     public void testFail() {
         Assert.fail("Test");
     }
