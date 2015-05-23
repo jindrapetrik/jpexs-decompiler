@@ -37,6 +37,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -202,6 +203,7 @@ public class FolderPreviewPanel extends JPanel {
         int finish_y = (int) Math.ceil((r.y + r.height) / (float) CELL_HEIGHT);
         Color color;
         Color selectedColor;
+        Color selectedTextColor;
         Color borderColor;
         Color textColor;
         if (Configuration.useRibbonInterface.get()) {
@@ -209,12 +211,14 @@ public class FolderPreviewPanel extends JPanel {
             color = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
             selectedColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
             borderColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_SELECTED).getUltraDarkColor();
-            textColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getForegroundColor();
+            textColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor();
+            selectedTextColor = skin.getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getForegroundColor();
         } else {
-            color = new Color(0xd9, 0xe8, 0xfb);
-            selectedColor = new Color(0xfe, 0xca, 0x81);
-            borderColor = Color.BLACK;
-            textColor = Color.BLACK;
+            color = SystemColor.control;
+            selectedColor = SystemColor.textHighlight;
+            borderColor = SystemColor.controlShadow;
+            textColor = SystemColor.controlText;
+            selectedTextColor = SystemColor.textHighlightText;
         }
 
         //g.setColor(SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED));
@@ -253,6 +257,9 @@ public class FolderPreviewPanel extends JPanel {
                     g.drawLine(x * CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE, x * CELL_WIDTH + CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE);
                     g.drawRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                     g.setColor(textColor);
+                    if (selectedItems.containsKey(index)) {
+                        g.setColor(selectedTextColor);
+                    }
                     g.drawString(s, x * CELL_WIDTH + BORDER_SIZE, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE + LABEL_HEIGHT);
 
                 }

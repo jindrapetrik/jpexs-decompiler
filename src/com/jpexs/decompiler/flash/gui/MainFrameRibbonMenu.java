@@ -356,7 +356,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         viewModeResourcesToggleButton.addActionListener(this::viewModeResouresButtonActionPerformed);
 
         viewModeHexToggleButton = new JCommandToggleButton(fixCommandTitle(translate("menu.file.view.hex")), View.getResizableIcon("viewhex16"));
-        viewModeHexToggleButton.addActionListener(this::viewModeHexDumpButtonActionPerformed);;
+        viewModeHexToggleButton.addActionListener(this::viewModeHexDumpButtonActionPerformed);
 
         viewModeToggleGroup.add(viewModeResourcesToggleButton);
         viewModeToggleGroup.add(viewModeHexToggleButton);
@@ -381,8 +381,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         debuggerSwitchCommandButton = new JCommandToggleButton(translate("menu.debugger.switch"), View.getResizableIcon("debugger32"));
         debuggerSwitchCommandButton.addActionListener(this::debuggerSwitchButtonActionPerformed);
 
-        //debuggerDetachCommandButton = new JCommandButton("Detach debugger",View.getResizableIcon("debuggerremove16"));
-        //debuggerDetachCommandButton.addActionListener(this::debuggerDetach);
         debuggerReplaceTraceCommandButton = new JCommandButton(translate("menu.debugger.replacetrace"), View.getResizableIcon("debuggerreplace16"));
         debuggerReplaceTraceCommandButton.addActionListener(this::debuggerReplaceTraceCalls);
 
@@ -685,8 +683,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         deobfuscationCommandButton.setEnabled(hasAbc);
         debuggerSwitchCommandButton.setEnabled(hasAbc);
         debuggerSwitchGroup.setSelected(debuggerSwitchCommandButton, hasDebugger);
-        //debuggerSwitchCommandButton.
-        //debuggerDetachCommandButton.setEnabled(hasDebugger);
         debuggerReplaceTraceCommandButton.setEnabled(hasAbc && hasDebugger);
     }
 
