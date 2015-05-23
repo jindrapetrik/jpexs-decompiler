@@ -98,6 +98,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
  * Main executable class
@@ -857,6 +858,18 @@ public class Main {
             View.setLookAndFeel();
         } else {
             try {
+                UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, null);
+                UIManager.put("Tree.expandedIcon", null);
+                UIManager.put("Tree.collapsedIcon", null);
+                UIManager.put("ColorChooserUI", null);
+                UIManager.put("ColorChooser.swatchesRecentSwatchSize", null);
+                UIManager.put("ColorChooser.swatchesSwatchSize", null);
+                UIManager.put("RibbonApplicationMenuPopupPanelUI", null);
+                UIManager.put("RibbonApplicationMenuButtonUI", null);
+                UIManager.put("ProgressBarUI", null);
+                UIManager.put("TextField.background", null);
+                UIManager.put("FormattedTextField.background", null);
+                UIManager.put("CommandButtonUI", null);
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                 logger.log(Level.SEVERE, null, ex);
