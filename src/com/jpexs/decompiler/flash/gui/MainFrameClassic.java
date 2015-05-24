@@ -50,6 +50,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
 
         boolean externalFlashPlayerUnavailable = flashPanel == null;
         mainMenu = new MainFrameClassicMenu(this, externalFlashPlayerUnavailable);
+        mainMenu.createMenuBar();
 
         panel = new MainPanel(this, mainMenu, flashPanel);
 

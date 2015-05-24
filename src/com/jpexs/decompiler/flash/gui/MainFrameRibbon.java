@@ -62,6 +62,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
         boolean externalFlashPlayerUnavailable = flashPanel == null;
         mainMenu = new MainFrameRibbonMenu(this, ribbon, externalFlashPlayerUnavailable);
+        mainMenu.createMenuBar();
 
         panel = new MainPanel(this, mainMenu, flashPanel);
         panel.setBackground(Color.yellow);
