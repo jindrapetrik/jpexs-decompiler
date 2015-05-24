@@ -256,7 +256,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             }
 
             ribbon.setApplicationMenu(mainMenu);
-
+            return;
         }
 
         for (String sub : subs) {
