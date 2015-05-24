@@ -234,10 +234,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
                 if (sub.startsWith("_/$")) //FooterMenu
                 {
-                    RibbonApplicationMenuEntryFooter footerMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon(subIcon), subTitle, subAction);
+                    RibbonApplicationMenuEntryFooter footerMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon(subIcon, 16), subTitle, subAction);
                     mainMenu.addFooterEntry(footerMenu);
                 } else {
-                    RibbonApplicationMenuEntryPrimary menu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon(subIcon), subTitle, subAction,
+                    RibbonApplicationMenuEntryPrimary menu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon(subIcon, 32), subTitle, subAction,
                             subType == TYPE_MENU ? JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION : JCommandButton.CommandButtonKind.ACTION_ONLY);
 
                     if (subLoader != null) {
@@ -266,12 +266,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             String subTitle = menuTitles.get(sub);
             String subIcon = menuIcons.get(sub);
             String subGroup = menuGroup.get(sub);
+            int subPriority = menuPriorities.get(sub);
             final ActionListener subLoader = menuLoaders.get(sub);
             AbstractCommandButton but = null;
             if (subType == TYPE_MENUITEM || (subType == TYPE_MENU && subAction != null)) {
                 JCommandButton cbut = null;
                 if (subIcon != null) {
-                    cbut = new JCommandButton(fixCommandTitle(subTitle), View.getResizableIcon(subIcon));
+                    cbut = new JCommandButton(fixCommandTitle(subTitle), View.getResizableIcon(subIcon, subPriority == PRIORITY_TOP ? 32 : 16));
                 } else {
                     cbut = new JCommandButton(fixCommandTitle(subTitle));
                 }
@@ -299,7 +300,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     menuItems.put(sub, cb);
                 } else {
                     if (subIcon != null) {
-                        but = new JCommandToggleButton(fixCommandTitle(subTitle), View.getResizableIcon(subIcon));
+                        but = new JCommandToggleButton(fixCommandTitle(subTitle), View.getResizableIcon(subIcon, subPriority == PRIORITY_TOP ? 32 : 16));
                     } else {
                         but = new JCommandToggleButton(fixCommandTitle(subTitle));
                     }
@@ -316,7 +317,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
         //if (parts.length == 3)
         { //3rd level - it's a Band!
-            JRibbonBand band = new JRibbonBand(title, icon != null ? View.getResizableIcon(icon) : null, null);
+            JRibbonBand band = new JRibbonBand(title, icon != null ? View.getResizableIcon(icon, 16) : null, null);
             band.setResizePolicies(getResizePolicies(band));
             int cnt = 0;
             for (String sub : subs) {
