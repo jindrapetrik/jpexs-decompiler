@@ -751,11 +751,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import", translate("menu.import"), null, null, 0, null, false);
         addMenuItem("/file/import/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/file/import/importText", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true);
-        addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importtext32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true);
         addMenuItem("/file/import/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true);
         finishMenu("/file/import");
-
-        addSeparator("/file");
 
         addMenuItem("/file/view", translate("menu.view"), null, null, 0, null, false);
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM);
@@ -767,6 +765,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAllActionPerformed, PRIORITY_MEDIUM, null, true);
 
         if (!supportsAppMenu()) {
+            addSeparator("/file");
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true);
         }
         finishMenu("/file");
@@ -870,10 +869,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         //Help
         addMenuItem("/help", translate("menu.help"), null, null, 0, null, false);
-        addMenuItem("/help/about", translate("menu.help.about"), "about32", this::aboutActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true);
-        addMenuItem("/help/checkUpdates", translate("menu.help.checkupdates"), "update16", this::checkUpdatesActionPerformed, PRIORITY_MEDIUM, null, true);
         addMenuItem("/help/homePage", translate("menu.help.homepage"), "homepage16", this::homePageActionPerformed, PRIORITY_MEDIUM, null, true);
+        addSeparator("/help");
+        addMenuItem("/help/checkUpdates", translate("menu.help.checkupdates"), "update16", this::checkUpdatesActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/help/about", translate("menu.help.about"), "about32", this::aboutActionPerformed, PRIORITY_TOP, null, true);
         finishMenu("/help");
 
         if (Configuration.showDebugMenu.get() || Configuration.debugMode.get()) {
