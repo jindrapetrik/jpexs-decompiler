@@ -206,6 +206,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     @Override
     public void setMenuEnabled(String path, boolean enabled) {
         path = mapping(path);
+        if (path.equals("_") || path.startsWith("_/")) {
+            return;
+        }
         MenuElement menu = menuElements.get(path);
         if (menu == null) {
             throw new IllegalArgumentException("Menu " + path + " does not exist");
