@@ -235,6 +235,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 if (sub.startsWith("_/$")) //FooterMenu
                 {
                     RibbonApplicationMenuEntryFooter footerMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon(subIcon, 16), subTitle, subAction);
+                    menuItems.put(sub, footerMenu);
                     mainMenu.addFooterEntry(footerMenu);
                 } else {
                     RibbonApplicationMenuEntryPrimary menu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon(subIcon, 32), subTitle, subAction,
@@ -248,6 +249,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                             }
                         });
                     }
+                    menuItems.put(sub, menu);
                     mainMenu.addMenuEntry(menu);
                 }
 
@@ -516,6 +518,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             ((JRibbonBand) o).setEnabled(enabled);
         } else if (o instanceof AbstractCommandButton) {
             ((AbstractCommandButton) o).setEnabled(enabled);
+        } else if (o instanceof RibbonApplicationMenuEntryPrimary) {
+            ((RibbonApplicationMenuEntryPrimary) o).setEnabled(enabled);
+        } else if (o instanceof RibbonApplicationMenuEntryFooter) {
+            ((RibbonApplicationMenuEntryFooter) o).setEnabled(enabled);
         } else if (o instanceof JComponent) {
             ((JComponent) o).setEnabled(enabled);
         } else {
