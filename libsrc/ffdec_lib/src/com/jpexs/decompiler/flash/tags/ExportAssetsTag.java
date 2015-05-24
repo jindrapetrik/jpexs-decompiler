@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,9 +47,11 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
      */
     @SWFType(value = BasicType.UI16)
     @SWFArray(value = "tag", countField = "count")
+    @Table(value = "assets", itemName = "asset")
     public List<Integer> tags;
 
     @SWFArray(value = "name", countField = "count")
+    @Table(value = "assets", itemName = "asset")
     public List<String> names;
 
     /**

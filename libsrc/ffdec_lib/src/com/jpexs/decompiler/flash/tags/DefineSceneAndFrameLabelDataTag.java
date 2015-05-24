@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,16 +40,20 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
 
     @SWFType(value = BasicType.EncodedU32)
     @SWFArray(value = "offset", countField = "sceneCount")
+    @Table(value = "scenes", itemName = "scene")
     public long[] sceneOffsets;
 
     @SWFArray(value = "name", countField = "sceneCount")
+    @Table(value = "scenes", itemName = "scene")
     public String[] sceneNames;
 
     @SWFType(value = BasicType.EncodedU32)
     @SWFArray(value = "frameNum", countField = "frameLabelCount")
+    @Table(value = "frames", itemName = "frame")
     public long[] frameNums;
 
     @SWFArray(countField = "frameLabelCount")
+    @Table(value = "frames", itemName = "frame")
     public String[] frameNames;
 
     /**
