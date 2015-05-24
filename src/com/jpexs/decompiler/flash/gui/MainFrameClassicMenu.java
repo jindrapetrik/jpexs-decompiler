@@ -40,15 +40,17 @@ public class MainFrameClassicMenu extends MainFrameMenu {
 
     private final MainFrameClassic mainFrame;
 
+    private final Map<String, MenuElement> menuElements = new HashMap<>();
+
+    private final Map<String, Set<String>> menuGroups = new HashMap<>();
+
+    private final Map<String, ButtonGroup> menuButtonGroups = new HashMap<>();
+
     public MainFrameClassicMenu(MainFrameClassic mainFrame, boolean externalFlashPlayerUnavailable) {
         super(mainFrame, externalFlashPlayerUnavailable);
         this.mainFrame = mainFrame;
 
     }
-
-    private final Map<String, MenuElement> menuElements = new HashMap<>();
-    private final Map<String, Set<String>> menuGroups = new HashMap<>();
-    private final Map<String, ButtonGroup> menuButtonGroups = new HashMap<>();
 
     private void addMenu(String path, String title, String icon, final ActionListener subLoader) {
         path = mapping(path);
@@ -345,5 +347,4 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         }
         return s;
     }
-
 }

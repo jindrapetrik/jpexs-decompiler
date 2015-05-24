@@ -59,7 +59,35 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
  */
 public class MainFrameRibbonMenu extends MainFrameMenu {
 
-    private JRibbon ribbon;
+    private final JRibbon ribbon;
+
+    private final Map<String, Object> menuItems = new HashMap<>();
+
+    private final Map<String, String> menuTitles = new HashMap<>();
+
+    private final Map<String, String> menuIcons = new HashMap<>();
+
+    private final Map<String, ActionListener> menuActions = new HashMap<>();
+
+    private final Map<String, ActionListener> menuLoaders = new HashMap<>();
+
+    private final Map<String, Integer> menuPriorities = new HashMap<>();
+
+    private final Map<String, List<String>> menuSubs = new HashMap<>();
+
+    private final Map<String, Integer> menuType = new HashMap<>();
+
+    private final Map<String, String> menuGroup = new HashMap<>();
+
+    private final Map<String, CommandToggleButtonGroup> menuToggleGroups = new HashMap<>();
+
+    private final Map<String, CommandToggleButtonGroup> menuToToggleGroup = new HashMap<>();
+
+    private static final int TYPE_MENU = 1;
+
+    private static final int TYPE_MENUITEM = 2;
+
+    private static final int TYPE_TOGGLEMENUITEM = 3;
 
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
         super(mainFrame, externalFlashPlayerUnavailable);
@@ -120,24 +148,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         return resizePolicies;
     }
 
-    private final Map<String, Object> menuItems = new HashMap<>();
-    private final Map<String, String> menuTitles = new HashMap<>();
-    private final Map<String, String> menuIcons = new HashMap<>();
-    private final Map<String, ActionListener> menuActions = new HashMap<>();
-    private final Map<String, ActionListener> menuLoaders = new HashMap<>();
-    private final Map<String, Integer> menuPriorities = new HashMap<>();
-
-    private final Map<String, List<String>> menuSubs = new HashMap<>();
-    private final Map<String, Integer> menuType = new HashMap<>();
-    private final Map<String, String> menuGroup = new HashMap<>();
-
-    private final Map<String, CommandToggleButtonGroup> menuToggleGroups = new HashMap<>();
-    private final Map<String, CommandToggleButtonGroup> menuToToggleGroup = new HashMap<>();
-
-    private static final int TYPE_MENU = 1;
-    private static final int TYPE_MENUITEM = 2;
-    private static final int TYPE_TOGGLEMENUITEM = 3;
-
     @Override
     protected void loadRecent(ActionEvent evt) {
         if (evt.getSource() instanceof JPanel) {
@@ -152,15 +162,11 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 String path = recentFiles.get(i);
                 RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
                 historyButton.fileName = path;
-                historyButton.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        RecentFilesButton source = (RecentFilesButton) ae.getSource();
-                        if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
-                            if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                                Configuration.removeRecentFile(source.fileName);
-                            }
+                historyButton.addActionListener((ActionEvent ae) -> {
+                    RecentFilesButton source = (RecentFilesButton) ae.getSource();
+                    if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
+                        if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                            Configuration.removeRecentFile(source.fileName);
                         }
                     }
                 });
@@ -308,7 +314,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             }
         }
 
-        //if (parts.length == 3) 
+        //if (parts.length == 3)
         { //3rd level - it's a Band!
             JRibbonBand band = new JRibbonBand(title, icon != null ? View.getResizableIcon(icon) : null, null);
             band.setResizePolicies(getResizePolicies(band));
@@ -543,5 +549,4 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     public boolean supportsAppMenu() {
         return true;
     }
-
 }
