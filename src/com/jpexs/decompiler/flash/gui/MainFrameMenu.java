@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import static com.jpexs.decompiler.flash.gui.Main.openFile;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -609,16 +611,24 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
         boolean hasDebugger = hasAbc && DebuggerTools.hasDebugger(swf);
 
+        setMenuEnabled("_/open", !isWorking);
         setMenuEnabled("/file/open", !isWorking);
+        setMenuEnabled("_/save", swfLoaded && !isWorking);
         setMenuEnabled("/file/save", swfLoaded && !isWorking);
+        setMenuEnabled("_/saveAs", swfLoaded && !isWorking);
         setMenuEnabled("/file/saveAs", swfLoaded && !isWorking);
         setMenuEnabled("/file/saveAsExe", swfLoaded && !isWorking);
+        setMenuEnabled("_/close", swfLoaded && !isWorking);
         setMenuEnabled("/file/close", swfLoaded && !isWorking);
+        setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
 
         setMenuEnabled("/file/export", swfLoaded);
+        setMenuEnabled("_/exportAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/export/exportAll", swfLoaded && !isWorking);
+        setMenuEnabled("_/exportFla", swfLoaded && !isWorking);
         setMenuEnabled("/file/export/exportFla", swfLoaded && !isWorking);
+        setMenuEnabled("_/exportSelected", swfLoaded && !isWorking);
         setMenuEnabled("/file/export/exportSelected", swfLoaded && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfLoaded && !isWorking);
 
@@ -645,9 +655,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuChecked("/tools/debugger/debuggerSwitch", hasDebugger);
         setMenuEnabled("/tools/debugger/debuggerReplaceTrace", hasAbc && hasDebugger);
 
+        setMenuEnabled("_/checkUpdates", !isWorking);
         setMenuEnabled("/help/checkUpdates", !isWorking);
         setMenuEnabled("/help/helpUs", !isWorking);
         setMenuEnabled("/help/homePage", !isWorking);
+        setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
     }
 
@@ -707,7 +719,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("_/checkUpdates", translate("menu.help.checkupdates"), "update32", this::checkUpdatesActionPerformed, PRIORITY_TOP, null, true);
             addMenuItem("_/about", translate("menu.help.about"), "about32", this::aboutActionPerformed, PRIORITY_TOP, null, true);
             addMenuItem("_/close", translate("menu.file.close"), "close32", this::closeActionPerformed, PRIORITY_TOP, null, true);
-            addMenuItem("_/closeAll", translate("menu.file.closeAll"), "close32", this::closeAllActionPerformed, PRIORITY_TOP, null, true);
+            addMenuItem("_/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAllActionPerformed, PRIORITY_TOP, null, true);
             addMenuItem("_/$exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true);
             finishMenu("_");
         }
@@ -752,7 +764,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addSeparator("/file");
         addMenuItem("/file/close", translate("menu.file.close"), "close32", this::closeActionPerformed, PRIORITY_MEDIUM, null, true);
-        addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "close32", this::closeAllActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAllActionPerformed, PRIORITY_MEDIUM, null, true);
 
         if (!supportsAppMenu()) {
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true);
@@ -895,6 +907,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 if (nswf != null) {
                     nswf.fixAS3Code();
                 }
+            }, PRIORITY_MEDIUM, null, true);
+            addMenuItem("/debug/openTestSwfs", "Open test SWFs", "update16", e -> {
+                String path;
+                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[2];
+                path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as2\\as2.swf";
+                sourceInfos[0] = new SWFSourceInfo(null, path, null);
+                path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
+                sourceInfos[1] = new SWFSourceInfo(null, path, null);
+                openFile(sourceInfos);
             }, PRIORITY_MEDIUM, null, true);
             finishMenu("/debug");
         }

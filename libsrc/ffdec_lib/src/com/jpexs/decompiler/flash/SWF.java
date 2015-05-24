@@ -2637,23 +2637,22 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline) {
-        int characterId = 0;
-        if (toRemove instanceof CharacterTag) {
-            characterId = ((CharacterTag) toRemove).getCharacterId();
-        }
         Map<Integer, Integer> stage = new HashMap<>();
-
         Set<Integer> dependingChars = new HashSet<>();
-        if (characterId != 0) {
-            dependingChars.add(characterId);
-            for (int i = 0; i < timeline.tags.size(); i++) {
-                Tag t = timeline.tags.get(i);
-                if (t instanceof CharacterIdTag) {
-                    CharacterIdTag c = (CharacterIdTag) t;
-                    Set<Integer> needed = new HashSet<>();
-                    t.getNeededCharacters(needed);
-                    if (needed.contains(characterId)) {
-                        dependingChars.add(c.getCharacterId());
+        if (toRemove instanceof CharacterTag) {
+            int characterId = ((CharacterTag) toRemove).getCharacterId();
+
+            if (characterId != 0) {
+                dependingChars.add(characterId);
+                for (int i = 0; i < timeline.tags.size(); i++) {
+                    Tag t = timeline.tags.get(i);
+                    if (t instanceof CharacterIdTag) {
+                        CharacterIdTag c = (CharacterIdTag) t;
+                        Set<Integer> needed = new HashSet<>();
+                        t.getNeededCharacters(needed);
+                        if (needed.contains(characterId)) {
+                            dependingChars.add(c.getCharacterId());
+                        }
                     }
                 }
             }
