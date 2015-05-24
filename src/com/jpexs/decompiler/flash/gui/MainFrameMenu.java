@@ -737,9 +737,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addSeparator("/file");
         addMenuItem("/file/close", translate("menu.file.close"), "close32", this::close, PRIORITY_MEDIUM, null, true);
-        addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "close32", this::closeAll, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAll, PRIORITY_MEDIUM, null, true);
 
         if (!supportsAppMenu()) {
+            addSeparator("/file");
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exit, PRIORITY_TOP, null, true);
         }
         finishMenu("/file");

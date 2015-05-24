@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -345,7 +347,10 @@ public class View {
     }
 
     public static ImageIcon getIcon(String name, int size) {
-        ImageIcon icon = getIcon(name);
+        ImageIcon icon = getIcon(getPrefferedIconName(name, size));
+        if (icon.getIconWidth() == size && icon.getIconHeight() == size) {
+            return icon;
+        }
         icon.getImage();
         BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         bi.createGraphics().drawImage(icon.getImage(), 0, 0, size, size, null, null);
@@ -372,6 +377,28 @@ public class View {
         root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 escapeStroke, dispatchWindowClosingActionMapKey);
         root.getActionMap().put(dispatchWindowClosingActionMapKey, dispatchClosing);
+    }
+
+    public static boolean iconExists(String resource) {
+        return View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + resource + ".png") != null;
+    }
+
+    private static String getPrefferedIconName(String resource, int preferredSize) {
+        Matcher m = Pattern.compile("(.*[^0-9])([0-9]+)").matcher(resource);
+        if (m.matches()) {
+            int origSize = Integer.parseInt(m.group(2));
+            String name = m.group(1);
+            if (origSize != preferredSize) {
+                if (iconExists(name + preferredSize)) {
+                    return name + preferredSize;
+                }
+            }
+        }
+        return resource;
+    }
+
+    public static ImageWrapperResizableIcon getResizableIcon(String resource, int preferredSize) {
+        return getResizableIcon(getPrefferedIconName(resource, preferredSize));
     }
 
     public static ImageWrapperResizableIcon getResizableIcon(String resource) {
