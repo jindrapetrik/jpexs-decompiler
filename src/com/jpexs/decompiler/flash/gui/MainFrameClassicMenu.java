@@ -275,6 +275,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (!menuElements.containsKey(path)) {
             throw new IllegalArgumentException("Invalid menu: " + path);
         }
+        if (path.startsWith("/file/recent")) {
+            return;
+        }
         MenuElement me = menuElements.get(path);
         if (me instanceof JMenu) {
             JMenu jm = (JMenu) me;
