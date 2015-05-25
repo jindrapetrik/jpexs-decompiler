@@ -896,8 +896,9 @@ public class Main {
                     ContextMenuTools.addToContextMenu(true, false);
                 }
             }
+
+            Configuration.offeredAssociation.set(true);
         }
-        Configuration.offeredAssociation.set(true);
     }
 
     public static void initLang() {

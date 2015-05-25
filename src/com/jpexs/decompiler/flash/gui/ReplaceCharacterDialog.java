@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import static com.jpexs.decompiler.flash.gui.AppDialog.ERROR_OPTION;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

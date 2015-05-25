@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -32,6 +35,8 @@ public class ConfigurationItem<T> {
     private T defaultValue;
 
     private boolean modified;
+
+    private List<ConfigurationItemChangeListener<T>> listeners;
 
     public ConfigurationItem(String name) {
         this.name = name;
@@ -71,12 +76,14 @@ public class ConfigurationItem<T> {
         hasValue = true;
         modified = true;
         this.value = value;
+        fireConfigurationItemChanged(value);
     }
 
     public void unset() {
         hasValue = false;
         modified = true;
         this.value = null;
+        fireConfigurationItemChanged(defaultValue);
     }
 
     public boolean hasValue() {
@@ -90,5 +97,27 @@ public class ConfigurationItem<T> {
     @Override
     public String toString() {
         return name;
+    }
+
+    private void fireConfigurationItemChanged(T newValue) {
+        if (listeners != null) {
+            for (ConfigurationItemChangeListener<T> listener : listeners) {
+                listener.configurationItemChanged(newValue);
+            }
+        }
+    }
+
+    public void addListener(ConfigurationItemChangeListener<T> l) {
+        if (listeners == null) {
+            listeners = new ArrayList<>();
+        }
+
+        listeners.add(l);
+    }
+
+    public void removeListener(ConfigurationItemChangeListener<T> l) {
+        if (listeners != null) {
+            listeners.remove(l);
+        }
     }
 }

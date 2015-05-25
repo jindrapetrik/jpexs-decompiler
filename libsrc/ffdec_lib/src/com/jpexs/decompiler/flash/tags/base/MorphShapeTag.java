@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
-import static com.jpexs.decompiler.flash.tags.base.DrawableTag.PARAMETER_RATIO;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;

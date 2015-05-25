@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import static com.jpexs.decompiler.flash.gui.Main.openFile;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -706,6 +705,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public void createMenuBar() {
         initMenu();
+
         if (supportsAppMenu()) {
             addMenuItem("_", null, null, null, 0, null, false);
             addMenuItem("_/open", translate("menu.file.open"), "open32", this::openActionPerformed, PRIORITY_TOP, this::loadRecent, false);
@@ -733,6 +733,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         } else {
             finishMenu("/file/open");
         }
+
         addMenuItem("/file/save", translate("menu.file.save"), "save32", this::saveActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/file/saveAs", translate("menu.file.saveas"), "saveas16", this::saveAsActionPerformed, PRIORITY_MEDIUM, null, true);
         addMenuItem("/file/saveAsExe", translate("menu.file.saveasexe"), "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true);
@@ -743,7 +744,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false);
         addMenuItem("/file/export/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/file/export/exportXml", translate("menu.file.export.xml"), "exportxml32", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true);
-
         addMenuItem("/file/export/exportAll", translate("menu.file.export.all"), "export16", this::exportAllActionPerformed, PRIORITY_MEDIUM, null, true);
         addMenuItem("/file/export/exportSelected", translate("menu.file.export.selection"), "exportsel16", this::exportSelectedActionPerformed, PRIORITY_MEDIUM, null, true);
         finishMenu("/file/export");
@@ -768,6 +768,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addSeparator("/file");
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true);
         }
+
         finishMenu("/file");
 
         if (Configuration.dumpView.get()) {
@@ -805,22 +806,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings", translate("menu.settings"), null, null, 0, null, false);
 
         addToggleMenuItem("/settings/autoDeobfuscation", translate("menu.settings.autodeobfuscation"), null, null, this::autoDeobfuscationActionPerformed, 0);
-
         addToggleMenuItem("/settings/internalViewer", translate("menu.settings.internalflashviewer"), null, null, this::internalViewerSwitchActionPerformed, 0);
-
         addToggleMenuItem("/settings/parallelSpeedUp", translate("menu.settings.parallelspeedup"), null, null, this::parallelSpeedUpActionPerformed, 0);
-
         addToggleMenuItem("/settings/disableDecompilation", translate("menu.settings.disabledecompilation"), null, null, this::disableDecompilationActionPerformed, 0);
-
         addToggleMenuItem("/settings/cacheOnDisk", translate("menu.settings.cacheOnDisk"), null, null, this::cacheOnDiskActionPerformed, 0);
-
         addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDucumentClassOnStartupActionPerformed, 0);
-
         addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0);
 
         if (Platform.isWindows()) {
             addToggleMenuItem("/settings/associate", translate("menu.settings.addtocontextmenu"), null, null, this::associateActionPerformed, 0);
         }
+
         addMenuItem("/settings/language", translate("menu.language"), null, null, 0, null, false);
         addMenuItem("/settings/language/setLanguage", translate("menu.settings.language"), "setlanguage32", this::setLanguageActionPerformed, PRIORITY_TOP, null, true);
         finishMenu("/settings/language");
@@ -838,22 +834,49 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true);
-
         finishMenu("/settings/advancedSettings");
 
         finishMenu("/settings");
 
         setMenuChecked("/settings/autoDeobfuscation", Configuration.autoDeobfuscate.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/autoDeobfuscation", newValue);
+        });
+
         setMenuChecked("/settings/internalViewer", Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/internalViewer", newValue || externalFlashPlayerUnavailable);
+        });
+
         setMenuChecked("/settings/parallelSpeedUp", Configuration.parallelSpeedUp.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/parallelSpeedUp", newValue);
+        });
+
         setMenuChecked("/settings/disableDecompilation", !Configuration.decompile.get());
-        setMenuChecked("/settings/cacheOnDisk", !Configuration.cacheOnDisk.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/disableDecompilation", !newValue);
+        });
+
+        setMenuChecked("/settings/cacheOnDisk", Configuration.cacheOnDisk.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/cacheOnDisk", newValue);
+        });
+
         setMenuChecked("/settings/gotoMainClassOnStartup", Configuration.gotoMainClassOnStartup.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/gotoMainClassOnStartup", newValue);
+        });
+
         setMenuChecked("/settings/autoRenameIdentifiers", Configuration.autoRenameIdentifiers.get());
+        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+            setMenuChecked("/settings/autoRenameIdentifiers", newValue);
+        });
 
         if (externalFlashPlayerUnavailable) {
             setMenuEnabled("/settings/internalViewer", false);
         }
+
         int deobfuscationMode = Configuration.deobfuscationMode.get();
         switch (deobfuscationMode) {
             case 0:
@@ -863,10 +886,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 setGroupSelection("deobfuscation", "/settings/deobfuscation/new");
                 break;
         }
+
         if (Platform.isWindows()) {
             setMenuChecked("/settings/associate", ContextMenuTools.isAddedToContextMenu());
-
         }
+
         //Help
         addMenuItem("/help", translate("menu.help"), null, null, 0, null, false);
         addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true);
@@ -910,12 +934,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
             }, PRIORITY_MEDIUM, null, true);
             addMenuItem("/debug/openTestSwfs", "Open test SWFs", "update16", e -> {
                 String path;
+
                 SWFSourceInfo[] sourceInfos = new SWFSourceInfo[2];
-                path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as2\\as2.swf";
+                String mainPath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+                path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as2\\as2.swf";
                 sourceInfos[0] = new SWFSourceInfo(null, path, null);
-                path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
+                path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
                 sourceInfos[1] = new SWFSourceInfo(null, path, null);
-                openFile(sourceInfos);
+                Main.openFile(sourceInfos);
             }, PRIORITY_MEDIUM, null, true);
             finishMenu("/debug");
         }
@@ -928,7 +954,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
         setMenuChecked("/tools/timeline", false);
-
     }
 
     private void viewHexActionPerformed(ActionEvent evt) {
@@ -989,6 +1014,5 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         finishMenu("/file/" + (supportsMenuAction() ? "open" : "recent"));
         finishMenu("_/open");
-
     }
 }

@@ -267,7 +267,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         for (String name : keys) {
             Field field = fields.get(name);
             ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
-            String scat = cat == null ? "other" : cat.value();
+            String scat = (cat == null || cat.value().equals("")) ? "other" : cat.value();
             if (!categorized.containsKey(scat)) {
                 categorized.put(scat, new HashMap<>());
             }
