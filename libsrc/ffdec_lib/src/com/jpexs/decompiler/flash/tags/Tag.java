@@ -421,6 +421,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public void undo() throws InterruptedException, IOException {
         byte[] data = getOriginalData();
+        if (data == null) { //If the tag is newly created in GUI it has no original data
+            return;
+        }
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
         readData(tagDataStream, getOriginalRange(), 0, false, true, false);
         setModified(false);
