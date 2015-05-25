@@ -168,4 +168,11 @@ public final class MainFrameRibbon extends AppRibbonFrame {
     public Window getWindow() {
         return this;
     }
+
+    @Override
+    public void dispose() {
+        removeAll();
+        mainMenu.dispose();
+        super.dispose();
+    }
 }

@@ -69,6 +69,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -91,6 +92,7 @@ import org.pushingpixels.substance.api.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.fonts.FontPolicy;
 import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
@@ -158,9 +160,20 @@ public class View {
         }
 
         try {
-            UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
-            SubstanceLookAndFeel.setSkin(Configuration.guiSkin.get());
-            if (SubstanceLookAndFeel.getCurrentSkin() == null) {
+            LookAndFeel oldLookAndFeel = UIManager.getLookAndFeel();
+            if (!(oldLookAndFeel instanceof SubstanceOfficeBlue2007LookAndFeel)) {
+                UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
+                oldLookAndFeel.uninitialize();
+            }
+
+            SubstanceSkin currentSkin = SubstanceLookAndFeel.getCurrentSkin();
+            if (currentSkin != null) {
+                String currentSkinName = currentSkin.getClass().getName();
+                String newSkinName = Configuration.guiSkin.get();
+                if (!currentSkinName.equals(newSkinName)) {
+                    SubstanceLookAndFeel.setSkin(newSkinName);
+                }
+            } else {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Current skin is null");
                 SubstanceLookAndFeel.setSkin("com.jpexs.decompiler.flash.gui.OceanicSkin");
             }

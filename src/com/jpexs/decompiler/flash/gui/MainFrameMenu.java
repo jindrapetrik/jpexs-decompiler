@@ -34,6 +34,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
@@ -62,6 +63,8 @@ import javax.swing.JOptionPane;
 public abstract class MainFrameMenu implements MenuBuilder {
 
     private final MainFrame mainFrame;
+
+    private KeyEventDispatcher keyEventDispatcher;
 
     private SWF swf;
 
@@ -664,42 +667,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private void registerHotKeys() {
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        manager.addKeyEventDispatcher((KeyEvent e) -> {
-            if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_PRESSED) {
-                int code = e.getKeyCode();
-                if (e.isControlDown() && e.isShiftDown()) {
-                    switch (code) {
-                        case KeyEvent.VK_O:
-                            return openActionPerformed(null);
-                        case KeyEvent.VK_S:
-                            return saveActionPerformed(null);
-                        case KeyEvent.VK_A:
-                            return saveAsActionPerformed(null);
-                        case KeyEvent.VK_F:
-                            return search(null, false);
-                        case KeyEvent.VK_T:
-                            return search(null, true);
-                        case KeyEvent.VK_R:
-                            return reloadActionPerformed(null);
-                        case KeyEvent.VK_X:
-                            return closeAllActionPerformed(null);
-                        case KeyEvent.VK_D:
-                            return clearLog();
-                        case KeyEvent.VK_E:
-                            return export(false);
-                    }
-                } else if (e.isControlDown() && !e.isShiftDown()) {
-                    switch (code) {
-                        case KeyEvent.VK_UP:
-                            return previousTag();
-                        case KeyEvent.VK_DOWN:
-                            return nextTag();
-                    }
-                }
-            }
-
-            return false;
-        });
+        manager.addKeyEventDispatcher(keyEventDispatcher = this::dispatchKeyEvent);
     }
 
     public void createMenuBar() {
@@ -1013,5 +981,47 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         finishMenu("/file/" + (supportsMenuAction() ? "open" : "recent"));
         finishMenu("_/open");
+    }
+
+    public void dispose() {
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.removeKeyEventDispatcher(keyEventDispatcher);
+    }
+
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_PRESSED) {
+            int code = e.getKeyCode();
+            if (e.isControlDown() && e.isShiftDown()) {
+                switch (code) {
+                    case KeyEvent.VK_O:
+                        return openActionPerformed(null);
+                    case KeyEvent.VK_S:
+                        return saveActionPerformed(null);
+                    case KeyEvent.VK_A:
+                        return saveAsActionPerformed(null);
+                    case KeyEvent.VK_F:
+                        return search(null, false);
+                    case KeyEvent.VK_T:
+                        return search(null, true);
+                    case KeyEvent.VK_R:
+                        return reloadActionPerformed(null);
+                    case KeyEvent.VK_X:
+                        return closeAllActionPerformed(null);
+                    case KeyEvent.VK_D:
+                        return clearLog();
+                    case KeyEvent.VK_E:
+                        return export(false);
+                }
+            } else if (e.isControlDown() && !e.isShiftDown()) {
+                switch (code) {
+                    case KeyEvent.VK_UP:
+                        return previousTag();
+                    case KeyEvent.VK_DOWN:
+                        return nextTag();
+                }
+            }
+        }
+
+        return false;
     }
 }

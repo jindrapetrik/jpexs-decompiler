@@ -861,10 +861,7 @@ public class Main {
             exit();
         }
         if (Configuration.useRibbonInterface.get()) {
-            Stopwatch sw = Stopwatch.startNew();
             View.setLookAndFeel();
-            sw.stop();
-            System.out.println("sw: " + sw.getElapsedMilliseconds());
         } else {
             try {
                 UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, null);
