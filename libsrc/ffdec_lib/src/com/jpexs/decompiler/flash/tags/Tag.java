@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -527,6 +528,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         originalRange = new ByteArrayRange(tagData);
     }
 
+    @Override
     public boolean isModified() {
         return modified;
     }
@@ -551,7 +553,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         getNeededCharacters(needed2);
 
         while (visited.size() != needed2.size()) {
-            for (Integer characterId : needed2) {
+            for (int characterId : needed2) {
                 if (!visited.contains(characterId)) {
                     visited.add(characterId);
                     if (swf.getCharacters().containsKey(characterId)) {
@@ -565,6 +567,21 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         for (Integer characterId : needed2) {
             if (swf.getCharacters().containsKey(characterId)) {
                 needed.add(characterId);
+            }
+        }
+    }
+
+    public void getDependentCharacters(Set<Integer> dependent) {
+        for (Tag tag : swf.tags) {
+            if (tag instanceof CharacterTag) {
+                Set<Integer> needed = new HashSet<>();
+                tag.getNeededCharactersDeep(needed);
+                for (int dep : dependent) {
+                    if (needed.contains(dep)) {
+                        dependent.add(((CharacterTag) tag).getCharacterId());
+                        break;
+                    }
+                }
             }
         }
     }
@@ -600,5 +617,18 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (needed.size() > 0) {
             tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
         }
+
+        /* todo: add dependent characters, getDependentCharacters method is currently slow
+         if (this instanceof CharacterTag) {
+         Set<Integer> dependent = new LinkedHashSet<>();
+         int characterId = ((CharacterTag) this).getCharacterId();
+         dependent.add(characterId);
+         getDependentCharacters(dependent);
+         dependent.remove(characterId);
+
+         if (dependent.size() > 0) {
+         tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
+         }
+         }*/
     }
 }
