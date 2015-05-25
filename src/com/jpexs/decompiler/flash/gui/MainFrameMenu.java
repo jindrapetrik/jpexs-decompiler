@@ -844,32 +844,32 @@ public abstract class MainFrameMenu implements MenuBuilder {
         });
 
         setMenuChecked("/settings/internalViewer", Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.internalFlashViewer.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/internalViewer", newValue || externalFlashPlayerUnavailable);
         });
 
         setMenuChecked("/settings/parallelSpeedUp", Configuration.parallelSpeedUp.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.parallelSpeedUp.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/parallelSpeedUp", newValue);
         });
 
         setMenuChecked("/settings/disableDecompilation", !Configuration.decompile.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.decompile.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/disableDecompilation", !newValue);
         });
 
         setMenuChecked("/settings/cacheOnDisk", Configuration.cacheOnDisk.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.cacheOnDisk.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/cacheOnDisk", newValue);
         });
 
         setMenuChecked("/settings/gotoMainClassOnStartup", Configuration.gotoMainClassOnStartup.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.gotoMainClassOnStartup.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/gotoMainClassOnStartup", newValue);
         });
 
         setMenuChecked("/settings/autoRenameIdentifiers", Configuration.autoRenameIdentifiers.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.autoRenameIdentifiers.addListener((Boolean newValue) -> {
             setMenuChecked("/settings/autoRenameIdentifiers", newValue);
         });
 
