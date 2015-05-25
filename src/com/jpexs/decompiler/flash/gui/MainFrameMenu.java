@@ -476,7 +476,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return true;
         }
 
-        return false;
+        Main.reloadApp();
+        return true;
     }
 
     protected void advancedSettingsActionPerformed(ActionEvent evt) {
@@ -636,8 +637,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/import/importScript", swfLoaded && !isWorking);
         setMenuEnabled("/file/import/importSymbolClass", swfLoaded && !isWorking);
         setMenuEnabled("/file/import/importXml", swfLoaded && !isWorking);
-
-        setMenuEnabled("/file/reload", swfLoaded);
 
         setMenuEnabled("/tools/deobfuscation", swfLoaded);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfLoaded && !isWorking);

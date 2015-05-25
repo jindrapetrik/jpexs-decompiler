@@ -113,12 +113,6 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     }
 
     @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
-        panel.setVisible(b);
-    }
-
-    @Override
     public MainPanel getPanel() {
         return panel;
     }
