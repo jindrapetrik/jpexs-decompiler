@@ -550,31 +550,37 @@ public class Main {
     public static void reloadApp() {
         if (debugDialog != null) {
             debugDialog.setVisible(false);
+            debugDialog.dispose();
             debugDialog = null;
         }
         if (loadingDialog != null) {
             synchronized (Main.class) {
                 if (loadingDialog != null) {
                     loadingDialog.setVisible(false);
+                    loadingDialog.dispose();
+                    loadingDialog = null;
                 }
-                loadingDialog = null;
             }
         }
         if (proxyFrame != null) {
             proxyFrame.setVisible(false);
+            proxyFrame.dispose();
             proxyFrame = null;
         }
         if (loadFromMemoryFrame != null) {
             loadFromMemoryFrame.setVisible(false);
+            loadFromMemoryFrame.dispose();
             loadFromMemoryFrame = null;
         }
         if (loadFromCacheFrame != null) {
             loadFromCacheFrame.setVisible(false);
+            loadFromCacheFrame.dispose();
             loadFromCacheFrame = null;
         }
         if (mainFrame != null) {
             mainFrame.setVisible(false);
             mainFrame.getPanel().closeAll();
+            mainFrame.dispose();
             mainFrame = null;
         }
         FontTag.reload();
@@ -855,7 +861,10 @@ public class Main {
             exit();
         }
         if (Configuration.useRibbonInterface.get()) {
+            Stopwatch sw = Stopwatch.startNew();
             View.setLookAndFeel();
+            sw.stop();
+            System.out.println("sw: " + sw.getElapsedMilliseconds());
         } else {
             try {
                 UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, null);
