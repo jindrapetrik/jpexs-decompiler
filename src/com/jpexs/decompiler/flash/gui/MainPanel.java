@@ -141,6 +141,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -3207,5 +3208,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return tag.hashCode();
             }
         };
+    }
+
+    private void disposeInner(Container container) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof Container) {
+                Container c2 = (Container) c;
+                disposeInner(c2);
+            }
+        }
+
+        container.removeAll();
+        container.setLayout(null);
+        Helper.emptyObject(container);
+    }
+
+    public void dispose() {
+        disposeInner(this);
     }
 }

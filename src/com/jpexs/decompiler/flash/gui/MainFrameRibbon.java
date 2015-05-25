@@ -173,6 +173,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
     public void dispose() {
         removeAll();
         mainMenu.dispose();
+        panel.dispose();
         super.dispose();
     }
 }

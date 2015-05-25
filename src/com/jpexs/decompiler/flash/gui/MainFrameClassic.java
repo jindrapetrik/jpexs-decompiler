@@ -126,6 +126,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     public void dispose() {
         removeAll();
         mainMenu.dispose();
+        panel.dispose();
         super.dispose();
     }
 }
