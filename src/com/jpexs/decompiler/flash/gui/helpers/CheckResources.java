@@ -140,7 +140,6 @@ public class CheckResources {
                     uc = latestUrl.openConnection();
                     latestProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
-                    Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
                 Properties prevProp = new Properties();
@@ -148,7 +147,6 @@ public class CheckResources {
                     uc = prevUrl.openConnection();
                     prevProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
-                    Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
                 for (Object key : latestProp.keySet()) {
