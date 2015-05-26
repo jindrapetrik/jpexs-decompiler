@@ -49,9 +49,14 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,7 +78,7 @@ public class CheckResources {
                     stream.println("Resource file not found: " + resourcePath);
                     return;
                 }
-                Properties prop = new Properties();
+                Properties prop = new LinkedProperties();
                 prop.load(is);
                 properties.put(clazz, prop);
             }
@@ -86,7 +91,7 @@ public class CheckResources {
                 boolean firstMissing = true;
                 for (Class clazz : classes) {
                     Properties prop = properties.get(clazz);
-                    Properties prop2 = new Properties();
+                    Properties prop2 = new LinkedProperties();
                     String resourcePath = getResourcePath(clazz, lang);
                     InputStream is = CheckResources.class.getResourceAsStream(resourcePath);
                     if (is == null) {
@@ -99,6 +104,7 @@ public class CheckResources {
                         Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, "Cannot load resource:" + clazz.getSimpleName() + " " + lang, ex);
                     }
 
+                    boolean firstMissing2 = true;
                     for (Object key : prop.keySet()) {
                         String keyStr = (String) key;
                         String value = prop2.getProperty(keyStr);
@@ -109,7 +115,12 @@ public class CheckResources {
                                 firstMissing = false;
                             }
 
-                            stream.println(clazz.getSimpleName() + ", property: " + key + "=" + prop.getProperty(keyStr));
+                            if (firstMissing2) {
+                                stream.println(clazz.getSimpleName());
+                                firstMissing2 = false;
+                            }
+
+                            stream.println(key + " = " + prop.getProperty(keyStr));
                         }
                     }
                 }
@@ -135,25 +146,31 @@ public class CheckResources {
                 URL latestUrl = new URL(rootUrl + (revision2 == null ? "master" : revision2) + resPath);
                 URL prevUrl = new URL(rootUrl + revision + resPath);
 
-                Properties latestProp = new Properties();
+                Properties latestProp = new LinkedProperties();
                 try {
                     uc = latestUrl.openConnection();
                     latestProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
                 }
 
-                Properties prevProp = new Properties();
+                Properties prevProp = new LinkedProperties();
                 try {
                     uc = prevUrl.openConnection();
                     prevProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
                 }
 
+                boolean firstMissing2 = true;
                 for (Object key : latestProp.keySet()) {
                     String keyStr = (String) key;
                     String value = prevProp.getProperty(keyStr);
                     if (value == null) {
-                        stream.println(clazz.getSimpleName() + ", property: " + key + "=" + latestProp.getProperty(keyStr));
+                        if (firstMissing2) {
+                            stream.println(clazz.getSimpleName());
+                            firstMissing2 = false;
+                        }
+
+                        stream.println(key + " = " + latestProp.getProperty(keyStr));
                     }
                 }
 
@@ -161,7 +178,12 @@ public class CheckResources {
                     String keyStr = (String) key;
                     String value = latestProp.getProperty(keyStr);
                     if (value == null) {
-                        stream.println(clazz.getSimpleName() + ", property: " + key + " was removed");
+                        if (firstMissing2) {
+                            stream.println(clazz.getSimpleName());
+                            firstMissing2 = false;
+                        }
+
+                        stream.println(key + " was removed. Last value: " + prevProp.getProperty(keyStr));
                     }
                 }
             } catch (MalformedURLException ex) {
@@ -213,5 +235,33 @@ public class CheckResources {
             name += ".properties";
         }
         return name;
+    }
+
+    private static class LinkedProperties extends Properties {
+
+        private final HashSet<Object> keys = new LinkedHashSet<>();
+
+        public LinkedProperties() {
+        }
+
+        public Iterable<Object> orderedKeys() {
+            return Collections.list(keys());
+        }
+
+        @Override
+        public Enumeration<Object> keys() {
+            return Collections.enumeration(keys);
+        }
+
+        @Override
+        public Set<Object> keySet() {
+            return keys;
+        }
+
+        @Override
+        public Object put(Object key, Object value) {
+            keys.add(key);
+            return super.put(key, value);
+        }
     }
 }
