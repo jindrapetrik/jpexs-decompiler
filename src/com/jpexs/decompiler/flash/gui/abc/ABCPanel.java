@@ -228,6 +228,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void setAbc(ABC abc) {
         this.abc = abc;
+        setDecompiledEditMode(false);
         navigator.setAbc(abc);
         updateConstList();
     }
@@ -629,7 +630,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void reload() {
         lastDecompiled = "";
-        getSwf().clearScriptCache();
+        SWF swf = getSwf();
+        if (swf != null) {
+            swf.clearScriptCache();
+        }
+
         decompiledTextArea.reloadClass();
         detailPanel.methodTraitPanel.methodCodePanel.clear();
     }

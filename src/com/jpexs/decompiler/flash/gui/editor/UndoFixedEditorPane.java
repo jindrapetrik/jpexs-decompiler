@@ -102,6 +102,10 @@ public class UndoFixedEditorPane extends JEditorPane {
 
     private void setText(String t, String contentType) {
         synchronized (setTextLock) {
+            if (t == null) {
+                t = "";
+            }
+
             if (!t.equals(getText())) {
                 boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
                 if (plain) {
