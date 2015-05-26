@@ -765,12 +765,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             String as = decompiledTextArea.getText();
             abc.replaceScriptPack(pack, as);
             lastDecompiled = as;
+            setDecompiledEditMode(false);
             mainPanel.updateClassesList();
 
             if (oldSp != null) {
                 hilightScript(getSwf(), oldSp);
             }
-            setDecompiledEditMode(false);
+
             reload();
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
         } catch (AVM2ParseException ex) {
