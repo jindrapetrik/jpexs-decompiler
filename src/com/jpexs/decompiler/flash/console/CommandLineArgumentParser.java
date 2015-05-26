@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
@@ -398,8 +399,11 @@ public class CommandLineArgumentParser {
                     }
                     Configuration.debugMode.set(true);
                     break;
-                case "-debugtool":
+                case "--debugtool":
                     parseDebugTool(args);
+                    break;
+                case "--compareresources":
+                    parseCompareResources(args);
                     break;
                 default:
                     break OUTER;
@@ -834,6 +838,16 @@ public class CommandLineArgumentParser {
                 }
                 break;
         }
+    }
+
+    private static void parseCompareResources(Stack<String> args) {
+        String revision = args.pop().toLowerCase();
+        String revision2 = null;
+        if (!args.isEmpty()) {
+            revision2 = args.pop();
+        }
+
+        CheckResources.compareResources(System.out, revision, revision2);
     }
 
     private static void parseProxy(Stack<String> args) {

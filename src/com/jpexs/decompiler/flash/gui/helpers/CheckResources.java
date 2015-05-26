@@ -40,10 +40,15 @@ import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.abc.NewTraitDialog;
 import com.jpexs.decompiler.flash.gui.abc.UsageFrame;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -57,38 +62,7 @@ import java.util.logging.Logger;
 public class CheckResources {
 
     public static void checkResources(PrintStream stream) {
-        Class[] classes = new Class[]{
-            AboutDialog.class,
-            AdvancedSettingsDialog.class,
-            DebugLogDialog.class,
-            ErrorLogFrame.class,
-            ExportDialog.class,
-            FontEmbedDialog.class,
-            FontPreviewDialog.class,
-            GraphDialog.class,
-            // GraphTreeFrame.class, // empty
-            LoadFromCacheFrame.class,
-            LoadFromMemoryFrame.class,
-            LoadingDialog.class,
-            MainFrame.class,
-            ModeFrame.class,
-            NewVersionDialog.class,
-            RenameDialog.class,
-            ReplaceCharacterDialog.class,
-            ReplaceTraceDialog.class,
-            SearchDialog.class,
-            SearchResultsDialog.class,
-            SelectLanguageDialog.class,
-            // ABC
-            DeobfuscationDialog.class,
-            NewTraitDialog.class,
-            UsageFrame.class,
-            // Proxy
-            ProxyFrame.class,};
-        checkResources(classes, stream);
-    }
-
-    private static void checkResources(Class[] classes, PrintStream stream) {
+        Class[] classes = getClasses();
         try {
             String[] languages = SelectLanguageDialog.getAvailableLanguages();
             Map<Class, Properties> properties = new HashMap<>();
@@ -149,6 +123,85 @@ public class CheckResources {
         } catch (IOException ex) {
             Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public static void compareResources(PrintStream stream, String revision, String revision2) {
+        String rootUrl = "https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/";
+        Class[] classes = getClasses();
+        for (Class clazz : classes) {
+            try {
+                String resPath = "/src" + getResourcePath(clazz, null);
+                URLConnection uc;
+                URL latestUrl = new URL(rootUrl + (revision2 == null ? "master" : revision2) + resPath);
+                URL prevUrl = new URL(rootUrl + revision + resPath);
+
+                Properties latestProp = new Properties();
+                try {
+                    uc = latestUrl.openConnection();
+                    latestProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
+                } catch (IOException ex) {
+                    Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                Properties prevProp = new Properties();
+                try {
+                    uc = prevUrl.openConnection();
+                    prevProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
+                } catch (IOException ex) {
+                    Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                for (Object key : latestProp.keySet()) {
+                    String keyStr = (String) key;
+                    String value = prevProp.getProperty(keyStr);
+                    if (value == null) {
+                        stream.println(clazz.getSimpleName() + ", property: " + key + "=" + latestProp.getProperty(keyStr));
+                    }
+                }
+
+                for (Object key : prevProp.keySet()) {
+                    String keyStr = (String) key;
+                    String value = latestProp.getProperty(keyStr);
+                    if (value == null) {
+                        stream.println(clazz.getSimpleName() + ", property: " + key + " was removed");
+                    }
+                }
+            } catch (MalformedURLException ex) {
+                throw new Error(ex);
+            }
+        }
+    }
+
+    private static Class[] getClasses() {
+        Class[] classes = new Class[]{
+            AboutDialog.class,
+            AdvancedSettingsDialog.class,
+            DebugLogDialog.class,
+            ErrorLogFrame.class,
+            ExportDialog.class,
+            FontEmbedDialog.class,
+            FontPreviewDialog.class,
+            GraphDialog.class,
+            // GraphTreeFrame.class, // empty
+            LoadFromCacheFrame.class,
+            LoadFromMemoryFrame.class,
+            LoadingDialog.class,
+            MainFrame.class,
+            ModeFrame.class,
+            NewVersionDialog.class,
+            RenameDialog.class,
+            ReplaceCharacterDialog.class,
+            ReplaceTraceDialog.class,
+            SearchDialog.class,
+            SearchResultsDialog.class,
+            SelectLanguageDialog.class,
+            // ABC
+            DeobfuscationDialog.class,
+            NewTraitDialog.class,
+            UsageFrame.class,
+            // Proxy
+            ProxyFrame.class,};
+        return classes;
     }
 
     private static String getResourcePath(Class cls, String lang) {
