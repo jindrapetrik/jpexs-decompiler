@@ -58,3 +58,5 @@ hs_err_pid*.log
 /version.properties
 /tools.properties
 /nbproject/private/
+/libsrc/cmykjpeg/build/
+/libsrc/cmykjpeg/nbproject/private/

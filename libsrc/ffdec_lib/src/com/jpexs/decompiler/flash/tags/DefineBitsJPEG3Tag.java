@@ -153,7 +153,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public ImageFormat getImageFormat() {
         ImageFormat fmt = ImageTag.getImageFormat(imageData);
-        if (fmt == ImageFormat.JPEG) {
+        if (fmt == ImageFormat.JPEG && bitmapAlphaData.getLength() > 0) {
             fmt = ImageFormat.PNG; //transparency
         }
         return fmt;
@@ -161,8 +161,17 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        int errorLength = hasErrorHeader(imageData) ? 4 : 0;
-        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
+
+        if (bitmapAlphaData.getLength() == 0) { //No alpha, then its JPEG
+            int errorLength = hasErrorHeader(imageData) ? 4 : 0;
+            return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
+        }
+
+        //Make PNG
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageHelper.write(getImage().getBufferedImage(), ImageFormat.PNG, baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+
     }
 
     @Override
@@ -171,7 +180,10 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            BufferedImage image = ImageHelper.read(getImageData());
+            int errorLength = hasErrorHeader(imageData) ? 4 : 0;
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
+
+            BufferedImage image = ImageHelper.read(bis);
             if (image == null) {
                 Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
                 return null;

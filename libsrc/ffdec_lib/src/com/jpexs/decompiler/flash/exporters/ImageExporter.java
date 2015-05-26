@@ -69,6 +69,7 @@ public class ImageExporter {
                 final ImageTag imageTag = (ImageTag) t;
 
                 ImageFormat fileFormat = imageTag.getImageFormat();
+                ImageFormat originalFormat = fileFormat;
                 if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = ImageFormat.PNG;
                 }
@@ -86,7 +87,9 @@ public class ImageExporter {
                     final ImageFormat ffileFormat = fileFormat;
 
                     new RetryTask(() -> {
-                        if (ffileFormat == ImageFormat.BMP) {
+                        if (ffileFormat == originalFormat) {
+
+                        } else if (ffileFormat == ImageFormat.BMP) {
                             BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
                         } else {
                             ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat, file);

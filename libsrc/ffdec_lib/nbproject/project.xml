@@ -236,7 +236,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../src</classpath>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../lib/cmykjpeg.jar;../../src</classpath>
                 <built-to>build</built-to>
                 <built-to>reports</built-to>
                 <built-to>dist</built-to>

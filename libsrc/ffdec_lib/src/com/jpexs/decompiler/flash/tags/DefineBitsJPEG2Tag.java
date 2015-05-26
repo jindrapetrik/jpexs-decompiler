@@ -58,7 +58,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     public DefineBitsJPEG2Tag(SWF swf) {
         super(swf, ID, NAME, null);
         characterID = swf.getNextCharacterId();
-        imageData = ByteArrayRange.EMPTY;
+        imageData = new ByteArrayRange(createEmptyImage());
         forceWriteAsLong = true;
     }
 
@@ -66,6 +66,13 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         super(swf, ID, NAME, data);
         this.characterID = characterID;
         this.imageData = new ByteArrayRange(imageData);
+    }
+
+    private byte[] createEmptyImage() {
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
+        return bitmapDataOS.toByteArray();
     }
 
     public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {

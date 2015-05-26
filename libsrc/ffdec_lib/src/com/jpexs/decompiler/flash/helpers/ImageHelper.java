@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +26,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import org.monte.media.jpeg.CMYKJPEGImageReader;
+import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
 
 /**
  *
@@ -41,9 +47,18 @@ public class ImageHelper {
     }
 
     public static BufferedImage read(InputStream input) throws IOException {
-        BufferedImage in = ImageIO.read(input);
-        if (in == null) {
-            return null;
+        BufferedImage in;
+        byte data[] = Helper.readStream(input);
+        try (ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(data))) {
+            CMYKJPEGImageReader r = new CMYKJPEGImageReader(new CMYKJPEGImageReaderSpi());
+            r.setInput(iis);
+            in = r.read(0);
+        } catch (IOException ex) {
+            try {
+                return ImageIO.read(ImageIO.createImageInputStream(new ByteArrayInputStream(data)));
+            } catch (IOException ex1) {
+                in = null;
+            }
         }
 
         int type = in.getType();

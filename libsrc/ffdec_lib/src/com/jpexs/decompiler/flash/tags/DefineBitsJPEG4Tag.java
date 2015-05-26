@@ -158,7 +158,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     @Override
     public ImageFormat getImageFormat() {
         ImageFormat fmt = ImageTag.getImageFormat(imageData);
-        if (fmt == ImageFormat.JPEG) {
+        if (fmt == ImageFormat.JPEG && bitmapAlphaData.getLength() > 0) {
             fmt = ImageFormat.PNG; //transparency
         }
         return fmt;
@@ -166,7 +166,15 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
+
+        if (bitmapAlphaData.getLength() == 0) { //No alpha, then its JPEG
+            return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
+        }
+        //Make PNG
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageHelper.write(getImage().getBufferedImage(), ImageFormat.PNG, baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+
     }
 
     @Override
@@ -175,7 +183,8 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            BufferedImage image = ImageHelper.read(getImageData());
+
+            BufferedImage image = ImageHelper.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
             if (image == null) {
                 Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
                 return null;
