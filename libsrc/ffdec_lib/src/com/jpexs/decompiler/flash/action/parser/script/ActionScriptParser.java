@@ -255,9 +255,6 @@ public class ActionScriptParser {
             s = lex();
         }
         lexer.pushback(s);
-        if (s.type.getPrecedence() == GraphTargetItem.PRECEDENCE_ASSIGMENT) {
-            ret = expression1(ret, s.type.getPrecedence(), inFunction, inMethod, inMethod, variables);
-        }
 
         if (debugMode) {
             System.out.println("/member");
