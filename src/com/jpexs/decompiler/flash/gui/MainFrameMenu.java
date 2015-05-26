@@ -51,6 +51,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -407,7 +408,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void checkResources() {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PrintStream stream = new PrintStream(os);
-        CheckResources.checkResources(stream);
+        CheckResources.checkResources(stream, null);
         final String str = new String(os.toByteArray(), Utf8Helper.charset);
         JDialog dialog = new JDialog() {
 
@@ -416,6 +417,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 setSize(new Dimension(800, 600));
                 Container cnt = getContentPane();
                 cnt.setLayout(new BorderLayout());
+                String[] languages = SelectLanguageDialog.getAvailableLanguages().clone();
+                languages[0] = "all";
+                JComboBox<String> languagesComboBox = new JComboBox<>(languages);
+                this.add(languagesComboBox, BorderLayout.NORTH);
                 ScrollPane scrollPane = new ScrollPane();
                 JEditorPane editor = new JEditorPane();
                 editor.setEditable(false);
@@ -424,6 +429,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 this.add(scrollPane, BorderLayout.CENTER);
                 this.setModal(true);
                 View.centerScreen(this);
+                languagesComboBox.addActionListener((ActionEvent e) -> {
+                    String lang = (String) languagesComboBox.getSelectedItem();
+                    if (lang.equals("all")) {
+                        lang = null;
+                    }
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    PrintStream stream = new PrintStream(os);
+                    CheckResources.checkResources(stream, lang);
+                    String str = new String(os.toByteArray(), Utf8Helper.charset);
+                    editor.setText(str);
+                });
                 super.setVisible(bln);
             }
         };

@@ -66,7 +66,7 @@ import java.util.logging.Logger;
  */
 public class CheckResources {
 
-    public static void checkResources(PrintStream stream) {
+    public static void checkResources(PrintStream stream, String selectedLanguage) {
         Class[] classes = getClasses();
         try {
             String[] languages = SelectLanguageDialog.getAvailableLanguages();
@@ -84,7 +84,7 @@ public class CheckResources {
             }
 
             for (String lang : languages) {
-                if (lang.equals("en")) {
+                if (lang.equals("en") || (selectedLanguage != null && !lang.equals(selectedLanguage))) {
                     continue;
                 }
 
