@@ -228,6 +228,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void setAbc(ABC abc) {
         this.abc = abc;
+        setDecompiledEditMode(false);
         navigator.setAbc(abc);
         updateConstList();
     }
@@ -629,7 +630,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void reload() {
         lastDecompiled = "";
-        getSwf().clearScriptCache();
+        SWF swf = getSwf();
+        if (swf != null) {
+            swf.clearScriptCache();
+        }
+
         decompiledTextArea.reloadClass();
         detailPanel.methodTraitPanel.methodCodePanel.clear();
     }
@@ -760,12 +765,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             String as = decompiledTextArea.getText();
             abc.replaceScriptPack(pack, as);
             lastDecompiled = as;
+            setDecompiledEditMode(false);
             mainPanel.updateClassesList();
 
             if (oldSp != null) {
                 hilightScript(getSwf(), oldSp);
             }
-            setDecompiledEditMode(false);
+
             reload();
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
         } catch (AVM2ParseException ex) {

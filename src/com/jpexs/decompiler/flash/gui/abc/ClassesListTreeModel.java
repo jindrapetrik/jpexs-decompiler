@@ -46,15 +46,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     }
 
     public ClassesListTreeModel(SWF swf) {
-        this(swf, null);
-    }
-
-    public ClassesListTreeModel(SWF swf, String filter) {
         super(null, null);
         root = new AS3Package(null, swf);
         this.swf = swf;
         this.list = swf.getAS3Packs();
-        setFilter(filter);
+        setFilter(null);
     }
 
     @Override
@@ -190,5 +186,19 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     @Override
     public boolean isModified() {
         return root.isModified();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ClassesListTreeModel)) {
+            return false;
+        }
+
+        return swf.equals(((ClassesListTreeModel) obj).swf);
+    }
+
+    @Override
+    public int hashCode() {
+        return ClassesListTreeModel.class.hashCode() ^ swf.hashCode();
     }
 }
