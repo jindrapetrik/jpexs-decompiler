@@ -10,7 +10,7 @@
             </classpath>
         </java>
     </target>
-    <target depends="compile-tests" name="run-selected-file-in-test">
+    <target depends="compile,compile-tests" name="run-selected-file-in-test">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath>
@@ -20,15 +20,15 @@
             </classpath>
         </java>
     </target>
-    <target depends="compile-tests" name="test-selected-file">
-        <fail unless="test.class">Must set property 'test.class'</fail>              
+    <target depends="compile,compile-tests" name="test-selected-file">
+        <fail unless="test.class">Must set property 'test.class'</fail>
         <loadresource property="test.file">
             <string value="${test.class}"/>
             <filterchain>
                 <replaceregex flags="g" pattern="\." replace="/"/>
                 <replaceregex pattern="$" replace=".class"/>
             </filterchain>
-        </loadresource>        
+        </loadresource>
         <testng haltOnFailure="true" outputDir="${test.result.dir}" verbose="2" workingDir="${basedir}">
             <classpath>
                 <pathelement path="${compile.test.dir}"/>
@@ -41,9 +41,9 @@
             <classfileset dir="${compile.test.dir}" includes="${test.file}"/>
         </testng>
     </target>
-    
-    <target depends="compile-tests" name="test-selected-method">
-        <fail unless="test.class">Must set property 'test.class'</fail>      
+
+    <target depends="compile,compile-tests" name="test-selected-method">
+        <fail unless="test.class">Must set property 'test.class'</fail>
         <loadresource property="test.file">
             <string value="${test.class}"/>
             <filterchain>
@@ -63,8 +63,8 @@
             <classfileset dir="${compile.test.dir}" includes="${test.file}" />
         </testng>
     </target>
-    
-    <target depends="compile-tests" name="test-debug-selected-file">
+
+    <target depends="compile,compile-tests" name="test-debug-selected-file">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
         <delete dir="${test.result.dir}"/>
         <mkdir dir="${test.result.dir}"/>
@@ -75,7 +75,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-        </nbjpdastart>        
+        </nbjpdastart>
         <loadresource property="debug.file">
             <string value="${debug.class}"/>
             <filterchain>
@@ -96,8 +96,8 @@
             <classfileset dir="${compile.test.dir}" includes="${debug.file}"/>
         </testng>
     </target>
-    
-    <target depends="compile-tests" name="test-debug-selected-method">
+
+    <target depends="compile,compile-tests" name="test-debug-selected-method">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
         <delete dir="${test.result.dir}"/>
         <mkdir dir="${test.result.dir}"/>
@@ -108,7 +108,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-        </nbjpdastart>        
+        </nbjpdastart>
         <loadresource property="debug.file">
             <string value="${debug.class}"/>
             <filterchain>
@@ -129,8 +129,8 @@
             <classfileset dir="${compile.test.dir}" includes="${debug.file}"/>
         </testng>
     </target>
-    
-    <target depends="compile-tests" name="debug-selected-file-in-test">
+
+    <target depends="compile,compile-tests" name="debug-selected-file-in-test">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
         <delete dir="${test.result.dir}"/>
         <mkdir dir="${test.result.dir}"/>
@@ -152,7 +152,7 @@
             </classpath>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-        </java>        
+        </java>
     </target>
     <target depends="compile" name="debug-selected-file-in-src">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
@@ -184,6 +184,6 @@
             </classpath>
             <jvmarg line="${agent.jvmargs}"/>
         </java>
-    </target>  
-    
+    </target>
+
 </project>

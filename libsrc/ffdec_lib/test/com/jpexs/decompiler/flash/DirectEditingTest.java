@@ -105,7 +105,7 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             asm.setActions(par.actionsFromString(as));
                         } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                            fail("Unable to parse: " + as + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
@@ -114,7 +114,7 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             asm.setActions(par.actionsFromString(as2));
                         } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
