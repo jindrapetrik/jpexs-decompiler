@@ -190,20 +190,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         this.mainPanel = mainPanel;
         this.flashPanel = flashPanel;
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (tempFile != null) {
-                    try {
-                        tempFile.delete();
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-
-        });
-
         viewerCards = new JPanel();
         viewerCards.setLayout(new CardLayout());
 
@@ -605,6 +591,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             if (tempFile != null) {
                 tempFile.delete();
             }
+
             tempFile = File.createTempFile("ffdec_view_", ".swf");
             tempFile.deleteOnExit();
 

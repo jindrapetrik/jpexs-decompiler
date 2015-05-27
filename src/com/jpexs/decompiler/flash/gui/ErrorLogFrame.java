@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -317,5 +318,12 @@ public class ErrorLogFrame extends AppFrame {
             ex.printStackTrace(new PrintWriter(sw));
         }
         log(level, msg, sw.toString());
+    }
+
+    @Override
+    public void dispose() {
+        removeAll();
+        Helper.emptyObject(this);
+        super.dispose();
     }
 }

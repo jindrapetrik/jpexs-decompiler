@@ -18,11 +18,13 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -109,5 +111,16 @@ public class LoadingDialog extends AppDialog {
         Dimension siz = getSize();
         setSize(Math.max(300, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), siz.height);
         View.centerScreen(this);
+    }
+
+    @Override
+    public void dispose() {
+        removeAll();
+        for (WindowListener windowListener : getWindowListeners()) {
+            removeWindowListener(windowListener);
+        }
+
+        Helper.emptyObject(this);
+        super.dispose();
     }
 }

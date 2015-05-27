@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -173,7 +174,9 @@ public final class MainFrameRibbon extends AppRibbonFrame {
     public void dispose() {
         removeAll();
         mainMenu.dispose();
+        Helper.emptyObject(mainMenu);
         panel.dispose();
+        Helper.emptyObject(this);
         super.dispose();
     }
 }

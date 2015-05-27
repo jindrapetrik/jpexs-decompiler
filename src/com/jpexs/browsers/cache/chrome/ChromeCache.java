@@ -108,8 +108,10 @@ public class ChromeCache implements CacheImplementation {
         File systemTempDir = new File(System.getProperty("java.io.tmpdir"));
         File originalIndexFile = new File(cacheDir + File.separator + "index");
         tempDir = new File(systemTempDir, "cacheView" + System.identityHashCode(this));
+        tempDir.deleteOnExit();
         tempDir.mkdir();
         indexFile = new File(tempDir, "index");
+        indexFile.deleteOnExit();
         try {
             Files.copy(originalIndexFile.toPath(), indexFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
@@ -120,6 +122,7 @@ public class ChromeCache implements CacheImplementation {
         dataFiles = new ArrayList<>();
         for (int i = 0; (originalDataFile = new File(cacheDir, "data_" + i)).exists(); i++) {
             File dataFile = new File(tempDir, "data_" + i);
+            dataFile.deleteOnExit();
             dataFiles.add(dataFile);
             try {
                 Files.copy(originalDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

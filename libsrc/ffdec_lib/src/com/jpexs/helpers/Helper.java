@@ -42,6 +42,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -782,8 +783,17 @@ public class Helper {
     public static void emptyObject(Object obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field f : fields) {
+            if ((f.getModifiers() & Modifier.STATIC) == Modifier.STATIC
+                    || f.getType().isPrimitive()) {
+                continue;
+            }
             try {
                 f.setAccessible(true);
+
+                Field modifiersField = Field.class.getDeclaredField("modifiers");
+                modifiersField.setAccessible(true);
+                modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+
                 Object v = f.get(obj);
                 if (v != null) {
                     try {
@@ -806,7 +816,8 @@ public class Helper {
 
                     f.set(obj, null);
                 }
-            } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException ex) {
+                throw new Error(ex);
             }
         }
     }

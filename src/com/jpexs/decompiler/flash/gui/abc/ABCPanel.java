@@ -61,12 +61,10 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
-import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
@@ -114,23 +112,21 @@ import jsyntaxpane.TokenType;
  *
  * @author JPEXS
  */
-public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, Freed, TagEditorPanel {
+public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, TagEditorPanel {
 
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
 
-    public TraitsList navigator;
+    public final TraitsList navigator;
 
     public ABC abc;
 
-    public JComboBox<ABCContainerTag> abcComboBox;
+    public final DecompiledEditorPane decompiledTextArea;
 
-    public DecompiledEditorPane decompiledTextArea;
+    public final JScrollPane decompiledScrollPane;
 
-    public JScrollPane decompiledScrollPane;
+    private final JPersistentSplitPane splitPane;
 
-    public JPersistentSplitPane splitPane;
-
-    private JTable constantTable;
+    private final JTable constantTable;
 
     public JComboBox<String> constantTypeList;
 
@@ -138,25 +134,25 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
 
-    public DetailPanel detailPanel;
+    public final DetailPanel detailPanel;
 
-    public JPanel navPanel;
+    private final JPanel navPanel;
 
-    public JTabbedPane tabbedPane;
+    public final JTabbedPane tabbedPane;
 
-    public SearchPanel<ABCPanelSearchResult> searchPanel;
+    private final SearchPanel<ABCPanelSearchResult> searchPanel;
 
     private NewTraitDialog newTraitDialog;
 
-    public JLabel scriptNameLabel;
+    public final JLabel scriptNameLabel;
 
-    private JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
-    private JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
 
-    private JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    private final JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
-    private JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+    private final JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     private String lastDecompiled = null;
 
@@ -278,19 +274,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         constantTable.setModel(new DefaultTableModel());
         navigator.clearAbc();
         decompiledTextArea.clearScript();
-    }
-
-    private boolean isFreeing;
-
-    @Override
-    public boolean isFreeing() {
-        return isFreeing;
-    }
-
-    @Override
-    public void free() {
-        isFreeing = true;
-        Helper.emptyObject(this);
     }
 
     public ABCPanel(MainPanel mainPanel) {

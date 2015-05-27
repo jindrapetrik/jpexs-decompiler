@@ -3112,9 +3112,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     @Override
     public void free() {
         isFreeing = true;
-        Helper.emptyObject(mainMenu);
-        Helper.emptyObject(statusPanel);
-        Helper.emptyObject(this);
     }
 
     public void setErrorState(ErrorState errorState) {
@@ -3220,10 +3217,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         container.removeAll();
         container.setLayout(null);
-        Helper.emptyObject(container);
+        if (container instanceof TagEditorPanel) {
+            Helper.emptyObject(container);
+        }
     }
 
     public void dispose() {
+        setDropTarget(null);
         disposeInner(this);
+        Helper.emptyObject(this);
     }
 }
